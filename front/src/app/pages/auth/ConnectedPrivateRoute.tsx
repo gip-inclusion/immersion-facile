@@ -112,6 +112,8 @@ type ConnectPrivateRoute =
   | FrontDashboardRoute
   | Route<typeof routes.formEstablishment>
   | Route<typeof routes.myProfile>
+  | Route<typeof routes.myProfileAgencies>
+  | Route<typeof routes.myProfileEstablishments>
   | Route<typeof routes.myProfileEstablishmentRegistration>
   | Route<typeof routes.addAgency>
   | Route<typeof routes.manageConventionConnectedUser>;
