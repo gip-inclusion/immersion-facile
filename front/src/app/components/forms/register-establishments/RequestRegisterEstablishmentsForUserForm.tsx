@@ -6,7 +6,6 @@ import {
   type ChangeEvent,
   type ElementRef,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -21,11 +20,12 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
-import { type routes, useRoute } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { match } from "ts-pattern";
 import type { Route } from "type-route";
 
 const establishmentRegisterEstablishmentModal = createFormModal({
@@ -50,18 +50,6 @@ export const RequestRegisterEstablishmentsForUserForm = ({
   const establishmentPublicOptions = useAppSelector(
     establishmentSelectors.establishmentPublicOptions,
   );
-  const establishmentPublicOptionsToDisplay = useMemo(
-    () =>
-      establishmentPublicOptions.filter(
-        (establishmentPublicOption) =>
-          !currentUser.establishments?.some(
-            (establishment) =>
-              establishment.siret === establishmentPublicOption.siret,
-          ),
-      ),
-    [establishmentPublicOptions, currentUser.establishments],
-  );
-
   const establishmentSearchBySiretOrNameInput =
     useRef<ElementRef<"input">>(null);
   const debouncedInputValue = useDebounce(inputValue, 500);
@@ -84,6 +72,17 @@ export const RequestRegisterEstablishmentsForUserForm = ({
     if (route.params.siret) {
       setInputValue(route.params.siret);
     }
+  }
+
+  const getStatusOnEstablishment = (siret: SiretDto) => {
+    const establishment = currentUser.establishments?.find(
+      (establishment) => establishment.siret === siret,
+    );
+    return establishment?.status;
+  };
+
+  if (inputValue === undefined && currentUser.proConnect) {
+    setInputValue(currentUser.proConnect.siret);
   }
 
   useEffect(() => {
@@ -135,44 +134,65 @@ export const RequestRegisterEstablishmentsForUserForm = ({
         <div className={fr.cx("fr-mt-4w")}>
           <strong>Résultats pour votre recherche "{inputValue}"</strong>
           <p className={fr.cx("fr-hint-text")}>
-            {establishmentPublicOptionsToDisplay.length}{" "}
-            {establishmentPublicOptionsToDisplay.length <= 1
+            {establishmentPublicOptions.length}{" "}
+            {establishmentPublicOptions.length <= 1
               ? "entreprise trouvée"
               : "entreprises trouvées"}
           </p>
           <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-            {establishmentPublicOptionsToDisplay.map(
-              (establishmentPublicOption) => (
-                <div
-                  className={fr.cx("fr-col-12", "fr-col-md-4")}
-                  key={establishmentPublicOption.siret}
-                >
-                  <Card
-                    title={
-                      establishmentPublicOption.businessNameCustomized
-                        ? establishmentPublicOption.businessNameCustomized
-                        : establishmentPublicOption.businessName
-                    }
-                    desc={establishmentPublicOption.siret}
-                    endDetail={
-                      <Button
-                        onClick={() => {
-                          setSelectedEstablishmentSiret(
-                            establishmentPublicOption.siret,
-                          );
-                          establishmentRegisterEstablishmentModal.open();
-                        }}
-                        size="small"
-                        id={`${domElementIds.myProfileEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
-                      >
-                        Demander le rattachement
-                      </Button>
-                    }
-                  />
-                </div>
-              ),
-            )}
+            {establishmentPublicOptions.map((establishmentPublicOption) => (
+              <div
+                className={fr.cx("fr-col-12", "fr-col-md-4")}
+                key={establishmentPublicOption.siret}
+              >
+                <Card
+                  title={
+                    establishmentPublicOption.businessNameCustomized
+                      ? establishmentPublicOption.businessNameCustomized
+                      : establishmentPublicOption.businessName
+                  }
+                  desc={establishmentPublicOption.siret}
+                  endDetail={
+                    <Button
+                      onClick={() => {
+                        setSelectedEstablishmentSiret(
+                          establishmentPublicOption.siret,
+                        );
+                        establishmentRegisterEstablishmentModal.open();
+                      }}
+                      size="small"
+                      id={`${domElementIds.myProfileEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
+                      disabled={
+                        getStatusOnEstablishment(
+                          establishmentPublicOption.siret,
+                        ) !== undefined
+                      }
+                    >
+                      {match(
+                        getStatusOnEstablishment(
+                          establishmentPublicOption.siret,
+                        ),
+                      )
+                        .with("PENDING", () => "Demande en cours")
+                        .with("ACCEPTED", () => "Rattachement effectué")
+                        .with(undefined, () => "Demander le rattachement")
+                        .exhaustive()}
+                    </Button>
+                  }
+                />
+              </div>
+            ))}
           </div>
+          {establishmentPublicOptions.length === 0 && (
+            <Button
+              linkProps={{
+                href: `${routes.formEstablishment().href}`,
+              }}
+              className={fr.cx("fr-mt-2w")}
+            >
+              Créer une nouvelle entreprise
+            </Button>
+          )}
           {createPortal(
             <establishmentRegisterEstablishmentModal.Component
               title={"Demander le rattachement"}

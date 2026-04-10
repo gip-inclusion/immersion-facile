@@ -26,7 +26,10 @@ export const UserProfile = ({
 }: UserProfileProps) => {
   const route = useRoute();
 
-  const userWithRightsEstablishments = userWithRights.establishments || [];
+  const userWithRightsEstablishments =
+    userWithRights.establishments?.filter(
+      (userEstablishment) => userEstablishment.status === "ACCEPTED",
+    ) || [];
   const userWithRightsAgencies = userWithRights.agencyRights;
   const currentTab = route.name || "myProfileAgencies";
 
@@ -158,7 +161,7 @@ export const UserProfile = ({
           </div>
         ) : (
           <EstablishmentsTablesSection
-            withEstablishmentData={userWithRights.establishments}
+            withEstablishmentData={userWithRightsEstablishments}
           />
         ),
     },
