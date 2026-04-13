@@ -74,43 +74,41 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
     }
 
     const emails: TemplatedEmail[] = await Promise.all(
-      recipients.map(async (recipient) => {
-        return {
-          kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-          recipients: [recipient.email],
-          params: {
-            agencyLogoUrl: agency.logoUrl ?? undefined,
-            agencyReferentName: getFormattedFirstnameAndLastname(
-              convention.agencyReferent ?? {},
-            ),
-            beneficiaryFirstName: getFormattedFirstnameAndLastname({
-              firstname: convention.signatories.beneficiary.firstName,
-            }),
-            beneficiaryLastName: getFormattedFirstnameAndLastname({
-              lastname: convention.signatories.beneficiary.lastName,
-            }),
-            businessName: convention.businessName,
-            conventionId: convention.id,
-            internshipKind: convention.internshipKind,
-            manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              {
-                conventionId: convention.id,
-              },
-            )}`,
-            possibleRoleAction:
-              recipient.role === "counsellor"
-                ? "en vérifier l'éligibilité"
-                : "en considérer la validation",
-            validatorName: convention.validators?.agencyCounsellor
-              ? getFormattedFirstnameAndLastname(
-                  convention.validators.agencyCounsellor,
-                )
-              : "",
-            peAdvisor: recipient.peAdvisor,
-          },
-        };
-      }),
+      recipients.map(async (recipient) => ({
+        kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+        recipients: [recipient.email],
+        params: {
+          agencyLogoUrl: agency.logoUrl ?? undefined,
+          agencyReferentName: getFormattedFirstnameAndLastname(
+            convention.agencyReferent ?? {},
+          ),
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
+          businessName: convention.businessName,
+          conventionId: convention.id,
+          internshipKind: convention.internshipKind,
+          manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            `/${frontRoutes.manageConventionUserConnected}`,
+            {
+              conventionId: convention.id,
+            },
+          )}`,
+          possibleRoleAction:
+            recipient.role === "counsellor"
+              ? "en vérifier l'éligibilité"
+              : "en considérer la validation",
+          validatorName: convention.validators?.agencyCounsellor
+            ? getFormattedFirstnameAndLastname(
+                convention.validators.agencyCounsellor,
+              )
+            : "",
+          peAdvisor: recipient.peAdvisor,
+        },
+      })),
     );
 
     await Promise.all(

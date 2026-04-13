@@ -160,7 +160,13 @@ describe("BrevoNotificationGateway unit", () => {
               email: "establishment-ceo@gmail.com",
             },
           ],
-          tags: ["espacePrescripteur", "adminAgence", "agenceActivee"],
+          tags: [
+            "template:agenceActivee",
+            "theme:espacePrescripteur",
+            "acteur:prescripteur",
+            "role:preValideur",
+            "role:valideur",
+          ],
           subject: "Immersion Facilitée - Votre structure a été activée",
           htmlContent: ignoreTabs(`
       <html lang="fr">

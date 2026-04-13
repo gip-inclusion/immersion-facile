@@ -130,27 +130,26 @@ const getNotificationsForClosedAgencies = async (
   }
 
   const allAdminUsers = await uow.userRepository.getByIds(allAdminUserIds);
-  const usersById = allAdminUsers.reduce<Record<UserId, UserWithAdminRights>>(
-    (acc, user) => {
-      acc[user.id] = user;
-      return acc;
-    },
-    {},
-  );
+  const adminUsersById = allAdminUsers.reduce<
+    Record<UserId, UserWithAdminRights>
+  >((acc, user) => {
+    acc[user.id] = user;
+    return acc;
+  }, {});
 
   return agenciesWithAdmins
     .map(
       ({ agency, adminUserIds }): NotificationContentAndFollowedIds | null => {
-        const recipients = adminUserIds
-          .map((userId) => usersById[userId]?.email)
+        const adminEmails = adminUserIds
+          .map((userId) => adminUsersById[userId]?.email)
           .filter(isTruthy);
 
-        return recipients.length > 0
+        return adminEmails.length > 0
           ? {
               kind: "email",
               templatedContent: {
                 kind: "AGENCY_CLOSED_FOR_INACTIVITY",
-                recipients: recipients,
+                recipients: adminEmails,
                 params: {
                   agencyName: agency.name,
                   numberOfMonthsWithoutConvention:

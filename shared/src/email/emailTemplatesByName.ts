@@ -43,7 +43,12 @@ export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
     AGENCY_ADMIN_NEW_USERS_TO_REVIEW_NOTIFICATION: {
       niceName: "Espace prescripteurs - Demande de rattachement",
-      tags: ["espacePrescripteur_demandeDeRattachement"],
+      tags: [
+        "template:espacePrescripteur_demandeDeRattachement",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:admin",
+      ],
       createEmailVariables: ({
         firstName,
         lastName,
@@ -81,7 +86,10 @@ export const emailTemplatesByName =
     AGENCY_DELEGATION_CONTACT_INFORMATION: {
       niceName: "Délégation - Information de contact DR",
       tags: [
-        "Transmision des informations de contact des DR aux agences sans délégation",
+        "template:Transmision des informations de contact des DR aux agences sans délégation", // pas top comme tag
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:utilisateurDestinataire", // ou bien initiateur ? C'est le champ email du form Tally,
       ],
       createEmailVariables: ({ delegationProviderMail }) => ({
         subject:
@@ -143,7 +151,13 @@ export const emailTemplatesByName =
     },
     AGENCY_FIRST_REMINDER: {
       niceName: "Convention - Premier rappel de validation à l'agence",
-      tags: ["relance vérification manquante"],
+      tags: [
+        "template:relance vérification manquante",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:valideur",
+        "role:preValideur",
+      ],
       createEmailVariables: ({
         manageConventionLink,
         agencyReferentName,
@@ -191,10 +205,12 @@ export const emailTemplatesByName =
       niceName:
         "Suppression compte - Prescripteur - Absence d’admin ou de validateur",
       tags: [
-        "suppressionCompte",
-        "prescripteur",
-        "absenceAdminOuValidateur",
-        "rôle(s)",
+        "template:suppressionCompte_absenceAdminOuValidateur",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:contact",
+        "role:preValideur",
+        "role:lecteur",
       ],
       createEmailVariables: ({ agencyName }) => ({
         subject: "",
@@ -228,7 +244,13 @@ export const emailTemplatesByName =
     },
     AGENCY_LAST_REMINDER: {
       niceName: "Convention - Dernier rappel de validation à l'agence",
-      tags: ["relance vérification manquante"],
+      tags: [
+        "template:relance vérification manquante",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:valideur",
+        "role:preValideur",
+      ],
       createEmailVariables: ({
         manageConventionLink,
         agencyReferentName,
@@ -265,7 +287,13 @@ export const emailTemplatesByName =
     },
     AGENCY_OF_TYPE_OTHER_ADDED: {
       niceName: "Délégation - Agence de type autre ajoutée",
-      tags: ["Agence de type autre ajoutée"],
+      tags: [
+        "template:Agence de type autre ajoutée",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({ agencyLogoUrl, agencyName }) => ({
         subject: "Immersion Facilitée - Votre structure a été activée",
         greetings: "Bonjour,",
@@ -283,7 +311,13 @@ export const emailTemplatesByName =
     },
     AGENCY_WAS_ACTIVATED: {
       niceName: "Espace prescripteur - Admin agence - Agence activée",
-      tags: ["espacePrescripteur", "adminAgence", "agenceActivee"],
+      tags: [
+        "template:agenceActivee",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
@@ -354,7 +388,15 @@ export const emailTemplatesByName =
     },
     AGENCY_WAS_REJECTED: {
       niceName: "Agence - Refusée",
-      tags: ["rejet prescripteur"],
+      tags: [
+        "template:rejet prescripteur",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:admin",
+        "role:preValideur",
+        "role:valideur",
+        "role:lecteur",
+      ],
       createEmailVariables: ({ agencyName, statusJustification }) => ({
         subject: `Rejet de ${agencyName} comme structure prescriptrice`,
         greetings: "Bonjour,",
@@ -366,7 +408,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     AGENCY_CLOSED_FOR_INACTIVITY: {
       niceName: "Espace prescripteurs - Fermeture automatique",
-      tags: ["espacePrescripteur_fermetureAutomatique"],
+      tags: [
+        "template:espacePrescripteur_fermetureAutomatique",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:admin",
+      ],
       createEmailVariables: ({
         agencyName,
         numberOfMonthsWithoutConvention,
@@ -389,7 +436,10 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       niceName:
         "Agence - notification de l'agence prescriptrice lors de l'activation d'une agence accompagnatrice",
       tags: [
-        "notification agence prescriptrice activation agence accompagnatrice",
+        "template:notification agence prescriptrice activation agence accompagnatrice",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:valideur",
       ],
       createEmailVariables: ({
         nameOfAgencyRefering,
@@ -417,7 +467,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_AGENCY_NOTIFICATION: {
       niceName: "Bilan - Prescripteurs - Relance bilan non rempli",
-      tags: ["bilan", "prescripteurs", "relanceBilanNonRempli"],
+      tags: [
+        "template:relanceBilanNonRempli",
+        "theme:bilan",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyReferentName,
@@ -463,7 +519,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Accompagnement au remplissage",
-      tags: ["bilan_bénéficiaire_accompagnementBilan"],
+      tags: [
+        "template:bilan_bénéficiaire_accompagnementBilan",
+        "theme:bilan",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         conventionId,
         beneficiaryFirstName,
@@ -511,7 +572,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Candidat - Signature du bilan",
-      tags: ["bilan_candidat_signatureBilan"],
+      tags: [
+        "template:bilan_candidat_signatureBilan",
+        "theme:bilan",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -555,7 +621,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Bilan complété",
-      tags: ["bilan_créé_bénéficiaire"],
+      tags: [
+        "template:bilan_créé_bénéficiaire",
+        "theme:bilan",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         internshipKind,
         conventionId,
@@ -594,7 +665,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION: {
       niceName: "Bilan - Établissement - Bilan complété",
-      tags: ["bilan_etablissement_bilanComplete"],
+      tags: [
+        "template:bilan_etablissement_bilanComplete",
+        "theme:bilan",
+        "acteur:entreprise",
+        "role:representantEntreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         recipientFullName,
         beneficiaryFullName,
@@ -631,7 +708,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
       niceName:
         "Bilan - Prescripteurs - Notification de création du bilan à l'agence (cas complet ou partiel)",
-      tags: ["bilan_complet_ou_partiel_créé_prescripteur_confirmation"],
+      tags: [
+        "template:bilan_complet_ou_partiel_créé_prescripteur_confirmation",
+        "theme:bilan",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyReferentName,
         beneficiaryFirstName,
@@ -730,7 +813,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
       niceName:
         "Bilan - Prescripteurs - Notification de création du bilan à l'agence - (cas absent)",
-      tags: ["bilan_absent_créé_prescripteur_confirmation"],
+      tags: [
+        "template:bilan_absent_créé_prescripteur_confirmation",
+        "theme:bilan",
+        "acteur:prescripteur",
+        "role:valideur",
+        "role:preValideur",
+      ],
       createEmailVariables: ({
         agencyReferentName,
         beneficiaryFirstName,
@@ -773,7 +862,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {
       niceName: "Bilan - Entreprise - Lien de creation du bilan",
-      tags: ["bilan_entreprise_formulaireBilan"],
+      tags: [
+        "template:bilan_entreprise_formulaireBilan",
+        "theme:bilan",
+        "acteur:entreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         beneficiaryFirstName,
@@ -821,7 +915,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_ESTABLISHMENT_REMINDER: {
       niceName: "Bilan - Entreprise - Relance",
-      tags: ["bilan_entreprise_relance"],
+      tags: [
+        "template:bilan_entreprise_relance",
+        "theme:bilan",
+        "acteur:entreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         assessmentCreationLink,
         beneficiaryFirstName,
@@ -863,7 +962,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_DELETED_ESTABLISHMENT_NOTIFICATION: {
       niceName: "Bilan - Entreprise - Bilan supprimé",
-      tags: ["bilan", "entreprise", "tuteur", "bilanSupprimé"],
+      tags: [
+        "template:bilanSupprimé",
+        "theme:bilan",
+        "acteur:entreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         assessmentCreationLink,
         beneficiaryName,
@@ -896,7 +1000,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     ASSESSMENT_DELETED_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Bilan supprimé",
-      tags: ["bilan", "bénéficiaire", "bilanSupprimé"],
+      tags: [
+        "template:bilanSupprimé",
+        "theme:bilan",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         beneficiaryName,
         conventionId,
@@ -924,7 +1033,20 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     CANCELLED_CONVENTION_NOTIFICATION: {
       niceName: "Convention - Annulée",
-      tags: ["annulation demande d'immersion"],
+      tags: [
+        "template:annulation demande d'immersion",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:preValideur",
+        "role:valideur",
+        "role:representantEntreprise",
+        "role:representantLégal",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
@@ -969,7 +1091,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
       niceName: "Candidat - Confirmation de la demande de contact",
-      tags: [""],
+      tags: [
+        "template:confirmation_contact_email_candidat",
+        "acteur:candidat",
+        "theme:MER",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         kind,
         beneficiaryFirstName,
@@ -996,7 +1123,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     },
     CONTACT_BY_EMAIL_REQUEST: {
       niceName: "Établissement - MER - instructions par mail",
-      tags: ["mise en relation mail"],
+      tags: [
+        "template:mise en relation mail",
+        "theme:MER",
+        "acteur:entreprise",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: (params) => ({
         subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
         greetings: "Bonjour,",
@@ -1053,7 +1186,13 @@ Profil du candidat :
     },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
       niceName: "Établissement - MER - instructions par mail (Legacy)",
-      tags: ["mise en relation mail"],
+      tags: [
+        "template:mise en relation mail",
+        "theme:MER",
+        "acteur:entreprise",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: ({
         appellationLabel,
         businessName,
@@ -1109,7 +1248,12 @@ Profil du candidat :
     },
     CONTACT_BY_PHONE_INSTRUCTIONS: {
       niceName: "Établissement - MER - instructions par téléphone",
-      tags: ["mise en relation tel"],
+      tags: [
+        "template:mise en relation tel",
+        "theme:MER",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         businessName,
         contactFirstName,
@@ -1138,7 +1282,12 @@ Profil du candidat :
     },
     CONTACT_IN_PERSON_INSTRUCTIONS: {
       niceName: "Établissement - MER - instructions en personne",
-      tags: ["mise en relation en personne"],
+      tags: [
+        "template:mise en relation en personne",
+        "theme:MER",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         welcomeAddress,
         businessName,
@@ -1167,7 +1316,13 @@ Profil du candidat :
     },
     CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
       niceName: "Convention - Changement prescripteur pour agence",
-      tags: ["changement prescripteur demande d'immersion pour prescripteur"],
+      tags: [
+        "template:changement prescripteur demande d'immersion pour prescripteur",
+        "theme:convention",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         previousAgencyName,
         justification,
@@ -1201,7 +1356,17 @@ Tél : ${beneficiaryPhone}`,
     },
     CONVENTION_TRANSFERRED_SIGNATORY_NOTIFICATION: {
       niceName: "Convention - Changement prescripteur pour signataire",
-      tags: ["changement prescripteur demande d'immersion pour signataire"],
+      tags: [
+        "template:changement prescripteur demande d'immersion pour signataire",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "theme:convention",
+        "role:beneficiaire",
+        "role:representantLégal",
+        "role:employeurActuel",
+        "role:representantEntreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         internshipKind,
         immersionProfession,
@@ -1233,7 +1398,20 @@ Tél : ${beneficiaryPhone}`,
     },
     DEPRECATED_CONVENTION_NOTIFICATION: {
       niceName: "Convention - Obsolète",
-      tags: ["dépreciation demande d'immersion"],
+      tags: [
+        "template:dépreciation demande d'immersion",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+        "role:tuteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -1270,7 +1448,12 @@ Tél : ${beneficiaryPhone}`,
     },
     DISCUSSION_BENEFICIARY_FOLLOW_UP: {
       niceName: "Établissement - MER - Relance par téléphone pour candidat",
-      tags: ["mer_candidat_relanceParTelephone"],
+      tags: [
+        "template:mer_candidat_relanceParTelephone",
+        "theme:MER",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         businessName,
         beneficiaryFirstName,
@@ -1315,7 +1498,12 @@ Tél : ${beneficiaryPhone}`,
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
       niceName: "Établissement - MER - Clôture automatique pour candidat",
-      tags: ["MER_candidat_clotureAutomatique"],
+      tags: [
+        "template:MER_candidat_clotureAutomatique",
+        "theme:MER",
+        "acteur:candidat",
+        "role:beneficiaire",
+      ],
       createEmailVariables: ({
         discussionCreatedAt,
         searchPageUrl,
@@ -1352,7 +1540,13 @@ Tél : ${beneficiaryPhone}`,
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
       niceName: "Établissement - MER - Clôture automatique pour entreprise",
-      tags: ["MER_etablissement_clotureAutomatique"],
+      tags: [
+        "template:MER_etablissement_clotureAutomatique",
+        "acteur:entreprise",
+        "theme:MER",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -1385,7 +1579,11 @@ Tél : ${beneficiaryPhone}`,
     DISCUSSION_EXCHANGE: {
       niceName:
         "Établissement - MER - Échange entre établissement et potentiel bénéficiaire",
-      tags: ["échange établissement potentiel bénéficiaire"],
+      tags: [
+        "template:échange établissement potentiel bénéficiaire",
+        "theme:MER",
+        "role:utilisateurDestinataire",
+      ],
       createEmailVariables: ({ subject, htmlContent, sender }) => ({
         bypassLayout: true,
         subject,
@@ -1400,6 +1598,11 @@ Tél : ${beneficiaryPhone}`,
     },
     DISCUSSION_EXCHANGE_FORBIDDEN: {
       niceName: "Établissement - MER - Réponse à candidature impossible",
+      tags: [
+        "template:réponse candidature impossible",
+        "theme:MER",
+        "role:utilisateurInitiateur",
+      ],
       createEmailVariables: (params) => ({
         subject: "Réponse à la candidature impossible",
         greetings: "Bonjour",
@@ -1408,11 +1611,16 @@ Tél : ${beneficiaryPhone}`,
           params.reason
         ],
       }),
-      tags: ["réponse candidature impossible"],
     },
     ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
       niceName: "Etablissement - Relance mise en relation",
-      tags: ["relance_MER"],
+      tags: [
+        "template:relance_MER",
+        "acteur:entreprise",
+        "theme:MER",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: ({
         appellationLabel,
         beneficiaryReplyToEmail,
@@ -1456,7 +1664,12 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_DELETED: {
       niceName: "Établissement - Supprimé",
-      tags: ["suppression entreprise"],
+      tags: [
+        "template:suppression entreprise",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+      ],
       createEmailVariables: ({ businessAddresses, businessName, siret }) => ({
         subject:
           "Votre entreprise a été supprimée de la liste des entreprises accueillantes d'Immersion Facilitée",
@@ -1470,7 +1683,12 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_LEAD_REMINDER: {
       niceName: "Establishment Lead - Premier rappel d'inscription",
-      tags: ["relance inscription prospect"],
+      tags: [
+        "template:relance inscription prospect",
+        "theme:acquisitionEntreprise",
+        "acteur:entreprise",
+        "role:representantEntreprise",
+      ],
       createEmailVariables: ({
         businessName,
         registerEstablishmentShortLink,
@@ -1505,7 +1723,13 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_USER_RIGHTS_ADDED: {
       niceName: "Compte - Etablissement - Ajout d’un utilisateur",
-      tags: ["compte_etablissement_ajoutUtilisateur"],
+      tags: [
+        "template:compte_etablissement_ajoutUtilisateur",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: ({
         businessName,
         role,
@@ -1539,7 +1763,13 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_USER_RIGHTS_UPDATED: {
       niceName: "Compte - Etablissement - Modification d’un utilisateur",
-      tags: ["compte_etablissement_modificationUtilisateur"],
+      tags: [
+        "template:compte_etablissement_modificationUtilisateur",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+        "role:contact",
+      ],
       createEmailVariables: ({
         businessName,
         updatedRole,
@@ -1568,7 +1798,29 @@ Tél : ${beneficiaryPhone}`,
     },
     FULL_PREVIEW_EMAIL: {
       niceName: "Tech - Preview email complet (tous les blocs)",
-      tags: ["aperçu pour tests"],
+      tags: [
+        "template:aperçu pour tests",
+        "theme:MER",
+        "theme:acquisitionEntreprise",
+        "theme:authentification",
+        "theme:bilan",
+        "theme:convention",
+        "theme:espaceEntreprise",
+        "theme:espacePrescripteur",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:admin",
+        "role:adminIF",
+        "role:beneficiaire",
+        "role:contact",
+        "role:employeurActuel",
+        "role:lecteur",
+        "role:preValideur",
+        "role:representantEntreprise",
+        "role:representantLégal",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         beneficiaryName,
@@ -1606,7 +1858,12 @@ Tél : ${beneficiaryPhone}`,
     },
     IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
       niceName: "ProConnect - Rejet de rattachement a une agence",
-      tags: ["rejet de rattachement a une agence"],
+      tags: [
+        "template:rejet de rattachement a une agence",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:utilisateurDestinataire",
+      ],
       createEmailVariables: ({ agencyName, justification }) => ({
         subject:
           "Immersion Facilitée - Refus de la demande d’accès au tableau de bord",
@@ -1620,7 +1877,12 @@ Tél : ${beneficiaryPhone}`,
     },
     IC_USER_RIGHTS_HAS_CHANGED: {
       niceName: "ProConnect - Changement de droit sur agence",
-      tags: ["activation BO prescripteur"],
+      tags: [
+        "template:activation BO prescripteur",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:utilisateurDestinataire",
+      ],
       createEmailVariables: ({
         agencyName,
         isNotifiedByEmail,
@@ -1650,7 +1912,7 @@ Tél : ${beneficiaryPhone}`,
     },
     LOGIN_BY_EMAIL_REQUESTED: {
       niceName: "Connexion - Lien magique",
-      tags: ["connexion_lienMagique"],
+      tags: ["template:connexion_lienMagique", "role:utilisateurInitiateur"],
       createEmailVariables: ({ loginLink, fullname, validMinutes }) => ({
         subject: "Votre lien de connexion à Immersion Facilitée",
         greetings: `Bonjour ${fullname ?? ""},`,
@@ -1674,7 +1936,7 @@ Tél : ${beneficiaryPhone}`,
     },
     MAGIC_LINK_RENEWAL: {
       niceName: "Renouvellement de lien",
-      tags: ["renouvellement de lien"],
+      tags: ["template:renouvellement de lien", "role:utilisateurInitiateur"],
       createEmailVariables: ({ conventionId, internshipKind, magicLink }) => ({
         subject: "Voici votre nouveau lien",
 
@@ -1700,7 +1962,13 @@ Tél : ${beneficiaryPhone}`,
     },
     NEW_CONVENTION_AGENCY_NOTIFICATION: {
       niceName: "Convention - Nouvelle convention à traiter par l'agence",
-      tags: ["notification conseiller création demande d’immersion"],
+      tags: [
+        "template:notification conseiller création demande d’immersion",
+        "theme:convention",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
@@ -1769,7 +2037,16 @@ Tél : ${beneficiaryPhone}`,
     },
     NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
       niceName: "Convention - Demande de signature",
-      tags: ["demande signature demande de convention"],
+      tags: [
+        "template:demande signature demande de convention",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         beneficiaryCurrentEmployerName,
@@ -1847,7 +2124,16 @@ Tél : ${beneficiaryPhone}`,
     },
     NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
       niceName: "Convention - Demande de signature après modification",
-      tags: ["demande signature demande de convention après modification"],
+      tags: [
+        "template:demande signature demande de convention après modification",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         beneficiaryFirstName,
@@ -1896,7 +2182,13 @@ Tél : ${beneficiaryPhone}`,
     },
     NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
       niceName: "Convention - Entièrement signée à traiter par l'agence",
-      tags: ["notification conseiller demande d’immersion signée à valider"],
+      tags: [
+        "template:notification conseiller demande d’immersion signée à valider",
+        "theme:convention",
+        "acteur:prescripteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyReferentName,
@@ -1953,7 +2245,12 @@ Tél : ${beneficiaryPhone}`,
     },
     NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
       niceName: "Inscription - Entreprise - Référencement réussi",
-      tags: ["inscription_entreprise_referencementReussi"],
+      tags: [
+        "template:inscription_entreprise_referencementReussi",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+      ],
       createEmailVariables: ({
         businessName,
         businessAddresses,
@@ -2001,7 +2298,12 @@ Tél : ${beneficiaryPhone}`,
     POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
       niceName:
         "Convention - Entièrement signée à traiter par le conseiller France Travail lié",
-      tags: ["immersion à étudier (mail conseiller)"],
+      tags: [
+        "template:immersion à étudier (mail conseiller)",
+        "theme:convention",
+        "acteur:prescripteur",
+        "role:preValideur",
+      ],
       createEmailVariables: ({
         advisorFirstName,
         advisorLastName,
@@ -2052,7 +2354,20 @@ Tél : ${beneficiaryPhone}`,
     },
     REJECTED_CONVENTION_NOTIFICATION: {
       niceName: "Convention - Rejetée",
-      tags: ["refus demande d'immersion"],
+      tags: [
+        "template:refus demande d'immersion",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+        "role:tuteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
@@ -2094,7 +2409,11 @@ Tél : ${beneficiaryPhone}`,
     },
     SHARE_CONVENTION_DRAFT_RECIPIENT: {
       niceName: "Convention - Partage du formulaire par lien",
-      tags: ["partage de convention"],
+      tags: [
+        "template:partage de convention",
+        "theme:convention",
+        "role:utilisateurDestinataire",
+      ],
       createEmailVariables: ({
         additionalDetails,
         conventionFormUrl,
@@ -2123,7 +2442,11 @@ Tél : ${beneficiaryPhone}`,
     },
     SHARE_CONVENTION_DRAFT_SELF: {
       niceName: "Convention - Brouillon de convention",
-      tags: ["convention_brouillonConvention"],
+      tags: [
+        "template:convention_brouillonConvention",
+        "theme:convention",
+        "role:utilisateurInitiateur",
+      ],
       createEmailVariables: ({ conventionFormUrl, internshipKind }) => ({
         subject: "Votre brouillon de convention",
         greetings: "Bonjour,",
@@ -2143,7 +2466,17 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
     },
     SIGNATORY_REMINDER: {
       niceName: "Convention - Dernier rappel de signature",
-      tags: ["relance signatures manquantes"],
+      tags: [
+        "template:relance signatures manquantes",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+        "role:tuteur",
+      ],
       createEmailVariables: ({
         actorFirstName,
         actorLastName,
@@ -2181,6 +2514,11 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
     },
     SIGNEE_HAS_SIGNED_CONVENTION: {
       niceName: "Convention - Confirmation de signature",
+      tags: [
+        "template:confirmation de signature de convention",
+        "theme:convention",
+        "role:utilisateurInitiateur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         conventionId,
@@ -2233,11 +2571,15 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
         ],
         agencyLogoUrl,
       }),
-      tags: ["confirmation de signature de convention"],
     },
     ESTABLISHMENT_REENGAGEMENT_SUGGESTION: {
       niceName: "Établissement - Suggestion de mise à jour",
-      tags: ["mise à jour fiche entreprise"],
+      tags: [
+        "template:mise à jour fiche entreprise",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+      ],
       createEmailVariables: ({ businessName }) => ({
         subject:
           "Devenez une Super Entreprise et gagnez en visibilité sur Immersion Facilitée !",
@@ -2279,6 +2621,32 @@ Vous pouvez reprendre votre demande quand vous le souhaitez. Si vous avez la moi
     },
     TEST_EMAIL: {
       niceName: "Email de test Immersion Facilitée",
+      tags: [
+        "template:test_email",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:admin",
+        "role:adminIF",
+        "role:beneficiaire",
+        "role:contact",
+        "role:employeurActuel",
+        "role:lecteur",
+        "role:preValideur",
+        "role:representantEntreprise",
+        "role:representantLégal",
+        "role:tuteur",
+        "role:utilisateurDestinataire",
+        "role:utilisateurInitiateur",
+        "role:valideur",
+        "theme:MER",
+        "theme:acquisitionEntreprise",
+        "theme:authentification",
+        "theme:bilan",
+        "theme:convention",
+        "theme:espaceEntreprise",
+        "theme:espacePrescripteur",
+      ],
       createEmailVariables: ({ input1, input2, url }) => ({
         subject: "[Immersion Facilitée] Un email de test",
         greetings: "Bonjour,",
@@ -2301,7 +2669,20 @@ L'équipe d'Immersion Facilitée`,
     },
     VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
       niceName: "Convention - Finale validée",
-      tags: ["envoi convention"],
+      tags: [
+        "template:envoi convention",
+        "theme:convention",
+        "acteur:candidat",
+        "acteur:entreprise",
+        "acteur:prescripteur",
+        "role:beneficiaire",
+        "role:employeurActuel",
+        "role:representantLégal",
+        "role:representantEntreprise",
+        "role:tuteur",
+        "role:preValideur",
+        "role:valideur",
+      ],
       createEmailVariables: ({
         agencyLogoUrl,
         beneficiaryBirthdate,
@@ -2375,7 +2756,11 @@ L'équipe d'Immersion Facilitée`,
     WARN_DISCUSSION_DELIVERY_FAILED: {
       niceName:
         "Établissement - Alerte de problème d'envoi d'un échange dans une discussion",
-      tags: ["envoi impossible"],
+      tags: [
+        "template:envoi impossible",
+        "theme:MER",
+        "role:utilisateurInitiateur",
+      ],
       createEmailVariables: ({ recipientsInEmailInError, errorMessage }) => ({
         bypassLayout: true,
         subject: "Échec d'envoi d'email",
