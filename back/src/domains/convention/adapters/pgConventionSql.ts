@@ -106,7 +106,7 @@ const createConventionSelection = (
               .else(null)
               .end(),
             emergencyContact: sql`b.extra_fields ->> 'emergencyContact'`,
-            emergencyContactPhone: sql`b.extra_fields ->> 'emergencyContactPhone'`,
+            emergencyContactPhone: sql`phone_numbers_b_emergency_phone.phone_number`,
             emergencyContactEmail: sql`b.extra_fields ->> 'emergencyContactEmail'`,
             federatedIdentity: eb
               .case()
@@ -338,6 +338,11 @@ const withAppellationsAndPartnerPeJoinAndPhoneNumber = <
       "conventions.immersion_appellation",
     )
     .leftJoin("phone_numbers", "phone_numbers.id", "b.phone_id")
+    .leftJoin(
+      "phone_numbers as phone_numbers_b_emergency_phone",
+      "phone_numbers_b_emergency_phone.id",
+      "b.emergency_contact_phone_id",
+    )
     .leftJoin(
       "phone_numbers as phone_numbers_er",
       "phone_numbers_er.id",

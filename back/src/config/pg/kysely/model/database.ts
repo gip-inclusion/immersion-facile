@@ -373,6 +373,7 @@ interface Actors {
   last_name: string;
   email: string;
   phone_id: number;
+  emergency_contact_phone_id: number | null;
   signed_at: Timestamp | null;
   extra_fields: Json | null;
   id: Generated<number>;
