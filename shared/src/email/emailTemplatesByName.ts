@@ -86,10 +86,10 @@ export const emailTemplatesByName =
     AGENCY_DELEGATION_CONTACT_INFORMATION: {
       niceName: "Délégation - Information de contact DR",
       tags: [
-        "template:Transmision des informations de contact des DR aux agences sans délégation", // pas top comme tag
+        "template:délégationInfosContactDR", // pas top comme tag
         "theme:espacePrescripteur",
         "acteur:prescripteur",
-        "role:utilisateurDestinataire", // ou bien initiateur ? C'est le champ email du form Tally,
+        "role:utilisateurInitiateur", // ou bien initiateur ? C'est le champ email du form Tally,
       ],
       createEmailVariables: ({ delegationProviderMail }) => ({
         subject:
@@ -153,7 +153,7 @@ export const emailTemplatesByName =
       niceName: "Convention - Premier rappel de validation à l'agence",
       tags: [
         "template:relance vérification manquante",
-        "theme:espacePrescripteur",
+        "theme:convention",
         "acteur:prescripteur",
         "role:valideur",
         "role:preValideur",
@@ -246,7 +246,7 @@ export const emailTemplatesByName =
       niceName: "Convention - Dernier rappel de validation à l'agence",
       tags: [
         "template:relance vérification manquante",
-        "theme:espacePrescripteur",
+        "theme:convention",
         "acteur:prescripteur",
         "role:valideur",
         "role:preValideur",
@@ -1912,7 +1912,11 @@ Tél : ${beneficiaryPhone}`,
     },
     LOGIN_BY_EMAIL_REQUESTED: {
       niceName: "Connexion - Lien magique",
-      tags: ["template:connexion_lienMagique", "role:utilisateurInitiateur"],
+      tags: [
+        "template:connexion_lienMagique",
+        "theme:authentification",
+        "role:utilisateurInitiateur",
+      ],
       createEmailVariables: ({ loginLink, fullname, validMinutes }) => ({
         subject: "Votre lien de connexion à Immersion Facilitée",
         greetings: `Bonjour ${fullname ?? ""},`,
