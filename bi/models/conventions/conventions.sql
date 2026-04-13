@@ -134,7 +134,7 @@ end as is_signed_by_beneficiary,
     b.extra_fields ->> 'birthdate'
 )::timestamp with time zone as beneficiary_birthdate,
 b.extra_fields ->> 'emergencyContact' as beneficiary_emergency_contact,
-b.extra_fields ->> 'emergencyContactPhone' as beneficiary_emergency_contact_phone,
+pn_b_emergency.phone_number as beneficiary_emergency_contact_phone,
 b.extra_fields ->> 'levelOfEducation' as beneficiary_level_of_education,
 b.extra_fields ->> 'isRqth' as beneficiary_is_rqth,
 b.extra_fields ->> 'schoolName' as beneficiary_school_name,
@@ -263,6 +263,8 @@ inner join {{ source('immersion', 'actors') }} as b
     on c.beneficiary_id = b.id
 left join {{ source('immersion', 'phone_numbers') }} as pn_b
     on pn_b.id = b.phone_id
+left join {{ source('immersion', 'phone_numbers') }} as pn_b_emergency
+    on pn_b_emergency.id = b.emergency_contact_phone_id
 
 inner join {{ source('immersion', 'actors') }} as et
     on c.establishment_tutor_id = et.id
