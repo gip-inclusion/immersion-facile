@@ -88,6 +88,7 @@ const topics = [
   "search-result",
   "send-signature-link",
   "send-assessment-link",
+  "beneficiary-dashboard-discussion-list",
   "sign-assessment",
   "siret-input",
   "close-agency-and-transfer-conventions",
@@ -188,6 +189,14 @@ export const feedbacks: Record<
       action: sendAssessmentLinkSlice.actions.sendAssessmentLinkFailed,
       title: "Problème lors de l'envoi SMS",
       message: "Une erreur est survenue lors de l'envoi du SMS.",
+    },
+  },
+  "beneficiary-dashboard-discussion-list": {
+    "fetch.error": {
+      action: discussionSlice.actions.fetchDiscussionListFailed,
+      title: "Problème lors de la récupération des candidatures",
+      message:
+        "Une erreur est survenue lors de la récupération des candidatures",
     },
   },
   "dashboard-discussion-status-updated": {

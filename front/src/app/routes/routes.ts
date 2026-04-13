@@ -99,6 +99,11 @@ export type ConventionTemplateFromRoute = Extract<
 
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
+const beneficiaryDashboard = defineRoute(
+  connectedUserParams,
+  () => `/${frontRoutes.beneficiaryDashboard}`,
+);
+
 const agencyDashboard = defineRoute(
   {
     ...connectedUserParams,
@@ -201,7 +206,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { agencyId: param.path.string },
     ({ agencyId }) => `/${agencyId}`,
   ),
-  beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
+  beneficiaryDashboard,
+  beneficiaryDashboardDiscussions: beneficiaryDashboard.extend("/discussions"),
   conventionConfirmation: defineRoute(
     {
       conventionId: param.path.string,

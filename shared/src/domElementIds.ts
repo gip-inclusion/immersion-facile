@@ -1156,7 +1156,34 @@ export const domElementIds = {
     dontKnowCategoryButton:
       "im-convention-form__initiate-dont-know-category-button",
   },
-  beneficiaryDashboard: {},
+  beneficiaryDashboard: {
+    tabContainer: "im-beneficiary-dashboard__tab-container",
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--beneficiary-dashboard",
+      byEmailButton:
+        "im-login-form__connect-button--beneficiary-dashboard-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--beneficiary-dashboard",
+      retryButton: "im-login-form__retry-login-button--beneficiary-dashboard",
+      contactSupport:
+        "im-login-form__contact-support-link--beneficiary-dashboard",
+    },
+  },
+  beneficiaryDashboardDiscussions: {
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--beneficiary-dashboard-discussions",
+      byEmailButton:
+        "im-login-form__connect-button--beneficiary-dashboard-discussions-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--beneficiary-dashboard-discussions",
+      retryButton:
+        "im-login-form__retry-login-button--beneficiary-dashboard-discussions",
+      contactSupport:
+        "im-login-form__contact-support-link--beneficiary-dashboard-discussions",
+    },
+  },
   conventionTemplate: {
     login: {
       proConnectButton:
