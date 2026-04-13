@@ -141,6 +141,16 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
       },
     },
   },
+  beneficiaryDashboard: {
+    label: "Tableau de bord bénéficiaire",
+    route: routes.beneficiaryDashboard(),
+    children: {
+      beneficiaryDashboardDiscussions: {
+        label: "Candidatures",
+        route: routes.beneficiaryDashboardDiscussions(),
+      },
+    },
+  },
   magicLinkInterstitial: {
     label: "Connexion à Immersion Facilitée",
     route: routes.magicLinkInterstitial({ email: "", code: "", state: "" }),

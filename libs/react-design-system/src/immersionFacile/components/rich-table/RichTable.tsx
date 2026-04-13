@@ -21,7 +21,7 @@ type RichTableProps = {
     items: RichDropdownProps[];
     onSubmit: () => void;
   };
-  searchBar: {
+  searchBar?: {
     label: string;
     placeholder: string;
     hintText?: string;
@@ -50,7 +50,7 @@ export const RichTable = ({
   );
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearchValue = useDebounce(searchValue, 500);
-  const searchBarRefOnSubmitRef = useRef(searchBar.onSubmit).current;
+  const searchBarRefOnSubmitRef = useRef(searchBar?.onSubmit).current;
   const tableRef = useRef<HTMLTableElement>(null);
 
   useScrollTo(pagination.defaultPage ?? 1);
@@ -76,7 +76,7 @@ export const RichTable = ({
   }, []);
 
   useEffect(() => {
-    searchBarRefOnSubmitRef(debouncedSearchValue);
+    searchBarRefOnSubmitRef?.(debouncedSearchValue);
   }, [debouncedSearchValue, searchBarRefOnSubmitRef]);
 
   return (
@@ -87,38 +87,40 @@ export const RichTable = ({
     >
       {isLoading && <Loader />}
       <header className={cx(Styles.header)}>
-        <form
-          onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const query = formData.get("search");
-            if (query && typeof query === "string") {
-              searchBar.onSubmit(query);
-            }
-          }}
-          className={fr.cx("fr-grid-row", "fr-search-bar")}
-        >
-          <div className={fr.cx("fr-col-lg-7")}>
-            <Input
-              label={searchBar.label}
-              nativeInputProps={{
-                placeholder: searchBar.placeholder,
-                role: "search",
-                name: "search",
-                onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                  setSearchValue(event.target.value);
-                },
-              }}
-              className={fr.cx("fr-mb-0")}
-            />
-            {searchBar.hintText && (
-              <span className={fr.cx("fr-hint-text", "fr-mt-1w")}>
-                {searchBar.hintText}
-              </span>
-            )}
-          </div>
-          <Button type="submit">Rechercher</Button>
-        </form>
+        {searchBar && (
+          <form
+            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+              const query = formData.get("search");
+              if (query && typeof query === "string") {
+                searchBar.onSubmit(query);
+              }
+            }}
+            className={fr.cx("fr-grid-row", "fr-search-bar")}
+          >
+            <div className={fr.cx("fr-col-lg-7")}>
+              <Input
+                label={searchBar.label}
+                nativeInputProps={{
+                  placeholder: searchBar.placeholder,
+                  role: "search",
+                  name: "search",
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    setSearchValue(event.target.value);
+                  },
+                }}
+                className={fr.cx("fr-mb-0")}
+              />
+              {searchBar.hintText && (
+                <span className={fr.cx("fr-hint-text", "fr-mt-1w")}>
+                  {searchBar.hintText}
+                </span>
+              )}
+            </div>
+            <Button type="submit">Rechercher</Button>
+          </form>
+        )}
         {dropdownFilters && (
           <form
             onSubmit={(event: React.FormEvent<HTMLFormElement>) => {

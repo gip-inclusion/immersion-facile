@@ -39,6 +39,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 import { z } from "zod";
 import { WithFeedbackReplacer } from "../../components/feedback/WithFeedbackReplacer";
@@ -74,6 +75,13 @@ export const agencyDashboardRoutes = [
   "establishmentManagement",
 ] satisfies AgencyDashboardRouteName[];
 
+export type BeneficiaryDashboardRouteName =
+  FrontBeneficiaryDashboardRoute["name"];
+
+export type FrontBeneficiaryDashboardRoute =
+  | Route<typeof routes.beneficiaryDashboard>
+  | Route<typeof routes.beneficiaryDashboardDiscussions>;
+
 export type EstablishmentDashboardRouteName =
   FrontEstablishmentDashboardRoute["name"];
 
@@ -105,6 +113,7 @@ export type FrontAgencyDashboardRoute =
 export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute
   | FrontEstablishmentDashboardRoute
+  | FrontBeneficiaryDashboardRoute
   | ConventionTemplatePageRoute;
 
 type ConnectPrivateRoute =
@@ -228,19 +237,61 @@ export const ConnectedPrivateRoute = ({
                 <p className={fr.cx("fr-text--lead")}>
                   {pageContent.description}
                 </p>
-                {"withEmailLogin" in pageContent ? (
-                  <SeparatedSection
-                    firstSection={<LoginWithEmail page={page} />}
-                    secondSection={
+
+                {match({
+                  withEmailLogin: pageContent.withEmailLogin,
+                  withProConnectLogin: pageContent.withProConnectLogin,
+                })
+                  .with(
+                    { withEmailLogin: true, withProConnectLogin: true },
+                    () => (
+                      <SeparatedSection
+                        firstSection={<LoginWithEmail page={page} />}
+                        secondSection={
+                          <LoginWithProConnect
+                            page={page}
+                            redirectUri={route.href}
+                          />
+                        }
+                      />
+                    ),
+                  )
+                  .with(
+                    { withEmailLogin: true, withProConnectLogin: P.nullish },
+                    () => (
+                      <div
+                        className={fr.cx(
+                          "fr-grid-row",
+                          "fr-grid-row--gutters",
+                          "fr-grid-row--middle",
+                        )}
+                      >
+                        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+                          <LoginWithEmail page={page} />
+                        </div>
+                        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+                          <img src={loginIllustration} alt="" />
+                        </div>
+                      </div>
+                    ),
+                  )
+                  .with(
+                    { withProConnectLogin: true, withEmailLogin: P.nullish },
+                    () => (
                       <LoginWithProConnect
                         page={page}
                         redirectUri={route.href}
                       />
-                    }
-                  />
-                ) : (
-                  <LoginWithProConnect page={page} redirectUri={route.href} />
-                )}
+                    ),
+                  )
+                  .with(
+                    {
+                      withEmailLogin: P.nullish,
+                      withProConnectLogin: P.nullish,
+                    },
+                    () => <p>Aucune méthode de connexion disponible</p>,
+                  )
+                  .exhaustive()}
 
                 <p className={fr.cx("fr-hint-text")}>
                   Si votre messagerie est protégée une anti-spam, pensez à
@@ -268,6 +319,17 @@ export const ConnectedPrivateRoute = ({
                       imageUrl={card.illustration}
                       imageAlt=""
                       imageSvg={false}
+                      detail={
+                        card.link ? (
+                          <a
+                            href={card.link.href}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {card.link.label}
+                          </a>
+                        ) : undefined
+                      }
                     />
                   </div>
                 ))}
@@ -308,8 +370,14 @@ const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
   routeParams: ConnectPrivateRoute["params"],
 ): AllowedLoginSource => {
+<<<<<<< HEAD
   if (routeName === "myProfile") return "myProfile";
   if (routeName === "myProfileEstablishmentRegistration") return "myProfile";
+=======
+  if (routeName === "beneficiaryDashboardDiscussions")
+    return "beneficiaryDashboardDiscussions";
+  if (routeName === "beneficiaryDashboard") return "beneficiaryDashboard";
+>>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
@@ -332,22 +400,25 @@ const getAllowedStartAuthPage = (
   return "admin";
 };
 
-type PageContent = (
-  | {
-      withEmailLogin: true;
-    }
-  | { illustration: string }
-) & {
+type PageContent = {
   title: string;
   description: ReactNode;
   cardsTitle?: string;
   cards?: {
     title: string;
     description: ReactNode;
-    link?: string;
+    link?: {
+      href?: string;
+      label: string;
+    };
     illustration: string;
   }[];
-};
+  illustration?: string;
+} & (
+  | { withEmailLogin: true; withProConnectLogin: true }
+  | { withEmailLogin: true; withProConnectLogin?: never }
+  | { withEmailLogin?: never; withProConnectLogin: true }
+);
 
 const establishmentDashboardContent: PageContent = {
   title: "Mon espace entreprise",
@@ -359,6 +430,7 @@ const establishmentDashboardContent: PageContent = {
   ),
   cardsTitle: "Tous les avantages du compte entreprise",
   withEmailLogin: true,
+  withProConnectLogin: true,
   cards: [
     {
       title: "Vos démarches centralisées",
@@ -391,6 +463,7 @@ const agencyDashboardContent: PageContent = {
   ),
   cardsTitle: "Tous les avantages du compte prescripteur",
   withEmailLogin: true,
+  withProConnectLogin: true,
   cards: [
     {
       title: "Une connexion simplifiée",
@@ -413,7 +486,50 @@ const agencyDashboardContent: PageContent = {
   ],
 };
 
+const beneficiaryDashboardContent: PageContent = {
+  title: "Mon espace bénéficiaire",
+  description: (
+    <>
+      Un espace unique pour <strong>suivre vos candidatures</strong>.
+    </>
+  ),
+  cardsTitle: "Votre parcours Immersion Facilitée",
+  withEmailLogin: true,
+  cards: [
+    {
+      title: "Gérer mes candidatures",
+      description:
+        "Retrouvez l'historique des candidatures que vous avez envoyées.",
+      illustration: commonIllustrations.warning,
+      link: {
+        label: "Comment fonctionne l'espace candidat ?",
+      },
+    },
+    {
+      title: "Suivre ma convention",
+      description:
+        "La gestion des conventions arrive bientôt. En attendant, retrouvez notre guide pour suivre votre demande.",
+      illustration: commonIllustrations.inscription,
+      link: {
+        href: `${immersionFacileHelpdeskRootUrl}/article/comment-suivre-ma-demande-de-convention-1gbhxt4/`,
+        label: "Comment suivre ma demande de convention ?",
+      },
+    },
+    {
+      title: "S'orienter et s'informer",
+      description:
+        "Vous avez des questions sur l'immersion ou vous n'êtes pas encore accompagné ? Trouvez les réponses dans notre guide.",
+      illustration: commonIllustrations.monCompte,
+      link: {
+        href: `${immersionFacileHelpdeskRootUrl}/category/candidat-jikpz1/`,
+        label: "Consulter le centre d'aide",
+      },
+    },
+  ],
+};
+
 const defaultPageContent: PageContent = {
+<<<<<<< HEAD
   title: "Se connecter à Immersion Facilitée",
   description: (
     <>
@@ -422,6 +538,13 @@ const defaultPageContent: PageContent = {
     </>
   ),
   withEmailLogin: true,
+=======
+  title: "Se connecter avec ProConnect",
+  description:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+  illustration: loginIllustration,
+  withProConnectLogin: true,
+>>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
 };
 
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
@@ -437,6 +560,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       ),
       cardsTitle: "Tous les avantages du compte entreprise",
       withEmailLogin: true,
+      withProConnectLogin: true,
       cards: [
         {
           title: "Vos démarches centralisées",
@@ -485,6 +609,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       ),
       cardsTitle: "Tous les avantages du compte prescripteur",
       withEmailLogin: true,
+      withProConnectLogin: true,
       cards: [
         {
           title: "Une connexion simplifiée",
@@ -512,9 +637,15 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       title: "Mon espace administrateur",
       description: "Pour la super team IF 😉",
       withEmailLogin: true,
+      withProConnectLogin: true,
     },
     conventionTemplate: defaultPageContent,
+<<<<<<< HEAD
     myProfile: defaultPageContent,
+=======
+    beneficiaryDashboard: beneficiaryDashboardContent,
+    beneficiaryDashboardDiscussions: beneficiaryDashboardContent,
+>>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
     default: defaultPageContent,
   };
 

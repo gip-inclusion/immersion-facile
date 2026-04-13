@@ -22,6 +22,8 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   manageConventionUserConnected: "pilotage-convention-inclusion-connect",
   conventionTemplate: "modele-convention",
   myProfile: "mon-profil",
+  beneficiaryDashboard: "tableau-de-bord-beneficiaire",
+  beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
 };
 
 export const frontRoutes = {

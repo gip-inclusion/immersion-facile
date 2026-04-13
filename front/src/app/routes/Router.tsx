@@ -229,7 +229,14 @@ const getPageByRouteName: {
     </DashboardPrivateRoute>
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
-  beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
+  beneficiaryDashboard: (route) => (
+    <RedirectTo route={routes.beneficiaryDashboardDiscussions(route.params)} />
+  ),
+  beneficiaryDashboardDiscussions: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <BeneficiaryDashboardPage />
+    </DashboardPrivateRoute>
+  ),
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
@@ -244,6 +251,7 @@ const getPageByRouteName: {
     <ConventionStatusDashboardPage route={route} />
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
+
   establishmentDashboard: (route) => (
     <RedirectTo
       route={routes.establishmentDashboardConventions(route.params)}

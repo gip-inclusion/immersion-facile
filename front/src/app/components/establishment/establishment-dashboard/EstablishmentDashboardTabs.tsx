@@ -318,5 +318,5 @@ const DiscussionTabContent = ({
   route.params.discussionId ? (
     <DiscussionManageContent discussionId={route.params.discussionId} />
   ) : (
-    <DiscussionList />
+    <DiscussionList userRole="establishment" />
   );

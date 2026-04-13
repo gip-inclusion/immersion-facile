@@ -18,6 +18,8 @@ export const allowedLoginSources = [
   "manageConventionUserConnected",
   "conventionTemplate",
   "myProfile",
+  "beneficiaryDashboard",
+  "beneficiaryDashboardDiscussions",
 ] as const;
 
 export type ExternalId = Flavor<string, "ExternalId">;
