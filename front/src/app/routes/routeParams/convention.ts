@@ -783,6 +783,7 @@ export const conventionPresentationFromConventionDraft = (
   immersionObjective: conventionDraft.immersionObjective as
     | ImmersionObjective
     | undefined,
+  remoteWorkMode: conventionDraft.remoteWorkMode,
   immersionAppellation: conventionDraft.immersionAppellation
     ? ({
         appellationCode: conventionDraft.immersionAppellation.appellationCode,

@@ -298,6 +298,7 @@ export const domElementIds = {
       sanitaryPrevention: "im-convention-form__sanitaryPrevention",
       sanitaryPreventionDescription:
         "im-convention-form__sanitaryPreventionDescription",
+      remoteWorkMode: "im-convention-form__remoteWorkMode",
       immersionAddress: "im-convention-form__immersionAddress",
       immersionObjective: "im-convention-form__immersionObjective",
       immersionAppellation: "im-convention-form__immersionAppellation",

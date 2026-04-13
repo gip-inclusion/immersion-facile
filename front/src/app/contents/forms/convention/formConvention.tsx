@@ -144,6 +144,11 @@ const conventionSection = ({
     id: conventionSectionIds.siret,
     required: !isConventionTemplate,
   },
+  remoteWorkMode: {
+    label: "Modalité de l'immersion",
+    id: conventionSectionIds.remoteWorkMode,
+    required: !isConventionTemplate,
+  },
   businessName: {
     label: "Nom (raison sociale)",
     id: conventionSectionIds.businessName,
