@@ -2319,7 +2319,7 @@ describe("Pg implementation of ConventionQueries", () => {
           consumerName: "any-consumer-name",
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
-          occurredAt: "2024-07-01T00:00:00.000Z",
+          occurredAt: "2024-06-01T00:00:00.000Z",
           handledByAgency: false,
           requestParams: {
             conventionId: cancelledConventionId,

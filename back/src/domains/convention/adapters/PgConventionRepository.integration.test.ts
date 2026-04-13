@@ -249,6 +249,7 @@ describe("PgConventionRepository", () => {
     const extraFields = {
       isRqth: false,
       emergencyContact: "jean bon",
+      emergencyContactPhone: "+33612345678",
     };
     const convention = new ConventionDtoBuilder()
       .withBeneficiary({

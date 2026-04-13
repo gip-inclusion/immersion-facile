@@ -3,12 +3,13 @@ import type { Database } from "../../../../config/pg/kysely/model/database";
 import type { PhoneId } from "../adapters/pgPhoneHelper";
 
 export const tablesWithPhoneReference = [
-  "discussions",
-  "agencies",
-  "api_consumers",
-  "establishments__users",
-  "actors",
-] as const satisfies (keyof Database)[];
+  { table: "discussions", column: "potential_beneficiary_phone_id" },
+  { table: "agencies", column: "phone_id" },
+  { table: "api_consumers", column: "contact_phone_id" },
+  { table: "establishments__users", column: "phone_id" },
+  { table: "actors", column: "phone_id" },
+  { table: "actors", column: "emergency_contact_phone_id" },
+] as const satisfies { table: keyof Database; column: string }[];
 
 export type TablesWithPhoneReference =
   (typeof tablesWithPhoneReference)[number];

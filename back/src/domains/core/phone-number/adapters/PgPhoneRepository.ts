@@ -6,12 +6,12 @@ import {
   pipeWithValue,
 } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import type { Database } from "../../../../config/pg/kysely/model/database";
-import type {
-  FixConflictingPhoneParams,
-  FixNotConflictingPhoneParams,
-  PhoneRepository,
-  TablesWithPhoneReference,
+import {
+  type FixConflictingPhoneParams,
+  type FixNotConflictingPhoneParams,
+  type PhoneRepository,
+  type TablesWithPhoneReference,
+  tablesWithPhoneReference,
 } from "../ports/PhoneRepository";
 import type { PhoneId } from "./pgPhoneHelper";
 
@@ -34,50 +34,15 @@ export class PgPhoneRepository implements PhoneRepository {
   async fixConflictingPhone(params: FixConflictingPhoneParams): Promise<void> {
     const { phoneToUpdate, conflictingPhoneId } = params;
 
-    const updateByTable: Record<TablesWithPhoneReference, () => Promise<void>> =
-      {
-        discussions: async () => {
-          await this.transaction
-            .updateTable("discussions")
-            .set({ potential_beneficiary_phone_id: conflictingPhoneId })
-            .where("potential_beneficiary_phone_id", "=", phoneToUpdate.id)
-            .execute();
-        },
-
-        agencies: async () => {
-          await this.transaction
-            .updateTable("agencies")
-            .set({ phone_id: conflictingPhoneId })
-            .where("phone_id", "=", phoneToUpdate.id)
-            .execute();
-        },
-
-        api_consumers: async () => {
-          await this.transaction
-            .updateTable("api_consumers")
-            .set({ contact_phone_id: conflictingPhoneId })
-            .where("contact_phone_id", "=", phoneToUpdate.id)
-            .execute();
-        },
-
-        establishments__users: async () => {
-          await this.transaction
-            .updateTable("establishments__users")
-            .set({ phone_id: conflictingPhoneId })
-            .where("phone_id", "=", phoneToUpdate.id)
-            .execute();
-        },
-
-        actors: async () => {
-          await this.transaction
-            .updateTable("actors")
-            .set({ phone_id: conflictingPhoneId })
-            .where("phone_id", "=", phoneToUpdate.id)
-            .execute();
-        },
-      };
-
-    await Promise.all(Object.values(updateByTable).map((update) => update()));
+    await Promise.all(
+      tablesWithPhoneReference.map(({ table, column }) =>
+        this.transaction
+          .updateTable(table)
+          .set({ [column]: conflictingPhoneId })
+          .where(column, "=", phoneToUpdate.id)
+          .execute(),
+      ),
+    );
 
     await this.transaction
       .deleteFrom("phone_numbers")
@@ -192,10 +157,11 @@ export class PgPhoneRepository implements PhoneRepository {
       .execute();
   }
 
-  async getTableNamesReferencingPhoneNumbers(): Promise<(keyof Database)[]> {
-    const result = await sql<{ tableName: keyof Database }>`
-    SELECT
-      kcu.table_name as "tableName"
+  async getTableNamesReferencingPhoneNumbers(): Promise<
+    TablesWithPhoneReference[]
+  > {
+    const result = await sql<TablesWithPhoneReference>`
+    SELECT kcu.table_name as "table", kcu.column_name as "column"
     FROM information_schema.key_column_usage kcu
     JOIN information_schema.referential_constraints rc
       ON rc.constraint_name = kcu.constraint_name
@@ -205,6 +171,6 @@ export class PgPhoneRepository implements PhoneRepository {
       AND ccu.column_name = 'id'
   `.execute(this.transaction);
 
-    return result.rows.map((row) => row.tableName);
+    return result.rows;
   }
 }

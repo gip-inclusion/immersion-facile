@@ -45,8 +45,10 @@ import {
 import { PgPhoneRepository } from "./PgPhoneRepository";
 import { getOrCreatePhoneIds } from "./pgPhoneHelper";
 
+type TableName = TablesWithPhoneReference["table"];
+
 type PhoneReference = {
-  tableName: TablesWithPhoneReference;
+  tableName: TableName;
   objectIdWithPhoneReference: string;
 };
 
@@ -222,7 +224,7 @@ describe("PgPhoneRepository", () => {
       establishmentAggregate,
     );
 
-    const referenceByTable: Record<TablesWithPhoneReference, PhoneReference> = {
+    const referenceByTable: Record<TableName, PhoneReference> = {
       agencies: {
         tableName: "agencies",
         objectIdWithPhoneReference: agency.id,
@@ -252,10 +254,7 @@ describe("PgPhoneRepository", () => {
     phoneReferences: PhoneReference[],
     phoneNumber: PhoneNumber,
   ) => {
-    const expectByTable: Record<
-      TablesWithPhoneReference,
-      (id: string) => Promise<void>
-    > = {
+    const expectByTable: Record<TableName, (id: string) => Promise<void>> = {
       agencies: async (id) => {
         const agency = await pgAgencyRepository.getById(id);
         expect(agency?.phoneNumber).toBe(phoneNumber);
