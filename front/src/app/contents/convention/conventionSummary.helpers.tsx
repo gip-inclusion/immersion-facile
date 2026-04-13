@@ -31,6 +31,7 @@ import {
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   type PhoneNumber,
+  remoteWorkModeLabels,
   removeEmptyValue,
   type ScheduleDto,
   type SignatoryRole,
@@ -727,6 +728,11 @@ const makeImmersionSubSections = (
           key: "immersionSkills",
           label: "Compétences évaluées",
           value: convention.immersionSkills || "-",
+        },
+        {
+          key: "remoteWorkMode",
+          label: "Modalité de l'immersion",
+          value: remoteWorkModeLabels[convention.remoteWorkMode].label,
         },
         {
           key: "workConditions",

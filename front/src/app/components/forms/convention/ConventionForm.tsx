@@ -4,6 +4,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Dispatch,
@@ -46,9 +47,12 @@ import {
   isCreateConventionPresentationInitialValues,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
+  isRemotableWorkMode,
   keys,
   makeConventionPresentationSchemaWithNormalizedInput,
   makeListAgencyOptionsKindFilter,
+  remoteWorkModeLabels,
+  remoteWorkModes,
   replaceEmptyValuesByUndefinedFromObject,
   toConventionTemplate,
   undefinedIfEmptyString,
@@ -470,6 +474,7 @@ const ConventionFormContent = ({
     agencyId: agencyIdField,
     agencyDepartment: agencyDepartmentField,
     agencyKind: agencyKindField,
+    remoteWorkMode: remoteWorkModeField,
   } = getFormFields();
 
   const onDepartmentCodeChangedMemoized = useCallback(
@@ -810,6 +815,32 @@ const ConventionFormContent = ({
                   }
                   {...makeAccordionProps(4)}
                 >
+                  <RadioButtons
+                    legend={remoteWorkModeField.label}
+                    id={remoteWorkModeField.id}
+                    orientation="horizontal"
+                    options={remoteWorkModes.map((remoteWorkMode) => ({
+                      label: remoteWorkModeLabels[remoteWorkMode].label,
+                      nativeInputProps: {
+                        value: remoteWorkMode,
+                        checked:
+                          conventionValues.remoteWorkMode === remoteWorkMode,
+                        onChange: () => {
+                          setValue("remoteWorkMode", remoteWorkMode);
+                        },
+                      },
+                    }))}
+                    {...getFieldError("remoteWorkMode")}
+                  />
+                  {conventionValues.remoteWorkMode &&
+                    isRemotableWorkMode(conventionValues.remoteWorkMode) && (
+                      <Alert
+                        severity="info"
+                        className={fr.cx("fr-mb-4w")}
+                        small
+                        description="Pensez à préciser le lieu dy télétravail (domicile, espace de coworking, etc.) dans la section 'Détails de l'immersion professionnelle'"
+                      />
+                    )}
                   <AddressAutocompleteWithCountrySelect
                     {...formContents.immersionAddress}
                     countryCode={establishmentAddressCountryCode ?? undefined}

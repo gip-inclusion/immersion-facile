@@ -4,7 +4,11 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 
 import { useFormContext } from "react-hook-form";
-import { type ConventionReadDto, conventionObjectiveOptions } from "shared";
+import {
+  type ConventionReadDto,
+  conventionObjectiveOptions,
+  isRemotableWorkMode,
+} from "shared";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -161,6 +165,12 @@ export const ImmersionDetailsSection = ({
           ...formContents.workConditions,
           ...register("workConditions"),
         }}
+        {...(isRemotableWorkMode(values.remoteWorkMode)
+          ? {
+              state: "info",
+              stateRelatedMessage: `Vous avez indiqué du télétravail pour cette immersion, indiquez ici le lieu de télétravail (ex. domicile, espace de coworking...). Cela fait partue des conditions réelles du poste et doit être précisé pour sécuriser le cadre de l'immersion.`,
+            }
+          : undefined)}
       />
 
       {values.internshipKind === "mini-stage-cci" && (
