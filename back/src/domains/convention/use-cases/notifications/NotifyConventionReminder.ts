@@ -163,7 +163,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         kind: reminderKind,
       });
 
-    const emails = uniq([
+    const counsellorsAndValidatorsEmails = uniq([
       ...agency.validatorEmails,
       ...agency.counsellorEmails,
     ]);
@@ -171,9 +171,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     await this.#saveNotificationsBatchAndRelatedEvent(
       uow,
       await Promise.all(
-        emails.map((email) =>
+        counsellorsAndValidatorsEmails.map((counsellorOrValidatorEmail) =>
           this.#createAgencyReminderEmail(
-            email,
+            counsellorOrValidatorEmail,
             conventionRead,
             agency,
             reminderKind,
@@ -277,7 +277,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   }
 
   async #createAgencyReminderEmail(
-    email: Email,
+    counsellorOrValidatorEmail: Email,
     convention: ConventionReadDto,
     agency: AgencyDto,
     kind: AgenciesReminderKind,
@@ -286,7 +286,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       kind === "FirstReminderForAgency"
         ? {
             kind: "AGENCY_FIRST_REMINDER",
-            recipients: [email],
+            recipients: [counsellorOrValidatorEmail],
             params: {
               conventionId: convention.id,
               agencyName: agency.name,
@@ -312,7 +312,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
           }
         : {
             kind: "AGENCY_LAST_REMINDER",
-            recipients: [email],
+            recipients: [counsellorOrValidatorEmail],
             params: {
               conventionId: convention.id,
               agencyReferentName: getFormattedFirstnameAndLastname(

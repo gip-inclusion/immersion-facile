@@ -92,26 +92,21 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
       ],
     );
 
-    const agencyRecipientsEmails: Email[] = uniq([
+    const agencyCounsellorsAndValidatorsEmails: Email[] = uniq([
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
     ]);
 
     await Promise.all([
-      ...sendAgencyEmails(
-        agencyRecipientsEmails,
+      ...sendAgencyEmails({
+        agencyCounsellorsAndValidatorsEmails,
         convention,
         uow,
         justification,
-        previousAgency.name,
-        {
-          config: deps.config,
-          timeGateway: deps.timeGateway,
-          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
-        },
-      ),
+        previousAgencyName: previousAgency.name,
+        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        config: deps.config,
+      }),
       ...sendSignatoriesEmail(
         signatoriesRecipientsRoleAndEmail,
         convention,
@@ -130,22 +125,25 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
     ]);
   });
 
-const sendAgencyEmails = (
-  agencyRecipientsEmails: Email[],
-  convention: ConventionDto,
-  uow: UnitOfWork,
-  justification: string,
-  previousAgencyName: string,
-  deps: {
-    config: AppConfig;
-    timeGateway: TimeGateway;
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  },
-) => {
-  return agencyRecipientsEmails.map(async (email) => {
-    return deps.saveNotificationAndRelatedEvent(uow, {
+const sendAgencyEmails = ({
+  agencyCounsellorsAndValidatorsEmails,
+  convention,
+  uow,
+  justification,
+  previousAgencyName,
+  config,
+  saveNotificationAndRelatedEvent,
+}: {
+  agencyCounsellorsAndValidatorsEmails: Email[];
+  convention: ConventionDto;
+  uow: UnitOfWork;
+  justification: string;
+  previousAgencyName: string;
+  config: AppConfig;
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+}) => {
+  return agencyCounsellorsAndValidatorsEmails.map((email) =>
+    saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
@@ -162,7 +160,7 @@ const sendAgencyEmails = (
           beneficiaryPhone: convention.signatories.beneficiary.phone,
           previousAgencyName,
           justification,
-          manageConventionLink: `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
             `/${frontRoutes.manageConventionUserConnected}`,
             {
               conventionId: convention.id,
@@ -176,8 +174,8 @@ const sendAgencyEmails = (
         agencyId: convention.agencyId,
         establishmentSiret: convention.siret,
       },
-    });
-  });
+    }),
+  );
 };
 
 const sendSignatoriesEmail = (

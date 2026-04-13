@@ -50,7 +50,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         convention.id,
       );
 
-    const recipientsEmails: Email[] = conventionAdvisor?.advisor
+    const agencyEmails: Email[] = conventionAdvisor?.advisor
       ? [conventionAdvisor?.advisor.email]
       : uniq([...validatorEmails, ...counsellorEmails]);
 
@@ -59,7 +59,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         kind: "email",
         templatedContent: {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
-          recipients: recipientsEmails,
+          recipients: agencyEmails,
           params: {
             agencyReferentName: getFormattedFirstnameAndLastname(
               convention.agencyReferent ?? {},
@@ -99,7 +99,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         status: assessment.status,
       });
 
-      await executeInSequence(recipientsEmails, async (email) => {
+      await executeInSequence(agencyEmails, async (email) => {
         const manageConventionLink = `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
           `/${frontRoutes.manageConventionUserConnected}`,
           { conventionId: convention.id },
