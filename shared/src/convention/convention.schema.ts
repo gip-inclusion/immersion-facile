@@ -163,7 +163,7 @@ const beneficiarySchema: ZodSchemaWithInputMatchingOutput<
   z.object({
     role: z.literal("beneficiary"),
     emergencyContact: optionalEmptyStringMax1024,
-    emergencyContactPhone: phoneNumberSchema.optional().or(z.literal("")),
+    emergencyContactPhone: z.string().max(16).optional().or(z.literal("")), // temp solution until we write the script to validate old phone numbers
     emergencyContactEmail: emailPossiblyEmptySchema,
     federatedIdentity: peConnectIdentitySchema.optional(),
     financiaryHelp: zStringCanBeEmptyMax1800.optional(),
