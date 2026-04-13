@@ -45,8 +45,11 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     uow = createInMemoryUow();
     verifyAndRequestInvalidPhonesUpdate =
       makeVerifyAndRequestInvalidPhonesUpdate({
-        uowPerformer: new InMemoryUowPerformer(uow),
-        deps: { timeGateway, createNewEvent },
+        deps: {
+          timeGateway,
+          createNewEvent,
+          uowPerformer: new InMemoryUowPerformer(uow),
+        },
       });
   });
 

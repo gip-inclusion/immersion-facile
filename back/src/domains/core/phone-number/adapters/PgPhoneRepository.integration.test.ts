@@ -164,6 +164,7 @@ describe("PgPhoneRepository", () => {
         role: "beneficiary",
         email: `${uuidGenerator.new()}@breizh.com`,
         phone: phoneNumber,
+        emergencyContactPhone: phoneNumber,
       })
       .withEstablishmentTutorPhone(phoneNumber)
       .withEstablishmentRepresentativePhone(phoneNumber)
@@ -263,6 +264,9 @@ describe("PgPhoneRepository", () => {
       actors: async (id) => {
         const convention = await pgConventionRepository.getById(id);
         expect(convention?.signatories.beneficiary.phone).toBe(phoneNumber);
+        expect(convention?.signatories.beneficiary.emergencyContactPhone).toBe(
+          phoneNumber,
+        );
         expect(convention?.establishmentTutor.phone).toBe(phoneNumber);
         expect(convention?.signatories.establishmentRepresentative.phone).toBe(
           phoneNumber,
