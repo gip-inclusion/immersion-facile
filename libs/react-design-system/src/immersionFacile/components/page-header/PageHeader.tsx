@@ -59,7 +59,7 @@ export const PageHeader = ({
       )}
       <div className={cx(fr.cx("fr-container", "fr-mt-8w"), classes.inner)}>
         {illustration && (
-          <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
             <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
               {textContent}
             </div>

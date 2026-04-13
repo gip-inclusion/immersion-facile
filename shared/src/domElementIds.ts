@@ -385,6 +385,10 @@ export const domElementIds = {
       shareFormSubmitButton: "im-convention-form__share-form-submit-button",
     },
     deleteHoursButton: "im-convention-form__delete-hours-button",
+    conventionConfirmation: {
+      copyConventionIdButton:
+        "im-convention-confirmation__copy-convention-id-button",
+    },
   },
 
   manageConvention: {
