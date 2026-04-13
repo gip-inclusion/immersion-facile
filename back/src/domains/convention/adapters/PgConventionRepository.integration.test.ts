@@ -274,6 +274,26 @@ describe("PgConventionRepository", () => {
       ...convention.signatories.beneficiary,
       ...extraFields,
     });
+
+    const { emergencyContactPhone: _, ...extraFieldsWithoutPhone } =
+      extraFields;
+    const conventionWithoutEmergencyPhone = new ConventionDtoBuilder(convention)
+      .withBeneficiary({
+        ...convention.signatories.beneficiary,
+        ...extraFieldsWithoutPhone,
+        emergencyContactPhone: undefined,
+      })
+      .build();
+
+    await conventionRepository.update(conventionWithoutEmergencyPhone);
+
+    const conventionAfterUpdate = await conventionRepository.getById(
+      convention.id,
+    );
+    expectToEqual(
+      conventionAfterUpdate?.signatories.beneficiary.emergencyContactPhone,
+      undefined,
+    );
   });
 
   it("Adds a new convention with beneficiary extra fields without isRqth", async () => {
