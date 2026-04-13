@@ -12,6 +12,7 @@ type FullPageFeedbackProps = FeedbackContentProps & {
 
 export const FullPageFeedback = ({
   title,
+  titleAs,
   illustration,
   content,
   buttonProps,
@@ -22,6 +23,7 @@ export const FullPageFeedback = ({
       buttonProps={buttonProps}
       illustration={illustration}
       title={title}
+      titleAs={titleAs}
       content={content}
     />
   );
