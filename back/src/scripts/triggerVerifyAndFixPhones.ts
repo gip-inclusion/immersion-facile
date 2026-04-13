@@ -26,8 +26,7 @@ const verifyAndFixPhones = async () => {
 
   const verifyAndRequestInvalidPhonesUpdate =
     makeVerifyAndRequestInvalidPhonesUpdate({
-      deps: { createNewEvent, timeGateway },
-      uowPerformer,
+      deps: { createNewEvent, timeGateway, uowPerformer },
     });
 
   const oneDayAgo = subDays(timeGateway.now(), 1);
