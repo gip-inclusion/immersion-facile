@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import test, { expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { type AgencyId, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
@@ -10,6 +10,7 @@ import {
   goToDashboard,
   initiateConvention,
 } from "../../utils/dashboard";
+import { test } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
