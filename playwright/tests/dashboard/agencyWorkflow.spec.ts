@@ -194,14 +194,10 @@ test.describe("Agency dashboard workflow", () => {
       const newConventionTemplateName = "Modèle de convention modifié";
       await page.goto("/");
       await goToDashboard(page, "agency");
-      const conventionTemplateCount = await page
-        .locator('[id^="convention-template-"]')
-        .count();
-      await expect(conventionTemplateCount).toBeGreaterThanOrEqual(1);
 
       await page
         .locator(
-          `#${domElementIds.conventionTemplate.editConventionTemplateButton}-`,
+          `[id^="${domElementIds.conventionTemplate.editConventionTemplateButton}-"]`,
         )
         .first()
         .click();
@@ -218,7 +214,7 @@ test.describe("Agency dashboard workflow", () => {
 
       await goToDashboard(page, "agency");
       await expect(
-        page.locator('[id^="convention-template-"]').first(),
+        await page.locator('[id^="convention-template-"]').first(),
       ).toContainText(newConventionTemplateName);
     });
 
@@ -234,7 +230,7 @@ test.describe("Agency dashboard workflow", () => {
 
       await page
         .locator(
-          `#${domElementIds.conventionTemplate.shareAsConventionDraft.button}-`,
+          `[id^="${domElementIds.conventionTemplate.shareAsConventionDraft.button}-"]`,
         )
         .first()
         .click();

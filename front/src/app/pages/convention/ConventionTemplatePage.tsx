@@ -81,6 +81,7 @@ export const ConventionTemplatePage = ({
 
   return (
     <>
+      {isConventionTemplateLoading && <Loader />}
       <Button {...backButtonProps} />
       <Feedback
         topics={["convention-template"]}
@@ -93,19 +94,15 @@ export const ConventionTemplatePage = ({
           : "Créer un modèle de convention"}
       </h1>
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-        {isConventionTemplateLoading ? (
-          <Loader />
-        ) : (
-          <ConventionForm
-            internshipKind="immersion"
-            mode={
-              conventionTemplateId
-                ? "edit-convention-template"
-                : "create-convention-template"
-            }
-            fromConventionTemplateId={conventionTemplateId}
-          />
-        )}
+        <ConventionForm
+          internshipKind="immersion"
+          mode={
+            conventionTemplateId
+              ? "edit-convention-template"
+              : "create-convention-template"
+          }
+          fromConventionTemplateId={conventionTemplateId}
+        />
       </div>
     </>
   );
