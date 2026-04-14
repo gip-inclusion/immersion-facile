@@ -1,8 +1,8 @@
-import test, { expect, type Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
-import { fillAutocomplete } from "../../utils/utils";
+import { fillAutocomplete, test } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 

@@ -1,10 +1,9 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import { test } from "@playwright/test";
 import { addMonths } from "date-fns";
 import { domElementIds, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
-import { validPhonesData } from "../../utils/utils";
+import { test, validPhonesData } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";

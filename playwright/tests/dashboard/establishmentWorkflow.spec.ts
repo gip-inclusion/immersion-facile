@@ -1,4 +1,4 @@
-import test, { expect, type Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
@@ -8,7 +8,7 @@ import {
   goToEstablishmentDashboardTab,
   initiateConvention,
 } from "../../utils/dashboard";
-import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
+import { expectLocatorToBeVisibleAndEnabled, test } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 

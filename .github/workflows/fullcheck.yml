@@ -237,19 +237,27 @@ jobs:
       - name: Run seed
         run: pnpm back db:seed:bun
       - name: Start the backend
-        run: pnpm back dev:no-typecheck &
+        run: pnpm back dev:no-typecheck > back.log 2>&1 &
       - name: Start the frontend
-        run: pnpm front dev &
+        run: pnpm front dev > front.log 2>&1 &
       - name: Wait for the backend to be ready
         run: npx --yes wait-on tcp:localhost:1234 -t 10000
       - name: Ping backend
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
         run: |
-          pnpm playwright test:ci
+          DEBUG=pw:api,pw:browser* pnpm playwright test:ci
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: ./playwright/playwright-report/
           retention-days: 30
+      - name: Upload app logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-logs
+          path: |
+            back.log
+            front.log

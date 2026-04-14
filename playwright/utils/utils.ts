@@ -1,4 +1,5 @@
 import {
+  test as base,
   expect,
   type Locator,
   type Page,
@@ -129,3 +130,34 @@ export const waitForVisibleLoaderHidden = async (
   if (await loader.isVisible())
     await loader.waitFor({ state: "hidden", timeout: 10_000 });
 };
+
+export const test = base.extend({
+  context: async ({ context }, use, testInfo) => {
+    const prefix = `[${testInfo.file} > ${testInfo.title}]`;
+
+    context.on("page", (page) => {
+      page.on("crash", () => {
+        console.log(`${prefix} PAGE CRASH`);
+      });
+
+      page.on("pageerror", (err) => {
+        console.log(`${prefix} PAGE ERROR: ${err.message}`);
+        console.log(err.stack);
+      });
+
+      page.on("console", (msg) => {
+        console.log(`${prefix} BROWSER CONSOLE [${msg.type()}]: ${msg.text()}`);
+      });
+
+      page.on("requestfailed", (req) => {
+        console.log(
+          `${prefix} REQUEST FAILED: ${req.method()} ${req.url()} -> ${req.failure()?.errorText}`,
+        );
+      });
+    });
+
+    await use(context);
+  },
+});
+
+export { expect } from "@playwright/test";
