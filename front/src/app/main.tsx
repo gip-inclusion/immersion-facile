@@ -44,6 +44,7 @@ if (ENV.envType !== "local") {
     integrations: [browserTracingIntegration(), replayIntegration()],
     release: import.meta.env.VITE_RELEASE_TAG,
     environment: ENV.envType,
+    sampleRate: 0.05,
     tracesSampleRate: 0.01,
     tracePropagationTargets: [
       "http://localhost:3000/api",
