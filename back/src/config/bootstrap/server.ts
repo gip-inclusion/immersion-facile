@@ -55,7 +55,7 @@ export const createApp = async (
   app.set("query parser", (str: string) =>
     qs.parse(str, {
       allowPrototypes: true,
-      arrayLimit: 100,
+      arrayLimit: 500,
     }),
   );
 
