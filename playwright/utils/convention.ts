@@ -490,7 +490,7 @@ export const confirmCreateConventionFormSubmit = async (
 };
 
 const getRandomSiret = () =>
-  ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
+  ["722 003 936 02320", "94937244500013", "130 005 481 00010"][
     Math.floor(Math.random() * 3)
   ];
 
