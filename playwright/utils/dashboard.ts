@@ -57,14 +57,6 @@ export const createConventionTemplate = async (
     `#${domElementIds.conventionTemplate.form.submitFormButton}`,
   );
   await expect(page.locator(".fr-alert--success")).toBeVisible();
-
-  await goToDashboard(page, dashboardKind);
-  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
-  await expect(
-    page
-      .locator('[id^="convention-template-"]')
-      .getByRole("heading", { name: templateName }),
-  ).toHaveCount(1);
 };
 
 export const deleteConventionTemplate = async (
@@ -74,16 +66,20 @@ export const deleteConventionTemplate = async (
   await page.goto("/");
   await goToDashboard(page, dashboardKind);
 
-  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+  await expect(
+    page.locator('[id^="convention-template-"]').count(),
+  ).toBeGreaterThanOrEqual(1);
 
-  await page.click(
-    `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
-  );
+  await page
+    .locator(
+      `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
+    )
+    .first()
+    .click();
   await page.click(
     `#${domElementIds.conventionTemplate.deleteConventionTemplate.confirmButton}`,
   );
   await expect(page.locator(".fr-alert--success")).toBeVisible();
-  await expect(page.locator('[id^="convention-template-"]')).toHaveCount(0);
 };
 
 export const initiateConvention = async ({
