@@ -1,8 +1,10 @@
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+const repoRoot = path.resolve(__dirname, "..");
 export default defineConfig({
   globalSetup: "./env-setup.ts",
   testDir: "./tests",
@@ -15,7 +17,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || "http://localhost:3000",
+    baseURL: process.env.CI ? "http://127.0.0.1:3000" : process.env.BASE_URL || "http://localhost:3000",
     screenshot: {
       mode: "only-on-failure",
       fullPage: true,
@@ -35,6 +37,28 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
       dependencies: ["setup"],
+    },
+  ],
+  webServer: [
+    {
+      name: "backend",
+      command: "pnpm back dev:no-typecheck",
+      cwd: repoRoot,
+      url: "http://127.0.0.1:1234",
+      timeout: 120_000,
+      reuseExistingServer: false,
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+    {
+      name: "frontend",
+      command: "pnpm front dev",
+      cwd: repoRoot,
+      url: "http://127.0.0.1:3000",
+      timeout: 120_000,
+      reuseExistingServer: false,
+      stdout: "pipe",
+      stderr: "pipe",
     },
   ],
 });
