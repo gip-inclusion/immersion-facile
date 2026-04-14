@@ -401,6 +401,13 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur ${role}-${emailHash} n'a pas de droit sur la convention '${conventionId}'. L'email saisi dans la convention a été modifié. Vous ne pouvez plus accéder à cette convention avec l'email que vous venez d'utiliser.`,
       ),
+    forbiddenMissingRightsApiConsumer: (
+      conventionId: ConventionId,
+      apiConsumerId: ApiConsumerId,
+    ) =>
+      new ForbiddenError(
+        `Le consomateur API '${apiConsumerId}' n'a pas de droits sur la convention '${conventionId}'.`,
+      ),
     forbiddenConventionIdMismatch: ({
       jwtConventionId,
       jwtRole,

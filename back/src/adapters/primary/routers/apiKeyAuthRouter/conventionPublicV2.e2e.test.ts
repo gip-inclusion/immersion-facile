@@ -3,6 +3,7 @@ import {
   type AssessmentDto,
   ConventionDtoBuilder,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
@@ -124,7 +125,10 @@ describe("Convention routes", () => {
 
       expectToEqual(body, {
         status: 403,
-        message: `You are not allowed to access convention : ${convention.id}`,
+        message: errors.convention.forbiddenMissingRightsApiConsumer(
+          convention.id,
+          conventionReadConsumerWithNoScope.id,
+        ).message,
       });
       expectToEqual(status, 403);
     });

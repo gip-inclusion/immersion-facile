@@ -12,36 +12,35 @@ import {
   type Role,
   type UserWithAdminRights,
 } from "shared";
+import { usersToEmails } from "../domains/connected-users/helpers/connectedUser.helper";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 import { conventionEmailsByRole } from "./convention";
 import { isSomeEmailMatchingEmailHash, makeEmailHash } from "./jwt";
 
 export const isHashMatchNotNotifiedCounsellorOrValidator = async ({
-  role,
   emailHash,
   agency,
   uow,
 }: {
-  role: Role;
   emailHash: EmailHash;
   agency: AgencyWithUsersRights;
   uow: UnitOfWork;
 }): Promise<boolean> => {
-  if (role !== "counsellor" && role !== "validator") return false;
-
-  const userIdsWithRoleOnAgency = toPairs(agency.usersRights)
+  const notNotitifedCounsellorsAndValidators = toPairs(agency.usersRights)
     .filter(
-      ([_, right]) => right?.roles.includes(role) && !right.isNotifiedByEmail,
+      ([_, right]) =>
+        right?.roles.some((role) =>
+          ["validator", "counsellor"].includes(role),
+        ) && !right.isNotifiedByEmail,
     )
     .map(([id]) => id);
 
-  const users = await uow.userRepository.getByIds(userIdsWithRoleOnAgency);
-
-  return isSomeEmailMatchingEmailHash(
-    users.map(({ email }) => email),
-    emailHash,
-  );
+  return uow.userRepository
+    .getByIds(notNotitifedCounsellorsAndValidators)
+    .then((users) =>
+      isSomeEmailMatchingEmailHash(usersToEmails(users), emailHash),
+    );
 };
 
 export const getAgencyEmailFromEmailHash = async (
@@ -64,7 +63,7 @@ export const getAgencyEmailFromEmailHash = async (
   return email;
 };
 
-export const isHashMatchConventionEmails = async ({
+export const isHashMatchConventionEmails = ({
   convention,
   emailHash,
   role,

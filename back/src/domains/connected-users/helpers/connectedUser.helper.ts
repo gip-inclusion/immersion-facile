@@ -7,6 +7,7 @@ import {
   type AgencyWithUsersRights,
   agencyRoleIsNotToReview,
   type ConnectedUser,
+  type Email,
   type EstablishmentDashboards,
   type User,
   type UserId,
@@ -350,3 +351,6 @@ const saveAndProvideNewUser = async (
   await userRepository.save(newUser);
   return newUser;
 };
+
+export const usersToEmails = (users: UserWithAdminRights[]): Email[] =>
+  users.map(({ email }) => email);
