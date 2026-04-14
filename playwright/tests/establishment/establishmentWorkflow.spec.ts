@@ -4,7 +4,7 @@ import { addMonths } from "date-fns";
 import { domElementIds, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
-import { phoneRegexp } from "../../utils/utils";
+import { validPhonesData } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";
@@ -54,7 +54,7 @@ test.describe("Establishment creation and modification workflow", () => {
             status: "ACCEPTED",
             email: testConfig.proConnect.username,
             job: faker.person.jobType(),
-            phone: faker.helpers.fromRegExp(phoneRegexp),
+            phone: validPhonesData.establishmentRepresentative,
             shouldReceiveDiscussionNotifications: true,
             isMainContactByPhone: false,
           },

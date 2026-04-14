@@ -11,7 +11,14 @@ export type PlaywrightTestCallback = (
   info: TestInfo,
 ) => Promise<void>;
 
-export const phoneRegexp = new RegExp(/[0][1-9][0-9]{8}/);
+export const validPhonesData = {
+  beneficiary: "0601010101",
+  beneficiaryRepresentative: "0249030304",
+  beneficiaryCurrentEmployer: "0605050505",
+  establishmentTutor: "0549030303",
+  establishmentRepresentative: "0604040404",
+  agency: "0605050505",
+};
 
 export const expectElementToBeVisible = async (
   page: Page,

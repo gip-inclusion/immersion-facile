@@ -194,9 +194,10 @@ test.describe("Agency dashboard workflow", () => {
       const newConventionTemplateName = "Modèle de convention modifié";
       await page.goto("/");
       await goToDashboard(page, "agency");
-      await expect(
-        page.locator('[id^="convention-template-"]').count(),
-      ).toBeGreaterThanOrEqual(1);
+      const conventionTemplateCount = await page
+        .locator('[id^="convention-template-"]')
+        .count();
+      await expect(conventionTemplateCount).toBeGreaterThanOrEqual(1);
 
       await page
         .locator(
@@ -226,9 +227,10 @@ test.describe("Agency dashboard workflow", () => {
     }) => {
       await page.goto("/");
       await goToDashboard(page, "agency");
-      await expect(
-        page.locator('[id^="convention-template-"]').count(),
-      ).toBeGreaterThanOrEqual(1);
+      const conventionTemplateCount = await page
+        .locator('[id^="convention-template-"]')
+        .count();
+      await expect(conventionTemplateCount).toBeGreaterThanOrEqual(1);
 
       await page
         .locator(
