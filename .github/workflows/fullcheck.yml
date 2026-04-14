@@ -175,7 +175,13 @@ jobs:
       SIRENE_INSEE_PASSWORD: ${{ secrets.SIRENE_INSEE_PASSWORD }}
       EVENT_CRAWLER_PERIOD_MS: 600
       EXTERNAL_AXIOS_TIMEOUT: 30000
+      CACHE: REDIS
+      REDIS_URL: redis://@localhost:6379
     services:
+      redis:
+        image: redis:7.2.5
+        ports:
+          - 6379:6379
       postgres:
         image: postgis/postgis:13-master
         env:
