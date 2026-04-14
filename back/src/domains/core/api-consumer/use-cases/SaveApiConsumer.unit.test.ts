@@ -9,7 +9,10 @@ import {
   type Role,
 } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
-import { makeCreateNewEvent } from "../../events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -99,6 +102,7 @@ describe("SaveApiConsumer", () => {
           publications: [],
           status: "never-published",
           wasQuarantined: false,
+          priority: defaultPriority,
         },
       ]);
     });
@@ -184,6 +188,7 @@ describe("SaveApiConsumer", () => {
           publications: [],
           status: "never-published",
           wasQuarantined: false,
+          priority: defaultPriority,
         },
       ]);
     });

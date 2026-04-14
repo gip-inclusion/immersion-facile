@@ -4,6 +4,7 @@ import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type {
   DomainEvent,
   DomainTopic,
+  EventPriority,
   EventPublication,
   EventStatus,
   SubscriptionId,
@@ -47,6 +48,8 @@ export type CreateNewEvent = <T extends DomainTopic>(
   params: CreateNewEventParams<T>,
 ) => NarrowEvent<T>;
 
+export const defaultPriority: EventPriority = 5;
+
 export const makeCreateNewEvent =
   ({
     uuidGenerator,
@@ -60,5 +63,6 @@ export const makeCreateNewEvent =
       wasQuarantined: new Set(quarantinedTopics).has(params.topic),
       publications: [],
       status: "never-published",
+      priority: defaultPriority,
       ...params,
     }) as any;

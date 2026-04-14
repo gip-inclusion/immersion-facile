@@ -16,7 +16,7 @@ import type {
   EventFailure,
   EventPublication,
 } from "../events";
-import type { EventBus } from "../ports/EventBus";
+import { defaultPriority, type EventBus } from "../ports/EventBus";
 import { getLastPublication, InMemoryEventBus } from "./InMemoryEventBus";
 
 const domainEvt: DomainEvent = {
@@ -30,6 +30,7 @@ const domainEvt: DomainEvent = {
   wasQuarantined: false,
   status: "never-published",
   publications: [],
+  priority: defaultPriority,
 };
 
 describe("InMemoryEventBus", () => {

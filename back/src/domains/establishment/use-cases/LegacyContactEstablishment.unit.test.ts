@@ -169,6 +169,7 @@ describe("LegacyContactEstablishment", () => {
           id: eventId,
           occurredAt: now.toISOString(),
           topic: "ContactRequestedByBeneficiary",
+          priority: 5,
           payload: {
             siret: establishmentAggregateWithEmailContact.establishment.siret,
             discussionId,
@@ -219,6 +220,7 @@ describe("LegacyContactEstablishment", () => {
           id: eventId,
           occurredAt: now.toISOString(),
           topic: "ContactRequestedByBeneficiary",
+          priority: 5,
           payload: {
             siret: establishment.establishment.siret,
             discussionId,
@@ -268,6 +270,7 @@ describe("LegacyContactEstablishment", () => {
           id: eventId,
           occurredAt: now.toISOString(),
           topic: "ContactRequestedByBeneficiary",
+          priority: 5,
           payload: {
             siret: establishment.establishment.siret,
             discussionId,

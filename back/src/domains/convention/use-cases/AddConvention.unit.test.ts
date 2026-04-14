@@ -8,6 +8,7 @@ import {
 import type { DomainEvent } from "../../core/events/events";
 import {
   type CreateNewEvent,
+  defaultPriority,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import {
@@ -75,6 +76,7 @@ describe("Add Convention", () => {
         publications: [],
         status: "never-published",
         wasQuarantined: false,
+        priority: defaultPriority,
       },
     ]);
   });
@@ -114,6 +116,7 @@ describe("Add Convention", () => {
         publications: [],
         status: "never-published",
         wasQuarantined: false,
+        priority: defaultPriority,
       },
     ]);
   });
@@ -147,6 +150,7 @@ describe("Add Convention", () => {
         publications: [],
         status: "never-published",
         wasQuarantined: false,
+        priority: defaultPriority,
       },
     ]);
   });
@@ -182,6 +186,7 @@ describe("Add Convention", () => {
         publications: [],
         status: "never-published",
         wasQuarantined: false,
+        priority: defaultPriority,
       },
     ]);
   });

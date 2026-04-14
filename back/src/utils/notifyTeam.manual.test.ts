@@ -25,6 +25,7 @@ describe("Notify Team", () => {
         triggeredBy: { kind: "connected-user", userId: "0001" },
       },
       status: "failed-but-will-retry",
+      priority: 5,
       publications: [
         {
           publishedAt: new Date().toISOString(),

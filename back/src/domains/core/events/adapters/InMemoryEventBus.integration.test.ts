@@ -14,7 +14,7 @@ import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import type { DomainEvent, EventPublication } from "../events";
-import type { EventBus } from "../ports/EventBus";
+import { defaultPriority, type EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import {
   PgOutboxRepository,
@@ -49,6 +49,7 @@ const domainEvt: DomainEvent = {
   wasQuarantined: false,
   status: "never-published",
   publications: [],
+  priority: defaultPriority,
 };
 
 describe("when simulating that an event has failed to force re-run it only for one usecase", () => {

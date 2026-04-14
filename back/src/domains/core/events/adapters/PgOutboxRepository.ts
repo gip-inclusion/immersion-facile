@@ -11,9 +11,11 @@ import type {
   DomainEvent,
   DomainTopic,
   EventFailure,
+  EventPriority,
   EventPublication,
   EventStatus,
 } from "../events";
+import { defaultPriority } from "../ports/EventBus";
 import type {
   DeleteOldestEventsParams,
   OutboxRepository,
@@ -346,5 +348,5 @@ const storedEventOutboxToDomainEvent = (row: StoredEventRow): DomainEvent => ({
   wasQuarantined: row.was_quarantined,
   publications: [],
   status: row.status,
-  ...(row.priority ? { priority: row.priority } : {}),
+  priority: (row.priority ?? defaultPriority) as EventPriority,
 });
