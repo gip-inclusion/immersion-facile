@@ -7,6 +7,7 @@ import {
   type DeleteAssessmentRequestDto,
   type Flavor,
   type InitiateLoginByEmailParams,
+  type RangeOfPosition,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
   roleSchema,
@@ -65,7 +66,7 @@ export type EventStatus =
 // The lower is the higher the priority:
 // 0 super important to process ASAP
 // 10 can be delayed without problems
-export type EventPriority = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type EventPriority = 0 | RangeOfPosition<10>;
 
 type GenericEvent<T extends string, P> = {
   id: string;

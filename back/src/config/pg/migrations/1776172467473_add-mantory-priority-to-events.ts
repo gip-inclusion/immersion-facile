@@ -4,11 +4,10 @@ const defaultPriority = 5;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.alterColumn("outbox", "priority", {
-    notNull: true,
     default: defaultPriority,
   });
 
-  pgm.alterColumn("events", "priority", {
+  pgm.alterColumn("outbox", "priority", {
     default: null,
   });
 }
