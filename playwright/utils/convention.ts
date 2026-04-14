@@ -86,9 +86,11 @@ export const fillConventionForm = async (page: Page) => {
   );
   await openConventionAccordionSection(page, 2); // Open Establishment section
 
-  await page.locator(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.siret}`,
-  ).pressSequentially(getRandomSiret());
+  await page
+    .locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.siret}`,
+    )
+    .pressSequentially(getRandomSiret());
 
   const establishmentFirstName = page.locator(
     `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.firstName}`,
@@ -485,7 +487,7 @@ export const confirmCreateConventionFormSubmit = async (
 
 const getRandomSiret = () =>
   ["722 003 936 02320", "94937244500013", "130 005 481 00010"][
-  Math.floor(Math.random() * 3)
+    Math.floor(Math.random() * 3)
   ];
 
 export const shareConventionDraftByEmail = async (page: Page) => {

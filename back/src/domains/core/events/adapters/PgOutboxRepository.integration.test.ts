@@ -59,6 +59,7 @@ describe("PgOutboxRepository", () => {
     const common = {
       occurred_at: "2021-11-15T08:30:00.000Z",
       topic: "PeConnectFederatedIdentityAssociated",
+      priority: null,
       payload:
         '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}',
     };
@@ -111,10 +112,12 @@ describe("PgOutboxRepository", () => {
       const event1 = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
         payload: { convention, triggeredBy: null },
+        priority: 5,
       });
       const event2 = createNewEvent({
         topic: "DiscussionMarkedAsDeprecated",
         payload: { discussionId: "discussionId", triggeredBy: null },
+        priority: 5,
       });
 
       await outboxRepository.saveNewEventsBatch([event1, event2]);
@@ -133,7 +136,7 @@ describe("PgOutboxRepository", () => {
       expectToEqual(conventionEvent, {
         id: conventionEventId,
         status: "never-published",
-        priority: null,
+        priority: 5,
         topic: "ConventionSubmittedByBeneficiary",
         occurred_at: expect.any(Date),
         was_quarantined: false,
@@ -143,7 +146,7 @@ describe("PgOutboxRepository", () => {
       expectToEqual(discussionEvent, {
         id: discussionEventId,
         status: "never-published",
-        priority: null,
+        priority: 5,
         topic: "DiscussionMarkedAsDeprecated",
         occurred_at: expect.any(Date),
         was_quarantined: false,
@@ -715,7 +718,7 @@ const expectStoredRowsToMatchEvent = (
         published_at: null,
         subscription_id: null,
         error_message: null,
-        priority: commonStoredEventFields.priority ?? null,
+        priority: commonStoredEventFields.priority,
       },
     ]);
     return;

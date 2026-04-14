@@ -99,6 +99,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
     expectArraysToMatch(uow.outboxRepository.events, [
       {
         topic: "InvalidPhoneUpdateRequested",
+        priority: 7,
         payload: {
           phoneIdToUpdate: fixablePhone.id,
           newPhoneNumber: fixedPhoneNumber,
@@ -107,6 +108,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
       },
       {
         topic: "InvalidPhoneUpdateRequested",
+        priority: 7,
         payload: {
           phoneIdToUpdate: unfixablePhone.id,
           newPhoneNumber: defaultPhoneNumber,

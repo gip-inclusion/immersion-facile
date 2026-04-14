@@ -109,6 +109,7 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
                 topic: "InvalidPhoneUpdateRequested",
                 payload: updatePhonePayload,
                 wasQuarantined: true, // we don't know how many events there are to fix phones
+                priority: 7,
               }),
           );
           await uow.outboxRepository.saveNewEventsBatch(
