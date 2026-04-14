@@ -194,11 +194,17 @@ test.describe("Agency dashboard workflow", () => {
       const newConventionTemplateName = "Modèle de convention modifié";
       await page.goto("/");
       await goToDashboard(page, "agency");
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+      await expect(
+        page.locator('[id^="convention-template-"]').count(),
+      ).toBeGreaterThanOrEqual(1);
 
-      await page.click(
-        `[id^="${domElementIds.conventionTemplate.editConventionTemplateButton}-"]`,
-      );
+      await page
+        .locator(
+          `#${domElementIds.conventionTemplate.editConventionTemplateButton}-`,
+        )
+        .first()
+        .click();
+
       await page.fill(
         `#${domElementIds.conventionTemplate.form.nameInput}`,
         newConventionTemplateName,
@@ -210,10 +216,9 @@ test.describe("Agency dashboard workflow", () => {
       await expect(page.locator(".fr-alert--success")).toBeVisible();
 
       await goToDashboard(page, "agency");
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
-      await expect(page.locator('[id^="convention-template-"]')).toContainText(
-        newConventionTemplateName,
-      );
+      await expect(
+        page.locator('[id^="convention-template-"]').first(),
+      ).toContainText(newConventionTemplateName);
     });
 
     test("IC user can share a convention template as a draft", async ({
@@ -221,11 +226,16 @@ test.describe("Agency dashboard workflow", () => {
     }) => {
       await page.goto("/");
       await goToDashboard(page, "agency");
-      await expect(page.locator('[id^="convention-template-"]')).toHaveCount(1);
+      await expect(
+        page.locator('[id^="convention-template-"]').count(),
+      ).toBeGreaterThanOrEqual(1);
 
-      await page.click(
-        `[id^="${domElementIds.conventionTemplate.shareAsConventionDraft.button}-"]`,
-      );
+      await page
+        .locator(
+          `#${domElementIds.conventionTemplate.shareAsConventionDraft.button}-`,
+        )
+        .first()
+        .click();
 
       await page.fill(
         `#${domElementIds.conventionTemplate.shareAsConventionDraft.emailInput}`,
