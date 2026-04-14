@@ -1,5 +1,8 @@
+import { addYears } from "date-fns";
 import {
   AgencyDtoBuilder,
+  type ApiConsumer,
+  type ApiConsumerRights,
   AssessmentDtoBuilder,
   ConnectedUserBuilder,
   type ConventionDomainJwtPayload,
@@ -106,6 +109,35 @@ describe("Get Convention", () => {
     .withEstablishmentRepresentativeEmail(establishmentRep.email)
     .withAgencyReferent({ firstname: "Fredy", lastname: "L'ACCOMPAGNATEUR" })
     .build();
+
+  const createApiConsumer = (
+    conventionRight: ApiConsumerRights["convention"],
+  ): ApiConsumer => ({
+    id: "my-api-consumer-id",
+    description: "Some description",
+    name: "pole-emploi",
+    createdAt: new Date().toISOString(),
+    expirationDate: addYears(new Date(), 2).toISOString(),
+    contact: {
+      firstName: "John",
+      lastName: "Doe",
+      job: "job",
+      emails: ["john.doe@mail.com"],
+      phone: "0601010101",
+    },
+    rights: {
+      searchEstablishment: {
+        kinds: [],
+        scope: "no-scope",
+        subscriptions: [],
+      },
+      convention: conventionRight,
+      statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
+    },
+    revokedAt: null,
+    currentKeyIssuedAt: new Date().toISOString(),
+  });
+
   const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
     .withId(uuidGenerator.new())
     .withAgencyId(agency.id)
@@ -118,6 +150,7 @@ describe("Get Convention", () => {
       job: "Job",
     })
     .build();
+
   const establishmentWithSiret = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(convention.siret)
     .withUserRights([
@@ -193,51 +226,54 @@ describe("Get Convention", () => {
 
   describe("Wrong paths", () => {
     describe("Forbidden error", () => {
-      it("When the user don't have correct role on connected users neither has right on existing establishment with same siret in convention", async () => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishmentWithSiret,
-        ];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [johnDoe.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
-          }),
-        ];
+      describe("with ConnectedUser", () => {
+        it("When the user don't have correct role on connected users neither has right on existing establishment with same siret in convention", async () => {
+          uow.establishmentAggregateRepository.establishmentAggregates = [
+            establishmentWithSiret,
+          ];
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [johnDoe.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+            }),
+          ];
 
-        await expectPromiseToFailWithError(
-          getConvention.execute(
-            { conventionId: convention.id },
-            { userId: johnDoe.id },
-          ),
-          errors.convention.forbiddenMissingRightsUserId({
-            conventionId: convention.id,
-            userId: johnDoe.id,
-          }),
-        );
-      });
-      it("When the user don't have correct status on connected users neither has right on existing establishment with same siret in convention", async () => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishmentWithSiret,
-        ];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [pendingUser.id]: {
-              isNotifiedByEmail: false,
-              roles: ["to-review"],
-            },
-          }),
-        ];
+          await expectPromiseToFailWithError(
+            getConvention.execute(
+              { conventionId: convention.id },
+              { userId: johnDoe.id },
+            ),
+            errors.convention.forbiddenMissingRightsUserId({
+              conventionId: convention.id,
+              userId: johnDoe.id,
+            }),
+          );
+        });
+        it("When the user don't have correct status on connected users neither has right on existing establishment with same siret in convention", async () => {
+          uow.establishmentAggregateRepository.establishmentAggregates = [
+            establishmentWithSiret,
+          ];
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [pendingUser.id]: {
+                isNotifiedByEmail: false,
+                roles: ["to-review"],
+              },
+            }),
+          ];
 
-        await expectPromiseToFailWithError(
-          getConvention.execute(
-            { conventionId: convention.id },
-            { userId: johnDoe.id },
-          ),
-          errors.convention.forbiddenMissingRightsUserId({
-            conventionId: convention.id,
-            userId: johnDoe.id,
-          }),
-        );
+          await expectPromiseToFailWithError(
+            getConvention.execute(
+              { conventionId: convention.id },
+              { userId: johnDoe.id },
+            ),
+            errors.convention.forbiddenMissingRightsUserId({
+              conventionId: convention.id,
+              userId: johnDoe.id,
+            }),
+          );
+        });
       });
+
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
           const jwtPayload: ConventionDomainJwtPayload = {
@@ -328,6 +364,38 @@ describe("Get Convention", () => {
           );
         });
       });
+
+      describe("with ApiConsumer", () => {
+        it("convention is linked to an agency with an Id which is not", async () => {
+          const apiConsumer = createApiConsumer({
+            kinds: ["READ"],
+            scope: { agencyIds: ["out-of-scope-agency-id"] },
+            subscriptions: [],
+          });
+          await expectPromiseToFailWithError(
+            getConvention.execute({ conventionId: convention.id }, apiConsumer),
+            errors.convention.forbiddenMissingRightsApiConsumer(
+              convention.id,
+              apiConsumer.id,
+            ),
+          );
+        });
+
+        it("convention is linked to an agency with a kind not in scope", async () => {
+          const apiConsumer = createApiConsumer({
+            kinds: ["READ"],
+            scope: { agencyKinds: ["mission-locale"] },
+            subscriptions: [],
+          });
+          await expectPromiseToFailWithError(
+            getConvention.execute({ conventionId: convention.id }, apiConsumer),
+            errors.convention.forbiddenMissingRightsApiConsumer(
+              convention.id,
+              apiConsumer.id,
+            ),
+          );
+        });
+      });
     });
 
     describe("Not found error", () => {
@@ -362,7 +430,7 @@ describe("Get Convention", () => {
   });
 
   describe("Right paths", () => {
-    describe("connected user", () => {
+    describe("with connected user", () => {
       it("that have agency rights", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
@@ -670,6 +738,64 @@ describe("Get Convention", () => {
             assessment: null,
           },
         );
+      });
+    });
+
+    describe("with ApiConsumer", () => {
+      it("when agencyIds scope matches", async () => {
+        const retrievedConvention = await getConvention.execute(
+          { conventionId: convention.id },
+          createApiConsumer({
+            kinds: ["READ"],
+            scope: { agencyIds: [agency.id] },
+            subscriptions: [],
+          }),
+        );
+
+        expectToEqual(retrievedConvention, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyContactEmail: agency.contactEmail,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+          assessment: {
+            status: assessment.status,
+            endedWithAJob: assessment.endedWithAJob,
+            signedAt: assessment.signedAt,
+            createdAt: assessment.createdAt,
+          },
+        });
+      });
+
+      it("when agencyKinds scope matches", async () => {
+        const retrievedConvention = await getConvention.execute(
+          { conventionId: convention.id },
+          createApiConsumer({
+            kinds: ["READ"],
+            scope: { agencyKinds: [agency.kind] },
+            subscriptions: [],
+          }),
+        );
+
+        expectToEqual(retrievedConvention, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyContactEmail: agency.contactEmail,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+          assessment: {
+            status: assessment.status,
+            endedWithAJob: assessment.endedWithAJob,
+            signedAt: assessment.signedAt,
+            createdAt: assessment.createdAt,
+          },
+        });
       });
     });
   });

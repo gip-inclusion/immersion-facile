@@ -46,7 +46,6 @@ import { makeGetApiConsumersByConvention } from "../../domains/convention/use-ca
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
 import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
-import { makeGetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
@@ -535,9 +534,6 @@ export const createUseCases = ({
     //Convention
     addConvention,
     getConvention: makeGetConvention({ uowPerformer }),
-    getConventionForApiConsumer: makeGetConventionForApiConsumer({
-      uowPerformer,
-    }),
 
     shareConventionByEmail: makeShareConventionDraftByEmail({
       uowPerformer,

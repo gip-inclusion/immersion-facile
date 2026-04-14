@@ -156,7 +156,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       )
         throw errors.apiConsumer.forbidden();
 
-      return deps.useCases.getConventionForApiConsumer
+      return deps.useCases.getConvention
         .execute(req.params, req.apiConsumer)
         .then(conventionReadToConventionReadPublicV2);
     }),
