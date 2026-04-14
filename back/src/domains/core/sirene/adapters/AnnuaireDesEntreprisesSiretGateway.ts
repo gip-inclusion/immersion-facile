@@ -1,11 +1,13 @@
 import Bottleneck from "bottleneck";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
 import type { HttpClient } from "shared-routes";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { SiretGateway } from "../ports/SiretGateway";
 import type {
   AnnuaireDesEntreprisesSiretEstablishment,
   AnnuaireDesEntreprisesSiretRoutes,
 } from "./AnnuaireDesEntreprisesSiretGateway.routes";
+import { annuaireDesEntreprisesSiretRoutes } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const adeMaxQueryPerSeconds = 7;
@@ -22,17 +24,37 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
 
   #fallbackGateway: SiretGateway;
 
+  #withCache: WithCache;
+
   constructor(
     httpClient: HttpClient<AnnuaireDesEntreprisesSiretRoutes>,
     fallbackGateway: SiretGateway,
+    withCache: WithCache,
   ) {
     this.#httpClient = httpClient;
     this.#fallbackGateway = fallbackGateway;
+    this.#withCache = withCache;
   }
 
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
+  ): Promise<SiretEstablishmentDto | undefined> {
+    return this.#withCache({
+      getCacheKey: (siret) =>
+        `ade_siret_${siret}_${includeClosedEstablishments}`,
+      cb: (siret) =>
+        this.#fetchEstablishmentBySiret(siret, includeClosedEstablishments),
+      logParams: {
+        partner: "annuaireDesEntreprises",
+        route: annuaireDesEntreprisesSiretRoutes.search,
+      },
+    })(siret);
+  }
+
+  async #fetchEstablishmentBySiret(
+    siret: SiretDto,
+    includeClosedEstablishments: boolean,
   ): Promise<SiretEstablishmentDto | undefined> {
     // https://api.gouv.fr/les-api/api-recherche-entreprises
     return this.#limiter
