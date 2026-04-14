@@ -259,6 +259,32 @@ export const ConventionForm = ({
         "immersionAppellation" in route.params
           ? route.params.immersionAppellation
           : convention.immersionAppellation,
+      signatories: {
+        ...convention.signatories,
+        beneficiary: {
+          ...convention.signatories?.beneficiary,
+          birthdate:
+            "birthdate" in route.params
+              ? route.params.birthdate
+              : convention.signatories?.beneficiary?.birthdate,
+          firstName:
+            "firstName" in route.params
+              ? route.params.firstName
+              : convention.signatories?.beneficiary?.firstName,
+          lastName:
+            "lastName" in route.params
+              ? route.params.lastName
+              : convention.signatories?.beneficiary?.lastName,
+          email:
+            "email" in route.params
+              ? route.params.email
+              : convention.signatories?.beneficiary?.email,
+          phone:
+            "phone" in route.params
+              ? route.params.phone
+              : convention.signatories?.beneficiary?.phone,
+        },
+      },
     } as ConventionFormInitialValues;
   }, [
     mode,

@@ -67,12 +67,7 @@ export const makeEmptyConventionInitialValues = ({
     }),
     siret,
     immersionAddress: immersionAddress,
-    immersionAppellation: immersionAppellation ?? {
-      romeLabel: "",
-      appellationLabel: "",
-      romeCode: "",
-      appellationCode: "",
-    },
+    immersionAppellation: immersionAppellation,
     establishmentTutor: {
       role: "establishment-tutor",
       firstName: "",
