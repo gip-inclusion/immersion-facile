@@ -10,6 +10,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../../config/bootstrap/magicLinkUrl";
+import { defaultPriority } from "../../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../domains/core/jwt";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -128,6 +129,7 @@ export const conventionSeed = async (
     publications: [],
     wasQuarantined: false,
     topic: "EmailWithLinkToCreateAssessmentSent",
+    priority: defaultPriority,
     payload: {
       id: conventionWithAssessmentReadyToFill.id,
     },

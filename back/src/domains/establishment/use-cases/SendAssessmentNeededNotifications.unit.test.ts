@@ -317,6 +317,8 @@ describe("SendAssessmentNeededNotifications", () => {
       await uow.outboxRepository.save({
         id: "existing-notification-added",
         topic: "NotificationAdded",
+        priority: 5,
+
         payload: {
           id: existingBeneficiaryNotification.id,
           kind: existingBeneficiaryNotification.kind,
@@ -330,6 +332,7 @@ describe("SendAssessmentNeededNotifications", () => {
       await uow.outboxRepository.save({
         id: "existing-beneficiary-assessment-email",
         topic: "BeneficiaryAssessmentEmailSent",
+        priority: 5,
         payload: {
           id: conventionEndingTomorrow.id,
         },
@@ -428,6 +431,7 @@ describe("SendAssessmentNeededNotifications", () => {
       await uow.outboxRepository.save({
         id: "existing-notification-added",
         topic: "NotificationAdded",
+        priority: 5,
         payload: {
           id: tutorNotification.id,
           kind: tutorNotification.kind,
@@ -441,6 +445,7 @@ describe("SendAssessmentNeededNotifications", () => {
       await uow.outboxRepository.save({
         id: "existing-beneficiary-assessment-email",
         topic: "EmailWithLinkToCreateAssessmentSent",
+        priority: 5,
         payload: {
           id: conventionEndedYesterday.id,
         },

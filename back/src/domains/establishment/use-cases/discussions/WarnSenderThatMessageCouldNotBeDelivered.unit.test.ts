@@ -8,6 +8,7 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { defaultPriority } from "../../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -86,6 +87,7 @@ describe("WarnSenderThatMessageCouldNotBeDelivered", () => {
       await uow.outboxRepository.save({
         id: "event-id",
         topic: "NotificationAdded",
+        priority: defaultPriority,
         payload: { id: notificationThatFailedId, kind: "email" },
         occurredAt: new Date().toISOString(),
         publications: [],

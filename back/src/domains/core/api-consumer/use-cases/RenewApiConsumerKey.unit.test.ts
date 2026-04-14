@@ -6,7 +6,10 @@ import {
   expectToEqual,
 } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
-import { makeCreateNewEvent } from "../../events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -109,6 +112,7 @@ describe("RenewApiConsumerKey", () => {
           publications: [],
           status: "never-published",
           wasQuarantined: false,
+          priority: defaultPriority,
         },
       ]);
     });
@@ -190,6 +194,7 @@ describe("RenewApiConsumerKey", () => {
           publications: [],
           status: "never-published",
           wasQuarantined: false,
+          priority: defaultPriority,
         },
       ]);
     });

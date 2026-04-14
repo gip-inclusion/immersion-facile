@@ -1,6 +1,9 @@
 import { addDays, subMonths } from "date-fns";
 import { DiscussionBuilder, expectToEqual } from "shared";
-import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -177,6 +180,7 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
         publications: [],
         wasQuarantined: false,
         status: "never-published" as const,
+        priority: defaultPriority,
       })),
     );
   });

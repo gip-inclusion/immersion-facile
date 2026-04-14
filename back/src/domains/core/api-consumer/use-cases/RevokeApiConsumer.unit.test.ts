@@ -5,7 +5,10 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { makeCreateNewEvent } from "../../events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -91,6 +94,7 @@ describe("RevokeApiConsumer", () => {
           publications: [],
           status: "never-published",
           wasQuarantined: false,
+          priority: defaultPriority,
         },
       ]);
     });

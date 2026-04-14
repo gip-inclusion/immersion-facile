@@ -14,7 +14,10 @@ import {
   type Location,
   UserBuilder,
 } from "shared";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -180,6 +183,7 @@ describe("ContactEstablishment", () => {
             status: "never-published",
             publications: [],
             wasQuarantined: false,
+            priority: defaultPriority,
           },
         ]);
       });
@@ -215,6 +219,7 @@ describe("ContactEstablishment", () => {
             publications: [],
             status: "never-published",
             wasQuarantined: false,
+            priority: defaultPriority,
           },
         ]);
       });
@@ -265,6 +270,7 @@ describe("ContactEstablishment", () => {
             publications: [],
             status: "never-published",
             wasQuarantined: false,
+            priority: defaultPriority,
           },
         ]);
       });

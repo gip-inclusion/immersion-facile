@@ -12,7 +12,10 @@ import {
   type User,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import {
+  defaultPriority,
+  makeCreateNewEvent,
+} from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -205,6 +208,7 @@ describe("RejectUserForAgency", () => {
         publications: [],
         status: "never-published",
         wasQuarantined: false,
+        priority: defaultPriority,
       },
     ]);
   });
