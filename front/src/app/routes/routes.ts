@@ -54,6 +54,13 @@ const ftConnectParams = {
   fedId: param.query.optional.string,
   fedIdProvider: param.query.optional.string,
   fedIdToken: param.query.optional.string,
+
+  // TODO temporary FT Connect params (to remove after FT Connect login refacto to save nounce and state)
+  birthdate: param.query.optional.string,
+  firstName: param.query.optional.string,
+  lastName: param.query.optional.string,
+  email: param.query.optional.string,
+  phone: param.query.optional.string,
 };
 
 const agencyParamsForConventionForm = {
