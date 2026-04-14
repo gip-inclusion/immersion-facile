@@ -23,11 +23,6 @@ export const fillAndSubmitBasicAgencyForm = async (
   await page
     .locator(`#${domElementIds.addAgency.agencySiretInput}`)
     .fill(override?.siret ?? "751 984 972 00016");
-  await page.waitForResponse(
-    (response) =>
-      response.url().includes("/siret/") && response.status() === 200,
-    { timeout: 30_000 },
-  );
 
   await expect(
     page.locator(
