@@ -63,6 +63,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         noRetries,
         withCache,
       ),
+      withCache,
     );
   });
 

@@ -333,6 +333,7 @@ export const createGateways = async (
             config,
           }),
           createInseeSiretGateway(),
+          withCache,
         ),
     };
     return gatewayByProvider[provider]();
