@@ -10,6 +10,11 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Agency workflow", () => {
   let agencyAddedId: AgencyId | null = null;
+  const makeAgencyOverride = (seed: string) => ({
+    customizedName: `Cap emploi de Bayonne ${seed}`,
+    validatorEmail: `valideur+${seed}@cap.com`,
+    agencyContactEmail: `contact+${seed}@cap.com`,
+  });
 
   test.describe("Agency creation", () => {
     test.use({ storageState: testConfig.agencyAuthFile });
@@ -17,7 +22,11 @@ test.describe("Agency workflow", () => {
     test("Can add an agency (prescripteur), with one step of validators", async ({
       page,
     }) => {
-      agencyAddedId = await fillAndSubmitBasicAgencyForm(page);
+      const seed = `agency-creation-r${test.info().retry}`;
+      agencyAddedId = await fillAndSubmitBasicAgencyForm(
+        page,
+        makeAgencyOverride(seed),
+      );
       await expect(
         page
           .locator(".fr-alert--success")
@@ -26,7 +35,10 @@ test.describe("Agency workflow", () => {
     });
 
     test("Cannot add a second agency with same data", async ({ page }) => {
-      await fillAndSubmitBasicAgencyForm(page);
+      const seed = `agency-duplicate-r${test.info().retry}`;
+      const override = makeAgencyOverride(seed);
+      await fillAndSubmitBasicAgencyForm(page, override);
+      await fillAndSubmitBasicAgencyForm(page, override);
       await expect(page.locator(".fr-alert--error")).toBeVisible();
     });
   });

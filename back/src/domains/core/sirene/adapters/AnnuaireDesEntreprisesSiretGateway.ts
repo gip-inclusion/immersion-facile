@@ -1,5 +1,9 @@
 import Bottleneck from "bottleneck";
-import type { SiretDto, SiretEstablishmentDto } from "shared";
+import {
+  ONE_SECOND_MS,
+  type SiretDto,
+  type SiretEstablishmentDto,
+} from "shared";
 import type { HttpClient } from "shared-routes";
 import type { WithCache } from "../../caching-gateway/port/WithCache";
 import type { SiretGateway } from "../ports/SiretGateway";
@@ -15,9 +19,9 @@ export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
 export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
   #limiter = new Bottleneck({
     reservoir: adeMaxQueryPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshInterval: ONE_SECOND_MS,
     reservoirRefreshAmount: adeMaxQueryPerSeconds,
-    minTime: adeMaxQueryPerSeconds,
+    minTime: Math.ceil(ONE_SECOND_MS / adeMaxQueryPerSeconds),
   });
 
   #httpClient: HttpClient<AnnuaireDesEntreprisesSiretRoutes>;
@@ -49,6 +53,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
         partner: "annuaireDesEntreprises",
         route: annuaireDesEntreprisesSiretRoutes.search,
       },
+      overrideCacheDurationInHours: 2,
     })(siret);
   }
 
