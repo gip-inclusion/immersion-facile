@@ -307,6 +307,7 @@ const getAllowedStartAuthPage = (
   routeParams: ConnectPrivateRoute["params"],
 ): AllowedLoginSource => {
   if (routeName === "myProfile") return "myProfile";
+  if (routeName === "myProfileEstablishmentRegistration") return "myProfile";
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
@@ -414,8 +415,8 @@ const defaultPageContent: PageContent = {
   title: "Se connecter à Immersion Facilitée",
   description: (
     <>
-      <strong>Un compte unique</strong> pour accéder à vos espace organisme et
-      entreprise.
+      <strong>Un compte unique</strong> pour accéder à votre espace entreprise,
+      prescripteur ou candidat.
     </>
   ),
   withEmailLogin: true,
@@ -511,11 +512,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withEmailLogin: true,
     },
     conventionTemplate: defaultPageContent,
-    myProfile: {
-      ...defaultPageContent,
-      withEmailLogin: true,
-      illustration: undefined,
-    },
+    myProfile: defaultPageContent,
     default: defaultPageContent,
   };
 
