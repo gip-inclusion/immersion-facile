@@ -253,6 +253,7 @@ export class PgConventionQueries implements ConventionQueries {
       return validateAndParseZodSchema({
         schemaName: "conventionReadSchema",
         inputSchema: conventionReadSchema,
+        id: pgResult.dto.id,
         schemaParsingInput: {
           ...pgResult.dto,
           ...agencyFields,
@@ -372,6 +373,7 @@ export class PgConventionQueries implements ConventionQueries {
       return validateAndParseZodSchema({
         schemaName: "conventionReadSchema",
         inputSchema: conventionReadSchema,
+        id: dto.id,
         schemaParsingInput: {
           ...dto,
           ...agencyFields,
@@ -448,6 +450,7 @@ export class PgConventionQueries implements ConventionQueries {
         validateAndParseZodSchema({
           schemaName: "conventionWithBroadcastFeedbackSchema",
           inputSchema: conventionWithBroadcastFeedbackSchema,
+          id: row.conventionId,
           schemaParsingInput: {
             id: row.conventionId,
             status: row.status,
