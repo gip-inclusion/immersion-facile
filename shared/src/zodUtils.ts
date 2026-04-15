@@ -12,6 +12,7 @@ export const localization = {
   invalidBeneficiaryAddress:
     "L'adresse complète du candidat doit être renseignée.",
   invalidDate: "Le format de la date saisie est invalide",
+  unsupportedDate: "Cette date n'est pas autorisée.",
   invalidDateEnd: "Le format de la date de fin est invalide",
   invalidDateStart: "Le format de la date de début est invalide",
   invalidDateStartDateEnd: "La date de fin doit être après la date de début.",

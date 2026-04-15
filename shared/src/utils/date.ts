@@ -1,5 +1,11 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
-import { addHours, differenceInCalendarDays, isValid } from "date-fns";
+import {
+  addHours,
+  addYears,
+  differenceInCalendarDays,
+  isValid,
+  subYears,
+} from "date-fns";
 import { z } from "zod";
 import type { Flavor } from "../typeFlavors";
 import {
@@ -13,10 +19,36 @@ export type DateString = Flavor<string, "DateString">;
 export const makeDateStringSchema: (
   errorMessage?: string,
 ) => ZodSchemaWithInputMatchingOutput<DateString> = (errorMessage) =>
-  zStringMinLength1Max1024.refine(
-    (dateString) => dateString.match(dateRegExp),
-    errorMessage ?? localization.invalidDate,
-  );
+  zStringMinLength1Max1024.superRefine((dateString, ctx) => {
+    if (!dateString.match(dateRegExp))
+      return ctx.addIssue({
+        code: "custom",
+        message: errorMessage ?? localization.invalidDate,
+      });
+
+    const date = new Date(dateString);
+
+    if (!Number.isFinite(+date))
+      return ctx.addIssue({
+        code: "custom",
+        message: errorMessage ?? localization.invalidDate,
+      });
+
+    const now = new Date();
+    if (
+      !isInRange(
+        {
+          from: subYears(now, 130),
+          to: addYears(now, 5),
+        },
+        date,
+      )
+    )
+      return ctx.addIssue({
+        code: "custom",
+        message: localization.unsupportedDate,
+      });
+  });
 
 export type DateTimeIsoString = Flavor<string, "DateTimeIsoString">;
 
