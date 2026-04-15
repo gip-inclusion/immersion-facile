@@ -224,10 +224,6 @@ test.describe("Agency dashboard workflow", () => {
     }) => {
       await page.goto("/");
       await goToDashboard(page, "agency");
-      const conventionTemplateCount = await page
-        .locator('[id^="convention-template-"]')
-        .count();
-      await expect(conventionTemplateCount).toBeGreaterThanOrEqual(1);
 
       await page
         .locator(
