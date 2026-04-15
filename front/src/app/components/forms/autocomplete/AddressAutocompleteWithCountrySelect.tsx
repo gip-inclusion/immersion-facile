@@ -37,17 +37,9 @@ export const AddressAutocompleteWithCountrySelect = ({
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<SupportedCountryCode | null>(null);
 
-  const [inputValue, setInputValue] = useState<string | undefined>(
-    initialInputValue,
-  );
-
   const getSelectedCountryCode = () => {
-    if (selectedCountryCode) {
-      return selectedCountryCode;
-    }
-    if (inputValue) {
-      return getCountryCodeFromAddress(inputValue);
-    }
+    if (selectedCountryCode) return selectedCountryCode;
+    if (initialInputValue) return getCountryCodeFromAddress(initialInputValue);
     return countryCode ?? defaultCountryCode;
   };
 
@@ -73,7 +65,6 @@ export const AddressAutocompleteWithCountrySelect = ({
               const newCountryCode = event.currentTarget
                 .value as SupportedCountryCode;
               setSelectedCountryCode(newCountryCode);
-              setInputValue("");
               dispatch(
                 geocodingSlice.actions.emptyQueryRequested({
                   locator: props.locator,
@@ -103,7 +94,7 @@ export const AddressAutocompleteWithCountrySelect = ({
         onAddressSelected={onAddressSelected}
         multiple={multiple}
         countryCode={selectedCountryCodeValue}
-        initialInputValue={inputValue}
+        initialInputValue={initialInputValue}
       />
     </div>
   );

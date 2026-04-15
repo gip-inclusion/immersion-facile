@@ -1,7 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useRef } from "react";
-
 import { useFormContext, useWatch } from "react-hook-form";
 import type { ConventionReadDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -12,6 +11,7 @@ import {
   useSiretRelatedField,
 } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 
 export const EstablishmentBusinessFields = ({
   isConventionTemplate,
@@ -21,20 +21,22 @@ export const EstablishmentBusinessFields = ({
   const { getValues, register, control, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
-  const shouldUpdateImmersionAddress = useRef(
-    values.status === "READY_TO_SIGN" && values.immersionAddress === "",
-  );
+  const siretValueOnForm = useWatch({ control, name: "siret" });
+  const initialSiret = useRef(values.siret);
+  const currentSiret = useAppSelector(siretSelectors.currentSiret);
+  const isSiretUpdated =
+    (currentSiret ?? siretValueOnForm) !== initialSiret.current;
+  const shouldUpdateImmersionAddress =
+    (values.status === "READY_TO_SIGN" && values.immersionAddress === "") ||
+    isSiretUpdated;
   const {
-    currentSiret,
     updateSiret,
     siretErrorToDisplay,
     establishmentInfos,
     isFetchingSiret,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
-    addressAutocompleteLocator: shouldUpdateImmersionAddress.current
-      ? "convention-immersion-address"
-      : null,
+    addressAutocompleteLocator: "convention-immersion-address",
   });
   const convention = useAppSelector(conventionSelectors.convention);
 
@@ -43,10 +45,8 @@ export const EstablishmentBusinessFields = ({
   });
   useSiretRelatedField("businessAddress", {
     fieldToUpdate: "immersionAddress",
-    disabled: !shouldUpdateImmersionAddress.current,
+    disabled: !shouldUpdateImmersionAddress,
   });
-
-  const siretValueOnForm = useWatch({ control, name: "siret" });
 
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels({
