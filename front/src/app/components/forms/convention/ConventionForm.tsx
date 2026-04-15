@@ -376,6 +376,7 @@ const ConventionFormContent = ({
     getFieldState,
     formState,
     register,
+    watch,
   } = methods;
 
   const { errors, submitCount } = formState;
@@ -888,7 +889,7 @@ const ConventionFormContent = ({
                       setValue("immersionAddress", "");
                     }}
                     disabled={isFetchingSiret}
-                    initialInputValue={getValues("immersionAddress")}
+                    initialInputValue={watch("immersionAddress")}
                     {...getFieldError("immersionAddress")}
                   />
                   <ScheduleSection

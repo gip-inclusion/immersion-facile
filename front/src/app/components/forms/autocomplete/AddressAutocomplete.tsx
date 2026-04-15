@@ -92,6 +92,7 @@ export const AddressAutocomplete = ({
                 multiple,
               }),
             );
+            setSearchTerm("");
             onAddressClear();
           }
           if (searchResult && actionMeta.action === "select-option") {
