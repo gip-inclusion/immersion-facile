@@ -21,6 +21,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   addAgency: "ajouter-prescripteur",
   manageConventionUserConnected: "pilotage-convention-inclusion-connect",
   conventionTemplate: "modele-convention",
+  myProfile: "mon-profil",
 };
 
 export const frontRoutes = {

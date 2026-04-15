@@ -908,6 +908,20 @@ export const domElementIds = {
       "im-profile-form-edit-agency__users-submit-button",
     registerAgenciesSearchLink: "im-profile__register-agencies-search-link",
   },
+  myProfile: {
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--my-profile-establishment-registration",
+      byEmailButton:
+        "im-login-form__connect-button--my-profile-establishment-registration-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--my-profile-establishment-registration",
+      retryButton:
+        "im-login-form__retry-login-button--my-profile-establishment-registration",
+      contactSupport:
+        "im-login-form__contact-support-link--my-profile-establishment-registration",
+    },
+  },
   myProfileEstablishmentRegistration: {
     registerEstablishmentButton: "im-profile__register-establishment-button",
     registerEstablishmentSearch: "im-register-establishment__search",

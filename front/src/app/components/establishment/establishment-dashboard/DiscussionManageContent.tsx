@@ -194,7 +194,6 @@ const getDiscussionButtons = ({
             ? `Réponse de ${connectedUser.firstName} ${connectedUser.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`
             : `Réponse de l'entreprise ${discussion.businessName} - Immersion potentielle en tant que ${discussion.appellation.appellationLabel}`,
         )}`,
-        target: "_blank",
       },
       children: "Répondre au candidat par email",
     } satisfies ButtonProps,
