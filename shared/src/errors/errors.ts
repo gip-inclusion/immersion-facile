@@ -771,6 +771,12 @@ export const errors = {
         `Les informations de marketing d'entreprise avec le siret '${siret}' ne sont pas trouvés.`,
       ),
   },
+  bannedEstablishment: {
+    alreadyBanned: ({ siret }: { siret: SiretDto }) =>
+      new ConflictError(
+        `L'établissement avec le siret '${siret}' est déjà banni.`,
+      ),
+  },
   establishmentCsv: {
     firstUserMustBeAdmin: (email: string) =>
       new Error(`Le premier utilisateur ${email} doit être admin`),
