@@ -3,6 +3,7 @@ import type { AgencyId } from "../agency/agency.dto";
 import type { Builder } from "../Builder";
 import type { BusinessName } from "../establishment/businessName";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type { RemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type {
   DateIntervalDto,
@@ -567,6 +568,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       immersionAddress,
+    });
+  }
+
+  public withRemoteWorkMode(remoteWorkMode: RemoteWorkMode) {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      remoteWorkMode,
     });
   }
 

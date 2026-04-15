@@ -159,7 +159,8 @@ describe("PgConventionRepository", () => {
 
     await conventionRepository.save(convention, anyConventionUpdatedAt);
 
-    expect(await conventionRepository.getById(convention.id)).toEqual(
+    expectToEqual(
+      await conventionRepository.getById(convention.id),
       convention,
     );
 
@@ -167,13 +168,16 @@ describe("PgConventionRepository", () => {
       .withBeneficiaryFirstName("Marvin")
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .withUpdatedAt(anyConventionUpdatedAt)
+      .withRemoteWorkMode("HYBRID")
       .build();
 
     await conventionRepository.update(
       updatedConvention,
       anyConventionUpdatedAt,
     );
-    expect(await conventionRepository.getById(updatedConvention.id)).toEqual(
+
+    expectToEqual(
+      await conventionRepository.getById(updatedConvention.id),
       updatedConvention,
     );
   });
