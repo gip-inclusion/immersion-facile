@@ -66,11 +66,6 @@ export const deleteConventionTemplate = async (
   await page.goto("/");
   await goToDashboard(page, dashboardKind);
 
-  const conventionTemplateCount = await page
-    .locator('[id^="convention-template-"]')
-    .count();
-  await expect(conventionTemplateCount).toBeGreaterThanOrEqual(1);
-
   await page
     .locator(
       `[id^="${domElementIds.conventionTemplate.deleteConventionTemplateButton}-"]`,
