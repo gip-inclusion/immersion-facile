@@ -629,6 +629,7 @@ export class PgConventionRepository implements ConventionRepository {
         sanitary_prevention: convention.sanitaryPrevention,
         sanitary_prevention_description:
           convention.sanitaryPreventionDescription,
+        remote_work_mode: convention.remoteWorkMode,
         immersion_address: convention.immersionAddress,
         immersion_objective: convention.immersionObjective,
         immersion_appellation: sql`${convention.immersionAppellation.appellationCode}`,

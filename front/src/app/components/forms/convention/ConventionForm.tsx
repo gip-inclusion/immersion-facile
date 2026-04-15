@@ -838,7 +838,7 @@ const ConventionFormContent = ({
                         severity="info"
                         className={fr.cx("fr-mb-4w")}
                         small
-                        description="Pensez à préciser le lieu dy télétravail (domicile, espace de coworking, etc.) dans la section 'Détails de l'immersion professionnelle'"
+                        description="Pensez à préciser le lieu du télétravail (domicile, espace de coworking, etc.) dans la section 'Détails de l'immersion professionnelle'"
                       />
                     )}
                   <AddressAutocompleteWithCountrySelect

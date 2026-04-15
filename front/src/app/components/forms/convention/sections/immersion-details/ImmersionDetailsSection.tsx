@@ -168,7 +168,7 @@ export const ImmersionDetailsSection = ({
         {...(isRemotableWorkMode(values.remoteWorkMode)
           ? {
               state: "info",
-              stateRelatedMessage: `Vous avez indiqué du télétravail pour cette immersion, indiquez ici le lieu de télétravail (ex. domicile, espace de coworking...). Cela fait partue des conditions réelles du poste et doit être précisé pour sécuriser le cadre de l'immersion.`,
+              stateRelatedMessage: `Vous avez indiqué du télétravail pour cette immersion, indiquez ici le lieu de télétravail (ex. domicile, espace de coworking...). Cela fait partie des conditions réelles du poste et doit être précisé pour sécuriser le cadre de l'immersion.`,
             }
           : undefined)}
       />
