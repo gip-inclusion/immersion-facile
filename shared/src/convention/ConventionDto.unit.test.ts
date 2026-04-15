@@ -1281,7 +1281,7 @@ describe("conventionDtoSchema", () => {
     describe("when beneficiary age is greater than 120yr", () => {
       const immersionStartDate = new Date("2022-01-01");
       const beneficiary: Beneficiary<"immersion"> = {
-        birthdate: addDays(subYears(immersionStartDate, 300), 1).toISOString(),
+        birthdate: addDays(subYears(immersionStartDate, 121), 1).toISOString(),
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
@@ -1306,7 +1306,7 @@ describe("conventionDtoSchema", () => {
           .build();
 
         expectDtoInvalidWithIssueMessages(conventionSchema, convention, [
-          "signatories.beneficiary.birthdate: Merci de vérifier votre date de naissance: avez-vous 302 ans ?",
+          "signatories.beneficiary.birthdate: Merci de vérifier votre date de naissance: avez-vous 123 ans ?",
         ]);
       });
     });
