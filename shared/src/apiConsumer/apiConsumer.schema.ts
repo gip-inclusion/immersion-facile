@@ -3,9 +3,8 @@ import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import type { ApiConsumerJwt } from "../tokens/jwt.dto";
-import { dateTimeIsoStringSchema } from "../utils/date";
+import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
 import {
   stringWithMaxLength255,
   zStringMinLength1Max255,

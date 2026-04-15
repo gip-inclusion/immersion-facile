@@ -11,9 +11,9 @@ import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { allAgencyRoles } from "../role/role.dto";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { makeDateStringSchema } from "../utils/date";
 import {
   stringWithMaxLength255,
   zStringMinLength1Max1024,

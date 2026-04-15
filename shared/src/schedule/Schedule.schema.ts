@@ -1,14 +1,7 @@
 import { z } from "zod";
-import {
-  type DateString,
-  dateRegExp,
-  dateTimeIsoStringSchema,
-} from "../utils/date";
-import { zStringMinLength1Max1024, zTimeString } from "../utils/string.schema";
-import {
-  localization,
-  type ZodSchemaWithInputMatchingOutput,
-} from "../zodUtils";
+import { dateTimeIsoStringSchema } from "../utils/date";
+import { zTimeString } from "../utils/string.schema";
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import type {
   DailyScheduleDto,
   ScheduleDto,
@@ -28,14 +21,6 @@ export const timePeriodSchema: ZodSchemaWithInputMatchingOutput<TimePeriodDto> =
 
 export const timePeriodsSchema: ZodSchemaWithInputMatchingOutput<TimePeriodsDto> =
   z.array(timePeriodSchema);
-
-export const makeDateStringSchema: (
-  errorMessage?: string,
-) => ZodSchemaWithInputMatchingOutput<DateString> = (errorMessage) =>
-  zStringMinLength1Max1024.refine(
-    (dateString) => dateString.match(dateRegExp),
-    errorMessage ?? localization.invalidDate,
-  );
 
 export const dailyScheduleSchema: ZodSchemaWithInputMatchingOutput<DailyScheduleDto> =
   z.object({

@@ -15,7 +15,6 @@ import {
   appellationAndRomeDtoSchema,
   appellationCodeSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { searchTextAlphaNumericSchema } from "../search/searchText.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -24,6 +23,7 @@ import {
   lastnameMandatorySchema,
   lastnameSchema,
 } from "../user/user.schema";
+import { makeDateStringSchema } from "../utils/date";
 import {
   MAX_HTML_SIZE,
   zStringMinLength1Max1024,
