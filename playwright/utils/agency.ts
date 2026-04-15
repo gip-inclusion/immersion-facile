@@ -10,6 +10,8 @@ export const fillAndSubmitBasicAgencyForm = async (
     siret?: string;
     customizedName?: string;
     rawAddress?: string;
+    validatorEmail?: string;
+    agencyContactEmail?: string;
   },
 ): Promise<AgencyId | null> => {
   await goToAddAgencyForm(page);
@@ -58,14 +60,14 @@ export const fillAndSubmitBasicAgencyForm = async (
     .click();
   await page
     .locator(`#${domElementIds.addAgency.validatorEmailsInput}`)
-    .fill("valideur@cap.com");
+    .fill(override?.validatorEmail ?? "valideur@cap.com");
 
   await page
     .locator(`#${domElementIds.addAgency.agencyContactEmailInput}`)
     .click();
   await page
     .locator(`#${domElementIds.addAgency.agencyContactEmailInput}`)
-    .fill("valideur@cap.com");
+    .fill(override?.agencyContactEmail ?? "valideur@cap.com");
 
   await page
     .locator(`#${domElementIds.addAgency.phoneNumberInput}`)

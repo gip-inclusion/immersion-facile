@@ -252,13 +252,14 @@ jobs:
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
         run: |
-          DEBUG=pw:api,pw:browser* pnpm playwright test:ci
-      - uses: actions/upload-artifact@v4
+          DEBUG=pw:browser* pnpm playwright test:ci
+      - name: Upload playwright report
+        uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: ./playwright/playwright-report/
-          retention-days: 30
+          retention-days: 7
       - name: Upload app logs
         if: failure()
         uses: actions/upload-artifact@v4
@@ -267,3 +268,4 @@ jobs:
           path: |
             back.log
             front.log
+          retention-days: 7
