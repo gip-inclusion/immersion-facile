@@ -1495,7 +1495,7 @@ Tél : ${beneficiaryPhone}`,
         ],
         highlight: {
           content:
-            "Pour gagner du temps lors de l’inscription, utilisez la même adresse email que celle indiquée dans la convention d’immersion.Certaines informations de votre entreprise pourront ainsi être pré-remplies automatiquement.",
+            "Pour gagner du temps lors de l’inscription, utilisez la même adresse email que celle indiquée dans la convention d’immersion. Certaines informations de votre entreprise pourront ainsi être préremplies automatiquement.",
           kind: "info",
         },
         subContent: `Bonne journée,
