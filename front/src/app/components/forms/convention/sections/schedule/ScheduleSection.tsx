@@ -163,7 +163,7 @@ export const ScheduleSection = ({
                 Afin de préparer au mieux les conditions de réalisation du
                 stage,{" "}
                 <strong>
-                  les signataires de la conventions s'engagent à avoir une
+                  les signataires de la convention s'engagent à avoir une
                   couverture d'assurance
                 </strong>{" "}
                 suffisante tant pour les dommages pouvant être occasionnés par
