@@ -25,6 +25,7 @@ export interface Database {
   agency_groups: AgencyGroups;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
   api_consumers: ApiConsumers;
+  banned_establishments: BannedEstablishments;
   broadcast_feedbacks: BroadcastFeedbacks;
   convention_external_ids: ConventionExternalIds;
   convention_drafts: ConventionDrafts;
@@ -220,6 +221,11 @@ interface Agencies extends WithAcquisition {
   phone_id: number;
   contact_email: string;
   delegation_info: Json | null;
+}
+
+interface BannedEstablishments {
+  siret: string;
+  bannishment_justification: string;
 }
 
 interface BroadcastFeedbacks {
