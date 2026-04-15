@@ -9,6 +9,7 @@ import { type ReactElement, type ReactNode, useEffect } from "react";
 import {
   Loader,
   MainWrapper,
+  type MainWrapperProps,
   PageHeader,
   SeparatedSection,
 } from "react-design-system";
@@ -26,16 +27,14 @@ import {
   isFederatedIdentityProvider,
   makeUrlWithQueryParams,
   toLowerCaseWithoutDiacritics,
+  withRedirectUriSchema,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
 import { routes, useRoute } from "src/app/routes/routes";
-import {
-  commonIllustrations,
-  loginIllustration,
-} from "src/assets/img/illustrations";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -113,6 +112,7 @@ type ConnectPrivateRoute =
   | FrontDashboardRoute
   | Route<typeof routes.formEstablishment>
   | Route<typeof routes.myProfile>
+  | Route<typeof routes.myProfileEstablishmentRegistration>
   | Route<typeof routes.addAgency>
   | Route<typeof routes.manageConventionConnectedUser>;
 
@@ -121,6 +121,10 @@ type ConnectedPrivateRouteProps = {
   children: ReactNode;
   oAuthConnectionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
+  mainWrapperProps?: Omit<
+    MainWrapperProps,
+    "layout" | "children" | "useBackground" | "backgroundStyles"
+  >;
 };
 
 export const loginByEmailFeedbackTopic: FeedbackTopic = "login-by-email";
@@ -129,6 +133,7 @@ export const ConnectedPrivateRoute = ({
   route,
   children,
   allowAdminOnly,
+  mainWrapperProps,
 }: ConnectedPrivateRouteProps) => {
   const dispatch = useDispatch();
   const isConnectedUser = useAppSelector(authSelectors.isConnectedUser);
@@ -290,7 +295,9 @@ export const ConnectedPrivateRoute = ({
     );
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="default">{children}</MainWrapper>
+      <MainWrapper layout="default" {...mainWrapperProps}>
+        {children}
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };
@@ -299,6 +306,7 @@ const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
   routeParams: ConnectPrivateRoute["params"],
 ): AllowedLoginSource => {
+  if (routeName === "myProfile") return "myProfile";
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
@@ -403,10 +411,14 @@ const agencyDashboardContent: PageContent = {
 };
 
 const defaultPageContent: PageContent = {
-  title: "Se connecter avec ProConnect",
-  description:
-    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-  illustration: loginIllustration,
+  title: "Se connecter à Immersion Facilitée",
+  description: (
+    <>
+      <strong>Un compte unique</strong> pour accéder à vos espace organisme et
+      entreprise.
+    </>
+  ),
+  withEmailLogin: true,
 };
 
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
@@ -499,7 +511,11 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withEmailLogin: true,
     },
     conventionTemplate: defaultPageContent,
-
+    myProfile: {
+      ...defaultPageContent,
+      withEmailLogin: true,
+      illustration: undefined,
+    },
     default: defaultPageContent,
   };
 
@@ -568,22 +584,17 @@ const LoginWithProConnect = ({
   redirectUri: string;
   page: AllowedLoginSource;
 }) => {
-  const queryParamsResult = authRoutes.initiateLoginByOAuth.queryParamsSchema[
-    "~standard"
-  ].validate({ redirectUri });
-
-  if (queryParamsResult instanceof Promise) {
-    throw new TypeError("Schema validation must be synchronous");
-  }
-
-  if (queryParamsResult.issues) {
-    throw new Error(
-      `Query params format is not valid. ${queryParamsResult.issues.map((issue) => `${issue.path?.join(".")}: ${issue.message}`).join(", ")}`,
-    );
-  }
-
+  const isRedirectUriAllowed = withRedirectUriSchema.safeParse({
+    redirectUri,
+  }).success;
   return (
     <>
+      {!isRedirectUriAllowed && (
+        <Alert
+          severity="error"
+          title="L'URL de redirection n'est pas autorisée"
+        />
+      )}
       <p>
         <strong>Connectez-vous avec ProConnect</strong>, et accédez à votre
         espace avec votre identité professionnelle sécurisée (24h de
@@ -594,7 +605,9 @@ const LoginWithProConnect = ({
           id={domElementIds[page].login.proConnectButton}
           url={makeUrlWithQueryParams(
             `/api${authRoutes.initiateLoginByOAuth.url}`,
-            queryParamsResult.value,
+            {
+              redirectUri,
+            },
           )}
         />
       </div>

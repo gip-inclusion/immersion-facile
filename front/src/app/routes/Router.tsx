@@ -296,8 +296,18 @@ const getPageByRouteName: {
     </ConnectedPrivateRoute>
   ),
   myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
-  myProfileEstablishmentRegistration: () => (
-    <RequestEstablishmentRegistrationPage />
+  myProfileEstablishmentRegistration: (route) => (
+    <ConnectedPrivateRoute
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
+      }
+      mainWrapperProps={{
+        vSpacing: 0,
+      }}
+    >
+      <RequestEstablishmentRegistrationPage />
+    </ConnectedPrivateRoute>
   ),
   openApiDoc: (route: Route<typeof routes.openApiDoc>) => {
     if (route.params.version === "v3") return <OpenApiDocV3Page />;

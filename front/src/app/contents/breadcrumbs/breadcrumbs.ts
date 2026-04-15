@@ -113,6 +113,10 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Demander l'accès à des organismes",
         route: routes.myProfileAgencyRegistration(),
       },
+      myProfileEstablishmentRegistration: {
+        label: "Se rattacher à une entreprise",
+        route: routes.myProfileEstablishmentRegistration(),
+      },
     },
   },
   admin: {
