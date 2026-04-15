@@ -31,10 +31,7 @@ import {
   appellationCodeSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import type { DailyScheduleDto } from "../schedule/Schedule.dto";
-import {
-  makeDateStringSchema,
-  scheduleSchema,
-} from "../schedule/Schedule.schema";
+import { scheduleSchema } from "../schedule/Schedule.schema";
 import {
   calculateDailyHoursFromSchedule,
   calculateWeeklyHoursFromSchedule,
@@ -52,7 +49,11 @@ import {
   lastnameSchema,
 } from "../user/user.schema";
 import type { OmitFromExistingKeys } from "../utils";
-import { type DateString, dateTimeIsoStringSchema } from "../utils/date";
+import {
+  type DateString,
+  dateTimeIsoStringSchema,
+  makeDateStringSchema,
+} from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   optionalEmptyStringMax1024,

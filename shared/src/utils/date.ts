@@ -6,8 +6,17 @@ import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
+import { zStringMinLength1Max1024 } from "./string.schema";
 
 export type DateString = Flavor<string, "DateString">;
+
+export const makeDateStringSchema: (
+  errorMessage?: string,
+) => ZodSchemaWithInputMatchingOutput<DateString> = (errorMessage) =>
+  zStringMinLength1Max1024.refine(
+    (dateString) => dateString.match(dateRegExp),
+    errorMessage ?? localization.invalidDate,
+  );
 
 export type DateTimeIsoString = Flavor<string, "DateTimeIsoString">;
 

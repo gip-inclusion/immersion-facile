@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { makeDateStringSchema } from "./schedule/Schedule.schema";
-import type { DateString } from "./utils/date";
+import { type DateString, makeDateStringSchema } from "./utils/date";
 import type { ZodSchemaWithInputMatchingOutput } from "./zodUtils";
 
 export type DateFilter = {

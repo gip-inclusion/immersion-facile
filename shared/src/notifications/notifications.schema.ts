@@ -2,11 +2,10 @@ import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { userIdSchema } from "../user/user.schema";
-import { dateTimeIsoStringSchema } from "../utils/date";
+import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
