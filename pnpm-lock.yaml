@@ -7,7 +7,7 @@ settings:
 overrides:
   '@isaacs/brace-expansion@<= 5.0.0': 5.0.1
   ajv@<8.18.0: ^8.18.0
-  axios@<= 1.13.4: 1.13.5
+  axios@< 1.15.0: 1.15.0
   brace-expansion@< 1.1.13: 1.1.13
   brace-expansion@>= 2.0.0 < 2.0.3: 2.0.3
   brace-expansion@>= 4.0.0 < 5.0.5: 5.0.5
@@ -94,8 +94,8 @@ importers:
         specifier: ^1.0.20
         version: 1.0.20
       axios:
-        specifier: 1.13.5
-        version: 1.13.5
+        specifier: ^1.15.0
+        version: 1.15.0
       body-parser:
         specifier: ^1.20.3
         version: 1.20.3
@@ -245,8 +245,8 @@ importers:
         specifier: ^8.3.4
         version: 8.3.4
       axios-mock-adapter:
-        specifier: ^1.21.2
-        version: 1.21.2(axios@1.13.5)
+        specifier: ^2.1.0
+        version: 2.1.0(axios@1.15.0)
       bun:
         specifier: ^1.3.11
         version: 1.3.11
@@ -283,10 +283,10 @@ importers:
         version: 1.30.2
       '@emotion/react':
         specifier: ^11.10.5
-        version: 11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0)
+        version: 11.10.5(@babel/core@7.28.5)(@types/react@18.3.18)(react@18.2.0)
       '@emotion/styled':
         specifier: ^11.10.5
-        version: 11.10.5(@babel/core@7.29.0)(@emotion/react@11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0))(@types/react@18.3.18)(react@18.2.0)
+        version: 11.10.5(@babel/core@7.28.5)(@emotion/react@11.10.5(@babel/core@7.28.5)(@types/react@18.3.18)(react@18.2.0))(@types/react@18.3.18)(react@18.2.0)
       '@hookform/error-message':
         specifier: ^2.0.1
         version: 2.0.1(react-dom@18.2.0(react@18.2.0))(react-hook-form@7.62.0(react@18.2.0))(react@18.2.0)
@@ -354,8 +354,8 @@ importers:
         specifier: ^10.4.4
         version: 10.4.7(postcss@8.5.6)
       axios:
-        specifier: 1.13.5
-        version: 1.13.5
+        specifier: ^1.15.0
+        version: 1.15.0
       date-fns:
         specifier: 2.28.0
         version: 2.28.0
@@ -406,7 +406,7 @@ importers:
         version: 7.2.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-select:
         specifier: ^5.9.0
-        version: 5.9.0(@babel/core@7.29.0)(@types/react@18.3.18)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 5.9.0(@babel/core@7.28.5)(@types/react@18.3.18)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       redux:
         specifier: ^4.2.0
         version: 4.2.0
@@ -436,7 +436,7 @@ importers:
         version: 5.7.0
       tss-react:
         specifier: ^4.5.2
-        version: 4.5.2(@emotion/react@11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0))(react@18.2.0)
+        version: 4.5.2(@emotion/react@11.10.5(@babel/core@7.28.5)(@types/react@18.3.18)(react@18.2.0))(react@18.2.0)
       type-route:
         specifier: ^1.0.0
         version: 1.0.1
@@ -647,8 +647,8 @@ importers:
   shared:
     dependencies:
       axios:
-        specifier: 1.13.5
-        version: 1.13.5
+        specifier: ^1.15.0
+        version: 1.15.0
       date-fns:
         specifier: 2.28.0
         version: 2.28.0
@@ -4701,13 +4701,13 @@ packages:
     resolution: {integrity: sha512-ilYanEU8vxxBexpJd8cWM4ElSQq4QctCLKih0TSfjIfCQTeyH/6zVrmIJfLPrKTKJRbiG+cfnZbQIjAlJmF1jQ==}
     engines: {node: '>=4'}
 
-  axios-mock-adapter@1.21.2:
-    resolution: {integrity: sha512-jzyNxU3JzB2XVhplZboUcF0YDs7xuExzoRSHXPHr+UQajaGmcTqvkkUADgkVI2WkGlpZ1zZlMVdcTMU0ejV8zQ==}
+  axios-mock-adapter@2.1.0:
+    resolution: {integrity: sha512-AZUe4OjECGCNNssH8SOdtneiQELsqTsat3SQQCWLPjN436/H+L9AjWfV7bF+Zg/YL9cgbhrz5671hoh+Tbn98w==}
     peerDependencies:
-      axios: 1.13.5
+      axios: 1.15.0
 
-  axios@1.13.5:
-    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
+  axios@1.15.0:
+    resolution: {integrity: sha512-wWyJDlAatxk30ZJer+GeCWS209sA42X+N5jU2jy6oHTp7ufw8uzUTVFBX9+wTfAlhiJXGS0Bq7X6efruWjuK9Q==}
 
   babel-core@7.0.0-bridge.0:
     resolution: {integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==}
@@ -7622,6 +7622,10 @@ packages:
 
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+
+  proxy-from-env@2.1.0:
+    resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
+    engines: {node: '>=10'}
 
   pump@2.0.1:
     resolution: {integrity: sha512-ruPMNRkN3MHP1cWJc9OWr+T/xDP0jhXYCLfJcBuX54hhfIBnaQmAUMfDcG4DM5UMWByBbJY69QSphm3jtDKIkA==}
@@ -10948,23 +10952,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/react@11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0)':
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@emotion/babel-plugin': 11.11.0
-      '@emotion/cache': 11.11.0
-      '@emotion/serialize': 1.1.2
-      '@emotion/use-insertion-effect-with-fallbacks': 1.0.1(react@18.2.0)
-      '@emotion/utils': 1.2.1
-      '@emotion/weak-memoize': 0.3.1
-      hoist-non-react-statics: 3.3.2
-      react: 18.2.0
-    optionalDependencies:
-      '@babel/core': 7.29.0
-      '@types/react': 18.3.18
-    transitivePeerDependencies:
-      - supports-color
-
   '@emotion/serialize@1.1.2':
     dependencies:
       '@emotion/hash': 0.9.1
@@ -10987,22 +10974,6 @@ snapshots:
       react: 18.2.0
     optionalDependencies:
       '@babel/core': 7.28.5
-      '@types/react': 18.3.18
-    transitivePeerDependencies:
-      - supports-color
-
-  '@emotion/styled@11.10.5(@babel/core@7.29.0)(@emotion/react@11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0))(@types/react@18.3.18)(react@18.2.0)':
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@emotion/babel-plugin': 11.11.0
-      '@emotion/is-prop-valid': 1.2.1
-      '@emotion/react': 11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0)
-      '@emotion/serialize': 1.1.2
-      '@emotion/use-insertion-effect-with-fallbacks': 1.0.1(react@18.2.0)
-      '@emotion/utils': 1.2.1
-      react: 18.2.0
-    optionalDependencies:
-      '@babel/core': 7.29.0
       '@types/react': 18.3.18
     transitivePeerDependencies:
       - supports-color
@@ -13758,7 +13729,7 @@ snapshots:
       '@swagger-api/apidom-core': 1.6.0
       '@swagger-api/apidom-error': 1.6.0
       '@types/ramda': 0.30.2
-      axios: 1.13.5
+      axios: 1.15.0
       minimatch: 10.2.3
       ramda: 0.30.1
       ramda-adjunct: 5.1.0(ramda@0.30.1)
@@ -14588,17 +14559,17 @@ snapshots:
 
   axe-core@4.11.0: {}
 
-  axios-mock-adapter@1.21.2(axios@1.13.5):
+  axios-mock-adapter@2.1.0(axios@1.15.0):
     dependencies:
-      axios: 1.13.5
+      axios: 1.15.0
       fast-deep-equal: 3.1.3
       is-buffer: 2.0.5
 
-  axios@1.13.5:
+  axios@1.15.0:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.5
-      proxy-from-env: 1.1.0
+      proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
 
@@ -18050,6 +18021,8 @@ snapshots:
 
   proxy-from-env@1.1.0: {}
 
+  proxy-from-env@2.1.0: {}
+
   pump@2.0.1:
     dependencies:
       end-of-stream: 1.4.5
@@ -18303,24 +18276,6 @@ snapshots:
       '@babel/runtime': 7.28.4
       '@emotion/cache': 11.11.0
       '@emotion/react': 11.10.5(@babel/core@7.28.5)(@types/react@18.3.18)(react@18.2.0)
-      '@floating-ui/dom': 1.6.12
-      '@types/react-transition-group': 4.4.5
-      memoize-one: 6.0.0
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      react-transition-group: 4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      use-isomorphic-layout-effect: 1.2.0(@types/react@18.3.18)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@types/react'
-      - supports-color
-
-  react-select@5.9.0(@babel/core@7.29.0)(@types/react@18.3.18)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@emotion/cache': 11.11.0
-      '@emotion/react': 11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0)
       '@floating-ui/dom': 1.6.12
       '@types/react-transition-group': 4.4.5
       memoize-one: 6.0.0
@@ -19391,14 +19346,6 @@ snapshots:
     dependencies:
       '@emotion/cache': 11.11.0
       '@emotion/react': 11.10.5(@babel/core@7.28.5)(@types/react@18.3.18)(react@18.2.0)
-      '@emotion/serialize': 1.1.2
-      '@emotion/utils': 1.2.1
-      react: 18.2.0
-
-  tss-react@4.5.2(@emotion/react@11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0))(react@18.2.0):
-    dependencies:
-      '@emotion/cache': 11.11.0
-      '@emotion/react': 11.10.5(@babel/core@7.29.0)(@types/react@18.3.18)(react@18.2.0)
       '@emotion/serialize': 1.1.2
       '@emotion/utils': 1.2.1
       react: 18.2.0
