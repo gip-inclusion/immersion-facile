@@ -758,6 +758,8 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' a déjà un droit sur l'entreprise '${siret}'.`,
       ),
+    bannedEstablishment: ({ siret }: { siret: SiretDto }) =>
+      new ForbiddenError(`L'entreprise avec le siret '${siret}' est bannie`),
   },
   establishmentLead: {
     notFound: ({ siret }: { siret: SiretDto }) =>

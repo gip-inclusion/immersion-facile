@@ -7,7 +7,7 @@ import {
   writeApiConsumerSchema,
 } from "../apiConsumer/apiConsumer.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
-import { banEstablishmentSchema } from "../establishment/establishment";
+import { banEstablishmentPayloadSchema } from "../establishment/establishment";
 import { setFeatureFlagSchema } from "../featureFlag/featureFlags.schema";
 import {
   establishmentBatchReportSchema,
@@ -192,7 +192,7 @@ export const adminRoutes = defineRoutes({
     method: "post",
     url: "/admin/ban-establishment",
     ...withAuthorizationHeaders,
-    requestBodySchema: banEstablishmentSchema,
+    requestBodySchema: banEstablishmentPayloadSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
