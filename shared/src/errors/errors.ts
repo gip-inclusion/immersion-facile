@@ -317,17 +317,17 @@ export const errors = {
         `Impossible de modifier le nom du conseiller pour les conventions ayant le statut "${status}".`,
       ),
 
-    editBeneficiaryBirthdateNotAllowedForStatus: ({
+    editConventionWithFinalStatusNotAllowedForStatus: ({
       status,
     }: {
       status: ConventionStatus;
     }) =>
       new BadRequestError(
-        `Impossible de modifier la date de naissance pour les conventions ayant le statut "${status}".`,
+        `La modification en tant qu'admin n'est pas autorisée pour les conventions ayant le statut "${status}".`,
       ),
-    invalidConventionAfterBirthdateUpdate: ({ message }: { message: string }) =>
+    invalidConventionAfterFinalStatusEdit: ({ message }: { message: string }) =>
       new BadRequestError(
-        `La convention ne serait plus valide avec cette date de naissance : ${message}`,
+        `La convention ne serait plus valide avec ces modifications : ${message}`,
       ),
     emailNotLinkedToConvention: (role: Role) =>
       new BadRequestError(

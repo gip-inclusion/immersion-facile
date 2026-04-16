@@ -119,13 +119,6 @@ export const conventionStatusesWithValidator = [
   "ACCEPTED_BY_VALIDATOR",
 ] as const;
 
-export const conventionFinalStatuses = [
-  "REJECTED",
-  "CANCELLED",
-  "DEPRECATED",
-  "ACCEPTED_BY_VALIDATOR",
-] as const satisfies readonly ConventionStatus[];
-
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustificationNorValidator,
   ...unvalidatedConventionStatuses,

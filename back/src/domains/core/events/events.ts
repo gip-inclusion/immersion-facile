@@ -127,7 +127,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionBroadcastRequested", WithConventionId & WithTriggeredBy>
   | GenericEvent<"ConventionTransferredToAgency", WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
-  | GenericEvent<"ConventionBeneficiaryBirthdateEdited", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionWithFinalStatusEdited", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
   | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: "sms" } & WithTriggeredBy>
   // UNHAPPY PATHS
