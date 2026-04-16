@@ -9,6 +9,7 @@ import {
   type DeleteAssessmentRequestDto,
   doesStatusNeedsValidators,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusRequestDto,
   isUnvalidatedConventionStatus,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
@@ -25,6 +26,7 @@ import {
 import { modalByAction } from "src/app/components/forms/convention/manage-actions/manageActionModals";
 import { BroadcastAgainModalContent } from "src/app/components/forms/convention/manage-actions/modals/BroadcastAgainModalContent";
 import { DeleteAssessmentModalContent } from "src/app/components/forms/convention/manage-actions/modals/DeleteAssessmentModalContent";
+import { EditConventionWithFinalStatusModalContent } from "src/app/components/forms/convention/manage-actions/modals/EditConventionWithFinalStatusModalContent";
 import { EditCounsellorNameModalContent } from "src/app/components/forms/convention/manage-actions/modals/EditCounsellorNameModalContent";
 import { JustificationModalContent } from "src/app/components/forms/convention/manage-actions/modals/JustificationModalContent";
 import { MarkConventionAsHandledModalContent } from "src/app/components/forms/convention/manage-actions/modals/MarkConventionAsHandledModalContent";
@@ -47,6 +49,7 @@ export type ModalWrapperProps = {
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
+      | EditConventionWithFinalStatusRequestDto
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => void;
@@ -75,6 +78,8 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const showTransferModal = verificationAction === "TRANSFER";
   const showEditCounsellorNameModal =
     verificationAction === "EDIT_COUNSELLOR_NAME";
+  const showEditConventionWithFinalStatusModal =
+    verificationAction === "EDIT_CONVENTION_WITH_FINAL_STATUS";
   const showRenewModal =
     verificationAction === "RENEW" && renewFeedback?.level !== "success";
   const showBroadcastAgainModal = verificationAction === "BROADCAST_AGAIN";
@@ -88,6 +93,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction !== "TRANSFER" &&
     verificationAction !== "RENEW" &&
     verificationAction !== "EDIT_COUNSELLOR_NAME" &&
+    verificationAction !== "EDIT_CONVENTION_WITH_FINAL_STATUS" &&
     verificationAction !== "BROADCAST_AGAIN" &&
     verificationAction !== "MARK_AS_HANDLED" &&
     verificationAction !== "FILL_ASSESSMENT_INFO" &&
@@ -100,6 +106,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     verificationAction !== "TRANSFER" &&
     verificationAction !== "RENEW" &&
     verificationAction !== "EDIT_COUNSELLOR_NAME" &&
+    verificationAction !== "EDIT_CONVENTION_WITH_FINAL_STATUS" &&
     verificationAction !== "BROADCAST_AGAIN" &&
     verificationAction !== "MARK_AS_HANDLED" &&
     verificationAction !== "FILL_ASSESSMENT_INFO" &&
@@ -117,6 +124,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     !showValidatorModal &&
     !showRenewModal &&
     !showEditCounsellorNameModal &&
+    !showEditConventionWithFinalStatusModal &&
     !showBroadcastAgainModal &&
     !showMarkAsHandledModal &&
     !showFillAssessmentInfoModal &&
@@ -137,6 +145,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
         showValidatorModal,
         showRenewModal,
         showEditCounsellorNameModal,
+        showEditConventionWithFinalStatusModal,
         showBroadcastAgainModal,
         showMarkAsHandledModal,
         showFillAssessmentInfoModal,
@@ -146,6 +155,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           verificationAction === "TRANSFER" ||
           verificationAction === "RENEW" ||
           verificationAction === "EDIT_COUNSELLOR_NAME" ||
+          verificationAction === "EDIT_CONVENTION_WITH_FINAL_STATUS" ||
           verificationAction === "BROADCAST_AGAIN" ||
           verificationAction === "MARK_AS_HANDLED" ||
           verificationAction === "FILL_ASSESSMENT_INFO" ||
@@ -175,6 +185,18 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
               onSubmit={(params) => onSubmit(verificationAction, params)}
               closeModal={closeModal}
               conventionId={convention.id}
+            />
+          ),
+        )
+        .with(
+          {
+            showEditConventionWithFinalStatusModal: true,
+          },
+          () => (
+            <EditConventionWithFinalStatusModalContent
+              convention={convention}
+              onSubmit={(params) => onSubmit(verificationAction, params)}
+              closeModal={closeModal}
             />
           ),
         )
@@ -253,6 +275,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             showValidatorModal: false,
             showRenewModal: false,
             showEditCounsellorNameModal: false,
+            showEditConventionWithFinalStatusModal: false,
             showMarkAsHandledModal: false,
           },
           () => (
@@ -271,6 +294,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             showValidatorModal: false,
             showRenewModal: false,
             showEditCounsellorNameModal: false,
+            showEditConventionWithFinalStatusModal: false,
             showBroadcastAgainModal: false,
             currentUser: P.not(P.nullish),
           },
@@ -291,6 +315,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             showValidatorModal: false,
             showRenewModal: false,
             showEditCounsellorNameModal: false,
+            showEditConventionWithFinalStatusModal: false,
             showBroadcastAgainModal: false,
             showMarkAsHandledModal: false,
             showSignModal: false,
@@ -311,6 +336,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             showValidatorModal: false,
             showRenewModal: false,
             showEditCounsellorNameModal: false,
+            showEditConventionWithFinalStatusModal: false,
             showBroadcastAgainModal: false,
             showMarkAsHandledModal: false,
             showFillAssessmentInfoModal: false,

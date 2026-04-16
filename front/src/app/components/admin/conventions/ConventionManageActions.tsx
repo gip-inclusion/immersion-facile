@@ -14,6 +14,7 @@ import {
   type DeleteAssessmentRequestDto,
   domElementIds,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusRequestDto,
   type ExcludeFromExisting,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
@@ -32,6 +33,7 @@ import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.sli
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
 import type { Feedback as FeedbackType } from "src/core-logic/domain/feedback/feedback.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
@@ -116,10 +118,25 @@ export const ConventionManageActions = ({
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
+      | EditConventionWithFinalStatusRequestDto
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => {
     if (isConventionActionLoading) return;
+
+    if (verificationAction === "EDIT_CONVENTION_WITH_FINAL_STATUS") {
+      if (jwtParams.kind === "convention") return;
+      dispatch(
+        editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusRequested(
+          {
+            ...(params as EditConventionWithFinalStatusRequestDto),
+            jwt: jwtParams.jwt,
+            feedbackTopic: "edit-convention-with-final-status",
+          },
+        ),
+      );
+      return;
+    }
 
     if (verificationAction === "BROADCAST_AGAIN" && "conventionId" in params) {
       dispatch(
@@ -321,6 +338,7 @@ export const ConventionManageActions = ({
           "convention-action-edit-counsellor-name",
           "delete-assessment",
           "partner-conventions",
+          "edit-convention-with-final-status",
         ]}
         className={fr.cx("fr-mb-2w")}
         closable

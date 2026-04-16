@@ -7,8 +7,10 @@ import {
   type ConnectedUser,
   type ConventionReadDto,
   type ConventionStatus,
+  conventionStatusesAllowedForModification,
   domElementIds,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusRequestDto,
   establishmentsRoles,
   hasAllowedRole,
   hasAllowedRoleOnAssessment,
@@ -56,6 +58,7 @@ type CreateButtonConfigurationsBySubStatusParams = {
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
+      | EditConventionWithFinalStatusRequestDto
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => void;
@@ -175,6 +178,7 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
       buttonPropsByVerificationAction["RENEW"],
+      buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
     ])
     .with("acceptedByValidatorWithAssessmentWithBroadcastError", () => [
       buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
@@ -183,6 +187,7 @@ export const getButtonConfigBySubStatus = (
       buttonPropsByVerificationAction["ACCESS_CONVENTION"],
       buttonPropsByVerificationAction["BROADCAST_AGAIN"],
       buttonPropsByVerificationAction["RENEW"],
+      buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
     ])
     .with(
       "acceptedByValidatorWithoutAssessmentDidNotStartWithoutBroadcastError",
@@ -192,6 +197,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -202,6 +208,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -213,6 +220,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -224,6 +232,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
         buttonPropsByVerificationAction["RENEW"],
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -236,6 +245,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
         buttonPropsByVerificationAction["FILL_ASSESSMENT"],
         buttonPropsByVerificationAction["FILL_ASSESSMENT_INFO"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -248,6 +258,7 @@ export const getButtonConfigBySubStatus = (
         buttonPropsByVerificationAction["ACCESS_CONVENTION"],
         buttonPropsByVerificationAction["FILL_ASSESSMENT"],
         buttonPropsByVerificationAction["FILL_ASSESSMENT_INFO"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -259,6 +270,7 @@ export const getButtonConfigBySubStatus = (
       () => [
         buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .with(
@@ -270,6 +282,7 @@ export const getButtonConfigBySubStatus = (
       () => [
         buttonPropsByVerificationAction["DUPLICATE_CONVENTION"],
         buttonPropsByVerificationAction["BROADCAST_AGAIN"],
+        buttonPropsByVerificationAction["EDIT_CONVENTION_WITH_FINAL_STATUS"],
       ],
     )
     .exhaustive();
@@ -371,6 +384,10 @@ const createButtonPropsByVerificationAction = (
 
   const shouldShowMarkAsHandledButton =
     shouldShowBroadcastAgainButton && !!broadcastErrorFeedback;
+
+  const shouldShowEditConventionWithFinalStatusButton =
+    currentUser?.isBackofficeAdmin === true &&
+    !conventionStatusesAllowedForModification.includes(convention.status);
 
   const shouldShowCancelButton =
     isAllowedConventionTransition(convention, "CANCELLED", requesterRoles) &&
@@ -729,6 +746,21 @@ const createButtonPropsByVerificationAction = (
       }),
       isVisibleForUserRights: shouldShowSignatureAction,
       buttonArea: "signatureArea",
+    },
+    EDIT_CONVENTION_WITH_FINAL_STATUS: {
+      props: getVerificationActionProps({
+        children: "Modifier la convention",
+        modalTitle: "Modifier une convention",
+        verificationAction: "EDIT_CONVENTION_WITH_FINAL_STATUS",
+        convention,
+        initialStatus: convention.status,
+        currentSignatoryRoles: requesterRoles,
+        onSubmit: createOnSubmitWithFeedbackKind,
+        buttonId:
+          domElementIds.manageConvention.editConventionWithFinalStatusButton,
+      }),
+      isVisibleForUserRights: shouldShowEditConventionWithFinalStatusButton,
+      buttonArea: "editionArea",
     },
   };
 };
