@@ -1,8 +1,6 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type ConventionSummaryField,
   ConventionWeeklySchedule,
@@ -13,20 +11,14 @@ import type {
   ConventionSummarySubSection,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
 import { createPortal } from "react-dom";
-import { type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
-  type ConnectedUserJwt,
   type ConventionReadDto,
-  conventionSchema,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
   domElementIds,
-  type EditBeneficiaryBirthdateRequestDto,
-  editBeneficiaryBirthdateRequestSchema,
   getFormattedFirstnameAndLastname,
-  type InternshipKind,
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
@@ -38,8 +30,6 @@ import {
   titleByRole,
   toDisplayedDate,
 } from "shared";
-import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
 const makeSignatoriesSubsections = (
@@ -514,16 +504,12 @@ const makeSignatoriesSubsections = (
 
 const makeBeneficiarySubSections = (
   convention: ConventionReadDto,
-  editBirthdateButtonProps?: () => ButtonProps,
 ): ConventionSummarySubSection[] => {
   return [
     {
       key: "beneficiairy",
       header: {
         title: "Bénéficiaire",
-        action: editBirthdateButtonProps
-          ? editBirthdateButtonProps()
-          : undefined,
       },
       fields: removeEmptyValue([
         {
@@ -834,7 +820,6 @@ export const makeConventionSections = (
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
   assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
-  editBirthdateButtonProps?: () => ButtonProps,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -846,10 +831,7 @@ export const makeConventionSections = (
     },
     {
       title: "Informations sur le bénéficiaire",
-      subSections: makeBeneficiarySubSections(
-        convention,
-        editBirthdateButtonProps,
-      ),
+      subSections: makeBeneficiarySubSections(convention),
     },
     {
       title: "Informations de l'entreprise",
@@ -996,139 +978,6 @@ export const SendAssessmentLinkModalWrapper = ({
     document.body,
   );
 
-export const editBeneficiaryBirthdateModal = createModal({
-  id: domElementIds.manageConvention.editBeneficiaryBirthdateModal,
-  isOpenedByDefault: false,
-});
-
-export const EditBeneficiaryBirthdateModalWrapper = ({
-  convention,
-  conventionId,
-  currentBirthdate,
-  dateStart,
-  internshipKind,
-  jwt,
-  feedbackTopic,
-}: {
-  convention: ConventionReadDto;
-  conventionId: string;
-  currentBirthdate: DateString;
-  dateStart: DateString;
-  internshipKind: InternshipKind;
-  jwt: ConnectedUserJwt;
-  feedbackTopic: "edit-beneficiary-birthdate";
-}) => {
-  const dispatch = useDispatch();
-  const currentDateDisplay = toDisplayedDate({
-    date: convertLocaleDateToUtcTimezoneDate(new Date(currentBirthdate)),
-  });
-
-  const { register, handleSubmit, formState, setError } =
-    useForm<EditBeneficiaryBirthdateRequestDto>({
-      resolver: zodResolver(editBeneficiaryBirthdateRequestSchema),
-      mode: "onTouched",
-      defaultValues: {
-        conventionId,
-        updatedBeneficiaryBirthDate: "",
-        dateStart,
-        internshipKind,
-      },
-    });
-
-  const onFormSubmit: SubmitHandler<EditBeneficiaryBirthdateRequestDto> = (
-    values,
-  ) => {
-    const conventionWithNewBirthdate = {
-      ...convention,
-      signatories: {
-        ...convention.signatories,
-        beneficiary: {
-          ...convention.signatories.beneficiary,
-          birthdate: values.updatedBeneficiaryBirthDate,
-        },
-      },
-    };
-    const result = conventionSchema.safeParse(conventionWithNewBirthdate);
-    if (!result.success) {
-      const birthdateOrRepresentativeIssue = result.error.issues.find(
-        (issue) =>
-          issue.path[0] === "signatories.beneficiary.birthdate" ||
-          issue.path[0] === "signatories.beneficiaryRepresentative",
-      );
-      if (birthdateOrRepresentativeIssue?.message) {
-        setError("updatedBeneficiaryBirthDate", {
-          type: "custom",
-          message: birthdateOrRepresentativeIssue.message,
-        });
-      }
-      return;
-    }
-    dispatch(
-      editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateRequested({
-        ...values,
-        jwt,
-        feedbackTopic,
-      }),
-    );
-    editBeneficiaryBirthdateModal.close();
-  };
-
-  const getFieldError = makeFieldError(formState);
-
-  return createPortal(
-    <editBeneficiaryBirthdateModal.Component
-      title="Modifier la date de naissance"
-      buttons={[
-        {
-          id: domElementIds.manageConvention
-            .editBeneficiaryBirthdateModalCancelButton,
-          priority: "secondary",
-          children: "Annuler",
-          onClick: () => {
-            dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-            editBeneficiaryBirthdateModal.close();
-          },
-        },
-        {
-          id: domElementIds.manageConvention
-            .editBeneficiaryBirthdateModalSubmitButton,
-          priority: "primary",
-          children: "Corriger la date",
-          doClosesModal: false,
-          onClick: () => handleSubmit(onFormSubmit)(),
-        },
-      ]}
-    >
-      <form
-        id={domElementIds.manageConvention.editBeneficiaryBirthdateModalForm}
-        onSubmit={handleSubmit(onFormSubmit)}
-      >
-        <Input
-          label="Date de naissance actuelle"
-          nativeInputProps={{
-            id: domElementIds.manageConvention
-              .editBeneficiaryBirthdateModalCurrentDateInput,
-            value: currentDateDisplay,
-            readOnly: true,
-          }}
-          disabled={true}
-        />
-        <Input
-          label="Nouvelle date de naissance"
-          nativeInputProps={{
-            ...register("updatedBeneficiaryBirthDate"),
-            id: domElementIds.manageConvention
-              .editBeneficiaryBirthdateModalNewDateInput,
-            type: "date",
-          }}
-          {...getFieldError("updatedBeneficiaryBirthDate")}
-        />
-      </form>
-    </editBeneficiaryBirthdateModal.Component>,
-    document.body,
-  );
-};
-
 export type SignatureLinkState = Record<SignatoryRole, boolean>;
 export const sendSignatureLinkButtonProps =
   ({
@@ -1181,16 +1030,4 @@ export const sendAssessmentLinkButtonProps =
     },
     type: "button",
     id: domElementIds.manageConvention.openSendAssessmentLinkModal,
-  });
-
-export const editBirthdateButtonProps =
-  ({ onClick }: { onClick: () => void }) =>
-  (): ButtonProps => ({
-    priority: "tertiary",
-    children: "Modifier la date de naissance",
-    iconId: "fr-icon-edit-line",
-    title: "Modifier la date de naissance",
-    onClick,
-    type: "button",
-    id: domElementIds.manageConvention.editBeneficiaryBirthdateButton,
   });
