@@ -16,6 +16,7 @@ import {
   expectElementToBeVisible,
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
+  remoteModeIndexMap,
   validPhonesData,
 } from "./utils";
 
@@ -140,6 +141,10 @@ export const fillConventionForm = async (page: Page) => {
     value: getRandomizedData("addressQueries"),
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
+
+  await page.click(
+    `[for='${domElementIds.conventionImmersionRoute.conventionSection.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
+  );
 
   await expect(
     page.locator(
