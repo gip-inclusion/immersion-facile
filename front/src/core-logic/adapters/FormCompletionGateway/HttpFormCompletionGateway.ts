@@ -79,7 +79,7 @@ const handleSiretResponses = (
       return errorMessageByCode[status];
     })
     .with(
-      { status: P.union(404, 409, 429, 503) },
+      { status: P.union(403, 404, 409, 429, 503) },
       ({ status }) => errorMessageByCode[status],
     )
     .otherwise(otherwiseThrow);
@@ -94,6 +94,7 @@ const getBodyIfStatus200ElseThrow = <R extends HttpResponse<number, unknown>>(
 };
 
 const errorMessageByCode = {
+  403: "L'entreprise avec ce siret est bannie",
   429: tooManySirenRequestsSiretErrorMessage,
   503: siretApiUnavailableSiretErrorMessage,
   404: siretApiMissingEstablishmentMessage,
