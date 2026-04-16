@@ -1,5 +1,5 @@
 import {
-  type BannedEstablishment,
+  type BanEstablishmentPayload,
   type ConnectedUser,
   ConnectedUserBuilder,
   expectArraysToEqual,
@@ -25,7 +25,7 @@ describe("BanEstablishment", () => {
     .withIsAdmin(true)
     .build();
 
-  const bannedEstablishment: BannedEstablishment = {
+  const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678901234",
     bannishmentJustification: "Le cidre n'est pas breton",
   };

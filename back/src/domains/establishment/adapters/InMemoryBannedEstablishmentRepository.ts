@@ -1,14 +1,17 @@
-import type { BannedEstablishment, SiretDto } from "shared";
-import type { BannedEstablishmentRepository } from "../ports/BannedEstablishmentRepository";
+import type { BanEstablishmentPayload, SiretDto } from "shared";
+import type {
+  BannedEstablishmentOutput,
+  BannedEstablishmentRepository,
+} from "../ports/BannedEstablishmentRepository";
 
 export class InMemoryBannedEstablishmentRepository
   implements BannedEstablishmentRepository
 {
-  public bannedEstablishments: BannedEstablishment[] = [];
+  public bannedEstablishments: BannedEstablishmentOutput[] = [];
 
   public async getBannedEstablishmentBySiret(
     siret: SiretDto,
-  ): Promise<BannedEstablishment | undefined> {
+  ): Promise<BannedEstablishmentOutput | undefined> {
     return this.bannedEstablishments.find(
       (bannedEstablishment) => bannedEstablishment.siret === siret,
     );
@@ -16,10 +19,7 @@ export class InMemoryBannedEstablishmentRepository
   public async banEstablishment({
     siret,
     bannishmentJustification,
-  }: {
-    siret: SiretDto;
-    bannishmentJustification: string;
-  }): Promise<void> {
+  }: BanEstablishmentPayload): Promise<void> {
     this.bannedEstablishments.push({ siret, bannishmentJustification });
   }
 }

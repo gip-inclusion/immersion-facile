@@ -1,7 +1,7 @@
 import {
   type AdminRoutes,
   adminRoutes,
-  type BannedEstablishment,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   type ConnectedUserJwt,
   currentJwtVersions,
@@ -18,7 +18,7 @@ describe("banEstablishment", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<AdminRoutes>;
 
-  const bannedEstablishment: BannedEstablishment = {
+  const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678901234",
     bannishmentJustification: "Le cidre n'est pas breton",
   };

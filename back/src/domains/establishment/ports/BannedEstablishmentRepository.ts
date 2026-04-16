@@ -1,14 +1,13 @@
-import type { BannedEstablishment, SiretDto } from "shared";
+import type { BanEstablishmentPayload, SiretDto } from "shared";
+
+export type BannedEstablishmentOutput = BanEstablishmentPayload;
 
 export interface BannedEstablishmentRepository {
   getBannedEstablishmentBySiret(
     siret: SiretDto,
-  ): Promise<BannedEstablishment | undefined>;
+  ): Promise<BannedEstablishmentOutput | undefined>;
   banEstablishment({
     siret,
     bannishmentJustification,
-  }: {
-    siret: SiretDto;
-    bannishmentJustification: string;
-  }): Promise<void>;
+  }: BanEstablishmentPayload): Promise<void>;
 }

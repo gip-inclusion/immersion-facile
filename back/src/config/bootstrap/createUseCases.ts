@@ -570,7 +570,10 @@ export const createUseCases = ({
       }),
 
     // siret
-    getSiret: makeGetSiret({ deps: { siretGateway: gateways.siret } }),
+    getSiret: makeGetSiret({
+      deps: { siretGateway: gateways.siret },
+      uowPerformer,
+    }),
 
     // Address
     lookupLocation: makeLookupLocation({

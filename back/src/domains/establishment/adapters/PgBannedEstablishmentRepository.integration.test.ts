@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { type BannedEstablishment, expectToEqual } from "shared";
+import { type BanEstablishmentPayload, expectToEqual } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -12,7 +12,7 @@ describe("PgBannedEstablishmentRepository", () => {
   let db: KyselyDb;
   let pgEstablishmentRepository: PgBannedEstablishmentRepository;
 
-  const bannedEstablishment: BannedEstablishment = {
+  const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678901234",
     bannishmentJustification: "Le cidre n'est pas breton",
   };
@@ -89,7 +89,7 @@ describe("PgBannedEstablishmentRepository", () => {
 
 const getAllBannedEstablishments = async (
   db: KyselyDb,
-): Promise<BannedEstablishment[]> =>
+): Promise<BanEstablishmentPayload[]> =>
   (await db.selectFrom("banned_establishments").selectAll().execute()).map(
     (dbBannedEstablishment) => ({
       siret: dbBannedEstablishment.siret,
