@@ -50,8 +50,8 @@ import { conventionActionEpics } from "src/core-logic/domain/convention/conventi
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionDraftEpics } from "src/core-logic/domain/convention/convention-draft/conventionDraft.epics";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
-import { editBeneficiaryBirthdateEpics } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.epic";
-import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
+import { editConventionWithFinalStatusEpics } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.epic";
+import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { conventionTemplateEpics } from "src/core-logic/domain/convention-template/conventionTemplate.epics";
@@ -128,7 +128,7 @@ const allEpics: AppEpic<any>[] = [
   ...removeUserFromAgencyEpics,
   ...rootAppEpics,
   ...searchEpics,
-  ...editBeneficiaryBirthdateEpics,
+  ...editConventionWithFinalStatusEpics,
   ...sendSignatureLinkEpics,
   ...sendAssessmentLinkEpics,
   ...siretEpics,
@@ -179,7 +179,8 @@ const appReducer = combineReducers({
   [conventionListSlice.name]: conventionListSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
-  [editBeneficiaryBirthdateSlice.name]: editBeneficiaryBirthdateSlice.reducer,
+  [editConventionWithFinalStatusSlice.name]:
+    editConventionWithFinalStatusSlice.reducer,
   [sendSignatureLinkSlice.name]: sendSignatureLinkSlice.reducer,
   [sendAssessmentLinkSlice.name]: sendAssessmentLinkSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
