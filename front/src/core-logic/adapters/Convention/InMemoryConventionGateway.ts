@@ -17,8 +17,8 @@ import {
   type ConventionTemplateId,
   type DashboardUrlAndName,
   type DataWithPagination,
-  type EditBeneficiaryBirthdateRequestDto,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusRequestDto,
   type FindSimilarConventionsParams,
   type FlatGetConventionsForAgencyUserParams,
   type MarkPartnersErroredConventionAsHandledRequest,
@@ -73,7 +73,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public editConventionCounsellorNameResult$ = new Subject<void>();
 
-  public editBeneficiaryBirthdateResult$ = new Subject<void>();
+  public editConventionWithFinalStatusResult$ = new Subject<void>();
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
@@ -124,11 +124,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.editConventionCounsellorNameResult$;
   }
 
-  public editBeneficiaryBirthdate$(
-    _params: EditBeneficiaryBirthdateRequestDto,
+  public editConventionWithFinalStatus$(
+    _params: EditConventionWithFinalStatusRequestDto,
     _jwt: ConnectedUserJwt,
   ): Observable<void> {
-    return this.editBeneficiaryBirthdateResult$;
+    return this.editConventionWithFinalStatusResult$;
   }
 
   public getApiConsumersByConvention$(
