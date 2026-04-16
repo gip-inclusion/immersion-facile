@@ -22,7 +22,7 @@
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
     "playwright": "pnpm --dir playwright",
-    "playwright:test": "pnpm back db:seed && pnpm playwright test:local",
+    "playwright:test": "pnpm back db:seed:bun && pnpm playwright test:local",
     "react-design-system": "pnpm --dir libs/react-design-system",
     "html-templates": "pnpm --dir libs/html-templates",
     "scss-mapper": "pnpm --dir libs/scss-mapper",
