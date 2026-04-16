@@ -614,11 +614,13 @@ describe("authenticatedConventionRoutes", () => {
   });
 
   describe(`${displayRouteName(
-    authenticatedConventionRoutes.editBeneficiaryBirthdate,
+    authenticatedConventionRoutes.editConventionWithFinalStatus,
   )}`, () => {
     const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
     const newBirthdate = "1995-03-15";
     const oldBeneficiaryBirthdate = "2002-10-05";
+    const newFirstName = "Jean";
+    const newLastName = "Martin";
     const convention = new ConventionDtoBuilder()
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -633,13 +635,15 @@ describe("authenticatedConventionRoutes", () => {
       .buildUser();
 
     it("401 with bad token", async () => {
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: { authorization: "wrong-token" },
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: convention.dateStart,
           internshipKind: convention.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
       expectHttpResponseToEqual(response, {
@@ -653,13 +657,15 @@ describe("authenticatedConventionRoutes", () => {
         { userId: adminUser.id, version: currentJwtVersions.connectedUser },
         0,
       );
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: { authorization: token },
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: convention.dateStart,
           internshipKind: convention.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
       expectHttpResponseToEqual(response, {
@@ -672,13 +678,15 @@ describe("authenticatedConventionRoutes", () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.userRepository.users = [validator];
 
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: { authorization: validToken },
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: convention.dateStart,
           internshipKind: convention.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
 
@@ -696,7 +704,7 @@ describe("authenticatedConventionRoutes", () => {
       inMemoryUow.userRepository.users = [adminUser];
       inMemoryUow.conventionRepository.setConventions([]);
 
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: {
           authorization: generateConnectedUserJwt({
             userId: adminUser.id,
@@ -708,6 +716,8 @@ describe("authenticatedConventionRoutes", () => {
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: convention.dateStart,
           internshipKind: convention.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
 
@@ -721,14 +731,14 @@ describe("authenticatedConventionRoutes", () => {
       });
     });
 
-    it("400 when convention status is not ACCEPTED_BY_VALIDATOR", async () => {
+    it("400 when convention status is not allowed", async () => {
       const conventionInReview = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();
       inMemoryUow.conventionRepository.setConventions([conventionInReview]);
       inMemoryUow.userRepository.users = [adminUser];
 
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: {
           authorization: generateConnectedUserJwt({
             userId: adminUser.id,
@@ -736,10 +746,12 @@ describe("authenticatedConventionRoutes", () => {
           }),
         },
         body: {
-          conventionId,
+          conventionId: conventionInReview.id,
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: conventionInReview.dateStart,
           internshipKind: conventionInReview.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
 
@@ -747,7 +759,7 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           status: 400,
           message:
-            errors.convention.editBeneficiaryBirthdateNotAllowedForStatus({
+            errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
               status: "IN_REVIEW",
             }).message,
         },
@@ -755,7 +767,7 @@ describe("authenticatedConventionRoutes", () => {
       });
     });
 
-    it("200 updates beneficiary birthdate and saves ConventionBeneficiaryBirthdateEdited event", async () => {
+    it("200 updates beneficiary and saves ConventionWithFinalStatusEdited event", async () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
       inMemoryUow.userRepository.users = [adminUser];
       inMemoryUow.agencyRepository.insert(
@@ -769,13 +781,15 @@ describe("authenticatedConventionRoutes", () => {
         version: currentJwtVersions.connectedUser,
       });
 
-      const response = await httpClient.editBeneficiaryBirthdate({
+      const response = await httpClient.editConventionWithFinalStatus({
         headers: { authorization: adminToken },
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
           dateStart: convention.dateStart,
           internshipKind: convention.internshipKind,
+          firstname: newFirstName,
+          lastname: newLastName,
         },
       });
 
@@ -789,10 +803,18 @@ describe("authenticatedConventionRoutes", () => {
         updatedConvention?.signatories.beneficiary.birthdate,
         newBirthdate,
       );
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.firstName,
+        newFirstName,
+      );
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.lastName,
+        newLastName,
+      );
 
       expectArraysToMatch(inMemoryUow.outboxRepository.events, [
         {
-          topic: "ConventionBeneficiaryBirthdateEdited",
+          topic: "ConventionWithFinalStatusEdited",
           payload: {
             convention: updatedConvention,
             triggeredBy: {
