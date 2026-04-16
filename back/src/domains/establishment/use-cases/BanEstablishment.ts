@@ -1,11 +1,15 @@
-import { banEstablishmentSchema, type ConnectedUser, errors } from "shared";
+import {
+  banEstablishmentPayloadSchema,
+  type ConnectedUser,
+  errors,
+} from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type BanEstablishment = ReturnType<typeof makeBanEstablishment>;
 
 export const makeBanEstablishment = useCaseBuilder("BanEstablishment")
-  .withInput(banEstablishmentSchema)
+  .withInput(banEstablishmentPayloadSchema)
   .withCurrentUser<ConnectedUser>()
   .build(async ({ uow, inputParams, currentUser }) => {
     throwIfNotAdmin(currentUser);

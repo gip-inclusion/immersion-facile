@@ -1,6 +1,9 @@
-import type { BannedEstablishment, SiretDto } from "shared";
+import type { BanEstablishmentPayload, SiretDto } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import type { BannedEstablishmentRepository } from "../ports/BannedEstablishmentRepository";
+import type {
+  BannedEstablishmentOutput,
+  BannedEstablishmentRepository,
+} from "../ports/BannedEstablishmentRepository";
 
 export class PgBannedEstablishmentRepository
   implements BannedEstablishmentRepository
@@ -9,7 +12,7 @@ export class PgBannedEstablishmentRepository
 
   public async getBannedEstablishmentBySiret(
     siret: SiretDto,
-  ): Promise<BannedEstablishment | undefined> {
+  ): Promise<BannedEstablishmentOutput | undefined> {
     return await this.transaction
       .selectFrom("banned_establishments")
       .select([
@@ -22,10 +25,7 @@ export class PgBannedEstablishmentRepository
   public async banEstablishment({
     siret,
     bannishmentJustification,
-  }: {
-    siret: SiretDto;
-    bannishmentJustification: string;
-  }): Promise<void> {
+  }: BanEstablishmentPayload): Promise<void> {
     await this.transaction
       .insertInto("banned_establishments")
       .values({
