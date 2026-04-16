@@ -1,5 +1,4 @@
-import type { SiretDto } from "shared";
-import type { BannedEstablishment } from "../use-cases/BanEstablishment";
+import type { BannedEstablishment, SiretDto } from "shared";
 
 export interface BannedEstablishmentRepository {
   getBannedEstablishmentBySiret(

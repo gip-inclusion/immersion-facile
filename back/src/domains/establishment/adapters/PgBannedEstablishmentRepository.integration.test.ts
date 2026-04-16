@@ -1,11 +1,10 @@
 import type { Pool } from "pg";
-import { expectToEqual } from "shared";
+import { type BannedEstablishment, expectToEqual } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../config/pg/pgPool";
-import type { BannedEstablishment } from "../use-cases/BanEstablishment";
 import { PgBannedEstablishmentRepository } from "./PgBannedEstablishmentRepository";
 
 describe("PgBannedEstablishmentRepository", () => {

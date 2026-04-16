@@ -175,6 +175,17 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     ),
   );
 
+  sharedAdminRouter.banEstablishment(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res.status(201), () =>
+        deps.useCases.banEstablishment.execute(
+          req.body,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   sharedAgencyRouter.getAgencyById(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
