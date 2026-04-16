@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
-import { useEffect } from "react";
 import { type ConnectedUser, domElementIds } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -26,25 +25,19 @@ export const UserProfile = ({
 }: UserProfileProps) => {
   const route = useRoute();
 
-  const userWithRightsEstablishments =
+  const userEstablishmentsRights =
     userWithRights.establishments?.filter(
       (userEstablishment) => userEstablishment.status === "ACCEPTED",
     ) || [];
-  const userWithRightsAgencies = userWithRights.agencyRights;
+  const userAgenciesRights = userWithRights.agencyRights;
   const currentTab = route.name || "myProfileAgencies";
-
-  useEffect(() => {
-    if (route.name === "myProfile") {
-      routes.myProfileAgencies().push();
-    }
-  }, [route.name]);
 
   const tabs = [
     {
       tabId: "myProfileAgencies" satisfies ProfileTabRouteName,
-      label: `Organismes (${userWithRightsAgencies.length})`,
+      label: `Organismes (${userAgenciesRights.length})`,
       content:
-        userWithRightsAgencies.length === 0 ? (
+        userAgenciesRights.length === 0 ? (
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -68,7 +61,7 @@ export const UserProfile = ({
                 vous serez guidé(e) vers le formulaire de création.
               </Highlight>
               <Button
-                id={domElementIds.profile.registerEstablishmentButton}
+                id={domElementIds.profile.registerAgencyButton}
                 priority="primary"
                 linkProps={routes.myProfileAgencyRegistration().link}
                 className={fr.cx("fr-ml-auto")}
@@ -97,9 +90,9 @@ export const UserProfile = ({
     },
     {
       tabId: "myProfileEstablishments" satisfies ProfileTabRouteName,
-      label: `Entreprises (${userWithRightsEstablishments.length})`,
+      label: `Entreprises (${userEstablishmentsRights.length})`,
       content:
-        userWithRightsEstablishments.length === 0 ? (
+        userEstablishmentsRights.length === 0 ? (
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -136,7 +129,10 @@ export const UserProfile = ({
                 </a>
               </p>
               <Button
-                id={domElementIds.profile.registerEstablishmentButton}
+                id={
+                  domElementIds.myProfileEstablishmentRegistration
+                    .registerEstablishmentButton
+                }
                 priority="primary"
                 linkProps={routes.myProfileEstablishmentRegistration().link}
                 className={fr.cx("fr-ml-auto")}
@@ -161,7 +157,7 @@ export const UserProfile = ({
           </div>
         ) : (
           <EstablishmentsTablesSection
-            withEstablishmentData={userWithRightsEstablishments}
+            withEstablishmentData={userEstablishmentsRights}
           />
         ),
     },
