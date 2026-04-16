@@ -3,6 +3,7 @@ import {
   type DiscussionDisplayStatus,
   type DiscussionInList,
   type DiscussionReadDto,
+  discussionToExchangesData,
   domElementIds,
   getDiscussionDisplayStatus,
   isDiscussionInList,
@@ -25,11 +26,7 @@ export const DiscussionStatusBadge = ({
           status: discussion.status,
           exchangesData: isDiscussionInList(discussion)
             ? discussion.exchangesData
-            : {
-                count: discussion.exchanges.length,
-                lastExchange:
-                  discussion.exchanges[discussion.exchanges.length - 1],
-              },
+            : discussionToExchangesData(discussion),
         },
         now: new Date(),
       })
