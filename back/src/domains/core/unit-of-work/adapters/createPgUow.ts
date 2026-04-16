@@ -10,6 +10,7 @@ import { PgConventionRepository } from "../../../convention/adapters/PgConventio
 import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgConventionsToSyncRepository";
 import { PgConventionTemplateQueries } from "../../../convention/adapters/PgConventionTemplateQueries";
 import { PgNpsRepository } from "../../../convention/adapters/PgNpsRepository";
+import { PgBannedEstablishmentRepository } from "../../../establishment/adapters/PgBannedEstablishmentRepository";
 import { PgDeletedEstablishmentRepository } from "../../../establishment/adapters/PgDeletedEstablishmentRepository";
 import { PgDiscussionRepository } from "../../../establishment/adapters/PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
@@ -41,6 +42,9 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     agencyRepository: new PgAgencyRepository(transaction),
     agencyGroupRepository: new PgAgencyGroupRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
+    bannedEstablishmentRepository: new PgBannedEstablishmentRepository(
+      transaction,
+    ),
     userRepository: new PgUserRepository(transaction),
     conventionFranceTravailAdvisorRepository:
       new PgConventionFranceTravailAdvisorRepository(transaction),

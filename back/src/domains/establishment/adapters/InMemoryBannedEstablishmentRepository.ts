@@ -1,6 +1,5 @@
-import type { SiretDto } from "shared";
+import type { BannedEstablishment, SiretDto } from "shared";
 import type { BannedEstablishmentRepository } from "../ports/BannedEstablishmentRepository";
-import type { BannedEstablishment } from "../use-cases/BanEstablishment";
 
 export class InMemoryBannedEstablishmentRepository
   implements BannedEstablishmentRepository

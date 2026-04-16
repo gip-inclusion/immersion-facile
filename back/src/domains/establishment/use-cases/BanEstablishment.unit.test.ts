@@ -1,4 +1,5 @@
 import {
+  type BannedEstablishment,
   type ConnectedUser,
   ConnectedUserBuilder,
   expectArraysToEqual,
@@ -10,7 +11,6 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type BanEstablishment,
-  type BannedEstablishment,
   makeBanEstablishment,
 } from "./BanEstablishment";
 

@@ -1,23 +1,6 @@
-import {
-  type ConnectedUser,
-  errors,
-  type SiretDto,
-  siretSchema,
-  zStringMinLength1Max1024,
-} from "shared";
-import z from "zod";
+import { banEstablishmentSchema, type ConnectedUser, errors } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-
-export type BannedEstablishment = {
-  siret: SiretDto;
-  bannishmentJustification: string;
-};
-
-export const banEstablishmentSchema = z.object({
-  siret: siretSchema,
-  bannishmentJustification: zStringMinLength1Max1024,
-});
 
 export type BanEstablishment = ReturnType<typeof makeBanEstablishment>;
 
