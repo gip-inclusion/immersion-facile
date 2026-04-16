@@ -93,8 +93,8 @@ import {
   conventionStatusesWithoutJustificationNorValidator,
   conventionStatusesWithValidator,
   DATE_CONSIDERED_OLD,
-  type EditBeneficiaryBirthdateRequestDto,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusRequestDto,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   type FindSimilarConventionsParams,
@@ -252,17 +252,28 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
     }),
   );
 
-export const editBeneficiaryBirthdateRequestSchema: ZodSchemaWithInputMatchingOutput<EditBeneficiaryBirthdateRequestDto> =
+const optionalUpdatedBeneficiaryBirthDateSchema: ZodSchemaWithInputMatchingOutput<
+  DateString | undefined
+> = z.preprocess(
+  (val) => (val === "" || val === undefined || val === null ? undefined : val),
+  makeDateStringSchema().optional(),
+);
+
+export const editConventionWithFinalStatusRequestSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusRequestDto> =
   z
     .object({
       conventionId: conventionIdSchema,
-      updatedBeneficiaryBirthDate: makeDateStringSchema(),
       dateStart: makeDateStringSchema(),
       internshipKind: z.enum(internshipKinds, {
         error: localization.invalidEnum,
       }),
+      updatedBeneficiaryBirthDate: optionalUpdatedBeneficiaryBirthDateSchema,
+      firstname: firstnameSchema.optional(),
+      lastname: lastnameSchema.optional(),
     })
     .superRefine((data, ctx) => {
+      if (data.updatedBeneficiaryBirthDate === undefined) return;
+
       const beneficiaryAgeAtConventionStart = differenceInYears(
         new Date(data.dateStart),
         new Date(data.updatedBeneficiaryBirthDate),
