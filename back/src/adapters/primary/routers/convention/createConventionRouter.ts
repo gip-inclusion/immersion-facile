@@ -117,11 +117,11 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
-  authenticatedConventionSharedRouter.editBeneficiaryBirthdate(
+  authenticatedConventionSharedRouter.editConventionWithFinalStatus(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.editBeneficiaryBirthdate.execute(
+        deps.useCases.editConventionWithFinalStatus.execute(
           req.body,
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
