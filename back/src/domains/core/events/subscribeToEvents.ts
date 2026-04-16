@@ -161,7 +161,7 @@ const getUseCasesByTopics = (
     ),
   ],
   ConventionCounsellorNameEdited: [],
-  ConventionBeneficiaryBirthdateEdited: [
+  ConventionWithFinalStatusEdited: [
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
     ),
