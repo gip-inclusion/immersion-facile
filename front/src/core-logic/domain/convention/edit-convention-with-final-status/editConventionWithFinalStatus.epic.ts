@@ -1,50 +1,52 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
+import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 
-export type EditBeneficiaryBirthdateAction = ActionOfSlice<
-  typeof editBeneficiaryBirthdateSlice
+export type EditConventionWithFinalStatusAction = ActionOfSlice<
+  typeof editConventionWithFinalStatusSlice
 >;
 
-type EditBeneficiaryBirthdateEpic = AppEpic<
-  EditBeneficiaryBirthdateAction | { type: "do-nothing" }
+type EditConventionWithFinalStatusEpic = AppEpic<
+  EditConventionWithFinalStatusAction | { type: "do-nothing" }
 >;
 
-const editBeneficiaryBirthdateEpic: EditBeneficiaryBirthdateEpic = (
+const editConventionWithFinalStatusEpic: EditConventionWithFinalStatusEpic = (
   action$,
   _,
   { conventionGateway },
 ) =>
   action$.pipe(
     filter(
-      editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateRequested
-        .match,
+      editConventionWithFinalStatusSlice.actions
+        .editConventionWithFinalStatusRequested.match,
     ),
     switchMap((action) =>
       conventionGateway
-        .editBeneficiaryBirthdate$(
+        .editConventionWithFinalStatus$(
           {
             conventionId: action.payload.conventionId,
             updatedBeneficiaryBirthDate:
               action.payload.updatedBeneficiaryBirthDate,
             dateStart: action.payload.dateStart,
             internshipKind: action.payload.internshipKind,
+            firstname: action.payload.firstname,
+            lastname: action.payload.lastname,
           },
           action.payload.jwt,
         )
         .pipe(
           map(() =>
-            editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateSucceeded(
+            editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusSucceeded(
               action.payload,
             ),
           ),
           catchEpicError((error: Error) =>
-            editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateFailed(
+            editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusFailed(
               {
                 errorMessage: error.message,
                 feedbackTopic: action.payload.feedbackTopic,
@@ -55,4 +57,6 @@ const editBeneficiaryBirthdateEpic: EditBeneficiaryBirthdateEpic = (
     ),
   );
 
-export const editBeneficiaryBirthdateEpics = [editBeneficiaryBirthdateEpic];
+export const editConventionWithFinalStatusEpics = [
+  editConventionWithFinalStatusEpic,
+];

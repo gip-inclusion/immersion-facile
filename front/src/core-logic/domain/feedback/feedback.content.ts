@@ -18,7 +18,7 @@ import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/con
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
-import { editBeneficiaryBirthdateSlice } from "src/core-logic/domain/convention/edit-beneficiary-birthdate/editBeneficiaryBirthdate.slice";
+import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { conventionTemplateSlice } from "src/core-logic/domain/convention-template/conventionTemplate.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
@@ -61,7 +61,7 @@ const topics = [
   "convention-action-deprecate",
   "convention-action-edit",
   "convention-action-edit-counsellor-name",
-  "edit-beneficiary-birthdate",
+  "edit-convention-with-final-status",
   "convention-action-reject",
   "convention-action-renew",
   "convention-action-sign",
@@ -647,19 +647,21 @@ export const feedbacks: Record<
         "Une erreur est survenue lors de la modification du nom du conseiller",
     },
   },
-  "edit-beneficiary-birthdate": {
+  "edit-convention-with-final-status": {
     "update.success": {
       action:
-        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateSucceeded,
-      title: "La date de naissance a bien été modifiée",
-      message: "La date de naissance a bien été modifiée",
+        editConventionWithFinalStatusSlice.actions
+          .editConventionWithFinalStatusSucceeded,
+      title: "La convention a bien été modifiée",
+      message: "La convention a bien été modifiée",
     },
     "update.error": {
       action:
-        editBeneficiaryBirthdateSlice.actions.editBeneficiaryBirthdateFailed,
-      title: "Problème lors de la modification de la date de naissance",
+        editConventionWithFinalStatusSlice.actions
+          .editConventionWithFinalStatusFailed,
+      title: "Problème lors de la modification de la convention",
       message:
-        "Une erreur est survenue lors de la modification de la date de naissance.",
+        "Une erreur est survenue lors de la modification de la convention.",
     },
   },
   "convention-action-deprecate": {
