@@ -32,13 +32,8 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  makeEmptyConventionInitialValues,
-  saveConventionInDeviceAndGetConventionFormRoute,
-} from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
@@ -87,7 +82,6 @@ export const ConventionTabContent = ({
 }: {
   activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
 }) => {
-  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const conventionTemplates = useAppSelector(
     conventionTemplateSelectors.conventionTemplates,
   );
@@ -163,19 +157,23 @@ export const ConventionTabContent = ({
     const internshipKind = miniStageAgencyKinds.includes(agency.kind)
       ? "mini-stage-cci"
       : "immersion";
-    saveConventionInDeviceAndGetConventionFormRoute({
-      //TODO store in draft
-      convention: makeEmptyConventionInitialValues({
-        internshipKind,
-        agencyDepartment: agency.address.departmentCode,
-        agencyKind: agency.kind,
-        agencyId: agency.id,
-        agencyReferentFirstName: currentUser?.firstName ?? "",
-        agencyReferentLastName: currentUser?.lastName ?? "",
-      }),
-      queryParams:
-        internshipKind === "immersion" ? { skipIntro: true } : undefined,
-    }).push();
+
+    internshipKind === "immersion"
+      ? routes
+          .conventionImmersion({
+            skipIntro: true,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencyId: agency.id,
+          })
+          .push()
+      : routes
+          .conventionMiniStage({
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencyId: agency.id,
+          })
+          .push();
   };
 
   const onInitiateConventionButtonClick = () => {

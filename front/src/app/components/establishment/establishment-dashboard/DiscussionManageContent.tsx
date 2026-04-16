@@ -4,6 +4,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import DOMPurify from "dompurify";
 import { useEffect } from "react";
 import {
@@ -16,8 +17,11 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type AbsoluteUrl,
+  absoluteUrlSchema,
   addressDtoToString,
   type ConnectedUser,
+  type ConventionDraftDto,
   type CreateConventionPresentationInitialValues,
   createOpaqueEmail,
   type DiscussionId,
@@ -29,10 +33,10 @@ import {
   exchangeMessageFromDashboardSchema,
   getFormattedFirstnameAndLastname,
   splitTextOnFirstSeparator,
+  toConventionDraftDto,
   toDisplayedDate,
   type WithDiscussionId,
 } from "shared";
-
 import {
   AcceptDiscussionModal,
   openAcceptDiscussionModal,
@@ -46,10 +50,7 @@ import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  makeEmptyConventionInitialValues,
-  saveConventionInDeviceAndGetConventionFormRoute,
-} from "src/app/routes/routeParams/convention";
+import { makeEmptyConventionInitialValues } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import {
   addLineBreakOnNewLines,
@@ -57,6 +58,7 @@ import {
 } from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
@@ -125,28 +127,50 @@ type ButtonPropsWithId = ButtonProps & { id: string };
 const getActivateDraftConventionButtonProps = ({
   discussion,
   connectedUser,
-}: DiscussionDetailsProps): ButtonProps => {
-  const draftConvention = makeConventionFromDiscussion({
-    initialConvention: makeEmptyConventionInitialValues({
-      internshipKind: discussion.kind === "IF" ? "immersion" : "mini-stage-cci",
+  saveConventionDraftThenRedirectRequested,
+}: DiscussionDetailsProps & {
+  saveConventionDraftThenRedirectRequested: ({
+    conventionDraft,
+    redirectUrl,
+  }: {
+    conventionDraft: ConventionDraftDto;
+    redirectUrl: AbsoluteUrl;
+  }) => void;
+}): ButtonProps => {
+  const internshipKind =
+    discussion.kind === "IF" ? "immersion" : "mini-stage-cci";
+  const conventionDraft = toConventionDraftDto({
+    convention: makeConventionFromDiscussion({
+      initialConvention: makeEmptyConventionInitialValues({
+        internshipKind,
+      }),
+      discussion,
+      connectedUser,
     }),
-    discussion,
-    connectedUser,
   });
+  const redirectPath =
+    internshipKind === "immersion"
+      ? routes.conventionImmersion({
+          skipIntro: true,
+          conventionDraftId: conventionDraft.id,
+          discussionId: discussion.id,
+          mtm_campaign: "mise_en_relation_activation_convention",
+        }).href
+      : routes.conventionMiniStage({
+          // TODO add discussionId as quaryPram for mini-stage. Do we need acquisitionParams ?
+          conventionDraftId: conventionDraft.id,
+        }).href;
 
   return {
     id: domElementIds.establishmentDashboard.discussion.activateDraftConvention,
     priority: "tertiary",
-    linkProps: {
-      style: { backgroundImage: "none" }, // this is to avoid the underline in the list
-      href: saveConventionInDeviceAndGetConventionFormRoute({
-        convention: draftConvention,
-        queryParams: {
-          discussionId: discussion.id,
-          mtm_campaign: "mise_en_relation_activation_convention",
-        },
-      }).href,
-      target: "_blank",
+    onClick: () => {
+      saveConventionDraftThenRedirectRequested({
+        conventionDraft,
+        redirectUrl: absoluteUrlSchema.parse(
+          `${window.location.origin}${redirectPath}`,
+        ),
+      });
     },
     children: "Pré-remplir la convention pour cette mise en relation",
   } satisfies ButtonProps;
@@ -155,10 +179,17 @@ const getActivateDraftConventionButtonProps = ({
 const getDiscussionButtons = ({
   discussion,
   connectedUser,
-}: DiscussionDetailsProps): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
+  makeInitiateConventionDraftButtonProps,
+}: {
+  discussion: DiscussionReadDto;
+  connectedUser: ConnectedUser;
+  makeInitiateConventionDraftButtonProps: (
+    props: DiscussionDetailsProps,
+  ) => ButtonProps;
+}): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   return [
     ...(discussion.status === "PENDING" && discussion.kind === "IF"
-      ? [getActivateDraftConventionButtonProps({ discussion, connectedUser })]
+      ? [makeInitiateConventionDraftButtonProps({ discussion, connectedUser })]
       : []),
     ...(discussion.status === "PENDING"
       ? [
@@ -243,7 +274,24 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
 };
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
+  const dispatch = useDispatch();
   const { discussion } = props;
+
+  const saveConventionDraftThenRedirectRequested = ({
+    conventionDraft,
+    redirectUrl,
+  }: {
+    conventionDraft: ConventionDraftDto;
+    redirectUrl: AbsoluteUrl;
+  }) =>
+    dispatch(
+      conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
+        conventionDraft,
+        redirectUrl,
+        feedbackTopic: "convention-draft",
+      }),
+    );
+
   return (
     <>
       <Feedback
@@ -288,7 +336,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             props.discussion.candidateWarnedMethod !== null &&
             props.discussion.conventionId === undefined && (
               <Button
-                {...getActivateDraftConventionButtonProps(props)}
+                {...getActivateDraftConventionButtonProps({
+                  ...props,
+                  saveConventionDraftThenRedirectRequested,
+                })}
                 priority="primary"
               >
                 Pré-remplir la convention
@@ -304,7 +355,14 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               buttonLabel={"Gérer la candidature"}
               buttonIconId="fr-icon-arrow-down-s-line"
               iconPosition="right"
-              navItems={getDiscussionButtons(props)}
+              navItems={getDiscussionButtons({
+                ...props,
+                makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                  getActivateDraftConventionButtonProps({
+                    ...discussionProps,
+                    saveConventionDraftThenRedirectRequested,
+                  }),
+              })}
               className={fr.cx("fr-ml-md-auto")}
             />
           )}
@@ -316,6 +374,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           {discussion.kind === "IF" &&
             discussion.potentialBeneficiary.resumeLink && (
               <a
+                key="resume"
                 href={discussion.potentialBeneficiary.resumeLink}
                 title={"CV du candidat"}
                 target="_blank"

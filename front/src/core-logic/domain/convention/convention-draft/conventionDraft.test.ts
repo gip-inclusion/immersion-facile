@@ -1,9 +1,11 @@
 import {
+  type AbsoluteUrl,
   type ConventionDraftDto,
   type ConventionDraftId,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import type { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   createTestStore,
@@ -105,7 +107,7 @@ describe("ConventionDraft slice", () => {
       });
 
       store.dispatch(
-        conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+        conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
           senderEmail: "sender@example.com",
           recipientEmail: "recipient@example.com",
           conventionDraft,
@@ -144,7 +146,7 @@ describe("ConventionDraft slice", () => {
       });
 
       store.dispatch(
-        conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+        conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
           senderEmail: "sender@example.com",
           recipientEmail: "recipient@example.com",
           conventionDraft,
@@ -174,6 +176,71 @@ describe("ConventionDraft slice", () => {
           on: "create",
           title: "Partager ou enregistrer un brouillon",
         },
+      );
+    });
+
+    it("redirects to the given URL on success when redirectUrl is provided", () => {
+      const redirectUrl: AbsoluteUrl = "https://example.com/redirect";
+
+      store.dispatch(
+        conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
+          senderEmail: "sender@example.com",
+          recipientEmail: "recipient@example.com",
+          conventionDraft,
+          redirectUrl,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+
+      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+
+      expectToEqual(
+        (dependencies.navigationGateway as InMemoryNavigationGateway)
+          .wentToUrls,
+        [redirectUrl],
+      );
+    });
+
+    it("does not redirect on success when no redirectUrl is provided", () => {
+      store.dispatch(
+        conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
+          senderEmail: "sender@example.com",
+          recipientEmail: "recipient@example.com",
+          conventionDraft,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+
+      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+
+      expectToEqual(
+        (dependencies.navigationGateway as InMemoryNavigationGateway)
+          .wentToUrls,
+        [],
+      );
+    });
+
+    it("does not redirect when the request fails", () => {
+      const redirectUrl: AbsoluteUrl = "https://example.com/redirect";
+
+      store.dispatch(
+        conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
+          senderEmail: "sender@example.com",
+          recipientEmail: "recipient@example.com",
+          conventionDraft,
+          redirectUrl,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+
+      dependencies.conventionGateway.shareConventionDraftByEmailResult$.error(
+        new Error("some error"),
+      );
+
+      expectToEqual(
+        (dependencies.navigationGateway as InMemoryNavigationGateway)
+          .wentToUrls,
+        [],
       );
     });
   });

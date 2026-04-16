@@ -107,7 +107,6 @@ const removeFederatedIdentityFromDevice = ({
   localDeviceRepository: DeviceRepository<LocalStoragePair>;
 }) => {
   localDeviceRepository.delete("federatedIdentityWithUser");
-  localDeviceRepository.delete("partialConvention");
   localDeviceRepository.delete("conventionDraftId");
 };
 

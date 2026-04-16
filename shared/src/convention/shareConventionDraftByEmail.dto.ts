@@ -50,9 +50,11 @@ export type ShareConventionDraftByEmailFromConventionTemplateDto = {
   conventionDraft: ConventionDraftDto;
 };
 
+//TODO: Rename this type + usecase because an email is not always sent
 export type ShareConventionDraftByEmailDto =
   | ShareConventionDraftByEmailFromConventionDto
-  | ShareConventionDraftByEmailFromConventionTemplateDto;
+  | ShareConventionDraftByEmailFromConventionTemplateDto
+  | { conventionDraft: ConventionDraftDto };
 
 export const toConventionDraftDto = ({
   convention,

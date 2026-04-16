@@ -14,6 +14,7 @@ import {
 import type {
   ConventionDraftDto,
   ConventionDraftId,
+  ShareConventionDraftByEmailDto,
   ShareConventionDraftByEmailFromConventionDto,
   ShareConventionDraftByEmailFromConventionTemplateDto,
 } from "./shareConventionDraftByEmail.dto";
@@ -142,9 +143,13 @@ export const shareConventionDraftByEmailFromConventionTemplateSchema: ZodSchemaW
     conventionDraft: conventionDraftSchema,
   });
 
-export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<
-  | ShareConventionDraftByEmailFromConventionDto
-  | ShareConventionDraftByEmailFromConventionTemplateDto
-> = shareConventionDraftByEmailFromConventionSchema.or(
-  shareConventionDraftByEmailFromConventionTemplateSchema,
-);
+export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
+  shareConventionDraftByEmailFromConventionSchema
+    .or(shareConventionDraftByEmailFromConventionTemplateSchema)
+    .or(
+      z
+        .object({
+          conventionDraft: conventionDraftSchema,
+        })
+        .strict(),
+    );

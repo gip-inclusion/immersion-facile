@@ -10,8 +10,22 @@ import {
   makeConventionDeepPartialSchema,
   shareConventionDraftByEmailFromConventionSchema,
   shareConventionDraftByEmailFromConventionTemplateSchema,
+  shareConventionDraftByEmailSchema,
 } from "./shareConventionDraftByEmail.schema";
 
+describe("shareConventionDraftByEmailSchema schema validation", () => {
+  it("can have no senderEmail nor recipientEmail", () => {
+    expectToEqual(
+      shareConventionDraftByEmailSchema.safeParse({
+        conventionDraft: {
+          id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+          internshipKind: "immersion",
+        },
+      }).success,
+      true,
+    );
+  });
+});
 describe("shareConventionDraftByEmailFromConventionSchema schema validation", () => {
   it.each<ShareConventionDraftByEmailFromConventionDto>([
     {

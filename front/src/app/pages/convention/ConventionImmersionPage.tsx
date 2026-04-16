@@ -14,7 +14,6 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { makeEmptyConventionInitialValues } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -47,19 +46,14 @@ const storeConventionRouteParamsOnDevice = (
     fedIdToken: _3,
     jwt: _4,
     conventionDraftId,
-    ...restQueryParams
   } = routeParams;
-  if (conventionDraftId) {
-    outOfReduxDependencies.localDeviceRepository.set(
-      "conventionDraftId",
-      conventionDraftId,
-    );
-    return;
-  }
-  outOfReduxDependencies.localDeviceRepository.set("partialConvention", {
-    ...makeEmptyConventionInitialValues({ internshipKind: "immersion" }),
-    ...restQueryParams,
-  });
+
+  if (!conventionDraftId) return;
+
+  outOfReduxDependencies.localDeviceRepository.set(
+    "conventionDraftId",
+    conventionDraftId,
+  );
 };
 
 export const ConventionImmersionPage = ({

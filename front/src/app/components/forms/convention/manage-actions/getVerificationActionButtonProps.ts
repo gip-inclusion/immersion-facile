@@ -5,6 +5,8 @@ import type {
 } from "@codegouvfr/react-dsfr/fr/generatedFromCss/classNames";
 import type { Dispatch, SetStateAction } from "react";
 import type {
+  AbsoluteUrl,
+  ConventionDraftDto,
   ConventionDto,
   ConventionReadDto,
   ConventionStatus,
@@ -21,6 +23,7 @@ import type {
 import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { linkByAction } from "src/app/components/forms/convention/manage-actions/manageActionLinks";
 import { modalByAction } from "src/app/components/forms/convention/manage-actions/manageActionModals";
+import { onClickByAction } from "src/app/components/forms/convention/manage-actions/manageActionOnClick";
 import type { Link } from "type-route";
 
 type BaseVerificationActionParams = {
@@ -60,8 +63,26 @@ type VerificationActionLinkParams = {
   jwt: string;
 };
 
+type VerificationActionOnClickParams = {
+  verificationAction: VerificationActionWithOnClick;
+  onActionClick: ({
+    conventionDraft,
+    redirectUrl,
+  }: {
+    conventionDraft: ConventionDraftDto;
+    redirectUrl: AbsoluteUrl;
+  }) => void;
+  convention: ConventionReadDto;
+};
+
 export type VerificationActionParams = BaseVerificationActionParams &
-  (VerificationActionLinkParams | VerificationActionModalParams);
+  (
+    | VerificationActionLinkParams
+    | VerificationActionModalParams
+    | VerificationActionOnClickParams
+  );
+
+const verificationActionWithOnClick = ["DUPLICATE_CONVENTION"] as const;
 
 const verificationActionsWithModal = [
   "ACCEPT_COUNSELLOR",
@@ -86,18 +107,20 @@ const verificationActionsWithLink = [
   "FILL_ASSESSMENT",
   "DECLARE_ABANDONMENT",
   "EDIT_CONVENTION",
-  "DUPLICATE_CONVENTION",
 ] as const;
 
 const allVerificationActions = [
   ...verificationActionsWithModal,
   ...verificationActionsWithLink,
+  ...verificationActionWithOnClick,
 ] as const;
 export type VerificationAction = (typeof allVerificationActions)[number];
 export type VerificationActionWithModal =
   (typeof verificationActionsWithModal)[number];
 export type VerificationActionWithLink =
   (typeof verificationActionsWithLink)[number];
+export type VerificationActionWithOnClick =
+  (typeof verificationActionWithOnClick)[number];
 
 export const newStatusByVerificationAction = {
   ACCEPT_COUNSELLOR: "ACCEPTED_BY_COUNSELLOR",
@@ -139,7 +162,7 @@ export type VerificationActionProps =
         iconId?: FrIconClassName | RiIconClassName;
         iconPosition?: "left" | "right";
       };
-      modalWrapperProps: ModalWrapperProps;
+      modalWrapperProps: ModalWrapperProps | null;
     };
 
 export const getVerificationActionProps = (
@@ -169,6 +192,39 @@ export const getVerificationActionProps = (
       buttonProps: {
         children,
         linkProps: link,
+        id: buttonId,
+        iconId,
+        iconPosition,
+      },
+      modalWrapperProps: null,
+    } as VerificationActionProps;
+  }
+
+  if (
+    verificationActionWithOnClick.includes(
+      params.verificationAction as VerificationActionWithOnClick,
+    )
+  ) {
+    const {
+      verificationAction,
+      children,
+      onActionClick,
+      convention,
+      buttonId,
+      iconId,
+      iconPosition,
+    } = params as BaseVerificationActionParams &
+      VerificationActionOnClickParams;
+
+    const onClick = onClickByAction(verificationAction, {
+      convention,
+      onActionClick,
+    });
+
+    return {
+      buttonProps: {
+        children,
+        onClick,
         id: buttonId,
         iconId,
         iconPosition,

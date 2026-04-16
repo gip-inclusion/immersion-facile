@@ -27,6 +27,7 @@ import {
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  type AgencyKind,
   type AgencyOption,
   addressDtoToString,
   type ConventionFormInitialValues,
@@ -135,6 +136,7 @@ export const ConventionForm = ({
   mode: ConventionFormMode;
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
+  const route = useRoute() as SupportedConventionRoutes;
   const dispatch = useDispatch();
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -150,18 +152,30 @@ export const ConventionForm = ({
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const acquisitionParams = useGetAcquisitionParams();
 
+  const agencyReferentName = federatedIdentity?.payload?.advisor
+    ? {
+        firstname: federatedIdentity.payload.advisor.firstName,
+        lastname: federatedIdentity.payload.advisor.lastName,
+      }
+    : {
+        firstname:
+          currentUser && currentUser.agencyRights?.length > 0
+            ? currentUser.firstName
+            : "",
+        lastname:
+          currentUser && currentUser.agencyRights?.length > 0
+            ? currentUser.lastName
+            : "",
+      };
+
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
     ...makeEmptyConventionInitialValues({
       internshipKind,
       federatedIdentity: federatedIdentity ?? undefined,
     }),
     ...acquisitionParams,
-    ...(federatedIdentity?.payload?.advisor &&
-    mode === "create-convention-from-scratch"
-      ? {
-          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
-          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
-        }
+    ...(mode === "create-convention-from-scratch"
+      ? { agencyReferent: agencyReferentName }
       : {}),
   }).current;
 
@@ -200,28 +214,52 @@ export const ConventionForm = ({
     !!currentUser;
 
   const defaultValues: ConventionFormInitialValues = useMemo(() => {
-    const makeDefaultValuesForMode = () => {
-      const isCreationMode = creationFormModes.includes(
-        mode as ExcludeFromExisting<
-          ConventionFormMode,
-          "edit-convention" | "edit-convention-template"
-        >,
-      );
-      if (isCreationMode) {
-        if (isTemplateForm)
-          return replaceEmptyValuesByUndefinedFromObject(initialValues);
-      }
-      return (
-        fetchedConvention ||
-        conventionPresentationFromDraft ||
-        conventionPresentationFromConventionTemplate ||
-        initialValues
-      );
-    };
+    const isCreationMode = creationFormModes.includes(
+      mode as ExcludeFromExisting<
+        ConventionFormMode,
+        "edit-convention" | "edit-convention-template"
+      >,
+    );
+
+    const convention: ConventionFormInitialValues =
+      isCreationMode && isTemplateForm
+        ? replaceEmptyValuesByUndefinedFromObject(initialValues)
+        : fetchedConvention ||
+          conventionPresentationFromDraft ||
+          conventionPresentationFromConventionTemplate ||
+          initialValues;
+
     return {
-      ...makeDefaultValuesForMode(),
+      ...convention,
       status: "READY_TO_SIGN",
-    };
+      agencyReferent: {
+        firstname:
+          convention.agencyReferent?.firstname ?? agencyReferentName.firstname,
+        lastname:
+          convention.agencyReferent?.lastname ?? agencyReferentName.lastname,
+      },
+      agencyId:
+        "agencyId" in route.params
+          ? route.params.agencyId
+          : convention.agencyId,
+      agencyDepartment:
+        "agencyDepartment" in route.params
+          ? route.params.agencyDepartment
+          : convention.agencyDepartment,
+      agencyKind:
+        "agencyKind" in route.params
+          ? (route.params.agencyKind as AgencyKind)
+          : convention.agencyKind,
+      siret: "siret" in route.params ? route.params.siret : convention.siret,
+      immersionAddress:
+        "immersionAddress" in route.params
+          ? route.params.immersionAddress
+          : convention.immersionAddress,
+      immersionAppellation:
+        "immersionAppellation" in route.params
+          ? route.params.immersionAppellation
+          : convention.immersionAppellation,
+    } as ConventionFormInitialValues;
   }, [
     mode,
     isTemplateForm,
@@ -229,6 +267,8 @@ export const ConventionForm = ({
     fetchedConvention,
     conventionPresentationFromDraft,
     conventionPresentationFromConventionTemplate,
+    agencyReferentName,
+    route,
   ]);
 
   return (
@@ -535,7 +575,6 @@ const ConventionFormContent = ({
   useScrollTo(!!conventionTemplateFeedback);
 
   useEffect(() => {
-    outOfReduxDependencies.localDeviceRepository.delete("partialConvention");
     outOfReduxDependencies.localDeviceRepository.delete("conventionDraftId");
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, [dispatch]);
