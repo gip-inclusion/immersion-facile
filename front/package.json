@@ -87,6 +87,6 @@
     "@emotion/styled": "^11.8.1"
   },
   "dependencies": {
-    "dompurify": "^3.3.3"
+    "dompurify": "^3.4.0"
   }
 }
