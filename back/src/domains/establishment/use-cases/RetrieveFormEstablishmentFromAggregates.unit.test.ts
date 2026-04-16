@@ -1,5 +1,6 @@
 import {
   addressDtoToString,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -149,6 +150,48 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           userId: pendingUser.id,
         }),
         errors.user.unauthorized(),
+      );
+    });
+
+    it("throws if establishment is banned and user is not admin", async () => {
+      const connectedNonAdminUser = new ConnectedUserBuilder().build();
+
+      const bannedEstablishmentAggregate = new EstablishmentAggregateBuilder(
+        establishmentAggregate,
+      )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            status: "ACCEPTED",
+            userId: establishmentAdmin.id,
+            job,
+            phone,
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+        ])
+        .build();
+
+      const banEstablishmentPayload: BanEstablishmentPayload = {
+        siret: bannedEstablishmentAggregate.establishment.siret,
+        bannishmentJustification: "L'entreprise est nantaise",
+      };
+
+      uow.userRepository.users = [establishmentAdmin, connectedNonAdminUser];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        bannedEstablishmentAggregate,
+      ];
+      uow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishmentPayload,
+      ];
+
+      await expectPromiseToFailWithError(
+        useCase.execute(banEstablishmentPayload.siret, {
+          userId: connectedNonAdminUser.id,
+        }),
+        errors.establishment.bannedEstablishment({
+          siret: banEstablishmentPayload.siret,
+        }),
       );
     });
   });

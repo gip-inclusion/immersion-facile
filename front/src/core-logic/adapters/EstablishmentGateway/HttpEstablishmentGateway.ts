@@ -48,6 +48,9 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 200 }, () => {
               /* void */
             })
+            .with({ status: 403 }, ({ body }) => {
+              throw new Error(JSON.stringify(body));
+            })
             .otherwise(otherwiseThrow),
         ),
     );

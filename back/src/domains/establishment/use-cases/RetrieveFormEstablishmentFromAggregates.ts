@@ -29,15 +29,23 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   ) {
     if (!jwtPayload) throw errors.user.noJwtProvided();
 
+    const currentUser = await uow.userRepository.getById(jwtPayload.userId);
+    if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
+    if (
+      !currentUser.isBackofficeAdmin &&
+      (await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        siret,
+      ))
+    ) {
+      throw errors.establishment.bannedEstablishment({ siret });
+    }
+
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
 
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
-
-    const currentUser = await uow.userRepository.getById(jwtPayload.userId);
-    if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
 
     if (
       establishmentAggregate.userRights.some(
