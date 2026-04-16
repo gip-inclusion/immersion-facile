@@ -11,8 +11,8 @@ import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
   conventionReadSchema,
-  editBeneficiaryBirthdateRequestSchema,
   editConventionCounsellorNameRequestSchema,
+  editConventionWithFinalStatusRequestSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
   flatGetConventionsForAgencyUserParamsSchema,
@@ -351,10 +351,10 @@ export const authenticatedConventionRoutes = defineRoutes({
     },
   }),
 
-  editBeneficiaryBirthdate: defineRoute({
-    url: "/inclusion-connected/edit-beneficiary-birthdate",
+  editConventionWithFinalStatus: defineRoute({
+    url: "/inclusion-connected/edit-convention-with-final-status",
     method: "post",
-    requestBodySchema: editBeneficiaryBirthdateRequestSchema,
+    requestBodySchema: editConventionWithFinalStatusRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

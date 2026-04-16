@@ -17,8 +17,8 @@ import type {
   ConventionTemplateId,
   DashboardUrlAndName,
   DataWithPagination,
-  EditBeneficiaryBirthdateRequestDto,
   EditConventionCounsellorNameRequestDto,
+  EditConventionWithFinalStatusRequestDto,
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
   FlatGetConventionsWithErroredBroadcastFeedbackParams,
@@ -144,13 +144,13 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public editBeneficiaryBirthdate$(
-    params: EditBeneficiaryBirthdateRequestDto,
+  public editConventionWithFinalStatus$(
+    params: EditConventionWithFinalStatusRequestDto,
     jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(
       this.authenticatedHttpClient
-        .editBeneficiaryBirthdate({
+        .editConventionWithFinalStatus({
           body: params,
           headers: { authorization: jwt },
         })

@@ -15,8 +15,8 @@ import type {
   DashboardUrlAndName,
   DataWithPagination,
   DiscussionId,
-  EditBeneficiaryBirthdateRequestDto,
   EditConventionCounsellorNameRequestDto,
+  EditConventionWithFinalStatusRequestDto,
   FindSimilarConventionsParams,
   FlatGetConventionsForAgencyUserParams,
   FlatGetConventionsWithErroredBroadcastFeedbackParams,
@@ -89,8 +89,8 @@ export interface ConventionGateway {
     params: EditConventionCounsellorNameRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
-  editBeneficiaryBirthdate$(
-    params: EditBeneficiaryBirthdateRequestDto,
+  editConventionWithFinalStatus$(
+    params: EditConventionWithFinalStatusRequestDto,
     jwt: ConnectedUserJwt,
   ): Observable<void>;
   markPartnersErroredConventionAsHandled$(
