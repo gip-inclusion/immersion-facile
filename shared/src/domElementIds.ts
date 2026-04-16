@@ -644,7 +644,7 @@ export const domElementIds = {
       searchableBy: "im-form-edit-establishment__searchable-by",
       refreshEditLink: "im-form-edit-establishment__refresh-link",
       offerCard: "im-form-edit-establishment__offer-card",
-      userRightsList: "establishment-users-list",
+      userRightsList: "im-form-edit-establishment__users-list",
     },
     admin: {
       form: "im-form-manage-establishment-admin",
@@ -908,6 +908,7 @@ export const domElementIds = {
     editAgencyUserRoleSubmitButton:
       "im-profile-form-edit-agency__users-submit-button",
     registerAgenciesSearchLink: "im-profile__register-agencies-search-link",
+    registerAgencyButton: "im-profile__register-agency-button",
   },
   myProfile: {
     login: {

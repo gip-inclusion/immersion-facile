@@ -286,14 +286,7 @@ const getPageByRouteName: {
     </ConnectedPrivateRoute>
   ),
   myProfile: (route) => (
-    <ConnectedPrivateRoute
-      route={route}
-      oAuthConnectionPageHeader={
-        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
-      }
-    >
-      <MyProfile route={route} />
-    </ConnectedPrivateRoute>
+    <RedirectTo route={routes.myProfileAgencies(route.params)} />
   ),
   myProfileAgencies: (route) => (
     <ConnectedPrivateRoute

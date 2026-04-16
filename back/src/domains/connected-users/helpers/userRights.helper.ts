@@ -1,6 +1,7 @@
 import {
   errors,
   type UserEstablishmentRightDetails,
+  type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
   type UserId,
   type UserWithAdminRights,
@@ -65,19 +66,17 @@ const makeEstablishmentRights = async (
 
   return match(userRight)
     .with({ status: "PENDING" }, (pendingUserRight) => {
-      const pendingUserDetails: UserEstablishmentRightDetailsWithPendingStatus =
-        {
-          siret: establishment.siret,
-          businessName: establishment.customizedName
-            ? establishment.customizedName
-            : establishment.name,
-          role: userRight.role,
-          status: pendingUserRight.status,
-        };
-      return pendingUserDetails;
+      return {
+        siret: establishment.siret,
+        businessName: establishment.customizedName
+          ? establishment.customizedName
+          : establishment.name,
+        role: userRight.role,
+        status: pendingUserRight.status,
+      } satisfies UserEstablishmentRightDetailsWithPendingStatus;
     })
     .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
-      const acceptedUserDetails: UserEstablishmentRightDetails = {
+      return {
         siret: establishment.siret,
         businessName: establishment.customizedName
           ? establishment.customizedName
@@ -89,8 +88,7 @@ const makeEstablishmentRights = async (
           lastName,
           email,
         })),
-      };
-      return acceptedUserDetails;
+      } satisfies UserEstablishmentRightDetailsWithAcceptedStatus;
     })
     .exhaustive();
 };
