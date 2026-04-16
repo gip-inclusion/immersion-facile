@@ -233,9 +233,14 @@ const getPageByRouteName: {
     <RedirectTo route={routes.beneficiaryDashboardDiscussions(route.params)} />
   ),
   beneficiaryDashboardDiscussions: (route) => (
-    <DashboardPrivateRoute route={route}>
+    <ConnectedPrivateRoute
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
+      }
+    >
       <BeneficiaryDashboardPage />
-    </DashboardPrivateRoute>
+    </ConnectedPrivateRoute>
   ),
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,

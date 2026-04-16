@@ -374,25 +374,29 @@ export class PgDiscussionRepository implements DiscussionRepository {
     const page = pagination.page;
     const limit = pagination.perPage;
     const offset = (page - 1) * limit;
-    const { data, totalCount } =
-      userRole === "establishment"
-        ? await getPaginatedDiscussionsForEstablishmentUser({
-            transaction: this.transaction,
-            userId,
-            authorizedRoles,
-            filters,
-            limit,
-            offset,
-            sort,
-          })
-        : await getPaginatedDiscussionsForPotentialBeneficiaryUser({
-            transaction: this.transaction,
-            userId,
-            filters,
-            limit,
-            offset,
-            sort,
-          });
+    const { data, totalCount } = await match(userRole)
+      .with("establishment", () =>
+        getPaginatedDiscussionsForEstablishmentUser({
+          transaction: this.transaction,
+          userId,
+          authorizedRoles,
+          filters,
+          limit,
+          offset,
+          sort,
+        }),
+      )
+      .with("potentialBeneficiary", () =>
+        getPaginatedDiscussionsForPotentialBeneficiaryUser({
+          transaction: this.transaction,
+          userId,
+          filters,
+          limit,
+          offset,
+          sort,
+        }),
+      )
+      .exhaustive();
 
     const totalPages = Math.ceil(totalCount / limit);
 

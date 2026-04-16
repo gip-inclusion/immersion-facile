@@ -2,6 +2,7 @@ import {
   DiscussionBuilder,
   type DiscussionInList,
   type DiscussionReadDto,
+  discussionToExchangesData,
   type Exchange,
   expectToEqual,
 } from "shared";
@@ -479,10 +480,7 @@ describe("Discussion slice", () => {
       },
       city: discussion.address.city,
       immersionObjective: null,
-      exchangesData: {
-        count: discussion.exchanges.length,
-        lastExchange: discussion.exchanges[discussion.exchanges.length - 1],
-      },
+      exchangesData: discussionToExchangesData(discussion),
     };
   };
 });
