@@ -5,12 +5,14 @@ import {
   domElementIds,
   type FormEstablishmentDto,
   formCompletionRoutes,
+  type RemoteWorkMode,
 } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   expectNoErrorVisible,
   fillAutocomplete,
   type PlaywrightTestCallback,
+  remoteModeIndexMap,
 } from "../../utils/utils";
 import {
   goToNextStep,
@@ -92,11 +94,11 @@ const step1 = async (
 const step2 = async (page: Page) => {
   await expectNoErrorVisible(page);
 
-  await addOffer(page, "boulang", "fullRemote");
+  await addOffer(page, "boulang", "FULL_REMOTE");
 
-  await editOffer(page, 0, "hybrid");
+  await editOffer(page, 0, "HYBRID");
 
-  await addOffer(page, "routage", "fullRemote");
+  await addOffer(page, "routage", "FULL_REMOTE");
 
   await addLocation(page);
 
@@ -157,17 +159,10 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
   });
 };
 
-type RemoteMode = "hybrid" | "fullRemote" | "onsite";
-const remoteModeIndexMap: Record<RemoteMode, number> = {
-  hybrid: 0,
-  fullRemote: 1,
-  onsite: 2,
-};
-
 const addOffer = async (
   page: Page,
   appelationValue: string,
-  remoteMode: RemoteMode,
+  remoteMode: RemoteWorkMode,
 ) => {
   await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
 
@@ -188,7 +183,7 @@ const addOffer = async (
 const editOffer = async (
   page: Page,
   offerIndex: number,
-  remoteMode: RemoteMode,
+  remoteMode: RemoteWorkMode,
 ) => {
   await page.click(
     `#${domElementIds.establishment.create.editOfferButton}-${offerIndex}`,

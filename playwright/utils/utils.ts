@@ -6,6 +6,7 @@ import {
   type PlaywrightTestArgs,
   type TestInfo,
 } from "@playwright/test";
+import type { RemoteWorkMode } from "shared";
 
 export type PlaywrightTestCallback = (
   args: PlaywrightTestArgs,
@@ -161,3 +162,9 @@ export const test = base.extend({
 });
 
 export { expect } from "@playwright/test";
+
+export const remoteModeIndexMap: Record<RemoteWorkMode, number> = {
+  HYBRID: 0,
+  FULL_REMOTE: 1,
+  ON_SITE: 2,
+};
