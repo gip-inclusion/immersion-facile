@@ -138,6 +138,7 @@ import { useCaseBuilder } from "../../domains/core/useCaseBuilder";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
+import { makeBanEstablishment } from "../../domains/establishment/use-cases/BanEstablishment";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
@@ -1076,6 +1077,8 @@ export const createUseCases = ({
         },
         uowPerformer,
       }),
+
+    banEstablishment: makeBanEstablishment({ uowPerformer }),
     getUsers: makeGetUsers({
       uowPerformer,
     }),

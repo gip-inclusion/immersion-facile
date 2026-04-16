@@ -105,3 +105,13 @@ export type EstablishmentDashboards = {
 export type WithEstablishmentDashboards = {
   establishments: EstablishmentDashboards;
 };
+
+export type BannedEstablishment = {
+  siret: SiretDto;
+  bannishmentJustification: string;
+};
+
+export const banEstablishmentSchema = z.object({
+  siret: siretSchema,
+  bannishmentJustification: zStringMinLength1Max1024,
+});

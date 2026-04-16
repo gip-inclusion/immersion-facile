@@ -1,0 +1,196 @@
+import {
+  type AdminRoutes,
+  adminRoutes,
+  type BannedEstablishment,
+  ConnectedUserBuilder,
+  type ConnectedUserJwt,
+  currentJwtVersions,
+  expectHttpResponseToEqual,
+} from "shared";
+import type { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { buildTestApp } from "../../../../utils/buildTestApp";
+
+describe("banEstablishment", () => {
+  let adminToken: ConnectedUserJwt;
+  let nonAdminToken: ConnectedUserJwt;
+  let inMemoryUow: InMemoryUnitOfWork;
+  let httpClient: HttpClient<AdminRoutes>;
+
+  const bannedEstablishment: BannedEstablishment = {
+    siret: "12345678901234",
+    bannishmentJustification: "Le cidre n'est pas breton",
+  };
+
+  beforeEach(async () => {
+    const testApp = await buildTestApp();
+    ({ inMemoryUow } = testApp);
+    httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
+
+    const connectedNonAdminUser = new ConnectedUserBuilder()
+      .withId("non-admin-user")
+      .build();
+    const connectedAdminUser = new ConnectedUserBuilder()
+      .withId("admin-user")
+      .withIsAdmin(true)
+      .build();
+
+    inMemoryUow.userRepository.users = [
+      connectedAdminUser,
+      connectedNonAdminUser,
+    ];
+
+    nonAdminToken = testApp.generateConnectedUserJwt({
+      version: currentJwtVersions.connectedUser,
+      userId: "non-admin-user",
+    });
+
+    adminToken = testApp.generateConnectedUserJwt({
+      userId: connectedAdminUser.id,
+      version: currentJwtVersions.connectedUser,
+    });
+  });
+  describe(`${adminRoutes.banEstablishment.method} ${adminRoutes.banEstablishment.url} route`, () => {
+    describe("Wrong paths", () => {
+      it("400 - returns 400 when siret is invalid", async () => {
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: adminToken },
+          body: {
+            siret: "invalid-siret",
+            bannishmentJustification:
+              bannedEstablishment.bannishmentJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            message:
+              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
+            issues: ["siret : SIRET doit être composé de 14 chiffres"],
+            status: 400,
+          },
+        });
+      });
+      it("400 - returns 400 when bannishment justification is empty", async () => {
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: adminToken },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification: "",
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            message:
+              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
+            issues: ["bannishmentJustification : Ce champ est obligatoire"],
+            status: 400,
+          },
+        });
+      });
+      it("400 - returns 400 when bannishment justification is too long", async () => {
+        const longJustification = "a".repeat(1024 + 1);
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: adminToken },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification: longJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            message:
+              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
+            issues: [
+              "bannishmentJustification : Le maximum est de 1024 caractères",
+            ],
+            status: 400,
+          },
+        });
+      });
+      it("401 - returns 401 when missing token", async () => {
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: "" },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification:
+              bannedEstablishment.bannishmentJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 401,
+          body: {
+            message: "Veuillez vous authentifier",
+            status: 401,
+          },
+        });
+      });
+      it("403 - returns 403 when user is not admin", async () => {
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: nonAdminToken },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification:
+              bannedEstablishment.bannishmentJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 403,
+          body: {
+            message:
+              "L'utilisateur qui a l'identifiant \"non-admin-user\" n'a pas le droit d'accéder à cette ressource.",
+            status: 403,
+          },
+        });
+      });
+      it("409 - returns 409 when establishment is already banned", async () => {
+        inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
+          bannedEstablishment,
+        ];
+
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: adminToken },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification:
+              bannedEstablishment.bannishmentJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 409,
+          body: {
+            message: `L'établissement avec le siret '${bannedEstablishment.siret}' est déjà banni.`,
+            status: 409,
+          },
+        });
+      });
+    });
+
+    describe("Right paths", () => {
+      it("201 - returns 201 when establishment is successfully banned", async () => {
+        const response = await httpClient.banEstablishment({
+          headers: { authorization: adminToken },
+          body: {
+            siret: bannedEstablishment.siret,
+            bannishmentJustification:
+              bannedEstablishment.bannishmentJustification,
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 201,
+          body: "",
+        });
+      });
+    });
+  });
+});
