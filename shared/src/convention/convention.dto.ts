@@ -119,6 +119,13 @@ export const conventionStatusesWithValidator = [
   "ACCEPTED_BY_VALIDATOR",
 ] as const;
 
+export const conventionFinalStatuses = [
+  "REJECTED",
+  "CANCELLED",
+  "DEPRECATED",
+  "ACCEPTED_BY_VALIDATOR",
+] as const satisfies readonly ConventionStatus[];
+
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustificationNorValidator,
   ...unvalidatedConventionStatuses,
@@ -506,11 +513,12 @@ export type TransferConventionToAgencyRequestDto = WithConventionId & {
 export type EditConventionCounsellorNameRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname;
 
-export type EditBeneficiaryBirthdateRequestDto = WithConventionId & {
-  updatedBeneficiaryBirthDate: string;
-  dateStart: DateString;
-  internshipKind: InternshipKind;
-};
+export type EditConventionWithFinalStatusRequestDto = WithConventionId &
+  WithOptionalFirstnameAndLastname & {
+    dateStart: DateString;
+    internshipKind: InternshipKind;
+    updatedBeneficiaryBirthDate?: DateString;
+  };
 
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
