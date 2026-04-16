@@ -34,7 +34,10 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
 import { routes, useRoute } from "src/app/routes/routes";
-import { commonIllustrations } from "src/assets/img/illustrations";
+import {
+  commonIllustrations,
+  loginIllustration,
+} from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -370,14 +373,11 @@ const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
   routeParams: ConnectPrivateRoute["params"],
 ): AllowedLoginSource => {
-<<<<<<< HEAD
   if (routeName === "myProfile") return "myProfile";
   if (routeName === "myProfileEstablishmentRegistration") return "myProfile";
-=======
   if (routeName === "beneficiaryDashboardDiscussions")
     return "beneficiaryDashboardDiscussions";
   if (routeName === "beneficiaryDashboard") return "beneficiaryDashboard";
->>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
@@ -529,7 +529,6 @@ const beneficiaryDashboardContent: PageContent = {
 };
 
 const defaultPageContent: PageContent = {
-<<<<<<< HEAD
   title: "Se connecter à Immersion Facilitée",
   description: (
     <>
@@ -538,13 +537,7 @@ const defaultPageContent: PageContent = {
     </>
   ),
   withEmailLogin: true,
-=======
-  title: "Se connecter avec ProConnect",
-  description:
-    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-  illustration: loginIllustration,
   withProConnectLogin: true,
->>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
 };
 
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
@@ -640,12 +633,9 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withProConnectLogin: true,
     },
     conventionTemplate: defaultPageContent,
-<<<<<<< HEAD
     myProfile: defaultPageContent,
-=======
     beneficiaryDashboard: beneficiaryDashboardContent,
     beneficiaryDashboardDiscussions: beneficiaryDashboardContent,
->>>>>>> de87a7166 (update: login view as beneficiary UI adjustments, fixed wording, add highlight on discussion listing)
     default: defaultPageContent,
   };
 
