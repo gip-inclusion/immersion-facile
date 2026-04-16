@@ -16,6 +16,7 @@ import {
 import { standardPagesSerializer } from "./routeParams/standardPage";
 import {
   appellationAndRomeDtoArraySerializer,
+  appellationAndRomeDtoSerializer,
   appellationStringSerializer,
   nafCodeSerializer,
   remoteWorkModeSerializer,
@@ -55,15 +56,21 @@ const ftConnectParams = {
   fedIdToken: param.query.optional.string,
 };
 
-export const conventionParams = {
-  discussionId: param.query.optional.string,
-  conventionDraftId: param.query.optional.string,
-  ...ftConnectParams,
-  ...acquisitionParams,
+const agencyParamsForConventionForm = {
+  agencyDepartment: param.query.optional.string,
+  agencyKind: param.query.optional.string,
+  agencyId: param.query.optional.string,
+};
+
+const establishmentParamsForConventionForm = {
+  siret: param.query.optional.string,
+  immersionAddress: param.query.optional.string,
+  immersionAppellation: param.query.optional.ofType(
+    appellationAndRomeDtoSerializer,
+  ),
 };
 
 export const conventionForExternalParams = {
-  ...conventionParams,
   consumer: param.path.string,
   jwt: param.query.optional.string,
 };
@@ -254,13 +261,25 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       jwt: param.query.optional.string,
       skipIntro: param.query.optional.boolean,
       conventionId: param.query.optional.string,
+      conventionDraftId: param.query.optional.string,
       conventionTemplateId: param.query.optional.string,
-      ...conventionParams,
+      discussionId: param.query.optional.string,
+      ...agencyParamsForConventionForm,
+      ...establishmentParamsForConventionForm,
+      ...ftConnectParams,
+      ...acquisitionParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
   conventionImmersionForExternals: defineRoute(
-    conventionForExternalParams,
+    {
+      discussionId: param.query.optional.string,
+      ...agencyParamsForConventionForm,
+      ...establishmentParamsForConventionForm,
+      ...ftConnectParams,
+      ...acquisitionParams,
+      ...conventionForExternalParams,
+    },
     (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
   ),
   conventionMiniStage: defineRoute(
@@ -269,6 +288,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
       conventionDraftId: param.query.optional.string,
       conventionTemplateId: param.query.optional.string,
+      ...agencyParamsForConventionForm,
+      ...establishmentParamsForConventionForm,
     },
     () => `/${frontRoutes.conventionMiniStageRoute}`,
   ),

@@ -1,12 +1,7 @@
 import type {
   AbsoluteUrl,
   ConventionDraftId,
-  CreateConventionPresentationInitialValues,
-  DiscussionId,
   ExternalOfferDto,
-  FederatedIdentityProvider,
-  FtConnectToken,
-  IdToken,
   WithAcquisition,
 } from "shared";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
@@ -18,21 +13,11 @@ export type GenericPair<K extends string, Payload> = {
 
 export type GenericStorage = GenericPair<string, unknown>;
 
-export type PartialConventionInDevice =
-  CreateConventionPresentationInitialValues &
-    WithAcquisition & {
-      discussionId?: DiscussionId;
-      fedId?: FtConnectToken;
-      fedIdProvider?: FederatedIdentityProvider;
-      fedIdToken?: IdToken;
-    };
-
 export type LocalStoragePair =
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>
   | GenericPair<"searchResultExternal", ExternalOfferDto>
-  | GenericPair<"conventionDraftId", ConventionDraftId>
-  | GenericPair<"partialConvention", CreateConventionPresentationInitialValues>;
+  | GenericPair<"conventionDraftId", ConventionDraftId>;
 
 export type SessionStoragePair =
   | GenericPair<"acquisitionParams", WithAcquisition>

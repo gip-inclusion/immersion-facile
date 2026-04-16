@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type {
+  AbsoluteUrl,
   ConventionDraftDto,
   ConventionDraftId,
   ShareConventionDraftByEmailDto,
@@ -46,19 +47,23 @@ export const conventionDraftSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-    shareConventionDraftByEmailRequested: (
+    saveConventionDraftThenRedirectRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<ShareConventionDraftByEmailDto>,
+      _action: PayloadActionWithFeedbackTopic<
+        ShareConventionDraftByEmailDto & { redirectUrl?: AbsoluteUrl }
+      >,
     ) => {
       state.isLoading = true;
     },
-    shareConventionDraftByEmailSucceeded: (
+    saveConventionDraftThenRedirectSucceeded: (
       state,
-      _action: PayloadActionWithFeedbackTopic<ShareConventionDraftByEmailDto>,
+      _action: PayloadActionWithFeedbackTopic<
+        ShareConventionDraftByEmailDto & { redirectUrl?: AbsoluteUrl }
+      >,
     ) => {
       state.isLoading = false;
     },
-    shareConventionDraftByEmailFailed: (
+    saveConventionDraftThenRedirectFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

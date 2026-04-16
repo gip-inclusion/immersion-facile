@@ -123,7 +123,7 @@ export const ConventionTemplatesList = ({
   ) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(
-      conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+      conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
         ...values,
         feedbackTopic: "convention-draft",
       }),

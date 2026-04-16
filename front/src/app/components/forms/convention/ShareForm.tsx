@@ -40,7 +40,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
   const onSubmit = (values: ShareConventionDraftByEmailFromConventionDto) => {
     dispatch(
-      conventionDraftSlice.actions.shareConventionDraftByEmailRequested({
+      conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
         ...values,
         feedbackTopic: "convention-draft",
       }),

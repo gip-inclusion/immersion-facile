@@ -83,7 +83,7 @@ export const makeShareConventionDraftByEmail = useCaseBuilder(
       });
     }
 
-    if (inputParams.recipientEmail) {
+    if ("recipientEmail" in inputParams && inputParams.recipientEmail) {
       await deps.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

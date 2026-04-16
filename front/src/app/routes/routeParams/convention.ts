@@ -21,12 +21,8 @@ import {
   type SiretDto,
   toDateUTCString,
 } from "shared";
-import { routes } from "src/app/routes/routes";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
-import type { PartialConventionInDevice } from "src/core-logic/ports/DeviceRepository";
-import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 export const makeEmptyConventionInitialValues = ({
@@ -56,7 +52,6 @@ export const makeEmptyConventionInitialValues = ({
   const dateEnd = addDays(dateStart, 1);
   const initialForm: CreateConventionPresentationInitialValues = {
     id: uuidV4(),
-
     agencyDepartment: agencyDepartment,
     agencyKind: agencyKind,
     agencyId: agencyId,
@@ -199,24 +194,18 @@ const withDevPrefilledValues = (
       email: tutor?.email || defaultTutor.email,
       job: tutor?.job || defaultTutor.job,
     },
-
-    // Enterprise
     siret: emptyForm.siret || "1234567890123",
     businessName: emptyForm.businessName || "Futuroscope",
     immersionAddress:
       emptyForm.immersionAddress ||
       "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
     agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-
-    // Covid
     individualProtection: emptyForm.individualProtection ?? true,
     individualProtectionDescription:
       emptyForm.individualProtectionDescription || "Aucunes",
     sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
     sanitaryPreventionDescription:
       emptyForm.sanitaryPreventionDescription || "Aucunes",
-
-    // Immersion
     immersionObjective: emptyForm.immersionObjective,
     immersionAppellation: emptyForm.immersionAppellation || {
       romeLabel: "Boulanger / Boulangère",
@@ -227,27 +216,6 @@ const withDevPrefilledValues = (
     immersionActivities: emptyForm.immersionActivities || "Superviser",
     immersionSkills: emptyForm.immersionSkills || "Attention au détail",
   };
-};
-
-export const saveConventionInDeviceAndGetConventionFormRoute = ({
-  convention,
-  queryParams,
-}: {
-  convention: PartialConventionInDevice;
-  queryParams?:
-    | Route<typeof routes.conventionImmersion>["params"]
-    | Route<typeof routes.conventionMiniStage>["params"];
-}):
-  | Route<typeof routes.conventionImmersion>
-  | Route<typeof routes.conventionMiniStage> => {
-  outOfReduxDependencies.localDeviceRepository.set(
-    "partialConvention",
-    convention,
-  );
-
-  return convention.internshipKind === "immersion"
-    ? routes.conventionImmersion(queryParams)
-    : routes.conventionMiniStage(queryParams);
 };
 
 export const beneficiaryRepresentativeFromParams = ({
@@ -337,6 +305,33 @@ const scheduleFromParams = ({
         [],
       ),
   };
+};
+
+const getMiniStageSignatoryProperty = <
+  S extends keyof Signatories<"mini-stage-cci">,
+  K extends keyof NonNullable<Signatories<"mini-stage-cci">[S]>,
+>({
+  conventionDraft,
+  signatoryKey,
+  propertyKey,
+}: {
+  conventionDraft: ConventionDraftDto;
+  signatoryKey: S;
+  propertyKey: K;
+}): NonNullable<Signatories<"mini-stage-cci">[S]>[K] | undefined => {
+  if (
+    conventionDraft.internshipKind === "mini-stage-cci" &&
+    conventionDraft.signatories &&
+    signatoryKey in conventionDraft.signatories &&
+    conventionDraft.signatories[signatoryKey]
+  ) {
+    return (
+      conventionDraft.signatories[signatoryKey] as NonNullable<
+        Signatories<"mini-stage-cci">[S]
+      >
+    )[propertyKey];
+  }
+  return undefined;
 };
 
 export const conventionPresentationFromConventionDraft = (
@@ -518,31 +513,4 @@ export const makeConventionPresentationFromConventionTemplate = (
     id,
     name,
   };
-};
-
-const getMiniStageSignatoryProperty = <
-  S extends keyof Signatories<"mini-stage-cci">,
-  K extends keyof NonNullable<Signatories<"mini-stage-cci">[S]>,
->({
-  conventionDraft,
-  signatoryKey,
-  propertyKey,
-}: {
-  conventionDraft: ConventionDraftDto;
-  signatoryKey: S;
-  propertyKey: K;
-}): NonNullable<Signatories<"mini-stage-cci">[S]>[K] | undefined => {
-  if (
-    conventionDraft.internshipKind === "mini-stage-cci" &&
-    conventionDraft.signatories &&
-    signatoryKey in conventionDraft.signatories &&
-    conventionDraft.signatories[signatoryKey]
-  ) {
-    return (
-      conventionDraft.signatories[signatoryKey] as NonNullable<
-        Signatories<"mini-stage-cci">[S]
-      >
-    )[propertyKey];
-  }
-  return undefined;
 };

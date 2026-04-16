@@ -10,7 +10,6 @@ import {
   noAgencyDashboards,
   noEstablishmentDashboard,
 } from "shared";
-import { makeEmptyConventionInitialValues } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
   type AuthState,
@@ -21,7 +20,6 @@ import {
 } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
-import type { PartialConventionInDevice } from "src/core-logic/ports/DeviceRepository";
 import {
   createTestStore,
   type TestDependencies,
@@ -125,13 +123,6 @@ describe("Auth slice", () => {
       "federatedIdentityWithUser",
       federatedIdentity,
     );
-    dependencies.localDeviceRepository.set(
-      "partialConvention",
-      makeEmptyConventionInitialValues({
-        internshipKind: "immersion",
-        federatedIdentity,
-      }),
-    );
 
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
@@ -154,7 +145,6 @@ describe("Auth slice", () => {
     });
 
     expectFederatedIdentityInDevice(undefined);
-    expectPartialConventionInDevice(undefined);
     expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
 
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
@@ -182,13 +172,6 @@ describe("Auth slice", () => {
       "federatedIdentityWithUser",
       connectedUserFederatedIdentity,
     );
-    dependencies.localDeviceRepository.set(
-      "partialConvention",
-      makeEmptyConventionInitialValues({
-        internshipKind: "immersion",
-        federatedIdentity: connectedUserFederatedIdentity,
-      }),
-    );
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
         mode: "device-only",
@@ -206,7 +189,6 @@ describe("Auth slice", () => {
     });
 
     expectFederatedIdentityInDevice(undefined);
-    expectPartialConventionInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, []);
 
     expectAuthStateToBe({
@@ -240,13 +222,6 @@ describe("Auth slice", () => {
       "federatedIdentityWithUser",
       peConnectedFederatedIdentity,
     );
-    dependencies.localDeviceRepository.set(
-      "partialConvention",
-      makeEmptyConventionInitialValues({
-        internshipKind: "immersion",
-        federatedIdentity: peConnectedFederatedIdentity,
-      }),
-    );
 
     store.dispatch(
       authSlice.actions.fetchLogoutUrlRequested({
@@ -265,7 +240,6 @@ describe("Auth slice", () => {
     });
 
     expectFederatedIdentityInDevice(undefined);
-    expectPartialConventionInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, []);
 
     expectAuthStateToBe({
@@ -298,13 +272,6 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
       peConnectedFederatedIdentity,
-    );
-    dependencies.localDeviceRepository.set(
-      "partialConvention",
-      makeEmptyConventionInitialValues({
-        internshipKind: "immersion",
-        federatedIdentity: peConnectedFederatedIdentity,
-      }),
     );
 
     store.dispatch(
@@ -772,13 +739,5 @@ describe("Auth slice", () => {
     expect(
       dependencies.localDeviceRepository.get("federatedIdentityWithUser"),
     ).toEqual(federatedIdentity);
-  };
-
-  const expectPartialConventionInDevice = (
-    conventionParams: Partial<PartialConventionInDevice> | undefined,
-  ) => {
-    expect(dependencies.localDeviceRepository.get("partialConvention")).toEqual(
-      conventionParams,
-    );
   };
 });

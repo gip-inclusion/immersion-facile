@@ -1,6 +1,5 @@
 import type { ConventionReadDto } from "shared";
 import type { VerificationActionWithLink } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
-import { saveConventionInDeviceAndGetConventionFormRoute } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import type { Link } from "type-route";
 
@@ -20,14 +19,6 @@ export const linkByAction = (
       conventionId: convention.id,
       jwt: jwt,
       skipIntro: true,
-    }).link,
-
-    DUPLICATE_CONVENTION: saveConventionInDeviceAndGetConventionFormRoute({
-      convention,
-      queryParams:
-        convention.internshipKind === "immersion"
-          ? { skipIntro: true }
-          : undefined,
     }).link,
 
     ACCESS_CONVENTION: routes.conventionDocument({

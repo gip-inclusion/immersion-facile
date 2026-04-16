@@ -1,6 +1,6 @@
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniq } from "ramda";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
@@ -81,8 +81,6 @@ export const AgencySelector = ({
   const initialAgencyKinds = getAgencyKindsInitialValue({
     shouldFilterDelegationPrescriptionAgencyKind,
   });
-  const [allowedAgencyKinds, setAllowedAgencyKinds] =
-    useState<AllowedAgencyKindToAdd[]>(initialAgencyKinds);
 
   const agencyIdFieldName = useMemo(
     () => agencyIdField.name as keyof SupportedFormsDto,
@@ -102,6 +100,21 @@ export const AgencySelector = ({
     name: agencyDepartmentFieldName,
     control,
   }) as string;
+
+  const agencyKindValue = useWatch({
+    name: agencyKindFieldName,
+    control,
+  }) as AgencyKindForSelector;
+
+  const allowedAgencyKinds = useMemo(
+    (): AllowedAgencyKindToAdd[] =>
+      agencyKindValue &&
+      agencyKindValue !== allAgencyKindsValue &&
+      allAgencyKindsAllowedToAdd.includes(agencyKindValue)
+        ? [agencyKindValue]
+        : initialAgencyKinds,
+    [agencyKindValue, initialAgencyKinds],
+  );
 
   const agencyPlaceholder = getAgencyPlaceholder(
     agencyDepartment,
@@ -183,12 +196,9 @@ export const AgencySelector = ({
           nativeSelectProps={{
             ...agencyKindField,
             ...register(agencyKindFieldName),
+            value: agencyKindValue,
             onChange: (event) =>
-              setAllowedAgencyKinds(
-                event.currentTarget.value === "all"
-                  ? allAgencyKindsAllowedToAdd
-                  : [event.currentTarget.value],
-              ),
+              setValue(agencyKindFieldName, event.currentTarget.value),
           }}
         />
       )}

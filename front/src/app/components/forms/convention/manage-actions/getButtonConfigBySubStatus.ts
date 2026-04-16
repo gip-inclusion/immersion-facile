@@ -2,6 +2,7 @@
 
 import { intersection } from "ramda";
 import type { Dispatch, SetStateAction } from "react";
+import { useDispatch } from "react-redux";
 import {
   allowedRolesToCreateAssessment,
   type ConnectedUser,
@@ -39,6 +40,7 @@ import {
   canAssessmentBeFilled,
   isConventionEndingInOneDayOrMore,
 } from "src/core-logic/domain/convention/convention.utils";
+import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { match, P } from "ts-pattern";
 export type ButtonConfiguration = {
   props: VerificationActionProps;
@@ -316,6 +318,7 @@ const createButtonPropsByVerificationAction = (
   } = params;
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
   const renewFeedback = useFeedbackTopic("convention-action-renew");
+  const dispatch = useDispatch();
 
   const allowedToTransferStatuses: ConventionStatus[] = [
     "IN_REVIEW",
@@ -433,7 +436,15 @@ const createButtonPropsByVerificationAction = (
         verificationAction: "DUPLICATE_CONVENTION",
         children: "Dupliquer la convention",
         convention,
-        jwt,
+        onActionClick: (conventionDraftWithRedirectUrl) =>
+          dispatch(
+            conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested(
+              {
+                ...conventionDraftWithRedirectUrl,
+                feedbackTopic: "convention-draft",
+              },
+            ),
+          ),
         buttonId: domElementIds.manageConvention.duplicateConventionButton,
       }),
       isVisibleForUserRights: true,

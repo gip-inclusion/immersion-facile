@@ -1,4 +1,4 @@
-import { filter, map, switchMap } from "rxjs";
+import { filter, map, switchMap, tap } from "rxjs";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -39,27 +39,32 @@ const fetchConventionDraftEpic: ConventionDraftEpic = (
 const shareConventionDraftByEmailEpic: ConventionDraftEpic = (
   action$,
   _state$,
-  { conventionGateway },
+  { conventionGateway, navigationGateway },
 ) =>
   action$.pipe(
     filter(
-      conventionDraftSlice.actions.shareConventionDraftByEmailRequested.match,
+      conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested
+        .match,
     ),
-    switchMap((action) =>
-      conventionGateway.shareConventionDraftByEmail(action.payload).pipe(
+    switchMap((action) => {
+      const { feedbackTopic, redirectUrl, ...shareDraftDto } = action.payload;
+      return conventionGateway.shareConventionDraftByEmail(shareDraftDto).pipe(
+        tap(() => {
+          if (redirectUrl) navigationGateway.goToUrl(redirectUrl);
+        }),
         map(() =>
-          conventionDraftSlice.actions.shareConventionDraftByEmailSucceeded(
+          conventionDraftSlice.actions.saveConventionDraftThenRedirectSucceeded(
             action.payload,
           ),
         ),
         catchEpicError((error: Error) =>
-          conventionDraftSlice.actions.shareConventionDraftByEmailFailed({
+          conventionDraftSlice.actions.saveConventionDraftThenRedirectFailed({
             errorMessage: error.message,
-            feedbackTopic: action.payload.feedbackTopic,
+            feedbackTopic,
           }),
         ),
-      ),
-    ),
+      );
+    }),
   );
 
 export const conventionDraftEpics = [
