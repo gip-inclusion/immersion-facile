@@ -162,6 +162,28 @@ const {
   close: closeEditCounsellorNameModal,
 } = createFormModal(createEditCounsellorNameModalParams);
 
+const createEditConventionWithFinalStatusModalParams = {
+  id: domElementIds.manageConvention.editConventionWithFinalStatusModal,
+  isOpenedByDefault: false,
+  formId: domElementIds.manageConvention.editConventionWithFinalStatusModalForm,
+  doSubmitClosesModal: false,
+  submitButton: {
+    id: domElementIds.manageConvention
+      .editConventionWithFinalStatusModalSubmitButton,
+    children: "Sauvegarder les modifications",
+  },
+  cancelButton: {
+    id: domElementIds.manageConvention
+      .editConventionWithFinalStatusModalCancelButton,
+    children: "Annuler",
+  },
+};
+const {
+  Component: EditConventionWithFinalStatusModal,
+  open: openEditConventionWithFinalStatusModal,
+  close: closeEditConventionWithFinalStatusModal,
+} = createFormModal(createEditConventionWithFinalStatusModalParams);
+
 const createRenewConventionModalParams = {
   id: domElementIds.manageConvention.renewModal,
   isOpenedByDefault: false,
@@ -290,6 +312,12 @@ export const modalByAction = (
       openModal: openEditCounsellorNameModal,
       closeModal: closeEditCounsellorNameModal,
       createModalParams: createEditCounsellorNameModalParams,
+    },
+    EDIT_CONVENTION_WITH_FINAL_STATUS: {
+      modal: EditConventionWithFinalStatusModal,
+      openModal: openEditConventionWithFinalStatusModal,
+      closeModal: closeEditConventionWithFinalStatusModal,
+      createModalParams: createEditConventionWithFinalStatusModalParams,
     },
     BROADCAST_AGAIN: {
       modal: BroadcastAgainModal,

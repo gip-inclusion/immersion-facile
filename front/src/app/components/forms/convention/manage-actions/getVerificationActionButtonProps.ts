@@ -10,6 +10,7 @@ import type {
   ConventionStatus,
   DeleteAssessmentRequestDto,
   EditConventionCounsellorNameRequestDto,
+  EditConventionWithFinalStatusRequestDto,
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   Role,
@@ -39,6 +40,7 @@ type VerificationActionModalParams = {
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
       | EditConventionCounsellorNameRequestDto
+      | EditConventionWithFinalStatusRequestDto
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => void;
@@ -71,6 +73,7 @@ const verificationActionsWithModal = [
   "TRANSFER",
   "RENEW",
   "EDIT_COUNSELLOR_NAME",
+  "EDIT_CONVENTION_WITH_FINAL_STATUS",
   "BROADCAST_AGAIN",
   "MARK_AS_HANDLED",
   "FILL_ASSESSMENT_INFO",
@@ -109,6 +112,7 @@ export const newStatusByVerificationAction = {
     | "TRANSFER"
     | "RENEW"
     | "EDIT_COUNSELLOR_NAME"
+    | "EDIT_CONVENTION_WITH_FINAL_STATUS"
     | "BROADCAST_AGAIN"
     | "MARK_AS_HANDLED"
     | "FILL_ASSESSMENT_INFO"

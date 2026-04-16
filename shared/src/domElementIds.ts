@@ -430,19 +430,28 @@ export const domElementIds = {
       "im-edit-counsellor-name-modal__submit-button",
     editCounsellorNameModalCancelButton:
       "im-edit-counsellor-name-modal__cancel-button",
-    editBeneficiaryBirthdateButton:
-      "im-convention-validation__edit-beneficiary-birthdate-button",
-    editBeneficiaryBirthdateModal: "im-edit-beneficiary-birthdate-modal",
-    editBeneficiaryBirthdateModalForm:
-      "im-edit-beneficiary-birthdate-modal__form",
-    editBeneficiaryBirthdateModalCurrentDateInput:
-      "im-edit-beneficiary-birthdate-modal__current-date-input",
-    editBeneficiaryBirthdateModalNewDateInput:
-      "im-edit-beneficiary-birthdate-modal__new-date-input",
-    editBeneficiaryBirthdateModalSubmitButton:
-      "im-edit-beneficiary-birthdate-modal__submit-button",
-    editBeneficiaryBirthdateModalCancelButton:
-      "im-edit-beneficiary-birthdate-modal__cancel-button",
+    editConventionWithFinalStatusButton:
+      "im-convention-validation__edit-convention-with-final-status-button",
+    editConventionWithFinalStatusModal:
+      "im-edit-convention-with-final-status-modal",
+    editConventionWithFinalStatusModalForm:
+      "im-edit-convention-with-final-status-modal__form",
+    editConventionWithFinalStatusModalCurrentDateInput:
+      "im-edit-convention-with-final-status-modal__current-date-input",
+    editConventionWithFinalStatusModalNewDateInput:
+      "im-edit-convention-with-final-status-modal__new-date-input",
+    editConventionWithFinalStatusModalCurrentFirstNameInput:
+      "im-edit-convention-with-final-status-modal__current-first-name-input",
+    editConventionWithFinalStatusModalNewFirstNameInput:
+      "im-edit-convention-with-final-status-modal__new-first-name-input",
+    editConventionWithFinalStatusModalCurrentLastNameInput:
+      "im-edit-convention-with-final-status-modal__current-last-name-input",
+    editConventionWithFinalStatusModalNewLastNameInput:
+      "im-edit-convention-with-final-status-modal__new-last-name-input",
+    editConventionWithFinalStatusModalSubmitButton:
+      "im-edit-convention-with-final-status-modal__submit-button",
+    editConventionWithFinalStatusModalCancelButton:
+      "im-edit-convention-with-final-status-modal__cancel-button",
     rejectedModalCancelButton: "im-rejected-modal__cancel-button",
     cancelModalCancelButton: "im-cancel-modal__cancel-button",
     deprecatedModalCancelButton: "im-deprecated-modal__cancel-button",
