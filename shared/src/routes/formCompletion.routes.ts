@@ -22,6 +22,7 @@ export const formCompletionRoutes = defineRoutes({
     responses: {
       200: getSiretInfoSchema,
       400: httpErrorSchema,
+      403: httpErrorSchema,
       404: httpErrorSchema,
       409: httpErrorSchema,
       429: httpErrorSchema,
@@ -34,6 +35,7 @@ export const formCompletionRoutes = defineRoutes({
     responses: {
       200: getSiretInfoSchema,
       400: httpErrorSchema,
+      403: httpErrorSchema,
       404: httpErrorSchema,
       409: httpErrorSchema,
       429: httpErrorSchema,

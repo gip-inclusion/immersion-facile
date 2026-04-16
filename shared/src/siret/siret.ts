@@ -18,6 +18,7 @@ export const siretApiUnexpectedErrorErrorMessage = "Unexpected Error";
 export const siretApiMissingEstablishmentMessage =
   "Missing establishment on SIRENE API.";
 export const siretInfoErrors = [
+  "L'entreprise avec ce siret est bannie",
   tooManySirenRequestsSiretErrorMessage,
   siretApiUnavailableSiretErrorMessage,
   siretApiMissingEstablishmentMessage,

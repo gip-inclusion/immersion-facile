@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import {
   addressDtoToString,
   authExpiredMessage,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
   currentJwtVersions,
@@ -257,6 +258,85 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
+  )} 200 if banned establishment and user is back office admin`, async () => {
+    const banEstablishmentPayload: BanEstablishmentPayload = {
+      siret: establishmentAggregate.establishment.siret,
+      bannishmentJustification: "Un employé a mangé du beurre doux",
+    };
+
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      establishmentAggregate,
+    ];
+
+    inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
+      banEstablishmentPayload,
+    ];
+
+    const response = await httpClient.getFormEstablishment({
+      headers: {
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
+      },
+      urlParams: {
+        siret: banEstablishmentPayload.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        siret: establishmentAggregate.establishment.siret,
+        source: "immersion-facile",
+        website: establishmentAggregate.establishment.website,
+        additionalInformation:
+          establishmentAggregate.establishment.additionalInformation,
+        businessName: establishmentAggregate.establishment.name,
+        businessAddresses: [
+          {
+            id: establishmentAggregate.establishment.locations[0].id,
+            rawAddress: addressDtoToString(
+              establishmentAggregate.establishment.locations[0].address,
+            ),
+          },
+        ],
+        naf: establishmentAggregate.establishment?.nafDto,
+        offers: [
+          {
+            appellationCode: establishmentAggregate.offers[0].appellationCode,
+            appellationLabel: establishmentAggregate.offers[0].appellationLabel,
+            romeCode: establishmentAggregate.offers[0].romeCode,
+            romeLabel: establishmentAggregate.offers[0].romeLabel,
+            remoteWorkMode: "ON_SITE",
+          },
+        ],
+        fitForDisabledWorkers:
+          establishmentAggregate.establishment.fitForDisabledWorkers,
+        maxContactsPerMonth:
+          establishmentAggregate.establishment.maxContactsPerMonth,
+        userRights: [
+          {
+            role: "establishment-admin",
+            status: "ACCEPTED",
+            email: establishmentAdmin.email,
+            job: establishmentAdminRight.job,
+            phone: establishmentAdminRight.phone,
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+          {
+            role: "establishment-contact",
+            status: "ACCEPTED",
+            email: establishmentContact.email,
+            shouldReceiveDiscussionNotifications: true,
+          },
+        ],
+        contactMode: establishmentAggregate.establishment.contactMode,
+        searchableBy: establishmentAggregate.establishment.searchableBy,
+      },
+      status: 200,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
   )} 400 if missing establishment`, async () => {
     const response = await httpClient.getFormEstablishment({
       body: {},
@@ -329,6 +409,42 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         status: 401,
       },
       status: 401,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 403 if banned establishment and user is not back office admin`, async () => {
+    const banEstablishmentPayload: BanEstablishmentPayload = {
+      siret: "12345678912345",
+      bannishmentJustification: "Un employé a mangé du beurre doux",
+    };
+
+    inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
+      banEstablishmentPayload,
+    ];
+
+    const response = await httpClient.getFormEstablishment({
+      headers: {
+        authorization: generateConnectedUserJwt(
+          createConnectedUserJwtPayload({
+            userId: establishmentAdmin.id,
+            durationHours: 1,
+            now: new Date(),
+          }),
+        ),
+      },
+      urlParams: {
+        siret: banEstablishmentPayload.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        message: `L'entreprise avec le siret '${banEstablishmentPayload.siret}' est bannie`,
+        status: 403,
+      },
+      status: 403,
     });
   });
 
