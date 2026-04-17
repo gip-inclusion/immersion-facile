@@ -466,7 +466,7 @@ export const ConventionList = () => {
                       title: "Filtrer par statut",
                       content: (
                         <>
-                          <RadioButtons options={statusOptions} />
+                          <Checkbox options={statusOptions} />
                         </>
                       ),
                     },
