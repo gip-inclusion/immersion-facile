@@ -487,7 +487,10 @@ export const confirmCreateConventionFormSubmit = async (
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
-  await expectElementToBeVisible(page, ".im-submit-confirmation-section");
+  await expectElementToBeVisible(
+    page,
+    `#${domElementIds.conventionImmersionRoute.conventionConfirmation.copyConventionIdButton}`,
+  );
 };
 
 const getRandomSiret = () =>
