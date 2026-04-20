@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
-import { type ConnectedUser, domElementIds } from "shared";
+import { type ConnectedUser, domElementIds, type UserId } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -22,7 +22,6 @@ type UserProfileAllowedRouteNames = Route<
   | typeof routes.myProfileEstablishments
 >["name"];
 
-type UserProfileMode = "my-profile" | "admin-user";
 type UserProfileTabId = "establishments" | "agencies";
 
 type UserProfileTab = {
@@ -31,12 +30,67 @@ type UserProfileTab = {
   content: ReactNode;
 };
 
+type RouteConfig = {
+  tabId: UserProfileTabId;
+  showRegistrationButtons: boolean;
+  onTabChange: (tabId: UserProfileTabId) => void;
+  emptyContent: Record<UserProfileTabId, ReactNode>;
+};
+
 type UserProfileProps = {
   title: string;
   userWithRights: ConnectedUser;
   editInformationsLink?: string;
   routeName: UserProfileAllowedRouteNames;
 };
+
+const adminTabChange =
+  (userId: string) =>
+  (tabId: UserProfileTabId): void =>
+    match(tabId)
+      .with("agencies", () => routes.adminUserDetailAgencies({ userId }).push())
+      .with("establishments", () =>
+        routes.adminUserDetailEstablishments({ userId }).push(),
+      )
+      .exhaustive();
+
+const myProfileTabChange = (tabId: UserProfileTabId): void =>
+  match(tabId)
+    .with("agencies", () => routes.myProfileAgencies().push())
+    .with("establishments", () => routes.myProfileEstablishments().push())
+    .exhaustive();
+
+const getRouteConfig = (
+  routeName: UserProfileAllowedRouteNames,
+  userId: UserId,
+): RouteConfig =>
+  match(routeName)
+    .returnType<RouteConfig>()
+    .with("adminUserDetailAgencies", () => ({
+      tabId: "agencies",
+      showRegistrationButtons: false,
+      onTabChange: adminTabChange(userId),
+      emptyContent: adminEmptyContent,
+    }))
+    .with("adminUserDetailEstablishments", () => ({
+      tabId: "establishments",
+      showRegistrationButtons: false,
+      onTabChange: adminTabChange(userId),
+      emptyContent: adminEmptyContent,
+    }))
+    .with("myProfileAgencies", () => ({
+      tabId: "agencies",
+      showRegistrationButtons: true,
+      onTabChange: myProfileTabChange,
+      emptyContent: myProfileEmptyContent,
+    }))
+    .with("myProfileEstablishments", () => ({
+      tabId: "establishments",
+      showRegistrationButtons: true,
+      onTabChange: myProfileTabChange,
+      emptyContent: myProfileEmptyContent,
+    }))
+    .exhaustive();
 
 export const UserProfile = ({
   title,
@@ -52,8 +106,12 @@ export const UserProfile = ({
     ) || [];
   const userAgenciesRights = userWithRights.agencyRights;
 
-  const mode: UserProfileMode = getUserProfileMode(routeName);
-  const currentTab = getCurrentTabId(routeName);
+  const {
+    tabId: currentTab,
+    showRegistrationButtons: showAddButtons,
+    onTabChange,
+    emptyContent,
+  } = getRouteConfig(routeName, userWithRights.id);
 
   const tabs: UserProfileTab[] = [
     {
@@ -61,10 +119,10 @@ export const UserProfile = ({
       label: `Organismes (${userAgenciesRights.length})`,
       content:
         userAgenciesRights.length === 0 ? (
-          contentToShowWhenEmptyTab[mode].agencies
+          emptyContent.agencies
         ) : (
           <>
-            {mode === "my-profile" && (
+            {showAddButtons && (
               <div className={fr.cx("fr-grid-row")}>
                 <Button
                   id={domElementIds.profile.registerAgenciesSearchLink}
@@ -91,10 +149,10 @@ export const UserProfile = ({
       label: `Entreprises (${userEstablishmentsRights.length})`,
       content:
         userEstablishmentsRights.length === 0 ? (
-          contentToShowWhenEmptyTab[mode].establishments
+          emptyContent.establishments
         ) : (
           <>
-            {mode === "my-profile" && (
+            {showAddButtons && (
               <div className={fr.cx("fr-grid-row")}>
                 <Button
                   id={
@@ -119,25 +177,6 @@ export const UserProfile = ({
     },
   ];
 
-  const onTabChange = (tabId: string) => {
-    match({ mode, tabId: tabId as UserProfileTabId })
-      .with({ mode: "admin-user", tabId: "agencies" }, () =>
-        routes.adminUserDetailAgencies({ userId: userWithRights.id }).push(),
-      )
-      .with({ mode: "admin-user", tabId: "establishments" }, () =>
-        routes
-          .adminUserDetailEstablishments({ userId: userWithRights.id })
-          .push(),
-      )
-      .with({ mode: "my-profile", tabId: "agencies" }, () =>
-        routes.myProfileAgencies().push(),
-      )
-      .with({ mode: "my-profile", tabId: "establishments" }, () =>
-        routes.myProfileEstablishments().push(),
-      )
-      .exhaustive();
-  };
-
   return (
     <div>
       <div className={fr.cx("fr-grid-row")}>
@@ -149,7 +188,7 @@ export const UserProfile = ({
       />
       <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>Mes rattachements</h2>
       <Tabs
-        onTabChange={onTabChange}
+        onTabChange={(tabId) => onTabChange(tabId as UserProfileTabId)}
         selectedTabId={currentTab}
         tabs={tabs.map((tab) => ({
           ...tab,
@@ -162,143 +201,114 @@ export const UserProfile = ({
   );
 };
 
-const getUserProfileMode = (
-  routeName: UserProfileAllowedRouteNames,
-): UserProfileMode => {
-  return match(routeName)
-    .returnType<UserProfileMode>()
-    .with("adminUserDetailAgencies", () => "admin-user")
-    .with("adminUserDetailEstablishments", () => "admin-user")
-    .with("myProfileAgencies", () => "my-profile")
-    .with("myProfileEstablishments", () => "my-profile")
-    .exhaustive();
+const adminEmptyContent: Record<UserProfileTabId, ReactNode> = {
+  agencies: <p>Cet utilisateur n'est rattaché à aucune agence</p>,
+  establishments: <p>Cet utilisateur n'est rattaché à aucune entreprise</p>,
 };
 
-const getCurrentTabId = (
-  routeName: UserProfileAllowedRouteNames,
-): UserProfileTabId => {
-  return match(routeName)
-    .returnType<UserProfileTabId>()
-    .with("adminUserDetailAgencies", () => "agencies")
-    .with("adminUserDetailEstablishments", () => "establishments")
-    .with("myProfileAgencies", () => "agencies")
-    .with("myProfileEstablishments", () => "establishments")
-    .exhaustive();
-};
-
-const contentToShowWhenEmptyTab: Record<
-  UserProfileMode,
-  Record<UserProfileTabId, ReactNode>
-> = {
-  "admin-user": {
-    agencies: <p>Cet utilisateur n'est rattaché à aucune agence</p>,
-    establishments: <p>Cet utilisateur n'est rattaché à aucune entreprise</p>,
-  },
-  "my-profile": {
-    agencies: (
+const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
+  agencies: (
+    <div
+      className={fr.cx(
+        "fr-grid-row",
+        "fr-grid-row--gutters",
+        "fr-grid-row--middle",
+      )}
+    >
+      <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+        <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>
+          Vous n'êtes rattaché(e) à aucun organisme
+        </h2>
+        <p>Vous n'êtes actuellement rattaché(e) à aucun organisme.</p>
+        <p>
+          Un organisme (France Travail, Mission Locale, Cap emploi, Conseil
+          Départemental, etc.) permet de valider les conventions d'immersion ou
+          encore de suivre les immersions.
+        </p>
+        <Highlight className={fr.cx("fr-ml-0")} size="sm">
+          Vous pourrez d'abord vérifier si votre organisme existe déjà pour
+          demander à y être rattaché(e). S'il n'existe pas encore, vous serez
+          guidé(e) vers le formulaire de création.
+        </Highlight>
+        <Button
+          id={domElementIds.profile.registerAgencyButton}
+          priority="primary"
+          linkProps={routes.myProfileAgencyRegistration().link}
+          className={fr.cx("fr-ml-auto")}
+          iconId="fr-icon-add-line"
+        >
+          Se rattacher à un organisme
+        </Button>
+      </div>
       <div
         className={fr.cx(
-          "fr-grid-row",
-          "fr-grid-row--gutters",
-          "fr-grid-row--middle",
+          "fr-col-12",
+          "fr-col-md-4",
+          "fr-hidden",
+          "fr-unhidden-md",
         )}
       >
-        <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-          <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>
-            Vous n'êtes rattaché(e) à aucun organisme
-          </h2>
-          <p>Vous n'êtes actuellement rattaché(e) à aucun organisme.</p>
-          <p>
-            Un organisme (France Travail, Mission Locale, Cap emploi, Conseil
-            Départemental, etc.) permet de valider les conventions d'immersion
-            ou encore de suivre les immersions.
-          </p>
-          <Highlight className={fr.cx("fr-ml-0")} size="sm">
-            Vous pourrez d'abord vérifier si votre organisme existe déjà pour
-            demander à y être rattaché(e). S'il n'existe pas encore, vous serez
-            guidé(e) vers le formulaire de création.
-          </Highlight>
-          <Button
-            id={domElementIds.profile.registerAgencyButton}
-            priority="primary"
-            linkProps={routes.myProfileAgencyRegistration().link}
-            className={fr.cx("fr-ml-auto")}
-            iconId="fr-icon-add-line"
-          >
-            Se rattacher à un organisme
-          </Button>
-        </div>
-        <div
-          className={fr.cx(
-            "fr-col-12",
-            "fr-col-md-4",
-            "fr-hidden",
-            "fr-unhidden-md",
-          )}
-        >
-          <img src={commonIllustrations.discussions} alt="Accès limité" />
-        </div>
+        <img src={commonIllustrations.discussions} alt="Accès limité" />
       </div>
-    ),
-    establishments: (
+    </div>
+  ),
+  establishments: (
+    <div
+      className={fr.cx(
+        "fr-grid-row",
+        "fr-grid-row--gutters",
+        "fr-grid-row--middle",
+      )}
+    >
+      <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+        <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>
+          Vous n'êtes rattaché(e) à aucune entreprise
+        </h2>
+        <p>
+          Vous n'êtes actuellement rattaché(e) à aucune entreprise accueillante.
+        </p>
+        <p>
+          Être rattaché(e) à une entreprise permet de gérer les offres
+          d'immersion, accéder aux mises en relation et suivre les immersions.
+        </p>
+        <Highlight className={fr.cx("fr-ml-0")} size="sm">
+          Vous pourrez d'abord vérifier si votre entreprise existe déjà pour
+          demander à y être rattaché(e). Si elle n'existe pas encore, vous serez
+          guidé(e) vers le formulaire de création.
+        </Highlight>
+        <p className={fr.cx("fr-text--xs")}>
+          Besoin d'aide pour référencer votre entreprise ?{" "}
+          <a
+            className={fr.cx("fr-download__link")}
+            href={ressourcesAndWebinarsUrl}
+            aria-label="Transcription textuelle, téléchargement en format texte"
+          >
+            Participez à notre webinaire
+          </a>
+        </p>
+        <Button
+          id={
+            domElementIds.myProfileEstablishmentRegistration
+              .registerEstablishmentButton
+          }
+          priority="primary"
+          linkProps={routes.myProfileEstablishmentRegistration().link}
+          className={fr.cx("fr-ml-auto")}
+          iconId="fr-icon-add-line"
+        >
+          Se rattacher à une entreprise
+        </Button>
+      </div>
       <div
         className={fr.cx(
-          "fr-grid-row",
-          "fr-grid-row--gutters",
-          "fr-grid-row--middle",
+          "fr-col-12",
+          "fr-col-md-4",
+          "fr-hidden",
+          "fr-unhidden-md",
         )}
       >
-        <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-          <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>
-            Vous n'êtes rattaché(e) à aucune entreprise
-          </h2>
-          <p>
-            Vous n'êtes actuellement rattaché(e) à aucune entreprise
-            accueillante.
-          </p>
-          <p>
-            Être rattaché(e) à une entreprise permet de gérer les offres
-            d'immersion, accéder aux mises en relation et suivre les immersions.
-          </p>
-          <Highlight className={fr.cx("fr-ml-0")} size="sm">
-            Vous pourrez d'abord vérifier si votre entreprise existe déjà pour
-            demander à y être rattaché(e). Si elle n'existe pas encore, vous
-            serez guidé(e) vers le formulaire de création.
-          </Highlight>
-          <p className={fr.cx("fr-text--xs")}>
-            Besoin d'aide pour référencer votre entreprise ?{" "}
-            <a
-              className={fr.cx("fr-download__link")}
-              href={ressourcesAndWebinarsUrl}
-              aria-label="Transcription textuelle, téléchargement en format texte"
-            >
-              Participez à notre webinaire
-            </a>
-          </p>
-          <Button
-            id={
-              domElementIds.myProfileEstablishmentRegistration
-                .registerEstablishmentButton
-            }
-            priority="primary"
-            linkProps={routes.myProfileEstablishmentRegistration().link}
-            className={fr.cx("fr-ml-auto")}
-            iconId="fr-icon-add-line"
-          >
-            Se rattacher à une entreprise
-          </Button>
-        </div>
-        <div
-          className={fr.cx(
-            "fr-col-12",
-            "fr-col-md-4",
-            "fr-hidden",
-            "fr-unhidden-md",
-          )}
-        >
-          <img src={commonIllustrations.structureAccueil} alt="Accès limité" />
-        </div>
+        <img src={commonIllustrations.structureAccueil} alt="Accès limité" />
       </div>
-    ),
-  },
+    </div>
+  ),
 };
