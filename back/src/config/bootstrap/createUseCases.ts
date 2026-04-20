@@ -29,7 +29,7 @@ import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases
 import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
 import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
-import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
+import { makeAddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
@@ -303,8 +303,6 @@ export const createUseCases = ({
         createNewEvent,
       ),
 
-      addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
-
       // Conventions
       getConventionsForApiConsumer: new GetConventionsForApiConsumer(
         uowPerformer,
@@ -529,6 +527,10 @@ export const createUseCases = ({
         generateApiConsumerJwt,
         gateways.timeGateway,
       ),
+    }),
+
+    addValidatedConventionNPS: makeAddValidatedConventionNps({
+      uowPerformer,
     }),
 
     //Convention
