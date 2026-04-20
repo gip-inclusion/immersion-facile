@@ -1,10 +1,4 @@
-import {
-  AgencyDtoBuilder,
-  ConventionDtoBuilder,
-  expectPromiseToFailWithError,
-  expectToEqual,
-  ForbiddenError,
-} from "shared";
+import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import {
@@ -12,7 +6,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { GetConventionsForApiConsumer } from "./GetConventionsForApiConsumer";
+import {
+  type GetConventionsForApiConsumer,
+  makeGetConventionsForApiConsumer,
+} from "./GetConventionsForApiConsumer";
 
 describe("Get Conventions for ApiConsumer", () => {
   const agencyFranceTravail = new AgencyDtoBuilder()
@@ -49,17 +46,8 @@ describe("Get Conventions for ApiConsumer", () => {
       conventionFranceTravail,
       conventionMissionLocale,
     ]);
-    getConventionsForApiConsumer = new GetConventionsForApiConsumer(
-      new InMemoryUowPerformer(uow),
-    );
-  });
-
-  describe("Forbidden error", () => {
-    it("When no api consumer is provided", async () => {
-      await expectPromiseToFailWithError(
-        getConventionsForApiConsumer.execute({}),
-        new ForbiddenError("No api consumer provided"),
-      );
+    getConventionsForApiConsumer = makeGetConventionsForApiConsumer({
+      uowPerformer: new InMemoryUowPerformer(uow),
     });
   });
 
