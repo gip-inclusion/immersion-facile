@@ -17,7 +17,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailWhenAgencyIsRejected } from "./SendEmailWhenAgencyIsRejected";
+import {
+  makeSendEmailWhenAgencyIsRejected,
+  type SendEmailWhenAgencyIsRejected,
+} from "./SendEmailWhenAgencyIsRejected";
 
 describe("Feature - SendEmailWhenAgencyIsRejected", () => {
   const agency = AgencyDtoBuilder.create()
@@ -55,13 +58,15 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    useCase = new SendEmailWhenAgencyIsRejected(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-    );
+    useCase = makeSendEmailWhenAgencyIsRejected({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+    });
 
     uow.userRepository.users = [
       user1,

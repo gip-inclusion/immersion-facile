@@ -4,31 +4,23 @@ import {
   errors,
   isTruthy,
   type UserId,
-  type WithAgencyId,
   withAgencyIdSchema,
 } from "shared";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgencyId> {
-  protected inputSchema = withAgencyIdSchema;
+export type SendEmailWhenAgencyIsRejected = ReturnType<
+  typeof makeSendEmailWhenAgencyIsRejected
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-  }
-
-  public async _execute(
-    { agencyId }: WithAgencyId,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeSendEmailWhenAgencyIsRejected = useCaseBuilder(
+  "SendEmailWhenAgencyIsRejected",
+)
+  .withInput(withAgencyIdSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  }>()
+  .build(async ({ inputParams: { agencyId }, uow, deps }) => {
     const agency = await uow.agencyRepository.getById(agencyId);
     if (!agency) throw errors.agency.notFound({ agencyId });
     const rejectedStatus: AgencyStatus = "rejected";
@@ -61,7 +53,7 @@ export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgen
 
     const users = await uow.userRepository.getByIds(userIdsToNotify);
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_REJECTED",
@@ -75,5 +67,4 @@ export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgen
         agencyId: agency.id,
       },
     });
-  }
-}
+  });
