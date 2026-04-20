@@ -73,7 +73,7 @@ import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
-import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
+import { makeSendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
@@ -418,10 +418,6 @@ export const createUseCases = ({
       romeSearch: new RomeSearch(uowPerformer),
 
       // agencies
-      sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-      ),
       sendEmailWhenNewAgencyOfTypeOtherAdded:
         new SendEmailWhenNewAgencyOfTypeOtherAdded(
           uowPerformer,
@@ -550,6 +546,14 @@ export const createUseCases = ({
 
     getConventionsForApiConsumer: makeGetConventionsForApiConsumer({
       uowPerformer,
+    }),
+
+    // agencies
+    sendEmailsWhenAgencyIsActivated: makeSendEmailsWhenAgencyIsActivated({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+      },
     }),
 
     // siret
