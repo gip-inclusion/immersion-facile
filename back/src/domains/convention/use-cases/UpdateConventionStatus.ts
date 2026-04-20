@@ -1,5 +1,4 @@
 import {
-  type AgencyId,
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -9,8 +8,6 @@ import {
   errors,
   type Role,
   reviewedConventionStatuses,
-  type UpdateConventionStatusRequestDto,
-  type UserId,
   type UserWithRights,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
@@ -20,9 +17,8 @@ import { getUserWithRights } from "../../connected-users/helpers/userRights.help
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   throwErrorOnConventionIdMismatch,
   throwIfTransitionNotAllowed,
@@ -42,38 +38,31 @@ const domainTopicByTargetStatusMap: Record<
   DEPRECATED: "ConventionDeprecated",
 };
 
-type UpdateConventionStatusSupportedJwtPayload = ConventionRelatedJwtPayload;
+export type UpdateConventionStatus = ReturnType<
+  typeof makeUpdateConventionStatus
+>;
 
-export class UpdateConventionStatus extends TransactionalUseCase<
-  UpdateConventionStatusRequestDto,
-  WithConventionIdLegacy,
-  UpdateConventionStatusSupportedJwtPayload
-> {
-  protected inputSchema = updateConventionStatusRequestSchema;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
-    private readonly timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-  }
-
-  public async _execute(
-    params: UpdateConventionStatusRequestDto,
-    uow: UnitOfWork,
-    payload: UpdateConventionStatusSupportedJwtPayload,
-  ): Promise<WithConventionIdLegacy> {
+export const makeUpdateConventionStatus = useCaseBuilder(
+  "UpdateConventionStatus",
+)
+  .withInput(updateConventionStatusRequestSchema)
+  .withOutput<WithConventionIdLegacy>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
+  .withDeps<{
+    createNewEvent: CreateNewEvent;
+    timeGateway: TimeGateway;
+  }>()
+  .build(async ({ inputParams, uow, deps, currentUser: payload }) => {
     throwErrorOnConventionIdMismatch({
-      requestedConventionId: params.conventionId,
+      requestedConventionId: inputParams.conventionId,
       jwtPayload: payload,
     });
     const conventionRead = await uow.conventionQueries.getConventionById(
-      params.conventionId,
+      inputParams.conventionId,
     );
     if (!conventionRead)
       throw errors.convention.notFound({
-        conventionId: params.conventionId,
+        conventionId: inputParams.conventionId,
       });
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
@@ -83,17 +72,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         agencyId: conventionRead.agencyId,
       });
 
-    const roleOrUser = await this.#getRoleInPayloadOrUser(
+    const roleOrUser = await getRoleInPayloadOrUser(
       uow,
       payload,
-      params.status,
+      inputParams.status,
       conventionRead.id,
     );
 
     const roles =
       "roleInPayload" in roleOrUser
         ? [roleOrUser.roleInPayload]
-        : await this.#rolesFromUser(roleOrUser.userWithRights, conventionRead);
+        : await rolesFromUser(roleOrUser.userWithRights, conventionRead);
 
     const assessment = await uow.assessmentRepository.getByConventionId(
       conventionRead.id,
@@ -101,40 +90,40 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
     throwIfTransitionNotAllowed({
       roles,
-      targetStatus: params.status,
+      targetStatus: inputParams.status,
       conventionRead,
       hasAssessment: !!assessment,
     });
 
-    const conventionUpdatedAt = this.timeGateway.now().toISOString();
+    const conventionUpdatedAt = deps.timeGateway.now().toISOString();
 
     const statusJustification =
-      params.status === "CANCELLED" ||
-      params.status === "REJECTED" ||
-      params.status === "DEPRECATED"
-        ? params.statusJustification
+      inputParams.status === "CANCELLED" ||
+      inputParams.status === "REJECTED" ||
+      inputParams.status === "DEPRECATED"
+        ? inputParams.statusJustification
         : undefined;
 
     const hasCounsellor =
-      params.status === "ACCEPTED_BY_COUNSELLOR" &&
-      (params.lastname || params.firstname);
+      inputParams.status === "ACCEPTED_BY_COUNSELLOR" &&
+      (inputParams.lastname || inputParams.firstname);
 
     const hasValidator =
-      params.status === "ACCEPTED_BY_VALIDATOR" &&
-      (params.lastname || params.firstname);
+      inputParams.status === "ACCEPTED_BY_VALIDATOR" &&
+      (inputParams.lastname || inputParams.firstname);
 
     const getDateApproval = (): DateString | undefined => {
-      if (reviewedConventionStatuses.includes(params.status))
+      if (reviewedConventionStatuses.includes(inputParams.status))
         return conventionUpdatedAt;
-      if (validatedConventionStatuses.includes(params.status))
+      if (validatedConventionStatuses.includes(inputParams.status))
         return conventionRead.dateApproval;
       return undefined;
     };
 
     const updatedConvention: ConventionDto = {
       ...conventionRead,
-      status: params.status,
-      dateValidation: validatedConventionStatuses.includes(params.status)
+      status: inputParams.status,
+      dateValidation: validatedConventionStatuses.includes(inputParams.status)
         ? conventionUpdatedAt
         : undefined,
       dateApproval: getDateApproval(),
@@ -144,8 +133,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             validators: {
               ...conventionRead.validators,
               agencyCounsellor: {
-                firstname: params.firstname,
-                lastname: params.lastname,
+                firstname: inputParams.firstname,
+                lastname: inputParams.lastname,
               },
             },
           }
@@ -155,8 +144,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             validators: {
               ...conventionRead.validators,
               agencyValidator: {
-                firstname: params.firstname,
-                lastname: params.lastname,
+                firstname: inputParams.firstname,
+                lastname: inputParams.lastname,
               },
             },
           }
@@ -169,7 +158,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         conventionId: updatedConvention.id,
       });
 
-    const domainTopic = domainTopicByTargetStatusMap[params.status];
+    const domainTopic = domainTopicByTargetStatusMap[inputParams.status];
     if (domainTopic) {
       const triggeredBy: TriggeredBy =
         "roleInPayload" in roleOrUser
@@ -182,11 +171,13 @@ export class UpdateConventionStatus extends TransactionalUseCase<
               userId: roleOrUser.userWithRights.id,
             };
 
-      const event = this.#createEvent(
-        updatedConvention,
-        domainTopic,
-        triggeredBy,
-      );
+      const event = deps.createNewEvent({
+        topic: domainTopic,
+        payload: {
+          convention: updatedConvention,
+          triggeredBy,
+        },
+      });
 
       await uow.outboxRepository.save({
         ...event,
@@ -195,88 +186,57 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     }
 
     return { id: updatedId };
-  }
+  });
 
-  async #getRoleInPayloadOrUser(
-    uow: UnitOfWork,
-    payload: UpdateConventionStatusSupportedJwtPayload,
-    targetStatus: ConventionStatus,
-    conventionId: ConventionId,
-  ): Promise<{ userWithRights: UserWithRights } | { roleInPayload: Role }> {
-    if ("role" in payload) {
-      if (payload.role === ("back-office" as ConventionRole))
-        throw errors.convention.badRoleStatusChange({
-          roles: ["back-office"],
-          status: targetStatus,
-          conventionId,
-        });
-      return { roleInPayload: payload.role };
-    }
-
-    const userWithRights = await getUserWithRights(uow, payload.userId);
-    if (!userWithRights)
-      throw errors.user.notFound({
-        userId: payload.userId,
+const getRoleInPayloadOrUser = async (
+  uow: UnitOfWork,
+  payload: ConventionRelatedJwtPayload,
+  targetStatus: ConventionStatus,
+  conventionId: ConventionId,
+): Promise<{ userWithRights: UserWithRights } | { roleInPayload: Role }> => {
+  if ("role" in payload) {
+    if (payload.role === ("back-office" as ConventionRole))
+      throw errors.convention.badRoleStatusChange({
+        roles: ["back-office"],
+        status: targetStatus,
+        conventionId,
       });
-
-    return {
-      userWithRights: userWithRights,
-    };
+    return { roleInPayload: payload.role };
   }
 
-  async #rolesFromUser(
-    user: UserWithRights,
-    convention: ConventionDto,
-  ): Promise<Role[]> {
-    const roles: Role[] = [];
-    if (user.isBackofficeAdmin) roles.push("back-office");
+  const userWithRights = await getUserWithRights(uow, payload.userId);
+  if (!userWithRights)
+    throw errors.user.notFound({
+      userId: payload.userId,
+    });
 
-    if (user.email === convention.signatories.establishmentRepresentative.email)
-      roles.push("establishment-representative");
+  return {
+    userWithRights: userWithRights,
+  };
+};
 
-    const userAgencyRight = user.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === convention.agencyId,
-    );
+const rolesFromUser = async (
+  user: UserWithRights,
+  convention: ConventionDto,
+): Promise<Role[]> => {
+  const roles: Role[] = [];
+  if (user.isBackofficeAdmin) roles.push("back-office");
 
-    if (!userAgencyRight && roles.length === 0) {
-      throw errors.user.noRightsOnAgency({
-        agencyId: convention.agencyId,
-        userId: user.id,
-      });
-    }
+  if (user.email === convention.signatories.establishmentRepresentative.email)
+    roles.push("establishment-representative");
 
-    if (userAgencyRight) roles.push(...userAgencyRight.roles);
+  const userAgencyRight = user.agencyRights.find(
+    (agencyRight) => agencyRight.agency.id === convention.agencyId,
+  );
 
-    return roles;
-  }
-
-  async #agencyEmailFromUserIdAndAgencyId(
-    uow: UnitOfWork,
-    userId: UserId,
-    agencyId: AgencyId,
-  ): Promise<string> {
-    const userWithRights = await getUserWithRights(uow, userId);
-    if (!userWithRights) throw errors.user.notFound({ userId });
-    const userAgencyRights = userWithRights.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === agencyId,
-    );
-    if (!userAgencyRights)
-      throw errors.user.noRightsOnAgency({ agencyId, userId });
-
-    return userWithRights.email;
-  }
-
-  #createEvent(
-    updatedConventionDto: ConventionDto,
-    domainTopic: DomainTopic,
-    triggeredBy: TriggeredBy,
-  ) {
-    return this.createNewEvent({
-      topic: domainTopic,
-      payload: {
-        convention: updatedConventionDto,
-        triggeredBy,
-      },
+  if (!userAgencyRight && roles.length === 0) {
+    throw errors.user.noRightsOnAgency({
+      agencyId: convention.agencyId,
+      userId: user.id,
     });
   }
-}
+
+  if (userAgencyRight) roles.push(...userAgencyRight.roles);
+
+  return roles;
+};
