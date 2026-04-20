@@ -130,6 +130,7 @@ export const ConventionConfirmationPage = ({
             onClick: () => onCopyButtonClick(conventionId),
             priority: "primary",
             size: "small",
+            iconId: "fr-icon-clipboard-line",
           }}
         />
         <SectionConventionNextSteps nextSteps={nextSteps} />
