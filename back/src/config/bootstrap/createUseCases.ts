@@ -82,7 +82,7 @@ import { makeSignAssessment } from "../../domains/convention/use-cases/SignAsses
 import { makeSignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { makeUpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
-import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
+import { makeUpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeLookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { makeLookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
 import { makeBroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
@@ -312,11 +312,6 @@ export const createUseCases = ({
           config.immersionFacileBaseUrl,
         ),
 
-      updateConventionStatus: new UpdateConventionStatus(
-        uowPerformer,
-        createNewEvent,
-        gateways.timeGateway,
-      ),
       renewExpiredJwt: new RenewExpiredJwt({
         uowPerformer,
         config,
@@ -532,6 +527,13 @@ export const createUseCases = ({
       deps: { addConvention },
     }),
     updateConvention: makeUpdateConvention({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
+    updateConventionStatus: makeUpdateConventionStatus({
       uowPerformer,
       deps: {
         createNewEvent,

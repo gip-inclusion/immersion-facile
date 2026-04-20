@@ -16,7 +16,7 @@ import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGa
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateConventionStatus } from "./UpdateConventionStatus";
+import { makeUpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   acceptStatusTransitionTests,
   conventionWithAgencyOneStepValidationId,
@@ -527,11 +527,14 @@ const prepareUseCaseForStandAloneTests = () => {
     timeGateway,
     uuidGenerator: new TestUuidGenerator(),
   });
-  const updateConventionStatusUseCase = new UpdateConventionStatus(
-    new InMemoryUowPerformer(uow),
-    createNewEvent,
-    timeGateway,
-  );
+  const updateConventionStatusUseCase = makeUpdateConventionStatus({
+    uowPerformer: new InMemoryUowPerformer(uow),
+    deps: {
+      createNewEvent,
+      timeGateway,
+    },
+  });
+
   return {
     uow,
     updateConventionStatusUseCase,

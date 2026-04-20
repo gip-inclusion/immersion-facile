@@ -35,7 +35,10 @@ import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemo
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
-import { UpdateConventionStatus } from "./UpdateConventionStatus";
+import {
+  makeUpdateConventionStatus,
+  type UpdateConventionStatus,
+} from "./UpdateConventionStatus";
 
 const allConnectedTestUsers = [
   "userWithRoleToReview",
@@ -264,11 +267,13 @@ export const setupInitialState = ({
     uuidGenerator: new TestUuidGenerator(),
   });
 
-  const updateConventionStatusUseCase = new UpdateConventionStatus(
-    new InMemoryUowPerformer(uow),
-    createNewEvent,
-    timeGateway,
-  );
+  const updateConventionStatusUseCase = makeUpdateConventionStatus({
+    uowPerformer: new InMemoryUowPerformer(uow),
+    deps: {
+      createNewEvent,
+      timeGateway,
+    },
+  });
 
   agencyRepository.agencies = [
     agencyWithCounsellorEmails,
