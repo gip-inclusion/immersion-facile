@@ -29,7 +29,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SignConvention } from "./SignConvention";
+import { makeSignConvention, type SignConvention } from "./SignConvention";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
@@ -61,11 +61,13 @@ describe("Sign convention", () => {
       uuidGenerator,
     });
 
-    signConvention = new SignConvention(
-      new InMemoryUowPerformer(uow),
-      createNewEvent,
-      timeGateway,
-    );
+    signConvention = makeSignConvention({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent,
+        timeGateway,
+      },
+    });
   });
 
   const [allowedToSignRoles, forbiddenToSignRoles] =

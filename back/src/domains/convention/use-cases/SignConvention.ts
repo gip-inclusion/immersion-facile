@@ -2,76 +2,63 @@ import {
   type ConnectedUserDomainJwtPayload,
   type ConventionDomainJwtPayload,
   errors,
-  type WithConventionId,
-  type WithConventionIdLegacy,
   withConventionIdSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   domainTopicByTargetStatusMap,
   signConvention,
   throwErrorOnConventionIdMismatch,
 } from "../entities/Convention";
 
-export class SignConvention extends TransactionalUseCase<
-  WithConventionId,
-  WithConventionIdLegacy,
-  ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload
-> {
-  protected inputSchema = withConventionIdSchema;
+export type SignConvention = ReturnType<typeof makeSignConvention>;
 
-  readonly #createNewEvent: CreateNewEvent;
-
-  readonly #timeGateway: TimeGateway;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-    timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-    this.#timeGateway = timeGateway;
-  }
-
-  public async _execute(
-    { conventionId }: WithConventionId,
-    uow: UnitOfWork,
-    jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
-  ): Promise<WithConventionIdLegacy> {
-    throwErrorOnConventionIdMismatch({
-      requestedConventionId: conventionId,
-      jwtPayload,
-    });
-    const convention =
-      await uow.conventionQueries.getConventionById(conventionId);
-    if (!convention) throw errors.convention.notFound({ conventionId });
-
-    const { role, userWithRights, signedConvention } = await signConvention({
+export const makeSignConvention = useCaseBuilder("SignConvention")
+  .withInput(withConventionIdSchema)
+  .withOutput()
+  .withDeps<{
+    timeGateway: TimeGateway;
+    createNewEvent: CreateNewEvent;
+  }>()
+  .withCurrentUser<ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload>()
+  .build(
+    async ({
+      inputParams: { conventionId },
       uow,
-      convention,
-      jwtPayload,
-      now: this.#timeGateway.now().toISOString(),
-    });
-
-    const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
-    if (domainTopic) {
-      const event = this.#createNewEvent({
-        topic: domainTopic,
-        payload: {
-          convention: signedConvention,
-          triggeredBy: userWithRights
-            ? { kind: "connected-user", userId: userWithRights.id }
-            : { kind: "convention-magic-link", role: role },
-        },
+      deps,
+      currentUser: jwtPayload,
+    }) => {
+      throwErrorOnConventionIdMismatch({
+        requestedConventionId: conventionId,
+        jwtPayload,
       });
-      await uow.outboxRepository.save(event);
-    }
+      const convention =
+        await uow.conventionQueries.getConventionById(conventionId);
+      if (!convention) throw errors.convention.notFound({ conventionId });
 
-    return { id: signedConvention.id };
-  }
-}
+      const { role, userWithRights, signedConvention } = await signConvention({
+        uow,
+        convention,
+        jwtPayload,
+        now: deps.timeGateway.now().toISOString(),
+      });
+
+      const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
+      if (domainTopic) {
+        const event = deps.createNewEvent({
+          topic: domainTopic,
+          payload: {
+            convention: signedConvention,
+            triggeredBy: userWithRights
+              ? { kind: "connected-user", userId: userWithRights.id }
+              : { kind: "convention-magic-link", role: role },
+          },
+        });
+        await uow.outboxRepository.save(event);
+      }
+
+      return { id: signedConvention.id };
+    },
+  );

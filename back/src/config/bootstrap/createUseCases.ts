@@ -79,7 +79,7 @@ import { makeSendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/conven
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
-import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
+import { makeSignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
@@ -322,11 +322,6 @@ export const createUseCases = ({
         createNewEvent,
         gateways.timeGateway,
       ),
-      signConvention: new SignConvention(
-        uowPerformer,
-        createNewEvent,
-        gateways.timeGateway,
-      ),
       renewExpiredJwt: new RenewExpiredJwt({
         uowPerformer,
         config,
@@ -527,6 +522,13 @@ export const createUseCases = ({
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
         timeGateway: gateways.timeGateway,
         config,
+      },
+    }),
+    signConvention: makeSignConvention({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
       },
     }),
 
