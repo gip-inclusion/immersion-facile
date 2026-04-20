@@ -18,7 +18,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailsWhenAgencyIsActivated } from "./SendEmailsWhenAgencyIsActivated";
+import {
+  makeSendEmailsWhenAgencyIsActivated,
+  type SendEmailsWhenAgencyIsActivated,
+} from "./SendEmailsWhenAgencyIsActivated";
 
 const connectedUser1 = new ConnectedUserBuilder()
   .withId("user-1-id")
@@ -88,10 +91,12 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       uuidGenerator,
       timeGateway,
     );
-    sendEmailsWhenAgencyActivated = new SendEmailsWhenAgencyIsActivated(
+    sendEmailsWhenAgencyActivated = makeSendEmailsWhenAgencyIsActivated({
       uowPerformer,
-      saveNotificationAndRelatedEvent,
-    );
+      deps: {
+        saveNotificationAndRelatedEvent,
+      },
+    });
   });
 
   it("Sends activation email to counsellors and validators when agency without refers to id got activated", async () => {
