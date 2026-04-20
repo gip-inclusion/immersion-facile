@@ -74,7 +74,7 @@ import { makeRenewConvention } from "../../domains/convention/use-cases/RenewCon
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { makeSendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
-import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
+import { makeSendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
@@ -423,10 +423,6 @@ export const createUseCases = ({
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      sendEmailWhenAgencyIsRejected: new SendEmailWhenAgencyIsRejected(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-      ),
 
       // notifications
       notifySignatoriesThatConventionSubmittedNeedsSignature:
@@ -550,6 +546,13 @@ export const createUseCases = ({
 
     // agencies
     sendEmailsWhenAgencyIsActivated: makeSendEmailsWhenAgencyIsActivated({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+      },
+    }),
+
+    sendEmailWhenAgencyIsRejected: makeSendEmailWhenAgencyIsRejected({
       uowPerformer,
       deps: {
         saveNotificationAndRelatedEvent,
