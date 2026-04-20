@@ -12,7 +12,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "./SendEmailWhenNewAgencyOfTypeOtherAdded";
+import {
+  makeSendEmailWhenNewAgencyOfTypeOtherAdded,
+  type SendEmailWhenNewAgencyOfTypeOtherAdded,
+} from "./SendEmailWhenNewAgencyOfTypeOtherAdded";
 
 describe("Send email when agency of type other added ", () => {
   const counsellorAndValidator = new ConnectedUserBuilder()
@@ -65,13 +68,15 @@ describe("Send email when agency of type other added ", () => {
       uow.outboxRepository,
     );
     sendEmailWhenNewAgencyOfTypeOtherAdded =
-      new SendEmailWhenNewAgencyOfTypeOtherAdded(
-        new InMemoryUowPerformer(uow),
-        makeSaveNotificationAndRelatedEvent(
-          new UuidV4Generator(),
-          new CustomTimeGateway(),
-        ),
-      );
+      makeSendEmailWhenNewAgencyOfTypeOtherAdded({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+            new UuidV4Generator(),
+            new CustomTimeGateway(),
+          ),
+        },
+      });
     uow.userRepository.users = [counsellor, validator, counsellorAndValidator];
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
