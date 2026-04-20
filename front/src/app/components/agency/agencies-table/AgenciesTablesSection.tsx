@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
 import { useDispatch } from "react-redux";
 import {
   type AgencyRight,
@@ -9,7 +8,6 @@ import {
   type UserParamsForAgency,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -60,19 +58,6 @@ export const AgenciesTablesSection = ({
   return (
     <>
       <Feedback topics={["user"]} closable />
-      <div className={fr.cx("fr-grid-row")}>
-        <Button
-          id={domElementIds.profile.registerAgenciesSearchLink}
-          priority="primary"
-          linkProps={{
-            href: `${routes.myProfileAgencyRegistration().href}`,
-          }}
-          iconId="fr-icon-add-line"
-          className={fr.cx("fr-ml-auto")}
-        >
-          Se rattacher à un organisme
-        </Button>
-      </div>
 
       {toReviewAgencyRights.length > 0 && (
         <>

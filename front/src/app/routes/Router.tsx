@@ -176,6 +176,14 @@ const getPageByRouteName: {
     </AdminPrivateRoute>
   ),
   adminUserDetail: (route) => (
+    <RedirectTo route={routes.adminUserDetailAgencies(route.params)} />
+  ),
+  adminUserDetailAgencies: (route) => (
+    <AdminPrivateRoute route={route}>
+      <AdminUserDetail route={route} />
+    </AdminPrivateRoute>
+  ),
+  adminUserDetailEstablishments: (route) => (
     <AdminPrivateRoute route={route}>
       <AdminUserDetail route={route} />
     </AdminPrivateRoute>

@@ -53,6 +53,8 @@ import { LoginByEmailFeedbackPage } from "./LoginByEmailFeedbackPage";
 export type FrontAdminRoute =
   | FrontAdminRouteTab
   | Route<typeof routes.adminUserDetail>
+  | Route<typeof routes.adminUserDetailAgencies>
+  | Route<typeof routes.adminUserDetailEstablishments>
   | Route<typeof routes.adminConventionDetail>
   | Route<typeof routes.adminAgencyDetail>;
 

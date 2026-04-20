@@ -13,9 +13,7 @@ import type { Route } from "type-route";
 
 type MyProfileProps = {
   route: Route<
-    | typeof routes.myProfile
-    | typeof routes.myProfileAgencies
-    | typeof routes.myProfileEstablishments
+    typeof routes.myProfileAgencies | typeof routes.myProfileEstablishments
   >;
 };
 
@@ -24,7 +22,7 @@ const linkToUpdateAccountInfo =
     ? "https://app.moncomptepro.beta.gouv.fr/personal-information"
     : "https://app-preprod.moncomptepro.beta.gouv.fr/personal-information";
 
-export const MyProfile = (_: MyProfileProps) => {
+export const MyProfile = ({ route }: MyProfileProps) => {
   const dispatch = useDispatch();
 
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
@@ -40,9 +38,7 @@ export const MyProfile = (_: MyProfileProps) => {
   if (!currentUser || !connectedUserJwt)
     return <p>Vous n'êtes pas connecté...</p>;
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return <Loader />;
 
   const userDisplayed =
     currentUser.firstName && currentUser.lastName
@@ -54,6 +50,7 @@ export const MyProfile = (_: MyProfileProps) => {
       title={userDisplayed}
       userWithRights={currentUser}
       editInformationsLink={linkToUpdateAccountInfo}
+      routeName={route.name}
     />
   );
 };

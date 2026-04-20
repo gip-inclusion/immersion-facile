@@ -176,6 +176,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { userId: param.path.string },
     ({ userId }) => `/${userId}`,
   ),
+  adminUserDetailAgencies: adminUsers.extend(
+    { userId: param.path.string },
+    ({ userId }) => `/${userId}/agences`,
+  ),
+  adminUserDetailEstablishments: adminUsers.extend(
+    { userId: param.path.string },
+    ({ userId }) => `/${userId}/etablissements`,
+  ),
   adminAgencies,
   adminAgencyDetail: adminAgencies.extend(
     { agencyId: param.path.string },
