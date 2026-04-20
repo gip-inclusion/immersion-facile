@@ -342,10 +342,12 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     city: zStringMinLength1Max1024,
     exchangesData: z.object({
       count: z.number(),
-      lastExchange: z.object({
-        sender: exchangeRoleSchema,
-        sentAt: makeDateStringSchema(),
-      }),
+      lastExchange: z
+        .object({
+          sender: exchangeRoleSchema,
+          sentAt: makeDateStringSchema(),
+        })
+        .nullable(),
     }),
     potentialBeneficiary: z.object({
       firstName: firstnameMandatorySchema,
