@@ -435,6 +435,8 @@ sources:
             description: "Timestamp when created"
           - name: updated_at
             description: "Timestamp when updated"
+          - name: signed_at
+            description: "Timestamp when benficiary signed the assessment"
 
       - name: establishments
         description: "Establishments offering immersion opportunities"
