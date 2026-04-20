@@ -81,7 +81,7 @@ import { makeShareConventionDraftByEmail } from "../../domains/convention/use-ca
 import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
 import { makeSignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
-import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
+import { makeUpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeLookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { makeLookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
@@ -312,11 +312,6 @@ export const createUseCases = ({
           config.immersionFacileBaseUrl,
         ),
 
-      updateConvention: new UpdateConvention(
-        uowPerformer,
-        createNewEvent,
-        gateways.timeGateway,
-      ),
       updateConventionStatus: new UpdateConventionStatus(
         uowPerformer,
         createNewEvent,
@@ -535,6 +530,13 @@ export const createUseCases = ({
     renewConvention: makeRenewConvention({
       uowPerformer,
       deps: { addConvention },
+    }),
+    updateConvention: makeUpdateConvention({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
+      },
     }),
 
     getConventionsForApiConsumer: makeGetConventionsForApiConsumer({
