@@ -75,7 +75,7 @@ import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { makeSendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { makeSendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
-import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
+import { makeSendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
@@ -418,11 +418,6 @@ export const createUseCases = ({
       romeSearch: new RomeSearch(uowPerformer),
 
       // agencies
-      sendEmailWhenNewAgencyOfTypeOtherAdded:
-        new SendEmailWhenNewAgencyOfTypeOtherAdded(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-        ),
 
       // notifications
       notifySignatoriesThatConventionSubmittedNeedsSignature:
@@ -558,6 +553,14 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
       },
     }),
+
+    sendEmailWhenNewAgencyOfTypeOtherAdded:
+      makeSendEmailWhenNewAgencyOfTypeOtherAdded({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+        },
+      }),
 
     // siret
     getSiret: makeGetSiret({ deps: { siretGateway: gateways.siret } }),
