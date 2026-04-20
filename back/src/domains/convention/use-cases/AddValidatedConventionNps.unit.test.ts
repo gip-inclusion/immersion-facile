@@ -4,18 +4,20 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { AddValidatedConventionNps } from "./AddValidatedConventionNps";
+import {
+  type AddValidatedConventionNps,
+  makeAddValidatedConventionNps,
+} from "./AddValidatedConventionNps";
 
 describe("AddValidatedConventionNps use case", () => {
-  let uowPerformer: InMemoryUowPerformer;
   let addValidatedConventionNps: AddValidatedConventionNps;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uowPerformer = new InMemoryUowPerformer(uow);
-
-    addValidatedConventionNps = new AddValidatedConventionNps(uowPerformer);
+    addValidatedConventionNps = makeAddValidatedConventionNps({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
   });
 
   it("saves the nps correctly", async () => {
