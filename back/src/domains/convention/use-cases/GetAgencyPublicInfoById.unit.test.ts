@@ -11,7 +11,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { GetAgencyPublicInfoById } from "./GetAgencyPublicInfoById";
+import {
+  type GetAgencyPublicInfoById,
+  makeGetAgencyPublicInfoById,
+} from "./GetAgencyPublicInfoById";
 
 describe("GetAgencyPublicInfoById", () => {
   const agency = new AgencyDtoBuilder().withId("agency1").build();
@@ -27,7 +30,9 @@ describe("GetAgencyPublicInfoById", () => {
   let useCase: GetAgencyPublicInfoById;
   beforeEach(() => {
     uow = createInMemoryUow();
-    useCase = new GetAgencyPublicInfoById(new InMemoryUowPerformer(uow));
+    useCase = makeGetAgencyPublicInfoById({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
   });
 
   describe("Happy path", () => {

@@ -2,23 +2,21 @@ import {
   type AgencyPublicDisplayDto,
   errors,
   toAgencyPublicDisplayDto,
-  type WithAgencyId,
   withAgencyIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class GetAgencyPublicInfoById extends TransactionalUseCase<
-  WithAgencyId,
-  AgencyPublicDisplayDto
-> {
-  protected inputSchema = withAgencyIdSchema;
+export type GetAgencyPublicInfoById = ReturnType<
+  typeof makeGetAgencyPublicInfoById
+>;
 
-  public async _execute(
-    { agencyId }: WithAgencyId,
-    uow: UnitOfWork,
-  ): Promise<AgencyPublicDisplayDto> {
+export const makeGetAgencyPublicInfoById = useCaseBuilder(
+  "GetAgencyPublicInfoById",
+)
+  .withInput(withAgencyIdSchema)
+  .withOutput<AgencyPublicDisplayDto>()
+  .build(async ({ inputParams: { agencyId }, uow }) => {
     const agencyWithRights = await uow.agencyRepository.getById(agencyId);
     if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
     const referedAgency =
@@ -31,5 +29,4 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
         ? await agencyWithRightToAgencyDto(uow, referedAgency)
         : null,
     );
-  }
-}
+  });

@@ -41,7 +41,7 @@ import { makeDeleteConventionDraft } from "../../domains/convention/use-cases/De
 import { makeDeleteConventionTemplate } from "../../domains/convention/use-cases/DeleteConventionTemplate";
 import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { makeEditConventionWithFinalStatus } from "../../domains/convention/use-cases/EditConventionWithFinalStatus";
-import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
+import { makeGetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
 import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
@@ -421,7 +421,6 @@ export const createUseCases = ({
       romeSearch: new RomeSearch(uowPerformer),
 
       // agencies
-      getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(
         uowPerformer,
         saveNotificationAndRelatedEvent,
@@ -865,6 +864,8 @@ export const createUseCases = ({
         createNewEvent,
       },
     }),
+
+    getAgencyPublicInfoById: makeGetAgencyPublicInfoById({ uowPerformer }),
 
     listAgencyOptionsByFilter: makeListAgencyOptionsByFilter({
       uowPerformer,
