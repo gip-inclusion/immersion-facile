@@ -1,7 +1,7 @@
 import { filterNotFalsy } from "shared";
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
-import { ConventionsReminder } from "../../domains/convention/use-cases/ConventionsReminder";
+import { makeConventionsReminder } from "../../domains/convention/use-cases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
@@ -17,15 +17,19 @@ const executeConventionReminder = () => {
   logger.info({ message: "Starting convention reminder script" });
   const timeGateway = new RealTimeGateway();
 
-  return new ConventionsReminder(
-    createDbRelatedSystems(config, createMakeProductionPgPool(config))
-      .uowPerformer,
-    timeGateway,
-    makeCreateNewEvent({
+  return makeConventionsReminder({
+    uowPerformer: createDbRelatedSystems(
+      config,
+      createMakeProductionPgPool(config),
+    ).uowPerformer,
+    deps: {
       timeGateway,
-      uuidGenerator: new UuidV4Generator(),
-    }),
-  ).execute();
+      createNewEvent: makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new UuidV4Generator(),
+      }),
+    },
+  }).execute();
 };
 
 export const triggerConventionReminder = ({

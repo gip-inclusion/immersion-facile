@@ -6,13 +6,10 @@ import {
   castError,
   type ReminderKind,
 } from "shared";
-import { z } from "zod";
 import type { DomainEvent } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 const agencyStatuses: ConventionStatus[] = ["IN_REVIEW"];
 const signatoryStatuses: ConventionStatus[] = [
@@ -37,31 +34,18 @@ type EventWithConventionId = {
   event: DomainEvent;
 };
 
-export class ConventionsReminder extends TransactionalUseCase<
-  void,
-  ConventionsReminderSummary
-> {
-  protected inputSchema = z.void();
+export type ConventionsReminder = ReturnType<typeof makeConventionsReminder>;
 
-  readonly #timeGateway: TimeGateway;
+type Deps = {
+  timeGateway: TimeGateway;
+  createNewEvent: CreateNewEvent;
+};
 
-  readonly #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    timeGateway: TimeGateway,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#timeGateway = timeGateway;
-    this.#createNewEvent = createNewEvent;
-  }
-
-  protected async _execute(
-    _: void,
-    uow: UnitOfWork,
-  ): Promise<ConventionsReminderSummary> {
-    const now = this.#timeGateway.now();
+export const makeConventionsReminder = useCaseBuilder("ConventionsReminder")
+  .withOutput<ConventionsReminderSummary>()
+  .withDeps<Deps>()
+  .build(async ({ uow, deps }) => {
+    const now = deps.timeGateway.now();
 
     const conventionsForLastSignatoryReminder =
       await uow.conventionQueries.getConventions({
@@ -85,10 +69,14 @@ export class ConventionsReminder extends TransactionalUseCase<
 
     const events = [
       ...conventionsForLastSignatoryReminder.map(({ id }) =>
-        this.#makeConventionReminderRequiredEvent(id, "ReminderForSignatories"),
+        makeConventionReminderRequiredEvent({
+          id,
+          reminderKind: "ReminderForSignatories",
+          deps,
+        }),
       ),
       ...conventionsForAgencyReminders.flatMap((c) =>
-        this.#makeAgencyReminders(c),
+        makeAgencyReminders(c, deps),
       ),
     ];
 
@@ -118,51 +106,56 @@ export class ConventionsReminder extends TransactionalUseCase<
         } => result.error instanceof Error,
       ),
     };
-  }
+  });
 
-  #makeConventionReminderRequiredEvent(
-    id: ConventionId,
-    reminderKind: ReminderKind,
-  ): EventWithConventionId {
-    return {
-      id,
-      event: this.#createNewEvent({
-        topic: "ConventionReminderRequired",
-        payload: {
-          conventionId: id,
-          reminderKind,
-        },
-      }),
-    };
-  }
+const makeAgencyReminders = (
+  { id, status, dateStart }: ConventionDto,
+  deps: Deps,
+): EventWithConventionId[] => {
+  const dateStartDiff = differenceInBusinessDays(
+    new Date(dateStart),
+    deps.timeGateway.now(),
+  );
+  if (!agencyStatuses.includes(status)) return [];
+  return [
+    ...(TWO_DAYS < dateStartDiff && dateStartDiff <= THREE_DAYS
+      ? [
+          makeConventionReminderRequiredEvent({
+            id,
+            reminderKind: "FirstReminderForAgency",
+            deps,
+          }),
+        ]
+      : []),
+    ...(ZERO_DAYS < dateStartDiff && dateStartDiff <= ONE_DAY
+      ? [
+          makeConventionReminderRequiredEvent({
+            id,
+            reminderKind: "LastReminderForAgency",
+            deps,
+          }),
+        ]
+      : []),
+  ];
+};
 
-  #makeAgencyReminders({
+const makeConventionReminderRequiredEvent = ({
+  id,
+  reminderKind,
+  deps,
+}: {
+  id: ConventionId;
+  reminderKind: ReminderKind;
+  deps: Deps;
+}): EventWithConventionId => {
+  return {
     id,
-    status,
-    dateStart,
-  }: ConventionDto): EventWithConventionId[] {
-    const dateStartDiff = differenceInBusinessDays(
-      new Date(dateStart),
-      this.#timeGateway.now(),
-    );
-    if (!agencyStatuses.includes(status)) return [];
-    return [
-      ...(TWO_DAYS < dateStartDiff && dateStartDiff <= THREE_DAYS
-        ? [
-            this.#makeConventionReminderRequiredEvent(
-              id,
-              "FirstReminderForAgency",
-            ),
-          ]
-        : []),
-      ...(ZERO_DAYS < dateStartDiff && dateStartDiff <= ONE_DAY
-        ? [
-            this.#makeConventionReminderRequiredEvent(
-              id,
-              "LastReminderForAgency",
-            ),
-          ]
-        : []),
-    ];
-  }
-}
+    event: deps.createNewEvent({
+      topic: "ConventionReminderRequired",
+      payload: {
+        conventionId: id,
+        reminderKind,
+      },
+    }),
+  };
+};
