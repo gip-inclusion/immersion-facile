@@ -266,6 +266,8 @@ models:
         description: Feedback from establishment
       - name: assessment_hours_actually_made
         description: Actual hours completed during immersion
+      - name: assessment_signed_at
+        description: Timestamp when beneficiary signed the assessment
 
   - name: conventions_for_counting
     description: |
