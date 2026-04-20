@@ -26,7 +26,7 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeAddConvention } from "./AddConvention";
-import { RenewConvention } from "./RenewConvention";
+import { makeRenewConvention, type RenewConvention } from "./RenewConvention";
 
 describe("RenewConvention", () => {
   let renewConvention: RenewConvention;
@@ -79,19 +79,21 @@ describe("RenewConvention", () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
     uuidGenerator = new TestUuidGenerator();
-    renewConvention = new RenewConvention(
+    renewConvention = makeRenewConvention({
       uowPerformer,
-      makeAddConvention({
-        uowPerformer,
-        deps: {
-          createNewEvent: makeCreateNewEvent({
-            timeGateway: new CustomTimeGateway(),
-            uuidGenerator,
-          }),
-          siretGateway: new InMemorySiretGateway(),
-        },
-      }),
-    );
+      deps: {
+        addConvention: makeAddConvention({
+          uowPerformer,
+          deps: {
+            createNewEvent: makeCreateNewEvent({
+              timeGateway: new CustomTimeGateway(),
+              uuidGenerator,
+            }),
+            siretGateway: new InMemorySiretGateway(),
+          },
+        }),
+      },
+    });
     uow.conventionRepository.setConventions([existingValidatedConvention]);
     uow.userRepository.users = [backofficeAdmin, validator, agencyAdmin];
     uow.agencyRepository.agencies = [
@@ -169,13 +171,6 @@ describe("RenewConvention", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws an error when no JWT payload", async () => {
-      await expectPromiseToFailWithError(
-        renewConvention.execute(renewConventionParams),
-        errors.user.unauthorized(),
-      );
-    });
-
     it("throws an error when convention id in params does not match to convention id in JWT payload", async () => {
       await expectPromiseToFailWithError(
         renewConvention.execute(

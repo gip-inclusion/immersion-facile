@@ -70,7 +70,7 @@ import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-
 import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
-import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
+import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
@@ -338,7 +338,6 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
         createNewEvent,
       }),
-      renewConvention: new RenewConvention(uowPerformer, addConvention),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
         gateways.timeGateway,
@@ -543,6 +542,12 @@ export const createUseCases = ({
         config,
       },
     }),
+
+    renewConvention: makeRenewConvention({
+      uowPerformer,
+      deps: { addConvention },
+    }),
+
     getConventionsForApiConsumer: makeGetConventionsForApiConsumer({
       uowPerformer,
     }),
