@@ -4,20 +4,16 @@ import {
   conventionStatuses,
   ForbiddenError,
   localization,
+  type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { GetConventionsFilters } from "../ports/ConventionQueries";
 
 const MAX_CONVENTIONS_RETURNED = 100;
 
-export class GetConventionsForApiConsumer extends TransactionalUseCase<
-  GetConventionsFilters,
-  ConventionReadDto[],
-  ApiConsumer
-> {
-  protected inputSchema = z.object({
+const inputSchema: ZodSchemaWithInputMatchingOutput<GetConventionsFilters> =
+  z.object({
     startDateGreater: z.date().optional(),
     startDateLessOrEqual: z.date().optional(),
     withStatuses: z
@@ -29,11 +25,17 @@ export class GetConventionsForApiConsumer extends TransactionalUseCase<
       .optional(),
   });
 
-  protected async _execute(
-    filters: GetConventionsFilters,
-    uow: UnitOfWork,
-    apiConsumer?: ApiConsumer,
-  ): Promise<ConventionReadDto[]> {
+export type GetConventionsForApiConsumer = ReturnType<
+  typeof makeGetConventionsForApiConsumer
+>;
+
+export const makeGetConventionsForApiConsumer = useCaseBuilder(
+  "GetConventionsForApiConsumer",
+)
+  .withInput(inputSchema)
+  .withOutput<ConventionReadDto[]>()
+  .withCurrentUser<ApiConsumer>()
+  .build(async ({ inputParams: filters, uow, currentUser: apiConsumer }) => {
     if (!apiConsumer) throw new ForbiddenError("No api consumer provided");
 
     return uow.conventionQueries.getConventionsByScope({
@@ -41,5 +43,4 @@ export class GetConventionsForApiConsumer extends TransactionalUseCase<
       limit: MAX_CONVENTIONS_RETURNED,
       filters,
     });
-  }
-}
+  });

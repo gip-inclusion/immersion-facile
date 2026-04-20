@@ -47,7 +47,7 @@ import { makeGetAssessmentByConventionId } from "../../domains/convention/use-ca
 import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
-import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeGetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
@@ -304,9 +304,7 @@ export const createUseCases = ({
       ),
 
       // Conventions
-      getConventionsForApiConsumer: new GetConventionsForApiConsumer(
-        uowPerformer,
-      ),
+
       linkFranceTravailAdvisorAndRedirectToConvention:
         new LinkFranceTravailAdvisorAndRedirectToConvention(
           uowPerformer,
@@ -544,6 +542,9 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
         config,
       },
+    }),
+    getConventionsForApiConsumer: makeGetConventionsForApiConsumer({
+      uowPerformer,
     }),
 
     // siret
