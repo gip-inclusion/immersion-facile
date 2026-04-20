@@ -8,7 +8,6 @@ import {
   isSignatoryRole,
   type Signatories,
   statusTransitionConfigs,
-  type UpdateConventionRequestDto,
   updateConventionRequestSchema,
   type WithConventionIdLegacy,
 } from "shared";
@@ -25,166 +24,161 @@ import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/autho
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   extractUserRolesOnConventionFromJwtPayload,
   signConvention,
 } from "../entities/Convention";
 
-export class UpdateConvention extends TransactionalUseCase<
-  UpdateConventionRequestDto,
-  WithConventionIdLegacy,
-  ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload
-> {
-  protected inputSchema = updateConventionRequestSchema;
+export type UpdateConvention = ReturnType<typeof makeUpdateConvention>;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private readonly createNewEvent: CreateNewEvent,
-    private readonly timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-  }
-
-  protected async _execute(
-    { convention }: UpdateConventionRequestDto,
-    uow: UnitOfWork,
-    jwtPayload?: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload,
-  ): Promise<WithConventionIdLegacy> {
-    if (!jwtPayload) throw errors.user.unauthorized();
-
-    const conventionFromRepo = await uow.conventionRepository.getById(
-      convention.id,
-    );
-
-    if (!conventionFromRepo)
-      throw errors.convention.notFound({ conventionId: convention.id });
-
-    const conventionReadDto = await conventionDtoToConventionReadDto(
-      conventionFromRepo,
+export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
+  .withInput(updateConventionRequestSchema)
+  .withOutput<WithConventionIdLegacy>()
+  .withCurrentUser<ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload>()
+  .withDeps<{
+    timeGateway: TimeGateway;
+    createNewEvent: CreateNewEvent;
+  }>()
+  .build(
+    async ({
+      inputParams: { convention },
       uow,
-    );
-    await throwIfNotAuthorizedForRole({
-      uow,
-      convention: conventionReadDto,
-      authorizedRoles: [...allModifierRoles],
-      errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
-      jwtPayload,
-      isPeAdvisorAllowed: true,
-      isValidatorOfAgencyRefersToAllowed:
-        conventionFromRepo.status !== "ACCEPTED_BY_COUNSELLOR",
-    });
+      deps,
+      currentUser: jwtPayload,
+    }) => {
+      if (!jwtPayload) throw errors.user.unauthorized();
 
-    const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
-
-    throwErrorIfConventionStatusNotAllowed(
-      convention.status,
-      [minimalValidStatus],
-      errors.convention.updateBadStatusInParams({ id: convention.id }),
-    );
-
-    const isTransitionAllowed = statusTransitionConfigs[
-      minimalValidStatus
-    ].validInitialStatuses.includes(conventionFromRepo.status);
-
-    if (!isTransitionAllowed)
-      throw errors.convention.updateBadStatusInRepo({
-        id: conventionFromRepo.id,
-        status: conventionFromRepo.status,
-      });
-
-    if (convention.updatedAt !== conventionFromRepo.updatedAt) {
-      throw errors.convention.conventionGotUpdatedWhileUpdating();
-    }
-    const userRolesOnConvention =
-      await extractUserRolesOnConventionFromJwtPayload(
-        jwtPayload,
-        uow,
-        conventionFromRepo,
-      );
-
-    const hasSignatoryRole = userRolesOnConvention.some((role) =>
-      isSignatoryRole(role),
-    );
-    const conventionWithSignatoriesSignedAtAndDateApprovalCleared: ConventionDto =
-      {
-        ...convention,
-        dateApproval: undefined,
-        signatories: clearSignedAtForAllSignatories(convention),
-      };
-
-    const triggeredBy: TriggeredBy =
-      "userId" in jwtPayload
-        ? {
-            kind: "connected-user",
-            userId: jwtPayload.userId,
-          }
-        : {
-            kind: "convention-magic-link",
-            role: jwtPayload.role,
-          };
-
-    if (hasSignatoryRole) {
-      const agencyWithRights = await uow.agencyRepository.getById(
-        convention.agencyId,
-      );
-      const assessment = await uow.assessmentRepository.getByConventionId(
+      const conventionFromRepo = await uow.conventionRepository.getById(
         convention.id,
       );
-      const assessmentFields =
-        assesmentEntityToConventionAssessmentFields(assessment);
 
-      if (!agencyWithRights)
-        throw errors.agency.notFound({ agencyId: convention.agencyId });
+      if (!conventionFromRepo)
+        throw errors.convention.notFound({ conventionId: convention.id });
 
-      const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-      const { signedConvention } = await signConvention({
+      const conventionReadDto = await conventionDtoToConventionReadDto(
+        conventionFromRepo,
         uow,
-        convention: {
-          ...conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-          ...agencyDtoToConventionAgencyFields(agency),
-          ...assessmentFields,
-        },
+      );
+      await throwIfNotAuthorizedForRole({
+        uow,
+        convention: conventionReadDto,
+        authorizedRoles: [...allModifierRoles],
+        errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
         jwtPayload,
-        now: this.timeGateway.now().toISOString(),
+        isPeAdvisorAllowed: true,
+        isValidatorOfAgencyRefersToAllowed:
+          conventionFromRepo.status !== "ACCEPTED_BY_COUNSELLOR",
       });
 
-      await Promise.all([
-        uow.conventionRepository.update(signedConvention),
-        uow.outboxRepository.save(
-          this.createNewEvent({
-            topic: "ConventionModifiedAndSigned",
-            payload: {
-              convention: signedConvention,
-              triggeredBy,
-            },
-          }),
-        ),
-      ]);
-    } else {
-      await Promise.all([
-        uow.conventionRepository.update(
-          conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-        ),
-        uow.outboxRepository.save(
-          this.createNewEvent({
-            topic: "ConventionSubmittedAfterModification",
-            payload: {
-              convention:
-                conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-              triggeredBy,
-            },
-          }),
-        ),
-      ]);
-    }
+      const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
-    return { id: conventionFromRepo.id };
-  }
-}
+      throwErrorIfConventionStatusNotAllowed(
+        convention.status,
+        [minimalValidStatus],
+        errors.convention.updateBadStatusInParams({ id: convention.id }),
+      );
+
+      const isTransitionAllowed = statusTransitionConfigs[
+        minimalValidStatus
+      ].validInitialStatuses.includes(conventionFromRepo.status);
+
+      if (!isTransitionAllowed)
+        throw errors.convention.updateBadStatusInRepo({
+          id: conventionFromRepo.id,
+          status: conventionFromRepo.status,
+        });
+
+      if (convention.updatedAt !== conventionFromRepo.updatedAt) {
+        throw errors.convention.conventionGotUpdatedWhileUpdating();
+      }
+      const userRolesOnConvention =
+        await extractUserRolesOnConventionFromJwtPayload(
+          jwtPayload,
+          uow,
+          conventionFromRepo,
+        );
+
+      const hasSignatoryRole = userRolesOnConvention.some((role) =>
+        isSignatoryRole(role),
+      );
+      const conventionWithSignatoriesSignedAtAndDateApprovalCleared: ConventionDto =
+        {
+          ...convention,
+          dateApproval: undefined,
+          signatories: clearSignedAtForAllSignatories(convention),
+        };
+
+      const triggeredBy: TriggeredBy =
+        "userId" in jwtPayload
+          ? {
+              kind: "connected-user",
+              userId: jwtPayload.userId,
+            }
+          : {
+              kind: "convention-magic-link",
+              role: jwtPayload.role,
+            };
+
+      if (hasSignatoryRole) {
+        const agencyWithRights = await uow.agencyRepository.getById(
+          convention.agencyId,
+        );
+        const assessment = await uow.assessmentRepository.getByConventionId(
+          convention.id,
+        );
+        const assessmentFields =
+          assesmentEntityToConventionAssessmentFields(assessment);
+
+        if (!agencyWithRights)
+          throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+        const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+        const { signedConvention } = await signConvention({
+          uow,
+          convention: {
+            ...conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+            ...agencyDtoToConventionAgencyFields(agency),
+            ...assessmentFields,
+          },
+          jwtPayload,
+          now: deps.timeGateway.now().toISOString(),
+        });
+
+        await Promise.all([
+          uow.conventionRepository.update(signedConvention),
+          uow.outboxRepository.save(
+            deps.createNewEvent({
+              topic: "ConventionModifiedAndSigned",
+              payload: {
+                convention: signedConvention,
+                triggeredBy,
+              },
+            }),
+          ),
+        ]);
+      } else {
+        await Promise.all([
+          uow.conventionRepository.update(
+            conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+          ),
+          uow.outboxRepository.save(
+            deps.createNewEvent({
+              topic: "ConventionSubmittedAfterModification",
+              payload: {
+                convention:
+                  conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+                triggeredBy,
+              },
+            }),
+          ),
+        ]);
+      }
+
+      return { id: conventionFromRepo.id };
+    },
+  );
 
 const clearSignedAtForAllSignatories = (
   convention: ConventionDto,

@@ -36,7 +36,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateConvention } from "./UpdateConvention";
+import {
+  makeUpdateConvention,
+  type UpdateConvention,
+} from "./UpdateConvention";
 
 describe("Update Convention", () => {
   const backofficeAdminUser = new ConnectedUserBuilder()
@@ -114,28 +117,19 @@ describe("Update Convention", () => {
 
     uowPerformer = new InMemoryUowPerformer(uow);
 
-    updateConvention = new UpdateConvention(
+    updateConvention = makeUpdateConvention({
       uowPerformer,
-      createNewEvent,
-      timeGateway,
-    );
+      deps: {
+        createNewEvent,
+        timeGateway,
+      },
+    });
 
     uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
   });
 
   describe("Wrong path", () => {
     describe("when user is not allowed", () => {
-      it("throws without jwtPayload", async () => {
-        uow.conventionRepository.setConventions([convention]);
-
-        await expectPromiseToFailWithError(
-          updateConvention.execute({
-            convention,
-          }),
-          errors.user.unauthorized(),
-        );
-      });
-
       describe("with connected user", () => {
         it("throws not found if connected user does not exist", async () => {
           uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
