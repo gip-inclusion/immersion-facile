@@ -1,16 +1,10 @@
 import { type ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
-import { z } from "zod";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { getOnlyAssessmentDto } from "../entities/AssessmentEntity";
-import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
-import {
-  type BroadcastToFranceTravailOnConventionUpdates,
-  makeBroadcastToFranceTravailOnConventionUpdates,
-} from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
+import type { BroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
 
 type ResyncOldConventionToFtReport = {
   success: number;
@@ -18,138 +12,137 @@ type ResyncOldConventionToFtReport = {
   errors: Record<ConventionId, Error>;
 };
 
-export class ResyncOldConventionsToFt extends TransactionalUseCase<
-  void,
-  ResyncOldConventionToFtReport
-> {
-  protected override inputSchema = z.void();
+export type ResyncOldConventionsToFt = ReturnType<
+  typeof makeResyncOldConventionsToFt
+>;
 
-  readonly #standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
+export const makeResyncOldConventionsToFt = useCaseBuilder(
+  "ResyncOldConventionsToFt",
+)
+  .withOutput<ResyncOldConventionToFtReport>()
+  .withDeps<{
+    timeGateway: TimeGateway;
+    standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
+    limit: number;
+  }>()
+  .build(
+    async ({
+      uow,
+      deps: { standardBroadcastToFTUsecase, limit, timeGateway },
+    }) => {
+      const report: ResyncOldConventionToFtReport = {
+        errors: {},
+        skips: {},
+        success: 0,
+      };
 
-  #report: ResyncOldConventionToFtReport = {
-    errors: {},
-    skips: {},
-    success: 0,
-  };
+      const conventionsToSync =
+        await uow.conventionsToSyncRepository.getToProcessOrError(limit);
 
-  readonly #timeGateway: TimeGateway;
+      await Promise.all(
+        conventionsToSync.map((conventionToSync) =>
+          handleConventionToSync({
+            uow,
+            conventionToSyncId: conventionToSync.id,
+            report,
+            timeGateway,
+            standardBroadcastToFTUsecase,
+          }),
+        ),
+      );
 
-  readonly #limit: number;
+      return report;
+    },
+  );
 
-  constructor(
-    uowPerform: UnitOfWorkPerformer,
-    franceTravailGateway: FranceTravailGateway,
-    timeGateway: TimeGateway,
-    limit: number,
-  ) {
-    super(uowPerform);
-    this.#standardBroadcastToFTUsecase =
-      makeBroadcastToFranceTravailOnConventionUpdates({
-        uowPerformer: uowPerform,
-        deps: {
-          franceTravailGateway,
-          timeGateway,
-          options: { resyncMode: true },
-        },
+const handleConventionToSync = async ({
+  uow,
+  conventionToSyncId,
+  report,
+  timeGateway,
+  standardBroadcastToFTUsecase,
+}: {
+  uow: UnitOfWork;
+  conventionToSyncId: ConventionId;
+  report: ResyncOldConventionToFtReport;
+  timeGateway: TimeGateway;
+  standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
+}) => {
+  try {
+    await resync({ uow, conventionToSyncId, standardBroadcastToFTUsecase });
+
+    const updatedConventionToSync =
+      await uow.conventionsToSyncRepository.getById(conventionToSyncId);
+
+    match(updatedConventionToSync)
+      .with(undefined, () => {
+        report.errors[conventionToSyncId] = new Error(
+          "Convention not found or no status",
+        );
+      })
+      .with({ status: "SUCCESS" }, () => {
+        report.success += 1;
+      })
+      .with({ status: "TO_PROCESS" }, (toProcessConventionToSync) => {
+        report.errors[toProcessConventionToSync.id] = new Error(
+          "Convention still have status TO_PROCESS",
+        );
+      })
+      .with({ status: "ERROR" }, (errorConventionToSync) => {
+        report.errors[errorConventionToSync.id] = new Error(
+          errorConventionToSync.reason,
+        );
+      })
+      .with({ status: "SKIP" }, (skipConventionToSync) => {
+        report.skips[skipConventionToSync.id] = skipConventionToSync.reason;
+      })
+      .exhaustive();
+  } catch (error) {
+    const anError =
+      error instanceof Error
+        ? error
+        : new Error(`Not an Error: ${JSON.stringify(error)}`);
+    await uow.conventionsToSyncRepository.save({
+      id: conventionToSyncId,
+      status: "ERROR",
+      processDate: timeGateway.now(),
+      reason: anError.message,
+    });
+    report.errors[conventionToSyncId] = anError;
+  }
+};
+
+const resync = async ({
+  uow,
+  conventionToSyncId,
+  standardBroadcastToFTUsecase,
+}: {
+  uow: UnitOfWork;
+  conventionToSyncId: ConventionId;
+  standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
+}): Promise<void> => {
+  const convention =
+    await uow.conventionQueries.getConventionById(conventionToSyncId);
+  if (!convention)
+    throw errors.convention.notFound({
+      conventionId: conventionToSyncId,
+    });
+
+  const assessmentEntity =
+    await uow.assessmentRepository.getByConventionId(conventionToSyncId);
+
+  const assessment = assessmentEntity
+    ? getOnlyAssessmentDto(assessmentEntity)
+    : undefined;
+
+  return assessment
+    ? standardBroadcastToFTUsecase.execute({
+        eventType: "ASSESSMENT_CREATED",
+        convention,
+        assessment,
+      })
+    : standardBroadcastToFTUsecase.execute({
+        eventType: "CONVENTION_UPDATED",
+        convention,
       });
-
-    this.#timeGateway = timeGateway;
-    this.#limit = limit;
-  }
-
-  public async _execute(
-    _: void,
-    uow: UnitOfWork,
-  ): Promise<ResyncOldConventionToFtReport> {
-    const conventionsToSync =
-      await uow.conventionsToSyncRepository.getToProcessOrError(this.#limit);
-    await Promise.all(
-      conventionsToSync.map((conventionToSync) =>
-        this.#handleConventionToSync(uow, conventionToSync.id),
-      ),
-    );
-
-    return this.#report;
-  }
-
-  async #handleConventionToSync(
-    uow: UnitOfWork,
-    conventionToSyncId: ConventionId,
-  ) {
-    try {
-      await this.#resync({ uow, conventionToSyncId });
-      const updatedConventionToSync =
-        await uow.conventionsToSyncRepository.getById(conventionToSyncId);
-
-      match(updatedConventionToSync)
-        .with(undefined, () => {
-          this.#report.errors[conventionToSyncId] = new Error(
-            "Convention not found or no status",
-          );
-        })
-        .with({ status: "SUCCESS" }, () => {
-          this.#report.success += 1;
-        })
-        .with({ status: "TO_PROCESS" }, (toProcessConventionToSync) => {
-          this.#report.errors[toProcessConventionToSync.id] = new Error(
-            "Convention still have status TO_PROCESS",
-          );
-        })
-        .with({ status: "ERROR" }, (errorConventionToSync) => {
-          this.#report.errors[errorConventionToSync.id] = new Error(
-            errorConventionToSync.reason,
-          );
-        })
-        .with({ status: "SKIP" }, (skipConventionToSync) => {
-          this.#report.skips[skipConventionToSync.id] =
-            skipConventionToSync.reason;
-        })
-        .exhaustive();
-    } catch (error) {
-      const anError =
-        error instanceof Error
-          ? error
-          : new Error(`Not an Error: ${JSON.stringify(error)}`);
-      await uow.conventionsToSyncRepository.save({
-        id: conventionToSyncId,
-        status: "ERROR",
-        processDate: this.#timeGateway.now(),
-        reason: anError.message,
-      });
-      this.#report.errors[conventionToSyncId] = anError;
-    }
-  }
-
-  async #resync({
-    uow,
-    conventionToSyncId,
-  }: {
-    uow: UnitOfWork;
-    conventionToSyncId: ConventionId;
-  }): Promise<void> {
-    const convention =
-      await uow.conventionQueries.getConventionById(conventionToSyncId);
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: conventionToSyncId,
-      });
-
-    const assessmentEntity =
-      await uow.assessmentRepository.getByConventionId(conventionToSyncId);
-
-    const assessment = assessmentEntity
-      ? getOnlyAssessmentDto(assessmentEntity)
-      : undefined;
-
-    return assessment
-      ? this.#standardBroadcastToFTUsecase.execute({
-          eventType: "ASSESSMENT_CREATED",
-          convention,
-          assessment,
-        })
-      : this.#standardBroadcastToFTUsecase.execute({
-          eventType: "CONVENTION_UPDATED",
-          convention,
-        });
-  }
-}
+};

@@ -14,7 +14,11 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemoryFranceTravailGateway } from "../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
-import { ResyncOldConventionsToFt } from "./ResyncOldConventionsToFt";
+import { makeBroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
+import {
+  makeResyncOldConventionsToFt,
+  type ResyncOldConventionsToFt,
+} from "./ResyncOldConventionsToFt";
 
 describe("ResyncOldConventionsToFt use case", () => {
   const agencyFT = new AgencyDtoBuilder().withKind("pole-emploi").build();
@@ -43,14 +47,26 @@ describe("ResyncOldConventionsToFt use case", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
 
+    const uowPerformer = new InMemoryUowPerformer(uow);
+
     timeGateway = new CustomTimeGateway();
     ftGateway = new InMemoryFranceTravailGateway();
-    useCase = new ResyncOldConventionsToFt(
-      new InMemoryUowPerformer(uow),
-      ftGateway,
-      timeGateway,
-      100,
-    );
+    useCase = makeResyncOldConventionsToFt({
+      uowPerformer,
+      deps: {
+        limit: 100,
+        standardBroadcastToFTUsecase:
+          makeBroadcastToFranceTravailOnConventionUpdates({
+            uowPerformer,
+            deps: {
+              franceTravailGateway: ftGateway,
+              timeGateway,
+              options: { resyncMode: true },
+            },
+          }),
+        timeGateway,
+      },
+    });
   });
 
   describe("Right paths", () => {
@@ -329,12 +345,23 @@ describe("ResyncOldConventionsToFt use case", () => {
         },
       ]);
 
-      const report = await new ResyncOldConventionsToFt(
-        new InMemoryUowPerformer(uow),
-        ftGateway,
-        timeGateway,
-        1,
-      ).execute();
+      const uowPerformer = new InMemoryUowPerformer(uow);
+      const report = await makeResyncOldConventionsToFt({
+        uowPerformer,
+        deps: {
+          limit: 1,
+          standardBroadcastToFTUsecase:
+            makeBroadcastToFranceTravailOnConventionUpdates({
+              uowPerformer,
+              deps: {
+                franceTravailGateway: ftGateway,
+                timeGateway,
+                options: { resyncMode: true },
+              },
+            }),
+          timeGateway,
+        },
+      }).execute();
 
       expectToEqual(uow.conventionRepository.conventions, [
         conventionToSync1,

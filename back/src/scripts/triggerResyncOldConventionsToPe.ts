@@ -1,11 +1,11 @@
-import "./instrumentSentryCron";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeConnectedRedisClient } from "../config/bootstrap/cache";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
 import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
+import { makeBroadcastToFranceTravailOnConventionUpdates } from "../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
+import { makeResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
 import { makeRedisWithCache } from "../domains/core/caching-gateway/adapters/makeRedisWithCache";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -13,6 +13,7 @@ import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/cr
 import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
+import "./instrumentSentryCron";
 
 const logger = createLogger(__filename);
 
@@ -50,12 +51,22 @@ const executeUsecase = async () => {
     createMakeProductionPgPool(config),
   );
 
-  const resyncOldConventionsToFtUsecase = new ResyncOldConventionsToFt(
+  const resyncOldConventionsToFtUsecase = makeResyncOldConventionsToFt({
     uowPerformer,
-    httpFranceTravailGateway,
-    timeGateway,
-    config.maxConventionsToSyncWithPe,
-  );
+    deps: {
+      limit: config.maxConventionsToSyncWithPe,
+      standardBroadcastToFTUsecase:
+        makeBroadcastToFranceTravailOnConventionUpdates({
+          uowPerformer,
+          deps: {
+            franceTravailGateway: httpFranceTravailGateway,
+            timeGateway,
+            options: { resyncMode: true },
+          },
+        }),
+      timeGateway,
+    },
+  });
 
   const result = await resyncOldConventionsToFtUsecase.execute();
   await redisClient.disconnect();
