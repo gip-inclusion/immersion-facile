@@ -13,7 +13,10 @@ import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
 type AdminUserDetailProps = {
-  route: Route<typeof routes.adminUserDetail>;
+  route: Route<
+    | typeof routes.adminUserDetailAgencies
+    | typeof routes.adminUserDetailEstablishments
+  >;
 };
 
 export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
@@ -47,5 +50,7 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
       ? `${user.firstName} ${user.lastName}`
       : user.email;
 
-  return <UserProfile title={title} userWithRights={user} />;
+  return (
+    <UserProfile title={title} userWithRights={user} routeName={route.name} />
+  );
 };
