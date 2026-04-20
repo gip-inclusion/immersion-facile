@@ -2,7 +2,7 @@ import "./instrumentSentryCron";
 import type { UserId } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../config/pg/pgPool";
-import { AssignAgencyViewerRole } from "../domains/agency/use-cases/AssignAgencyViewerRoleToUsers";
+import { makeAssignAgencyViewerRole } from "../domains/agency/use-cases/AssignAgencyViewerRoleToUsers";
 import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
@@ -47,9 +47,9 @@ const executeAssignAgencyViewerRole = async () => {
     createMakeProductionPgPool(config),
   );
 
-  const assignAgencyViewerRoleUseCase = new AssignAgencyViewerRole(
+  const assignAgencyViewerRoleUseCase = makeAssignAgencyViewerRole({
     uowPerformer,
-  );
+  });
 
   return assignAgencyViewerRoleUseCase.execute({
     userIds: TARGET_USER_IDS,

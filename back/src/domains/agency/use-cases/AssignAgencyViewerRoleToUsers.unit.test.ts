@@ -11,7 +11,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { AssignAgencyViewerRole } from "./AssignAgencyViewerRoleToUsers";
+import {
+  type AssignAgencyViewerRole,
+  makeAssignAgencyViewerRole,
+} from "./AssignAgencyViewerRoleToUsers";
 
 describe("AssignAgencyViewerRoleToUsers", () => {
   let uow: InMemoryUnitOfWork;
@@ -132,9 +135,9 @@ describe("AssignAgencyViewerRoleToUsers", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    assignAgencyViewerRole = new AssignAgencyViewerRole(
-      new InMemoryUowPerformer(uow),
-    );
+    assignAgencyViewerRole = makeAssignAgencyViewerRole({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     uow.agencyRepository.agencies = [
       poleEmploiAgency1,

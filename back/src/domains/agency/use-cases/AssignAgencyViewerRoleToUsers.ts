@@ -1,8 +1,7 @@
 import type { AgencyKind, UserId } from "shared";
 import { agencyKindSchema, userIdSchema } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 type AssignAgencyViewerRoleInput = {
   userIds: UserId[];
@@ -20,16 +19,16 @@ const assignAgencyViewerRoleInputSchema = z.object({
   agencyKinds: z.array(agencyKindSchema),
 });
 
-export class AssignAgencyViewerRole extends TransactionalUseCase<
-  AssignAgencyViewerRoleInput,
-  AssignAgencyViewerRoleOutput
-> {
-  protected inputSchema = assignAgencyViewerRoleInputSchema;
+export type AssignAgencyViewerRole = ReturnType<
+  typeof makeAssignAgencyViewerRole
+>;
 
-  protected async _execute(
-    { userIds, agencyKinds }: AssignAgencyViewerRoleInput,
-    uow: UnitOfWork,
-  ): Promise<AssignAgencyViewerRoleOutput> {
+export const makeAssignAgencyViewerRole = useCaseBuilder(
+  "AssignAgencyViewerRole",
+)
+  .withInput<AssignAgencyViewerRoleInput>(assignAgencyViewerRoleInputSchema)
+  .withOutput<AssignAgencyViewerRoleOutput>()
+  .build(async ({ inputParams: { agencyKinds, userIds }, uow }) => {
     const users = await uow.userRepository.getByIds(userIds);
 
     if (users.length === 0) {
@@ -102,5 +101,4 @@ export class AssignAgencyViewerRole extends TransactionalUseCase<
       agencyUpdatesFailed,
       agenciesSkipped,
     };
-  }
-}
+  });
