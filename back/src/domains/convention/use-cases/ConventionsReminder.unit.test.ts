@@ -27,7 +27,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ConventionsReminder } from "./ConventionsReminder";
+import {
+  type ConventionsReminder,
+  makeConventionsReminder,
+} from "./ConventionsReminder";
 
 describe("ConventionReminder use case", () => {
   const now = new Date("2023-03-17");
@@ -50,14 +53,16 @@ describe("ConventionReminder use case", () => {
     uow = createInMemoryUow();
     uuidGenerator.setNextUuids([...eventIds]);
 
-    conventionsReminder = new ConventionsReminder(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-      makeCreateNewEvent({
+    conventionsReminder = makeConventionsReminder({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
         timeGateway,
-        uuidGenerator,
-      }),
-    );
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+      },
+    });
   });
 
   describe("Do nothing", () => {
