@@ -126,6 +126,7 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
       titleAs="h2"
       className={fr.cx("fr-mt-0")}
       titleAction={
+        userRole === "establishment" &&
         currentUser?.dashboards.establishments.discussions ? (
           <MetabaseFullScreenButton
             url={currentUser.dashboards.establishments.discussions}
