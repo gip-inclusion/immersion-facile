@@ -178,7 +178,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
   },
   "Identifiant National DE non trouvé": {
     description:
-      "Le bénéficiaire n'est pas inscrit à France Travail OU l'adresse mail indiquée sur la convention n'est pas identique à celle du dossier France travail.",
+      "Le bénéficiaire n’est pas inscrit à France travail OU l’adresse mail OU le numéro de téléphone indiqué sur la convention n’est pas identique à ceux du dossier France travail.",
     solution: (isConventionValidated) => (
       <>
         <p>{"-> "}Dans le cas où il n'est pas inscrit :</p>
