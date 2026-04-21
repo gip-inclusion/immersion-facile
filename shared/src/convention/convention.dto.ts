@@ -508,8 +508,6 @@ export type EditConventionCounsellorNameRequestDto = WithConventionId &
 
 export type EditConventionWithFinalStatusRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname & {
-    dateStart: DateString;
-    internshipKind: InternshipKind;
     updatedBeneficiaryBirthDate?: DateString;
   };
 

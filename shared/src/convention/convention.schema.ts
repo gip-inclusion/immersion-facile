@@ -252,45 +252,13 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
     }),
   );
 
-const optionalUpdatedBeneficiaryBirthDateSchema: ZodSchemaWithInputMatchingOutput<
-  DateString | undefined
-> = z.preprocess(
-  (val) => (val === "" || val === undefined || val === null ? undefined : val),
-  makeDateStringSchema().optional(),
-);
-
 export const editConventionWithFinalStatusRequestSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusRequestDto> =
-  z
-    .object({
-      conventionId: conventionIdSchema,
-      dateStart: makeDateStringSchema(),
-      internshipKind: z.enum(internshipKinds, {
-        error: localization.invalidEnum,
-      }),
-      updatedBeneficiaryBirthDate: optionalUpdatedBeneficiaryBirthDateSchema,
-      firstname: firstnameSchema.optional(),
-      lastname: lastnameSchema.optional(),
-    })
-    .superRefine((data, ctx) => {
-      if (data.updatedBeneficiaryBirthDate === undefined) return;
-
-      const beneficiaryAgeAtConventionStart = differenceInYears(
-        new Date(data.dateStart),
-        new Date(data.updatedBeneficiaryBirthDate),
-      );
-      const addIssue = (message: string, _path: string) =>
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message,
-          path: ["updatedBeneficiaryBirthDate"],
-        });
-
-      addIssueIfAgeLessThanMinimumAge(
-        addIssue,
-        beneficiaryAgeAtConventionStart,
-        ageRequirementByInternshipKind[data.internshipKind],
-      );
-    });
+  z.object({
+    conventionId: conventionIdSchema,
+    updatedBeneficiaryBirthDate: makeDateStringSchema().optional(),
+    firstname: firstnameSchema.optional(),
+    lastname: lastnameSchema.optional(),
+  });
 
 export const renewedSchema = z.object({
   from: conventionIdSchema,

@@ -436,16 +436,10 @@ export const domElementIds = {
       "im-edit-convention-with-final-status-modal",
     editConventionWithFinalStatusModalForm:
       "im-edit-convention-with-final-status-modal__form",
-    editConventionWithFinalStatusModalCurrentDateInput:
-      "im-edit-convention-with-final-status-modal__current-date-input",
     editConventionWithFinalStatusModalNewDateInput:
       "im-edit-convention-with-final-status-modal__new-date-input",
-    editConventionWithFinalStatusModalCurrentFirstNameInput:
-      "im-edit-convention-with-final-status-modal__current-first-name-input",
     editConventionWithFinalStatusModalNewFirstNameInput:
       "im-edit-convention-with-final-status-modal__new-first-name-input",
-    editConventionWithFinalStatusModalCurrentLastNameInput:
-      "im-edit-convention-with-final-status-modal__current-last-name-input",
     editConventionWithFinalStatusModalNewLastNameInput:
       "im-edit-convention-with-final-status-modal__new-last-name-input",
     editConventionWithFinalStatusModalSubmitButton:

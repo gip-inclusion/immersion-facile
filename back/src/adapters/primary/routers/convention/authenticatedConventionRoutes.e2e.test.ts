@@ -640,8 +640,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },
@@ -662,8 +660,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },
@@ -683,8 +679,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },
@@ -714,8 +708,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId: unknownId,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },
@@ -748,8 +740,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId: conventionInReview.id,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: conventionInReview.dateStart,
-          internshipKind: conventionInReview.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },
@@ -761,6 +751,7 @@ describe("authenticatedConventionRoutes", () => {
           message:
             errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
               status: "IN_REVIEW",
+              conventionId: conventionInReview.id,
             }).message,
         },
         status: 400,
@@ -786,8 +777,6 @@ describe("authenticatedConventionRoutes", () => {
         body: {
           conventionId,
           updatedBeneficiaryBirthDate: newBirthdate,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
           lastname: newLastName,
         },

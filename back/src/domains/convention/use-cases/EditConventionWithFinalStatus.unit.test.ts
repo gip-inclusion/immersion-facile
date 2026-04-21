@@ -2,7 +2,8 @@ import {
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
-  type ConventionStatus,
+  conventionStatusesAllowedForModification,
+  type EditConventionWithFinalStatusRequestDto,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -38,11 +39,9 @@ describe("EditConventionWithFinalStatus", () => {
     .withBeneficiaryBirthdate(oldBeneficiaryBirthdate)
     .build();
 
-  const baseRequest = {
+  const baseRequest: EditConventionWithFinalStatusRequestDto = {
     conventionId,
     updatedBeneficiaryBirthDate: newBirthdate,
-    dateStart: convention.dateStart,
-    internshipKind: convention.internshipKind,
     firstname: newFirstName,
     lastname: newLastName,
   };
@@ -94,12 +93,9 @@ describe("EditConventionWithFinalStatus", () => {
       );
     });
 
-    it.each([
-      "READY_TO_SIGN",
-      "PARTIALLY_SIGNED",
-      "IN_REVIEW",
-      "ACCEPTED_BY_COUNSELLOR",
-    ] satisfies ConventionStatus[])("throws when convention status is not allowed (%s)", async (status) => {
+    it.each(
+      conventionStatusesAllowedForModification,
+    )("throws when convention status is not allowed (%s)", async (status) => {
       const conventionWithStatus = new ConventionDtoBuilder(convention)
         .withStatus(status)
         .build();
@@ -110,13 +106,13 @@ describe("EditConventionWithFinalStatus", () => {
         usecase.execute(
           {
             ...baseRequest,
-            dateStart: conventionWithStatus.dateStart,
-            internshipKind: conventionWithStatus.internshipKind,
+            conventionId: conventionWithStatus.id,
           },
           backOfficeAdmin,
         ),
         errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
           status,
+          conventionId: conventionWithStatus.id,
         }),
       );
     });
@@ -148,36 +144,42 @@ describe("EditConventionWithFinalStatus", () => {
           {
             ...baseRequest,
             updatedBeneficiaryBirthDate: minorAbove16YearsOldBirthdate,
-            dateStart: conventionWithoutRepresentative.dateStart,
-            internshipKind: conventionWithoutRepresentative.internshipKind,
           },
           backOfficeAdmin,
         ),
         errors.convention.invalidConventionAfterFinalStatusEdit({
           message:
             "Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait 17 ans au démarrage de la convention.",
+          conventionId,
         }),
       );
     });
 
-    it("throws when beneficiary would be under 16 years old", async () => {
-      const beneficiaryUnder16YearsOldBirthdate = "2015-01-01";
-      uow.conventionRepository.setConventions([convention]);
+    it("throws when beneficiary would be under minimum age for immersion", async () => {
+      const conventionWithRepresentative = new ConventionDtoBuilder(convention)
+        .withBeneficiaryRepresentative({
+          role: "beneficiary-representative",
+          email: "rep.parent@email.fr",
+          phone: "+33601010102",
+          firstName: "Rep",
+          lastName: "Legal",
+        })
+        .build();
+      uow.conventionRepository.setConventions([conventionWithRepresentative]);
       uow.userRepository.users = [backOfficeAdmin];
 
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            ...baseRequest,
-            updatedBeneficiaryBirthDate: beneficiaryUnder16YearsOldBirthdate,
+            conventionId,
+            updatedBeneficiaryBirthDate: "2009-06-01",
           },
           backOfficeAdmin,
         ),
-        errors.inputs.badSchema({
-          useCaseName: "EditConventionWithFinalStatus",
-          flattenErrors: [
-            "updatedBeneficiaryBirthDate : L'âge du bénéficiaire doit être au minimum de 16ans",
-          ],
+        errors.convention.invalidConventionAfterFinalStatusEdit({
+          message:
+            "L'âge du bénéficiaire doit être au minimum de 16ans; La confirmation de votre accord est obligatoire.",
+          conventionId,
         }),
       );
     });
@@ -190,24 +192,17 @@ describe("EditConventionWithFinalStatus", () => {
 
       await usecase.execute(baseRequest, backOfficeAdmin);
 
-      const updatedConvention = uow.conventionRepository.conventions[0];
-      expectToEqual(updatedConvention, {
-        ...convention,
-        signatories: {
-          ...convention.signatories,
-          beneficiary: {
-            ...convention.signatories.beneficiary,
-            birthdate: newBirthdate,
-            firstName: newFirstName,
-            lastName: newLastName,
-          },
-        },
-      });
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryBirthdate(newBirthdate)
+        .withBeneficiaryFirstName(newFirstName)
+        .withBeneficiaryLastName(newLastName)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionWithFinalStatusEdited",
           payload: {
-            convention: updatedConvention,
+            convention: expectedConvention,
             triggeredBy: {
               kind: "connected-user",
               userId: backOfficeAdmin.id,
@@ -224,24 +219,15 @@ describe("EditConventionWithFinalStatus", () => {
       await usecase.execute(
         {
           conventionId,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           updatedBeneficiaryBirthDate: newBirthdate,
         },
         backOfficeAdmin,
       );
 
-      const updatedConvention = uow.conventionRepository.conventions[0];
-      expectToEqual(updatedConvention, {
-        ...convention,
-        signatories: {
-          ...convention.signatories,
-          beneficiary: {
-            ...convention.signatories.beneficiary,
-            birthdate: newBirthdate,
-          },
-        },
-      });
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryBirthdate(newBirthdate)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionWithFinalStatusEdited",
@@ -263,24 +249,15 @@ describe("EditConventionWithFinalStatus", () => {
       await usecase.execute(
         {
           conventionId,
-          dateStart: convention.dateStart,
-          internshipKind: convention.internshipKind,
           firstname: newFirstName,
         },
         backOfficeAdmin,
       );
 
-      const updatedConvention = uow.conventionRepository.conventions[0];
-      expectToEqual(updatedConvention, {
-        ...convention,
-        signatories: {
-          ...convention.signatories,
-          beneficiary: {
-            ...convention.signatories.beneficiary,
-            firstName: newFirstName,
-          },
-        },
-      });
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryFirstName(newFirstName)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionWithFinalStatusEdited",

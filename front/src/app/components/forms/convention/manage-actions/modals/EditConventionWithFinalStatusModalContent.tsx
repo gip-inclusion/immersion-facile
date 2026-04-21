@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionDto,
-  conventionSchema,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   type EditConventionWithFinalStatusRequestDto,
@@ -28,14 +27,12 @@ export const EditConventionWithFinalStatusModalContent = ({
     date: convertLocaleDateToUtcTimezoneDate(new Date(beneficiary.birthdate)),
   });
 
-  const { register, handleSubmit, formState, setError } =
+  const { register, handleSubmit, formState } =
     useForm<EditConventionWithFinalStatusRequestDto>({
       resolver: zodResolver(editConventionWithFinalStatusRequestSchema),
       mode: "onTouched",
       defaultValues: {
         conventionId: convention.id,
-        dateStart: convention.dateStart,
-        internshipKind: convention.internshipKind,
         updatedBeneficiaryBirthDate: undefined,
         firstname: undefined,
         lastname: undefined,
@@ -45,42 +42,6 @@ export const EditConventionWithFinalStatusModalContent = ({
   const onFormSubmit: SubmitHandler<EditConventionWithFinalStatusRequestDto> = (
     values,
   ) => {
-    const updatedConvention = {
-      ...convention,
-      signatories: {
-        ...convention.signatories,
-        beneficiary: {
-          ...convention.signatories.beneficiary,
-          ...(values.updatedBeneficiaryBirthDate && {
-            birthdate: values.updatedBeneficiaryBirthDate,
-          }),
-          ...(values.firstname && {
-            firstName: values.firstname,
-          }),
-          ...(values.lastname && {
-            lastName: values.lastname,
-          }),
-        },
-      },
-    };
-    const result = conventionSchema.safeParse(updatedConvention);
-    if (!result.success) {
-      const birthdateOrRepresentativeIssue = result.error.issues.find(
-        (issue) => {
-          const pathStr = issue.path.map(String).join(".");
-          return (
-            pathStr === "signatories.beneficiary.birthdate" ||
-            pathStr.startsWith("signatories.beneficiaryRepresentative")
-          );
-        },
-      );
-      if (birthdateOrRepresentativeIssue?.message)
-        setError("updatedBeneficiaryBirthDate", {
-          type: "custom",
-          message: birthdateOrRepresentativeIssue.message,
-        });
-      return;
-    }
     onSubmit(values);
     closeModal();
   };
@@ -102,8 +63,6 @@ export const EditConventionWithFinalStatusModalContent = ({
             <Input
               label="Date de naissance actuelle"
               nativeInputProps={{
-                id: domElementIds.manageConvention
-                  .editConventionWithFinalStatusModalCurrentDateInput,
                 value: currentDateDisplay,
                 readOnly: true,
               }}
@@ -114,7 +73,9 @@ export const EditConventionWithFinalStatusModalContent = ({
             <Input
               label="Nouvelle date de naissance"
               nativeInputProps={{
-                ...register("updatedBeneficiaryBirthDate"),
+                ...register("updatedBeneficiaryBirthDate", {
+                  setValueAs: (value) => (value ? value : undefined),
+                }),
                 id: domElementIds.manageConvention
                   .editConventionWithFinalStatusModalNewDateInput,
                 type: "date",
@@ -137,8 +98,6 @@ export const EditConventionWithFinalStatusModalContent = ({
             <Input
               label="Prénom actuel du candidat"
               nativeInputProps={{
-                id: domElementIds.manageConvention
-                  .editConventionWithFinalStatusModalCurrentFirstNameInput,
                 value: beneficiary.firstName,
                 readOnly: true,
               }}
@@ -162,8 +121,6 @@ export const EditConventionWithFinalStatusModalContent = ({
             <Input
               label="Nom de famille actuel du candidat"
               nativeInputProps={{
-                id: domElementIds.manageConvention
-                  .editConventionWithFinalStatusModalCurrentLastNameInput,
                 value: beneficiary.lastName,
                 readOnly: true,
               }}

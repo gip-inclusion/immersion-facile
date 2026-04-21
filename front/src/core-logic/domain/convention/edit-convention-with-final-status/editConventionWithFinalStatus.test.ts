@@ -1,4 +1,8 @@
-import { expectObjectsToMatch, expectToEqual } from "shared";
+import {
+  type EditConventionWithFinalStatusRequestDto,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
 import {
   type EditConventionWithFinalStatusState,
   editConventionWithFinalStatusInitialState,
@@ -15,13 +19,11 @@ describe("editConventionWithFinalStatus slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
-  const basePayload = {
+  const basePayload: EditConventionWithFinalStatusRequestDto = {
     conventionId: "fake-convention-id",
     updatedBeneficiaryBirthDate: "1995-03-15",
-    dateStart: "2025-06-01",
-    internshipKind: "immersion" as const,
-    updatedBeneficiaryFirstName: "Jean",
-    updatedBeneficiaryLastName: "Martin",
+    firstname: "Jean",
+    lastname: "Martin",
   };
 
   beforeEach(() => {
