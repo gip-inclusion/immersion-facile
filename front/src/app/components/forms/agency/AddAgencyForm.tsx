@@ -143,7 +143,7 @@ export const AddAgencyForm = () => {
         <p>
           <a
             className={fr.cx("fr-link", "fr-text--sm")}
-            href="https://app.livestorm.co/p/07e3d586-f2e0-42a3-babb-a9f0aff20b3a/live?s=2c76add6-7006-4ab3-a145-1cece3c86a38"
+            href="https://pages.immersion-facile.beta.gouv.fr/ressources-webinaires-prescripteurs-immersion-professionnelle-pmsmp/"
             target="_blank"
             rel="noreferrer"
           >
