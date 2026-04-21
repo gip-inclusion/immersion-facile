@@ -1455,86 +1455,29 @@ describe("conventionDtoSchema", () => {
 
 describe("editConventionWithFinalStatusRequestSchema", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
-  const dateStart = "2025-06-01";
-  const updatedBeneficiaryFirstName = "Jean";
-  const updatedBeneficiaryLastName = "Dupont";
 
-  it("accepts valid request when beneficiary age at convention start meets minimum age for immersion", () => {
-    const request = {
+  it("accepts request with only convention id", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
+      conventionId,
+    });
+  });
+
+  it("accepts request with optional beneficiary updates", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
       conventionId,
       updatedBeneficiaryBirthDate: "2008-06-01",
-      dateStart,
-      internshipKind: "immersion" as const,
-      updatedBeneficiaryFirstName,
-      updatedBeneficiaryLastName,
-    };
-    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, request);
+      firstname: "Jean",
+      lastname: "Dupont",
+    });
   });
 
-  it("rejects request when beneficiary age at convention start is below minimum for immersion", () => {
-    const request = {
-      conventionId,
-      updatedBeneficiaryBirthDate: "2016-06-01",
-      dateStart,
-      internshipKind: "immersion" as const,
-      updatedBeneficiaryFirstName,
-      updatedBeneficiaryLastName,
-    };
-    expectDtoInvalidWithIssueMessages(
-      editConventionWithFinalStatusRequestSchema,
-      request,
-      [
-        "updatedBeneficiaryBirthDate: L'âge du bénéficiaire doit être au minimum de 16ans",
-      ],
-    );
-  });
-
-  it("accepts valid request when beneficiary age at convention start meets minimum for mini-stage-cci", () => {
-    const request = {
-      conventionId,
-      updatedBeneficiaryBirthDate: "2005-01-01",
-      dateStart,
-      internshipKind: "mini-stage-cci" as const,
-      updatedBeneficiaryFirstName,
-      updatedBeneficiaryLastName,
-    };
-    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, request);
-  });
-  it("rejects request when beneficiary age at convention start is below minimum for mini-stage-cci", () => {
-    const request = {
-      conventionId,
-      updatedBeneficiaryBirthDate: "2016-01-01",
-      dateStart,
-      internshipKind: "mini-stage-cci" as const,
-      updatedBeneficiaryFirstName,
-      updatedBeneficiaryLastName,
-    };
-    expectDtoInvalidWithIssueMessages(
-      editConventionWithFinalStatusRequestSchema,
-      request,
-      [
-        "updatedBeneficiaryBirthDate: L'âge du bénéficiaire doit être au minimum de 10ans",
-      ],
-    );
-  });
-
-  it("accepts request when no beneficiary field is updated", () => {
-    const request = {
-      conventionId,
-      dateStart,
-      internshipKind: "immersion" as const,
-    };
-    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, request);
-  });
-
-  it("accepts request when only first name is updated", () => {
-    const request = {
-      conventionId,
-      dateStart,
-      internshipKind: "immersion" as const,
-      updatedBeneficiaryFirstName: "Camille",
-    };
-    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, request);
+  it("rejects empty string for updatedBeneficiaryBirthDate", () => {
+    expect(() =>
+      editConventionWithFinalStatusRequestSchema.parse({
+        conventionId,
+        updatedBeneficiaryBirthDate: "",
+      }),
+    ).toThrow();
   });
 });
 

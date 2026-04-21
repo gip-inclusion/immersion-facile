@@ -319,15 +319,23 @@ export const errors = {
 
     editConventionWithFinalStatusNotAllowedForStatus: ({
       status,
+      conventionId,
     }: {
       status: ConventionStatus;
+      conventionId: ConventionId;
     }) =>
       new BadRequestError(
-        `La modification en tant qu'admin n'est pas autorisée pour les conventions ayant le statut "${status}".`,
+        `Impossible de modifier la convention : ${conventionId} en tant qu'admin : le statut "${status}" ne permet pas cette action.`,
       ),
-    invalidConventionAfterFinalStatusEdit: ({ message }: { message: string }) =>
+    invalidConventionAfterFinalStatusEdit: ({
+      message,
+      conventionId,
+    }: {
+      message: string;
+      conventionId: ConventionId;
+    }) =>
       new BadRequestError(
-        `La convention ne serait plus valide avec ces modifications : ${message}`,
+        `La convention : ${conventionId} ne serait plus valide avec ces modifications : ${message}`,
       ),
     emailNotLinkedToConvention: (role: Role) =>
       new BadRequestError(

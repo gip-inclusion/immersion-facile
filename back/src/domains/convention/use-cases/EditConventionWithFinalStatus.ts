@@ -46,6 +46,7 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       ),
       errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
         status: convention.status,
+        conventionId: convention.id,
       }),
     );
 
@@ -73,7 +74,10 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
     );
     if (!conventionValidation.success)
       throw errors.convention.invalidConventionAfterFinalStatusEdit({
-        message: conventionValidation.error.issues[0].message,
+        message: conventionValidation.error.issues
+          .map((issue) => issue.message)
+          .join("; "),
+        conventionId: convention.id,
       });
 
     const updatedConvention: ConventionDto = conventionValidation.data;

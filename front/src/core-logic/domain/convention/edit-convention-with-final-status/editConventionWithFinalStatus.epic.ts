@@ -32,8 +32,6 @@ const editConventionWithFinalStatusEpic: EditConventionWithFinalStatusEpic = (
             conventionId: action.payload.conventionId,
             updatedBeneficiaryBirthDate:
               action.payload.updatedBeneficiaryBirthDate,
-            dateStart: action.payload.dateStart,
-            internshipKind: action.payload.internshipKind,
             firstname: action.payload.firstname,
             lastname: action.payload.lastname,
           },
