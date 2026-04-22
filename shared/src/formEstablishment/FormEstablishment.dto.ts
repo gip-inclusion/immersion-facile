@@ -7,6 +7,7 @@ import type {
   BusinessName,
   BusinessNameCustomized,
 } from "../establishment/businessName";
+import type { WithBannedEstablishmentInformations } from "../establishment/establishment";
 import type { GroupName } from "../group/group.dto";
 import type { NafDto } from "../naf/naf.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
@@ -138,7 +139,7 @@ export type CommonFormEstablishmentDto = {
   source: FormEstablishmentSource;
   website?: EstablishmentWebSite;
   searchableBy: EstablishmentSearchableBy;
-};
+} & WithBannedEstablishmentInformations;
 
 type GenericFormEstablishmentDto<T extends ContactMode> =
   CommonFormEstablishmentDto &

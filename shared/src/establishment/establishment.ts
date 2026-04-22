@@ -110,9 +110,11 @@ type WithBannishmentJustification = {
   bannishmentJustification: string;
 };
 
-export type WithBannedEstablishmentInformations = {
-  isBanned: true;
-} & WithBannishmentJustification;
+export type WithBannedEstablishmentInformations =
+  | { isBanned: false }
+  | ({
+      isBanned: true;
+    } & WithBannishmentJustification);
 
 export type BanEstablishmentPayload = WithSiretDto &
   WithBannishmentJustification;
