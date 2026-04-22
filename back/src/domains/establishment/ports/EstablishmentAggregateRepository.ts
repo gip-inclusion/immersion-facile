@@ -3,6 +3,7 @@ import type {
   AppellationCode,
   DataWithPagination,
   DateTimeIsoString,
+  DepartmentCode,
   EstablishmentSearchableByValue,
   FitForDisableWorkerOption,
   InternalOfferDto,
@@ -47,6 +48,7 @@ type GetOffersFilters = {
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
   showOnlyAvailableOffers: boolean;
+  departmentCodes?: DepartmentCode[];
 };
 
 export type GetOffersParams = WithRequiredPagination &

@@ -1,5 +1,6 @@
 import type {
   ApiConsumerName,
+  DepartmentCode,
   EstablishmentSearchableByValue,
   ExpectTrue,
   FitForDisableWorkerOption,
@@ -27,6 +28,7 @@ type SearchMadeFilters = {
   remoteWorkModes?: RemoteWorkMode[];
   showOnlyAvailableOffers?: boolean;
   sirets?: SiretDto[];
+  departmentCodes?: DepartmentCode[];
 };
 
 type _CheckExaustiveSearchFilters = ExpectTrue<

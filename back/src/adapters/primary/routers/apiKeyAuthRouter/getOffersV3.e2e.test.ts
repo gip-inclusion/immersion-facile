@@ -244,4 +244,35 @@ describe("GET /v3/offers", () => {
       "Paris, France",
     );
   });
+
+  it("should filter offers on department codes", async () => {
+    const response = await sharedRequest.getOffers({
+      headers: { authorization: authToken },
+      queryParams: {
+        sortBy: "score",
+        sortOrder: "desc",
+        departmentCodes: ["75"],
+      },
+    });
+
+    expectToEqual(response.status, 200);
+    expectToEqual(inMemoryUow.searchMadeRepository.searchesMade.length, 1);
+    expectToEqual(
+      inMemoryUow.searchMadeRepository.searchesMade[0].departmentCodes,
+      ["75"],
+    );
+  });
+
+  it("rejects invalid departmentCodes values", async () => {
+    const response = await sharedRequest.getOffers({
+      headers: { authorization: authToken },
+      queryParams: {
+        sortBy: "score",
+        sortOrder: "desc",
+        departmentCodes: [""],
+      },
+    });
+
+    expectToEqual(response.status, 400);
+  });
 });

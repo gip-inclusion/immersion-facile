@@ -11,6 +11,7 @@ import {
   castError,
   type DataWithPagination,
   type DateTimeIsoString,
+  type DepartmentCode,
   type EstablishmentSearchableByValue,
   type EstablishmentUserRightStatus,
   type EstablishmentWebSite,
@@ -901,6 +902,7 @@ const makeEstablishmentAggregateFromDb = (
 
 export type SearchImmersionFilters = {
   appellationCodes?: AppellationCode[];
+  departmentCodes?: DepartmentCode[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   geoParams?: GeoParams;
   locationIds?: LocationId[];
@@ -932,6 +934,7 @@ const checkHasNoJoinFilters = (filters: SearchImmersionFilters): boolean => {
     nafCodes: !filters.nafCodes?.length,
     remoteWorkModes: !filters.remoteWorkModes?.length,
     locationIds: !filters.locationIds?.length,
+    departmentCodes: !filters.departmentCodes?.length,
     fitForDisabledWorkers: true,
     searchableBy: true,
     showOnlyAvailableOffers: true,
@@ -945,6 +948,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
 }: Pick<SearchImmersionResultsParams, "filters" | "sort">) => {
   const {
     appellationCodes,
+    departmentCodes,
     fitForDisabledWorkers,
     geoParams,
     locationIds,
@@ -1065,6 +1069,14 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                       "establishments_location_infos.id",
                       "in",
                       locationIds,
+                    )
+                  : eb,
+              (eb) =>
+                departmentCodes?.length
+                  ? eb.where(
+                      "establishments_location_infos.department_code",
+                      "in",
+                      departmentCodes,
                     )
                   : eb,
             ).as("loc"),

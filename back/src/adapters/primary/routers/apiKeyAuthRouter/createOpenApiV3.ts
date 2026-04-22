@@ -169,6 +169,11 @@ export const createOpenApiSpecV3 = (envType: string) =>
               example: ["11573", "38444"],
               description: "Tableau de codes appellation à 5 chiffres",
             },
+            departmentCodes: {
+              example: ["75", "76"],
+              description:
+                "Tableau de codes département des localisations d'établissement",
+            },
             sortBy: {
               example: "distance",
               description: "Critère de tri des résultats de recheche",

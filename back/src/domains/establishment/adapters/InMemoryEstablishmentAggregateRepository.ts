@@ -220,6 +220,13 @@ export class InMemoryEstablishmentAggregateRepository
             )
           : true,
       )
+      .filter((aggregate) =>
+        filters.departmentCodes?.length
+          ? aggregate.establishment.locations.some((loc) =>
+              filters.departmentCodes?.includes(loc.address.departmentCode),
+            )
+          : true,
+      )
       .flatMap((aggregate) =>
         aggregate.offers
           .filter((offer) =>

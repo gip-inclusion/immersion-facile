@@ -7,6 +7,7 @@ import {
   type GetOffersFlatQueryParams,
   type GetOffersPerPageOption,
   type InternalOfferDto,
+  LocationBuilder,
 } from "shared";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import {
@@ -42,6 +43,11 @@ describe("GetOffers", () => {
     .withEstablishmentNaf({ code: "8560C", nomenclature: "naf nomenclature" })
     .withFitForDisabledWorkers("no")
     .withScore(100)
+    .withLocations([
+      new LocationBuilder()
+        .withId("11111111-1111-4444-1111-111111111111")
+        .build(),
+    ])
     .withOffers([secretariatOffer, boulangerOffer])
     .withUserRights(userRights)
     .build();
@@ -51,6 +57,16 @@ describe("GetOffers", () => {
     .withEstablishmentNaf({ code: "7510A", nomenclature: "naf nomenclature" })
     .withFitForDisabledWorkers("yes-ft-certified")
     .withScore(80)
+    .withLocations([
+      new LocationBuilder({
+        ...new LocationBuilder().build(),
+        id: "22222222-2222-4444-2222-222222222222",
+        address: {
+          ...new LocationBuilder().build().address,
+          departmentCode: "75",
+        },
+      }).build(),
+    ])
     .withOffers([secretariatOffer])
     .withUserRights(userRights)
     .build();
@@ -60,6 +76,16 @@ describe("GetOffers", () => {
     .withEstablishmentNaf({ code: "6201Z", nomenclature: "naf nomenclature" })
     .withFitForDisabledWorkers("yes-declared-only")
     .withScore(120)
+    .withLocations([
+      new LocationBuilder({
+        ...new LocationBuilder().build(),
+        id: "33333333-3333-4444-3333-333333333333",
+        address: {
+          ...new LocationBuilder().build().address,
+          departmentCode: "77",
+        },
+      }).build(),
+    ])
     .withOffers([boulangerOffer])
     .withUserRights(userRights)
     .build();
@@ -119,6 +145,66 @@ describe("GetOffers", () => {
     expect(uow.searchMadeRepository.searchesMade[0].numberOfResults).toBe(
       result.pagination.totalRecords,
     );
+  });
+
+  it("should filter offers on department codes", async () => {
+    const searchParams: GetOffersFlatQueryParams = {
+      sortBy: "score",
+      sortOrder: "desc",
+      departmentCodes: ["75"],
+    };
+
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(searchParams, undefined);
+
+    expect(result.data).toHaveLength(1);
+    expectToEqual(result.data, [
+      {
+        siret: establishment2.establishment.siret,
+        appellations: [
+          {
+            appellationCode: secretariatOffer.appellationCode,
+            appellationLabel: secretariatOffer.appellationLabel,
+          },
+        ],
+        establishmentScore: establishment2.establishment.score,
+        naf: establishment2.establishment.nafDto.code,
+        nafLabel: "FAKE",
+        name: establishment2.establishment.name,
+        customizedName: establishment2.establishment.customizedName,
+        numberOfEmployeeRange:
+          establishment2.establishment.numberEmployeesRange,
+        voluntaryToImmersion: establishment2.establishment.voluntaryToImmersion,
+        additionalInformation:
+          establishment2.establishment.additionalInformation,
+        remoteWorkMode: "ON_SITE",
+        fitForDisabledWorkers: "no",
+        position: establishment2.establishment.locations[0].position,
+        address: establishment2.establishment.locations[0].address,
+        locationId: establishment2.establishment.locations[0].id,
+        contactMode: establishment2.establishment.contactMode,
+        romeLabel: "test_rome_label",
+        rome: secretariatOffer.romeCode,
+        website: establishment2.establishment.website,
+        updatedAt: establishment2.establishment.updatedAt.toISOString(),
+        createdAt: establishment2.establishment.createdAt.toISOString(),
+        isAvailable: true,
+      },
+    ]);
+  });
+
+  it("should return no offer when departmentCodes has no matching department", async () => {
+    const searchParams: GetOffersFlatQueryParams = {
+      sortBy: "score",
+      sortOrder: "desc",
+      departmentCodes: ["99"],
+    };
+
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(searchParams, undefined);
+
+    expectToEqual(result.data, []);
+    expectToEqual(result.pagination.totalRecords, 0);
   });
 
   describe("showOnlyAvailableOffers", () => {

@@ -33,6 +33,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       page,
       perPage,
       appellationCodes,
+      departmentCodes,
       fitForDisabledWorkers,
       locationIds,
       nafCodes,
@@ -62,6 +63,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
           }),
       filters: {
         appellationCodes,
+        departmentCodes,
         fitForDisabledWorkers,
         locationIds,
         nafCodes,
@@ -76,6 +78,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
 
     const searchMadeCommon: SearchMadeCommon = {
       appellationCodes,
+      departmentCodes,
       fitForDisabledWorkers,
       locationIds,
       nafCodes,

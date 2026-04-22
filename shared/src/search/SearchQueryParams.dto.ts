@@ -1,5 +1,5 @@
 import type { WithAcquisition } from "../acquisition.dto";
-import type { LocationId } from "../address/address.dto";
+import type { DepartmentCode, LocationId } from "../address/address.dto";
 import type {
   EstablishmentSearchableByValue,
   FitForDisableWorkerOption,
@@ -83,6 +83,7 @@ type GetOffersFlatParamsCommon = WithAcquisition & {
   nafCodes?: NafCode[];
   searchableBy?: EstablishmentSearchableByValue;
   sirets?: SiretDto[];
+  departmentCodes?: DepartmentCode[];
   showOnlyAvailableOffers?: boolean;
 } & Partial<WithAppellationCodes> &
   WithOptionnalRemoteWorkModes;
