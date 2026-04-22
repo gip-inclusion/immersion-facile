@@ -413,6 +413,8 @@ describe("technical router", () => {
         href: "https://www.example.com",
         label: "Mon label de highlight pour l'agence",
       }),
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+      enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
     };
     it(`${displayRouteName(
       technicalRoutes.featureFlags,

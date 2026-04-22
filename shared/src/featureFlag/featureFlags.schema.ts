@@ -116,4 +116,6 @@ export const featureFlagsSchema: ZodSchemaWithInputMatchingOutput<FeatureFlags> 
     enableBroadcastOfMissionLocaleToFT: featureFlagBooleanSchema,
     enableEstablishmentDashboardHighlight: featureFlagHighlightSchema,
     enableAgencyDashboardHighlight: featureFlagHighlightSchema,
+    enableInactiveUsersCleanup: featureFlagBooleanSchema,
+    enableInactiveUsersDeletionAutoProcessing: featureFlagBooleanSchema,
   });

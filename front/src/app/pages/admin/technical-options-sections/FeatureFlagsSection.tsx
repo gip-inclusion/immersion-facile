@@ -148,6 +148,16 @@ const labelsByFeatureFlag: Record<
     title: null,
     enableLabel: "Promotion sur le tableau de bord prescripteur",
   },
+  enableInactiveUsersCleanup: {
+    title: "Suppression des comptes inactifs",
+    enableLabel:
+      "Activer l'alerting et la suppression des comptes inactifs (>2 ans)",
+  },
+  enableInactiveUsersDeletionAutoProcessing: {
+    title: null,
+    enableLabel:
+      "Traiter automatiquement les events de suppression (sinon mis en quarantaine)",
+  },
 };
 
 const FeatureFlagTextWithSeverityForm = ({
