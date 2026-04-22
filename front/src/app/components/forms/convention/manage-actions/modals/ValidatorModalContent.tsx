@@ -15,7 +15,6 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFormModal } from "src/app/utils/createFormModal";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export const ValidatorModalContent = ({
   onSubmit,
@@ -33,7 +32,6 @@ export const ValidatorModalContent = ({
   >;
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const { modalOnCancelCallback, formId } = useFormModal();
   const currentUserName =
     currentUser?.firstName && currentUser?.lastName
@@ -43,15 +41,11 @@ export const ValidatorModalContent = ({
         })
       : undefined;
 
-  const counsellorNameInConvention = fetchedConvention?.agencyReferent
-    ? pick(["firstname", "lastname"], fetchedConvention.agencyReferent)
-    : undefined;
-
   const { register, handleSubmit, formState } =
     useForm<WithFirstnameAndLastname>({
       resolver: zodResolver(withFirstnameAndLastnameSchema),
       mode: "onTouched",
-      defaultValues: currentUserName ?? counsellorNameInConvention,
+      defaultValues: currentUserName,
     });
   const onFormSubmit: SubmitHandler<WithFirstnameAndLastname> = ({
     firstname,
@@ -78,10 +72,10 @@ export const ValidatorModalContent = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} id={formId}>
       <p>
-        Pour {newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"}{" "}
-        la convention, veuillez saisir les informations de la personne qui
-        valide la demande. Ces informations apparaitront sur la convention
-        finale au format PDF.
+        Veuillez saisir votre prénom et votre nom. En{" "}
+        {newStatus === "ACCEPTED_BY_VALIDATOR" ? "validant" : "pré-validant"},
+        vous attestez que ces informations sont exactes : elles apparaîtront sur
+        la convention finale au format PDF.
       </p>
       <Input
         label={"Prénom *"}
