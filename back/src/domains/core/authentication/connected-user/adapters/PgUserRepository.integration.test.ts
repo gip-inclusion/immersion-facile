@@ -455,7 +455,10 @@ describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
     userRepository = new PgUserRepository(db);
 
     const validatorId = uuid();
-    const validator = makeUniqueUserForTest(validatorId);
+    const validator = {
+      ...makeUniqueUserForTest(validatorId),
+      lastLoginAt: oneYearAgo.toISOString(),
+    };
     await userRepository.save(validator);
 
     agencyId = uuid();
@@ -471,7 +474,29 @@ describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
     await pool.end();
   });
 
-  it("returns users with old login and never-logged-in users", async () => {
+  it("returns never-logged-in users when last_login_at is null", async () => {
+    const neverLoggedIn = makeUserWithOldLogin({
+      id: uuid(),
+      email: "never-logged@test.fr",
+      lastLoginAt: undefined,
+    });
+    const recentlyActiveUser = makeUserWithOldLogin({
+      id: uuid(),
+      email: "recently-active@test.fr",
+      lastLoginAt: oneYearAgo.toISOString(),
+    });
+
+    await userRepository.save(neverLoggedIn);
+    await userRepository.save(recentlyActiveUser);
+
+    const result = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+    });
+
+    expectArraysToEqualIgnoringOrder(result, [neverLoggedIn.id]);
+  });
+
+  it("returns users with old login", async () => {
     const inactiveUser = makeUserWithOldLogin({
       id: uuid(),
       email: "inactive@test.fr",
@@ -481,24 +506,14 @@ describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
       email: "recently-active@test.fr",
       lastLoginAt: oneYearAgo.toISOString(),
     });
-    const neverLoggedIn = makeUserWithOldLogin({
-      id: uuid(),
-      email: "never-logged@test.fr",
-      lastLoginAt: undefined,
-    });
-
     await userRepository.save(inactiveUser);
     await userRepository.save(recentlyActiveUser);
-    await userRepository.save(neverLoggedIn);
 
     const result = await userRepository.getUserIdsLoggedInLongAgo({
       since: twoYearsAgo,
     });
 
-    expectArraysToEqualIgnoringOrder(result, [
-      inactiveUser.id,
-      neverLoggedIn.id,
-    ]);
+    expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
   });
 
   it("excludes users warned within excludeWarnedSince window", async () => {

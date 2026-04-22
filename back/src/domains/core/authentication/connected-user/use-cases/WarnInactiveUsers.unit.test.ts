@@ -1,0 +1,271 @@
+import { addDays, subDays, subYears } from "date-fns";
+import {
+  type AbsoluteUrl,
+  ConventionDtoBuilder,
+  DiscussionBuilder,
+  expectToEqual,
+  frontRoutes,
+  makeBooleanFeatureFlag,
+} from "shared";
+import {
+  type ExpectSavedNotificationsBatchAndEvent,
+  makeExpectSavedNotificationsBatchAndEvent,
+} from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import {
+  makeUser,
+  setUsersWithRecentConventions,
+  setUsersWithRecentEstablishmentExchanges,
+  setUserWithOldConventionAndDiscussion,
+} from "./inactiveUsersTest.helpers";
+import {
+  makeWarnInactiveUsers,
+  type WarnInactiveUsers,
+} from "./WarnInactiveUsers";
+
+const immersionBaseUrl: AbsoluteUrl = "https://immersion-facile.test";
+
+const now = new Date("2026-01-15T10:00:00.000Z");
+
+describe("WarnInactiveUsers", () => {
+  let uow: InMemoryUnitOfWork;
+  let warnInactiveUsers: WarnInactiveUsers;
+  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
+  let timeGateway: CustomTimeGateway;
+
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    uow.featureFlagRepository.featureFlags = {
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(true),
+    };
+    timeGateway = new CustomTimeGateway();
+    timeGateway.setNextDate(now);
+
+    expectSavedNotificationsBatchAndEvent =
+      makeExpectSavedNotificationsBatchAndEvent(
+        uow.notificationRepository,
+        uow.outboxRepository,
+      );
+
+    warnInactiveUsers = makeWarnInactiveUsers({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationsBatchAndRelatedEvent:
+          makeSaveNotificationsBatchAndRelatedEvent(
+            new UuidV4Generator(),
+            timeGateway,
+          ),
+        timeGateway,
+        immersionBaseUrl,
+      },
+    });
+  });
+
+  it("does nothing when the enableInactiveUsersCleanup flag is off", async () => {
+    uow.featureFlagRepository.featureFlags = {
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+    };
+    const inactiveUser = makeUser({
+      id: "inactive-id",
+      email: "inactive@test.fr",
+      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+    });
+    uow.userRepository.users = [inactiveUser];
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 0 });
+    expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("warns inactive and never-logged-in users, skips boundary-active user", async () => {
+    const inactiveUser = makeUser({
+      id: "inactive-id",
+      email: "inactive@test.fr",
+      firstName: "Marie",
+      lastName: "Martin",
+      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+    });
+    const boundaryActiveUser = makeUser({
+      id: "boundary-id",
+      email: "boundary@test.fr",
+      lastLoginAt: subYears(now, 2).toISOString(),
+    });
+    const neverLoggedInUser = makeUser({
+      id: "never-logged-id",
+      email: "never@test.fr",
+      firstName: "Paul",
+      lastName: "Durand",
+    });
+    uow.userRepository.users = [
+      inactiveUser,
+      boundaryActiveUser,
+      neverLoggedInUser,
+    ];
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 2 });
+    expectSavedNotificationsBatchAndEvent({
+      emails: [
+        {
+          kind: "ACCOUNT_DELETION_WARNING",
+          recipients: [inactiveUser.email],
+          params: {
+            fullName: `${inactiveUser.firstName} ${inactiveUser.lastName}`,
+            deletionDate: "22 janvier 2026",
+            loginUrl: `${immersionBaseUrl}/${frontRoutes.profile}`,
+          },
+        },
+        {
+          kind: "ACCOUNT_DELETION_WARNING",
+          recipients: [neverLoggedInUser.email],
+          params: {
+            fullName: `${neverLoggedInUser.firstName} ${neverLoggedInUser.lastName}`,
+            deletionDate: "22 janvier 2026",
+            loginUrl: `${immersionBaseUrl}/${frontRoutes.profile}`,
+          },
+        },
+      ],
+    });
+  });
+
+  it("does not warn user with convention ending within 2-year window (future or 23 months ago)", async () => {
+    setUsersWithRecentConventions({
+      now,
+      uow,
+      users: [
+        {
+          id: "future-convention-user-id",
+          email: "future-convention@test.fr",
+        },
+        {
+          id: "recent-convention-user-id",
+          email: "recent-convention@test.fr",
+        },
+      ],
+    });
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 0 });
+  });
+
+  it("warns user with a recent convention whose status does not demonstrate activity", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const userWithRejected = makeUser({
+      id: "rejected-user-id",
+      email: "rejected-user@test.fr",
+      firstName: "Reject",
+      lastName: "Writer",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [userWithRejected];
+
+    uow.conventionRepository.setConventions([
+      new ConventionDtoBuilder()
+        .withId("rejected-convention")
+        .withBeneficiaryEmail(userWithRejected.email)
+        .withDateEnd(addDays(now, 30).toISOString())
+        .withStatus("REJECTED")
+        .build(),
+    ]);
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 1 });
+  });
+
+  it("does not warn user who sent a recent exchange as establishment (30 days ago or 23 months ago)", async () => {
+    setUsersWithRecentEstablishmentExchanges({
+      now,
+      uow,
+      users: [
+        {
+          id: "recent-exchange-user-id",
+          email: "recent-exchange@test.fr",
+        },
+        {
+          id: "old-exchange-user-id",
+          email: "old-exchange@test.fr",
+        },
+      ],
+    });
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 0 });
+  });
+
+  it("does not protect a user whose email only appears as potential beneficiary on a recent discussion", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const candidateOnlyUser = makeUser({
+      id: "candidate-only-id",
+      email: "candidate-only@test.fr",
+      firstName: "Cand",
+      lastName: "Only",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [candidateOnlyUser];
+
+    uow.discussionRepository.discussions = [
+      new DiscussionBuilder()
+        .withId("discussion-candidate-only")
+        .withPotentialBeneficiaryEmail(candidateOnlyUser.email)
+        .withExchanges([
+          {
+            subject: "Candidate sent",
+            message: "Hello",
+            sentAt: subDays(now, 10).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build(),
+    ];
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 1 });
+  });
+
+  it("warns user with expired convention and old establishment exchange", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const userWithOldActivity = makeUser({
+      id: "old-activity-user-id",
+      email: "old-activity@test.fr",
+      firstName: "Expired",
+      lastName: "Convention",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    setUserWithOldConventionAndDiscussion({
+      now,
+      uow,
+      user: userWithOldActivity,
+    });
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 1 });
+    expectSavedNotificationsBatchAndEvent({
+      emails: [
+        {
+          kind: "ACCOUNT_DELETION_WARNING",
+          recipients: [userWithOldActivity.email],
+          params: {
+            fullName: `${userWithOldActivity.firstName} ${userWithOldActivity.lastName}`,
+            deletionDate: "22 janvier 2026",
+            loginUrl: `${immersionBaseUrl}/${frontRoutes.profile}`,
+          },
+        },
+      ],
+    });
+  });
+});

@@ -180,10 +180,10 @@ export type DomainEvent =
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticationByEmailRequested", InitiateLoginByEmailParams>
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
+
   // INACTIVE USER ACCOUNT DELETION
   | GenericEvent<"InactiveUserAccountDeletionTriggered", DeleteUserInputSchema>
   | GenericEvent<"UserDeleted", WithUserId & WithTriggeredBy>
-
 
   // Est-ce que les deux events au final c'est pas la même chose ???????!!!!!!! De quoi péter un gros boulard!
   | GenericEvent<"AgencyRegisteredToConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy> // Old name AgencyRegisteredToInclusionConnectedUser
