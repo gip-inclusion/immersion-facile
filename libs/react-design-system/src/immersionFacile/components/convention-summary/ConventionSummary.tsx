@@ -70,11 +70,10 @@ export const ConventionSummary = ({
             conventionSummaryStyles.sectionHeader,
           )}
         >
-          <img
-            src={illustration}
-            alt=""
-            className={fr.cx("fr-col-12", "fr-col-md-1")}
-          />
+          <div className={fr.cx("fr-col-12", "fr-col-md-1")}>
+            <img src={illustration} alt="" />
+          </div>
+
           <div
             className={cx(
               fr.cx("fr-col-12", "fr-col-md-11", "fr-grid-row"),
