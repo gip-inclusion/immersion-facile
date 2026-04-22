@@ -28,6 +28,10 @@ import { SubscriberErrorFeedbackComponent } from "src/app/components/SubscriberE
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import {
+  getAssessmentCompletionStatus,
+  getAssessmentLabelsAndSeverityByStatus,
+} from "src/app/utils/assessment.utils";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -37,7 +41,6 @@ import {
 } from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
-import { useStyles } from "tss-react/dsfr";
 import {
   makeConventionSections,
   SendAssessmentLinkModalWrapper,
@@ -66,7 +69,6 @@ export const ConventionValidation = ({
   jwtParams,
   roles,
 }: ConventionValidationProps) => {
-  const { cx } = useStyles();
   const dispatch = useDispatch();
   const conventionLastBroadcastFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
@@ -163,20 +165,31 @@ export const ConventionValidation = ({
 
   return (
     <>
-      <div className={fr.cx("fr-mb-3w")}>
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-3w")}>
         <Badge
-          className={cx(
-            fr.cx("fr-mr-2w"),
-            labelAndSeverityByStatus[status].color,
-          )}
+          className={`${fr.cx("fr-mr-2w")} ${labelAndSeverityByStatus[status].color}`}
         >
           {labelAndSeverityByStatus[status].label}
         </Badge>
         {shouldShowConventionLastBroadcastFeedbackErrorInfo && (
-          <Badge className={cx(fr.cx("fr-mr-2w", "fr-badge--error"))}>
-            ❌ Erreur de synchronisation
+          <Badge className={fr.cx("fr-mr-2w")} severity="error">
+            Erreur de synchronisation
           </Badge>
         )}
+        <Badge
+          className={fr.cx("fr-mr-2w")}
+          severity={
+            getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
+              getAssessmentCompletionStatus(convention.assessment)
+            ].severity
+          }
+        >
+          {
+            getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
+              getAssessmentCompletionStatus(convention.assessment)
+            ].shortLabel
+          }
+        </Badge>
       </div>
       <h1 className={fr.cx("fr-h3")}>{title}</h1>
       {convention.statusJustification && (
