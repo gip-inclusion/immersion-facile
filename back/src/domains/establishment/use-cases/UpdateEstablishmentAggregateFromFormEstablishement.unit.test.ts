@@ -90,6 +90,7 @@ describe("Update Establishment aggregate from form data", () => {
   });
 
   describe("wrong paths", () => {
+    const adminUser = new UserBuilder().withId("admin").build();
     const contactUser = new UserBuilder().withId("contact").build();
 
     const establishment = new EstablishmentAggregateBuilder()
@@ -110,7 +111,7 @@ describe("Update Establishment aggregate from form data", () => {
       })
       .withUserRights([
         {
-          userId: "admin",
+          userId: adminUser.id,
           role: "establishment-admin",
           status: "ACCEPTED",
           job: "job",
@@ -198,6 +199,41 @@ describe("Update Establishment aggregate from form data", () => {
           },
         ),
         errors.user.forbidden({ userId: contactUser.id }),
+      );
+    });
+
+    it("Forbidden if the establishment is banned", async () => {
+      const bannedSiret: SiretDto = "12345678912345";
+      uow.bannedEstablishmentRepository.bannedEstablishments = [
+        {
+          siret: bannedSiret,
+          bannishmentJustification:
+            "L'entreprise relâche des produits chimiques sur la côte de granite rose",
+        },
+      ];
+
+      uow.userRepository.users = [adminUser, contactUser];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        {
+          ...establishment,
+          establishment: { ...establishment.establishment, siret: bannedSiret },
+        },
+      ];
+
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret(bannedSiret)
+        .build();
+
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment,
+          },
+          {
+            userId: adminUser.id,
+          },
+        ),
+        errors.establishment.bannedEstablishment({ siret: bannedSiret }),
       );
     });
   });
@@ -613,6 +649,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withAdditionalInformation(
             existingFormEstablishment.additionalInformation,
           )
+          .withBannishmentInformations({ isBanned: false })
           .withScore(0)
           .build(),
       )
@@ -683,6 +720,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withAdditionalInformation(
             updatedFormEstablishment.additionalInformation,
           )
+          .withBannishmentInformations({ isBanned: false })
           .withScore(0)
           .build(),
       )
@@ -1133,6 +1171,112 @@ describe("Update Establishment aggregate from form data", () => {
               offers: expectedEstablishmentAggregate.offers,
             },
           ],
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+            payload: {
+              siret: expectedEstablishmentAggregate.establishment.siret,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: user.id,
+              },
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [expectedEstablishmentAggregate],
+        );
+      });
+
+      it("cannot ban an establishment", async () => {
+        uow.userRepository.users = [user];
+        const updatedFormEstablishmentWithBan: FormEstablishmentDto = {
+          ...updatedFormEstablishment,
+          isBanned: true,
+          bannishmentJustification: "Ils font des crêpes à la poêle",
+        };
+        const expectedEstablishmentAggregate = {
+          ...updatedEstablishmentAggregate,
+        };
+
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment: updatedFormEstablishmentWithBan,
+          },
+          {
+            userId: user.id,
+          },
+        );
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [updatedEstablishmentAggregate],
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+            payload: {
+              siret: expectedEstablishmentAggregate.establishment.siret,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: user.id,
+              },
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [expectedEstablishmentAggregate],
+        );
+      });
+
+      it("cannot unban an establishment", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          {
+            ...existingEstablishmentAggregate,
+            establishment: {
+              ...existingEstablishmentAggregate.establishment,
+              isBanned: true,
+              bannishmentJustification:
+                "L'entreprise est concurrente à Petit Navire",
+            },
+          },
+        ];
+        uow.userRepository.users = [user];
+
+        const updatedFormEstablishmentWithBan: FormEstablishmentDto = {
+          ...updatedFormEstablishment,
+          isBanned: false,
+        };
+
+        const expectedEstablishmentAggregate = {
+          ...updatedEstablishmentAggregate,
+          establishment: {
+            ...updatedEstablishmentAggregate.establishment,
+            isBanned: true,
+            bannishmentJustification:
+              "L'entreprise est concurrente à Petit Navire",
+          },
+        };
+
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment: updatedFormEstablishmentWithBan,
+          },
+          {
+            userId: user.id,
+          },
+        );
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [expectedEstablishmentAggregate],
         );
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [

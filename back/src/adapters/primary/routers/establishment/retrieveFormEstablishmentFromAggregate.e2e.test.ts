@@ -182,6 +182,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: false,
         },
+        isBanned: false,
       },
       status: 200,
     });
@@ -251,6 +252,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
+        isBanned: false,
       },
       status: 200,
     });
@@ -330,6 +332,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
+        isBanned: true,
+        bannishmentJustification:
+          banEstablishmentPayload.bannishmentJustification,
       },
       status: 200,
     });

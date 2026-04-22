@@ -95,6 +95,15 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       nextAvailabilityDate:
         establishmentAggregate.establishment.nextAvailabilityDate,
       searchableBy: establishmentAggregate.establishment.searchableBy,
+      ...(establishmentAggregate.establishment.isBanned
+        ? {
+            isBanned: true,
+            bannishmentJustification:
+              establishmentAggregate.establishment.bannishmentJustification,
+          }
+        : {
+            isBanned: false,
+          }),
       ...(establishmentAggregate.establishment.contactMode === "IN_PERSON"
         ? {
             potentialBeneficiaryWelcomeAddress:

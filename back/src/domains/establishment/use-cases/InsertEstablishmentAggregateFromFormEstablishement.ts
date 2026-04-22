@@ -85,6 +85,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
             ? undefined
             : formEstablishment.businessNameCustomized,
       },
+      withBannedEstablishmentInformations: { isBanned: false },
     });
 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(

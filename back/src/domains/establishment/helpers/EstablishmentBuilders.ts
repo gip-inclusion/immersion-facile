@@ -14,6 +14,7 @@ import {
   type RemoteWorkMode,
   type RomeCode,
   type WithAcquisition,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
 import type {
@@ -68,6 +69,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   fitForDisabledWorkers: "no",
   website: "",
   score: 10,
+  isBanned: false,
 };
 
 export class EstablishmentEntityBuilder
@@ -223,6 +225,15 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({
       ...this.entity,
       potentialBeneficiaryWelcomeAddress: welcomeAddress,
+    });
+  }
+
+  public withBannishmentInformations(
+    withBannishmentInformations: WithBannedEstablishmentInformations,
+  ) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      ...withBannishmentInformations,
     });
   }
 }
@@ -486,6 +497,19 @@ export class EstablishmentAggregateBuilder
         this.aggregate.establishment,
       )
         .withAcquisition(withAcquisition)
+        .build(),
+    });
+  }
+
+  public withBannishmentInformations(
+    withBannishmentInformation: WithBannedEstablishmentInformations,
+  ) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withBannishmentInformations(withBannishmentInformation)
         .build(),
     });
   }
