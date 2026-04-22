@@ -79,6 +79,7 @@ export const allowedRolesToAccessAssessment = [
   "establishment-admin",
   "establishment-contact",
   "beneficiary",
+  "beneficiary-representative",
 ] as const;
 
 export const establishmentsRoles = [
