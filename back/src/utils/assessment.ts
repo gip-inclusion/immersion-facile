@@ -81,7 +81,10 @@ const assessmentEmailsByRole = (
       ? [convention.signatories.beneficiary.email]
       : errors.assessment.forbidden(mode),
   "beneficiary-current-employer": errors.assessment.forbidden(mode),
-  "beneficiary-representative": errors.assessment.forbidden(mode),
+  "beneficiary-representative":
+    mode === "GetAssessment" && convention.signatories.beneficiaryRepresentative
+      ? [convention.signatories.beneficiaryRepresentative.email]
+      : errors.assessment.forbidden(mode),
   "agency-admin": errors.assessment.forbidden(mode),
   "establishment-representative":
     mode === "GetAssessment" ||

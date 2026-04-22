@@ -120,5 +120,95 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
         ],
       });
     });
+
+    it("Sends one email to the beneficiary and one to the legal representative for mini-stage CCI", async () => {
+      const today = timeGateway.now();
+      const cciConventionWithRepresentative = new ConventionDtoBuilder()
+        .withInternshipKind("mini-stage-cci")
+        .withBeneficiaryRepresentative({
+          role: "beneficiary-representative",
+          firstName: "Legal",
+          lastName: "Representative",
+          phone: "+33601010102",
+          email: "legal.rep@mail.fr",
+        })
+        .build();
+      const miniStageAssessment: AssessmentDto = {
+        ...assessment,
+        conventionId: cciConventionWithRepresentative.id,
+      };
+      uow.conventionRepository.setConventions([
+        cciConventionWithRepresentative,
+      ]);
+
+      await usecase.execute({ assessment: miniStageAssessment });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
+            params: {
+              internshipKind: cciConventionWithRepresentative.internshipKind,
+              conventionId: cciConventionWithRepresentative.id,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  cciConventionWithRepresentative.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  cciConventionWithRepresentative.signatories.beneficiary
+                    .lastName,
+              }),
+              magicLink: fakeGenerateMagicLinkUrlFn({
+                id: cciConventionWithRepresentative.id,
+                email:
+                  cciConventionWithRepresentative.signatories.beneficiary.email,
+                role: "beneficiary",
+                targetRoute: frontRoutes.assessmentDocument,
+                now: today,
+                lifetime: "1Month",
+              }),
+            },
+            recipients: [
+              cciConventionWithRepresentative.signatories.beneficiary.email,
+            ],
+          },
+          {
+            kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
+            params: {
+              internshipKind: cciConventionWithRepresentative.internshipKind,
+              conventionId: cciConventionWithRepresentative.id,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  cciConventionWithRepresentative.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  cciConventionWithRepresentative.signatories.beneficiary
+                    .lastName,
+              }),
+              magicLink: fakeGenerateMagicLinkUrlFn({
+                id: cciConventionWithRepresentative.id,
+                email:
+                  // biome-ignore lint/style/noNonNullAssertion: <explanation>
+                  cciConventionWithRepresentative.signatories
+                    .beneficiaryRepresentative!.email,
+                role: "beneficiary-representative",
+                targetRoute: frontRoutes.assessmentDocument,
+                now: today,
+                lifetime: "1Month",
+              }),
+            },
+            recipients: [
+              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              cciConventionWithRepresentative.signatories
+                .beneficiaryRepresentative!.email,
+            ],
+          },
+        ],
+      });
+    });
   });
 });

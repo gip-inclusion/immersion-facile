@@ -35,6 +35,13 @@ export const makeNotifyBeneficiaryThatAssessmentIsCreated = useCaseBuilder(
       });
 
     const today = deps.timeGateway.now();
+
+    const followedIds = {
+      conventionId: convention.id,
+      agencyId: convention.agencyId,
+      establishmentSiret: convention.siret,
+    };
+
     await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -59,10 +66,38 @@ export const makeNotifyBeneficiaryThatAssessmentIsCreated = useCaseBuilder(
           }),
         },
       },
-      followedIds: {
-        conventionId: convention.id,
-        agencyId: convention.agencyId,
-        establishmentSiret: convention.siret,
-      },
+      followedIds,
     });
+
+    if (
+      convention.internshipKind === "mini-stage-cci" &&
+      convention.signatories.beneficiaryRepresentative
+    ) {
+      await deps.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
+          recipients: [convention.signatories.beneficiaryRepresentative.email],
+          params: {
+            internshipKind: convention.internshipKind,
+            conventionId: convention.id,
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            magicLink: deps.generateConventionMagicLinkUrl({
+              id: convention.id,
+              email: convention.signatories.beneficiaryRepresentative.email,
+              role: "beneficiary-representative",
+              targetRoute: frontRoutes.assessmentDocument,
+              now: today,
+              lifetime: "1Month",
+            }),
+          },
+        },
+        followedIds,
+      });
+    }
   });
