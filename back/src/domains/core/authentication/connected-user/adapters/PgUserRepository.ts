@@ -202,7 +202,12 @@ export class PgUserRepository implements UserRepository {
     const query = this.transaction
       .selectFrom("users")
       .select("users.id")
-      .where("users.last_login_at", "<", since);
+      .where(({ eb, or }) =>
+        or([
+          eb("users.last_login_at", "<", since),
+          eb("users.last_login_at", "is", null),
+        ]),
+      );
 
     const rows = await pipeWithValue(
       query,
