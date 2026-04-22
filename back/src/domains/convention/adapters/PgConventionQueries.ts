@@ -18,9 +18,11 @@ import {
   calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
+  conventionStatusesDemonstratingUserActivity,
   conventionWithBroadcastFeedbackSchema,
   type DataWithPagination,
   type DateFilter,
+  type Email,
   errors,
   functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsFilters,
@@ -63,6 +65,68 @@ const logger = createLogger(__filename);
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
+
+  public async getUserIdsWithNoActiveConvention({
+    users,
+    since,
+  }: {
+    users: { id: UserId; email: Email }[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (users.length === 0) return [];
+
+    const activeRows = await this.transaction
+      .selectFrom("conventions")
+      .innerJoin("actors", (join) =>
+        join.on((actorEb) =>
+          actorEb.or([
+            actorEb(
+              "actors.id",
+              "=",
+              actorEb.ref("conventions.beneficiary_id"),
+            ),
+            actorEb(
+              "actors.id",
+              "=",
+              actorEb.ref("conventions.establishment_tutor_id"),
+            ),
+            actorEb(
+              "actors.id",
+              "=",
+              actorEb.ref("conventions.establishment_representative_id"),
+            ),
+            actorEb(
+              "actors.id",
+              "=",
+              actorEb.ref("conventions.beneficiary_representative_id"),
+            ),
+            actorEb(
+              "actors.id",
+              "=",
+              actorEb.ref("conventions.beneficiary_current_employer_id"),
+            ),
+          ]),
+        ),
+      )
+      .select("actors.email")
+      .distinct()
+      .where("conventions.date_end", ">=", since)
+      .where(
+        "conventions.status",
+        "in",
+        conventionStatusesDemonstratingUserActivity,
+      )
+      .where(
+        "actors.email",
+        "in",
+        users.map((u) => u.email),
+      )
+      .execute();
+
+    const activeEmails = new Set(activeRows.map((r) => r.email));
+
+    return users.filter((u) => !activeEmails.has(u.email)).map((u) => u.id);
+  }
 
   public async getConventionIdsByFilters({
     filters: {

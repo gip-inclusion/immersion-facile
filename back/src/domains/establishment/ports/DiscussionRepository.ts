@@ -58,6 +58,10 @@ export type GetPaginatedDiscussionsForUserParams = WithRequiredPagination &
   };
 
 export interface DiscussionRepository {
+  getUserIdsWithNoRecentExchange(params: {
+    users: { id: UserId; email: Email }[];
+    since: Date;
+  }): Promise<UserId[]>;
   insert: (discussion: DiscussionDto) => Promise<void>;
   update: (discussion: DiscussionDto) => Promise<void>;
   archiveDiscussions: (discussionIds: DiscussionId[]) => Promise<void>;
