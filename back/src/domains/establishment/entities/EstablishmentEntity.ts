@@ -11,6 +11,7 @@ import type {
   NumberEmployeesRange,
   SiretDto,
   WithAcquisition,
+  WithBannedEstablishmentInformations,
 } from "shared";
 
 type ApiSource = "api_labonneboite";
@@ -40,4 +41,5 @@ export type EstablishmentEntity = {
   score: number;
   contactMode: ContactMode;
   potentialBeneficiaryWelcomeAddress?: AddressAndPosition;
-} & WithAcquisition;
+} & WithAcquisition &
+  WithBannedEstablishmentInformations;

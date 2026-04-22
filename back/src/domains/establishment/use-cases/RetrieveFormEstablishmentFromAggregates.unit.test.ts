@@ -10,6 +10,7 @@ import {
   type SiretDto,
   type User,
   UserBuilder,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import {
   createInMemoryUow,
@@ -153,7 +154,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       );
     });
 
-    it("throws if establishment is banned and user is not admin", async () => {
+    it("throws if establishment is banned and user is not back office admin", async () => {
       const connectedNonAdminUser = new ConnectedUserBuilder().build();
 
       const bannedEstablishmentAggregate = new EstablishmentAggregateBuilder(
@@ -249,6 +250,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentAdmin: adminWithoutFirstNameAndLastName,
           job,
           phone,
+          withBannedEstablishmentInformations: { isBanned: false },
         }),
       );
     });
@@ -412,6 +414,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
+          withBannedEstablishmentInformations: { isBanned: false },
         }),
       );
     });
@@ -429,6 +432,46 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
+          withBannedEstablishmentInformations: { isBanned: false },
+        }),
+      );
+    });
+
+    it("returns a ban establishment if user is back office admin", async () => {
+      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+        {
+          isBanned: true,
+          bannishmentJustification: "Le patron n'aime pas la pluie",
+        };
+
+      uow.userRepository.users = [
+        establishmentAdmin,
+        establishmentContact,
+        adminUser,
+      ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        {
+          ...establishmentAggregate,
+          establishment: {
+            ...establishmentAggregate.establishment,
+            ...withBannedEstablishmentInformations,
+          },
+        },
+      ];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: adminUser.id,
+      });
+
+      expectToEqual(
+        establishmentForm,
+        makeExpectedFormEstablishment({
+          establishmentAdmin,
+          establishmentAggregate,
+          establishmentContact,
+          job,
+          phone,
+          withBannedEstablishmentInformations,
         }),
       );
     });
@@ -441,12 +484,14 @@ const makeExpectedFormEstablishment = ({
   establishmentAdmin,
   job,
   phone,
+  withBannedEstablishmentInformations,
 }: {
   establishmentAggregate: EstablishmentAggregate;
   establishmentContact: User;
   establishmentAdmin: User;
   job: string;
   phone: string;
+  withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
 }): FormEstablishmentDto => ({
   siret: establishmentAggregate.establishment.siret,
   source: "immersion-facile",
@@ -494,4 +539,5 @@ const makeExpectedFormEstablishment = ({
     jobSeekers: true,
     students: false,
   },
+  ...withBannedEstablishmentInformations,
 });
