@@ -9,7 +9,7 @@ import type {
 } from "../formEstablishment/FormEstablishment.dto";
 import { formEstablishmentPendingUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
 import type { EstablishmentRole } from "../role/role.dto";
-import type { SiretDto, WithSiretDto } from "../siret/siret";
+import type { SiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
@@ -105,21 +105,3 @@ export type EstablishmentDashboards = {
 export type WithEstablishmentDashboards = {
   establishments: EstablishmentDashboards;
 };
-
-type WithBannishmentJustification = {
-  bannishmentJustification: string;
-};
-
-export type WithBannedEstablishmentInformations =
-  | { isBanned: false }
-  | ({
-      isBanned: true;
-    } & WithBannishmentJustification);
-
-export type BanEstablishmentPayload = WithSiretDto &
-  WithBannishmentJustification;
-
-export const banEstablishmentPayloadSchema = z.object({
-  siret: siretSchema,
-  bannishmentJustification: zStringMinLength1Max1024,
-});

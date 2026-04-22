@@ -4,6 +4,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressAndPositionSchema } from "../address/address.schema";
 import { emailSchema } from "../email/email.schema";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
 import { businessNameSchema } from "../establishment/businessName";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
@@ -259,7 +260,8 @@ export const formEstablishmentSchema: ZodSchemaWithInputMatchingOutput<FormEstab
           "En cas de mode de contact en personne, vous devez renseigner un contact principal.",
         path: ["userRights"],
       },
-    );
+    )
+    .and(withBannedEstablishmentInformationSchema);
 
 export const withFormEstablishmentSchema: ZodSchemaWithInputMatchingOutput<WithFormEstablishmentDto> =
   z.object({
