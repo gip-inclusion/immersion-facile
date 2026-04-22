@@ -60,7 +60,7 @@ describe("MarkOldConventionAsDeprecated", () => {
     );
     expect(deprecatedConvention.status).toEqual("DEPRECATED");
     expect(deprecatedConvention.statusJustification).toEqual(
-      "Devenu obsolète car statut PARTIALLY_SIGNED alors que la date de fin est dépassée depuis longtemps",
+      "Devenu obsolète car le statut était PARTIALLY_SIGNED alors que la date de fin est dépassée depuis longtemps",
     );
     expect(uow.outboxRepository.events).toHaveLength(1);
     expect(uow.outboxRepository.events[0].topic).toEqual(

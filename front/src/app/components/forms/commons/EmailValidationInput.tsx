@@ -14,7 +14,7 @@ type StateRelated = {
   stateRelatedMessage: InputProps.Common["stateRelatedMessage"];
 };
 
-const emailSeemsValidMessage = "L'adresse email a l'air valide";
+const emailSeemsValidMessage = "Le format de l'adresse email est valide";
 
 // https://help.emailable.com/en-us/article/verification-results-all-possible-states-and-reasons-fjsjn2/
 export const makeStateRelated = (

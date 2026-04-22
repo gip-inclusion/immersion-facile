@@ -313,8 +313,8 @@ export const ConventionDocumentPage = ({
               <li>
                 <strong>{agencyInfo.name}</strong> (
                 {agencyInfo.address.streetNumberAndAddress},{" "}
-                {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
-                qualité d' <strong>agence accompagnante.</strong>
+                {agencyInfo.address.postcode} {agencyInfo.address.city}) en
+                qualité d'<strong>agence accompagnante.</strong>
                 <ul>
                   <li>
                     <strong>Contact en cas de besoin : </strong>
@@ -326,7 +326,7 @@ export const ConventionDocumentPage = ({
                 <strong>{agencyInfo.refersToAgency.name}</strong> (
                 {agencyInfo.refersToAgency.address.streetNumberAndAddress},{" "}
                 {agencyInfo.refersToAgency.address.postcode}{" "}
-                {agencyInfo.refersToAgency.address.city} {}) en qualité d'{" "}
+                {agencyInfo.refersToAgency.address.city}) en qualité d'
                 <strong>agence prescriptrice.</strong>
                 <ul>
                   <li>
@@ -341,8 +341,8 @@ export const ConventionDocumentPage = ({
             <li>
               <strong>{agencyInfo.name}</strong> (
               {agencyInfo.address.streetNumberAndAddress},{" "}
-              {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
-              qualité d' <strong>agence prescriptrice.</strong>
+              {agencyInfo.address.postcode} {agencyInfo.address.city}) en
+              qualité d'<strong>agence prescriptrice.</strong>
               <ul>
                 <li>
                   <strong>Contact en cas de besoin : </strong>
@@ -462,7 +462,8 @@ export const ConventionDocumentPage = ({
             {internshipKind === "immersion"
               ? "de l'immersion"
               : "du mini-stage"}{" "}
-            seront : {formatSchedule(convention)}.
+            seront : {formatSchedule(convention)}
+            <br />
           </strong>
         </div>
         <h4 className={fr.cx("fr-h6")}>
