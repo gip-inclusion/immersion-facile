@@ -1336,6 +1336,7 @@ const makeOrderByClauses = (
 const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
   db
     .selectFrom("establishments as e")
+    .leftJoin("banned_establishments as be", "be.siret", "e.siret")
     .select(({ ref, eb }) =>
       jsonStripNulls(
         jsonBuildObject({
@@ -1402,6 +1403,8 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
               code: ref("e.naf_code"),
               nomenclature: ref("e.naf_nomenclature"),
             }),
+            isBanned: sql<boolean>`${ref("be.siret")} IS NOT NULL`,
+            bannishmentJustification: ref("be.bannishment_justification"),
             potentialBeneficiaryWelcomeAddress: sql`CASE WHEN ${ref("e.contact_mode")} = 'IN_PERSON' THEN ${jsonBuildObject(
               {
                 address: jsonBuildObject({
@@ -1473,5 +1476,5 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
         }),
       ).as("aggregate"),
     )
-    .groupBy("e.siret")
+    .groupBy(["e.siret", "be.siret", "be.bannishment_justification"])
     .orderBy("e.siret asc");

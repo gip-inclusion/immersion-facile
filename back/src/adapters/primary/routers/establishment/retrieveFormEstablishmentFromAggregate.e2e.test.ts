@@ -21,7 +21,10 @@ import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InM
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import type { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
+import type {
+  EstablishmentAdminRight,
+  EstablishmentAggregate,
+} from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -261,17 +264,18 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
   )} 200 if banned establishment and user is back office admin`, async () => {
-    const banEstablishmentPayload: BanEstablishmentPayload = {
-      siret: establishmentAggregate.establishment.siret,
-      bannishmentJustification: "Un employé a mangé du beurre doux",
+    const bannishmentJustification = "Un employé a mangé du beurre doux";
+    const bannedEstablishmentAggregate: EstablishmentAggregate = {
+      ...establishmentAggregate,
+      establishment: {
+        ...establishmentAggregate.establishment,
+        isBanned: true,
+        bannishmentJustification,
+      },
     };
 
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-      establishmentAggregate,
-    ];
-
-    inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
-      banEstablishmentPayload,
+      bannedEstablishmentAggregate,
     ];
 
     const response = await httpClient.getFormEstablishment({
@@ -279,7 +283,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
       urlParams: {
-        siret: banEstablishmentPayload.siret,
+        siret: bannedEstablishmentAggregate.establishment.siret,
       },
     });
 
@@ -333,8 +337,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
         isBanned: true,
-        bannishmentJustification:
-          banEstablishmentPayload.bannishmentJustification,
+        bannishmentJustification,
       },
       status: 200,
     });
