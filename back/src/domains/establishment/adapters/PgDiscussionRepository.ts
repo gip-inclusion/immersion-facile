@@ -14,6 +14,7 @@ import {
   type DiscussionKind,
   type DiscussionOrderKey,
   type DiscussionStatus,
+  type Email,
   type EstablishmentRole,
   type Exchange,
   type ExchangeRole,
@@ -25,6 +26,7 @@ import {
   pipeWithValue,
   type RejectionKind,
   type SiretDto,
+  type UserId,
   type WithDiscussionStatus,
 } from "shared";
 import { match, P } from "ts-pattern";
@@ -77,6 +79,37 @@ type DeleteDiscussionResultPayload = {
 
 export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
+
+  async getUserIdsWithNoRecentExchange({
+    users,
+    since,
+  }: {
+    users: { id: UserId; email: Email }[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (users.length === 0) return [];
+
+    const activeRows = await this.transaction
+      .selectFrom("exchanges")
+      .select("exchanges.establishment_email")
+      .distinct()
+      .where("exchanges.sender", "=", "establishment")
+      .where("exchanges.sent_at", ">=", since)
+      .where(
+        "exchanges.establishment_email",
+        "in",
+        users.map((u) => u.email),
+      )
+      .execute();
+
+    const activeEmails = new Set(
+      activeRows
+        .map((r) => r.establishment_email)
+        .filter((e): e is string => e !== null),
+    );
+
+    return users.filter((u) => !activeEmails.has(u.email)).map((u) => u.id);
+  }
 
   async __test_getAllDiscussions(): Promise<DiscussionDto[]> {
     return executeGetDiscussions(this.transaction, {

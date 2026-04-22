@@ -11,7 +11,9 @@ import {
   type ConventionWithBroadcastFeedback,
   conventionReadSchema,
   conventionSchema,
+  conventionStatusesDemonstratingUserActivity,
   type DataWithPagination,
+  type Email,
   errors,
   type GetPaginatedConventionsFilters,
   isFunctionalBroadcastFeedbackError,
@@ -50,6 +52,39 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly assessmentRepository: InMemoryAssessmentRepository,
     private readonly broadcastFeedbacksRepository: InMemoryBroadcastFeedbacksRepository,
   ) {}
+
+  public async getUserIdsWithNoActiveConvention({
+    users,
+    since,
+  }: {
+    users: { id: UserId; email: Email }[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (users.length === 0) return [];
+
+    return users
+      .filter(
+        (user) =>
+          !this.conventionRepository.conventions.some((convention) => {
+            if (new Date(convention.dateEnd) < since) return false;
+            if (
+              !conventionStatusesDemonstratingUserActivity.includes(
+                convention.status,
+              )
+            )
+              return false;
+            const conventionEmails = [
+              convention.signatories.beneficiary.email,
+              convention.establishmentTutor.email,
+              convention.signatories.establishmentRepresentative.email,
+              convention.signatories.beneficiaryRepresentative?.email,
+              convention.signatories.beneficiaryCurrentEmployer?.email,
+            ].filter(Boolean);
+            return conventionEmails.includes(user.email);
+          }),
+      )
+      .map((u) => u.id);
+  }
 
   public async getConventionIdsByFilters(
     params: GetConventionIdsParams,

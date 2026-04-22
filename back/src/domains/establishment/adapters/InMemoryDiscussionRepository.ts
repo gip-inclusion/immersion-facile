@@ -5,7 +5,9 @@ import type {
   DiscussionDto,
   DiscussionId,
   DiscussionInList,
+  Email,
   SiretDto,
+  UserId,
 } from "shared";
 import type {
   DiscussionRepository,
@@ -21,6 +23,30 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
 
   public discussionCallsCount = 0;
   public archivedDiscussionIds: DiscussionId[] = [];
+
+  public async getUserIdsWithNoRecentExchange({
+    users,
+    since,
+  }: {
+    users: { id: UserId; email: Email }[];
+    since: Date;
+  }): Promise<UserId[]> {
+    if (users.length === 0) return [];
+
+    return users
+      .filter(
+        (user) =>
+          !this.discussions.some((discussion) =>
+            discussion.exchanges.some(
+              (exchange) =>
+                exchange.sender === "establishment" &&
+                exchange.email === user.email &&
+                new Date(exchange.sentAt) >= since,
+            ),
+          ),
+      )
+      .map((u) => u.id);
+  }
 
   public async getPaginatedDiscussionsForUser(): Promise<
     DataWithPagination<DiscussionInList>

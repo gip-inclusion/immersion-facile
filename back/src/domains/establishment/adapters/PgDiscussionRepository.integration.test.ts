@@ -3436,6 +3436,118 @@ describe("PgDiscussionRepository", () => {
       });
     });
   });
+
+  describe("getUserIdsWithNoRecentExchange", () => {
+    it("returns empty array when given no users", async () => {
+      expectToEqual(
+        await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
+          users: [],
+          since: new Date("2024-01-01"),
+        }),
+        [],
+      );
+    });
+
+    it("returns only users with no recent establishment exchange since the given date", async () => {
+      const since = new Date("2025-01-01");
+
+      const userA = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000001")
+        .withEmail("userA-disc@test.com")
+        .build();
+      const userB = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000002")
+        .withEmail("userB-disc@test.com")
+        .build();
+      const userC = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000003")
+        .withEmail("userC-disc@test.com")
+        .build();
+      const userD = new UserBuilder()
+        .withId("aaaa0000-0000-4000-a000-000000000004")
+        .withEmail("userD-disc@test.com")
+        .build();
+
+      const userRepo = new PgUserRepository(db);
+      await Promise.all([
+        userRepo.save(userA),
+        userRepo.save(userB),
+        userRepo.save(userC),
+        userRepo.save(userD),
+      ]);
+
+      // userA has a recent exchange sent by the establishment (matches on establishment_email)
+      const recentEstablishmentExchange = new DiscussionBuilder()
+        .withId("11111111-1111-4111-a111-111111111111")
+        .withPotentialBeneficiaryEmail("candidate-a@test.com")
+        .withExchanges([
+          {
+            subject: "Recent",
+            message: "Hello",
+            sentAt: addDays(since, 1).toISOString(),
+            sender: "establishment",
+            firstname: "Estab",
+            lastname: "Contact",
+            email: userA.email,
+            attachments: [],
+          },
+        ])
+        .build();
+
+      // userB has an old exchange sent by the establishment
+      const oldEstablishmentExchange = new DiscussionBuilder()
+        .withId("22222222-2222-4222-a222-222222222222")
+        .withSiret("11111111111112")
+        .withPotentialBeneficiaryEmail("candidate-b@test.com")
+        .withExchanges([
+          {
+            subject: "Old",
+            message: "Hello",
+            sentAt: addDays(since, -1).toISOString(),
+            sender: "establishment",
+            firstname: "Estab",
+            lastname: "Contact",
+            email: userB.email,
+            attachments: [],
+          },
+        ])
+        .build();
+
+      // userD appears only as a candidate (potential_beneficiary email), never as establishment sender
+      // this exchange MUST NOT count as recent activity for userD
+      const candidateOnlyDiscussion = new DiscussionBuilder()
+        .withId("33333333-3333-4333-a333-333333333333")
+        .withSiret("11111111111113")
+        .withPotentialBeneficiaryEmail(userD.email)
+        .withExchanges([
+          {
+            subject: "Candidate sent",
+            message: "Hello",
+            sentAt: addDays(since, 1).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+      await Promise.all([
+        pgDiscussionRepository.insert(recentEstablishmentExchange),
+        pgDiscussionRepository.insert(oldEstablishmentExchange),
+        pgDiscussionRepository.insert(candidateOnlyDiscussion),
+      ]);
+
+      const result =
+        await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
+          users: [userA, userB, userC, userD].map((u) => ({
+            id: u.id,
+            email: u.email,
+          })),
+          since,
+        });
+
+      expectToEqual(result.sort(), [userB.id, userC.id, userD.id].sort());
+    });
+  });
 });
 
 const insertDiscussions = async (

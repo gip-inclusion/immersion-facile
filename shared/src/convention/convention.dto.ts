@@ -125,6 +125,13 @@ export const conventionStatuses = [
   ...conventionStatusesWithValidator,
 ] as const;
 
+export const conventionStatusesDemonstratingUserActivity: ConventionStatus[] = [
+  "IN_REVIEW",
+  "ACCEPTED_BY_COUNSELLOR",
+  "ACCEPTED_BY_VALIDATOR",
+  "CANCELLED",
+];
+
 export const maxPresenceDaysByInternshipKind: Record<InternshipKind, number> = {
   immersion: 30,
   "mini-stage-cci": 5,
