@@ -1,12 +1,13 @@
 import z from "zod";
 import type { WithSiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
+import { zStringMinLength1Max1024 } from "../utils/string.schema";
 
 type WithBannishmentJustification = {
   bannishmentJustification: string;
 };
 const withBannishmentJustificationSchema = z.object({
-  bannishmentJustification: z.string(),
+  bannishmentJustification: zStringMinLength1Max1024,
 });
 
 export type WithBannedEstablishmentInformations =
