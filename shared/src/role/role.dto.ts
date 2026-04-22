@@ -80,6 +80,8 @@ export const allowedRolesToAccessAssessment = [
   "establishment-contact",
   "beneficiary",
   "beneficiary-representative",
+  "agency-admin",
+  "agency-viewer",
 ] as const;
 
 export const establishmentsRoles = [
