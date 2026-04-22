@@ -47,6 +47,14 @@ describe("GetAssessmentByConventionId", () => {
     .withEmail("backOfficeAdmin@email.com")
     .withIsAdmin(true)
     .buildUser();
+  const agencyAdmin = new ConnectedUserBuilder()
+    .withId("agencyAdmin")
+    .withEmail("agencyAdmin@email.com")
+    .buildUser();
+  const agencyViewer = new ConnectedUserBuilder()
+    .withId("agencyViewer")
+    .withEmail("agencyViewer@email.com")
+    .buildUser();
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
   const establishmentTutorPayload: ConventionDomainJwtPayload = {
     applicationId: convention.id,
@@ -88,11 +96,18 @@ describe("GetAssessmentByConventionId", () => {
       toAgencyWithRights(agency, {
         [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [agencyAdmin.id]: { isNotifiedByEmail: true, roles: ["agency-admin"] },
+        [agencyViewer.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-viewer"],
+        },
       }),
     ];
     uow.userRepository.users = [
       counsellor,
       validator,
+      agencyAdmin,
+      agencyViewer,
       userWithoutRoleOnConvention,
       backOfficeAdmin,
     ];
@@ -265,6 +280,34 @@ describe("GetAssessmentByConventionId", () => {
           { conventionId: convention.id },
           {
             userId: backOfficeAdmin.id,
+          },
+        ),
+        assessment,
+      );
+    });
+
+    it("get existing assessment if user is agency-admin", async () => {
+      uow.conventionRepository.setConventions([convention]);
+
+      expectToEqual(
+        await getAssessment.execute(
+          { conventionId: convention.id },
+          {
+            userId: agencyAdmin.id,
+          },
+        ),
+        assessment,
+      );
+    });
+
+    it("get existing assessment if user is agency-viewer", async () => {
+      uow.conventionRepository.setConventions([convention]);
+
+      expectToEqual(
+        await getAssessment.execute(
+          { conventionId: convention.id },
+          {
+            userId: agencyViewer.id,
           },
         ),
         assessment,
