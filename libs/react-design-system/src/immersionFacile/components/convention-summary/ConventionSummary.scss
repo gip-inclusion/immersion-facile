@@ -23,7 +23,7 @@
 
     img {
       max-width: 100px;
-      height: fit-content;
+      height: auto;
 
       @include for-screen-min($bp-md) {
         max-width: 100%;
