@@ -35,6 +35,8 @@ const defaultFlagsInFront: FeatureFlags = {
     href: "",
     label: "",
   }),
+  enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+  enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

@@ -58,6 +58,8 @@ const defaultFeatureFlags: FeatureFlags = {
     false,
     defaultHighlightFeatureFlagValue,
   ),
+  enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+  enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -85,6 +87,8 @@ const flagsFromApi: FeatureFlags = {
     false,
     highlightFeatureFlagFromApi,
   ),
+  enableInactiveUsersCleanup: makeBooleanFeatureFlag(true),
+  enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
 };
 
 describe("feature flag slice", () => {

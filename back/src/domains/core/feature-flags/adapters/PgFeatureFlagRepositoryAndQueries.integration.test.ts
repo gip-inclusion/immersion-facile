@@ -68,6 +68,8 @@ describe("PG getFeatureFlags", () => {
         href: "https://www.example.com",
         label: "Mon label de highlight",
       }),
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+      enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -101,6 +103,8 @@ describe("PG getFeatureFlags", () => {
         href: "https://www.example.com",
         label: "Mon label de highlight",
       }),
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+      enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
     });
   });
 
@@ -134,6 +138,8 @@ describe("PG getFeatureFlags", () => {
         href: "https://www.example.com",
         label: "Mon label de highlight",
       }),
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+      enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -196,6 +202,8 @@ describe("PG getFeatureFlags", () => {
         href: "https://www.example.com",
         label: "Mon label de highlight",
       }),
+      enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+      enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
     });
   });
 });

@@ -41,6 +41,8 @@ const initialState: FeatureFlagsState = {
     href: "",
     label: "",
   }),
+  enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+  enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
   isLoading: true,
 };
 

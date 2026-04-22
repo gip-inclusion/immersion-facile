@@ -37,6 +37,8 @@ const defaultFlags: FeatureFlags = {
     href: "https://www.example.com",
     label: "Mon label de highlight pour l'agence",
   }),
+  enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+  enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

@@ -40,6 +40,8 @@ export const featureFlagsSeed = async (uow: UnitOfWork) => {
       href: "https://www.example.com",
       label: "Mon label de highlight",
     }),
+    enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
+    enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
