@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { addressDepartmentCodeSchema } from "../address/address.schema";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
@@ -109,6 +110,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
 > = z
   .object({
     appellationCodes: z.array(appellationCodeSchema).optional(),
+    departmentCodes: z.array(addressDepartmentCodeSchema).optional(),
     fitForDisabledWorkers: z.array(fitForDisabledWorkersSchema).optional(),
     locationIds: z.array(zUuidLike).optional(),
     nafCodes: nafCodesSchema.optional(),

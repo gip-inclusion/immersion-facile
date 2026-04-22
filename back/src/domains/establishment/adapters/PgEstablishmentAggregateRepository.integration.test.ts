@@ -579,6 +579,178 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
         });
       });
+
+      describe("filters.departmentCodes", () => {
+        const establishmentInDepartment75: EstablishmentAggregate = {
+          ...searchableByAllEstablishment,
+          establishment: {
+            ...searchableByAllEstablishment.establishment,
+            siret: "00000000000070",
+            locations: [
+              {
+                ...searchableByAllEstablishment.establishment.locations[0],
+                id: uuid(),
+                address: {
+                  ...searchableByAllEstablishment.establishment.locations[0]
+                    .address,
+                  departmentCode: "75",
+                },
+              },
+            ],
+          },
+        };
+        const establishmentInDepartment76: EstablishmentAggregate = {
+          ...searchableByStudentsEstablishment,
+          establishment: {
+            ...searchableByStudentsEstablishment.establishment,
+            siret: "00000000000071",
+            locations: [
+              {
+                ...searchableByStudentsEstablishment.establishment.locations[0],
+                id: uuid(),
+                address: {
+                  ...searchableByStudentsEstablishment.establishment
+                    .locations[0].address,
+                  departmentCode: "76",
+                },
+              },
+            ],
+          },
+        };
+        const establishmentInDepartment95: EstablishmentAggregate = {
+          ...searchableByJobSeekerEstablishment,
+          establishment: {
+            ...searchableByJobSeekerEstablishment.establishment,
+            siret: "00000000000072",
+            locations: [
+              {
+                ...searchableByJobSeekerEstablishment.establishment
+                  .locations[0],
+                id: uuid(),
+                address: {
+                  ...searchableByJobSeekerEstablishment.establishment
+                    .locations[0].address,
+                  departmentCode: "95",
+                },
+              },
+            ],
+          },
+        };
+        const departmentCodeTestEstablishmentAggregates: EstablishmentAggregate[] =
+          [
+            establishmentInDepartment75,
+            establishmentInDepartment76,
+            establishmentInDepartment95,
+          ];
+
+        beforeEach(async () => {
+          await Promise.all(
+            departmentCodeTestEstablishmentAggregates.map(
+              (establishmentAggregate) =>
+                pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                  establishmentAggregate,
+                ),
+            ),
+          );
+        });
+        it("doesn't filter by departmentCodes when no departmentCodes are provided (empty array)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { ...defaultFilters, departmentCodes: [] },
+          });
+          expectToEqual(result.pagination, {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 3,
+          });
+          expectToEqual(
+            result.data,
+            departmentCodeTestEstablishmentAggregates.map(
+              (establishmentAggregate) =>
+                makeExpectedSearchResult({
+                  establishment: establishmentAggregate,
+                  withOffers: establishmentAggregate.offers,
+                  withLocationAndDistance:
+                    establishmentAggregate.establishment.locations[0],
+                  nafLabel: "Activités des agences de travail temporaire",
+                }),
+            ),
+          );
+        });
+        it("filters by departmentCodes (single value)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { ...defaultFilters, departmentCodes: ["75"] },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 1,
+            },
+            data: [
+              makeExpectedSearchResult({
+                establishment: establishmentInDepartment75,
+                withOffers: establishmentInDepartment75.offers,
+                withLocationAndDistance:
+                  establishmentInDepartment75.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ],
+          });
+        });
+        it("filters by departmentCodes (multiple values)", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { ...defaultFilters, departmentCodes: ["75", "76"] },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 2,
+            },
+            data: [
+              makeExpectedSearchResult({
+                establishment: establishmentInDepartment75,
+                withOffers: establishmentInDepartment75.offers,
+                withLocationAndDistance:
+                  establishmentInDepartment75.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+              makeExpectedSearchResult({
+                establishment: establishmentInDepartment76,
+                withOffers: establishmentInDepartment76.offers,
+                withLocationAndDistance:
+                  establishmentInDepartment76.establishment.locations[0],
+                nafLabel: "Activités des agences de travail temporaire",
+              }),
+            ],
+          });
+        });
+        it("returns no result when departmentCodes has no match", async () => {
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 10 },
+            sort: defaultSort,
+            filters: { ...defaultFilters, departmentCodes: ["99"] },
+          });
+          expectToEqual(result, {
+            pagination: {
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+              totalRecords: 0,
+            },
+            data: [],
+          });
+        });
+      });
       describe("filters.fitForDisabledWorkers", () => {
         const testEstablishmentAggregates: EstablishmentAggregate[] = [
           establishmentWithFitForDisabledWorkersYesCertified,

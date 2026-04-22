@@ -13,6 +13,7 @@ const searchFilters = [
   "appellationCodes",
   "locationIds",
   "showOnlyAvailableOffers",
+  "departmentCodes",
 ] as const;
 
 type SearchFilterKey = (typeof searchFilters)[number];
