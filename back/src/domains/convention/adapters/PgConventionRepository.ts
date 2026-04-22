@@ -32,7 +32,7 @@ export class PgConventionRepository implements ConventionRepository {
       .updateTable("conventions")
       .set({
         status: "DEPRECATED",
-        status_justification: sql`'Devenu obsolète car statut ' || status || ' alors que la date de fin est dépassée depuis longtemps'`,
+        status_justification: sql`'Devenu obsolète car le statut était ' || status || ' alors que la date de fin est dépassée depuis longtemps'`,
         updated_at: now ?? sql`now()`,
       })
       .where("date_end", "<=", endedSince)

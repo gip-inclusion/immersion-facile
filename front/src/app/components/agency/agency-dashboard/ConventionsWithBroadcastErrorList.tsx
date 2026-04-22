@@ -89,7 +89,7 @@ export const ConventionsWithBroadcastErrorList = ({
     if (isFranceTravailBroadcastTemporaryNetworkErrorMessage(errorMessage))
       return franceTravailTemporaryNetworkErrorBroadcastFeedback.description;
 
-    return "Erreur technique : Immersion facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
+    return "Erreur technique : Immersion Facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
   };
 
   const broadcastErrorKindOptions: RadioButtonsProps["options"] = useMemo(

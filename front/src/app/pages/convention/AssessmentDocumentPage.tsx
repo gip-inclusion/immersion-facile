@@ -157,7 +157,7 @@ export const AssessmentDocumentPage = ({
     return (
       <FullPageFeedback
         title="Votre bilan d'immersion a bien été signé"
-        illustration={commonIllustrations.success}
+        illustration={commonIllustrations.documentsAdministratifs}
         content={
           <>
             <p>
