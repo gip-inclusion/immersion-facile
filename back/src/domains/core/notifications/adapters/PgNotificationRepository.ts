@@ -378,6 +378,7 @@ export class PgNotificationRepository implements NotificationRepository {
           sms_kind: notification.templatedContent.kind,
           recipient_phone: notification.templatedContent.recipientPhone,
           convention_id: notification.followedIds.conventionId,
+          user_id: notification.followedIds.userId,
           establishment_siret: notification.followedIds.establishmentSiret,
           agency_id: notification.followedIds.agencyId,
           params: JSON.stringify(notification.templatedContent.params),
@@ -442,6 +443,7 @@ export class PgNotificationRepository implements NotificationRepository {
             created_at: createdAt,
             email_kind: templatedContent.kind,
             convention_id: followedIds.conventionId,
+            user_id: followedIds.userId,
             establishment_siret: followedIds.establishmentSiret,
             agency_id: followedIds.agencyId,
             params: JSON.stringify(templatedContent.params),
@@ -475,6 +477,7 @@ const getSmsNotificationBuilder = (transaction: KyselyDb) =>
           conventionId: eb.ref("convention_id"),
           establishmentId: eb.ref("establishment_siret"),
           agencyId: eb.ref("agency_id"),
+          userId: eb.ref("user_id"),
         }),
       ),
       templatedContent: jsonBuildObject({
@@ -511,6 +514,7 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
             conventionId: ref("convention_id"),
             establishmentId: ref("establishment_siret"),
             agencyId: ref("agency_id"),
+            userId: ref("user_id"),
           }),
         ),
         templatedContent: jsonBuildObject({

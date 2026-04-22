@@ -404,6 +404,47 @@ describe("PgNotificationRepository", () => {
       });
     });
 
+    it("round-trips followedIds.userId on email and sms notifications", async () => {
+      const userId = "dddddddd-1111-4111-1111-dddddddddddd";
+
+      const { id: emailId, emailNotification } =
+        createTemplatedEmailAndNotification({
+          recipients: ["user@mail.com"],
+          sender: {
+            email: "recette@immersion-facile.beta.gouv.fr",
+            name: "Recette Immersion Facile",
+          },
+        });
+      const emailWithUserId: EmailNotification = {
+        ...emailNotification,
+        followedIds: { ...emailNotification.followedIds, userId },
+      };
+
+      const smsWithUserId: SmsNotification = {
+        ...smsNotification,
+        followedIds: { ...smsNotification.followedIds, userId },
+      };
+
+      await pgNotificationRepository.save(emailWithUserId);
+      await pgNotificationRepository.save(smsWithUserId);
+
+      expectToEqual(
+        await pgNotificationRepository.getByIdAndKind(emailId, "email"),
+        {
+          ...emailWithUserId,
+          templatedContent: {
+            ...emailWithUserId.templatedContent,
+            cc: [],
+          },
+          ...withToBeSendState,
+        },
+      );
+      expectToEqual(
+        await pgNotificationRepository.getByIdAndKind(smsNotificationId, "sms"),
+        { ...smsWithUserId, ...withToBeSendState },
+      );
+    });
+
     it("save and eliminates duplicates when cc ends up empty after de-duplication", async () => {
       const { id, emailNotification } = createTemplatedEmailAndNotification({
         recipients: ["bob@mail.com"],
