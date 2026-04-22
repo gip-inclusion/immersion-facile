@@ -64,6 +64,7 @@ export const defaultFormEstablishmentValue = (
     jobSeekers: true,
     students: true,
   },
+  isBanned: false,
 });
 
 export type EstablishmentState = {

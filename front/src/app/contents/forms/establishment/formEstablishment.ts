@@ -184,6 +184,7 @@ export const formEstablishmentFieldsLabels = (
     label: "Adresse d'accueil pour les candidats",
     id: domElementIds.establishment[mode].potentialBeneficiaryWelcomeAddress,
   },
+  isBanned: { label: "", id: "" },
 });
 
 export const mailtoHref = (siret: SiretDto) => {
