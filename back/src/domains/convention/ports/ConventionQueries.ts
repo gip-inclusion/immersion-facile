@@ -51,6 +51,8 @@ export type GetConventionIdsParams = {
   filters: {
     withAppelationCodes?: AppellationCode[];
     withDateStart?: OptionalDateRange;
+    withEndDate?: OptionalDateRange;
+    withUpdateDate?: OptionalDateRange;
     withSirets?: SiretDto[];
     withStatuses?: ConventionStatus[];
     withBeneficiary?: {

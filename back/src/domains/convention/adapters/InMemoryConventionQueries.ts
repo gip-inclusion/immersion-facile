@@ -384,6 +384,8 @@ const makeApplyFiltersToGetConventionIds =
     withAppelationCodes,
     withBeneficiary,
     withDateStart,
+    withEndDate,
+    withUpdateDate,
     withEstablishmentRepresentative,
     withEstablishmentTutor,
     withSirets,
@@ -396,6 +398,18 @@ const makeApplyFiltersToGetConventionIds =
           withDateStart?.to ? dateStart <= withDateStart : true,
         ({ dateStart }) =>
           withDateStart?.from ? dateStart >= withDateStart : true,
+        ({ dateEnd }) =>
+          withEndDate?.to ? new Date(dateEnd) <= withEndDate.to : true,
+        ({ dateEnd }) =>
+          withEndDate?.from ? new Date(dateEnd) >= withEndDate.from : true,
+        ({ updatedAt }) =>
+          withUpdateDate?.to && updatedAt
+            ? new Date(updatedAt) <= withUpdateDate.to
+            : true,
+        ({ updatedAt }) =>
+          withUpdateDate?.from && updatedAt
+            ? new Date(updatedAt) >= withUpdateDate.from
+            : true,
         ({ establishmentTutor }) =>
           withEstablishmentTutor?.email
             ? establishmentTutor.email === withEstablishmentTutor.email
