@@ -79,11 +79,11 @@ export const makeSendAssessmentNeededNotifications = useCaseBuilder(
     const {
       conventionsQtyWithImmersionEnding,
       conventionsQtyWithAlreadyExistingAssessment,
-      conventionsThatDontHaveAssessment,
+      conventionIdsThatDontHaveAssessment,
     } = await getConventionIdsToSendEmailTo(deps, inputParams);
 
     const results = await executeInSequence(
-      conventionsThatDontHaveAssessment,
+      conventionIdsThatDontHaveAssessment,
       (conventionId) =>
         deps.uowPerformer
           // each transaction could fail here without impacting others
@@ -121,10 +121,10 @@ const getConventionIdsToSendEmailTo = async (
   params: SendAssessmentParams,
 ): Promise<{
   conventionsQtyWithImmersionEnding: number;
-  conventionsThatDontHaveAssessment: ConventionId[];
+  conventionIdsThatDontHaveAssessment: ConventionId[];
   conventionsQtyWithAlreadyExistingAssessment: number;
 }> => {
-  const conventionsEndingInRange =
+  const conventionIdsEndingInRange =
     await deps.outOfTransaction.conventionQueries.getConventionIdsByFilters({
       filters: {
         withEndDate: params.conventionEndDate,
@@ -132,7 +132,7 @@ const getConventionIdsToSendEmailTo = async (
       },
     });
 
-  const conventionsUpdatedInRangeAndEndingUpToRange =
+  const conventionIdsUpdatedInRangeAndEndingUpToRange =
     await deps.outOfTransaction.conventionQueries.getConventionIdsByFilters({
       filters: {
         withEndDate: {
@@ -146,29 +146,29 @@ const getConventionIdsToSendEmailTo = async (
       },
     });
 
-  const conventionsThatRequireAnAssessment = uniq([
-    ...conventionsEndingInRange,
-    ...conventionsUpdatedInRangeAndEndingUpToRange,
+  const conventionIdsThatRequireAnAssessment = uniq([
+    ...conventionIdsEndingInRange,
+    ...conventionIdsUpdatedInRangeAndEndingUpToRange,
   ]);
 
   const conventionIdsWithAlreadyExistingAssessment =
     await deps.outOfTransaction.assessmentRepository
-      .getByConventionIds(conventionsThatRequireAnAssessment)
+      .getByConventionIds(conventionIdsThatRequireAnAssessment)
       .then((assessments) =>
         assessments.map(({ conventionId }) => conventionId),
       );
 
-  const conventionsThatDontHaveAssessment =
-    conventionsThatRequireAnAssessment.filter(
+  const conventionIdsThatDontHaveAssessment =
+    conventionIdsThatRequireAnAssessment.filter(
       (id) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
     );
 
   return {
     conventionsQtyWithImmersionEnding:
-      conventionsThatRequireAnAssessment.length,
+      conventionIdsThatRequireAnAssessment.length,
     conventionsQtyWithAlreadyExistingAssessment:
       conventionIdsWithAlreadyExistingAssessment.length,
-    conventionsThatDontHaveAssessment,
+    conventionIdsThatDontHaveAssessment,
   };
 };
 
