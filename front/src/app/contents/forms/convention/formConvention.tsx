@@ -1,7 +1,11 @@
 import { keys, mergeRight } from "ramda";
-
 import type { ReactNode } from "react";
-import { domElementIds, type InternshipKind } from "shared";
+import {
+  domElementIds,
+  type ExpectTrue,
+  type ExtractAddedOrMissingKeys,
+  type InternshipKind,
+} from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import type { ConventionField } from "../../admin/types";
 import type { FormFieldAttributesForContent } from "../types";
@@ -53,7 +57,7 @@ export const formConventionFieldsLabels: (params: {
   //
   // TODO: exclude these fields from typing
   //
-  ...fieldsToExclude,
+  ...formattedFieldsToExclude,
 });
 
 const conventionTemplateSection = ({
@@ -537,207 +541,83 @@ const establishmentRepresentativeSection = ({
   },
 });
 
-const fieldsToExclude = {
-  agencyContactEmail: {
-    label: "",
-    id: "",
-  },
+const fieldsToExclude = [
+  "name",
 
-  agencyCounsellorEmails: {
-    label: "",
-    id: "",
-  },
-  agencyValidatorEmails: {
-    label: "",
-    id: "",
-  },
-  "agencyRefersTo.id": {
-    label: "",
-    id: "",
-  },
-  "agencyRefersTo.name": {
-    label: "",
-    id: "",
-  },
-  "agencyRefersTo.kind": {
-    label: "",
-    id: "",
-  },
-  "agencyRefersTo.contactEmail": {
-    label: "",
-    id: "",
-  },
-  "agencyRefersTo.siret": {
-    label: "",
-    id: "",
-  },
-  agencySiret: {
-    label: "",
-    id: "",
-  },
-  agencyName: {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  assessment: {
-    label: "",
-    id: "",
-  },
-  "establishmentTutor.role": {
-    // to exclude
-    label: "",
-    id: "",
-  },
-  "signatories.beneficiary.signedAt": {
-    // to exclude
-    label: "",
-    id: "",
-  },
-  "signatories.beneficiary.role": {
-    // to exclude
-    label: "",
-    id: "",
-  },
-  signatories: {
-    label: "",
-    id: "",
-  },
+  "agencyContactEmail",
+  "agencyCounsellorEmails",
+  "agencyValidatorEmails",
+  "agencyRefersTo.id",
+  "agencyRefersTo.name",
+  "agencyRefersTo.kind",
+  "agencyRefersTo.contactEmail",
+  "agencyRefersTo.siret",
+  "agencyReferent.firstname",
+  "agencyReferent.lastname",
+  "agencyDepartment",
+  "agencyKind",
+  "agencyRefersTo",
+  "agencySiret",
+  "agencyName",
 
-  establishmentTutor: {
-    label: "",
-    id: "",
-  },
-  agencyReferent: {
-    label: "",
-    id: "",
-  },
-  externalId: {
-    label: "",
-    id: "",
-  },
-  internshipKind: {
-    label: "",
-    id: "",
-  },
-  id: {
-    label: "",
-    id: "",
-  },
-  status: {
-    label: "",
-    id: "",
-  },
-  statusJustification: {
-    label: "",
-    id: "",
-  },
-  dateSubmission: {
-    label: "",
-    id: "",
-  },
-  updatedAt: {
-    label: "",
-    id: "",
-  },
-  "signatories.establishmentRepresentative.signedAt": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  "signatories.establishmentRepresentative.role": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
+  "assessment",
+  "establishmentTutor.role",
+  "establishmentTutor",
+  "isEstablishmentTutorIsEstablishmentRepresentative",
+  "agencyReferent",
+  "internshipKind",
+  "id",
+  "status",
+  "statusJustification",
+  "dateSubmission",
+  "updatedAt",
 
-  "signatories.beneficiaryCurrentEmployer.signedAt": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  "signatories.beneficiaryCurrentEmployer.role": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  "signatories.beneficiaryRepresentative.signedAt": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  "signatories.beneficiaryRepresentative.role": {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  dateValidation: {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
-  dateApproval: {
-    label: "",
-    hintText: undefined,
-    placeholder: undefined,
-    id: "",
-    required: undefined,
-    autoComplete: undefined,
-  },
+  "signatories.beneficiary.signedAt",
+  "signatories.beneficiary.role",
+  "signatories",
+  "signatories.establishmentRepresentative.signedAt",
+  "signatories.establishmentRepresentative.role",
 
-  validators: {
-    label: "",
-    id: "",
-  },
-  renewed: {
-    label: "",
-    id: "",
-  },
-  "renewed.from": {
-    label: "",
-    id: "",
-  },
-  "renewed.justification": {
-    label: "",
-    id: "",
-  },
-  acquisitionKeyword: {
-    label: "",
-    id: "",
-  },
-  acquisitionCampaign: {
-    label: "",
-    id: "",
-  },
-  establishmentNumberEmployeesRange: {
-    label: "",
-    id: "",
-  },
-};
+  "signatories.beneficiaryCurrentEmployer.signedAt",
+  "signatories.beneficiaryCurrentEmployer.role",
+  "signatories.beneficiaryCurrentEmployer.email",
+  "signatories.beneficiaryCurrentEmployer.job",
+  "signatories.beneficiaryCurrentEmployer.phone",
+  "signatories.beneficiaryCurrentEmployer.firstName",
+  "signatories.beneficiaryCurrentEmployer.lastName",
+  "signatories.beneficiaryCurrentEmployer.businessName",
+  "signatories.beneficiaryCurrentEmployer.businessAddress",
+  "signatories.beneficiaryCurrentEmployer.businessSiret",
+
+  "signatories.beneficiaryRepresentative.signedAt",
+  "signatories.beneficiaryRepresentative.role",
+  "signatories.beneficiaryRepresentative.email",
+  "signatories.beneficiaryRepresentative.phone",
+  "signatories.beneficiaryRepresentative.firstName",
+  "signatories.beneficiaryRepresentative.lastName",
+
+  "dateValidation",
+  "dateApproval",
+  "validators",
+  "renewed",
+  "renewed.from",
+  "renewed.justification",
+  "acquisitionKeyword",
+  "acquisitionCampaign",
+  "establishmentNumberEmployeesRange",
+
+  "workConditions",
+  "businessAdvantages",
+  "individualProtectionDescription",
+  "sanitaryPreventionDescription",
+  "immersionSkills",
+  "isCurrentEmployer",
+  "isMinor",
+] as const satisfies readonly FormFieldKeys[];
+
+const formattedFieldsToExclude = Object.fromEntries(
+  fieldsToExclude.map((fieldKey) => [fieldKey, { label: "", id: "" }]),
+) as Record<(typeof fieldsToExclude)[number], FormFieldAttributesForContent>;
 
 type SidebarStepContent = {
   title: string;
@@ -924,33 +804,49 @@ export const makeFormUiSections = ({
   isConventionTemplate,
 }: {
   isConventionTemplate: boolean;
-}): Partial<FormFieldKeys>[][] => [
-  ["agencyId"],
-  keys(
+}): Partial<FormFieldKeys>[][] => {
+  const beneficiarySectionKeys = keys(
     beneficiarySection({
       internshipKind: "immersion",
       isConventionTemplate,
     }),
-  ),
-  [
-    ...keys(
-      mergeRight(
-        establishmentRepresentativeSection({ isConventionTemplate }),
-        establishmentTutorSection({
-          internshipKind: "immersion",
-          isConventionTemplate,
-        }),
-      ),
+  ) as (keyof ReturnType<typeof beneficiarySection>)[];
+
+  const establishmentSectionKeys = keys(
+    mergeRight(
+      establishmentRepresentativeSection({ isConventionTemplate }),
+      establishmentTutorSection({
+        internshipKind: "immersion",
+        isConventionTemplate,
+      }),
     ),
-    "siret",
-    "businessName",
-  ],
-  ["dateStart", "dateEnd", "schedule", "immersionAddress"],
-  [
-    "individualProtection",
-    "sanitaryPrevention",
-    "immersionObjective",
-    "immersionAppellation",
-    "immersionActivities",
-  ],
-];
+  ) as (
+    | keyof ReturnType<typeof establishmentRepresentativeSection>
+    | keyof ReturnType<typeof establishmentTutorSection>
+  )[];
+
+  const formUiSections = [
+    ["agencyId"],
+    beneficiarySectionKeys,
+    [...establishmentSectionKeys, "siret", "businessName"],
+    ["dateStart", "dateEnd", "schedule", "immersionAddress", "remoteWorkMode"],
+    [
+      "individualProtection",
+      "sanitaryPrevention",
+      "immersionObjective",
+      "immersionAppellation",
+      "immersionActivities",
+    ],
+  ] as const;
+
+  type ReturnedFormUiSectionKeys = (typeof formUiSections)[number][number];
+  type _CheckFormUiSectionsReturnContainsKeys = ExpectTrue<
+    ExtractAddedOrMissingKeys<
+      FormFieldKeys,
+      Record<ReturnedFormUiSectionKeys, true>,
+      (typeof fieldsToExclude)[number]
+    >
+  >;
+
+  return formUiSections.map((section) => [...section]);
+};
