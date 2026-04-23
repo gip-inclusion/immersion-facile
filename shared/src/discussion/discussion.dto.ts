@@ -38,6 +38,10 @@ export type CandidateWarnedMethod = (typeof candidateWarnedMethods)[number];
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
 
+export type WithUserRole = {
+  userRole: ExchangeRole;
+};
+
 export type DiscussionExchangeForbiddenReason =
   (typeof discussionExchangeForbiddenReasons)[number];
 

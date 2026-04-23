@@ -132,6 +132,11 @@ describe("AddExchangeToDiscussion", () => {
     ])
     .build();
 
+  const potentialBeneficiaryConnectedUser = new ConnectedUserBuilder()
+    .withId("potential-beneficiary-user")
+    .withEmail(pendingDiscussion1.potentialBeneficiary.email)
+    .build();
+
   let uow: InMemoryUnitOfWork;
   let addExchangeToDiscussion: AddExchangeToDiscussion;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -177,6 +182,7 @@ describe("AddExchangeToDiscussion", () => {
       adminUserEstablishment2,
       contactUserEstablishment1,
       contactUserEstablishment2,
+      potentialBeneficiaryConnectedUser,
     ];
   });
 
@@ -467,6 +473,32 @@ describe("AddExchangeToDiscussion", () => {
             email: adminUserEstablishment1.email,
             firstname: adminUserEstablishment1.firstName,
             lastname: adminUserEstablishment1.lastName,
+            subject:
+              "Réponse de My default business name à votre demande d'immersion",
+            sentAt: "2021-09-01T10:10:00.000Z",
+            attachments: [],
+          });
+        });
+
+        it("saves a potentialBeneficiary exchange through dashboard when connected user email matches discussion", async () => {
+          await addExchangeToDiscussion.execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  message: "Hello from potential beneficiary",
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            potentialBeneficiaryConnectedUser,
+          );
+
+          expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
+            message: "Hello from potential beneficiary",
+            sender: "potentialBeneficiary",
             subject:
               "Réponse de My default business name à votre demande d'immersion",
             sentAt: "2021-09-01T10:10:00.000Z",

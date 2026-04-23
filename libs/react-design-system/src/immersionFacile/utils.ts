@@ -33,3 +33,6 @@ export const dashboardTitleToClassName: Record<TitleLevel, FrClassName> = {
   h3: "fr-h6",
   h4: "fr-h6",
 };
+
+export type Capitalize<T extends string> =
+  T extends `${infer First}${infer Rest}` ? `${Uppercase<First>}${Rest}` : T;

@@ -130,7 +130,8 @@ type ConnectPrivateRoute =
   | Route<typeof routes.myProfileEstablishments>
   | Route<typeof routes.myProfileEstablishmentRegistration>
   | Route<typeof routes.addAgency>
-  | Route<typeof routes.manageConventionConnectedUser>;
+  | Route<typeof routes.manageConventionConnectedUser>
+  | Route<typeof routes.beneficiaryDashboardDiscussions>;
 
 type ConnectedPrivateRouteProps = {
   route: ConnectPrivateRoute;

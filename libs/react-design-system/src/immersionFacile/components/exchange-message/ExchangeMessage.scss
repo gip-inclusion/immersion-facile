@@ -8,4 +8,16 @@
   &--establishment {
     border-left: 6px solid var(--blue-cumulus-main-526)
   }
+
+  &--for-potential-beneficiary {
+    &.im-exchange-message--establishment {
+      border-left: none;
+      border-right: 6px solid var(--blue-cumulus-main-526)
+    }
+
+    &.im-exchange-message--potentialBeneficiary {
+      border-right: none;
+      border-left: 6px solid var(--green-archipel-main-557);
+    }
+  }
 }

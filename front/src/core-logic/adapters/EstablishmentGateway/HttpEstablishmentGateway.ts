@@ -199,16 +199,18 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   public getDiscussionById$({
     discussionId,
     jwt,
+    viewer,
   }: FetchDiscussionRequestedPayload): Observable<
     DiscussionReadDto | undefined
   > {
     return from(
       this.httpClient
-        .getDiscussionByIdForEstablishment({
+        .getDiscussionById({
           headers: { authorization: jwt },
           urlParams: {
             discussionId,
           },
+          queryParams: { userRole: viewer },
         })
         .then((response) =>
           match(response)

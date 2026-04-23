@@ -43,9 +43,15 @@ describe("discussion e2e", () => {
   const establishmentAdminUserBuilder = new ConnectedUserBuilder()
     .withId("admin")
     .withEmail("admin@establishment.mail");
+  const potentialBeneficiaryUserBuilder = new ConnectedUserBuilder()
+    .withId("potential-beneficiary")
+    .withEmail("ali-baba@gmail.com");
 
   const establishmentAdminUser = establishmentAdminUserBuilder.buildUser();
   const establishmentAdminConnectedUser = establishmentAdminUserBuilder.build();
+  const potentialBeneficiaryUser = potentialBeneficiaryUserBuilder.buildUser();
+  const potentialBeneficiaryConnectedUser =
+    potentialBeneficiaryUserBuilder.build();
 
   const existingEstablishment = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(formEstablishment.siret)
@@ -90,13 +96,16 @@ describe("discussion e2e", () => {
     ]);
     gateways.timeGateway.defaultDate = new Date();
 
-    inMemoryUow.userRepository.users = [establishmentAdminUser];
+    inMemoryUow.userRepository.users = [
+      establishmentAdminUser,
+      potentialBeneficiaryUser,
+    ];
   });
 
   describe(`${displayRouteName(
-    establishmentRoutes.getDiscussionByIdForEstablishment,
+    establishmentRoutes.getDiscussionById,
   )} returns the discussion`, () => {
-    it("gets the discussion for the establishment", async () => {
+    it("gets the discussion for the establishment role", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
         .build();
@@ -104,13 +113,14 @@ describe("discussion e2e", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
 
       expectHttpResponseToEqual(
-        await httpClient.getDiscussionByIdForEstablishment({
+        await httpClient.getDiscussionById({
           headers: {
             authorization: generateConnectedUserJwt({
               userId: establishmentAdminConnectedUser.id,
               version: currentJwtVersions.connectedUser,
             }),
           },
+          queryParams: { userRole: "establishment" },
           urlParams: { discussionId: discussion.id },
         }),
         {
@@ -118,6 +128,138 @@ describe("discussion e2e", () => {
           body: new DiscussionBuilder(discussion).buildRead(),
         },
       );
+    });
+
+    it("gets the discussion for the potentialBeneficiary role", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionById({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          queryParams: { userRole: "potentialBeneficiary" },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 200,
+          body: new DiscussionBuilder(discussion).buildRead(),
+        },
+      );
+    });
+
+    it("returns 403 when userRole=establishment for a user with only potentialBeneficiary rights", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionById({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          queryParams: { userRole: "establishment" },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 403,
+          body: {
+            message: errors.discussion.accessForbidden({
+              discussionId: discussion.id,
+              userId: potentialBeneficiaryConnectedUser.id,
+            }).message,
+            status: 403,
+          },
+        },
+      );
+    });
+
+    it("returns 403 when userRole=potentialBeneficiary for a user with only establishment rights", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail("someone-else@mail.com")
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionById({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          queryParams: { userRole: "potentialBeneficiary" },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 403,
+          body: {
+            message: errors.discussion.accessForbidden({
+              discussionId: discussion.id,
+              userId: establishmentAdminConnectedUser.id,
+            }).message,
+            status: 403,
+          },
+        },
+      );
+    });
+
+    it("returns 400 when userRole is invalid", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      const response = await httpClient.getDiscussionById({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: establishmentAdminConnectedUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        queryParams: { userRole: "invalid-role" } as any,
+        urlParams: { discussionId: discussion.id },
+      });
+
+      expectToEqual(response.status, 400);
+    });
+
+    it("returns 400 when userRole is missing", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      const response = await httpClient.getDiscussionById({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: establishmentAdminConnectedUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        queryParams: {} as any,
+        urlParams: { discussionId: discussion.id },
+      });
+
+      expectToEqual(response.status, 400);
     });
   });
 
@@ -436,6 +578,55 @@ describe("discussion e2e", () => {
       );
 
       expectToEqual(inMemoryUow.discussionRepository.discussions, [discussion]);
+    });
+
+    it("200 - saves the exchange from a potential beneficiary connected user based on email", async () => {
+      const potentialBeneficiaryUser = new ConnectedUserBuilder()
+        .withId("beneficiary-user")
+        .withEmail("potential.beneficiary@mail.com")
+        .buildUser();
+      const discussion = new DiscussionBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryUser.email)
+        .build();
+
+      inMemoryUow.userRepository.users = [user, potentialBeneficiaryUser];
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      const expectedExchange: Exchange = {
+        subject:
+          "Réponse de My default business name à votre demande d'immersion",
+        message: "Message from potential beneficiary",
+        sentAt: gateways.timeGateway.now().toISOString(),
+        sender: "potentialBeneficiary",
+        attachments: [],
+      };
+
+      expectHttpResponseToEqual(
+        await httpClient.replyToDiscussion({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+          body: {
+            message: expectedExchange.message,
+          },
+        }),
+        {
+          status: 200,
+          body: expectedExchange,
+        },
+      );
+
+      expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
+        new DiscussionBuilder(discussion)
+          .withExchanges([...discussion.exchanges, expectedExchange])
+          .withUpdatedAt(gateways.timeGateway.now())
+          .build(),
+      ]);
     });
   });
 });

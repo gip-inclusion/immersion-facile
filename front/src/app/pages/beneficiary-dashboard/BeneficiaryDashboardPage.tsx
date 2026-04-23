@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { Loader, SectionHighlight } from "react-design-system";
 import { domElementIds } from "shared";
-import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
+import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
 
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -23,16 +23,16 @@ export const BeneficiaryDashboardPage = () => {
         </h2>
         <p className={fr.cx("fr-text--lg", "fr-mb-2w")}>
           Immersion Facilitée évolue pour simplifier vos démarches. Pour le
-          moment, vous pouvez consulter l'historique de vos candidatures.
-          D'autres services arriveront très prochainement pour vous accompagner
-          dans votre parcours.
+          moment, vous pouvez consulter l'historique de vos candidatures et y
+          répondre. D'autres services arriveront très prochainement pour vous
+          accompagner dans votre parcours.
         </p>
       </SectionHighlight>
       <Tabs
         tabs={[
           {
             label: "Mes candidatures",
-            content: <DiscussionList userRole="potentialBeneficiary" />,
+            content: <DiscussionTabContent viewer="potentialBeneficiary" />,
           },
         ]}
         id={domElementIds.beneficiaryDashboard.tabContainer}

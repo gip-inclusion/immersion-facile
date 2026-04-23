@@ -84,14 +84,19 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       ),
   );
 
-  establishmentSharedRouter.getDiscussionByIdForEstablishment(
+  establishmentSharedRouter.getDiscussionById(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getDiscussionByIdForEstablishment.execute(
-          req.params.discussionId,
-          getGenericAuthOrThrow(req.payloads?.connectedUser),
-        ),
+        req.query.userRole === "establishment"
+          ? deps.useCases.getDiscussionByIdForEstablishment.execute(
+              req.params.discussionId,
+              getGenericAuthOrThrow(req.payloads?.connectedUser),
+            )
+          : deps.useCases.getDiscussionByIdForPotentialBeneficiary.execute(
+              req.params.discussionId,
+              getGenericAuthOrThrow(req.payloads?.connectedUser),
+            ),
       ),
   );
 
