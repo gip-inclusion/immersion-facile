@@ -82,28 +82,31 @@ describe("Get Convention", () => {
     .withAgencyId(agency.id)
     .withEstablishmentRepresentative({
       email: "estab-rep@email.com",
-      firstName: "",
-      lastName: "",
-      phone: "",
+      firstName: "John",
+      lastName: "LeRepEtablissement",
+      phone: "+590590275843",
       role: "establishment-representative",
+      signedAt: new Date().toISOString(),
     })
     .withBeneficiaryRepresentative({
       email: "benef-rep@email.com",
-      firstName: "",
-      lastName: "",
-      phone: "",
+      firstName: "Joel",
+      lastName: "LeRepBeneficiaire",
+      phone: "+262269612345",
       role: "beneficiary-representative",
+      signedAt: new Date().toISOString(),
     })
     .withBeneficiaryCurrentEmployer({
-      email: "benef-rep@email.com",
-      firstName: "",
-      lastName: "",
-      phone: "",
+      email: "benef-employer@email.com",
+      firstName: "Julie",
+      lastName: "Lemployeur",
+      phone: "+33555689727",
       businessAddress: "",
-      businessName: "",
-      businessSiret: "",
+      businessName: "Current employer",
+      businessSiret: "12345678912345",
       job: "",
       role: "beneficiary-current-employer",
+      signedAt: new Date().toISOString(),
     })
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withEstablishmentRepresentativeEmail(establishmentRep.email)

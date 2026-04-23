@@ -13,6 +13,7 @@ import {
   getFormattedFirstnameAndLastname,
   makeUrlWithQueryParams,
   type Notification,
+  reasonableSchedule,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -142,6 +143,7 @@ describe("AssessmentReminder", () => {
   });
 
   describe("reminders are sent", () => {
+    let immersionDateEnd: Date;
     let now: Date;
     let agency: AgencyDto;
     let convention: ConventionDto;
@@ -149,10 +151,13 @@ describe("AssessmentReminder", () => {
 
     beforeEach(async () => {
       now = timeGateway.now();
+      immersionDateEnd = subMonths(now, 3);
       agency = new AgencyDtoBuilder().build();
       convention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
-        .withDateEnd(subMonths(now, 3).toISOString())
+        .withDateStart(subDays(immersionDateEnd, 2).toISOString())
+        .withDateEnd(immersionDateEnd.toISOString())
+        .withSchedule(reasonableSchedule)
         .withAgencyId(agency.id)
         .build();
 
@@ -431,11 +436,13 @@ describe("AssessmentReminder", () => {
 
     it("when internshipKind is mini-stage-cci, only send reminder to tutor and not agency", async () => {
       const miniStageConvention = new ConventionDtoBuilder()
-        .withId("77777777-6666-4777-7777-777777777777")
+        .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2")
         .withInternshipKind("mini-stage-cci")
         .withStatus("ACCEPTED_BY_VALIDATOR")
-        .withDateEnd(subMonths(now, 3).toISOString())
+        .withDateStart(subDays(immersionDateEnd, 2).toISOString())
+        .withDateEnd(immersionDateEnd.toISOString())
         .withAgencyId(agency.id)
+        .withSchedule(reasonableSchedule)
         .build();
       await uow.conventionRepository.save(miniStageConvention);
       const initialEstablishmentNotification: Notification =

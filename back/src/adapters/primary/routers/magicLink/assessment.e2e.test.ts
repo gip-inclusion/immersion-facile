@@ -189,7 +189,7 @@ describe("Assessment routes", () => {
 
     it("fails with 403 if convention id does not matches the one in token", async () => {
       const anotherConvention = new ConventionDtoBuilder()
-        .withId("another-convention-id")
+        .withId("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
         .withAgencyId(agency.id)
         .build();
 

@@ -608,8 +608,58 @@ describe("SendAssessmentNeededNotifications", () => {
   });
 
   describe("Error handling report", () => {
+    it("shows error in report about schema parsing error but does not fail the entire script", async () => {
+      const phoneNumber =
+        conventionEndedYesterday.signatories.beneficiary.phone;
+      const conventionWithSignatoriesWithSamePhoneNumber =
+        new ConventionDtoBuilder({ ...conventionEndedYesterday })
+          .withBeneficiaryPhone(phoneNumber)
+          .withEstablishmentRepresentativePhone(phoneNumber)
+          .withDateSubmission(
+            new Date("2026-01-01T00:00:00.000Z").toISOString(),
+          )
+          .build();
+      uow.conventionRepository.setConventions([
+        conventionWithSignatoriesWithSamePhoneNumber,
+        conventionEndingTomorrow,
+      ]);
+
+      expectToEqual(
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: yesterday,
+            to: inOneDay,
+          },
+        }),
+        {
+          conventionsQtyWithAlreadyExistingAssessment: 0,
+          conventionsQtyWithAssessmentSentSuccessfully: 1,
+          conventionsQtyWithImmersionEnding: 2,
+          conventionsAssessmentSentErrored: {
+            [conventionWithSignatoriesWithSamePhoneNumber.id]: new Error(
+              `Schema validation failed for schema conventionReadSchema for element with id ${conventionWithSignatoriesWithSamePhoneNumber.id}. See issues for details.`,
+            ),
+          },
+        },
+      );
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        { topic: "NotificationAdded" },
+        {
+          topic: "EmailWithLinkToCreateAssessmentSent",
+          payload: { id: conventionEndingTomorrow.id },
+        },
+        {
+          topic: "BeneficiaryAssessmentEmailSent",
+          payload: {
+            id: conventionEndingTomorrow.id,
+          },
+        },
+      ]);
+    });
+
     it("shows error in report about convention on missing user but does not fail the entire script", async () => {
-      // Arrange
       const conventionWithoutAgency = new ConventionDtoBuilder(
         conventionValidatedWithAgencyStartedTwoDaysAgo,
       )
@@ -623,7 +673,6 @@ describe("SendAssessmentNeededNotifications", () => {
       ]);
       uow.userRepository.users = [];
 
-      // Act
       expectToEqual(
         await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
@@ -645,15 +694,12 @@ describe("SendAssessmentNeededNotifications", () => {
     });
 
     it("shows error in report about convention on missing agency but does not fail the entire script", async () => {
-      // Arrange
-
       uow.conventionRepository.setConventions([
         conventionEndingTomorrow,
         conventionEndingInTwoDays,
       ]);
       uow.agencyRepository.agencies = [];
 
-      // Act
       expectToEqual(
         await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {

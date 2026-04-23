@@ -9,6 +9,7 @@ import {
   type ConventionScope,
   type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
+  conventionReadSchema,
   conventionSchema,
   type DataWithPagination,
   errors,
@@ -68,7 +69,15 @@ export class InMemoryConventionQueries implements ConventionQueries {
     );
     if (!convention) return;
 
-    return this.#addAgencyAndAssessmentDataToConvention(convention);
+    const conventionReadDto =
+      await this.#addAgencyAndAssessmentDataToConvention(convention);
+    return validateAndParseZodSchema({
+      schemaName: "conventionReadSchema",
+      inputSchema: conventionReadSchema,
+      schemaParsingInput: conventionReadDto,
+      id: convention.id,
+      logger,
+    });
   }
 
   public getConventionsByFiltersCalled = 0;
