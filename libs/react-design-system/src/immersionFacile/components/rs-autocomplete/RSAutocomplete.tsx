@@ -6,6 +6,7 @@ import Select, {
   type Props as SelectProps,
 } from "react-select";
 import { useStyles } from "tss-react/dsfr";
+import type { Capitalize } from "../../utils";
 import Styles from "./RSAutocomplete.styles";
 
 export type OptionType<T> = { value: T; label: string };
@@ -23,10 +24,6 @@ export type RSAutocompleteProps<T, L> = InputProps.Common &
     locator: L;
     multiple?: boolean;
   };
-
-type Capitalize<T extends string> = T extends `${infer First}${infer Rest}`
-  ? `${Uppercase<First>}${Rest}`
-  : T;
 
 export type RSAutocompleteComponentProps<
   K extends string,

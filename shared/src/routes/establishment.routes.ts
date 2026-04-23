@@ -7,6 +7,7 @@ import {
   paginatedDiscussionListSchema,
   withDiscussionStatusSchema,
   withExchangeMessageSchema,
+  withUserRoleSchema,
 } from "../discussion/discussion.schema";
 import {
   establishmentNameAndAdminsSchema,
@@ -101,10 +102,11 @@ export const establishmentRoutes = defineRoutes({
       401: httpErrorSchema,
     },
   }),
-  getDiscussionByIdForEstablishment: defineRoute({
+  getDiscussionById: defineRoute({
     method: "get",
-    url: "/discussion-for-establishment/:discussionId",
+    url: "/discussions/:discussionId",
     ...withAuthorizationHeaders,
+    queryParamsSchema: withUserRoleSchema,
     responses: {
       200: discussionReadSchema,
       400: httpErrorSchema,

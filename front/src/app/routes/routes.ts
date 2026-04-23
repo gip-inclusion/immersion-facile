@@ -234,7 +234,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     ({ agencyId }) => `/${agencyId}`,
   ),
   beneficiaryDashboard,
-  beneficiaryDashboardDiscussions: beneficiaryDashboard.extend("/discussions"),
+  beneficiaryDashboardDiscussions: beneficiaryDashboard.extend(
+    {
+      discussionId: param.path.optional.string,
+    },
+    ({ discussionId }) => `/discussions/${discussionId}`,
+  ),
   conventionConfirmation: defineRoute(
     {
       conventionId: param.path.string,

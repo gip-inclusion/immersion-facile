@@ -28,6 +28,7 @@ import {
   type DiscussionReadDto,
   domElementIds,
   type ExchangeFromDashboard,
+  type ExchangeRole,
   emailExchangeSplitters,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
@@ -58,6 +59,7 @@ import {
 } from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -65,15 +67,19 @@ import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
 
-type DiscussionManageContentProps = WithDiscussionId;
+type DiscussionManageContentProps = WithDiscussionId & {
+  viewer: ExchangeRole;
+};
 
 export const DiscussionManageContent = ({
   discussionId,
+  viewer,
 }: DiscussionManageContentProps): JSX.Element => {
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const { discussion, isLoading } = useDiscussion(
     discussionId,
+    viewer,
     connectedUserJwt,
   );
   const dispatch = useDispatch();
@@ -89,6 +95,7 @@ export const DiscussionManageContent = ({
             discussionId,
             feedbackTopic: "dashboard-discussion",
             jwt: connectedUserJwt,
+            viewer,
           }),
         );
       }
@@ -110,6 +117,7 @@ export const DiscussionManageContent = ({
           <DiscussionDetails
             discussion={discussion}
             connectedUser={currentUser}
+            viewer={viewer}
           />
         )}
       </WithFeedbackReplacer>
@@ -120,7 +128,12 @@ export const DiscussionManageContent = ({
 type DiscussionDetailsProps = {
   discussion: DiscussionReadDto;
   connectedUser: ConnectedUser;
+  viewer: ExchangeRole;
 };
+type ActivateConventionDraftButtonProps = Pick<
+  DiscussionDetailsProps,
+  "discussion" | "connectedUser"
+>;
 
 type ButtonPropsWithId = ButtonProps & { id: string };
 
@@ -128,7 +141,8 @@ const getActivateDraftConventionButtonProps = ({
   discussion,
   connectedUser,
   saveConventionDraftThenRedirectRequested,
-}: DiscussionDetailsProps & {
+  saveConventionDraftIsLoading,
+}: ActivateConventionDraftButtonProps & {
   saveConventionDraftThenRedirectRequested: ({
     conventionDraft,
     redirectUrl,
@@ -136,6 +150,7 @@ const getActivateDraftConventionButtonProps = ({
     conventionDraft: ConventionDraftDto;
     redirectUrl: AbsoluteUrl;
   }) => void;
+  saveConventionDraftIsLoading: boolean;
 }): ButtonProps => {
   const internshipKind =
     discussion.kind === "IF" ? "immersion" : "mini-stage-cci";
@@ -148,6 +163,7 @@ const getActivateDraftConventionButtonProps = ({
       connectedUser,
     }),
   });
+
   const redirectPath =
     internshipKind === "immersion"
       ? routes.conventionImmersion({
@@ -173,6 +189,7 @@ const getActivateDraftConventionButtonProps = ({
       });
     },
     children: "Pré-remplir la convention pour cette mise en relation",
+    disabled: saveConventionDraftIsLoading,
   } satisfies ButtonProps;
 };
 
@@ -184,7 +201,7 @@ const getDiscussionButtons = ({
   discussion: DiscussionReadDto;
   connectedUser: ConnectedUser;
   makeInitiateConventionDraftButtonProps: (
-    props: DiscussionDetailsProps,
+    props: ActivateConventionDraftButtonProps,
   ) => ButtonProps;
 }): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   return [
@@ -275,8 +292,10 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const { discussion } = props;
-
+  const { discussion, viewer } = props;
+  const saveConventionDraftIsLoading = useAppSelector(
+    conventionDraftSelectors.isLoading,
+  );
   const saveConventionDraftThenRedirectRequested = ({
     conventionDraft,
     redirectUrl,
@@ -312,7 +331,11 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <header>
         <Button
           type="button"
-          onClick={() => routes.establishmentDashboardDiscussions().push()}
+          onClick={() =>
+            viewer === "establishment"
+              ? routes.establishmentDashboardDiscussions().push()
+              : routes.beneficiaryDashboardDiscussions().push()
+          }
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
           iconPosition="left"
@@ -326,55 +349,61 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           <div className={fr.cx("fr-col-12", "fr-col-lg")}>
             <h1>
               Discussion avec{" "}
-              {getFormattedFirstnameAndLastname({
-                firstname: discussion.potentialBeneficiary.firstName,
-                lastname: discussion.potentialBeneficiary.lastName,
-              })}
+              {viewer === "establishment"
+                ? getFormattedFirstnameAndLastname({
+                    firstname: discussion.potentialBeneficiary.firstName,
+                    lastname: discussion.potentialBeneficiary.lastName,
+                  })
+                : discussion.businessName}
             </h1>
           </div>
-          {props.discussion.status === "ACCEPTED" &&
+          {(props.discussion.status === "ACCEPTED" &&
             props.discussion.candidateWarnedMethod !== null &&
-            props.discussion.conventionId === undefined && (
+            props.discussion.conventionId === undefined) ||
+            (viewer === "potentialBeneficiary" && (
               <Button
                 {...getActivateDraftConventionButtonProps({
                   ...props,
                   saveConventionDraftThenRedirectRequested,
+                  saveConventionDraftIsLoading,
                 })}
                 priority="primary"
               >
                 Pré-remplir la convention
               </Button>
+            ))}
+          {props.discussion.status === "PENDING" &&
+            viewer === "establishment" && (
+              <ButtonWithSubMenu
+                priority="primary"
+                id={
+                  domElementIds.establishmentDashboard.discussion
+                    .handleDiscussionButton
+                }
+                buttonLabel={"Gérer la candidature"}
+                buttonIconId="fr-icon-arrow-down-s-line"
+                iconPosition="right"
+                navItems={getDiscussionButtons({
+                  ...props,
+                  makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                    getActivateDraftConventionButtonProps({
+                      ...discussionProps,
+                      saveConventionDraftThenRedirectRequested,
+                      saveConventionDraftIsLoading,
+                    }),
+                })}
+                className={fr.cx("fr-ml-md-auto")}
+              />
             )}
-          {props.discussion.status === "PENDING" && (
-            <ButtonWithSubMenu
-              priority="primary"
-              id={
-                domElementIds.establishmentDashboard.discussion
-                  .handleDiscussionButton
-              }
-              buttonLabel={"Gérer la candidature"}
-              buttonIconId="fr-icon-arrow-down-s-line"
-              iconPosition="right"
-              navItems={getDiscussionButtons({
-                ...props,
-                makeInitiateConventionDraftButtonProps: (discussionProps) =>
-                  getActivateDraftConventionButtonProps({
-                    ...discussionProps,
-                    saveConventionDraftThenRedirectRequested,
-                  }),
-              })}
-              className={fr.cx("fr-ml-md-auto")}
-            />
-          )}
         </div>
         <DiscussionMeta>
-          <DiscussionStatusBadge discussion={discussion} />
+          <DiscussionStatusBadge discussion={discussion} viewer={viewer} />
           {discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}
           {discussion.kind === "IF" &&
-            discussion.potentialBeneficiary.resumeLink && (
+            discussion.potentialBeneficiary.resumeLink &&
+            viewer === "establishment" && (
               <a
-                key="resume"
                 href={discussion.potentialBeneficiary.resumeLink}
                 title={"CV du candidat"}
                 target="_blank"
@@ -386,9 +415,12 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </DiscussionMeta>
       </header>
 
-      <DiscussionExchangeMessageForm discussionId={discussion.id} />
+      <DiscussionExchangeMessageForm
+        discussionId={discussion.id}
+        viewer={viewer}
+      />
 
-      <DiscussionExchangesList discussion={discussion} />
+      <DiscussionExchangesList discussion={discussion} viewer={viewer} />
 
       {createPortal(
         <RejectDiscussionModal discussion={discussion} />,
@@ -405,8 +437,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
 
 const DiscussionExchangesList = ({
   discussion,
+  viewer,
 }: {
   discussion: DiscussionReadDto;
+  viewer: ExchangeRole;
 }): JSX.Element => {
   const sortedExchangesBySentAtDesc = [...discussion.exchanges].sort(
     (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
@@ -424,6 +458,7 @@ const DiscussionExchangesList = ({
         );
         return (
           <ExchangeMessage
+            viewer={viewer}
             sender={exchange.sender}
             key={`${exchange.sender}-${exchange.sentAt}`}
           >
@@ -532,18 +567,22 @@ const makeConventionFromDiscussion = ({
 
 const DiscussionExchangeMessageForm = ({
   discussionId,
+  viewer,
 }: {
   discussionId: DiscussionId;
+  viewer: ExchangeRole;
 }) => {
-  const { register, handleSubmit, formState } = useForm<ExchangeFromDashboard>({
-    resolver: zodResolver(exchangeMessageFromDashboardSchema),
-    defaultValues: {
-      message: "",
-    },
-  });
+  const { register, handleSubmit, formState, watch, setValue } =
+    useForm<ExchangeFromDashboard>({
+      resolver: zodResolver(exchangeMessageFromDashboardSchema),
+      defaultValues: {
+        message: "",
+      },
+    });
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const message = watch("message");
 
   const onSubmit = (data: ExchangeFromDashboard) => {
     if (connectedUserJwt) {
@@ -554,23 +593,38 @@ const DiscussionExchangeMessageForm = ({
             discussionId,
             message: data.message,
           },
-          feedbackTopic: "establishment-dashboard-discussion-send-message",
+          feedbackTopic: "beneficiary-dashboard-discussion-send-message",
         }),
       );
     }
   };
 
+  useFeedbackEventCallback(
+    "beneficiary-dashboard-discussion-send-message",
+    "create.success",
+    () => {
+      setValue("message", "", { shouldValidate: true });
+    },
+  );
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
       <Feedback
-        topics={["establishment-dashboard-discussion-send-message"]}
+        topics={[
+          "establishment-dashboard-discussion-send-message",
+          "beneficiary-dashboard-discussion-send-message",
+        ]}
         className={fr.cx("fr-mb-2w")}
         closable
       />
       <input type="hidden" {...register("discussionId")} value={discussionId} />
       <Input
         textArea
-        label="Répondre au candidat"
+        label={
+          viewer === "establishment"
+            ? "Répondre au candidat"
+            : "Répondre à l'entreprise"
+        }
         nativeTextAreaProps={{
           id: domElementIds.establishmentDashboard.discussion.sendMessageInput,
           rows: 5,
@@ -588,7 +642,7 @@ const DiscussionExchangeMessageForm = ({
               .sendMessageSubmitButton
           }
           type="submit"
-          disabled={formState.isSubmitting}
+          disabled={formState.isSubmitting || message.trim().length === 0}
           size="small"
         >
           Envoyer un message

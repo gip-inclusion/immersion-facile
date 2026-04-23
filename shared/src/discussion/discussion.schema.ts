@@ -66,6 +66,7 @@ import {
   type WithDiscussionStatusAccepted,
   type WithDiscussionStatusPending,
   type WithDiscussionStatusRejected,
+  type WithUserRole,
 } from "./discussion.dto";
 
 export const discussionIdSchema: ZodSchemaWithInputMatchingOutput<DiscussionId> =
@@ -431,3 +432,8 @@ export const isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistra
   ): params is DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl => {
     return params.reason === discussionUserMissingReason;
   };
+
+export const withUserRoleSchema: ZodSchemaWithInputMatchingOutput<WithUserRole> =
+  z.object({
+    userRole: exchangeRoleSchema,
+  });

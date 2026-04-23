@@ -18,6 +18,9 @@ describe("Discussions", () => {
     type TestCase = {
       message: string;
       discussion: DiscussionReadDto;
+      viewer: SpecificExchangeSender<
+        "establishment" | "potentialBeneficiary"
+      >["sender"];
       expectedDisplayStatus: DiscussionDisplayStatus;
     };
 
@@ -42,6 +45,7 @@ describe("Discussions", () => {
     const testCases: TestCase[] = [
       {
         message: "status is REJECTED",
+        viewer: "establishment",
         expectedDisplayStatus: "rejected",
         discussion: new DiscussionBuilder()
           .withStatus({
@@ -52,6 +56,7 @@ describe("Discussions", () => {
       },
       {
         message: "status is ACCEPTED",
+        viewer: "establishment",
         expectedDisplayStatus: "accepted",
         discussion: new DiscussionBuilder()
           .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
@@ -59,6 +64,7 @@ describe("Discussions", () => {
       },
       {
         message: "candidate has sent the first message without being answered",
+        viewer: "establishment",
         expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
           .withStatus({ status: "PENDING" })
@@ -75,6 +81,7 @@ describe("Discussions", () => {
       {
         message:
           "candidate has sent the last message without being answered (but it is not the first message)",
+        viewer: "establishment",
         expectedDisplayStatus: "needs-answer",
         discussion: new DiscussionBuilder()
           .withStatus({ status: "PENDING" })
@@ -105,6 +112,7 @@ describe("Discussions", () => {
       },
       {
         message: "last message is sent by establishment",
+        viewer: "establishment",
         expectedDisplayStatus: "answered",
         discussion: new DiscussionBuilder()
           .withStatus({ status: "PENDING" })
@@ -130,6 +138,7 @@ describe("Discussions", () => {
       {
         message:
           "last message is from beneficiary and has had no answer for more than 15 days",
+        viewer: "establishment",
         expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
           .withStatus({ status: "PENDING" })
@@ -145,6 +154,7 @@ describe("Discussions", () => {
       },
       {
         message: "discussion contact method is recent and not email",
+        viewer: "establishment",
         expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 14))
@@ -156,6 +166,7 @@ describe("Discussions", () => {
       {
         message:
           "discussion contact method is older than 15 days and not email",
+        viewer: "establishment",
         expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 15))
@@ -169,6 +180,7 @@ describe("Discussions", () => {
     it.each(testCases)("returns $expectedDisplayStatus when $message", ({
       discussion,
       expectedDisplayStatus,
+      viewer,
     }) => {
       expectToEqual(
         getDiscussionDisplayStatus({
@@ -182,9 +194,63 @@ describe("Discussions", () => {
             },
           },
           now,
+          viewer,
         }),
         expectedDisplayStatus,
       );
+    });
+
+    it("returns a different display status for potentialBeneficiary viewer than establishment on same discussion", () => {
+      const discussion = new DiscussionBuilder()
+        .withStatus({ status: "PENDING" })
+        .withExchanges([
+          createExchange({
+            sentAt: subDays(now, 3),
+            specificExchangeSender: {
+              sender: "potentialBeneficiary",
+            },
+          }),
+          createExchange({
+            sentAt: subDays(now, 1),
+            specificExchangeSender: {
+              sender: "establishment",
+              email: "establishment@mail.com",
+              firstname: "billy",
+              lastname: "idol",
+            },
+          }),
+        ])
+        .buildRead();
+
+      const establishmentStatus = getDiscussionDisplayStatus({
+        discussion: {
+          createdAt: discussion.createdAt,
+          status: discussion.status,
+          exchangesData: {
+            count: discussion.exchanges.length,
+            lastExchange: discussion.exchanges[discussion.exchanges.length - 1],
+          },
+        },
+        now,
+        viewer: "establishment",
+      });
+
+      const potentialBeneficiaryStatus = getDiscussionDisplayStatus({
+        discussion: {
+          createdAt: discussion.createdAt,
+          status: discussion.status,
+          exchangesData: {
+            count: discussion.exchanges.length,
+            lastExchange: discussion.exchanges[discussion.exchanges.length - 1],
+          },
+        },
+        now,
+        viewer: "potentialBeneficiary",
+      });
+
+      expectToEqual(establishmentStatus, "answered");
+      expectToEqual(potentialBeneficiaryStatus, "needs-answer");
+      expectToEqual(establishmentStatus === potentialBeneficiaryStatus, false);
     });
   });
 

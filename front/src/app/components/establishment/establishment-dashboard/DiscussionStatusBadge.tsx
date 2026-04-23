@@ -5,21 +5,24 @@ import {
   type DiscussionReadDto,
   discussionToExchangesData,
   domElementIds,
+  type ExchangeRole,
   getDiscussionDisplayStatus,
   isDiscussionInList,
 } from "shared";
 
 export const DiscussionStatusBadge = ({
   discussion,
+  viewer,
   id = domElementIds.establishmentDashboard.discussion.statusBadge,
   small = false,
 }: {
   discussion: DiscussionReadDto | DiscussionInList;
+  viewer: ExchangeRole;
   id?: string;
   small?: BadgeProps["small"];
 }) => {
   const statusBadge =
-    statusBadgeData[
+    statusBadgeData[viewer][
       getDiscussionDisplayStatus({
         discussion: {
           createdAt: discussion.createdAt,
@@ -29,6 +32,7 @@ export const DiscussionStatusBadge = ({
             : discussionToExchangesData(discussion),
         },
         now: new Date(),
+        viewer,
       })
     ];
   return (
@@ -39,34 +43,65 @@ export const DiscussionStatusBadge = ({
 };
 
 const statusBadgeData: Record<
-  DiscussionDisplayStatus,
-  {
-    severity: BadgeProps["severity"];
-    label: string;
-  }
+  ExchangeRole,
+  Record<
+    DiscussionDisplayStatus,
+    {
+      severity: BadgeProps["severity"];
+      label: string;
+    }
+  >
 > = {
-  new: {
-    severity: "info",
-    label: "En cours - Nouveau",
+  establishment: {
+    new: {
+      severity: "info",
+      label: "En cours - Nouveau",
+    },
+    "needs-answer": {
+      severity: "warning",
+      label: "En cours - À répondre",
+    },
+    "needs-urgent-answer": {
+      severity: "error",
+      label: "En cours - Urgent",
+    },
+    answered: {
+      severity: "new",
+      label: "En cours - Répondu",
+    },
+    accepted: {
+      severity: "success",
+      label: "Acceptée",
+    },
+    rejected: {
+      severity: undefined,
+      label: "Refusée",
+    },
   },
-  "needs-answer": {
-    severity: "warning",
-    label: "En cours - À répondre",
-  },
-  "needs-urgent-answer": {
-    severity: "error",
-    label: "En cours - Urgent",
-  },
-  answered: {
-    severity: "new",
-    label: "En cours - Répondu",
-  },
-  accepted: {
-    severity: "success",
-    label: "Acceptée",
-  },
-  rejected: {
-    severity: undefined,
-    label: "Refusée",
+  potentialBeneficiary: {
+    new: {
+      severity: "info",
+      label: "Envoyée",
+    },
+    "needs-answer": {
+      severity: "warning",
+      label: "En cours - À répondre",
+    },
+    "needs-urgent-answer": {
+      severity: "error",
+      label: "En cours - Urgent",
+    },
+    answered: {
+      severity: "new",
+      label: "En cours - Répondu",
+    },
+    accepted: {
+      severity: "success",
+      label: "Acceptée",
+    },
+    rejected: {
+      severity: undefined,
+      label: "Refusée",
+    },
   },
 };

@@ -37,7 +37,7 @@ import {
 } from "src/core-logic/domain/discussion/discussion.slice";
 import { match, P } from "ts-pattern";
 
-export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
+export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
   const dispatch = useDispatch();
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
@@ -109,13 +109,13 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
           jwt: connectedUserJwt,
           filters: {
             ...initialDiscussionsWithPagination.filters,
-            userRole,
+            userRole: viewer,
           },
           feedbackTopic: "establishment-dashboard-discussion-list",
         }),
       );
     }
-  }, [connectedUserJwt, dispatch, userRole]);
+  }, [connectedUserJwt, dispatch, viewer]);
   if (!connectedUserJwt) {
     return;
   }
@@ -126,7 +126,7 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
       titleAs="h2"
       className={fr.cx("fr-mt-0")}
       titleAction={
-        userRole === "establishment" &&
+        viewer === "establishment" &&
         currentUser?.dashboards.establishments.discussions ? (
           <MetabaseFullScreenButton
             url={currentUser.dashboards.establishments.discussions}
@@ -138,17 +138,17 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
       <WithFeedbackReplacer topic="establishment-dashboard-discussion-list">
         {match({
           discussions,
-          userRole,
+          viewer,
         })
 
-          .with({ discussions: P.nullish, userRole: "establishment" }, () => (
+          .with({ discussions: P.nullish, viewer: "establishment" }, () => (
             <p>
               Nous n'avons pas trouvé de candidatures où vous êtes référencé en
               tant que contact d'entreprise.
             </p>
           ))
           .with(
-            { discussions: P.nullish, userRole: "potentialBeneficiary" },
+            { discussions: P.nullish, viewer: "potentialBeneficiary" },
             () => (
               <p>
                 Nous n'avons pas trouvé de candidatures envoyées avec votre
@@ -157,7 +157,7 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
             ),
           )
           .with(
-            { discussions: P.not(P.nullish), userRole: "establishment" },
+            { discussions: P.not(P.nullish), viewer: "establishment" },
             () => (
               <EstablishmentDiscussionTable
                 discussions={discussions}
@@ -172,7 +172,7 @@ export const DiscussionList = ({ userRole }: { userRole: ExchangeRole }) => {
             ),
           )
           .with(
-            { discussions: P.not(P.nullish), userRole: "potentialBeneficiary" },
+            { discussions: P.not(P.nullish), viewer: "potentialBeneficiary" },
             () => (
               <BeneficiaryDiscussionTable
                 discussions={discussions}
@@ -280,6 +280,7 @@ const EstablishmentDiscussionTable = ({
         <DiscussionStatusBadge
           key={discussion.id}
           discussion={discussion}
+          viewer={"establishment"}
           small
         />,
         <Button
@@ -412,7 +413,7 @@ const BeneficiaryDiscussionTable = ({
   );
   const getTableHeaders = () => {
     if (hasDiscussions) {
-      return ["Métier", "Nom d'entreprise", "Date"];
+      return ["Métier", "Nom d'entreprise", "Date", "Statut", "Actions"];
     }
     if (!filtersAreEmpty) {
       return [
@@ -437,6 +438,25 @@ const BeneficiaryDiscussionTable = ({
           date: new Date(discussion.createdAt),
           withHours: false,
         }),
+        <DiscussionStatusBadge
+          key={discussion.id}
+          discussion={discussion}
+          viewer={"potentialBeneficiary"}
+          small
+        />,
+        <Button
+          key={discussion.id}
+          id={`${domElementIds.beneficiaryDashboard.manageDiscussions.goToDiscussionButton}--${discussion.id}`}
+          size="small"
+          priority="secondary"
+          linkProps={{
+            ...routes.beneficiaryDashboardDiscussions({
+              discussionId: discussion.id,
+            }).link,
+          }}
+        >
+          Voir la candidature
+        </Button>,
       ])}
       pagination={{
         count: pagination.totalPages,

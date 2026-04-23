@@ -1177,6 +1177,9 @@ export const domElementIds = {
       contactSupport:
         "im-login-form__contact-support-link--beneficiary-dashboard",
     },
+    manageDiscussions: {
+      goToDiscussionButton: "im-beneficiary-dashboard__go-to-discussion-button",
+    },
   },
   beneficiaryDashboardDiscussions: {
     login: {

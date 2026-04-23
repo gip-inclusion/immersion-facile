@@ -5,6 +5,7 @@ import type { DateString } from "../utils/date";
 import type {
   DiscussionDisplayStatus,
   DiscussionInList,
+  ExchangeRole,
 } from "./discussion.dto";
 
 const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
@@ -13,9 +14,11 @@ const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
 export const getDiscussionDisplayStatus = ({
   discussion,
   now,
+  viewer,
 }: {
   discussion: Pick<DiscussionInList, "status" | "exchangesData" | "createdAt">;
   now: Date;
+  viewer: ExchangeRole;
 }): DiscussionDisplayStatus => {
   return match(discussion.status)
     .with("REJECTED", (): DiscussionDisplayStatus => "rejected")
@@ -28,7 +31,7 @@ export const getDiscussionDisplayStatus = ({
           ? "needs-urgent-answer"
           : "new";
 
-      if (lastExchange.sender === "establishment") return "answered";
+      if (lastExchange.sender === viewer) return "answered";
 
       if (isNowUrgent({ now, from: lastExchange.sentAt }))
         return "needs-urgent-answer";

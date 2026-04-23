@@ -104,6 +104,7 @@ const defaultSubject = "Sans objet";
 
 type MessageInputFromDashboardWithUserId = MessageInputFromDashboard & {
   userId: UserId;
+  userEmail: Email;
 };
 
 type Deps = {
@@ -125,14 +126,19 @@ export const makeAddExchangeToDiscussion = useCaseBuilder(
   .withCurrentUser<ConnectedUser | undefined>()
   .withDeps<Deps>()
   .build(async ({ inputParams, uow, currentUser, deps }) => {
+    const messageInputsWithIdentity =
+      inputParams.source === "inbound-parsing"
+        ? inputParams.messageInputs
+        : inputParams.messageInputs.map((messageInput) =>
+            makeDashboardMessageWithUserId(messageInput, currentUser),
+          );
+
     return Promise.all(
-      inputParams.messageInputs.map((messageInput) =>
+      messageInputsWithIdentity.map((messageInput) =>
         processSendMessage({
           uow,
           source: inputParams.source,
-          messageInput: isMessageInputFromEmail(messageInput)
-            ? messageInput
-            : makeDashboardMessageWithUserId(messageInput, currentUser),
+          messageInput,
           deps,
         }),
       ),
@@ -277,7 +283,7 @@ const isUserPotentialBeneficiaryOnDiscussion = ({
   if (isMessageInputFromEmail(messageInput)) {
     return messageInput.senderEmail === discussion.potentialBeneficiary.email;
   }
-  return false;
+  return messageInput.userEmail === discussion.potentialBeneficiary.email;
 };
 
 const addExchangeAndSendEvent = async ({
@@ -405,5 +411,9 @@ const makeDashboardMessageWithUserId = (
   connectedUser?: ConnectedUser,
 ): MessageInputFromDashboardWithUserId => {
   if (!connectedUser) throw errors.user.unauthorized();
-  return { ...messageInput, userId: connectedUser.id };
+  return {
+    ...messageInput,
+    userId: connectedUser.id,
+    userEmail: connectedUser.email,
+  };
 };

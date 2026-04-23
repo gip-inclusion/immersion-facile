@@ -14,8 +14,7 @@ import {
   onlyAdminUserRightsWithStatusAccepted,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
-import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
-import { DiscussionManageContent } from "src/app/components/establishment/establishment-dashboard/DiscussionManageContent";
+import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
@@ -167,7 +166,7 @@ const makeEstablishmentDashboardTabs = (
           {
             label: "Candidatures",
             tabId: "discussions",
-            content: <DiscussionTabContent route={route} />,
+            content: <DiscussionTabContent viewer="establishment" />,
           },
         ]
       : []),
@@ -308,15 +307,3 @@ const OnboardingTabContent = () => (
     </div>
   </section>
 );
-
-const DiscussionTabContent = ({
-  route,
-}: {
-  route: FrontEstablishmentDashboardRoute;
-}) =>
-  route.name === "establishmentDashboardDiscussions" &&
-  route.params.discussionId ? (
-    <DiscussionManageContent discussionId={route.params.discussionId} />
-  ) : (
-    <DiscussionList userRole="establishment" />
-  );
