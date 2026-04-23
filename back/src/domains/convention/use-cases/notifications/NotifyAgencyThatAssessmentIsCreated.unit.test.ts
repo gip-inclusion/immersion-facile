@@ -38,7 +38,7 @@ const validator = new ConnectedUserBuilder()
 const convention = new ConventionDtoBuilder()
   .withAgencyId(agency.id)
   .withDateStart(new Date("2025-01-01").toISOString())
-  .withDateEnd(new Date("2025-01-15").toISOString())
+  .withDateEnd(new Date("2025-01-03").toISOString())
   .withSchedule(reasonableSchedule)
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
@@ -155,7 +155,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             immersionAppellationLabel:
               convention.immersionAppellation.appellationLabel,
             assessment: signedAssessment,
-            numberOfHoursMade: "45h",
+            numberOfHoursMade: "17h",
             manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               { conventionId: convention.id },
@@ -183,7 +183,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             immersionAppellationLabel:
               convention.immersionAppellation.appellationLabel,
             assessment: signedAssessment,
-            numberOfHoursMade: "45h",
+            numberOfHoursMade: "17h",
             manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
               `/${frontRoutes.manageConventionUserConnected}`,
               { conventionId: convention.id },
@@ -332,7 +332,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               immersionAppellationLabel:
                 convention.immersionAppellation.appellationLabel,
               assessment: signedAssessment,
-              numberOfHoursMade: "45h",
+              numberOfHoursMade: "17h",
               manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
                 `/${frontRoutes.manageConventionUserConnected}`,
                 { conventionId: convention.id },

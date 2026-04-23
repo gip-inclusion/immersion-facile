@@ -19,6 +19,7 @@ import {
   type Signatories,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
+import { match } from "ts-pattern";
 import { toAgencyWithRights } from "../../../utils/agency";
 import type { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -34,7 +35,7 @@ import { makeSignConvention, type SignConvention } from "./SignConvention";
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
   email: "bob@email.com",
-  phone: "0665565432",
+  phone: "+33665565432",
   firstName: "Bob",
   lastName: "L'éponge",
 };
@@ -42,7 +43,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
 const establishmentRepresentative: EstablishmentRepresentative = {
   role: "establishment-representative",
   email: "patron@email.com",
-  phone: "0665565432",
+  phone: "+33665565432",
   firstName: "Pa",
   lastName: "Tron",
 };
@@ -189,7 +190,13 @@ describe("Sign convention", () => {
           ),
           errors.convention.badStatusTransition({
             currentStatus: initialStatus,
-            targetStatus: "PARTIALLY_SIGNED",
+            targetStatus: [
+              "ACCEPTED_BY_VALIDATOR",
+              "ACCEPTED_BY_COUNSELLOR",
+              "IN_REVIEW",
+            ].includes(initialStatus)
+              ? "IN_REVIEW"
+              : "PARTIALLY_SIGNED",
           }),
         );
       });
@@ -439,20 +446,55 @@ describe("Sign convention", () => {
   });
 
   const conventionId: ConventionId = "abd5c20e-6dd2-45af-affe-927358005251";
-  const prepareAgencyAndConventionWithStatus = (status: ConventionStatus) => {
+  const prepareAgencyAndConventionWithStatus = (
+    initialStatus: ConventionStatus,
+  ) => {
     const agency = new AgencyDtoBuilder().build();
 
-    return {
-      agency,
-      convention: new ConventionDtoBuilder()
-        .withId(conventionId)
-        .withAgencyId(agency.id)
-        .withStatus(status)
-        .withBeneficiaryRepresentative(beneficiaryRepresentative)
-        .withEstablishmentRepresentative(establishmentRepresentative)
-        .notSigned()
-        .build(),
-    };
+    const conventionBuilder = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withAgencyId(agency.id)
+      .withStatus(initialStatus)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
+      .withEstablishmentRepresentative(establishmentRepresentative);
+
+    return match(initialStatus)
+      .with(
+        "ACCEPTED_BY_VALIDATOR",
+        "ACCEPTED_BY_COUNSELLOR",
+        "IN_REVIEW",
+        () => {
+          return {
+            agency,
+            convention: conventionBuilder
+              .withBeneficiarySignedAt(new Date())
+              .withEstablishmentRepresentative({
+                ...establishmentRepresentative,
+                signedAt: new Date().toISOString(),
+              })
+              .withBeneficiaryRepresentative({
+                ...beneficiaryRepresentative,
+                signedAt: new Date().toISOString(),
+              })
+              .build(),
+          };
+        },
+      )
+      .with("PARTIALLY_SIGNED", () => {
+        return {
+          agency,
+          convention: conventionBuilder
+            .withBeneficiarySignedAt(new Date())
+            .build(),
+        };
+      })
+      .with("READY_TO_SIGN", "REJECTED", "CANCELLED", "DEPRECATED", () => {
+        return {
+          agency,
+          convention: conventionBuilder.notSigned().build(),
+        };
+      })
+      .exhaustive();
   };
 
   const expectAllowedInitialStatus = (status: ConventionStatus) =>

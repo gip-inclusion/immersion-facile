@@ -1,5 +1,5 @@
 import subDays from "date-fns/subDays";
-import { partition, uniqBy } from "ramda";
+import { partition, uniq } from "ramda";
 import {
   type AbsoluteUrl,
   type AgencyWithUsersRights,
@@ -80,15 +80,17 @@ export const makeSendAssessmentNeededNotifications = useCaseBuilder(
       conventionsQtyWithImmersionEnding,
       conventionsQtyWithAlreadyExistingAssessment,
       conventionsThatDontHaveAssessment,
-    } = await getConventionsToSendEmailTo(deps, inputParams);
+    } = await getConventionIdsToSendEmailTo(deps, inputParams);
 
     const results = await executeInSequence(
       conventionsThatDontHaveAssessment,
-      (convention) =>
+      (conventionId) =>
         deps.uowPerformer
           // each transaction could fail here without impacting others
-          .perform((uow) => sendAssessmentNotifications(uow, deps, convention))
-          .catch((error) => ({ id: convention.id, error: castError(error) })),
+          .perform((uow) =>
+            sendAssessmentNotifications(uow, deps, conventionId),
+          )
+          .catch((error) => ({ id: conventionId, error: castError(error) })),
     );
 
     const [conventionIdsWithError, conventionIdsWithoutError] = partition(
@@ -114,58 +116,51 @@ export const makeSendAssessmentNeededNotifications = useCaseBuilder(
     };
   });
 
-const getConventionsToSendEmailTo = async (
+const getConventionIdsToSendEmailTo = async (
   deps: Deps,
   params: SendAssessmentParams,
 ): Promise<{
   conventionsQtyWithImmersionEnding: number;
-  conventionsThatDontHaveAssessment: ConventionDto[];
+  conventionsThatDontHaveAssessment: ConventionId[];
   conventionsQtyWithAlreadyExistingAssessment: number;
 }> => {
   const conventionsEndingInRange =
-    await deps.outOfTransaction.conventionQueries.getConventions({
+    await deps.outOfTransaction.conventionQueries.getConventionIdsByFilters({
       filters: {
-        endDate: params.conventionEndDate,
+        withEndDate: params.conventionEndDate,
         withStatuses: validatedConventionStatuses,
       },
-      sortBy: "dateStart",
     });
 
   const conventionsUpdatedInRangeAndEndingUpToRange =
-    await deps.outOfTransaction.conventionQueries.getConventions({
+    await deps.outOfTransaction.conventionQueries.getConventionIdsByFilters({
       filters: {
-        endDate: {
+        withEndDate: {
           to: params.conventionEndDate.to,
         },
-        updateDate: {
+        withUpdateDate: {
           from: subDays(params.conventionEndDate.from, 2),
           to: params.conventionEndDate.to,
         },
         withStatuses: validatedConventionStatuses,
       },
-      sortBy: "dateStart",
     });
 
-  const conventionsThatRequireAnAssessment = uniqBy(
-    (c) => c.id,
-    [
-      ...conventionsEndingInRange,
-      ...conventionsUpdatedInRangeAndEndingUpToRange,
-    ],
-  );
+  const conventionsThatRequireAnAssessment = uniq([
+    ...conventionsEndingInRange,
+    ...conventionsUpdatedInRangeAndEndingUpToRange,
+  ]);
 
   const conventionIdsWithAlreadyExistingAssessment =
     await deps.outOfTransaction.assessmentRepository
-      .getByConventionIds(
-        conventionsThatRequireAnAssessment.map(({ id }) => id),
-      )
+      .getByConventionIds(conventionsThatRequireAnAssessment)
       .then((assessments) =>
         assessments.map(({ conventionId }) => conventionId),
       );
 
   const conventionsThatDontHaveAssessment =
     conventionsThatRequireAnAssessment.filter(
-      ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
+      (id) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
     );
 
   return {
@@ -180,14 +175,18 @@ const getConventionsToSendEmailTo = async (
 const sendAssessmentNotifications = async (
   uow: UnitOfWork,
   deps: Deps,
-  convention: ConventionDto,
+  conventionId: ConventionId,
 ): Promise<{ id: ConventionId }> => {
+  const convention =
+    await uow.conventionQueries.getConventionById(conventionId);
+  if (!convention) throw errors.convention.notFound({ conventionId });
+
   const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
 
   const alreadySentNotifications =
     await uow.notificationRepository.getEmailsByFilters({
-      conventionId: convention.id,
+      conventionId,
     });
 
   const isBeneficiaryNotificationNotSent =

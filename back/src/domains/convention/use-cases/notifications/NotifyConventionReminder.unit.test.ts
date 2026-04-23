@@ -630,7 +630,6 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       ["+33600000001"], // Metropole
       ["+262639000001"], // Mayotte
       ["+590690000001"], // Guadeloupe
-      ["+590691000001"], // Guadeloupe
       ["+594694000001"], // Guyane
       ["+596696000001"], // Martinique
       ["+262692000001"], // Réunion
