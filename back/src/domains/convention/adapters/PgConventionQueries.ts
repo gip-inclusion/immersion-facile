@@ -69,6 +69,8 @@ export class PgConventionQueries implements ConventionQueries {
       withAppelationCodes,
       withBeneficiary,
       withDateStart,
+      withEndDate,
+      withUpdateDate,
       withEstablishmentRepresentative,
       withEstablishmentTutor,
       withSirets,
@@ -81,6 +83,7 @@ export class PgConventionQueries implements ConventionQueries {
         .selectFrom("conventions")
         .select("conventions.id")
         .orderBy("conventions.date_start", "desc"),
+      addDateFilters({ withDateStart, withEndDate, withUpdateDate }),
       (qb) =>
         withAppelationCodes
           ? qb.where(
@@ -93,15 +96,6 @@ export class PgConventionQueries implements ConventionQueries {
         withSirets ? qb.where("conventions.siret", "in", withSirets) : qb,
       (qb) =>
         withStatuses ? qb.where("conventions.status", "in", withStatuses) : qb,
-      (qb) =>
-        withDateStart?.to
-          ? qb.where("conventions.date_start", "<=", withDateStart.to)
-          : qb,
-      (qb) =>
-        withDateStart?.from
-          ? qb.where("conventions.date_start", ">=", withDateStart.from)
-          : qb,
-      (qb) => (limit ? qb.limit(limit) : qb),
       (qb) =>
         withEstablishmentRepresentative?.email
           ? qb
@@ -156,6 +150,8 @@ export class PgConventionQueries implements ConventionQueries {
                   : qb,
             )
           : qb,
+      (qb) => qb.orderBy("conventions.date_start", "desc"),
+      (qb) => (limit ? qb.limit(limit) : qb),
     ).execute();
 
     return pgResults.map(({ id }) => id);
@@ -813,17 +809,61 @@ const addFiltersToBuilder =
         withSirets && withSirets.length > 0
           ? b.where("conventions.siret", "=", sql<SiretDto>`ANY(${withSirets})`)
           : b,
+      addDateFilters({
+        withEndDate: endDate,
+        withUpdateDate: updateDate,
+      }),
+    );
+
+type DateFilterableBuilder<TBuilder> = {
+  where: (...args: unknown[]) => TBuilder;
+};
+
+const addDateFilters =
+  <TBuilder extends DateFilterableBuilder<TBuilder>>({
+    withDateStart,
+    withEndDate,
+    withUpdateDate,
+  }: {
+    withDateStart?: {
+      from?: Date | string;
+      to?: Date | string;
+    };
+    withEndDate?: {
+      from?: Date | string;
+      to?: Date | string;
+    };
+    withUpdateDate?: {
+      from?: Date | string;
+      to?: Date | string;
+    };
+  }) =>
+  (builder: TBuilder): TBuilder =>
+    pipeWithValue(
+      builder,
       (b) =>
-        endDate?.from ? b.where("conventions.date_end", ">=", endDate.from) : b,
-      (b) =>
-        endDate?.to ? b.where("conventions.date_end", "<=", endDate.to) : b,
-      (b) =>
-        updateDate?.from
-          ? b.where("conventions.updated_at", ">=", updateDate.from)
+        withDateStart?.to
+          ? b.where("conventions.date_start", "<=", withDateStart.to)
           : b,
       (b) =>
-        updateDate?.to
-          ? b.where("conventions.updated_at", "<=", updateDate.to)
+        withDateStart?.from
+          ? b.where("conventions.date_start", ">=", withDateStart.from)
+          : b,
+      (b) =>
+        withEndDate?.from
+          ? b.where("conventions.date_end", ">=", withEndDate.from)
+          : b,
+      (b) =>
+        withEndDate?.to
+          ? b.where("conventions.date_end", "<=", withEndDate.to)
+          : b,
+      (b) =>
+        withUpdateDate?.from
+          ? b.where("conventions.updated_at", ">=", withUpdateDate.from)
+          : b,
+      (b) =>
+        withUpdateDate?.to
+          ? b.where("conventions.updated_at", "<=", withUpdateDate.to)
           : b,
     );
 
