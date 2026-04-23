@@ -7,6 +7,8 @@ import {
 
 describe("phonesShema", () => {
   it.each<string>([
+    "+33600000000", //FR default number
+    "+33600000001", //FR default number
     "+33100000000", //FR
     "+33555689727", //FR
     "+262269612345", //YT
