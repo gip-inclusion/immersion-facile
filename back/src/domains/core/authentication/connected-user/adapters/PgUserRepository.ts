@@ -4,7 +4,6 @@ import {
   errors,
   type GetUsersFilters,
   isTruthy,
-  pipeWithValue,
   type SiretDto,
   type User,
   type UserId,
@@ -192,14 +191,10 @@ export class PgUserRepository implements UserRepository {
 
   public async getUserIdsLoggedInLongAgo({
     since,
-    excludeWarnedSince,
-    onlyWarnedBetween,
   }: {
     since: Date;
-    excludeWarnedSince?: Date;
-    onlyWarnedBetween?: { from: Date; to: Date };
-  }): Promise<string[]> {
-    const query = this.transaction
+  }): Promise<UserId[]> {
+    const rows = await this.transaction
       .selectFrom("users")
       .select("users.id")
       .where(({ eb, or }) =>
@@ -207,61 +202,8 @@ export class PgUserRepository implements UserRepository {
           eb("users.last_login_at", "<", since),
           eb("users.last_login_at", "is", null),
         ]),
-      );
-
-    const rows = await pipeWithValue(
-      query,
-      (b) =>
-        excludeWarnedSince
-          ? b.where(({ eb, not, exists }) =>
-              not(
-                exists(
-                  eb
-                    .selectFrom("notifications_email")
-                    .select("notifications_email.id")
-                    .where(
-                      "notifications_email.email_kind",
-                      "=",
-                      "ACCOUNT_DELETION_WARNING",
-                    )
-                    .whereRef("notifications_email.user_id", "=", "users.id")
-                    .where(
-                      "notifications_email.created_at",
-                      ">=",
-                      excludeWarnedSince,
-                    ),
-                ),
-              ),
-            )
-          : b,
-      (b) =>
-        onlyWarnedBetween
-          ? b.where(({ eb, exists }) =>
-              exists(
-                eb
-                  .selectFrom("notifications_email")
-                  .select("notifications_email.id")
-                  .where(
-                    "notifications_email.email_kind",
-                    "=",
-                    "ACCOUNT_DELETION_WARNING",
-                  )
-                  .whereRef("notifications_email.user_id", "=", "users.id")
-                  .where(
-                    "notifications_email.created_at",
-                    ">=",
-                    onlyWarnedBetween.from,
-                  )
-                  .where(
-                    "notifications_email.created_at",
-                    "<=",
-                    onlyWarnedBetween.to,
-                  ),
-              ),
-            )
-          : b,
-      (b) => b.execute(),
-    );
+      )
+      .execute();
 
     return rows.map((r) => r.id);
   }

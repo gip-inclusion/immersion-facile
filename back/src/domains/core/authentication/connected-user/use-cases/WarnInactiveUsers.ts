@@ -37,11 +37,21 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
     const deletionDate = addDays(now, deletionWarningDelayInDays);
     const warningCutoff = subDays(now, deletionWarningDedupInDays);
 
-    const userIdsWithNoRecentConnections =
+    const loggedInLongAgoUserIds =
       await uow.userRepository.getUserIdsLoggedInLongAgo({
         since: twoYearsAgo,
+      });
+
+    const alreadyWarnedUserIds =
+      await uow.notificationRepository.filterUserDeletionWarningNotifications({
+        userIds: loggedInLongAgoUserIds,
         excludeWarnedSince: warningCutoff,
       });
+
+    const alreadyWarned = new Set(alreadyWarnedUserIds);
+    const userIdsWithNoRecentConnections = loggedInLongAgoUserIds.filter(
+      (id) => !alreadyWarned.has(id),
+    );
 
     const candidateUsers = await uow.userRepository.getByIds(
       userIdsWithNoRecentConnections,

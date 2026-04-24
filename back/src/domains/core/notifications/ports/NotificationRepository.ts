@@ -1,5 +1,6 @@
 import type {
   ConventionId,
+  DateRange,
   Email,
   EmailNotification,
   EmailType,
@@ -10,6 +11,7 @@ import type {
   PhoneNumber,
   SmsNotification,
   TemplatedSms,
+  UserId,
 } from "shared";
 
 export type EmailNotificationFilters = {
@@ -60,4 +62,10 @@ export interface NotificationRepository {
   getLastSmsNotificationByFilter: (
     filters: SmsNotificationFilters,
   ) => Promise<SmsNotification | undefined>;
+  filterUserDeletionWarningNotifications(
+    params: { userIds: UserId[] } & (
+      | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
+      | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
+    ),
+  ): Promise<UserId[]>;
 }

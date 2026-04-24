@@ -3,6 +3,7 @@ import {
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  type UserId,
   type UserWithAdminRights,
 } from "shared";
 import type { InMemoryUnitOfWork } from "../../../unit-of-work/adapters/createInMemoryUow";
@@ -18,6 +19,34 @@ export const makeUser = (
     .buildUser(),
   lastLoginAt: overrides.lastLoginAt,
 });
+
+export const saveDeletionWarningNotification = ({
+  uow,
+  userId,
+  createdAt,
+  notificationId,
+}: {
+  uow: InMemoryUnitOfWork;
+  userId: UserId;
+  createdAt: Date;
+  notificationId?: string;
+}) => {
+  uow.notificationRepository.notifications.push({
+    id: notificationId ?? `notif-${userId}-${createdAt.toISOString()}`,
+    kind: "email",
+    createdAt: createdAt.toISOString(),
+    followedIds: { userId },
+    templatedContent: {
+      kind: "ACCOUNT_DELETION_WARNING",
+      recipients: ["some@test.fr"],
+      params: {
+        fullName: "Jean Dupont",
+        deletionDate: "22 janvier 2026",
+        loginUrl: "https://immersion-facile.test/profile",
+      },
+    },
+  });
+};
 
 export const setUsersWithRecentConventions = ({
   now,

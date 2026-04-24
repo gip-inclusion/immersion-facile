@@ -10,6 +10,7 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeUser,
+  saveDeletionWarningNotification,
   setUsersWithRecentConventions,
   setUsersWithRecentEstablishmentExchanges,
   setUserWithOldConventionAndDiscussion,
@@ -75,6 +76,11 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
       lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
     });
     uow.userRepository.users = [inactiveUser];
+    saveDeletionWarningNotification({
+      uow,
+      userId: inactiveUser.id,
+      createdAt: subDays(now, 8),
+    });
 
     const result = await triggerEventsToDeleteInactiveUsers.execute();
 
@@ -101,6 +107,11 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
       lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
     });
     uow.userRepository.users = [inactiveUser];
+    saveDeletionWarningNotification({
+      uow,
+      userId: inactiveUser.id,
+      createdAt: subDays(now, 8),
+    });
 
     await triggerEventsToDeleteInactiveUsers.execute();
 
@@ -174,6 +185,11 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
       uow,
       user: inactiveUser,
     });
+    saveDeletionWarningNotification({
+      uow,
+      userId: inactiveUser.id,
+      createdAt: subDays(now, 8),
+    });
 
     const result = await triggerEventsToDeleteInactiveUsers.execute();
 
@@ -187,5 +203,60 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     });
     expectToEqual(event.wasQuarantined, true);
     expectToEqual(event.priority, 8);
+  });
+
+  it("only triggers deletion for users warned inside [warnedFrom, warnedTo]", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const warnedInsideWindow = makeUser({
+      id: "warned-inside-id",
+      email: "warned-inside@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const neverWarned = makeUser({
+      id: "never-warned-id",
+      email: "never-warned@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const warnedTooRecently = makeUser({
+      id: "warned-too-recently-id",
+      email: "warned-too-recently@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const warnedTooLongAgo = makeUser({
+      id: "warned-too-long-ago-id",
+      email: "warned-too-long-ago@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+
+    uow.userRepository.users = [
+      warnedInsideWindow,
+      neverWarned,
+      warnedTooRecently,
+      warnedTooLongAgo,
+    ];
+    saveDeletionWarningNotification({
+      uow,
+      userId: warnedInsideWindow.id,
+      createdAt: subDays(now, 8),
+    });
+    saveDeletionWarningNotification({
+      uow,
+      userId: warnedTooRecently.id,
+      createdAt: subDays(now, 6),
+    });
+    saveDeletionWarningNotification({
+      uow,
+      userId: warnedTooLongAgo.id,
+      createdAt: subDays(now, 11),
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 1 });
+    expectToEqual(uow.outboxRepository.events.length, 1);
+    expectToEqual(uow.outboxRepository.events[0].payload, {
+      userId: warnedInsideWindow.id,
+      triggeredBy: { kind: "crawler" },
+    });
   });
 });

@@ -14,6 +14,7 @@ import {
   type SmsNotification,
   type TemplatedEmail,
   type TemplatedSms,
+  type UserId,
 } from "shared";
 import {
   jsonBuildObject,
@@ -463,6 +464,47 @@ export class PgNotificationRepository implements NotificationRepository {
   ): Promise<EmailNotification | undefined> {
     const emails = await this.getEmailsByIds([id]);
     return emails[0];
+  }
+
+  public async filterUserDeletionWarningNotifications(
+    params: { userIds: UserId[] } & (
+      | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
+      | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
+    ),
+  ): Promise<UserId[]> {
+    if (params.userIds.length === 0) return [];
+
+    const baseQuery = this.transaction
+      .selectFrom("notifications_email")
+      .where("notifications_email.user_id", "in", params.userIds)
+      .where("notifications_email.email_kind", "=", "ACCOUNT_DELETION_WARNING");
+
+    const filteredQuery = params.excludeWarnedSince
+      ? baseQuery.where(
+          "notifications_email.created_at",
+          ">=",
+          params.excludeWarnedSince,
+        )
+      : baseQuery
+          .where(
+            "notifications_email.created_at",
+            ">=",
+            params.onlyWarnedBetween.from,
+          )
+          .where(
+            "notifications_email.created_at",
+            "<=",
+            params.onlyWarnedBetween.to,
+          );
+
+    const rows = await filteredQuery
+      .select("notifications_email.user_id")
+      .distinct()
+      .execute();
+
+    return rows
+      .map((r) => r.user_id)
+      .filter((userId): userId is UserId => userId !== null);
   }
 }
 
