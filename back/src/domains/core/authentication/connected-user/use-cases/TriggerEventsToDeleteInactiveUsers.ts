@@ -1,4 +1,5 @@
 import { subDays, subYears } from "date-fns";
+import type { DateRange } from "shared";
 import { z } from "zod";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
@@ -7,11 +8,8 @@ import {
   accountInactivityDelayInYears,
   deletionWarningDedupInDays,
   deletionWarningDelayInDays,
+  inactiveUserNotificationEventPriority,
 } from "./inactiveUserConstants";
-
-// Low priority: business events (convention signing, assessment, etc.) should
-// be processed first by the outbox workers.
-const inactiveUserDeletionEventPriority = 8;
 
 export type TriggerEventsToDeleteInactiveUsersResult = {
   numberOfDeletionsTriggered: number;
@@ -37,8 +35,11 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
 
     const now = deps.timeGateway.now();
     const twoYearsAgo = subYears(now, accountInactivityDelayInYears);
-    const warnedFrom = subDays(now, deletionWarningDedupInDays);
-    const warnedTo = subDays(now, deletionWarningDelayInDays);
+
+    const warnedRange: DateRange = {
+      from: subDays(now, deletionWarningDedupInDays),
+      to: subDays(now, deletionWarningDelayInDays),
+    };
 
     const loggedInLongAgoUserIds =
       await uow.userRepository.getUserIdsLoggedInLongAgo({
@@ -48,10 +49,10 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
     const candidateUserIds =
       await uow.notificationRepository.filterUserDeletionWarningNotifications({
         userIds: loggedInLongAgoUserIds,
-        onlyWarnedBetween: { from: warnedFrom, to: warnedTo },
+        onlyWarnedBetween: warnedRange,
       });
 
-    const afterConventionFilterIds =
+    const candidateUserIdsWithoutActiveConvention =
       await uow.conventionQueries.getUserIdsWithNoActiveConvention({
         userIds: candidateUserIds,
         since: twoYearsAgo,
@@ -59,7 +60,7 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
 
     const userIdsToDelete =
       await uow.discussionRepository.getUserIdsWithNoRecentExchange({
-        userIds: afterConventionFilterIds,
+        userIds: candidateUserIdsWithoutActiveConvention,
         since: twoYearsAgo,
       });
 
@@ -71,7 +72,7 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
         topic: "InactiveUserAccountDeletionTriggered",
         payload: { userId, triggeredBy: { kind: "crawler" } },
         wasQuarantined: shouldQuarantine,
-        priority: inactiveUserDeletionEventPriority,
+        priority: inactiveUserNotificationEventPriority,
       }),
     );
 

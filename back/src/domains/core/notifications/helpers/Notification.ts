@@ -6,6 +6,7 @@ import type {
 } from "shared";
 import {
   type CreateNewEvent,
+  defaultPriority,
   makeCreateNewEvent,
 } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -78,6 +79,7 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
   async (
     uow: UnitOfWork,
     notificationsContent: NotificationContentAndFollowedIds[],
+    options?: { priority: number },
   ): Promise<Notification[]> => {
     const now = timeGateway.now().toISOString();
 
@@ -94,6 +96,7 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
         id: notification.id,
         kind: notification.kind,
       })),
+      priority: options?.priority ?? defaultPriority,
     });
 
     await Promise.all([

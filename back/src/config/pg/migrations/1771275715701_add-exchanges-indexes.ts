@@ -7,9 +7,15 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createIndex("exchanges", ["discussion_id", "sent_at"], {
     name: "exchanges_discussion_id_sent_at_index",
   });
+  pgm.createIndex("exchanges", ["establishment_email", "sent_at"], {
+    name: "exchanges_establishment_email_sent_at_index",
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.dropIndex("exchanges", ["establishment_email", "sent_at"], {
+    name: "exchanges_establishment_email_sent_at_index",
+  });
   pgm.dropIndex("exchanges", ["discussion_id", "sent_at"], {
     name: "exchanges_discussion_id_sent_at_index",
   });

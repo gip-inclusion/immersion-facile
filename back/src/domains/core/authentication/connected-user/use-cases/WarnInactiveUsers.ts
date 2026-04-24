@@ -11,6 +11,7 @@ import {
   accountInactivityDelayInYears,
   deletionWarningDedupInDays,
   deletionWarningDelayInDays,
+  inactiveUserNotificationEventPriority,
 } from "./inactiveUserConstants";
 
 export type WarnInactiveUsersResult = {
@@ -48,9 +49,14 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         excludeWarnedSince: warningCutoff,
       });
 
+    const alreadyWarned = new Set(alreadyWarnedUserIds);
+    const notYetWarnedUserIds = loggedInLongAgoUserIds.filter(
+      (id) => !alreadyWarned.has(id),
+    );
+
     const candidateUserIdsWithoutActiveConvention =
       await uow.conventionQueries.getUserIdsWithNoActiveConvention({
-        userIds: alreadyWarnedUserIds,
+        userIds: notYetWarnedUserIds,
         since: twoYearsAgo,
       });
 
@@ -87,7 +93,9 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         },
       }));
 
-    await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
+    await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications, {
+      priority: inactiveUserNotificationEventPriority,
+    });
 
     return { numberOfWarningsSent: notifications.length };
   });
