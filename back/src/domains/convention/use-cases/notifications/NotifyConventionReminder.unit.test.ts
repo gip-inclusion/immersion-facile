@@ -7,6 +7,7 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   conventionStatuses,
+  defaultPhoneNumber,
   type EstablishmentRepresentative,
   errors,
   expectPromiseToFailWithError,
@@ -723,6 +724,74 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             },
           },
         ],
+      });
+    });
+
+    it("should not send SMS to beneficiary if he has default phone number", async () => {
+      const agency = new AgencyDtoBuilder().withId("agencyId").build();
+      const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryPhone(defaultPhoneNumber)
+        .withBeneficiarySignedAt(undefined)
+        .withEstablishmentRepresentativePhone("+262693000002")
+        .build();
+      uow.conventionRepository.setConventions([convention]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
+      const shortLinkIds = ["link1", "link2"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+      await useCase.execute({
+        conventionId: convention.id,
+        reminderKind: "ReminderForSignatories",
+      });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), [
+        {
+          id: shortLinkIds[0],
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+
+          lastUsedAt: null,
+        },
+        {
+          id: shortLinkIds[1],
+          url: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          lastUsedAt: null,
+        },
+      ]);
+
+      expectSavedNotificationsBatchAndEvent({
+        emails: [
+          makeSignatoriesLastReminderEmail({
+            actor: convention.signatories.beneficiary,
+            convention,
+            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+          }),
+          makeSignatoriesLastReminderEmail({
+            actor: convention.signatories.establishmentRepresentative,
+            convention,
+            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+          }),
+          makeSignatoriesLastReminderEmail({
+            actor: convention.establishmentTutor,
+            convention,
+            shortlinkUrl: undefined,
+          }),
+        ],
+        sms: [],
       });
     });
   });
