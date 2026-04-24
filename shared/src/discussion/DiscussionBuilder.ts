@@ -63,6 +63,7 @@ const defaultDiscussion = {
   status: "PENDING",
   kind: "IF",
   contactMode: "EMAIL",
+  locationId: "123e4567-e89b-12d3-a456-426614174000",
 } satisfies DiscussionDto;
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {

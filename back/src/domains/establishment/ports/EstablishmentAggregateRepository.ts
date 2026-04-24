@@ -96,7 +96,7 @@ export interface EstablishmentAggregateRepository {
   getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
-    locationId: LocationId,
+    locationId?: LocationId,
   ): Promise<RepositorySearchResultDto | undefined>;
   legacySearchImmersionResults(
     searchImmersionParams: LegacySearchImmersionParams,

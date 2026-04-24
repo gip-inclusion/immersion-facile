@@ -170,6 +170,45 @@ describe("Route to get ImmersionSearchResultDto by siret, appellation code and l
     expect(response.status).toBe(200);
   });
 
+  it("accepts valid authenticated requests with no location id", async () => {
+    const response = await request
+      .get(`/v3/offers/${immersionOfferSiret}/${styliste.appellationCode}`)
+      .set("Authorization", authToken);
+
+    expectToEqual(response.body, {
+      rome: styliste.romeCode,
+      naf: defaultNafCode,
+      siret: "78000403200019",
+      name: "Company inside repository",
+      voluntaryToImmersion: true,
+      locationId: TEST_LOCATION.id,
+      numberOfEmployeeRange: "10-19",
+      address: TEST_LOCATION.address,
+      contactMode: "EMAIL",
+      romeLabel: TEST_ROME_LABEL,
+      establishmentScore: 15,
+      appellations: [
+        {
+          appellationLabel: styliste.appellationLabel,
+          appellationCode: styliste.appellationCode,
+        },
+      ],
+      nafLabel: "FAKE",
+      additionalInformation: "",
+      website: "",
+      position: {
+        lat: TEST_LOCATION.position.lat,
+        lon: TEST_LOCATION.position.lon,
+      },
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+      fitForDisabledWorkers: "no",
+      remoteWorkMode: "ON_SITE",
+      isAvailable: true,
+    } satisfies SearchImmersionResultPublicV3);
+    expect(response.status).toBe(200);
+  });
+
   it("returns 404 if no offer can be found with such siret & appellation code", async () => {
     const siretNotInDB = "11000403200019";
 

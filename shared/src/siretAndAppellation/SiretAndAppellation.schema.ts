@@ -19,5 +19,5 @@ export const siretAndAppellationSchema: ZodSchemaWithInputMatchingOutput<SiretAn
 export const searchResultQuerySchema: ZodSchemaWithInputMatchingOutput<SearchResultQuery> =
   z.object({
     ...siretAndAppellationShape,
-    locationId: zUuidLike,
+    locationId: zUuidLike.optional(),
   });

@@ -227,6 +227,10 @@ export const locationOfSearchPosition = new LocationBuilder()
   .withId(uuid())
   .withPosition({ lat: 49, lon: 6 })
   .build();
+export const locationOfSearchPosition2 = new LocationBuilder()
+  .withId(uuid())
+  .withPosition({ lat: 46, lon: 4 })
+  .build();
 export const locationOfCloseSearchPosition = new LocationBuilder()
   .withId(uuid())
   .withPosition({ lat: 49.001, lon: 6.001 })
@@ -250,6 +254,14 @@ export const establishmentWithOfferA1101_AtPosition =
   new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("00000000000001")
     .withLocations([locationOfSearchPosition])
+    .withOffers([offer_A1101_11987])
+    .withUserRights([osefUserRight])
+    .build();
+
+export const establishmentWithOfferA1101_AtPositionWithTwoLocations =
+  new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000001")
+    .withLocations([locationOfSearchPosition, locationOfSearchPosition2])
     .withOffers([offer_A1101_11987])
     .withUserRights([osefUserRight])
     .build();

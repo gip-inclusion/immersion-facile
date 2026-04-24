@@ -260,6 +260,7 @@ const commonDiscussionSchema: ZodSchemaWithInputMatchingOutput<CommonDiscussionD
       businessName: zStringMinLength1Max1024,
       address: addressSchema,
       conventionId: conventionIdSchema.optional(),
+      locationId: zUuidLike,
     })
     .and(withDiscussionStatusSchema);
 

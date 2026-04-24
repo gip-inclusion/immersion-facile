@@ -19,6 +19,7 @@ import {
   type ExchangeRole,
   errors,
   type ImmersionObjective,
+  type LocationId,
   type PhoneNumber,
   type PotentialBeneficiaryCommonProps,
   pipeWithValue,
@@ -578,6 +579,7 @@ const discussionToPgAndPhoneInsert = async (
     acquisition_campaign: discussion.acquisitionCampaign,
     acquisition_keyword: discussion.acquisitionKeyword,
     convention_id: discussion.conventionId,
+    location_id: discussion.locationId,
     ...discussionStatusWithRejectionToPg(discussion),
   };
 };
@@ -671,6 +673,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       siret: discussion.siret,
       conventionId: discussion.conventionId,
       id: discussion.id,
+      locationId: discussion.locationId,
       ...getWithDiscussionStatusFromPgDiscussion(discussion),
     };
 
@@ -917,6 +920,7 @@ const executeGetDiscussions = (
           acquisition_keyword: ref("d.acquisition_keyword"),
           candidateWarnedMethod: ref("d.candidate_warned_method"),
           kind: ref("d.kind"),
+          locationId: sql<LocationId>`${ref("d.location_id")}`,
         }),
       ).as("discussion"),
     )
