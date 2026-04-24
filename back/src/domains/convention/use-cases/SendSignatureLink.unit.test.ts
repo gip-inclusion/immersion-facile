@@ -7,6 +7,7 @@ import {
   ConventionDtoBuilder,
   type ConventionRole,
   conventionStatusesWithValidator,
+  defaultPhoneNumber,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -732,7 +733,6 @@ describe("Send signature link", () => {
     });
 
     it.each([
-      "+33600000000", // metropole
       "+33785689727", // metropole
       "+262639000001", // Mayotte
       "+590690000001", // Guadeloupe
@@ -864,6 +864,35 @@ describe("Send signature link", () => {
           },
         },
       ]);
+    });
+
+    it("does not send sms when signatory phone is default phone number", async () => {
+      const conventionWithDefaultPhone = new ConventionDtoBuilder(convention)
+        .withBeneficiaryPhone(defaultPhoneNumber)
+        .build();
+
+      uow.conventionRepository.setConventions([conventionWithDefaultPhone]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+      uow.userRepository.users = [notConnectedUser];
+
+      await usecase.execute(
+        {
+          conventionId,
+          role: "beneficiary",
+        },
+        validatorJwtPayload,
+      );
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
     });
 
     it("send signature link if requested for another signatory", async () => {

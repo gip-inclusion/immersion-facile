@@ -9,6 +9,7 @@ import {
   type ConventionActorRole,
   type ConventionDto,
   type ConventionReadDto,
+  defaultPhoneNumber,
   type Email,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
@@ -199,7 +200,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     const smsSignatories = signatories.filter(
       (signatory) =>
         !signatory.signedAt &&
-        smsRecipientPhoneSchema.safeParse(signatory.phone).success,
+        smsRecipientPhoneSchema.safeParse(signatory.phone).success &&
+        signatory.phone !== defaultPhoneNumber,
     );
 
     const emailActors = [

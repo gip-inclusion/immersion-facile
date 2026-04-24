@@ -17,6 +17,7 @@ import {
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
+  defaultPhoneNumber,
   domElementIds,
   getFormattedFirstnameAndLastname,
   isValidMobilePhone,
@@ -1005,7 +1006,8 @@ export const sendSignatureLinkButtonProps =
           disabled:
             !isValidMobilePhone(signatoryPhone) ||
             signatoryAlreadySign ||
-            signatureLinksSent[signatoryRole],
+            signatureLinksSent[signatoryRole] ||
+            signatoryPhone === defaultPhoneNumber,
           onClick: () => {
             onClick({ signatoryRole, signatoryPhone });
           },
@@ -1024,7 +1026,10 @@ export const sendAssessmentLinkButtonProps =
   (phone: PhoneNumber): ButtonProps => ({
     priority: "tertiary",
     children: "Renvoyer le bilan par SMS",
-    disabled: !isValidMobilePhone(phone) || isAssessmentLinkSent,
+    disabled:
+      !isValidMobilePhone(phone) ||
+      isAssessmentLinkSent ||
+      phone === defaultPhoneNumber,
     onClick: () => {
       onClick({ phone });
     },

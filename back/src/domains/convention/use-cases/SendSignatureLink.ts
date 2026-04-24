@@ -7,6 +7,7 @@ import {
   type ConventionRelatedJwtPayload,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
+  defaultPhoneNumber,
   errors,
   frontRoutes,
   type SignatoryRole,
@@ -135,6 +136,10 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
       notificationRepository: uow.notificationRepository,
       conventionId: convention.id,
     });
+
+    if (signatory.phone === defaultPhoneNumber) {
+      return;
+    }
 
     await sendSms({
       conventionMagicLinkPayload: {

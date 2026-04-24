@@ -5,6 +5,7 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
+  defaultPhoneNumber,
   errors,
   frontRoutes,
   type UserId,
@@ -183,6 +184,10 @@ const sendSms = async ({
   recipientPhone: string;
   userId: UserId | undefined;
 }) => {
+  if (recipientPhone === defaultPhoneNumber) {
+    return;
+  }
+
   const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
     config,
     conventionMagicLinkPayload: conventionMagicLinkPayload,

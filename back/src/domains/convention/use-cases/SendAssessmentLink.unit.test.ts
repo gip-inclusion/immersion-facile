@@ -6,6 +6,7 @@ import {
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   type ConventionRole,
+  defaultPhoneNumber,
   type EstablishmentRole,
   errors,
   expectObjectInArrayToMatch,
@@ -797,6 +798,42 @@ describe("SendAssessmentLink", () => {
             },
           },
         },
+      ]);
+    });
+
+    it("does not send sms when recipient phone is default phone number", async () => {
+      const conventionWithDefaultTutorPhone = new ConventionDtoBuilder(
+        convention,
+      )
+        .withEstablishmentTutor({
+          ...convention.establishmentTutor,
+          phone: defaultPhoneNumber,
+        })
+        .build();
+
+      uow.conventionRepository.setConventions([
+        conventionWithDefaultTutorPhone,
+      ]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      await usecase.execute(
+        {
+          conventionId: conventionWithDefaultTutorPhone.id,
+        },
+        validatorJwtPayload,
+      );
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "AssessmentReminderManuallySent" },
       ]);
     });
   });
