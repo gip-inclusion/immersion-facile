@@ -4,6 +4,7 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionRole,
+  type DateRange,
   displayEmergencyContactInfos,
   type EmailNotification,
   errors,
@@ -20,6 +21,7 @@ import {
   type Signatory,
   type SmsNotification,
   type TemplatedEmail,
+  type UserId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
@@ -197,6 +199,31 @@ export class InMemoryNotificationRepository implements NotificationRepository {
       { ...notification, state: params.state },
       ({ id }) => id === params.notificationId,
     );
+  }
+
+  async filterUserDeletionWarningNotifications(
+    params: { userIds: UserId[] } & (
+      | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
+      | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
+    ),
+  ): Promise<UserId[]> {
+    if (params.userIds.length === 0) return [];
+
+    const userIdSet = new Set(params.userIds);
+    const matchingUserIds = this.notifications.flatMap((n) => {
+      if (n.kind !== "email") return [];
+      if (n.templatedContent.kind !== "ACCOUNT_DELETION_WARNING") return [];
+      const userId = n.followedIds.userId;
+      if (!userId || !userIdSet.has(userId)) return [];
+      const createdAt = new Date(n.createdAt);
+      if (params.excludeWarnedSince)
+        return createdAt >= params.excludeWarnedSince ? [userId] : [];
+      return createdAt >= params.onlyWarnedBetween.from &&
+        createdAt <= params.onlyWarnedBetween.to
+        ? [userId]
+        : [];
+    });
+    return Array.from(new Set(matchingUserIds));
   }
 }
 

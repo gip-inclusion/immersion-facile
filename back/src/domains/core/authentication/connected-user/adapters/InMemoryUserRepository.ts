@@ -133,16 +133,10 @@ export class InMemoryUserRepository implements UserRepository {
     return values(this.#usersById);
   }
 
-  // NOTE: excludeWarnedSince and onlyWarnedBetween are ignored here — the
-  // in-memory adapter has no notion of ACCOUNT_DELETION_WARNING notification
-  // history, so dedup filters can only be exercised through the Pg
-  // integration tests (see PgUserRepository.getUserIdsLoggedInLongAgo).
   public async getUserIdsLoggedInLongAgo({
     since,
   }: {
     since: Date;
-    excludeWarnedSince?: Date;
-    onlyWarnedBetween?: { from: Date; to: Date };
   }): Promise<UserId[]> {
     return values(this.#usersById)
       .filter((user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since)

@@ -21,6 +21,7 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeUser,
+  saveDeletionWarningNotification,
   setUsersWithRecentConventions,
   setUsersWithRecentEstablishmentExchanges,
   setUserWithOldConventionAndDiscussion,
@@ -267,5 +268,43 @@ describe("WarnInactiveUsers", () => {
         },
       ],
     });
+  });
+
+  it("does not re-warn a user who was already warned within the dedup window", async () => {
+    const twoYearsAgo = subYears(now, 2);
+    const recentlyWarnedUser = makeUser({
+      id: "recently-warned-id",
+      email: "recently-warned@test.fr",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    const freshCandidate = makeUser({
+      id: "fresh-candidate-id",
+      email: "fresh-candidate@test.fr",
+      firstName: "Fresh",
+      lastName: "Candidate",
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    });
+    uow.userRepository.users = [recentlyWarnedUser, freshCandidate];
+
+    saveDeletionWarningNotification({
+      uow,
+      userId: recentlyWarnedUser.id,
+      createdAt: subDays(now, 3),
+    });
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 1 });
+    const batchEvent = uow.outboxRepository.events.find(
+      (e) => e.topic === "NotificationBatchAdded",
+    );
+    expectToEqual(batchEvent?.payload.length, 1);
+    const newWarnings = uow.notificationRepository.notifications.filter(
+      (n) =>
+        n.kind === "email" &&
+        n.templatedContent.kind === "ACCOUNT_DELETION_WARNING" &&
+        n.followedIds.userId === freshCandidate.id,
+    );
+    expectToEqual(newWarnings.length, 1);
   });
 });

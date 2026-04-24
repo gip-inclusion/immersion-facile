@@ -972,6 +972,138 @@ describe("PgNotificationRepository", () => {
       expect(lastNotification).toBeUndefined();
     });
   });
+
+  describe("filterUserDeletionWarningNotifications", () => {
+    const referenceDate = new Date("2026-01-15T10:00:00.000Z");
+    const userA = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa";
+    const userB = "bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb";
+    const userC = "cccccccc-cccc-4ccc-cccc-cccccccccccc";
+    const userD = "dddddddd-dddd-4ddd-dddd-dddddddddddd";
+
+    const insertDeletionWarning = async ({
+      userId,
+      createdAt,
+    }: {
+      userId: string;
+      createdAt: Date;
+    }) =>
+      db
+        .insertInto("notifications_email")
+        .values({
+          id: uuid(),
+          email_kind: "ACCOUNT_DELETION_WARNING",
+          user_id: userId,
+          created_at: createdAt.toISOString(),
+        })
+        .execute();
+
+    it("returns [] without querying when userIds is empty", async () => {
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 3),
+      });
+
+      const result =
+        await pgNotificationRepository.filterUserDeletionWarningNotifications({
+          userIds: [],
+          excludeWarnedSince: subDays(referenceDate, 10),
+        });
+
+      expectToEqual(result, []);
+    });
+
+    it("returns distinct user ids warned at or after excludeWarnedSince", async () => {
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 3),
+      });
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 5),
+      });
+      await insertDeletionWarning({
+        userId: userB,
+        createdAt: subDays(referenceDate, 20),
+      });
+
+      const result =
+        await pgNotificationRepository.filterUserDeletionWarningNotifications({
+          userIds: [userA, userB, userC],
+          excludeWarnedSince: subDays(referenceDate, 10),
+        });
+
+      expectArraysToEqualIgnoringOrder(result, [userA]);
+    });
+
+    it("returns distinct user ids warned inside onlyWarnedBetween", async () => {
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 8),
+      });
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 9),
+      });
+      await insertDeletionWarning({
+        userId: userB,
+        createdAt: subDays(referenceDate, 6),
+      });
+      await insertDeletionWarning({
+        userId: userC,
+        createdAt: subDays(referenceDate, 11),
+      });
+
+      const result =
+        await pgNotificationRepository.filterUserDeletionWarningNotifications({
+          userIds: [userA, userB, userC, userD],
+          onlyWarnedBetween: {
+            from: subDays(referenceDate, 10),
+            to: subDays(referenceDate, 7),
+          },
+        });
+
+      expectArraysToEqualIgnoringOrder(result, [userA]);
+    });
+
+    it("ignores users whose warnings exist but who are not in the input userIds", async () => {
+      await insertDeletionWarning({
+        userId: userA,
+        createdAt: subDays(referenceDate, 3),
+      });
+      await insertDeletionWarning({
+        userId: userB,
+        createdAt: subDays(referenceDate, 3),
+      });
+
+      const result =
+        await pgNotificationRepository.filterUserDeletionWarningNotifications({
+          userIds: [userA],
+          excludeWarnedSince: subDays(referenceDate, 10),
+        });
+
+      expectArraysToEqualIgnoringOrder(result, [userA]);
+    });
+
+    it("ignores notifications with a different email_kind", async () => {
+      await db
+        .insertInto("notifications_email")
+        .values({
+          id: uuid(),
+          email_kind: "TEST_EMAIL",
+          user_id: userA,
+          created_at: subDays(referenceDate, 3).toISOString(),
+        })
+        .execute();
+
+      const result =
+        await pgNotificationRepository.filterUserDeletionWarningNotifications({
+          userIds: [userA],
+          excludeWarnedSince: subDays(referenceDate, 10),
+        });
+
+      expectToEqual(result, []);
+    });
+  });
 });
 
 const createTemplatedEmailAndNotification = ({

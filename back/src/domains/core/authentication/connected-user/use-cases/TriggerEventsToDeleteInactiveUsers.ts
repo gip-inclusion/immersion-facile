@@ -40,12 +40,16 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
     const warnedFrom = subDays(now, deletionWarningDedupInDays);
     const warnedTo = subDays(now, deletionWarningDelayInDays);
 
-    const candidateUserIds = await uow.userRepository.getUserIdsLoggedInLongAgo(
-      {
+    const loggedInLongAgoUserIds =
+      await uow.userRepository.getUserIdsLoggedInLongAgo({
         since: twoYearsAgo,
+      });
+
+    const candidateUserIds =
+      await uow.notificationRepository.filterUserDeletionWarningNotifications({
+        userIds: loggedInLongAgoUserIds,
         onlyWarnedBetween: { from: warnedFrom, to: warnedTo },
-      },
-    );
+      });
 
     const candidateUsers = await uow.userRepository.getByIds(candidateUserIds);
 
