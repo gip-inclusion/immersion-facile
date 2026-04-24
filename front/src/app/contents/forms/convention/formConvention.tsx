@@ -945,7 +945,7 @@ export const makeFormUiSections = ({
     "siret",
     "businessName",
   ],
-  ["dateStart", "dateEnd", "schedule", "immersionAddress"],
+  ["dateStart", "dateEnd", "schedule", "immersionAddress", "remoteWorkMode"],
   [
     "individualProtection",
     "sanitaryPrevention",
