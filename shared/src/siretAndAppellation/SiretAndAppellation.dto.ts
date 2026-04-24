@@ -8,5 +8,5 @@ export type SiretAndAppellationDto = {
 };
 
 export type SearchResultQuery = SiretAndAppellationDto & {
-  locationId: LocationId;
+  locationId?: LocationId;
 };

@@ -60,6 +60,7 @@ import {
   establishmentWithFitForDisabledWorkersYesCertified,
   establishmentWithFitForDisabledWorkersYesDeclaredOnly,
   establishmentWithOfferA1101_AtPosition,
+  establishmentWithOfferA1101_AtPositionWithTwoLocations,
   establishmentWithOfferA1101_close,
   establishmentWithOfferA1101_outOfDistanceRange,
   groomChevauxOffer,
@@ -3777,7 +3778,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     describe("getSearchResultBySearchQuery", () => {
       beforeEach(async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          establishmentWithOfferA1101_AtPosition,
+          establishmentWithOfferA1101_AtPositionWithTwoLocations,
         );
       });
 
@@ -3787,9 +3788,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             missingSiret,
-            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
-            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-              .id,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+              .appellationCode,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .locations[0].id,
           ),
           undefined,
         );
@@ -3800,8 +3802,10 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
-            establishmentWithOfferA1101_AtPosition.establishment.siret,
-            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .siret,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+              .appellationCode,
             missingLocationId,
           ),
           undefined,
@@ -3813,79 +3817,168 @@ describe("PgEstablishmentAggregateRepository", () => {
 
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
-            establishmentWithOfferA1101_AtPosition.establishment.siret,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .siret,
             missingAppellationCode,
-            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-              .id,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .locations[0].id,
           ),
           undefined,
         );
       });
 
-      it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and location id", async () => {
+      it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and given location id", async () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
-            establishmentWithOfferA1101_AtPosition.establishment.siret,
-            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
-            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-              .id,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .siret,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+              .appellationCode,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .locations[0].id,
           ),
           {
-            rome: establishmentWithOfferA1101_AtPosition.offers[0].romeCode,
+            rome: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .offers[0].romeCode,
             romeLabel:
-              establishmentWithOfferA1101_AtPosition.offers[0].romeLabel,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+                .romeLabel,
             establishmentScore:
-              establishmentWithOfferA1101_AtPosition.establishment.score,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.score,
             appellations: [
               {
                 appellationLabel:
-                  establishmentWithOfferA1101_AtPosition.offers[0]
-                    .appellationLabel,
+                  establishmentWithOfferA1101_AtPositionWithTwoLocations
+                    .offers[0].appellationLabel,
                 appellationCode:
-                  establishmentWithOfferA1101_AtPosition.offers[0]
-                    .appellationCode,
+                  establishmentWithOfferA1101_AtPositionWithTwoLocations
+                    .offers[0].appellationCode,
               },
             ],
-            naf: establishmentWithOfferA1101_AtPosition.establishment.nafDto
-              .code,
+            naf: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .establishment.nafDto.code,
             nafLabel: "Activités des agences de travail temporaire",
-            siret: establishmentWithOfferA1101_AtPosition.establishment.siret,
-            name: establishmentWithOfferA1101_AtPosition.establishment.name,
+            siret:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.siret,
+            name: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .establishment.name,
             customizedName:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .customizedName,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.customizedName,
             website:
-              establishmentWithOfferA1101_AtPosition.establishment.website,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.website,
             additionalInformation:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .additionalInformation,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.additionalInformation,
             voluntaryToImmersion:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .voluntaryToImmersion,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.voluntaryToImmersion,
             fitForDisabledWorkers:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .fitForDisabledWorkers,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.fitForDisabledWorkers,
             numberOfEmployeeRange:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .numberEmployeesRange,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.numberEmployeesRange,
             contactMode:
-              establishmentWithOfferA1101_AtPosition.establishment.contactMode,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.contactMode,
             distance_m: undefined,
             address:
-              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-                .address,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[0].address,
             position:
-              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-                .position,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[0].position,
             locationId:
-              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
-                .id,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[0].id,
             createdAt:
-              establishmentWithOfferA1101_AtPosition.establishment.createdAt.toISOString(),
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment.createdAt.toISOString(),
             updatedAt:
-              establishmentWithOfferA1101_AtPosition.establishment.updatedAt.toISOString(),
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment.updatedAt.toISOString(),
             remoteWorkMode:
-              establishmentWithOfferA1101_AtPosition.offers[0].remoteWorkMode,
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+                .remoteWorkMode,
+            isAvailable: true,
+          },
+        );
+      });
+      it("Returns first reconstructed SearchImmersionResultDto for given siret, appellationCode but no location id", async () => {
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .siret,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+              .appellationCode,
+          ),
+          {
+            rome: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .offers[0].romeCode,
+            romeLabel:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+                .romeLabel,
+            establishmentScore:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.score,
+            appellations: [
+              {
+                appellationLabel:
+                  establishmentWithOfferA1101_AtPositionWithTwoLocations
+                    .offers[0].appellationLabel,
+                appellationCode:
+                  establishmentWithOfferA1101_AtPositionWithTwoLocations
+                    .offers[0].appellationCode,
+              },
+            ],
+            naf: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .establishment.nafDto.code,
+            nafLabel: "Activités des agences de travail temporaire",
+            siret:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.siret,
+            name: establishmentWithOfferA1101_AtPositionWithTwoLocations
+              .establishment.name,
+            customizedName:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.customizedName,
+            website:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.website,
+            additionalInformation:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.additionalInformation,
+            voluntaryToImmersion:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.voluntaryToImmersion,
+            fitForDisabledWorkers:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.fitForDisabledWorkers,
+            numberOfEmployeeRange:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.numberEmployeesRange,
+            contactMode:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.contactMode,
+            distance_m: undefined,
+            address:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[1].address, // is the last location added
+            position:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[1].position, // is the last location added
+            locationId:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations
+                .establishment.locations[1].id, // is the last location added
+            createdAt:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment.createdAt.toISOString(),
+            updatedAt:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment.updatedAt.toISOString(),
+            remoteWorkMode:
+              establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+                .remoteWorkMode,
             isAvailable: true,
           },
         );

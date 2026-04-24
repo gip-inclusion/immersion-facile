@@ -288,6 +288,7 @@ describe("ContactEstablishment", () => {
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         status: "PENDING",
+        locationId: validEmailRequest.locationId,
       });
 
       describe("with discussion kind IF", () => {
@@ -799,6 +800,7 @@ describe("ContactEstablishment", () => {
                 validEmailRequest.experienceAdditionalInformation,
               resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
             },
+            locationId: validEmailRequest.locationId,
           },
         ]);
 

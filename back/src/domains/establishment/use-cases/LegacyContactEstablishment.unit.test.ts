@@ -303,6 +303,7 @@ describe("LegacyContactEstablishment", () => {
       expectToEqual(uow.discussionRepository.discussions, [
         {
           id: discussionId,
+          locationId: validEmailRequest.locationId,
           appellationCode: "12898",
           siret: validEmailRequest.siret,
           businessName: "Company inside repository",
@@ -387,6 +388,7 @@ describe("LegacyContactEstablishment", () => {
             },
           ],
           status: "PENDING",
+          locationId: establishmentAggregate.establishment.locations[0].id,
         },
         {
           id: "discussion1",
@@ -418,6 +420,7 @@ describe("LegacyContactEstablishment", () => {
             },
           ],
           status: "PENDING",
+          locationId: establishmentAggregate.establishment.locations[0].id,
         },
       ];
 

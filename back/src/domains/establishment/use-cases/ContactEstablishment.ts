@@ -175,6 +175,7 @@ export class ContactEstablishment extends TransactionalUseCase<CreateDiscussionD
       updatedAt: now.toISOString(),
       address: matchingAddress.address,
       status: "PENDING",
+      locationId: contactRequest.locationId,
     };
 
     const extraDiscussionDtoProperties: ExtraDiscussionDtoProperties = {

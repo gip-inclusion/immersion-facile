@@ -29,7 +29,7 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
   }),
   getOffer: defineRoute({
     method: "get",
-    url: "/v3/offers/:siret/:appellationCode/:locationId",
+    url: "/v3/offers/:siret/:appellationCode/:locationId?",
     ...withAuthorizationHeaders,
     responses: {
       200: internalOfferSchema,

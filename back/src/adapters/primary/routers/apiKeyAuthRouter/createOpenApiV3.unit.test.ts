@@ -2,15 +2,13 @@ import type { OpenAPIV3_1 as OpenAPI } from "openapi-types";
 import { createOpenApiSpecV3 } from "./createOpenApiV3";
 import { publicApiV3SearchEstablishmentRoutes } from "./publicApiV3.routes";
 
-const toOpenApiPath = (url: string) => url.replace(/:(\w+)/g, "{$1}");
-
 describe("createOpenApiSpecV3", () => {
   const spec = createOpenApiSpecV3("test");
   const paths = spec.paths!;
 
   const getOffersPath = publicApiV3SearchEstablishmentRoutes.getOffers.url;
-  const getOfferPath = toOpenApiPath(
-    publicApiV3SearchEstablishmentRoutes.getOffer.url,
+  const getOfferPath = Object.keys(paths).find((path) =>
+    path.startsWith("/v3/offers/{siret}/{appellationCode}"),
   );
   const contactEstablishmentPath =
     publicApiV3SearchEstablishmentRoutes.contactEstablishment.url;
@@ -22,8 +20,11 @@ describe("createOpenApiSpecV3", () => {
     });
 
     it("has getOffer route", () => {
+      expect(getOfferPath).toBeDefined();
+      expect(getOfferPath).toContain("/v3/offers/{siret}/{appellationCode}");
+      if (!getOfferPath) return;
       expect(paths[getOfferPath]).toBeDefined();
-      expect(paths[getOfferPath]!.get).toBeDefined();
+      expect(paths[getOfferPath]?.get).toBeDefined();
     });
 
     it("has contactEstablishment route", () => {
@@ -92,7 +93,11 @@ describe("createOpenApiSpecV3", () => {
   });
 
   describe("documents getOffer URL parameters", () => {
-    const getOfferRoute = spec.paths![getOfferPath]!.get!;
+    if (!getOfferPath) throw new Error("Missing getOffer path in OpenAPI spec");
+    const getOfferRoute = spec.paths![getOfferPath]?.get;
+
+    if (!getOfferRoute)
+      throw new Error("Missing GET operation for getOffer in OpenAPI spec");
 
     it("has siret parameter", () => {
       const siretParam = getOfferRoute.parameters?.find(
@@ -112,13 +117,18 @@ describe("createOpenApiSpecV3", () => {
       expect(appellationParam).toBeDefined();
     });
 
-    it("has locationId parameter", () => {
+    it("does not require locationId parameter anymore", () => {
       const locationIdParam = getOfferRoute.parameters?.find(
         (p) =>
           (p as OpenAPI.ParameterObject).name === "locationId" &&
           (p as OpenAPI.ParameterObject).in === "path",
       );
-      expect(locationIdParam).toBeDefined();
+      if (!locationIdParam) {
+        expect(locationIdParam).toBeUndefined();
+        return;
+      }
+
+      expect((locationIdParam as OpenAPI.ParameterObject).required).toBe(false);
     });
   });
 });

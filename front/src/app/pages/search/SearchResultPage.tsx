@@ -107,13 +107,16 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
     useState<ReactNode | null>(null);
 
   useEffect(() => {
-    if (!isExternal && "location" in params && params.location) {
+    if (!isExternal) {
       dispatch(
         searchSlice.actions.fetchSearchResultRequested({
           searchResult: {
             siret: params.siret,
             appellationCode: params.appellationCode[0],
-            locationId: params.location,
+            locationId:
+              "location" in params && params.location
+                ? params.location
+                : undefined,
           },
           feedbackTopic: "search-result",
         }),

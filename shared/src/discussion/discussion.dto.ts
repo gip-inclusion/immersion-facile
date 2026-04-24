@@ -165,6 +165,7 @@ export type CommonDiscussionDto = {
   updatedAt: DateString;
   id: DiscussionId;
   siret: SiretDto;
+  locationId: LocationId;
 } & WithDiscussionStatus;
 
 export type ExtraDiscussionDtoProperties = WithAcquisition & {

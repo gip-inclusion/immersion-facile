@@ -223,6 +223,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
       status: "PENDING",
+      locationId: contactRequest.locationId,
     };
   }
 

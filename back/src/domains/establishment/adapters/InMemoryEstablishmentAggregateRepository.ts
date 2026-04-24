@@ -407,12 +407,17 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
       (offer) => offer.appellationCode === searchedAppellationCode,
     )?.romeCode ?? "no-offer-matched";
 
-  const location = establishmentAgg.establishment.locations.find(
-    (loc) => loc.id === locationId,
-  );
+  const location = locationId
+    ? establishmentAgg.establishment.locations.find(
+        (loc) => loc.id === locationId,
+      )
+    : establishmentAgg.establishment.locations[0];
 
-  if (!location)
-    throw new Error(`NO LOCATION MATCHING PROVIDED ID: ${locationId}`);
+  if (!location) {
+    throw new Error(
+      `NO LOCATION MATCHING PROVIDED ID: ${locationId} OR FIRST LOCATION`,
+    );
+  }
 
   return {
     address: location.address,

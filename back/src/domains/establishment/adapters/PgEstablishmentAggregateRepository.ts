@@ -428,7 +428,7 @@ export class PgEstablishmentAggregateRepository
   public async getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
-    locationId: LocationId,
+    locationId?: LocationId,
   ): Promise<RepositorySearchResultDto | undefined> {
     const { data } = await searchImmersionResultsQuery(this.transaction, {
       limit: 1,
@@ -437,7 +437,7 @@ export class PgEstablishmentAggregateRepository
       filters: {
         sirets: [siret],
         appellationCodes: [appellationCode],
-        locationIds: [locationId],
+        locationIds: locationId ? [locationId] : undefined,
         showOnlyAvailableOffers: false,
       },
       shouldCountAll: false,
