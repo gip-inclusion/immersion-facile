@@ -13,3 +13,4 @@ export type Phone = {
 };
 
 export const defaultPhoneNumber: PhoneNumber = "+33600000000";
+export const allDefaultPhoneNumbers = [defaultPhoneNumber, "+33600000001"];

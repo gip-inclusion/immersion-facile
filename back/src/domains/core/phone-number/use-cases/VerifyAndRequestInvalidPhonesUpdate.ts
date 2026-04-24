@@ -1,6 +1,7 @@
 import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js/max";
 import { partition } from "ramda";
 import {
+  allDefaultPhoneNumbers,
   defaultPhoneNumber,
   getSupportedCountryCodesForCountry,
   type Phone,
@@ -139,7 +140,7 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
 
           const [defaultedPhoneList, fixedPhoneList] = partition(
             ({ updatePhonePayload: { newPhoneNumber } }) =>
-              newPhoneNumber === defaultPhoneNumber,
+              allDefaultPhoneNumbers.includes(newPhoneNumber),
             invalidPhoneList,
           );
 

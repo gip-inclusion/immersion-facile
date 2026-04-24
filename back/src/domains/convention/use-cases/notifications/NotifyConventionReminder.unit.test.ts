@@ -628,7 +628,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
   describe("handle SMS DOM", () => {
     it.each([
-      ["+33600000001"], // Metropole
+      ["+33600000002"], // Metropole
       ["+262639000001"], // Mayotte
       ["+590690000001"], // Guadeloupe
       ["+594694000001"], // Guyane
