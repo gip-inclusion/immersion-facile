@@ -48,34 +48,19 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         excludeWarnedSince: warningCutoff,
       });
 
-    const alreadyWarned = new Set(alreadyWarnedUserIds);
-    const userIdsWithNoRecentConnections = loggedInLongAgoUserIds.filter(
-      (id) => !alreadyWarned.has(id),
-    );
-
-    const candidateUsers = await uow.userRepository.getByIds(
-      userIdsWithNoRecentConnections,
-    );
-
-    const afterConventionFilterIds =
+    const candidateUserIdsWithoutActiveConvention =
       await uow.conventionQueries.getUserIdsWithNoActiveConvention({
-        users: candidateUsers,
+        userIds: alreadyWarnedUserIds,
         since: twoYearsAgo,
       });
 
-    const afterConventionFilterIdSet = new Set(afterConventionFilterIds);
     const inactiveUserIds =
       await uow.discussionRepository.getUserIdsWithNoRecentExchange({
-        users: candidateUsers.filter((u) =>
-          afterConventionFilterIdSet.has(u.id),
-        ),
+        userIds: candidateUserIdsWithoutActiveConvention,
         since: twoYearsAgo,
       });
 
-    const inactiveUserIdSet = new Set(inactiveUserIds);
-    const inactiveUsers = candidateUsers.filter((u) =>
-      inactiveUserIdSet.has(u.id),
-    );
+    const inactiveUsers = await uow.userRepository.getByIds(inactiveUserIds);
 
     const deletionDateFormatted = deletionDate.toLocaleDateString("fr-FR", {
       day: "numeric",
@@ -83,8 +68,7 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
       year: "numeric",
     });
 
-    const loginUrl =
-      `${deps.immersionBaseUrl}/${frontRoutes.profile}` as AbsoluteUrl;
+    const loginUrl: AbsoluteUrl = `${deps.immersionBaseUrl}/${frontRoutes.profile}`;
 
     const notifications: NotificationContentAndFollowedIds[] =
       inactiveUsers.map((user) => ({

@@ -14,7 +14,6 @@ import {
   type DiscussionKind,
   type DiscussionOrderKey,
   type DiscussionStatus,
-  type Email,
   type EstablishmentRole,
   type Exchange,
   type ExchangeRole,
@@ -81,34 +80,33 @@ export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
 
   async getUserIdsWithNoRecentExchange({
-    users,
+    userIds,
     since,
   }: {
-    users: { id: UserId; email: Email }[];
+    userIds: UserId[];
     since: Date;
   }): Promise<UserId[]> {
-    if (users.length === 0) return [];
+    if (userIds.length === 0) return [];
 
-    const activeRows = await this.transaction
-      .selectFrom("exchanges")
-      .select("exchanges.establishment_email")
-      .distinct()
-      .where("exchanges.sender", "=", "establishment")
-      .where("exchanges.sent_at", ">=", since)
-      .where(
-        "exchanges.establishment_email",
-        "in",
-        users.map((u) => u.email),
+    const inactiveRows = await this.transaction
+      .selectFrom("users")
+      .select("users.id")
+      .where("users.id", "in", userIds)
+      .where((eb) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("exchanges")
+              .select(sql`1`.as("__"))
+              .whereRef("exchanges.establishment_email", "=", "users.email")
+              .where("exchanges.sender", "=", "establishment")
+              .where("exchanges.sent_at", ">=", since),
+          ),
+        ),
       )
       .execute();
 
-    const activeEmails = new Set(
-      activeRows
-        .map((r) => r.establishment_email)
-        .filter((e): e is string => e !== null),
-    );
-
-    return users.filter((u) => !activeEmails.has(u.email)).map((u) => u.id);
+    return inactiveRows.map((r) => r.id);
   }
 
   async __test_getAllDiscussions(): Promise<DiscussionDto[]> {

@@ -3441,7 +3441,7 @@ describe("PgDiscussionRepository", () => {
     it("returns empty array when given no users", async () => {
       expectToEqual(
         await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
-          users: [],
+          userIds: [],
           since: new Date("2024-01-01"),
         }),
         [],
@@ -3538,10 +3538,7 @@ describe("PgDiscussionRepository", () => {
 
       const result =
         await pgDiscussionRepository.getUserIdsWithNoRecentExchange({
-          users: [userA, userB, userC, userD].map((u) => ({
-            id: u.id,
-            email: u.email,
-          })),
+          userIds: [userA.id, userB.id, userC.id, userD.id],
           since,
         });
 

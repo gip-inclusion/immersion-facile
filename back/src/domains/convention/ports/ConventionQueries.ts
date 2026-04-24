@@ -71,7 +71,7 @@ export type GetConventionIdsParams = {
 
 export interface ConventionQueries {
   getUserIdsWithNoActiveConvention(params: {
-    users: { id: UserId; email: Email }[];
+    userIds: UserId[];
     since: Date;
   }): Promise<UserId[]>;
 
