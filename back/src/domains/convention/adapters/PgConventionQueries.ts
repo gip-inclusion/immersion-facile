@@ -22,7 +22,6 @@ import {
   conventionWithBroadcastFeedbackSchema,
   type DataWithPagination,
   type DateFilter,
-  type Email,
   errors,
   functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsFilters,
@@ -67,65 +66,68 @@ export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
 
   public async getUserIdsWithNoActiveConvention({
-    users,
+    userIds,
     since,
   }: {
-    users: { id: UserId; email: Email }[];
+    userIds: UserId[];
     since: Date;
   }): Promise<UserId[]> {
-    if (users.length === 0) return [];
+    if (userIds.length === 0) return [];
 
-    const activeRows = await this.transaction
-      .selectFrom("conventions")
-      .innerJoin("actors", (join) =>
-        join.on((actorEb) =>
-          actorEb.or([
-            actorEb(
-              "actors.id",
-              "=",
-              actorEb.ref("conventions.beneficiary_id"),
-            ),
-            actorEb(
-              "actors.id",
-              "=",
-              actorEb.ref("conventions.establishment_tutor_id"),
-            ),
-            actorEb(
-              "actors.id",
-              "=",
-              actorEb.ref("conventions.establishment_representative_id"),
-            ),
-            actorEb(
-              "actors.id",
-              "=",
-              actorEb.ref("conventions.beneficiary_representative_id"),
-            ),
-            actorEb(
-              "actors.id",
-              "=",
-              actorEb.ref("conventions.beneficiary_current_employer_id"),
-            ),
-          ]),
+    const inactiveRows = await this.transaction
+      .selectFrom("users")
+      .select("users.id")
+      .where("users.id", "in", userIds)
+      .where((eb) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("actors")
+              .innerJoin("conventions", (join) =>
+                join.on((joinEb) =>
+                  joinEb.or([
+                    joinEb(
+                      "actors.id",
+                      "=",
+                      joinEb.ref("conventions.beneficiary_id"),
+                    ),
+                    joinEb(
+                      "actors.id",
+                      "=",
+                      joinEb.ref("conventions.establishment_tutor_id"),
+                    ),
+                    joinEb(
+                      "actors.id",
+                      "=",
+                      joinEb.ref("conventions.establishment_representative_id"),
+                    ),
+                    joinEb(
+                      "actors.id",
+                      "=",
+                      joinEb.ref("conventions.beneficiary_representative_id"),
+                    ),
+                    joinEb(
+                      "actors.id",
+                      "=",
+                      joinEb.ref("conventions.beneficiary_current_employer_id"),
+                    ),
+                  ]),
+                ),
+              )
+              .whereRef("actors.email", "=", "users.email")
+              .where("conventions.date_end", ">=", since)
+              .where(
+                "conventions.status",
+                "in",
+                conventionStatusesDemonstratingUserActivity,
+              )
+              .select(sql`1`.as("__")),
+          ),
         ),
-      )
-      .select("actors.email")
-      .distinct()
-      .where("conventions.date_end", ">=", since)
-      .where(
-        "conventions.status",
-        "in",
-        conventionStatusesDemonstratingUserActivity,
-      )
-      .where(
-        "actors.email",
-        "in",
-        users.map((u) => u.email),
       )
       .execute();
 
-    const activeEmails = new Set(activeRows.map((r) => r.email));
-
-    return users.filter((u) => !activeEmails.has(u.email)).map((u) => u.id);
+    return inactiveRows.map((r) => r.id);
   }
 
   public async getConventionIdsByFilters({

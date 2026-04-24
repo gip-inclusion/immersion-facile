@@ -223,6 +223,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
         ? [userId]
         : [];
     });
+
     return Array.from(new Set(matchingUserIds));
   }
 }

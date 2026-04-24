@@ -51,20 +51,15 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
         onlyWarnedBetween: { from: warnedFrom, to: warnedTo },
       });
 
-    const candidateUsers = await uow.userRepository.getByIds(candidateUserIds);
-
     const afterConventionFilterIds =
       await uow.conventionQueries.getUserIdsWithNoActiveConvention({
-        users: candidateUsers,
+        userIds: candidateUserIds,
         since: twoYearsAgo,
       });
 
-    const afterConventionFilterIdSet = new Set(afterConventionFilterIds);
     const userIdsToDelete =
       await uow.discussionRepository.getUserIdsWithNoRecentExchange({
-        users: candidateUsers.filter((u) =>
-          afterConventionFilterIdSet.has(u.id),
-        ),
+        userIds: afterConventionFilterIds,
         since: twoYearsAgo,
       });
 

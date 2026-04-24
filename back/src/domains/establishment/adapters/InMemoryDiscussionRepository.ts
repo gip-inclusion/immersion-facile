@@ -5,10 +5,10 @@ import type {
   DiscussionDto,
   DiscussionId,
   DiscussionInList,
-  Email,
   SiretDto,
   UserId,
 } from "shared";
+import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type {
   DiscussionRepository,
   GetDiscussionIdsParams,
@@ -19,19 +19,26 @@ import type {
 type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 
 export class InMemoryDiscussionRepository implements DiscussionRepository {
-  constructor(private _discussions: DiscussionsById = {}) {}
+  constructor(
+    private readonly userRepository: InMemoryUserRepository,
+    private _discussions: DiscussionsById = {},
+  ) {}
 
   public discussionCallsCount = 0;
   public archivedDiscussionIds: DiscussionId[] = [];
 
   public async getUserIdsWithNoRecentExchange({
-    users,
+    userIds,
     since,
   }: {
-    users: { id: UserId; email: Email }[];
+    userIds: UserId[];
     since: Date;
   }): Promise<UserId[]> {
-    if (users.length === 0) return [];
+    if (userIds.length === 0) return [];
+
+    const users = this.userRepository.users.filter((user) =>
+      userIds.includes(user.id),
+    );
 
     return users
       .filter(

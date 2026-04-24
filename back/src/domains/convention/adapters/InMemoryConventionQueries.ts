@@ -13,7 +13,6 @@ import {
   conventionSchema,
   conventionStatusesDemonstratingUserActivity,
   type DataWithPagination,
-  type Email,
   errors,
   type GetPaginatedConventionsFilters,
   isFunctionalBroadcastFeedbackError,
@@ -54,13 +53,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
   ) {}
 
   public async getUserIdsWithNoActiveConvention({
-    users,
+    userIds,
     since,
   }: {
-    users: { id: UserId; email: Email }[];
+    userIds: UserId[];
     since: Date;
   }): Promise<UserId[]> {
-    if (users.length === 0) return [];
+    if (userIds.length === 0) return [];
+
+    const users = this.userRepository.users.filter((user) =>
+      userIds.includes(user.id),
+    );
 
     return users
       .filter(

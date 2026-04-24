@@ -3417,7 +3417,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("returns empty array when given no users", async () => {
       expectToEqual(
         await conventionQueries.getUserIdsWithNoActiveConvention({
-          users: [],
+          userIds: [],
           since: new Date("2024-01-01"),
         }),
         [],
@@ -3478,11 +3478,7 @@ describe("Pg implementation of ConventionQueries", () => {
       await conventionRepository.save(expiredConvention);
 
       const result = await conventionQueries.getUserIdsWithNoActiveConvention({
-        users: [
-          { id: userA.id, email: userA.email },
-          { id: userB.id, email: userB.email },
-          { id: userC.id, email: userC.email },
-        ],
+        userIds: [userA.id, userB.id, userC.id],
         since,
       });
 
@@ -3557,7 +3553,7 @@ describe("Pg implementation of ConventionQueries", () => {
       );
 
       const result = await conventionQueries.getUserIdsWithNoActiveConvention({
-        users: usersWithStatus.map(({ user }) => user),
+        userIds: usersWithStatus.map(({ user }) => user.id),
         since,
       });
 
