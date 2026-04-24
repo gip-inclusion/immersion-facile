@@ -1,13 +1,13 @@
 import { subHours } from "date-fns";
 import {
   agencyModifierRoles,
+  allDefaultPhoneNumbers,
   allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
-  defaultPhoneNumber,
   errors,
   frontRoutes,
   type SignatoryRole,
@@ -137,7 +137,7 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
       conventionId: convention.id,
     });
 
-    if (signatory.phone === defaultPhoneNumber) {
+    if (allDefaultPhoneNumbers.includes(signatory.phone)) {
       return;
     }
 

@@ -3,13 +3,13 @@ import { uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyWithUsersRights,
+  allDefaultPhoneNumbers,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionActorRole,
   type ConventionDto,
   type ConventionReadDto,
-  defaultPhoneNumber,
   type Email,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
@@ -201,7 +201,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       (signatory) =>
         !signatory.signedAt &&
         smsRecipientPhoneSchema.safeParse(signatory.phone).success &&
-        signatory.phone !== defaultPhoneNumber,
+        !allDefaultPhoneNumbers.includes(signatory.phone),
     );
 
     const emailActors = [

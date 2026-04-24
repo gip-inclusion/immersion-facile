@@ -1,11 +1,11 @@
 import { addDays, subHours } from "date-fns";
 import {
   agencyModifierRoles,
+  allDefaultPhoneNumbers,
   allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  defaultPhoneNumber,
   errors,
   frontRoutes,
   type UserId,
@@ -184,7 +184,7 @@ const sendSms = async ({
   recipientPhone: string;
   userId: UserId | undefined;
 }) => {
-  if (recipientPhone === defaultPhoneNumber) {
+  if (allDefaultPhoneNumbers.includes(recipientPhone)) {
     return;
   }
 

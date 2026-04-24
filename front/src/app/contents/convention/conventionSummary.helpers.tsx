@@ -14,10 +14,10 @@ import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
+  allDefaultPhoneNumbers,
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
-  defaultPhoneNumber,
   domElementIds,
   getFormattedFirstnameAndLastname,
   isValidMobilePhone,
@@ -1007,7 +1007,7 @@ export const sendSignatureLinkButtonProps =
             !isValidMobilePhone(signatoryPhone) ||
             signatoryAlreadySign ||
             signatureLinksSent[signatoryRole] ||
-            signatoryPhone === defaultPhoneNumber,
+            allDefaultPhoneNumbers.includes(signatoryPhone),
           onClick: () => {
             onClick({ signatoryRole, signatoryPhone });
           },
@@ -1029,7 +1029,7 @@ export const sendAssessmentLinkButtonProps =
     disabled:
       !isValidMobilePhone(phone) ||
       isAssessmentLinkSent ||
-      phone === defaultPhoneNumber,
+      allDefaultPhoneNumbers.includes(phone),
     onClick: () => {
       onClick({ phone });
     },
