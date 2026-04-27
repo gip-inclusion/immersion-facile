@@ -6,6 +6,12 @@ import type {
   UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 
+export type GetUserIdsLoggedInLongAgoParams = {
+  since: Date;
+  limit: number;
+  offset: number;
+};
+
 export interface UserRepository {
   save(user: UserWithAdminRights): Promise<void>;
   updateEmail(userId: UserId, email: Email): Promise<void>; //TODO pourquoi cette méthode alors qu'on a un save?
@@ -19,5 +25,7 @@ export interface UserRepository {
     externalId: string,
   ): Promise<UserWithAdminRights | undefined>;
   findByEmail(email: Email): Promise<UserWithAdminRights | undefined>;
-  getUserIdsLoggedInLongAgo(params: { since: Date }): Promise<UserId[]>;
+  getUserIdsLoggedInLongAgo(
+    params: GetUserIdsLoggedInLongAgoParams,
+  ): Promise<UserId[]>;
 }

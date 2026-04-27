@@ -18,6 +18,8 @@ import {
   type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeUser,
@@ -56,8 +58,8 @@ describe("WarnInactiveUsers", () => {
       );
 
     warnInactiveUsers = makeWarnInactiveUsers({
-      uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
+        uowPerformer: new InMemoryUowPerformer(uow),
         saveNotificationsBatchAndRelatedEvent:
           makeSaveNotificationsBatchAndRelatedEvent(
             new UuidV4Generator(),
@@ -65,6 +67,7 @@ describe("WarnInactiveUsers", () => {
           ),
         timeGateway,
         immersionBaseUrl,
+        batchSize: 2,
       },
     });
   });
@@ -307,4 +310,56 @@ describe("WarnInactiveUsers", () => {
     );
     expectToEqual(newWarnings.length, 1);
   });
+
+  it("processes inactive users in batches and skips the empty final batch", async () => {
+    const countingUowPerformer = makeCountingUowPerformer(uow);
+    warnInactiveUsers = makeWarnInactiveUsers({
+      deps: {
+        uowPerformer: countingUowPerformer,
+        saveNotificationsBatchAndRelatedEvent:
+          makeSaveNotificationsBatchAndRelatedEvent(
+            new UuidV4Generator(),
+            timeGateway,
+          ),
+        timeGateway,
+        immersionBaseUrl,
+        batchSize: 2,
+      },
+    });
+    const twoYearsAgo = subYears(now, 2);
+    uow.userRepository.users = makeInactiveUsers(3, twoYearsAgo);
+
+    const result = await warnInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfWarningsSent: 3 });
+    expectToEqual(
+      uow.outboxRepository.events
+        .filter((event) => event.topic === "NotificationBatchAdded")
+        .map((event) => event.payload.length),
+      [2, 1],
+    );
+    expectToEqual(countingUowPerformer.getCount(), 4);
+  });
 });
+
+const makeInactiveUsers = (count: number, twoYearsAgo: Date) =>
+  Array.from({ length: count }, (_, index) =>
+    makeUser({
+      id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
+      email: `inactive-${index + 1}@test.fr`,
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    }),
+  );
+
+const makeCountingUowPerformer = (
+  uow: UnitOfWork,
+): UnitOfWorkPerformer & { getCount: () => number } => {
+  let count = 0;
+  return {
+    perform: async (cb) => {
+      count++;
+      return cb(uow);
+    },
+    getCount: () => count,
+  };
+};

@@ -6,6 +6,7 @@ import type {
   SaveNotificationsBatchAndRelatedEvent,
 } from "../../../notifications/helpers/Notification";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { useCaseBuilder } from "../../../useCaseBuilder";
 import {
   accountInactivityDelayInYears,
@@ -24,12 +25,17 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
   .withInput(z.void())
   .withOutput<WarnInactiveUsersResult>()
   .withDeps<{
+    uowPerformer: UnitOfWorkPerformer;
     saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
     timeGateway: TimeGateway;
     immersionBaseUrl: AbsoluteUrl;
+    batchSize: number;
   }>()
-  .build(async ({ uow, deps }) => {
-    const featureFlags = await uow.featureFlagQueries.getAll();
+  .notTransactional()
+  .build(async ({ deps }) => {
+    const featureFlags = await deps.uowPerformer.perform((uow) =>
+      uow.featureFlagQueries.getAll(),
+    );
     if (!featureFlags.enableInactiveUsersCleanup.isActive)
       return { numberOfWarningsSent: 0 };
 
@@ -38,64 +44,93 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
     const deletionDate = addDays(now, deletionWarningDelayInDays);
     const warningCutoff = subDays(now, deletionWarningDedupInDays);
 
-    const loggedInLongAgoUserIds =
-      await uow.userRepository.getUserIdsLoggedInLongAgo({
-        since: twoYearsAgo,
+    let offset = 0;
+    let numberOfWarningsSent = 0;
+
+    while (true) {
+      const batchResult = await deps.uowPerformer.perform(async (uow) => {
+        const loggedInLongAgoUserIds =
+          await uow.userRepository.getUserIdsLoggedInLongAgo({
+            since: twoYearsAgo,
+            limit: deps.batchSize,
+            offset,
+          });
+
+        if (loggedInLongAgoUserIds.length === 0)
+          return {
+            hasMore: false,
+            numberOfWarningsSent: 0,
+          };
+
+        const alreadyWarnedUserIds =
+          await uow.notificationRepository.filterUserDeletionWarningNotifications(
+            {
+              userIds: loggedInLongAgoUserIds,
+              excludeWarnedSince: warningCutoff,
+            },
+          );
+
+        const alreadyWarned = new Set(alreadyWarnedUserIds);
+        const notYetWarnedUserIds = loggedInLongAgoUserIds.filter(
+          (id) => !alreadyWarned.has(id),
+        );
+
+        const candidateUserIdsWithoutActiveConvention =
+          await uow.conventionQueries.getUserIdsWithNoActiveConvention({
+            userIds: notYetWarnedUserIds,
+            since: twoYearsAgo,
+          });
+
+        const inactiveUserIds =
+          await uow.discussionRepository.getUserIdsWithNoRecentExchange({
+            userIds: candidateUserIdsWithoutActiveConvention,
+            since: twoYearsAgo,
+          });
+
+        const inactiveUsers =
+          await uow.userRepository.getByIds(inactiveUserIds);
+
+        const deletionDateFormatted = deletionDate.toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+
+        const loginUrl: AbsoluteUrl = `${deps.immersionBaseUrl}/${frontRoutes.profile}`;
+
+        const notifications: NotificationContentAndFollowedIds[] =
+          inactiveUsers.map((user) => ({
+            kind: "email",
+            templatedContent: {
+              kind: "ACCOUNT_DELETION_WARNING",
+              recipients: [user.email],
+              params: {
+                fullName: `${user.firstName} ${user.lastName}`,
+                deletionDate: deletionDateFormatted,
+                loginUrl,
+              },
+            },
+            followedIds: {
+              userId: user.id,
+            },
+          }));
+
+        if (notifications.length)
+          await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications, {
+            priority: inactiveUserNotificationEventPriority,
+          });
+
+        return {
+          hasMore: true,
+          numberOfWarningsSent: notifications.length,
+        };
       });
 
-    const alreadyWarnedUserIds =
-      await uow.notificationRepository.filterUserDeletionWarningNotifications({
-        userIds: loggedInLongAgoUserIds,
-        excludeWarnedSince: warningCutoff,
-      });
+      if (!batchResult.hasMore) break;
 
-    const alreadyWarned = new Set(alreadyWarnedUserIds);
-    const notYetWarnedUserIds = loggedInLongAgoUserIds.filter(
-      (id) => !alreadyWarned.has(id),
-    );
+      offset += deps.batchSize;
+      numberOfWarningsSent += batchResult.numberOfWarningsSent;
+    }
 
-    const candidateUserIdsWithoutActiveConvention =
-      await uow.conventionQueries.getUserIdsWithNoActiveConvention({
-        userIds: notYetWarnedUserIds,
-        since: twoYearsAgo,
-      });
-
-    const inactiveUserIds =
-      await uow.discussionRepository.getUserIdsWithNoRecentExchange({
-        userIds: candidateUserIdsWithoutActiveConvention,
-        since: twoYearsAgo,
-      });
-
-    const inactiveUsers = await uow.userRepository.getByIds(inactiveUserIds);
-
-    const deletionDateFormatted = deletionDate.toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-
-    const loginUrl: AbsoluteUrl = `${deps.immersionBaseUrl}/${frontRoutes.profile}`;
-
-    const notifications: NotificationContentAndFollowedIds[] =
-      inactiveUsers.map((user) => ({
-        kind: "email",
-        templatedContent: {
-          kind: "ACCOUNT_DELETION_WARNING",
-          recipients: [user.email],
-          params: {
-            fullName: `${user.firstName} ${user.lastName}`,
-            deletionDate: deletionDateFormatted,
-            loginUrl,
-          },
-        },
-        followedIds: {
-          userId: user.id,
-        },
-      }));
-
-    await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications, {
-      priority: inactiveUserNotificationEventPriority,
-    });
-
-    return { numberOfWarningsSent: notifications.length };
+    return { numberOfWarningsSent };
   });
