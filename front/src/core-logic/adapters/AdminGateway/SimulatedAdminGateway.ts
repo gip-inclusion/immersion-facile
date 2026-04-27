@@ -4,6 +4,7 @@ import {
   type ApiConsumer,
   type ApiConsumerId,
   type ApiConsumerJwt,
+  type BanEstablishmentPayload,
   type ConnectedUser,
   type ConnectedUserJwt,
   type DashboardUrlAndName,
@@ -181,6 +182,12 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(
       "newFakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.RENEWED_KEY",
     );
+  }
+
+  public banEstablishment$(
+    _payload: BanEstablishmentPayload,
+  ): Observable<void> {
+    return of(undefined);
   }
 }
 

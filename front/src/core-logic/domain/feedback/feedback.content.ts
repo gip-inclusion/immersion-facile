@@ -81,6 +81,7 @@ const topics = [
   "establishments-batch",
   "form-establishment",
   "form-establishment-offer-modal",
+  "ban-establishment",
   "my-profile-establishment-registration",
   "login-by-email",
   "magic-link-interstitial",
@@ -543,6 +544,19 @@ export const feedbacks: Record<
     },
   },
   "form-establishment-offer-modal": {},
+  "ban-establishment": {
+    "create.error": {
+      action: establishmentSlice.actions.banEstablishmentFailed,
+      title: "Impossible de bannir l'entreprise",
+      message:
+        "Une erreur technique est survenue. Le bannissement du SIRET n'a pas pu être enregistré.",
+    },
+    "create.success": {
+      action: establishmentSlice.actions.banEstablishmentSucceeded,
+      title: "L'entreprise a bien été bannie",
+      message: "Le SIRET a été ajouté à la blacklist d’Immersion Facilitée.",
+    },
+  },
   "siret-input": {},
   assessment: {
     "create.success": {
