@@ -96,6 +96,9 @@ export const cast = <Cast>(query: ExpressionWrapper<any, any, any>) =>
 
 export type KyselyDb = Kysely<Database>;
 
+// this is used just like where col in (...), it will do where col = ANY(...)
+// the advantage is that it is considered a single query parameter instead of multiple,
+// and will make the query easier to monitor (each time the number of param change it is considered a new query)
 export const isInArray = <
   DB,
   TB extends keyof DB,

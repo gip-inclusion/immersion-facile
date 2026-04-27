@@ -1,6 +1,7 @@
 import "./instrumentSentryCron";
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
+import { inactiveUsersCleanupBatchSize } from "../../domains/core/authentication/connected-user/use-cases/inactiveUserConstants";
 import { makeTriggerEventsToDeleteInactiveUsers } from "../../domains/core/authentication/connected-user/use-cases/TriggerEventsToDeleteInactiveUsers";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
@@ -23,10 +24,11 @@ const triggerEventsToDeleteInactiveUsersScript = async () => {
 
   const triggerEventsToDeleteInactiveUsers =
     makeTriggerEventsToDeleteInactiveUsers({
-      uowPerformer,
       deps: {
+        uowPerformer,
         timeGateway,
         createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+        batchSize: inactiveUsersCleanupBatchSize,
       },
     });
 

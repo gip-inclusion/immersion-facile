@@ -1,6 +1,7 @@
 import "./instrumentSentryCron";
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
+import { inactiveUsersCleanupBatchSize } from "../../domains/core/authentication/connected-user/use-cases/inactiveUserConstants";
 import { makeWarnInactiveUsers } from "../../domains/core/authentication/connected-user/use-cases/WarnInactiveUsers";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
@@ -19,8 +20,8 @@ const warnInactiveUsersScript = async () => {
   );
 
   const warnInactiveUsers = makeWarnInactiveUsers({
-    uowPerformer,
     deps: {
+      uowPerformer,
       saveNotificationsBatchAndRelatedEvent:
         makeSaveNotificationsBatchAndRelatedEvent(
           new UuidV4Generator(),
@@ -28,6 +29,7 @@ const warnInactiveUsersScript = async () => {
         ),
       timeGateway: new CustomTimeGateway(),
       immersionBaseUrl: config.immersionFacileBaseUrl,
+      batchSize: inactiveUsersCleanupBatchSize,
     },
   });
 

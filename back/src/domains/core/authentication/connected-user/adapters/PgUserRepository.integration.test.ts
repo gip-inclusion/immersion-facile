@@ -491,6 +491,8 @@ describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
 
     const result = await userRepository.getUserIdsLoggedInLongAgo({
       since: twoYearsAgo,
+      limit: 100,
+      offset: 0,
     });
 
     expectArraysToEqualIgnoringOrder(result, [neverLoggedIn.id]);
@@ -511,9 +513,45 @@ describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
 
     const result = await userRepository.getUserIdsLoggedInLongAgo({
       since: twoYearsAgo,
+      limit: 100,
+      offset: 0,
     });
 
     expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
+  });
+
+  it("returns old-login user ids by stable offset pages", async () => {
+    const inactiveUserA = makeUserWithOldLogin({
+      id: "11111111-1111-4111-9111-111111111111",
+      email: "inactive-a@test.fr",
+    });
+    const inactiveUserB = makeUserWithOldLogin({
+      id: "22222222-2222-4222-9222-222222222222",
+      email: "inactive-b@test.fr",
+    });
+    const inactiveUserC = makeUserWithOldLogin({
+      id: "33333333-3333-4333-9333-333333333333",
+      email: "inactive-c@test.fr",
+    });
+    await Promise.all([
+      userRepository.save(inactiveUserC),
+      userRepository.save(inactiveUserA),
+      userRepository.save(inactiveUserB),
+    ]);
+
+    const firstPage = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+      limit: 2,
+      offset: 0,
+    });
+    const secondPage = await userRepository.getUserIdsLoggedInLongAgo({
+      since: twoYearsAgo,
+      limit: 2,
+      offset: 2,
+    });
+
+    expectToEqual(firstPage, [inactiveUserA.id, inactiveUserB.id]);
+    expectToEqual(secondPage, [inactiveUserC.id]);
   });
 });
 

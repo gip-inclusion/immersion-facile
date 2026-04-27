@@ -7,7 +7,10 @@ import {
   type UserWithAdminRights,
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
-import type { UserRepository } from "../port/UserRepository";
+import type {
+  GetUserIdsLoggedInLongAgoParams,
+  UserRepository,
+} from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
   #usersById: Record<string, UserWithAdminRights> = {};
@@ -135,11 +138,13 @@ export class InMemoryUserRepository implements UserRepository {
 
   public async getUserIdsLoggedInLongAgo({
     since,
-  }: {
-    since: Date;
-  }): Promise<UserId[]> {
+    limit,
+    offset,
+  }: GetUserIdsLoggedInLongAgoParams): Promise<UserId[]> {
     return values(this.#usersById)
       .filter((user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since)
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .slice(offset, offset + limit)
       .map((u) => u.id);
   }
 }

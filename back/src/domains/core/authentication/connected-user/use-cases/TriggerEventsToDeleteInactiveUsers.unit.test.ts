@@ -7,6 +7,8 @@ import {
   type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeUser,
@@ -43,10 +45,11 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
 
     triggerEventsToDeleteInactiveUsers = makeTriggerEventsToDeleteInactiveUsers(
       {
-        uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
+          uowPerformer: new InMemoryUowPerformer(uow),
           timeGateway,
           createNewEvent,
+          batchSize: 2,
         },
       },
     );
@@ -259,4 +262,64 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
       triggeredBy: { kind: "crawler" },
     });
   });
+
+  it("processes warned inactive users in batches and skips the empty final batch", async () => {
+    const countingUowPerformer = makeCountingUowPerformer(uow);
+    triggerEventsToDeleteInactiveUsers = makeTriggerEventsToDeleteInactiveUsers(
+      {
+        deps: {
+          uowPerformer: countingUowPerformer,
+          timeGateway,
+          createNewEvent: makeCreateNewEvent({
+            timeGateway,
+            uuidGenerator: new UuidV4Generator(),
+          }),
+          batchSize: 2,
+        },
+      },
+    );
+    const twoYearsAgo = subYears(now, 2);
+    const users = makeInactiveUsers(3, twoYearsAgo);
+    uow.userRepository.users = users;
+    users.forEach((user) => {
+      saveDeletionWarningNotification({
+        uow,
+        userId: user.id,
+        createdAt: subDays(now, 8),
+      });
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 3 });
+    expectToEqual(
+      uow.outboxRepository.events.filter(
+        (event) => event.topic === "InactiveUserAccountDeletionTriggered",
+      ).length,
+      3,
+    );
+    expectToEqual(countingUowPerformer.getCount(), 4);
+  });
 });
+
+const makeInactiveUsers = (count: number, twoYearsAgo: Date) =>
+  Array.from({ length: count }, (_, index) =>
+    makeUser({
+      id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
+      email: `inactive-${index + 1}@test.fr`,
+      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+    }),
+  );
+
+const makeCountingUowPerformer = (
+  uow: UnitOfWork,
+): UnitOfWorkPerformer & { getCount: () => number } => {
+  let count = 0;
+  return {
+    perform: async (cb) => {
+      count++;
+      return cb(uow);
+    },
+    getCount: () => count,
+  };
+};

@@ -14,7 +14,10 @@ import {
   isInArray,
   type KyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import type { UserRepository } from "../port/UserRepository";
+import type {
+  GetUserIdsLoggedInLongAgoParams,
+  UserRepository,
+} from "../port/UserRepository";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -194,9 +197,9 @@ export class PgUserRepository implements UserRepository {
 
   public async getUserIdsLoggedInLongAgo({
     since,
-  }: {
-    since: Date;
-  }): Promise<UserId[]> {
+    limit,
+    offset,
+  }: GetUserIdsLoggedInLongAgoParams): Promise<UserId[]> {
     const rows = await this.transaction
       .selectFrom("users")
       .select("users.id")
@@ -206,6 +209,9 @@ export class PgUserRepository implements UserRepository {
           eb("users.last_login_at", "is", null),
         ]),
       )
+      .orderBy("users.id")
+      .limit(limit)
+      .offset(offset)
       .execute();
 
     return rows.map((r) => r.id);
