@@ -1,7 +1,7 @@
 import { omit } from "ramda";
 import { match, P } from "ts-pattern";
 import type { WithAcquisition } from "../acquisition.dto";
-import type { AddressDto } from "../address/address.dto";
+import type { AddressDto, LocationId } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import {
   type ConventionId,
@@ -416,5 +416,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       .exhaustive();
 
     return new DiscussionBuilder(updatedDiscussion);
+  }
+
+  withLocationId(locationId: LocationId) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      locationId,
+    });
   }
 }

@@ -3797,8 +3797,23 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
-      it("undefined when missing location id", async () => {
-        const missingLocationId = "55555555-5555-4444-5555-555555555666";
+      it("ignores location id when location does not exist anymore", async () => {
+        const deletedLocationId =
+          establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+            .locations[0].id;
+
+        await kyselyDb
+          .deleteFrom("establishments_location_infos")
+          .where("id", "=", deletedLocationId)
+          .execute();
+
+        const searchResultWithoutLocationId =
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.establishment
+              .siret,
+            establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
+              .appellationCode,
+          );
 
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
@@ -3806,9 +3821,9 @@ describe("PgEstablishmentAggregateRepository", () => {
               .siret,
             establishmentWithOfferA1101_AtPositionWithTwoLocations.offers[0]
               .appellationCode,
-            missingLocationId,
+            deletedLocationId,
           ),
-          undefined,
+          searchResultWithoutLocationId,
         );
       });
 

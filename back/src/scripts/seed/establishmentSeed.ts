@@ -123,9 +123,6 @@ const decathlon = new EstablishmentAggregateBuilder()
   .build();
 
 export const establishmentSeed = async (uow: UnitOfWork) => {
-  // biome-ignore lint/suspicious/noConsole: <explanation>
-  console.log("establishmentSeed start ...");
-
   await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
     franceMerguez,
   );
@@ -145,6 +142,13 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
     },
     name: "Decathlon",
   });
+
+  const franceMerguezLocationId =
+    franceMerguez.establishment.locations.at(0)?.id;
+  if (!franceMerguezLocationId)
+    throw new Error(
+      "Cannot seed discussions without an establishment location.",
+    );
 
   const discussionId = "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa";
   await uow.discussionRepository.insert(
@@ -176,6 +180,7 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
           attachments: [],
         },
       ])
+      .withLocationId(franceMerguezLocationId)
       .build(),
   );
   await uow.discussionRepository.insert(
@@ -208,9 +213,7 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
         },
       ])
       .withStatus({ status: "REJECTED", rejectionKind: "DEPRECATED" })
+      .withLocationId(franceMerguezLocationId)
       .build(),
   );
-
-  // biome-ignore lint/suspicious/noConsole: <explanation>
-  console.log("establishmentSeed done");
 };

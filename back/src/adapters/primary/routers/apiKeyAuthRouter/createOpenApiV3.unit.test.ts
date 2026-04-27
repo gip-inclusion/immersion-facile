@@ -5,10 +5,10 @@ import { publicApiV3SearchEstablishmentRoutes } from "./publicApiV3.routes";
 describe("createOpenApiSpecV3", () => {
   const spec = createOpenApiSpecV3("test");
   const paths = spec.paths!;
-
+  const fullPath = "/v3/offers/{siret}/{appellationCode}/{locationId?}";
   const getOffersPath = publicApiV3SearchEstablishmentRoutes.getOffers.url;
   const getOfferPath = Object.keys(paths).find((path) =>
-    path.startsWith("/v3/offers/{siret}/{appellationCode}"),
+    path.startsWith(fullPath),
   );
   const contactEstablishmentPath =
     publicApiV3SearchEstablishmentRoutes.contactEstablishment.url;
@@ -21,7 +21,7 @@ describe("createOpenApiSpecV3", () => {
 
     it("has getOffer route", () => {
       expect(getOfferPath).toBeDefined();
-      expect(getOfferPath).toContain("/v3/offers/{siret}/{appellationCode}");
+      expect(getOfferPath).toContain(fullPath);
       if (!getOfferPath) return;
       expect(paths[getOfferPath]).toBeDefined();
       expect(paths[getOfferPath]?.get).toBeDefined();

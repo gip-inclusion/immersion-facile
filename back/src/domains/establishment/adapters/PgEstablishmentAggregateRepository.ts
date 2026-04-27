@@ -430,6 +430,19 @@ export class PgEstablishmentAggregateRepository
     appellationCode: AppellationCode,
     locationId?: LocationId,
   ): Promise<RepositorySearchResultDto | undefined> {
+    const isLocationIdExisting = locationId
+      ? await this.transaction
+          .selectFrom("establishments_location_infos")
+          .select("id")
+          .where("id", "=", locationId)
+          .where("establishment_siret", "=", siret)
+          .executeTakeFirst()
+          .then((result) => result !== undefined)
+      : Promise.resolve(false);
+
+    const locationIds =
+      isLocationIdExisting && locationId ? [locationId] : undefined;
+
     const { data } = await searchImmersionResultsQuery(this.transaction, {
       limit: 1,
       offset: 0,
@@ -437,7 +450,7 @@ export class PgEstablishmentAggregateRepository
       filters: {
         sirets: [siret],
         appellationCodes: [appellationCode],
-        locationIds: locationId ? [locationId] : undefined,
+        locationIds,
         showOnlyAvailableOffers: false,
       },
       shouldCountAll: false,
