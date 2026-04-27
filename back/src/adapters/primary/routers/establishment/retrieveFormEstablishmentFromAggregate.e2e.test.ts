@@ -185,7 +185,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: false,
         },
-        isBanned: false,
+        isEstablishmentBanned: false,
       },
       status: 200,
     });
@@ -255,7 +255,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
-        isBanned: false,
+        isEstablishmentBanned: false,
       },
       status: 200,
     });
@@ -264,13 +264,14 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
   )} 200 if banned establishment and user is back office admin`, async () => {
-    const bannishmentJustification = "Un employé a mangé du beurre doux";
+    const establishmentBannishmentJustification =
+      "Un employé a mangé du beurre doux";
     const bannedEstablishmentAggregate: EstablishmentAggregate = {
       ...establishmentAggregate,
       establishment: {
         ...establishmentAggregate.establishment,
-        isBanned: true,
-        bannishmentJustification,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
       },
     };
 
@@ -336,8 +337,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
-        isBanned: true,
-        bannishmentJustification,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
       },
       status: 200,
     });
@@ -425,7 +426,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   )} 403 if banned establishment and user is not back office admin`, async () => {
     const banEstablishmentPayload: BanEstablishmentPayload = {
       siret: "12345678912345",
-      bannishmentJustification: "Un employé a mangé du beurre doux",
+      establishmentBannishmentJustification:
+        "Un employé a mangé du beurre doux",
     };
 
     inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [

@@ -204,7 +204,7 @@ describe("Add form establishment", () => {
     )} 403 if establishment siret is banned`, async () => {
       const banEstablishmentPayload: BanEstablishmentPayload = {
         siret: "12345678912345",
-        bannishmentJustification:
+        establishmentBannishmentJustification:
           "Le patron normand a dit que le Mont Saint-Michel n'était pas breton",
       };
 

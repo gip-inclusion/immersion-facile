@@ -84,7 +84,7 @@ describe("GetSiret", () => {
   it("throws when siret is banned", async () => {
     const banEstablishmentPayload: BanEstablishmentPayload = {
       siret: "12345678912345",
-      bannishmentJustification: "Valid justification",
+      establishmentBannishmentJustification: "Valid justification",
     };
 
     uow.bannedEstablishmentRepository.bannedEstablishments = [

@@ -309,7 +309,8 @@ export class HttpAdminGateway implements AdminGateway {
           headers: { authorization: jwt },
           body: {
             siret: payload.siret,
-            bannishmentJustification: payload.bannishmentJustification,
+            establishmentBannishmentJustification:
+              payload.establishmentBannishmentJustification,
           },
         })
         .then((response) =>

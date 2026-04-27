@@ -9,6 +9,6 @@ export interface BannedEstablishmentRepository {
   ): Promise<BannedEstablishment | undefined>;
   banEstablishment({
     siret,
-    bannishmentJustification,
+    establishmentBannishmentJustification,
   }: BanEstablishmentPayload): Promise<void>;
 }

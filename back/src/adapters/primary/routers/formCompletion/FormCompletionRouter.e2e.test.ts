@@ -118,7 +118,8 @@ describe("formCompletion Routes", () => {
     it("403 - siret already banned", async () => {
       const banEstablishmentPayload: BanEstablishmentPayload = {
         siret: "12345678912345",
-        bannishmentJustification: "Le cidre vendu n'est pas breton",
+        establishmentBannishmentJustification:
+          "Le cidre vendu n'est pas breton",
       };
 
       inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
