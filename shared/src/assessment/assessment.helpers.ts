@@ -1,7 +1,12 @@
+import { addDays, isBefore } from "date-fns";
 import { match } from "ts-pattern";
 import type { ConventionDto } from "../convention/convention.dto";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
-import { type DateString, hoursValueToHoursDisplayed } from "../utils/date";
+import {
+  type DateString,
+  type DateTimeIsoString,
+  hoursValueToHoursDisplayed,
+} from "../utils/date";
 import type {
   AssessmentDto,
   AssessmentStatus,
@@ -9,6 +14,14 @@ import type {
 } from "./assessment.dto";
 
 export const ASSESSEMENT_SIGNATURE_RELEASE_DATE = new Date("2026-03-10");
+
+export const isBeforeAssessmentSignatureReleaseDate = (
+  assessmentCreatedAt: DateTimeIsoString,
+): boolean =>
+  isBefore(
+    new Date(assessmentCreatedAt),
+    addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
+  );
 
 export const computeTotalHours = ({
   convention,

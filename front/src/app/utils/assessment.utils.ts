@@ -1,7 +1,8 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
-import type {
-  AssessmentCompletionStatusFilter,
-  ConventionAssessmentFields,
+import {
+  type AssessmentCompletionStatusFilter,
+  type ConventionAssessmentFields,
+  isBeforeAssessmentSignatureReleaseDate,
 } from "shared";
 
 export type AssessmentLabelsAndSeverity = {
@@ -51,7 +52,8 @@ export const getAssessmentCompletionStatus = (
   if (
     "signedAt" in assessment &&
     assessment.signedAt === null &&
-    assessment.status !== "DID_NOT_SHOW"
+    assessment.status !== "DID_NOT_SHOW" &&
+    !isBeforeAssessmentSignatureReleaseDate(assessment.createdAt)
   )
     return "to-sign";
   return "finalized";
