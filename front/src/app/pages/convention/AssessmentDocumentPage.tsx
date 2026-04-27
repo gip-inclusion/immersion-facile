@@ -1,13 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { addDays, isBefore } from "date-fns";
 import DOMPurify from "dompurify";
 import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
@@ -15,6 +13,7 @@ import {
   getFormattedFirstnameAndLastname,
   immersionFacileHelpdeskRootUrl,
   isAssessmentDto,
+  isBeforeAssessmentSignatureReleaseDate,
   isStringDate,
   makeSiretDescriptionLink,
   toDisplayedDate,
@@ -186,10 +185,7 @@ export const AssessmentDocumentPage = ({
   const isSignedByBeneficiary = !isAssessmentLegacy && !!assessment.signedAt;
   const isBeforeSignatureReleaseDate =
     !isAssessmentLegacy &&
-    isBefore(
-      new Date(assessment.createdAt),
-      addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
-    );
+    isBeforeAssessmentSignatureReleaseDate(assessment.createdAt);
   const isSignatureRequired = !(
     isSignedByBeneficiary ||
     assessment.status === "DID_NOT_SHOW" ||

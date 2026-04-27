@@ -7,8 +7,6 @@ import { useCallback } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type AssessmentCompletionStatusFilter,
-  type ConventionAssessmentFields,
   type ConventionReadDto,
   domElementIds,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
@@ -16,7 +14,10 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import { getAssessmentLabelsAndSeverityByStatus } from "src/app/utils/assessment.utils";
+import {
+  getAssessmentCompletionStatus,
+  getAssessmentLabelsAndSeverityByStatus,
+} from "src/app/utils/assessment.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
@@ -107,7 +108,7 @@ const AssessmentToCompleteTaskItem = ({
 }: {
   convention: ConventionReadDto;
 }) => {
-  const assessmentCompletionStatus = getAssessmentCompletionStatusFilter(
+  const assessmentCompletionStatus = getAssessmentCompletionStatus(
     convention.assessment,
   );
   const title = (
@@ -166,15 +167,4 @@ const AssessmentToCompleteTaskItem = ({
       ]}
     />
   );
-};
-
-const getAssessmentCompletionStatusFilter = (
-  assessment: ConventionAssessmentFields["assessment"],
-): AssessmentCompletionStatusFilter => {
-  if (!assessment) return "to-complete";
-  if ("signedAt" in assessment)
-    return assessment.signedAt !== null || assessment.status === "DID_NOT_SHOW"
-      ? "finalized"
-      : "to-sign";
-  return "finalized";
 };
