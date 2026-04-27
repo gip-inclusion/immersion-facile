@@ -50,7 +50,7 @@ export const acquisitionParams = {
   mtm_kwd: param.query.optional.string,
 };
 
-const ftConnectParams = {
+export const ftConnectParams = {
   fedId: param.query.optional.string,
   fedIdProvider: param.query.optional.string,
   fedIdToken: param.query.optional.string,
