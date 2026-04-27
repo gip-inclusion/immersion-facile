@@ -71,7 +71,6 @@ export const initialDiscussionsWithPagination: DataWithPagination<DiscussionInLi
     perPage: defaultPerPageInWebPagination,
     statuses: [],
     search: "",
-    userRole: "establishment",
   },
 };
 

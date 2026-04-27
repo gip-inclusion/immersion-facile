@@ -50,7 +50,7 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
   const defaultFilters = useMemo(
     () =>
       pick(
-        ["orderBy", "orderDirection", "statuses", "search", "userRole"],
+        ["orderBy", "orderDirection", "statuses", "search"],
         initialDiscussionsWithPagination.filters,
       ),
     [],
@@ -59,7 +59,7 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
     useState<
       Pick<
         FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
-        "statuses" | "orderBy" | "orderDirection" | "search" | "userRole"
+        "statuses" | "orderBy" | "orderDirection" | "search"
       >
     >(defaultFilters);
 
@@ -107,15 +107,12 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
       dispatch(
         discussionSlice.actions.fetchDiscussionListRequested({
           jwt: connectedUserJwt,
-          filters: {
-            ...initialDiscussionsWithPagination.filters,
-            userRole: viewer,
-          },
+          filters: initialDiscussionsWithPagination.filters,
           feedbackTopic: "establishment-dashboard-discussion-list",
         }),
       );
     }
-  }, [connectedUserJwt, dispatch, viewer]);
+  }, [connectedUserJwt, dispatch]);
   if (!connectedUserJwt) {
     return;
   }
