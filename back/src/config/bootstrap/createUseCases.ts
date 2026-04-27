@@ -142,8 +142,7 @@ import { ContactEstablishment } from "../../domains/establishment/use-cases/Cont
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
-import { makeGetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
-import { makeGetDiscussionByIdForPotentialBeneficiary } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForPotentialBeneficiary";
+import { makeGetDiscussionById } from "../../domains/establishment/use-cases/discussions/GetDiscussionById";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
@@ -650,13 +649,9 @@ export const createUseCases = ({
       },
     }),
 
-    getDiscussionByIdForEstablishment: makeGetDiscussionByIdForEstablishment({
+    getDiscussionById: makeGetDiscussionById({
       uowPerformer,
     }),
-    getDiscussionByIdForPotentialBeneficiary:
-      makeGetDiscussionByIdForPotentialBeneficiary({
-        uowPerformer,
-      }),
 
     sendExchangeToRecipient: makeSendExchangeToRecipient({
       deps: {

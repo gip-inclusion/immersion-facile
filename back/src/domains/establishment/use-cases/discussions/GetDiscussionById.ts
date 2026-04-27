@@ -13,13 +13,9 @@ import { createLogger } from "../../../../utils/logger";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export type GetDiscussionByIdForEstablishment = ReturnType<
-  typeof makeGetDiscussionByIdForEstablishment
->;
+export type GetDiscussionById = ReturnType<typeof makeGetDiscussionById>;
 
-export const makeGetDiscussionByIdForEstablishment = useCaseBuilder(
-  "GetDiscussionByIdForEstablishment",
-)
+export const makeGetDiscussionById = useCaseBuilder("GetDiscussionById")
   .withInput<DiscussionId>(discussionIdSchema)
   .withOutput<DiscussionReadDto>()
   .withCurrentUser<ConnectedUserDomainJwtPayload>()
@@ -72,6 +68,8 @@ const hasUserRightToAccessDiscussion = async (
   user: User,
   discussion: DiscussionDto,
 ): Promise<boolean> => {
+  if (user.email === discussion.potentialBeneficiary.email) return true;
+
   const establishment =
     await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
       discussion.siret,
