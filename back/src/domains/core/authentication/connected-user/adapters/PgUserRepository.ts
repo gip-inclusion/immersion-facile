@@ -10,7 +10,10 @@ import {
   type UserWithAdminRights,
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
-import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import {
+  isInArray,
+  type KyselyDb,
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import type { UserRepository } from "../port/UserRepository";
 
 type PersistenceAuthenticatedUser = {
@@ -136,7 +139,7 @@ export class PgUserRepository implements UserRepository {
   async getByIds(userIds: UserId[]): Promise<UserWithAdminRights[]> {
     if (!userIds.length) return [];
     const usersInDb = await this.#getUserQueryBuilder()
-      .where("id", "in", userIds)
+      .where((eb) => isInArray(eb, "users.id", userIds))
       .execute();
     const users = usersInDb
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))

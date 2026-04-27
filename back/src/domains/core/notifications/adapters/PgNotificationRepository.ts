@@ -17,6 +17,7 @@ import {
   type UserId,
 } from "shared";
 import {
+  isInArray,
   jsonBuildObject,
   jsonStripNulls,
   type KyselyDb,
@@ -476,7 +477,9 @@ export class PgNotificationRepository implements NotificationRepository {
 
     const baseQuery = this.transaction
       .selectFrom("notifications_email")
-      .where("notifications_email.user_id", "in", params.userIds)
+      .where((eb) =>
+        isInArray(eb, "notifications_email.user_id", params.userIds),
+      )
       .where("notifications_email.email_kind", "=", "ACCOUNT_DELETION_WARNING");
 
     const filteredQuery = params.excludeWarnedSince

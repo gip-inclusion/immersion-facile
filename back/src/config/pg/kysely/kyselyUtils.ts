@@ -1,10 +1,14 @@
 import {
   type Expression,
+  type ExpressionBuilder,
   type ExpressionWrapper,
+  type ExtractTypeFromReferenceExpression,
   Kysely,
   PostgresDialect,
   type RawBuilder,
+  type ReferenceExpression,
   type Simplify,
+  type SqlBool,
   sql,
 } from "kysely";
 import type { Pool } from "pg";
@@ -91,6 +95,25 @@ export const cast = <Cast>(query: ExpressionWrapper<any, any, any>) =>
   sql<Cast>`${query}`;
 
 export type KyselyDb = Kysely<Database>;
+
+export const isInArray = <
+  DB,
+  TB extends keyof DB,
+  RE extends ReferenceExpression<DB, TB>,
+>(
+  eb: ExpressionBuilder<DB, TB>,
+  column: RE,
+  values: readonly NonNullable<
+    ExtractTypeFromReferenceExpression<DB, TB, RE>
+  >[],
+): Expression<SqlBool> =>
+  values.length === 0
+    ? sql<SqlBool>`false`
+    : eb(
+        column,
+        "=",
+        sql<ExtractTypeFromReferenceExpression<DB, TB, RE>>`ANY(${values})`,
+      );
 
 export const falsyToNull = <T>(value: T | Falsy): T | null =>
   value ? value : null;
