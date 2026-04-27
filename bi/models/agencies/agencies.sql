@@ -40,6 +40,9 @@ select
     a.covered_departments,
     a.acquisition_campaign,
     a.acquisition_keyword,
+    a.delegation_info ->> 'delegationAgencyKind' as delegation_agency_kind,
+    a.delegation_info ->> 'delegationAgencyName' as delegation_agency_name,
+    (a.delegation_info ->> 'delegationEndDate')::date as delegation_end_date,
     pn.phone_number
 from {{ source('immersion', 'agencies') }} as a
 left join {{ source('immersion', 'public_department_region') }} as pdr
