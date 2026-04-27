@@ -463,10 +463,9 @@ export const ConventionDocumentPage = ({
               ? "de l'immersion"
               : "du mini-stage"}{" "}
             seront : {formatSchedule(convention)}
-            <br />
           </strong>
         </div>
-        <h4 className={fr.cx("fr-h6")}>
+        <h4 className={fr.cx("fr-h6", "fr-mt-4w")}>
           Conditions d'observation de l’activité
         </h4>
         {(convention.sanitaryPrevention || convention.individualProtection) && (
