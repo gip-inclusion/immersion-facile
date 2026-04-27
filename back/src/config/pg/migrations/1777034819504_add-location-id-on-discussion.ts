@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
-
-export const shorthands: ColumnDefinitions | undefined = undefined;
+import type { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumn("discussions", {
-    location_id: { type: "uuid" },
+    location_id: {
+      type: "uuid",
+    },
   });
 }
 
