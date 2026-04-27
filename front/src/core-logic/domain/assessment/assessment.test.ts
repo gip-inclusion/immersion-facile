@@ -29,20 +29,19 @@ describe("Immersion Assessment slice", () => {
       expectStateToMatchInitialState(store);
       store.dispatch(
         assessmentSlice.actions.creationRequested({
-          assessmentAndJwt: {
-            assessment: {
-              conventionId: "23465",
-              status: "DID_NOT_SHOW",
-              endedWithAJob: false,
-              establishmentFeedback: "my feedback",
-              establishmentAdvices: "my advices",
-              beneficiaryAgreement: null,
-              beneficiaryFeedback: null,
-              signedAt: null,
-              createdAt: new Date().toISOString(),
-            },
-            jwt: "",
+          assessment: {
+            conventionId: "23465",
+            conventionStartDate: "2025-01-01",
+            status: "DID_NOT_SHOW",
+            endedWithAJob: false,
+            establishmentFeedback: "my feedback",
+            establishmentAdvices: "my advices",
+            beneficiaryAgreement: null,
+            beneficiaryFeedback: null,
+            signedAt: null,
+            createdAt: new Date().toISOString(),
           },
+          jwt: "",
           feedbackTopic: "assessment",
         }),
       );
@@ -64,20 +63,19 @@ describe("Immersion Assessment slice", () => {
       expectStateToMatchInitialState(store);
       store.dispatch(
         assessmentSlice.actions.creationRequested({
-          assessmentAndJwt: {
-            assessment: {
-              conventionId: "23465",
-              status: "DID_NOT_SHOW",
-              endedWithAJob: false,
-              establishmentFeedback: "my feedback",
-              establishmentAdvices: "my advices",
-              beneficiaryAgreement: null,
-              beneficiaryFeedback: null,
-              signedAt: null,
-              createdAt: new Date().toISOString(),
-            },
-            jwt: "",
+          assessment: {
+            conventionId: "23465",
+            conventionStartDate: "2025-01-01",
+            status: "DID_NOT_SHOW",
+            endedWithAJob: false,
+            establishmentFeedback: "my feedback",
+            establishmentAdvices: "my advices",
+            beneficiaryAgreement: null,
+            beneficiaryFeedback: null,
+            signedAt: null,
+            createdAt: new Date().toISOString(),
           },
+          jwt: "",
           feedbackTopic: "assessment",
         }),
       );

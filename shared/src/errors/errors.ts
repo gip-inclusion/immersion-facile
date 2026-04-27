@@ -236,6 +236,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de relancer la demande de completion du bilan pour les conventions se terminant dans plus d'un jour.`,
       ),
+    conventionDateStartMismatch: (conventionId: ConventionId) =>
+      new BadRequestError(
+        `Il y a un écart entre la date de démarrage de l'immersion '${conventionId}' dans la convention et celle indiquée dans les paramètre de la demande.`,
+      ),
     conventionIdMismatch: () =>
       new ForbiddenError(
         "Il y a un décalage d'identifiant de convention dans les données envoyées.",

@@ -14,6 +14,7 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
+  type AssessmentInputDto,
   type DeleteAssessmentRequestDto,
   type FormAssessmentDto,
   type LegacyAssessmentDto,
@@ -72,7 +73,7 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
+export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =
   z
     .object({
       conventionId: z.string(),
@@ -89,9 +90,26 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
       }),
     );
 
+export const assessmentInputDtoSchema: z.ZodType<
+  AssessmentInputDto,
+  FormAssessmentDto
+> = assessmentDtoSchema
+  .and(z.object({ conventionStartDate: makeDateStringSchema() }))
+  .superRefine((assessmentInput, context) => {
+    if (
+      assessmentInput.endedWithAJob &&
+      assessmentInput.contractStartDate < assessmentInput.conventionStartDate
+    )
+      context.addIssue({
+        code: "custom",
+        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${assessmentInput.conventionStartDate}.`,
+        path: ["contractStartDate"],
+      });
+  });
+
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
-  { assessment: FormAssessmentDto }
+  { assessment: AssessmentDto }
 > = z.object({
   assessment: assessmentDtoSchema,
 });

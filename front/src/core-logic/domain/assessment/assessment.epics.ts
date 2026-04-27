@@ -17,19 +17,21 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
   action$.pipe(
     filter(assessmentSlice.actions.creationRequested.match),
     switchMap((action) =>
-      assessmentGateway.createAssessment$(action.payload.assessmentAndJwt).pipe(
-        map((_result) =>
-          assessmentSlice.actions.creationSucceeded({
-            feedbackTopic: action.payload.feedbackTopic,
-          }),
+      assessmentGateway
+        .createAssessment$(action.payload.assessment, action.payload.jwt)
+        .pipe(
+          map((_result) =>
+            assessmentSlice.actions.creationSucceeded({
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            assessmentSlice.actions.creationFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
         ),
-        catchEpicError((error) =>
-          assessmentSlice.actions.creationFailed({
-            errorMessage: error.message,
-            feedbackTopic: action.payload.feedbackTopic,
-          }),
-        ),
-      ),
     ),
   );
 

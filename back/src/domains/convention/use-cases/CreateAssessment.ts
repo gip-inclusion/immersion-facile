@@ -1,6 +1,6 @@
 import {
   type AssessmentDto,
-  assessmentDtoSchema,
+  assessmentInputDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   errors,
@@ -22,13 +22,13 @@ type WithCreateNewEvent = { createNewEvent: CreateNewEvent };
 
 export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
 export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
-  .withInput<AssessmentDto>(assessmentDtoSchema)
+  .withInput(assessmentInputDtoSchema)
   .withOutput<void>()
   .withCurrentUser<ConventionRelatedJwtPayload | undefined>()
   .withDeps<WithCreateNewEvent>()
   .build(
     async ({
-      inputParams: assessment,
+      inputParams: { conventionStartDate, ...assessment },
       uow,
       deps,
       currentUser: conventionJwtPayload,
@@ -40,6 +40,9 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         uow,
         assessment.conventionId,
       );
+
+      if (conventionStartDate !== convention.dateStart)
+        throw errors.assessment.conventionDateStartMismatch(convention.id);
 
       await throwForbiddenIfNotAllowedForAssessments({
         mode: "CreateAssessment",
