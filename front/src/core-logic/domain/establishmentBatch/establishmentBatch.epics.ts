@@ -126,7 +126,7 @@ export const candidateEstablishmentMapper = (
         students: csvBooleanToBoolean(establishmentRow.searchableByStudents),
       },
       contactMode: establishmentRow.contactMode,
-      isBanned: false,
+      isEstablishmentBanned: false,
     };
     formEstablishmentSchema.parse(mappedEstablishment);
   } catch (error) {

@@ -531,7 +531,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     it("Can't create establishment when establishment siret is banned", async () => {
       const banEstablishment: BanEstablishmentPayload = {
         siret: "12345678912345",
-        bannishmentJustification: "Justification valide",
+        establishmentBannishmentJustification: "Justification valide",
       };
 
       const formEstablishment = FormEstablishmentDtoBuilder.valid()

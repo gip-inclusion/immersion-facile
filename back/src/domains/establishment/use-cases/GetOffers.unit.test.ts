@@ -565,7 +565,8 @@ describe("GetOffers", () => {
     uow.bannedEstablishmentRepository.bannedEstablishments = [
       {
         siret: establishment1.establishment.siret,
-        bannishmentJustification: "Des crêpes à la poêle ? Sérieusement ??",
+        establishmentBannishmentJustification:
+          "Des crêpes à la poêle ? Sérieusement ??",
       },
     ];
 

@@ -98,15 +98,19 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
       },
       score: initialEstablishmentAggregate.establishment.score,
       withBannedEstablishmentInformations: {
-        ...(initialEstablishmentAggregate.establishment.isBanned
+        ...(initialEstablishmentAggregate.establishment.isEstablishmentBanned
           ? {
-              isBanned: initialEstablishmentAggregate.establishment.isBanned,
-              bannishmentJustification:
+              isEstablishmentBanned:
                 initialEstablishmentAggregate.establishment
-                  .bannishmentJustification,
+                  .isEstablishmentBanned,
+              establishmentBannishmentJustification:
+                initialEstablishmentAggregate.establishment
+                  .establishmentBannishmentJustification,
             }
           : {
-              isBanned: initialEstablishmentAggregate.establishment.isBanned,
+              isEstablishmentBanned:
+                initialEstablishmentAggregate.establishment
+                  .isEstablishmentBanned,
             }),
       },
     });

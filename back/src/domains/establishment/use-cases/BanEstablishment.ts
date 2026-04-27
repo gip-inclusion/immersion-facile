@@ -26,6 +26,7 @@ export const makeBanEstablishment = useCaseBuilder("BanEstablishment")
 
     await uow.bannedEstablishmentRepository.banEstablishment({
       siret: inputParams.siret,
-      bannishmentJustification: inputParams.bannishmentJustification,
+      establishmentBannishmentJustification:
+        inputParams.establishmentBannishmentJustification,
     });
   });

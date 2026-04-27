@@ -27,7 +27,7 @@ describe("BanEstablishment", () => {
 
   const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678901234",
-    bannishmentJustification: "Le cidre n'est pas breton",
+    establishmentBannishmentJustification: "Le cidre n'est pas breton",
   };
 
   beforeEach(() => {
@@ -40,7 +40,8 @@ describe("BanEstablishment", () => {
     await banEstablishment.execute(
       {
         siret: bannedEstablishment.siret,
-        bannishmentJustification: bannedEstablishment.bannishmentJustification,
+        establishmentBannishmentJustification:
+          bannedEstablishment.establishmentBannishmentJustification,
       },
       connectedAdminUser,
     );
@@ -55,7 +56,8 @@ describe("BanEstablishment", () => {
     await banEstablishment.execute(
       {
         siret: bannedEstablishment.siret,
-        bannishmentJustification: bannedEstablishment.bannishmentJustification,
+        establishmentBannishmentJustification:
+          bannedEstablishment.establishmentBannishmentJustification,
       },
       connectedAdminUser,
     );
@@ -64,8 +66,8 @@ describe("BanEstablishment", () => {
       banEstablishment.execute(
         {
           siret: bannedEstablishment.siret,
-          bannishmentJustification:
-            bannedEstablishment.bannishmentJustification,
+          establishmentBannishmentJustification:
+            bannedEstablishment.establishmentBannishmentJustification,
         },
         connectedAdminUser,
       ),
@@ -79,8 +81,8 @@ describe("BanEstablishment", () => {
       banEstablishment.execute(
         {
           siret: bannedEstablishment.siret,
-          bannishmentJustification:
-            bannedEstablishment.bannishmentJustification,
+          establishmentBannishmentJustification:
+            bannedEstablishment.establishmentBannishmentJustification,
         },
         connectedNonAdminUser,
       ),

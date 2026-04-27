@@ -175,7 +175,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
       const banEstablishmentPayload: BanEstablishmentPayload = {
         siret: bannedEstablishmentAggregate.establishment.siret,
-        bannishmentJustification: "L'entreprise est nantaise",
+        establishmentBannishmentJustification: "L'entreprise est nantaise",
       };
 
       uow.userRepository.users = [establishmentAdmin, connectedNonAdminUser];
@@ -250,7 +250,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentAdmin: adminWithoutFirstNameAndLastName,
           job,
           phone,
-          withBannedEstablishmentInformations: { isBanned: false },
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -414,7 +414,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
-          withBannedEstablishmentInformations: { isBanned: false },
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -432,7 +432,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
-          withBannedEstablishmentInformations: { isBanned: false },
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -440,8 +440,9 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     it("returns a ban establishment if user is back office admin", async () => {
       const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
         {
-          isBanned: true,
-          bannishmentJustification: "Le patron n'aime pas la pluie",
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            "Le patron n'aime pas la pluie",
         };
 
       uow.userRepository.users = [

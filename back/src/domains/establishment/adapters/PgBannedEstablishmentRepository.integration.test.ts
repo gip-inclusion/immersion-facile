@@ -18,7 +18,7 @@ describe("PgBannedEstablishmentRepository", () => {
 
   const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678901234",
-    bannishmentJustification: "Le cidre n'est pas breton",
+    establishmentBannishmentJustification: "Le cidre n'est pas breton",
   };
 
   beforeEach(async () => {
@@ -37,7 +37,7 @@ describe("PgBannedEstablishmentRepository", () => {
     it("returns all banned establishments", async () => {
       const anotherBannedEstablishment: BanEstablishmentPayload = {
         siret: "98765432109876",
-        bannishmentJustification:
+        establishmentBannishmentJustification:
           "Leurs kouign amann ne contiennent que 40% de beurre",
       };
 
@@ -47,12 +47,12 @@ describe("PgBannedEstablishmentRepository", () => {
           {
             siret: bannedEstablishment.siret,
             bannishment_justification:
-              bannedEstablishment.bannishmentJustification,
+              bannedEstablishment.establishmentBannishmentJustification,
           },
           {
             siret: anotherBannedEstablishment.siret,
             bannishment_justification:
-              anotherBannedEstablishment.bannishmentJustification,
+              anotherBannedEstablishment.establishmentBannishmentJustification,
           },
         ])
         .execute();
@@ -78,7 +78,7 @@ describe("PgBannedEstablishmentRepository", () => {
         .values({
           siret: bannedEstablishment.siret,
           bannishment_justification:
-            bannedEstablishment.bannishmentJustification,
+            bannedEstablishment.establishmentBannishmentJustification,
         })
         .execute();
 
@@ -104,7 +104,8 @@ describe("PgBannedEstablishmentRepository", () => {
     it("bans the establishment with the given siret and bannishment justification", async () => {
       await pgEstablishmentRepository.banEstablishment({
         siret: bannedEstablishment.siret,
-        bannishmentJustification: bannedEstablishment.bannishmentJustification,
+        establishmentBannishmentJustification:
+          bannedEstablishment.establishmentBannishmentJustification,
       });
 
       const bannedEstablishments = await getAllBannedEstablishments(db);
@@ -115,14 +116,15 @@ describe("PgBannedEstablishmentRepository", () => {
     it("throws if the establishment with the given siret is already banned", async () => {
       await pgEstablishmentRepository.banEstablishment({
         siret: bannedEstablishment.siret,
-        bannishmentJustification: bannedEstablishment.bannishmentJustification,
+        establishmentBannishmentJustification:
+          bannedEstablishment.establishmentBannishmentJustification,
       });
 
       expect(
         pgEstablishmentRepository.banEstablishment({
           siret: bannedEstablishment.siret,
-          bannishmentJustification:
-            bannedEstablishment.bannishmentJustification,
+          establishmentBannishmentJustification:
+            bannedEstablishment.establishmentBannishmentJustification,
         }),
       ).rejects.toThrow();
     });
@@ -135,6 +137,7 @@ const getAllBannedEstablishments = async (
   (await db.selectFrom("banned_establishments").selectAll().execute()).map(
     (dbBannedEstablishment) => ({
       siret: dbBannedEstablishment.siret,
-      bannishmentJustification: dbBannedEstablishment.bannishment_justification,
+      establishmentBannishmentJustification:
+        dbBannedEstablishment.bannishment_justification,
     }),
   );

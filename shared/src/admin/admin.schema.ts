@@ -2,7 +2,7 @@ import { z } from "zod";
 import { agencyIdSchema, agencyRoleSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
-import { withBannishmentJustificationSchema } from "../establishment/bannedEstablishmentInformations";
+import { withEstablishmentBannishmentJustificationSchema } from "../establishment/bannedEstablishmentInformations";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
@@ -67,7 +67,7 @@ export const manageEstablishmentAdminFormSchema: ZodSchemaWithInputMatchingOutpu
   });
 
 export const banEstablishmentAdminFormSchema: ZodSchemaWithInputMatchingOutput<BanEstablishmentAdminForm> =
-  withBannishmentJustificationSchema;
+  withEstablishmentBannishmentJustificationSchema;
 
 export const getUsersFiltersSchema: ZodSchemaWithInputMatchingOutput<GetUsersFilters> =
   z.object({
