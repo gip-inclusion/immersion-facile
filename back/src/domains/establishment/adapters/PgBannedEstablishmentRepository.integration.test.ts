@@ -1,5 +1,9 @@
 import type { Pool } from "pg";
-import { type BanEstablishmentPayload, expectToEqual } from "shared";
+import {
+  type BanEstablishmentPayload,
+  expectArraysToEqualIgnoringOrder,
+  expectToEqual,
+} from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -27,6 +31,44 @@ describe("PgBannedEstablishmentRepository", () => {
 
   afterEach(async () => {
     await pool.end();
+  });
+
+  describe("getBannedEstablishments", () => {
+    it("returns all banned establishments", async () => {
+      const anotherBannedEstablishment: BanEstablishmentPayload = {
+        siret: "98765432109876",
+        bannishmentJustification:
+          "Leurs kouign amann ne contiennent que 40% de beurre",
+      };
+
+      await db
+        .insertInto("banned_establishments")
+        .values([
+          {
+            siret: bannedEstablishment.siret,
+            bannishment_justification:
+              bannedEstablishment.bannishmentJustification,
+          },
+          {
+            siret: anotherBannedEstablishment.siret,
+            bannishment_justification:
+              anotherBannedEstablishment.bannishmentJustification,
+          },
+        ])
+        .execute();
+
+      expectArraysToEqualIgnoringOrder(
+        await pgEstablishmentRepository.getBannedEstablishments(),
+        [bannedEstablishment, anotherBannedEstablishment],
+      );
+    });
+
+    it("returns empty array when no establishments are banned", async () => {
+      expectToEqual(
+        await pgEstablishmentRepository.getBannedEstablishments(),
+        [],
+      );
+    });
   });
 
   describe("getBannedEstablishmentBySiret", () => {

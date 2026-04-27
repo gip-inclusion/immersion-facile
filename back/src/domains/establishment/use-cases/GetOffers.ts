@@ -45,6 +45,10 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       ...sortAndPositionParams
     } = inputParams;
 
+    const bannedEstablishments =
+      await uow.bannedEstablishmentRepository.getBannedEstablishments();
+    const bannedSirets = new Set(bannedEstablishments.map((b) => b.siret));
+
     const geoParams = getValidatedGeoParams({
       lat: sortAndPositionParams.latitude,
       lon: sortAndPositionParams.longitude,
@@ -76,6 +80,10 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
+    const filteredData = result.data.filter(
+      (offer) => !bannedSirets.has(offer.siret),
+    );
+
     const searchMadeCommon: SearchMadeCommon = {
       appellationCodes,
       departmentCodes,
@@ -97,12 +105,18 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
     await uow.searchMadeRepository.insertSearchMade({
       ...searchMade,
       id: deps.uuidGenerator.new(),
-      needsToBeSearched: true, // this is useless (legacy TODO : remove this column)
-      numberOfResults: result.pagination.totalRecords,
+      needsToBeSearched: true,
+      numberOfResults: filteredData.length,
       apiConsumerName: apiConsumer?.name,
     });
 
-    return result;
+    return {
+      data: filteredData,
+      pagination: {
+        ...result.pagination,
+        totalRecords: filteredData.length,
+      },
+    };
   });
 
 const getValidatedGeoParams = (
