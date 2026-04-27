@@ -1,6 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { AddEstablishmentsByBatch } from "src/app/components/admin/establishments/AddEstablishmentsByBatch";
 import { ManageEstablishment } from "src/app/components/admin/establishments/ManageEstablishment";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { makeStyles } from "tss-react/dsfr";
 import { useAdminDashboard } from "./useAdminDashboard";
@@ -13,6 +14,7 @@ export const EstablishmentsTab = () => {
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
     <div className={cx("admin-tab__import-establishments")}>
+      <Feedback topics={["ban-establishment"]} />
       <ManageEstablishment />
       <MetabaseView title="Consulter les établissements" url={url} />
       <AddEstablishmentsByBatch />

@@ -6,7 +6,8 @@ import { zStringMinLength1Max1024 } from "../utils/string.schema";
 type WithBannishmentJustification = {
   bannishmentJustification: string;
 };
-const withBannishmentJustificationSchema = z.object({
+
+export const withBannishmentJustificationSchema = z.object({
   bannishmentJustification: zStringMinLength1Max1024,
 });
 

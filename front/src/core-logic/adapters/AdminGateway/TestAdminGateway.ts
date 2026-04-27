@@ -3,6 +3,7 @@ import type {
   ApiConsumer,
   ApiConsumerId,
   ApiConsumerJwt,
+  BanEstablishmentPayload,
   ConnectedUser,
   ConnectedUserJwt,
   DashboardUrlAndName,
@@ -46,6 +47,8 @@ export class TestAdminGateway implements AdminGateway {
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
+
+  public banEstablishmentResponse$ = new Subject<void>();
 
   public listUsersResponse$ = new Subject<
     UserWithNumberOfAgenciesAndEstablishments[]
@@ -143,5 +146,11 @@ export class TestAdminGateway implements AdminGateway {
     _token: ConnectedUserJwt,
   ): Observable<ApiConsumerJwt> {
     return this.renewApiConsumerKeyResponse$;
+  }
+
+  public banEstablishment$(
+    _payload: BanEstablishmentPayload,
+  ): Observable<void> {
+    return this.banEstablishmentResponse$;
   }
 }

@@ -3,6 +3,7 @@ import type {
   ApiConsumer,
   ApiConsumerId,
   ApiConsumerJwt,
+  BanEstablishmentPayload,
   ConnectedUser,
   ConnectedUserJwt,
   DashboardUrlAndName,
@@ -85,4 +86,9 @@ export interface AdminGateway {
     consumerId: ApiConsumerId,
     token: ConnectedUserJwt,
   ): Observable<ApiConsumerJwt>;
+
+  banEstablishment$(
+    banEstablishmentPayload: BanEstablishmentPayload,
+    jwt: ConnectedUserJwt,
+  ): Observable<void>;
 }

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { agencyIdSchema, agencyRoleSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
+import { withBannishmentJustificationSchema } from "../establishment/bannedEstablishmentInformations";
 import { siretSchema } from "../siret/siret.schema";
 import { userIdSchema } from "../user/user.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
@@ -10,6 +11,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import type {
+  BanEstablishmentAdminForm,
   GetUsersFilters,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
@@ -63,6 +65,9 @@ export const manageEstablishmentAdminFormSchema: ZodSchemaWithInputMatchingOutpu
   z.object({
     siret: siretSchema,
   });
+
+export const banEstablishmentAdminFormSchema: ZodSchemaWithInputMatchingOutput<BanEstablishmentAdminForm> =
+  withBannishmentJustificationSchema;
 
 export const getUsersFiltersSchema: ZodSchemaWithInputMatchingOutput<GetUsersFilters> =
   z.object({
