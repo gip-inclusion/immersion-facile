@@ -1,7 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   AssessmentDto,
+  AssessmentInputDto,
   ConventionId,
+  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
@@ -11,7 +13,6 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import type { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
 
 export interface AssessmentState {
   isLoading: boolean;
@@ -30,7 +31,8 @@ export const assessmentSlice = createSlice({
     creationRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
-        assessmentAndJwt: AssessmentAndJwt;
+        assessment: AssessmentInputDto;
+        jwt: ConventionJwt;
       }>,
     ) => {
       state.isLoading = true;

@@ -1,16 +1,15 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   AssessmentDto,
+  AssessmentInputDto,
   ConventionId,
+  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   SignAssessmentRequestDto,
   WithConventionId,
 } from "shared";
-import type {
-  AssessmentAndJwt,
-  AssessmentGateway,
-} from "src/core-logic/ports/AssessmentGateway";
+import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
 export class TestAssessmentGateway implements AssessmentGateway {
   // test purpose
@@ -20,7 +19,10 @@ export class TestAssessmentGateway implements AssessmentGateway {
   public getResponse$ = new Subject<AssessmentDto>();
   public sendAssessmentLinkResponse$ = new Subject<void>();
 
-  public createAssessment$(_params: AssessmentAndJwt): Observable<void> {
+  public createAssessment$(
+    _params: AssessmentInputDto,
+    _jwt: ConventionJwt,
+  ): Observable<void> {
     return this.creationResponse$;
   }
 

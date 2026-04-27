@@ -3,6 +3,7 @@ import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import {
   assessmentDtoSchema,
+  assessmentInputDtoSchema,
   deleteAssessmentRequestDtoSchema,
   legacyAssessmentDtoSchema,
   signAssessmentRequestDtoSchema,
@@ -50,7 +51,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/assessment",
     method: "post",
     ...withAuthorizationHeaders,
-    requestBodySchema: assessmentDtoSchema,
+    requestBodySchema: assessmentInputDtoSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
