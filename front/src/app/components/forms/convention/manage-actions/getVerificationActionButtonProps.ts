@@ -65,7 +65,7 @@ type VerificationActionLinkParams = {
 
 type VerificationActionOnClickParams = {
   verificationAction: VerificationActionWithOnClick;
-  onActionClick: ({
+  onClick: ({
     conventionDraft,
     redirectUrl,
   }: {
@@ -83,6 +83,13 @@ export type VerificationActionParams = BaseVerificationActionParams &
   );
 
 const verificationActionWithOnClick = ["DUPLICATE_CONVENTION"] as const;
+const isVerificationActionWithOnClick = (
+  action: VerificationAction,
+): action is VerificationActionWithOnClick => {
+  return verificationActionWithOnClick.some(
+    (verificationAction) => verificationAction === action,
+  );
+};
 
 const verificationActionsWithModal = [
   "ACCEPT_COUNSELLOR",
@@ -100,6 +107,13 @@ const verificationActionsWithModal = [
   "FILL_ASSESSMENT_INFO",
   "SIGN",
 ] as const;
+const isVerificationActionWithModal = (
+  action: VerificationAction,
+): action is VerificationActionWithModal => {
+  return verificationActionsWithModal.some(
+    (verificationAction) => verificationAction === action,
+  );
+};
 
 const verificationActionsWithLink = [
   "ACCESS_CONVENTION",
@@ -108,6 +122,13 @@ const verificationActionsWithLink = [
   "DECLARE_ABANDONMENT",
   "EDIT_CONVENTION",
 ] as const;
+const isVerificationActionWithLink = (
+  action: VerificationAction,
+): action is VerificationActionWithLink => {
+  return verificationActionsWithLink.some(
+    (verificationAction) => verificationAction === action,
+  );
+};
 
 const allVerificationActions = [
   ...verificationActionsWithModal,
@@ -162,16 +183,27 @@ export type VerificationActionProps =
         iconId?: FrIconClassName | RiIconClassName;
         iconPosition?: "left" | "right";
       };
-      modalWrapperProps: ModalWrapperProps | null;
+      modalWrapperProps: ModalWrapperProps;
+    }
+  | {
+      buttonProps: ButtonProps & {
+        children: string;
+        onClick: () => void;
+        id: string;
+        iconId?: FrIconClassName | RiIconClassName;
+        iconPosition?: "left" | "right";
+      };
+      modalWrapperProps: null;
     };
 
 export const getVerificationActionProps = (
   params: VerificationActionParams,
 ): VerificationActionProps => {
   if (
-    verificationActionsWithLink.includes(
+    isVerificationActionWithLink(
       params.verificationAction as VerificationActionWithLink,
-    )
+    ) &&
+    "jwt" in params
   ) {
     const {
       verificationAction,
@@ -181,91 +213,121 @@ export const getVerificationActionProps = (
       buttonId,
       iconId,
       iconPosition,
-    } = params as BaseVerificationActionParams & VerificationActionLinkParams;
+    } = params;
 
     const link = linkByAction(verificationAction, {
       convention,
       jwt,
     });
 
+    const buttonProps = iconId
+      ? {
+          children,
+          linkProps: link,
+          id: buttonId,
+          iconId,
+          iconPosition,
+        }
+      : {
+          children,
+          linkProps: link,
+          id: buttonId,
+        };
+
     return {
-      buttonProps: {
-        children,
-        linkProps: link,
-        id: buttonId,
-        iconId,
-        iconPosition,
-      },
+      buttonProps,
       modalWrapperProps: null,
-    } as VerificationActionProps;
+    };
   }
 
   if (
-    verificationActionWithOnClick.includes(
-      params.verificationAction as VerificationActionWithOnClick,
-    )
+    isVerificationActionWithOnClick(params.verificationAction) &&
+    "onClick" in params
   ) {
     const {
       verificationAction,
       children,
-      onActionClick,
+      onClick: onActionClick,
       convention,
       buttonId,
       iconId,
       iconPosition,
-    } = params as BaseVerificationActionParams &
-      VerificationActionOnClickParams;
+    } = params;
 
     const onClick = onClickByAction(verificationAction, {
       convention,
       onActionClick,
     });
 
+    const buttonProps = iconId
+      ? {
+          children,
+          onClick,
+          id: buttonId,
+          iconId,
+          iconPosition,
+        }
+      : {
+          children,
+          onClick,
+          id: buttonId,
+        };
+
     return {
-      buttonProps: {
-        children,
-        onClick,
-        id: buttonId,
-        iconId,
-        iconPosition,
-      },
+      buttonProps,
       modalWrapperProps: null,
-    } as VerificationActionProps;
+    };
   }
 
-  const {
-    verificationAction,
-    disabled,
-    children,
-    onSubmit,
-    convention,
-    currentSignatoryRoles,
-    initialStatus,
-    onCloseValidatorModalWithoutValidatorInfo,
-    modalTitle,
-    buttonId,
-    iconId,
-    iconPosition,
-  } = params as BaseVerificationActionParams & VerificationActionModalParams;
-
-  return {
-    buttonProps: {
-      children,
-      onClick: () => modalByAction(verificationAction).openModal(),
+  if (
+    isVerificationActionWithModal(params.verificationAction) &&
+    "onSubmit" in params
+  ) {
+    const {
+      verificationAction,
       disabled,
-      id: buttonId,
+      children,
+      onSubmit,
+      convention,
+      currentSignatoryRoles,
+      initialStatus,
+      onCloseValidatorModalWithoutValidatorInfo,
+      modalTitle,
+      buttonId,
       iconId,
       iconPosition,
-    },
-    modalWrapperProps: {
-      title: modalTitle,
-      initialStatus: initialStatus,
-      verificationAction: verificationAction,
-      onSubmit,
-      convention: convention,
-      currentSignatoryRoles: currentSignatoryRoles,
-      onCloseValidatorModalWithoutValidatorInfo:
-        onCloseValidatorModalWithoutValidatorInfo,
-    },
-  } as VerificationActionProps;
+    } = params;
+
+    const buttonProps = iconId
+      ? {
+          children,
+          onClick: () => modalByAction(verificationAction).openModal(),
+          disabled,
+          id: buttonId,
+          iconId,
+          iconPosition,
+        }
+      : {
+          children,
+          onClick: () => modalByAction(verificationAction).openModal(),
+          disabled,
+          id: buttonId,
+        };
+
+    return {
+      buttonProps,
+      modalWrapperProps: {
+        title: modalTitle,
+        initialStatus: initialStatus,
+        verificationAction: verificationAction,
+        onSubmit,
+        convention: convention,
+        currentSignatoryRoles: currentSignatoryRoles,
+        onCloseValidatorModalWithoutValidatorInfo:
+          onCloseValidatorModalWithoutValidatorInfo,
+      },
+    };
+  }
+
+  throw new Error(`Invalid verification action: ${params.verificationAction}`);
 };

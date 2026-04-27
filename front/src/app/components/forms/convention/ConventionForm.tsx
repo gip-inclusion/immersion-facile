@@ -27,7 +27,6 @@ import {
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  type AgencyKind,
   type AgencyOption,
   addressDtoToString,
   type ConventionFormInitialValues,
@@ -91,7 +90,7 @@ import {
   makeConventionPresentationFromConventionTemplate,
   makeEmptyConventionInitialValues,
 } from "src/app/routes/routeParams/convention";
-import { routes, useRoute } from "src/app/routes/routes";
+import { type ftConnectParams, routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
@@ -126,6 +125,18 @@ export type EmailValidationErrorsState = Partial<
 export type SetEmailValidationErrorsState = Dispatch<
   SetStateAction<EmailValidationErrorsState>
 >;
+
+type ConventionRouteParams = Pick<
+  CreateConventionPresentationInitialValues,
+  | "agencyId"
+  | "agencyDepartment"
+  | "agencyKind"
+  | "siret"
+  | "immersionAddress"
+  | "immersionAppellation"
+>;
+type ConventionParamKey = keyof ConventionRouteParams;
+type FtConnectParamKey = keyof typeof ftConnectParams;
 
 export const ConventionForm = ({
   mode,
@@ -221,15 +232,54 @@ export const ConventionForm = ({
       >,
     );
 
-    const convention: ConventionFormInitialValues =
-      isCreationMode && isTemplateForm
+    if (isTemplateForm) {
+      return isCreationMode
         ? replaceEmptyValuesByUndefinedFromObject(initialValues)
-        : fetchedConvention ||
-          conventionPresentationFromDraft ||
-          conventionPresentationFromConventionTemplate ||
-          initialValues;
+        : conventionPresentationFromConventionTemplate || initialValues;
+    }
 
-    return {
+    const convention: CreateConventionPresentationInitialValues =
+      fetchedConvention || conventionPresentationFromDraft || initialValues;
+
+    const hasRouteParam = <
+      TKey extends ConventionParamKey | FtConnectParamKey,
+      TValue,
+    >(
+      params: object,
+      key: TKey,
+    ): params is Record<TKey, TValue> => key in params;
+
+    const pickConventionValueFromRouteParams = <
+      TKey extends ConventionParamKey,
+    >(
+      key: TKey,
+    ): ConventionRouteParams[TKey] => {
+      if (hasRouteParam<TKey, ConventionRouteParams[TKey]>(route.params, key))
+        return route.params[key];
+
+      return convention[key];
+    };
+
+    const pickBeneficiaryValueFromRouteParams = <
+      TKey extends Extract<
+        FtConnectParamKey,
+        "birthdate" | "firstName" | "lastName" | "email" | "phone"
+      >,
+    >(
+      key: TKey,
+    ): ConventionReadDto["signatories"]["beneficiary"][TKey] => {
+      if (
+        hasRouteParam<
+          TKey,
+          ConventionReadDto["signatories"]["beneficiary"][TKey]
+        >(route.params, key)
+      )
+        return route.params[key];
+
+      return convention.signatories?.beneficiary?.[key];
+    };
+
+    const conventionDefaultValues: CreateConventionPresentationInitialValues = {
       ...convention,
       status: "READY_TO_SIGN",
       agencyReferent: {
@@ -238,54 +288,28 @@ export const ConventionForm = ({
         lastname:
           convention.agencyReferent?.lastname ?? agencyReferentName.lastname,
       },
-      agencyId:
-        "agencyId" in route.params
-          ? route.params.agencyId
-          : convention.agencyId,
-      agencyDepartment:
-        "agencyDepartment" in route.params
-          ? route.params.agencyDepartment
-          : convention.agencyDepartment,
-      agencyKind:
-        "agencyKind" in route.params
-          ? (route.params.agencyKind as AgencyKind)
-          : convention.agencyKind,
-      siret: "siret" in route.params ? route.params.siret : convention.siret,
-      immersionAddress:
-        "immersionAddress" in route.params
-          ? route.params.immersionAddress
-          : convention.immersionAddress,
-      immersionAppellation:
-        "immersionAppellation" in route.params
-          ? route.params.immersionAppellation
-          : convention.immersionAppellation,
+      agencyId: pickConventionValueFromRouteParams("agencyId"),
+      agencyDepartment: pickConventionValueFromRouteParams("agencyDepartment"),
+      agencyKind: pickConventionValueFromRouteParams("agencyKind"),
+      siret: pickConventionValueFromRouteParams("siret"),
+      immersionAddress: pickConventionValueFromRouteParams("immersionAddress"),
+      immersionAppellation: pickConventionValueFromRouteParams(
+        "immersionAppellation",
+      ),
       signatories: {
         ...convention.signatories,
         beneficiary: {
           ...convention.signatories?.beneficiary,
-          birthdate:
-            "birthdate" in route.params
-              ? route.params.birthdate
-              : convention.signatories?.beneficiary?.birthdate,
-          firstName:
-            "firstName" in route.params
-              ? route.params.firstName
-              : convention.signatories?.beneficiary?.firstName,
-          lastName:
-            "lastName" in route.params
-              ? route.params.lastName
-              : convention.signatories?.beneficiary?.lastName,
-          email:
-            "email" in route.params
-              ? route.params.email
-              : convention.signatories?.beneficiary?.email,
-          phone:
-            "phone" in route.params
-              ? route.params.phone
-              : convention.signatories?.beneficiary?.phone,
+          birthdate: pickBeneficiaryValueFromRouteParams("birthdate"),
+          firstName: pickBeneficiaryValueFromRouteParams("firstName"),
+          lastName: pickBeneficiaryValueFromRouteParams("lastName"),
+          email: pickBeneficiaryValueFromRouteParams("email"),
+          phone: pickBeneficiaryValueFromRouteParams("phone"),
         },
       },
-    } as ConventionFormInitialValues;
+    };
+
+    return conventionDefaultValues;
   }, [
     mode,
     isTemplateForm,
@@ -376,7 +400,6 @@ const ConventionFormContent = ({
     getFieldState,
     formState,
     register,
-    watch,
   } = methods;
 
   const { errors, submitCount } = formState;
@@ -889,7 +912,7 @@ const ConventionFormContent = ({
                       setValue("immersionAddress", "");
                     }}
                     disabled={isFetchingSiret}
-                    initialInputValue={watch("immersionAddress")}
+                    initialInputValue={conventionValues.immersionAddress}
                     {...getFieldError("immersionAddress")}
                   />
                   <ScheduleSection

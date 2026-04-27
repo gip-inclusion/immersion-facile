@@ -436,7 +436,7 @@ const createButtonPropsByVerificationAction = (
         verificationAction: "DUPLICATE_CONVENTION",
         children: "Dupliquer la convention",
         convention,
-        onActionClick: (conventionDraftWithRedirectUrl) =>
+        onClick: (conventionDraftWithRedirectUrl) =>
           dispatch(
             conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested(
               {

@@ -5,7 +5,6 @@ import { Loader } from "react-design-system";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
   type AgencyId,
-  type AgencyKind,
   type AgencyOption,
   type AllowedAgencyKindToAdd,
   agencyKindToLabel,
@@ -44,6 +43,20 @@ type AgencyKindForSelector =
 export const isAllAgencyKinds = (
   value: unknown,
 ): value is typeof allAgencyKindsValue => value === allAgencyKindsValue;
+
+const isAllowedAgencyKind = (value: unknown): value is AllowedAgencyKindToAdd =>
+  allAgencyKindsAllowedToAdd.some((agencyKind) => agencyKind === value);
+
+const isSelectableAgencyKind = (
+  kind: unknown,
+  shouldFilterDelegationPrescriptionAgencyKind: boolean,
+): kind is AllowedAgencyKindToAdd => {
+  if (isAllAgencyKinds(kind)) return true;
+  if (!isAllowedAgencyKind(kind)) return false;
+  if (shouldFilterDelegationPrescriptionAgencyKind)
+    return fitForDelegationAgencyKind.includes(kind);
+  return true;
+};
 
 type SupportedFormsDto = ConventionReadDto | CreateAgencyDto;
 
@@ -104,13 +117,14 @@ export const AgencySelector = ({
   const agencyKindValue = useWatch({
     name: agencyKindFieldName,
     control,
-  }) as AgencyKindForSelector;
+  });
 
   const allowedAgencyKinds = useMemo(
     (): AllowedAgencyKindToAdd[] =>
-      agencyKindValue &&
-      agencyKindValue !== allAgencyKindsValue &&
-      allAgencyKindsAllowedToAdd.includes(agencyKindValue)
+      isSelectableAgencyKind(
+        agencyKindValue,
+        shouldFilterDelegationPrescriptionAgencyKind,
+      )
         ? [agencyKindValue]
         : initialAgencyKinds,
     [agencyKindValue, initialAgencyKinds],
@@ -196,7 +210,12 @@ export const AgencySelector = ({
           nativeSelectProps={{
             ...agencyKindField,
             ...register(agencyKindFieldName),
-            value: agencyKindValue,
+            value: isSelectableAgencyKind(
+              agencyKindValue,
+              shouldFilterDelegationPrescriptionAgencyKind,
+            )
+              ? agencyKindValue
+              : undefined,
             onChange: (event) =>
               setValue(agencyKindFieldName, event.currentTarget.value),
           }}
@@ -269,20 +288,13 @@ const makeAgencyKindOptions = (
   agencyOptions: AgencyOption[],
   shouldFilterDelegationPrescriptionAgencyKind: boolean,
 ): AgencyKindOptions => {
-  const isAllowedAgencyKindFilter = (
-    kind: AgencyKind,
-  ): kind is AllowedAgencyKindToAdd => {
-    if (
-      kind !== "immersion-facile" &&
-      kind !== "prepa-apprentissage" &&
-      shouldFilterDelegationPrescriptionAgencyKind
-    )
-      return fitForDelegationAgencyKind.includes(kind);
-    return kind !== "immersion-facile" && kind !== "prepa-apprentissage";
-  };
-
   const availableKinds = uniq(agencyOptions.map(({ kind }) => kind))
-    .filter(isAllowedAgencyKindFilter)
+    .filter((kind) =>
+      isSelectableAgencyKind(
+        kind,
+        shouldFilterDelegationPrescriptionAgencyKind,
+      ),
+    )
     .map((agencyKind) => ({
       label: agencyKindToLabel[agencyKind],
       value: agencyKind,
