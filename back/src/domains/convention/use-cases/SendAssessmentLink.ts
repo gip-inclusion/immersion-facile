@@ -108,6 +108,11 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
       conventionId: convention.id,
     });
 
+    const recipientPhone = convention.establishmentTutor.phone;
+    if (allDefaultPhoneNumbers.includes(recipientPhone)) {
+      return;
+    }
+
     await sendSms({
       conventionMagicLinkPayload: {
         id: convention.id,
@@ -116,7 +121,7 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
         now: deps.timeGateway.now(),
       },
       userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
-      recipientPhone: convention.establishmentTutor.phone,
+      recipientPhone,
       uow,
       convention: conventionRead,
       ...deps,
@@ -184,10 +189,6 @@ const sendSms = async ({
   recipientPhone: string;
   userId: UserId | undefined;
 }) => {
-  if (allDefaultPhoneNumbers.includes(recipientPhone)) {
-    return;
-  }
-
   const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
     config,
     conventionMagicLinkPayload: conventionMagicLinkPayload,
