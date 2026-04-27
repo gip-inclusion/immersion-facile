@@ -832,9 +832,7 @@ describe("SendAssessmentLink", () => {
 
       expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, [
-        { topic: "AssessmentReminderManuallySent" },
-      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
     });
   });
 });
