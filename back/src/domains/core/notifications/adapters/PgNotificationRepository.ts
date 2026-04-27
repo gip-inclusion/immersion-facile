@@ -25,6 +25,7 @@ import {
 import type {
   DeleteNotificationsParams,
   EmailNotificationFilters,
+  FilterUserDeletionWarningNotificationsParams,
   NotificationRepository,
   SmsNotificationFilters,
 } from "../ports/NotificationRepository";
@@ -468,42 +469,41 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   public async filterUserDeletionWarningNotifications(
-    params: { userIds: UserId[] } & (
-      | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
-      | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
-    ),
+    params: FilterUserDeletionWarningNotificationsParams,
   ): Promise<UserId[]> {
     if (params.userIds.length === 0) return [];
 
-    const baseQuery = this.transaction
-      .selectFrom("notifications_email")
-      .where((eb) =>
-        isInArray(eb, "notifications_email.user_id", params.userIds),
-      )
-      .where("notifications_email.email_kind", "=", "ACCOUNT_DELETION_WARNING");
-
-    const filteredQuery = params.excludeWarnedSince
-      ? baseQuery.where(
-          "notifications_email.created_at",
-          ">=",
-          params.excludeWarnedSince,
+    const rows = await pipeWithValue(
+      this.transaction
+        .selectFrom("notifications_email")
+        .where((eb) =>
+          isInArray(eb, "notifications_email.user_id", params.userIds),
         )
-      : baseQuery
-          .where(
-            "notifications_email.created_at",
-            ">=",
-            params.onlyWarnedBetween.from,
-          )
-          .where(
-            "notifications_email.created_at",
-            "<=",
-            params.onlyWarnedBetween.to,
-          );
-
-    const rows = await filteredQuery
-      .select("notifications_email.user_id")
-      .distinct()
-      .execute();
+        .where(
+          "notifications_email.email_kind",
+          "=",
+          "ACCOUNT_DELETION_WARNING",
+        ),
+      (q) =>
+        params.excludeWarnedSince
+          ? q.where(
+              "notifications_email.created_at",
+              ">=",
+              params.excludeWarnedSince,
+            )
+          : q
+              .where(
+                "notifications_email.created_at",
+                ">=",
+                params.onlyWarnedBetween.from,
+              )
+              .where(
+                "notifications_email.created_at",
+                "<=",
+                params.onlyWarnedBetween.to,
+              ),
+      (q) => q.select("notifications_email.user_id").distinct().execute(),
+    );
 
     return rows
       .map((r) => r.user_id)

@@ -36,6 +36,8 @@ import {
 const immersionBaseUrl: AbsoluteUrl = "https://immersion-facile.test";
 
 const now = new Date("2026-01-15T10:00:00.000Z");
+const twoYearsAgo = subYears(now, 2);
+const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
 
 describe("WarnInactiveUsers", () => {
   let uow: InMemoryUnitOfWork;
@@ -79,7 +81,7 @@ describe("WarnInactiveUsers", () => {
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
-      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [inactiveUser];
 
@@ -95,12 +97,12 @@ describe("WarnInactiveUsers", () => {
       email: "inactive@test.fr",
       firstName: "Marie",
       lastName: "Martin",
-      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     const boundaryActiveUser = makeUser({
       id: "boundary-id",
       email: "boundary@test.fr",
-      lastLoginAt: subYears(now, 2).toISOString(),
+      lastLoginAt: twoYearsAgo.toISOString(),
     });
     const neverLoggedInUser = makeUser({
       id: "never-logged-id",
@@ -163,13 +165,12 @@ describe("WarnInactiveUsers", () => {
   });
 
   it("warns user with a recent convention whose status does not demonstrate activity", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const userWithRejected = makeUser({
       id: "rejected-user-id",
       email: "rejected-user@test.fr",
       firstName: "Reject",
       lastName: "Writer",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [userWithRejected];
 
@@ -209,13 +210,12 @@ describe("WarnInactiveUsers", () => {
   });
 
   it("does not protect a user whose email only appears as potential beneficiary on a recent discussion", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const candidateOnlyUser = makeUser({
       id: "candidate-only-id",
       email: "candidate-only@test.fr",
       firstName: "Cand",
       lastName: "Only",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [candidateOnlyUser];
 
@@ -241,13 +241,12 @@ describe("WarnInactiveUsers", () => {
   });
 
   it("warns user with expired convention and old establishment exchange", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const userWithOldActivity = makeUser({
       id: "old-activity-user-id",
       email: "old-activity@test.fr",
       firstName: "Expired",
       lastName: "Convention",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     setUserWithOldConventionAndDiscussion({
       now,
@@ -274,18 +273,17 @@ describe("WarnInactiveUsers", () => {
   });
 
   it("does not re-warn a user who was already warned within the dedup window", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const recentlyWarnedUser = makeUser({
       id: "recently-warned-id",
       email: "recently-warned@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     const freshCandidate = makeUser({
       id: "fresh-candidate-id",
       email: "fresh-candidate@test.fr",
       firstName: "Fresh",
       lastName: "Candidate",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [recentlyWarnedUser, freshCandidate];
 
@@ -326,8 +324,7 @@ describe("WarnInactiveUsers", () => {
         batchSize: 2,
       },
     });
-    const twoYearsAgo = subYears(now, 2);
-    uow.userRepository.users = makeInactiveUsers(3, twoYearsAgo);
+    uow.userRepository.users = makeInactiveUsers(3);
 
     const result = await warnInactiveUsers.execute();
 
@@ -342,12 +339,12 @@ describe("WarnInactiveUsers", () => {
   });
 });
 
-const makeInactiveUsers = (count: number, twoYearsAgo: Date) =>
+const makeInactiveUsers = (count: number) =>
   Array.from({ length: count }, (_, index) =>
     makeUser({
       id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
       email: `inactive-${index + 1}@test.fr`,
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     }),
   );
 

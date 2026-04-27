@@ -36,6 +36,13 @@ export type DeleteNotificationsParams = {
   };
 };
 
+export type FilterUserDeletionWarningNotificationsParams = {
+  userIds: UserId[];
+} & (
+  | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
+  | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
+);
+
 export interface NotificationRepository {
   deleteOldestNotifications(params: DeleteNotificationsParams): Promise<number>;
   getSmsByIds: (ids: NotificationId[]) => Promise<SmsNotification[]>;
@@ -63,9 +70,6 @@ export interface NotificationRepository {
     filters: SmsNotificationFilters,
   ) => Promise<SmsNotification | undefined>;
   filterUserDeletionWarningNotifications(
-    params: { userIds: UserId[] } & (
-      | { excludeWarnedSince: Date; onlyWarnedBetween?: never }
-      | { onlyWarnedBetween: DateRange; excludeWarnedSince?: never }
-    ),
+    params: FilterUserDeletionWarningNotificationsParams,
   ): Promise<UserId[]>;
 }
