@@ -13,11 +13,11 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  type GetDiscussionByIdForEstablishment,
-  makeGetDiscussionByIdForEstablishment,
-} from "./GetDiscussionByIdForEstablishment";
+  type GetDiscussionById,
+  makeGetDiscussionById,
+} from "./GetDiscussionById";
 
-describe("GetDiscussionByIdForEstablishment use case", () => {
+describe("GetDiscussionById use case", () => {
   const establishmentAdmin = new ConnectedUserBuilder()
     .withId(uuid())
     .buildUser();
@@ -26,19 +26,24 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
     .buildUser();
   const pendingUser = new ConnectedUserBuilder().withId(uuid()).buildUser();
   const discussion = new DiscussionBuilder().withId(uuid()).build();
+  const potentialBeneficiaryUser = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withEmail(discussion.potentialBeneficiary.email)
+    .buildUser();
 
-  let getDiscussionByIdForEstablishment: GetDiscussionByIdForEstablishment;
+  let getDiscussionById: GetDiscussionById;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getDiscussionByIdForEstablishment = makeGetDiscussionByIdForEstablishment({
+    getDiscussionById = makeGetDiscussionById({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
     uow.userRepository.users = [
       establishmentAdmin,
       establishmentContact,
       pendingUser,
+      potentialBeneficiaryUser,
     ];
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -76,7 +81,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
       it("when user cannot be found", async () => {
         uow.userRepository.users = [];
         await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(discussion.id, {
+          getDiscussionById.execute(discussion.id, {
             userId: establishmentAdmin.id,
           }),
           errors.user.notFound({ userId: establishmentAdmin.id }),
@@ -87,18 +92,18 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
         const missingDiscussionId = uuid();
 
         await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(missingDiscussionId, {
+          getDiscussionById.execute(missingDiscussionId, {
             userId: establishmentAdmin.id,
           }),
           errors.discussion.notFound({ discussionId: missingDiscussionId }),
         );
       });
 
-      it("when missing establishment", async () => {
+      it("when missing establishment and user is not potential beneficiary", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [];
 
         await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(discussion.id, {
+          getDiscussionById.execute(discussion.id, {
             userId: establishmentAdmin.id,
           }),
           errors.establishment.notFound({
@@ -108,28 +113,11 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
       });
     });
 
-    it("throws accessForbidden when user have no rights on establishment", async () => {
-      const userWithNoRight = new ConnectedUserBuilder()
-        .withId(uuid())
-        .buildUser();
-
-      uow.userRepository.users = [userWithNoRight];
-
-      await expectPromiseToFailWithError(
-        getDiscussionByIdForEstablishment.execute(discussion.id, {
-          userId: userWithNoRight.id,
-        }),
-        errors.discussion.accessForbidden({
-          discussionId: discussion.id,
-          userId: userWithNoRight.id,
-        }),
-      );
-    });
-    it("throws accessForbidden when user have no ACCEPTED right on establishment", async () => {
+    it("throws accessForbidden when user has no accepted rights and is not potential beneficiary", async () => {
       uow.userRepository.users = [pendingUser];
 
       await expectPromiseToFailWithError(
-        getDiscussionByIdForEstablishment.execute(discussion.id, {
+        getDiscussionById.execute(discussion.id, {
           userId: pendingUser.id,
         }),
         errors.discussion.accessForbidden({
@@ -141,6 +129,17 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
   });
 
   describe("Right paths", () => {
+    it("returns discussion for potential beneficiary email match", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+
+      expectToEqual(
+        await getDiscussionById.execute(discussion.id, {
+          userId: potentialBeneficiaryUser.id,
+        }),
+        new DiscussionBuilder(discussion).buildRead(),
+      );
+    });
+
     describe("Discussion with kinds and methods", () => {
       it.each([
         new DiscussionBuilder(discussion)
@@ -167,11 +166,11 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           .withDiscussionKind("1_ELEVE_1_STAGE")
           .withContactMode("PHONE")
           .build(),
-      ])("Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email", async (discussion) => {
+      ])("Gets discussion with kind $kind and contact mode $contactMode", async (discussion) => {
         uow.discussionRepository.discussions = [discussion];
 
         expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(discussion.id, {
+          await getDiscussionById.execute(discussion.id, {
             userId: establishmentAdmin.id,
           }),
           new DiscussionBuilder(discussion).buildRead(),
@@ -182,7 +181,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
     describe("user has rights on discussion's establishment", () => {
       it("user has establishment admin right", async () => {
         expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(discussion.id, {
+          await getDiscussionById.execute(discussion.id, {
             userId: establishmentAdmin.id,
           }),
           new DiscussionBuilder(discussion).buildRead(),
@@ -191,7 +190,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
 
       it("user has establishment contact right", async () => {
         expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(discussion.id, {
+          await getDiscussionById.execute(discussion.id, {
             userId: establishmentContact.id,
           }),
           new DiscussionBuilder(discussion).buildRead(),

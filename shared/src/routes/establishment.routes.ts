@@ -7,7 +7,6 @@ import {
   paginatedDiscussionListSchema,
   withDiscussionStatusSchema,
   withExchangeMessageSchema,
-  withUserRoleSchema,
 } from "../discussion/discussion.schema";
 import {
   establishmentNameAndAdminsSchema,
@@ -106,7 +105,6 @@ export const establishmentRoutes = defineRoutes({
     method: "get",
     url: "/discussions/:discussionId",
     ...withAuthorizationHeaders,
-    queryParamsSchema: withUserRoleSchema,
     responses: {
       200: discussionReadSchema,
       400: httpErrorSchema,

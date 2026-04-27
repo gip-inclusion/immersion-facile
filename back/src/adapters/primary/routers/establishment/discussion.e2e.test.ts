@@ -120,7 +120,6 @@ describe("discussion e2e", () => {
               version: currentJwtVersions.connectedUser,
             }),
           },
-          queryParams: { userRole: "establishment" },
           urlParams: { discussionId: discussion.id },
         }),
         {
@@ -146,7 +145,6 @@ describe("discussion e2e", () => {
               version: currentJwtVersions.connectedUser,
             }),
           },
-          queryParams: { userRole: "potentialBeneficiary" },
           urlParams: { discussionId: discussion.id },
         }),
         {
@@ -156,7 +154,7 @@ describe("discussion e2e", () => {
       );
     });
 
-    it("returns 403 when userRole=establishment for a user with only potentialBeneficiary rights", async () => {
+    it("returns 200 for a user with only potentialBeneficiary rights", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
         .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
@@ -172,23 +170,16 @@ describe("discussion e2e", () => {
               version: currentJwtVersions.connectedUser,
             }),
           },
-          queryParams: { userRole: "establishment" },
           urlParams: { discussionId: discussion.id },
         }),
         {
-          status: 403,
-          body: {
-            message: errors.discussion.accessForbidden({
-              discussionId: discussion.id,
-              userId: potentialBeneficiaryConnectedUser.id,
-            }).message,
-            status: 403,
-          },
+          status: 200,
+          body: new DiscussionBuilder(discussion).buildRead(),
         },
       );
     });
 
-    it("returns 403 when userRole=potentialBeneficiary for a user with only establishment rights", async () => {
+    it("returns 200 for a user with only establishment rights", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
         .withPotentialBeneficiaryEmail("someone-else@mail.com")
@@ -204,62 +195,13 @@ describe("discussion e2e", () => {
               version: currentJwtVersions.connectedUser,
             }),
           },
-          queryParams: { userRole: "potentialBeneficiary" },
           urlParams: { discussionId: discussion.id },
         }),
         {
-          status: 403,
-          body: {
-            message: errors.discussion.accessForbidden({
-              discussionId: discussion.id,
-              userId: establishmentAdminConnectedUser.id,
-            }).message,
-            status: 403,
-          },
+          status: 200,
+          body: new DiscussionBuilder(discussion).buildRead(),
         },
       );
-    });
-
-    it("returns 400 when userRole is invalid", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret(existingEstablishment.establishment.siret)
-        .build();
-
-      inMemoryUow.discussionRepository.discussions = [discussion];
-
-      const response = await httpClient.getDiscussionById({
-        headers: {
-          authorization: generateConnectedUserJwt({
-            userId: establishmentAdminConnectedUser.id,
-            version: currentJwtVersions.connectedUser,
-          }),
-        },
-        queryParams: { userRole: "invalid-role" } as any,
-        urlParams: { discussionId: discussion.id },
-      });
-
-      expectToEqual(response.status, 400);
-    });
-
-    it("returns 400 when userRole is missing", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret(existingEstablishment.establishment.siret)
-        .build();
-
-      inMemoryUow.discussionRepository.discussions = [discussion];
-
-      const response = await httpClient.getDiscussionById({
-        headers: {
-          authorization: generateConnectedUserJwt({
-            userId: establishmentAdminConnectedUser.id,
-            version: currentJwtVersions.connectedUser,
-          }),
-        },
-        queryParams: {} as any,
-        urlParams: { discussionId: discussion.id },
-      });
-
-      expectToEqual(response.status, 400);
     });
   });
 
