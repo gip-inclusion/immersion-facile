@@ -29,13 +29,15 @@ import {
   type NotEmptyArray,
   type PaginationQueryParams,
   pipeWithValue,
-  type SiretDto,
   type UserId,
   unvalidatedConventionStatuses,
   type WithSort,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
-import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  isInArray,
+  type KyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
@@ -77,7 +79,7 @@ export class PgConventionQueries implements ConventionQueries {
     const inactiveRows = await this.transaction
       .selectFrom("users")
       .select("users.id")
-      .where("users.id", "in", userIds)
+      .where((eb) => isInArray(eb, "users.id", userIds))
       .where((eb) =>
         eb.not(
           eb.exists(
@@ -876,7 +878,7 @@ const addFiltersToBuilder =
           : b,
       (b) =>
         withSirets && withSirets.length > 0
-          ? b.where("conventions.siret", "=", sql<SiretDto>`ANY(${withSirets})`)
+          ? b.where((eb) => isInArray(eb, "conventions.siret", withSirets))
           : b,
       addDateFilters({
         withEndDate: endDate,

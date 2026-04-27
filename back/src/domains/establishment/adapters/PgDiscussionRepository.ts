@@ -30,6 +30,7 @@ import {
 } from "shared";
 import { match, P } from "ts-pattern";
 import {
+  isInArray,
   jsonBuildObject,
   jsonStripNulls,
   type KyselyDb,
@@ -91,7 +92,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     const inactiveRows = await this.transaction
       .selectFrom("users")
       .select("users.id")
-      .where("users.id", "in", userIds)
+      .where((eb) => isInArray(eb, "users.id", userIds))
       .where((eb) =>
         eb.not(
           eb.exists(
@@ -341,7 +342,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("created_at", ">=", since)
       .executeTakeFirst();
 
-    return result ? Number.parseInt(result.count) : 0;
+    return result ? Number.parseInt(result.count, 10) : 0;
   }
 
   public async deleteOldMessages(endedSince: Date) {
@@ -840,11 +841,7 @@ const executeGetDiscussions = (
           (qb) => {
             if (!sirets) return qb;
             if (sirets.length === 0) throw errors.discussion.badSiretFilter();
-            return qb.where(
-              "discussions.siret",
-              "=",
-              sql<SiretDto>`ANY(${sirets})`,
-            );
+            return qb.where((eb) => isInArray(eb, "discussions.siret", sirets));
           },
           (qb) =>
             createdSince
