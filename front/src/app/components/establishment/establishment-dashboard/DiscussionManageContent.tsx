@@ -63,6 +63,8 @@ import { conventionDraftSelectors } from "src/core-logic/domain/convention/conve
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
+import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
@@ -101,6 +103,21 @@ export const DiscussionManageContent = ({
       }
     },
   );
+
+  useEffect(() => {
+    if (discussion) {
+      dispatch(
+        searchSlice.actions.fetchSearchResultRequested({
+          searchResult: {
+            siret: discussion.siret,
+            appellationCode: discussion.appellation.appellationCode,
+            locationId: discussion.locationId,
+          },
+          feedbackTopic: "unused",
+        }),
+      );
+    }
+  }, [discussion, dispatch]);
 
   useEffect(
     () => () => {
@@ -296,6 +313,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const saveConventionDraftIsLoading = useAppSelector(
     conventionDraftSelectors.isLoading,
   );
+  const relatedOffer = useAppSelector(searchSelectors.currentSearchResult);
   const saveConventionDraftThenRedirectRequested = ({
     conventionDraft,
     redirectUrl,
@@ -310,7 +328,6 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         feedbackTopic: "convention-draft",
       }),
     );
-
   return (
     <>
       <Feedback
@@ -357,10 +374,9 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 : discussion.businessName}
             </h1>
           </div>
-          {(props.discussion.status === "ACCEPTED" &&
-            props.discussion.candidateWarnedMethod !== null &&
-            props.discussion.conventionId === undefined) ||
-            (viewer === "potentialBeneficiary" && (
+          {discussion.status === "ACCEPTED" &&
+            discussion.candidateWarnedMethod !== null &&
+            discussion.conventionId === undefined && (
               <Button
                 {...getActivateDraftConventionButtonProps({
                   ...props,
@@ -371,30 +387,29 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               >
                 Pré-remplir la convention
               </Button>
-            ))}
-          {props.discussion.status === "PENDING" &&
-            viewer === "establishment" && (
-              <ButtonWithSubMenu
-                priority="primary"
-                id={
-                  domElementIds.establishmentDashboard.discussion
-                    .handleDiscussionButton
-                }
-                buttonLabel={"Gérer la candidature"}
-                buttonIconId="fr-icon-arrow-down-s-line"
-                iconPosition="right"
-                navItems={getDiscussionButtons({
-                  ...props,
-                  makeInitiateConventionDraftButtonProps: (discussionProps) =>
-                    getActivateDraftConventionButtonProps({
-                      ...discussionProps,
-                      saveConventionDraftThenRedirectRequested,
-                      saveConventionDraftIsLoading,
-                    }),
-                })}
-                className={fr.cx("fr-ml-md-auto")}
-              />
             )}
+          {discussion.status === "PENDING" && viewer === "establishment" && (
+            <ButtonWithSubMenu
+              priority="primary"
+              id={
+                domElementIds.establishmentDashboard.discussion
+                  .handleDiscussionButton
+              }
+              buttonLabel={"Gérer la candidature"}
+              buttonIconId="fr-icon-arrow-down-s-line"
+              iconPosition="right"
+              navItems={getDiscussionButtons({
+                ...props,
+                makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                  getActivateDraftConventionButtonProps({
+                    ...discussionProps,
+                    saveConventionDraftThenRedirectRequested,
+                    saveConventionDraftIsLoading,
+                  }),
+              })}
+              className={fr.cx("fr-ml-md-auto")}
+            />
+          )}
         </div>
         <DiscussionMeta>
           <DiscussionStatusBadge discussion={discussion} viewer={viewer} />
@@ -410,6 +425,19 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 rel="noreferrer"
               >
                 CV
+              </a>
+            )}
+          {discussion.kind === "IF" &&
+            viewer === "potentialBeneficiary" &&
+            relatedOffer &&
+            relatedOffer.website && (
+              <a
+                href={relatedOffer.website}
+                title={"Site web de l'entreprise"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Site web de l'entreprise
               </a>
             )}
         </DiscussionMeta>
