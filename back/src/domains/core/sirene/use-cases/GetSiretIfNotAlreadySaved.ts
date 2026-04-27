@@ -29,6 +29,17 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<SiretEstablishmentDto> {
     const { siret } = params;
+
+    if (
+      await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        siret,
+      )
+    ) {
+      throw errors.establishment.bannedEstablishment({
+        siret,
+      });
+    }
+
     const isEstablishmentWithProvidedSiretAlreadyInDb =
       await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
         siret,

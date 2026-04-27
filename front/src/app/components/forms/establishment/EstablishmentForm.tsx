@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -439,6 +440,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {match(currentStep)
               .with(null, () => (
                 <>
+                  {currentUser?.isBackofficeAdmin && (
+                    <Badge severity="error" className={fr.cx("fr-mb-2w")}>
+                      ENTREPRISE BANNIE
+                    </Badge>
+                  )}
                   <BusinessAndAdminSection
                     mode={mode}
                     onStepChange={onStepChange}
