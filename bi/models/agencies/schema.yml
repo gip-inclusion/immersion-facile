@@ -27,6 +27,14 @@ models:
         description: The name of the parent agency if applicable
       - name: status
         description: Current status of the agency
+      - name: delegation_agency_kind
+        description: |
+          Kind of the delegating agency, extracted from delegation_info JSON.
+          One of: pole-emploi, mission-locale, cap-emploi, operateur-cep. Null if no delegation.
+      - name: delegation_agency_name
+        description: Name of the delegating agency, extracted from delegation_info JSON. Null if no delegation.
+      - name: delegation_end_date
+        description: End date of the delegation, extracted from delegation_info JSON. Null if no delegation.
 
   - name: agency_users
     description: |

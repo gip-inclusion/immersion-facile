@@ -73,6 +73,8 @@ sources:
             description: "Marketing campaign that led to the agency"
           - name: acquisition_keyword
             description: "Marketing keyword that led to the agency"
+          - name: delegation_info
+            description: "JSON object describing delegation: delegationAgencyKind, delegationAgencyName, delegationEndDate"
 
       - name: agency_groups
         description: "Groups of agencies"
