@@ -69,7 +69,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   fitForDisabledWorkers: "no",
   website: "",
   score: 10,
-  isBanned: false,
+  isEstablishmentBanned: false,
 };
 
 export class EstablishmentEntityBuilder

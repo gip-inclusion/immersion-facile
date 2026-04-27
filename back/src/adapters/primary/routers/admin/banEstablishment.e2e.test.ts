@@ -20,7 +20,7 @@ describe("banEstablishment", () => {
 
   const bannedEstablishment: BanEstablishmentPayload = {
     siret: "12345678912345",
-    bannishmentJustification: "Le cidre n'est pas breton",
+    establishmentBannishmentJustification: "Le cidre n'est pas breton",
   };
 
   beforeEach(async () => {
@@ -61,8 +61,8 @@ describe("banEstablishment", () => {
           headers: { authorization: adminToken },
           body: {
             siret: "invalid-siret",
-            bannishmentJustification:
-              bannedEstablishment.bannishmentJustification,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
           },
         });
 
@@ -81,7 +81,7 @@ describe("banEstablishment", () => {
           headers: { authorization: adminToken },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification: "",
+            establishmentBannishmentJustification: "",
           },
         });
 
@@ -101,7 +101,7 @@ describe("banEstablishment", () => {
           headers: { authorization: adminToken },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification: longJustification,
+            establishmentBannishmentJustification: longJustification,
           },
         });
 
@@ -122,8 +122,8 @@ describe("banEstablishment", () => {
           headers: { authorization: "" },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification:
-              bannedEstablishment.bannishmentJustification,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
           },
         });
 
@@ -140,8 +140,8 @@ describe("banEstablishment", () => {
           headers: { authorization: nonAdminToken },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification:
-              bannedEstablishment.bannishmentJustification,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
           },
         });
 
@@ -163,8 +163,8 @@ describe("banEstablishment", () => {
           headers: { authorization: adminToken },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification:
-              bannedEstablishment.bannishmentJustification,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
           },
         });
 
@@ -184,8 +184,8 @@ describe("banEstablishment", () => {
           headers: { authorization: adminToken },
           body: {
             siret: bannedEstablishment.siret,
-            bannishmentJustification:
-              bannedEstablishment.bannishmentJustification,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
           },
         });
 

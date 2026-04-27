@@ -13,7 +13,10 @@ export class PgBannedEstablishmentRepository
   public async getBannedEstablishments(): Promise<BannedEstablishment[]> {
     return this.transaction
       .selectFrom("banned_establishments")
-      .select(["siret", "bannishment_justification as bannishmentJustification"])
+      .select([
+        "siret",
+        "bannishment_justification as establishmentBannishmentJustification",
+      ])
       .execute();
   }
 
@@ -24,20 +27,20 @@ export class PgBannedEstablishmentRepository
       .selectFrom("banned_establishments")
       .select([
         "siret",
-        "bannishment_justification as bannishmentJustification",
+        "bannishment_justification as establishmentBannishmentJustification",
       ])
       .where("siret", "=", siret)
       .executeTakeFirst();
   }
   public async banEstablishment({
     siret,
-    bannishmentJustification,
+    establishmentBannishmentJustification,
   }: BanEstablishmentPayload): Promise<void> {
     await this.transaction
       .insertInto("banned_establishments")
       .values({
         siret,
-        bannishment_justification: bannishmentJustification,
+        bannishment_justification: establishmentBannishmentJustification,
       })
       .execute();
   }

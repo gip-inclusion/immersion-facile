@@ -583,7 +583,7 @@ describe("Establishment", () => {
       store.dispatch(
         establishmentSlice.actions.banEstablishmentRequested({
           siret: formEstablishment.siret,
-          bannishmentJustification: "Raison du bannissement",
+          establishmentBannishmentJustification: "Raison du bannissement",
           jwt: adminJwt,
           feedbackTopic: "ban-establishment",
         }),
@@ -607,7 +607,7 @@ describe("Establishment", () => {
       store.dispatch(
         establishmentSlice.actions.banEstablishmentRequested({
           siret: formEstablishment.siret,
-          bannishmentJustification: "Raison du bannissement",
+          establishmentBannishmentJustification: "Raison du bannissement",
           jwt: adminJwt,
           feedbackTopic: "ban-establishment",
         }),

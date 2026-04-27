@@ -3,35 +3,35 @@ import type { WithSiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 
-type WithBannishmentJustification = {
-  bannishmentJustification: string;
+type WithEstablishmentBannishmentJustification = {
+  establishmentBannishmentJustification: string;
 };
 
-export const withBannishmentJustificationSchema = z.object({
-  bannishmentJustification: zStringMinLength1Max1024,
+export const withEstablishmentBannishmentJustificationSchema = z.object({
+  establishmentBannishmentJustification: zStringMinLength1Max1024,
 });
 
 export type WithBannedEstablishmentInformations =
-  | { isBanned: false }
+  | { isEstablishmentBanned: false }
   | ({
-      isBanned: true;
-    } & WithBannishmentJustification);
+      isEstablishmentBanned: true;
+    } & WithEstablishmentBannishmentJustification);
 
 export const withBannedEstablishmentInformationSchema = z.discriminatedUnion(
-  "isBanned",
+  "isEstablishmentBanned",
   [
-    z.object({ isBanned: z.literal(false) }),
+    z.object({ isEstablishmentBanned: z.literal(false) }),
     z
-      .object({ isBanned: z.literal(true) })
-      .extend(withBannishmentJustificationSchema.shape),
+      .object({ isEstablishmentBanned: z.literal(true) })
+      .extend(withEstablishmentBannishmentJustificationSchema.shape),
   ],
 );
 
 export type BanEstablishmentPayload = WithSiretDto &
-  WithBannishmentJustification;
+  WithEstablishmentBannishmentJustification;
 
 export const banEstablishmentPayloadSchema = z
   .object({
     siret: siretSchema,
   })
-  .extend(withBannishmentJustificationSchema.shape);
+  .extend(withEstablishmentBannishmentJustificationSchema.shape);

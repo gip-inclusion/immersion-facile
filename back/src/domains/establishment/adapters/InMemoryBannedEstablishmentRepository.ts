@@ -22,8 +22,11 @@ export class InMemoryBannedEstablishmentRepository
   }
   public async banEstablishment({
     siret,
-    bannishmentJustification,
+    establishmentBannishmentJustification,
   }: BanEstablishmentPayload): Promise<void> {
-    this.bannedEstablishments.push({ siret, bannishmentJustification });
+    this.bannedEstablishments.push({
+      siret,
+      establishmentBannishmentJustification,
+    });
   }
 }

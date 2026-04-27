@@ -207,7 +207,7 @@ describe("Update Establishment aggregate from form data", () => {
       uow.bannedEstablishmentRepository.bannedEstablishments = [
         {
           siret: bannedSiret,
-          bannishmentJustification:
+          establishmentBannishmentJustification:
             "L'entreprise relâche des produits chimiques sur la côte de granite rose",
         },
       ];
@@ -649,7 +649,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withAdditionalInformation(
             existingFormEstablishment.additionalInformation,
           )
-          .withBannishmentInformations({ isBanned: false })
+          .withBannishmentInformations({ isEstablishmentBanned: false })
           .withScore(0)
           .build(),
       )
@@ -720,7 +720,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withAdditionalInformation(
             updatedFormEstablishment.additionalInformation,
           )
-          .withBannishmentInformations({ isBanned: false })
+          .withBannishmentInformations({ isEstablishmentBanned: false })
           .withScore(0)
           .build(),
       )
@@ -1196,8 +1196,9 @@ describe("Update Establishment aggregate from form data", () => {
         uow.userRepository.users = [user];
         const updatedFormEstablishmentWithBan: FormEstablishmentDto = {
           ...updatedFormEstablishment,
-          isBanned: true,
-          bannishmentJustification: "Ils font des crêpes à la poêle",
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            "Ils font des crêpes à la poêle",
         };
         const expectedEstablishmentAggregate = {
           ...updatedEstablishmentAggregate,
@@ -1242,8 +1243,8 @@ describe("Update Establishment aggregate from form data", () => {
             ...existingEstablishmentAggregate,
             establishment: {
               ...existingEstablishmentAggregate.establishment,
-              isBanned: true,
-              bannishmentJustification:
+              isEstablishmentBanned: true,
+              establishmentBannishmentJustification:
                 "L'entreprise est concurrente à Petit Navire",
             },
           },
@@ -1252,7 +1253,7 @@ describe("Update Establishment aggregate from form data", () => {
 
         const updatedFormEstablishmentWithBan: FormEstablishmentDto = {
           ...updatedFormEstablishment,
-          isBanned: false,
+          isEstablishmentBanned: false,
         };
 
         const expectedEstablishmentAggregate = {

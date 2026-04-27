@@ -46,7 +46,7 @@ export type ManageEstablishmentAdminForm = {
 };
 
 export type BanEstablishmentAdminForm = {
-  bannishmentJustification: string;
+  establishmentBannishmentJustification: string;
 };
 
 export type UpdateAgencyStatusParams = {

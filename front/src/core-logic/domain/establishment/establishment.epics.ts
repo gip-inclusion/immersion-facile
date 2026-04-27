@@ -251,7 +251,8 @@ const banEstablishmentEpic: AppEpic<EstablishmentAction> = (
         .banEstablishment$(
           {
             siret: action.payload.siret,
-            bannishmentJustification: action.payload.bannishmentJustification,
+            establishmentBannishmentJustification:
+              action.payload.establishmentBannishmentJustification,
           },
           action.payload.jwt,
         )

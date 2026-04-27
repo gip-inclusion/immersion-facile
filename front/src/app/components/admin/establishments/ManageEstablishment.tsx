@@ -105,16 +105,18 @@ export const ManageEstablishment = (): JSX.Element => {
               doClosesModal: true,
               children: "Confirmer le bannissement",
               disabled: !banFormState.isValid,
-              onClick: handleBanSubmit(({ bannishmentJustification }) => {
-                dispatch(
-                  establishmentSlice.actions.banEstablishmentRequested({
-                    siret,
-                    bannishmentJustification,
-                    feedbackTopic: "ban-establishment",
-                    jwt: connectedUserJwt,
-                  }),
-                );
-              }),
+              onClick: handleBanSubmit(
+                ({ establishmentBannishmentJustification }) => {
+                  dispatch(
+                    establishmentSlice.actions.banEstablishmentRequested({
+                      siret,
+                      establishmentBannishmentJustification,
+                      feedbackTopic: "ban-establishment",
+                      jwt: connectedUserJwt,
+                    }),
+                  );
+                },
+              ),
             },
           ]}
         >
@@ -128,9 +130,11 @@ export const ManageEstablishment = (): JSX.Element => {
             textArea
             nativeTextAreaProps={{
               rows: 6,
-              ...registerBan("bannishmentJustification"),
+              ...registerBan("establishmentBannishmentJustification"),
             }}
-            {...makeFieldError(banFormState)("bannishmentJustification")}
+            {...makeFieldError(banFormState)(
+              "establishmentBannishmentJustification",
+            )}
           />
         </banEstablishmentModal.Component>,
         document.body,
