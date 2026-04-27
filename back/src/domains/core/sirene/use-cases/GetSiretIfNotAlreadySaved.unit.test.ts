@@ -1,4 +1,10 @@
-import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  type BanEstablishmentPayload,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import { InMemoryBannedEstablishmentRepository } from "../../../establishment/adapters/InMemoryBannedEstablishmentRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
@@ -14,13 +20,16 @@ describe("GetSiretIfNotAlreadySaved", () => {
   let getSiretIfNotAlreadySaved: GetSiretIfNotAlreadySaved;
   let uowPerformer: InMemoryUowPerformer;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
+  let bannedEstablishmentRepo: InMemoryBannedEstablishmentRepository;
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
+    bannedEstablishmentRepo = new InMemoryBannedEstablishmentRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       establishmentAggregateRepository: establishmentAggregateRepo,
+      bannedEstablishmentRepository: bannedEstablishmentRepo,
     });
     getSiretIfNotAlreadySaved = new GetSiretIfNotAlreadySaved(
       uowPerformer,
@@ -52,6 +61,24 @@ describe("GetSiretIfNotAlreadySaved", () => {
         siret: siretAlreadyInDb,
       }),
       errors.establishment.conflictError({ siret: siretAlreadyInDb }),
+    );
+  });
+
+  it("throws when siret is banned", async () => {
+    const banEstablishmentPayload: BanEstablishmentPayload = {
+      siret: "12345678912345",
+      bannishmentJustification: "Valid justification",
+    };
+
+    bannedEstablishmentRepo.bannedEstablishments = [banEstablishmentPayload];
+
+    await expectPromiseToFailWithError(
+      getSiretIfNotAlreadySaved.execute({
+        siret: banEstablishmentPayload.siret,
+      }),
+      errors.establishment.bannedEstablishment({
+        siret: banEstablishmentPayload.siret,
+      }),
     );
   });
 
