@@ -17,7 +17,6 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../../../utils/agency";
-import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
@@ -406,152 +405,104 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       });
     });
   });
-});
 
-describe("PgUserRepository - getUserIdsLoggedInLongAgo", () => {
-  const now = new Date("2026-01-15T10:00:00.000Z");
-  const twoYearsAgo = subYears(now, 2);
-  const oneYearAgo = subYears(now, 1);
-  const threeYearsAgoIso = subYears(now, 3).toISOString();
+  describe("getUserIdsLoggedInLongAgo()", () => {
+    const now = new Date("2026-01-15T10:00:00.000Z");
+    const twoYearsAgo = subYears(now, 2);
+    const oneYearAgo = subYears(now, 1);
+    const threeYearsAgoIso = subYears(now, 3).toISOString();
 
-  let pool: Pool;
-  let db: KyselyDb;
-  let userRepository: PgUserRepository;
-  let agencyId: string;
-
-  const makeUserWithOldLogin = (
-    overrides: Partial<UserWithAdminRights> & { id: string; email: string },
-  ): UserWithAdminRights => ({
-    id: overrides.id,
-    email: overrides.email,
-    firstName: overrides.firstName ?? "Jean",
-    lastName: overrides.lastName ?? "Dupont",
-    createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
-    proConnect: null,
-    lastLoginAt: overrides.lastLoginAt ?? threeYearsAgoIso,
-  });
-
-  beforeAll(async () => {
-    pool = makeTestPgPool();
-    db = makeKyselyDb(pool);
-  });
-
-  beforeEach(async () => {
-    await db.deleteFrom("notifications_email_recipients").execute();
-    await db.deleteFrom("notifications_email_attachments").execute();
-    await db.deleteFrom("notifications_email").execute();
-    await db.deleteFrom("exchanges").execute();
-    await db.deleteFrom("discussions").execute();
-    await db.deleteFrom("conventions").execute();
-    await db.deleteFrom("actors").execute();
-    await db.deleteFrom("convention_external_ids").execute();
-    await db.deleteFrom("users__agencies").execute();
-    await db.deleteFrom("agency_groups__agencies").execute();
-    await db.deleteFrom("agencies").execute();
-    await db.deleteFrom("users_ongoing_oauths").execute();
-    await db.deleteFrom("users_admins").execute();
-    await db.deleteFrom("users").execute();
-
-    userRepository = new PgUserRepository(db);
-
-    const validatorId = uuid();
-    const validator = {
-      ...makeUniqueUserForTest(validatorId),
-      lastLoginAt: oneYearAgo.toISOString(),
-    };
-    await userRepository.save(validator);
-
-    agencyId = uuid();
-    const agency = new AgencyDtoBuilder().withId(agencyId).build();
-    await new PgAgencyRepository(db).insert(
-      toAgencyWithRights(agency, {
-        [validatorId]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
-    );
-  });
-
-  afterAll(async () => {
-    await pool.end();
-  });
-
-  it("returns never-logged-in users when last_login_at is null", async () => {
-    const neverLoggedIn = makeUserWithOldLogin({
-      id: uuid(),
-      email: "never-logged@test.fr",
-      lastLoginAt: undefined,
-    });
-    const recentlyActiveUser = makeUserWithOldLogin({
-      id: uuid(),
-      email: "recently-active@test.fr",
-      lastLoginAt: oneYearAgo.toISOString(),
+    const makeUserWithOldLogin = (
+      overrides: Partial<UserWithAdminRights> & { id: string; email: string },
+    ): UserWithAdminRights => ({
+      id: overrides.id,
+      email: overrides.email,
+      firstName: overrides.firstName ?? "Jean",
+      lastName: overrides.lastName ?? "Dupont",
+      createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
+      proConnect: null,
+      lastLoginAt: overrides.lastLoginAt ?? threeYearsAgoIso,
     });
 
-    await userRepository.save(neverLoggedIn);
-    await userRepository.save(recentlyActiveUser);
+    it("returns never-logged-in users when last_login_at is null", async () => {
+      const neverLoggedIn = makeUserWithOldLogin({
+        id: uuid(),
+        email: "never-logged@test.fr",
+        lastLoginAt: undefined,
+      });
+      const recentlyActiveUser = makeUserWithOldLogin({
+        id: uuid(),
+        email: "recently-active@test.fr",
+        lastLoginAt: oneYearAgo.toISOString(),
+      });
 
-    const result = await userRepository.getUserIdsLoggedInLongAgo({
-      since: twoYearsAgo,
-      limit: 100,
-      offset: 0,
-    });
+      await userRepository.save(neverLoggedIn);
+      await userRepository.save(recentlyActiveUser);
 
-    expectArraysToEqualIgnoringOrder(result, [neverLoggedIn.id]);
-  });
+      const result = await userRepository.getUserIdsLoggedInLongAgo({
+        since: twoYearsAgo,
+        limit: 100,
+        offset: 0,
+      });
 
-  it("returns users with old login", async () => {
-    const inactiveUser = makeUserWithOldLogin({
-      id: uuid(),
-      email: "inactive@test.fr",
-    });
-    const recentlyActiveUser = makeUserWithOldLogin({
-      id: uuid(),
-      email: "recently-active@test.fr",
-      lastLoginAt: oneYearAgo.toISOString(),
-    });
-    await userRepository.save(inactiveUser);
-    await userRepository.save(recentlyActiveUser);
-
-    const result = await userRepository.getUserIdsLoggedInLongAgo({
-      since: twoYearsAgo,
-      limit: 100,
-      offset: 0,
+      expectArraysToEqualIgnoringOrder(result, [neverLoggedIn.id]);
     });
 
-    expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
-  });
+    it("returns users with old login", async () => {
+      const inactiveUser = makeUserWithOldLogin({
+        id: uuid(),
+        email: "inactive@test.fr",
+      });
+      const recentlyActiveUser = makeUserWithOldLogin({
+        id: uuid(),
+        email: "recently-active@test.fr",
+        lastLoginAt: oneYearAgo.toISOString(),
+      });
+      await userRepository.save(inactiveUser);
+      await userRepository.save(recentlyActiveUser);
 
-  it("returns old-login user ids by stable offset pages", async () => {
-    const inactiveUserA = makeUserWithOldLogin({
-      id: "11111111-1111-4111-9111-111111111111",
-      email: "inactive-a@test.fr",
-    });
-    const inactiveUserB = makeUserWithOldLogin({
-      id: "22222222-2222-4222-9222-222222222222",
-      email: "inactive-b@test.fr",
-    });
-    const inactiveUserC = makeUserWithOldLogin({
-      id: "33333333-3333-4333-9333-333333333333",
-      email: "inactive-c@test.fr",
-    });
-    await Promise.all([
-      userRepository.save(inactiveUserC),
-      userRepository.save(inactiveUserA),
-      userRepository.save(inactiveUserB),
-    ]);
+      const result = await userRepository.getUserIdsLoggedInLongAgo({
+        since: twoYearsAgo,
+        limit: 100,
+        offset: 0,
+      });
 
-    const firstPage = await userRepository.getUserIdsLoggedInLongAgo({
-      since: twoYearsAgo,
-      limit: 2,
-      offset: 0,
-    });
-    const secondPage = await userRepository.getUserIdsLoggedInLongAgo({
-      since: twoYearsAgo,
-      limit: 2,
-      offset: 2,
+      expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
     });
 
-    expectToEqual(firstPage, [inactiveUserA.id, inactiveUserB.id]);
-    expectToEqual(secondPage, [inactiveUserC.id]);
+    it("returns old-login user ids by stable offset pages", async () => {
+      const inactiveUserA = makeUserWithOldLogin({
+        id: "11111111-1111-4111-9111-111111111111",
+        email: "inactive-a@test.fr",
+      });
+      const inactiveUserB = makeUserWithOldLogin({
+        id: "22222222-2222-4222-9222-222222222222",
+        email: "inactive-b@test.fr",
+      });
+      const inactiveUserC = makeUserWithOldLogin({
+        id: "33333333-3333-4333-9333-333333333333",
+        email: "inactive-c@test.fr",
+      });
+      await Promise.all([
+        userRepository.save(inactiveUserC),
+        userRepository.save(inactiveUserA),
+        userRepository.save(inactiveUserB),
+      ]);
+
+      const firstPage = await userRepository.getUserIdsLoggedInLongAgo({
+        since: twoYearsAgo,
+        limit: 2,
+        offset: 0,
+      });
+      const secondPage = await userRepository.getUserIdsLoggedInLongAgo({
+        since: twoYearsAgo,
+        limit: 2,
+        offset: 2,
+      });
+
+      expectToEqual(firstPage, [inactiveUserA.id, inactiveUserB.id]);
+      expectToEqual(secondPage, [inactiveUserC.id]);
+    });
   });
 });
 

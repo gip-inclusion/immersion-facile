@@ -23,6 +23,8 @@ import {
 } from "./TriggerEventsToDeleteInactiveUsers";
 
 const now = new Date("2026-01-15T10:00:00.000Z");
+const twoYearsAgo = subYears(now, 2);
+const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
 
 describe("TriggerEventsToDeleteInactiveUsers", () => {
   let uow: InMemoryUnitOfWork;
@@ -62,7 +64,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
-      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [inactiveUser];
 
@@ -76,7 +78,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
-      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [inactiveUser];
     saveDeletionWarningNotification({
@@ -107,7 +109,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
-      lastLoginAt: subDays(subYears(now, 2), 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     uow.userRepository.users = [inactiveUser];
     saveDeletionWarningNotification({
@@ -177,11 +179,10 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
   });
 
   it("triggers deletion for user with expired convention and old discussion", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     setUserWithOldConventionAndDiscussion({
       now,
@@ -209,26 +210,25 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
   });
 
   it("only triggers deletion for users warned inside [warnedFrom, warnedTo]", async () => {
-    const twoYearsAgo = subYears(now, 2);
     const warnedInsideWindow = makeUser({
       id: "warned-inside-id",
       email: "warned-inside@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     const neverWarned = makeUser({
       id: "never-warned-id",
       email: "never-warned@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     const warnedTooRecently = makeUser({
       id: "warned-too-recently-id",
       email: "warned-too-recently@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
     const warnedTooLongAgo = makeUser({
       id: "warned-too-long-ago-id",
       email: "warned-too-long-ago@test.fr",
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     });
 
     uow.userRepository.users = [
@@ -278,8 +278,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
         },
       },
     );
-    const twoYearsAgo = subYears(now, 2);
-    const users = makeInactiveUsers(3, twoYearsAgo);
+    const users = makeInactiveUsers(3);
     uow.userRepository.users = users;
     users.forEach((user) => {
       saveDeletionWarningNotification({
@@ -302,12 +301,12 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
   });
 });
 
-const makeInactiveUsers = (count: number, twoYearsAgo: Date) =>
+const makeInactiveUsers = (count: number) =>
   Array.from({ length: count }, (_, index) =>
     makeUser({
       id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
       email: `inactive-${index + 1}@test.fr`,
-      lastLoginAt: subDays(twoYearsAgo, 1).toISOString(),
+      lastLoginAt: inactiveLastLoginAt,
     }),
   );
 

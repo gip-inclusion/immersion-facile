@@ -3476,8 +3476,7 @@ describe("PgDiscussionRepository", () => {
         userRepo.save(userD),
       ]);
 
-      // userA has a recent exchange sent by the establishment (matches on establishment_email)
-      const recentEstablishmentExchange = new DiscussionBuilder()
+      const recentExchangeWhereUserAIsEstablishment = new DiscussionBuilder()
         .withId("11111111-1111-4111-a111-111111111111")
         .withPotentialBeneficiaryEmail("candidate-a@test.com")
         .withExchanges([
@@ -3494,8 +3493,7 @@ describe("PgDiscussionRepository", () => {
         ])
         .build();
 
-      // userB has an old exchange sent by the establishment
-      const oldEstablishmentExchange = new DiscussionBuilder()
+      const oldExchangeWhereUserBIsEstablishment = new DiscussionBuilder()
         .withId("22222222-2222-4222-a222-222222222222")
         .withSiret("11111111111112")
         .withPotentialBeneficiaryEmail("candidate-b@test.com")
@@ -3513,9 +3511,7 @@ describe("PgDiscussionRepository", () => {
         ])
         .build();
 
-      // userD appears only as a candidate (potential_beneficiary email), never as establishment sender
-      // this exchange MUST NOT count as recent activity for userD
-      const candidateOnlyDiscussion = new DiscussionBuilder()
+      const recentDiscussionWhereUserDIsCandidateOnly = new DiscussionBuilder()
         .withId("33333333-3333-4333-a333-333333333333")
         .withSiret("11111111111113")
         .withPotentialBeneficiaryEmail(userD.email)
@@ -3531,9 +3527,11 @@ describe("PgDiscussionRepository", () => {
         .build();
 
       await Promise.all([
-        pgDiscussionRepository.insert(recentEstablishmentExchange),
-        pgDiscussionRepository.insert(oldEstablishmentExchange),
-        pgDiscussionRepository.insert(candidateOnlyDiscussion),
+        pgDiscussionRepository.insert(recentExchangeWhereUserAIsEstablishment),
+        pgDiscussionRepository.insert(oldExchangeWhereUserBIsEstablishment),
+        pgDiscussionRepository.insert(
+          recentDiscussionWhereUserDIsCandidateOnly,
+        ),
       ]);
 
       const result =
