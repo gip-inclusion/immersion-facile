@@ -10,15 +10,17 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     UPDATE actors
     SET extra_fields = jsonb_set(extra_fields, '{birthdate}', 
       CASE 
-        WHEN (extra_fields->>'birthdate')::date < '${minDateString}' THEN '"${minDateString}"'::jsonb
-        WHEN (extra_fields->>'birthdate')::date > '${maxDateString}' THEN '"${maxDateString}"'::jsonb
+        -- On utilise LEFT pour normaliser à 10 caractères avant de tester
+        WHEN (LEFT(extra_fields->>'birthdate', 10))::date < '${minDateString}' THEN '"${minDateString}"'::jsonb
+        WHEN (LEFT(extra_fields->>'birthdate', 10))::date > '${maxDateString}' THEN '"${maxDateString}"'::jsonb
       END
     )
     WHERE extra_fields ? 'birthdate'
+    AND extra_fields->>'birthdate' ~ '^\\d{4}-\\d{2}-\\d{2}'
     AND (
-      (extra_fields->>'birthdate')::date < '${minDateString}' 
+      (LEFT(extra_fields->>'birthdate', 10))::date < '${minDateString}' 
       OR 
-      (extra_fields->>'birthdate')::date > '${maxDateString}'
+      (LEFT(extra_fields->>'birthdate', 10))::date > '${maxDateString}'
     )
   `);
 
