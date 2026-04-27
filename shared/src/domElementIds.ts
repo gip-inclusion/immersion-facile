@@ -892,6 +892,7 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__submit-edit-button",
       submitDeleteButton:
         "im-form-manage-establishment-admin__submit-delete-button",
+      banButton: "im-manage-establishment__ban-button",
     },
     adminPrivateRoute: {
       formLoginUserInput: "im-login__user-input",

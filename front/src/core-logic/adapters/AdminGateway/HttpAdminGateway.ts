@@ -4,6 +4,7 @@ import {
   type ApiConsumer,
   type ApiConsumerId,
   type ApiConsumerJwt,
+  type BanEstablishmentPayload,
   type ConnectedUser,
   type ConnectedUserJwt,
   createApiConsumerParamsFromApiConsumer,
@@ -293,6 +294,29 @@ export class HttpAdminGateway implements AdminGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public banEstablishment$(
+    payload: BanEstablishmentPayload,
+    jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .banEstablishment({
+          headers: { authorization: jwt },
+          body: {
+            siret: payload.siret,
+            bannishmentJustification: payload.bannishmentJustification,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => {})
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

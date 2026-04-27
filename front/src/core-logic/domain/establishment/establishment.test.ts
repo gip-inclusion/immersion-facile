@@ -577,6 +577,12 @@ describe("Establishment", () => {
     });
   });
 
+  describe("ban establishment", () => {
+    it("should ban an establishment", () => {
+      expect(true).toBe(false);
+    });
+  });
+
   const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,

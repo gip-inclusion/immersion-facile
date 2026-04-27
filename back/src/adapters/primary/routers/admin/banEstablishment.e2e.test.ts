@@ -19,7 +19,7 @@ describe("banEstablishment", () => {
   let httpClient: HttpClient<AdminRoutes>;
 
   const bannedEstablishment: BanEstablishmentPayload = {
-    siret: "12345678901234",
+    siret: "12345678912345",
     bannishmentJustification: "Le cidre n'est pas breton",
   };
 
@@ -41,6 +41,8 @@ describe("banEstablishment", () => {
       connectedNonAdminUser,
     ];
 
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [];
+
     nonAdminToken = testApp.generateConnectedUserJwt({
       version: currentJwtVersions.connectedUser,
       userId: "non-admin-user",
@@ -51,6 +53,7 @@ describe("banEstablishment", () => {
       version: currentJwtVersions.connectedUser,
     });
   });
+
   describe(`${adminRoutes.banEstablishment.method} ${adminRoutes.banEstablishment.url} route`, () => {
     describe("Wrong paths", () => {
       it("400 - returns 400 when siret is invalid", async () => {
