@@ -579,7 +579,52 @@ describe("Establishment", () => {
 
   describe("ban establishment", () => {
     it("should ban an establishment", () => {
-      expect(true).toBe(false);
+      const adminJwt: ConnectedUserJwt = "admin-jwt";
+      store.dispatch(
+        establishmentSlice.actions.banEstablishmentRequested({
+          siret: formEstablishment.siret,
+          bannishmentJustification: "Raison du bannissement",
+          jwt: adminJwt,
+          feedbackTopic: "ban-establishment",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.adminGateway.banEstablishmentResponse$.next(undefined);
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "ban-establishment": {
+          on: "create",
+          level: "success",
+          title: "L'entreprise a bien été bannie",
+          message:
+            "Le SIRET a été ajouté à la blacklist d’Immersion Facilitée.",
+        },
+      });
+    });
+
+    it("should fail when banning an establishment on gateway error", () => {
+      const adminJwt: ConnectedUserJwt = "admin-jwt";
+      store.dispatch(
+        establishmentSlice.actions.banEstablishmentRequested({
+          siret: formEstablishment.siret,
+          bannishmentJustification: "Raison du bannissement",
+          jwt: adminJwt,
+          feedbackTopic: "ban-establishment",
+        }),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
+      dependencies.adminGateway.banEstablishmentResponse$.error(
+        new Error("Ban failed"),
+      );
+      expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "ban-establishment": {
+          on: "create",
+          level: "error",
+          title: "Impossible de bannir l'entreprise",
+          message: "Ban failed",
+        },
+      });
     });
   });
 
