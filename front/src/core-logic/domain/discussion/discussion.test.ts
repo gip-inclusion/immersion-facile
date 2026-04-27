@@ -356,7 +356,6 @@ describe("Discussion slice", () => {
             page: 1,
             perPage: 20,
             search: "test",
-            userRole: "establishment",
           };
         expectDiscussionSelector(defaultStartingDiscussionState);
         store.dispatch(
@@ -410,7 +409,6 @@ describe("Discussion slice", () => {
               orderDirection: "desc",
               page: 1,
               perPage: 10,
-              userRole: "establishment",
             },
             feedbackTopic: "establishment-dashboard-discussion-list",
           }),

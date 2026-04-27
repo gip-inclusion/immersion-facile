@@ -356,7 +356,6 @@ export type FlatGetPaginatedDiscussionsParams = {
   // filters
   statuses?: DiscussionStatus | DiscussionStatus[];
   search?: SearchTextAlphaNumeric;
-  userRole: ExchangeRole;
 };
 
 export const isDiscussionInList = (
