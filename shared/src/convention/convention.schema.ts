@@ -352,29 +352,27 @@ const miniStageConventionCoreSchema = (
 
 export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
   ConventionCommon &
-  ConventionInternshipKindSpecific<"immersion"> &
-  WithBannedEstablishmentInformations
-> = immersionConventionCoreSchema
-  .and(
-    withBannedEstablishmentInformationSchema,
-  ) as unknown as ZodSchemaWithInputMatchingOutput<
-    ConventionCommon &
     ConventionInternshipKindSpecific<"immersion"> &
     WithBannedEstablishmentInformations
-  >;
+> = immersionConventionCoreSchema.and(
+  withBannedEstablishmentInformationSchema,
+) as unknown as ZodSchemaWithInputMatchingOutput<
+  ConventionCommon &
+    ConventionInternshipKindSpecific<"immersion"> &
+    WithBannedEstablishmentInformations
+>;
 
 export const miniStageConventionSchema: ZodSchemaWithInputMatchingOutput<
   ConventionCommon &
-  ConventionInternshipKindSpecific<"mini-stage-cci"> &
-  WithBannedEstablishmentInformations
-> = miniStageConventionCoreSchema
-  .and(
-    withBannedEstablishmentInformationSchema,
-  ) as unknown as ZodSchemaWithInputMatchingOutput<
-    ConventionCommon &
     ConventionInternshipKindSpecific<"mini-stage-cci"> &
     WithBannedEstablishmentInformations
-  >;
+> = miniStageConventionCoreSchema.and(
+  withBannedEstablishmentInformationSchema,
+) as unknown as ZodSchemaWithInputMatchingOutput<
+  ConventionCommon &
+    ConventionInternshipKindSpecific<"mini-stage-cci"> &
+    WithBannedEstablishmentInformations
+>;
 
 // https://github.com/colinhacks/zod#discriminated-unions
 export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingOutput<
@@ -393,11 +391,15 @@ export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingO
 export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
   (
     z
-      .discriminatedUnion("internshipKind", [
-        immersionConventionCoreSchema,
-        miniStageConventionCoreSchema,
-      ])
-      .and(withBannedEstablishmentInformationSchema) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
+      .looseObject({})
+      .pipe(
+        z
+          .discriminatedUnion("internshipKind", [
+            immersionConventionCoreSchema,
+            miniStageConventionCoreSchema,
+          ])
+          .and(withBannedEstablishmentInformationSchema) as any,
+      ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
   )
     .check((ctx) => {
       if (
