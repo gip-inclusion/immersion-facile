@@ -277,6 +277,18 @@ const createConventionSelection = (
           job: sql`et.extra_fields ->> 'job'`.$castTo<string>(),
         }),
         validators: ref("conventions.validators"),
+        isEstablishmentBanned: eb
+          .case()
+          .when("banned_establishments.siret", "is not", null)
+          .then(sql`true`)
+          .else(sql`false`)
+          .end(),
+        establishmentBannishmentJustification: eb
+          .case()
+          .when("banned_establishments.siret", "is not", null)
+          .then(ref("banned_establishments.bannishment_justification"))
+          .else(null)
+          .end(),
         renewed: eb
           .case()
           .when("renewed_from", "is not", null)
@@ -363,6 +375,11 @@ const withAppellationsAndPartnerPeJoinAndPhoneNumber = <
       "phone_numbers as phone_numbers_bce",
       "phone_numbers_bce.id",
       "bce.phone_id",
+    )
+    .leftJoin(
+      "banned_establishments",
+      "banned_establishments.siret",
+      "conventions.siret",
     ) as QB;
 
 export const createConventionQueryBuilder = (
