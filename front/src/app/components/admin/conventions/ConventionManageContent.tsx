@@ -3,6 +3,7 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   allAgencyRoles,
+  badSchemaErrorMessagePrefix,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredJwtErrorMessage,
@@ -112,22 +113,26 @@ export const ConventionManageContent = ({
   ]);
 
   if (fetchConventionError) {
-    if (
-      !conventionFormFeedback?.message.includes(expiredJwtErrorMessage) &&
-      currentUser?.email
-    ) {
-      throw frontErrors.convention.noRightsOnConvention({
-        userEmail: currentUser.email,
-        conventionId: conventionId,
-      });
-    }
+    const message = conventionFormFeedback?.message ?? "";
 
-    return (
-      <ShowConventionErrorOrRenewExpiredJwt
-        errorMessage={conventionFormFeedback?.message}
-        jwt={jwtParams.jwt}
-      />
-    );
+    if (message.includes(expiredJwtErrorMessage))
+      return (
+        <ShowConventionErrorOrRenewExpiredJwt
+          errorMessage={message}
+          jwt={jwtParams.jwt}
+        />
+      );
+
+    if (message.includes(badSchemaErrorMessagePrefix))
+      throw frontErrors.convention.badSchema({
+        conventionId,
+        errorMessage: message,
+      });
+
+    throw frontErrors.convention.noRightsOnConvention({
+      userEmail: currentUser?.email ?? "INCONNU",
+      conventionId,
+    });
   }
 
   if (

@@ -11,6 +11,7 @@ export const conventionDraftSeed = async (uow: UnitOfWork) => {
   const conventionDraftImmersion: ConventionDraftDto = {
     id: "11111111-1111-4111-9111-111111111111",
     internshipKind: "immersion",
+    remoteWorkMode: "ON_SITE",
     signatories: {
       beneficiary: {
         firstName: "John",
