@@ -9,7 +9,7 @@ export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 export type WithRemoteWorkMode = {
   remoteWorkMode: RemoteWorkMode;
 };
-export type WithOptionnalRemoteWorkModes = {
+export type WithOptionalRemoteWorkModes = {
   remoteWorkModes?: RemoteWorkMode[];
 };
 

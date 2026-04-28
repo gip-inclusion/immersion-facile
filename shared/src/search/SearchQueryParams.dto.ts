@@ -9,7 +9,7 @@ import type {
   PaginationQueryParams,
   SortDirection,
 } from "../pagination/pagination.dto";
-import type { WithOptionnalRemoteWorkModes } from "../remoteWorkMode/remoteWorkMode.dto";
+import type { WithOptionalRemoteWorkModes } from "../remoteWorkMode/remoteWorkMode.dto";
 import type {
   AppellationCode,
   RomeCode,
@@ -86,7 +86,7 @@ type GetOffersFlatParamsCommon = WithAcquisition & {
   departmentCodes?: DepartmentCode[];
   showOnlyAvailableOffers?: boolean;
 } & Partial<WithAppellationCodes> &
-  WithOptionnalRemoteWorkModes;
+  WithOptionalRemoteWorkModes;
 
 export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
   sortBy: T;
