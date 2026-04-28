@@ -146,7 +146,7 @@ interface Discussions extends WithAcquisition {
   rejection_kind: string | null;
   rejection_reason: string | null;
   candidate_warned_method: "phone" | "email" | "inPerson" | "other" | null;
-  location_id: string;
+  location_id: string | null;
 }
 
 interface DiscussionsArchives {

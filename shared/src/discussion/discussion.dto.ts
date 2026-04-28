@@ -100,7 +100,7 @@ type ContactInformations<D extends DiscussionKind> = {
   potentialBeneficiaryEmail: Email;
   contactMode: ContactMode;
   kind: D;
-  locationId: LocationId;
+  locationId?: LocationId;
 } & WithAcquisition &
   (D extends "1_ELEVE_1_STAGE"
     ? { levelOfEducation: ContactLevelOfEducation }
@@ -165,7 +165,7 @@ export type CommonDiscussionDto = {
   updatedAt: DateString;
   id: DiscussionId;
   siret: SiretDto;
-  locationId: LocationId;
+  locationId?: LocationId;
 } & WithDiscussionStatus;
 
 export type ExtraDiscussionDtoProperties = WithAcquisition & {

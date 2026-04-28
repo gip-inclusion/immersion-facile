@@ -731,10 +731,10 @@ export const errors = {
       locationId,
     }: {
       siret: SiretDto;
-      locationId: LocationId;
+      locationId?: LocationId;
     }) =>
       new NotFoundError(
-        `L'addresse '${locationId}' n'existe pas pour l'entreprise '${siret}'.`,
+        `L'addresse ${locationId ? `'${locationId}' ` : ""}n'existe pas pour l'entreprise '${siret}'.`,
       ),
     noLocation: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(`L'établissement '${siret}' n'a pas de localisations.`),
