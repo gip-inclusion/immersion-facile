@@ -17,6 +17,7 @@ import type {
   LegacyAssessmentDto,
 } from "../assessment/assessment.dto";
 import type { Email } from "../email/email.dto";
+import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations";
 import type { BusinessName } from "../establishment/businessName";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
@@ -373,7 +374,8 @@ export type ConventionDto = ConventionCommon &
   (
     | ConventionInternshipKindSpecific<"immersion">
     | ConventionInternshipKindSpecific<"mini-stage-cci">
-  );
+  ) &
+  WithBannedEstablishmentInformations;
 
 export type Signatories<T extends InternshipKind = InternshipKind> = {
   beneficiary: Beneficiary<T>;

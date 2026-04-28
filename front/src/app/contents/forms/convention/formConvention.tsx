@@ -737,6 +737,14 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  isEstablishmentBanned: {
+    label: "",
+    id: "",
+  },
+  establishmentBannishmentJustification: {
+    label: "",
+    id: "",
+  },
 };
 
 type SidebarStepContent = {
