@@ -1,7 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
+import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -22,6 +24,7 @@ import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/S
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import type { Route } from "type-route";
 
@@ -32,6 +35,15 @@ interface AssessmentPageProps {
 }
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
+  const dispatch = useDispatch();
+
+  useEffect(
+    () => () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+    [dispatch],
+  );
+
   const conventionFormFeedback = useFeedbackTopic("convention-form");
   const userRolesForFetchedConvention = useAppSelector(
     connectedUserSelectors.userRolesForFetchedConvention,

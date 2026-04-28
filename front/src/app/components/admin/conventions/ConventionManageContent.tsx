@@ -19,6 +19,7 @@ import { frontErrors } from "src/app/pages/error/front-errors";
 import { useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { match } from "ts-pattern";
@@ -86,6 +87,7 @@ export const ConventionManageContent = ({
 
   useEffect(
     () => () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
       dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(
         partnersErroredConventionSlice.actions.clearConventionLastBroadcastFeedback(),

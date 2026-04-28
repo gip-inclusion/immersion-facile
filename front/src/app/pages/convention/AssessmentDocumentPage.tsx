@@ -32,6 +32,7 @@ import { createFormModal } from "src/app/utils/createFormModal";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
@@ -104,6 +105,13 @@ export const AssessmentDocumentPage = ({
       }),
     );
   }, [dispatch, conventionId, jwt]);
+
+  useEffect(
+    () => () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+    [dispatch],
+  );
 
   if (isConventionLoading || isAssessmentLoading || isPdfLoading)
     return <Loader />;
