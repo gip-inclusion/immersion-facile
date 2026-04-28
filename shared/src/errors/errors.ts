@@ -65,6 +65,8 @@ import {
   UnavailableApiError,
 } from "./httpErrors";
 
+export const badSchemaErrorMessagePrefix = "Schema validation failed";
+
 export const errors = {
   fetch: {
     errorResponse: async (errorResponse: Response) => {
@@ -1170,7 +1172,7 @@ export const errors = {
       ),
     ) =>
       new BadRequestError(
-        `Schema validation failed ${"schemaName" in params ? `for schema ${params.schemaName}` : `in usecase ${params.useCaseName}`}${params.id ? ` for element with id ${params.id}` : ""}. See issues for details.`,
+        `${badSchemaErrorMessagePrefix} ${"schemaName" in params ? `for schema ${params.schemaName}` : `in usecase ${params.useCaseName}`}${params.id ? ` for element with id ${params.id}` : ""}. See issues for details.`,
         params.flattenErrors,
       ),
   },

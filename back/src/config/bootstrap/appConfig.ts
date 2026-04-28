@@ -377,7 +377,7 @@ export class AppConfig {
       v2: {
         url: this.#throwIfNotDefinedOrDefault(
           "METABASE_V2_URL",
-          "MISSING_METABASE_V2_URL",
+          "http://missing-metabase-v2-url.com",
         ) as AbsoluteUrl,
         apiKey: this.#throwIfNotDefinedOrDefault(
           "METABASE_V2_API_KEY",

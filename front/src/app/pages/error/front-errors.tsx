@@ -177,6 +177,46 @@ export const frontErrors = {
         buttons: [HomeButton, ContactUsButton()],
       });
     },
+    badSchema: ({
+      conventionId,
+      errorMessage,
+      issues,
+    }: {
+      conventionId: ConventionId;
+      errorMessage: string;
+      issues?: string[];
+    }) =>
+      new FrontSpecificError({
+        title: "Affichage de la convention impossible",
+        description: (
+          <>
+            <p>
+              Un incident technique empêche l'affichage de cette convention.
+              Cela peut être dû par exemple à une incohérence dans ses données
+              (ex : durée journalière, dates ou formats invalides).
+            </p>
+            <ul>
+              <li>ID de la convention : {conventionId}</li>
+              <li>Type d'erreur : {errorMessage}</li>
+              {issues && (
+                <>
+                  <li>Problèmes rencontrés :</li>
+                  <ul>
+                    {issues.map((issue) => (
+                      <li key={issue}>{issue}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </ul>
+            <p>
+              Pour corriger cette situation et accéder à nouveau à la
+              convention, veuillez contacter le support d'Immersion Facilitée.
+            </p>
+          </>
+        ),
+        buttons: [ContactUsButton()],
+      }),
     noRightsOnConvention: ({
       userEmail,
       conventionId,
