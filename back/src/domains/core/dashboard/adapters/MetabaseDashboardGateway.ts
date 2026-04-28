@@ -92,7 +92,10 @@ export class MetabaseDashboardGateway implements DashboardGateway {
       }),
       agencyManagement: this.#makeDashboardUrlByDashboardName({
         dashboardName: "agencyManagement",
-        editableParams: { structure: agencyNames },
+        // this is to avoid too long url, we limit the number of agencies to 40, or we do not apply the default filter
+        editableParams: {
+          structure: agencyNames.length <= 40 ? agencyNames : [],
+        },
         now,
       }),
       establishmentManagement: this.#makeDashboardUrlByDashboardName({
