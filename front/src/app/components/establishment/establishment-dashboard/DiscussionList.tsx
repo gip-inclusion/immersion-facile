@@ -107,12 +107,15 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
       dispatch(
         discussionSlice.actions.fetchDiscussionListRequested({
           jwt: connectedUserJwt,
-          filters: initialDiscussionsWithPagination.filters,
+          filters: {
+            ...initialDiscussionsWithPagination.filters,
+            userRole: viewer,
+          },
           feedbackTopic: "establishment-dashboard-discussion-list",
         }),
       );
     }
-  }, [connectedUserJwt, dispatch]);
+  }, [connectedUserJwt, dispatch, viewer]);
   if (!connectedUserJwt) {
     return;
   }
@@ -161,7 +164,7 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
                 filters={filters}
                 isLoading={isLoading}
                 connectedUserJwt={connectedUserJwt}
-                tempFilters={tempFilters}
+                tempFilters={{ ...tempFilters, userRole: viewer }}
                 statusOptions={statusOptions}
                 dateOptions={dateOptions}
                 pagination={pagination}

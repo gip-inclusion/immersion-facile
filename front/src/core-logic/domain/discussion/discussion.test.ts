@@ -351,6 +351,7 @@ describe("Discussion slice", () => {
       it("fetches discussion list successfully and keeps filters", () => {
         const filtersToKeep: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray =
           {
+            userRole: "establishment",
             orderBy: "createdAt",
             orderDirection: "asc",
             page: 1,
@@ -405,6 +406,7 @@ describe("Discussion slice", () => {
           discussionSlice.actions.fetchDiscussionListRequested({
             jwt,
             filters: {
+              userRole: "establishment",
               orderBy: "createdAt",
               orderDirection: "desc",
               page: 1,
