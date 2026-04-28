@@ -13,6 +13,10 @@ import {
   legacyAssessmentStatuses,
 } from "../assessment/assessment.dto";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
+import {
+  type WithBannedEstablishmentInformations,
+  withBannedEstablishmentInformationSchema,
+} from "../establishment/bannedEstablishmentInformations";
 import { businessAddressSchema } from "../establishment/businessAddress";
 import { businessNameSchema } from "../establishment/businessName";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
@@ -332,23 +336,45 @@ const cciSignatoriesSchema: ZodSchemaWithInputMatchingOutput<
   beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
 });
 
-export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"immersion">
-> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
+const immersionConventionCoreSchema = (
+  conventionCommonSchema as unknown as z.ZodObject<any>
+).extend({
   internshipKind: z.literal("immersion"),
   signatories: immersionSignatoriesSchema,
-}) as unknown as ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"immersion">
->;
+});
 
-export const miniStageConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
-> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
+const miniStageConventionCoreSchema = (
+  conventionCommonSchema as unknown as z.ZodObject<any>
+).extend({
   internshipKind: z.literal("mini-stage-cci"),
   signatories: cciSignatoriesSchema,
-}) as unknown as ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
->;
+});
+
+export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
+  ConventionCommon &
+  ConventionInternshipKindSpecific<"immersion"> &
+  WithBannedEstablishmentInformations
+> = immersionConventionCoreSchema
+  .and(
+    withBannedEstablishmentInformationSchema,
+  ) as unknown as ZodSchemaWithInputMatchingOutput<
+    ConventionCommon &
+    ConventionInternshipKindSpecific<"immersion"> &
+    WithBannedEstablishmentInformations
+  >;
+
+export const miniStageConventionSchema: ZodSchemaWithInputMatchingOutput<
+  ConventionCommon &
+  ConventionInternshipKindSpecific<"mini-stage-cci"> &
+  WithBannedEstablishmentInformations
+> = miniStageConventionCoreSchema
+  .and(
+    withBannedEstablishmentInformationSchema,
+  ) as unknown as ZodSchemaWithInputMatchingOutput<
+    ConventionCommon &
+    ConventionInternshipKindSpecific<"mini-stage-cci"> &
+    WithBannedEstablishmentInformations
+  >;
 
 // https://github.com/colinhacks/zod#discriminated-unions
 export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingOutput<
@@ -366,10 +392,12 @@ export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingO
 
 export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
   (
-    z.discriminatedUnion("internshipKind", [
-      immersionConventionSchema as unknown as z.ZodObject<any>,
-      miniStageConventionSchema as unknown as z.ZodObject<any>,
-    ]) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
+    z
+      .discriminatedUnion("internshipKind", [
+        immersionConventionCoreSchema,
+        miniStageConventionCoreSchema,
+      ])
+      .and(withBannedEstablishmentInformationSchema) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
   )
     .check((ctx) => {
       if (

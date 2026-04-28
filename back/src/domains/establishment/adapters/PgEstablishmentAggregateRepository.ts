@@ -1403,7 +1403,7 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
               code: ref("e.naf_code"),
               nomenclature: ref("e.naf_nomenclature"),
             }),
-            isBanned: sql<boolean>`${ref("be.siret")} IS NOT NULL`,
+            isEstablishmentBanned: sql<boolean>`${ref("be.siret")} IS NOT NULL`,
             bannishmentJustification: ref("be.bannishment_justification"),
             potentialBeneficiaryWelcomeAddress: sql`CASE WHEN ${ref("e.contact_mode")} = 'IN_PERSON' THEN ${jsonBuildObject(
               {

@@ -1260,8 +1260,8 @@ describe("Update Establishment aggregate from form data", () => {
           ...updatedEstablishmentAggregate,
           establishment: {
             ...updatedEstablishmentAggregate.establishment,
-            isBanned: true,
-            bannishmentJustification:
+            isEstablishmentBanned: true,
+            establishmentBannishmentJustification:
               "L'entreprise est concurrente à Petit Navire",
           },
         };

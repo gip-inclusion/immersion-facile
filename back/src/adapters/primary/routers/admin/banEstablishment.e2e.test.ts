@@ -90,7 +90,9 @@ describe("banEstablishment", () => {
           body: {
             message:
               "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
-            issues: ["bannishmentJustification : Ce champ est obligatoire"],
+            issues: [
+              "establishmentBannishmentJustification : Ce champ est obligatoire",
+            ],
             status: 400,
           },
         });
@@ -111,7 +113,7 @@ describe("banEstablishment", () => {
             message:
               "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
             issues: [
-              "bannishmentJustification : Le maximum est de 1024 caractères",
+              "establishmentBannishmentJustification : Le maximum est de 1024 caractères",
             ],
             status: 400,
           },
