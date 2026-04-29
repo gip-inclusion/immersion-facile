@@ -440,11 +440,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {match(currentStep)
               .with(null, () => (
                 <>
-                  {currentUser?.isBackofficeAdmin && (
-                    <Badge severity="error" className={fr.cx("fr-mb-2w")}>
-                      ENTREPRISE BANNIE
-                    </Badge>
-                  )}
+                  {currentUser?.isBackofficeAdmin &&
+                    initialFormEstablishment.isEstablishmentBanned && (
+                      <Badge severity="error" className={fr.cx("fr-mb-2w")}>
+                        ENTREPRISE BANNIE
+                      </Badge>
+                    )}
                   <BusinessAndAdminSection
                     mode={mode}
                     onStepChange={onStepChange}
