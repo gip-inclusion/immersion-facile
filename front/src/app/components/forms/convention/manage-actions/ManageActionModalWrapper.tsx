@@ -245,7 +245,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
               onSubmit={(params) => onSubmit(verificationAction, params)}
               closeModal={closeModal}
               newStatus={newStatus}
-              conventionId={convention.id}
+              convention={convention}
               onCloseValidatorModalWithoutValidatorInfo={
                 onCloseValidatorModalWithoutValidatorInfo
               }

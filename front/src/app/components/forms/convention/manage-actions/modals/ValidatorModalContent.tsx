@@ -1,10 +1,12 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pick } from "ramda";
 import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
-  type ConventionId,
+  type ConventionDto,
   type ConventionStatusWithValidator,
   domElementIds,
   type UpdateConventionStatusRequestDto,
@@ -20,13 +22,13 @@ export const ValidatorModalContent = ({
   onSubmit,
   closeModal,
   newStatus,
-  conventionId,
+  convention,
   onCloseValidatorModalWithoutValidatorInfo,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithValidator;
-  conventionId: ConventionId;
+  convention: ConventionDto;
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
@@ -51,7 +53,12 @@ export const ValidatorModalContent = ({
     firstname,
     lastname,
   }) => {
-    onSubmit({ status: newStatus, conventionId, firstname, lastname });
+    onSubmit({
+      status: newStatus,
+      conventionId: convention.id,
+      firstname,
+      lastname,
+    });
     closeModal();
   };
   const getFieldError = makeFieldError(formState);
@@ -71,6 +78,15 @@ export const ValidatorModalContent = ({
   ]);
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} id={formId}>
+      {convention.isEstablishmentBanned && (
+        <Alert
+          severity="warning"
+          small
+          closable
+          description={`L’entreprise liée à cette convention a été bannie d’Immersion Facilitée suite à des signalements. Nous vous recommandons de ne pas ${newStatus === "ACCEPTED_BY_VALIDATOR" ? "valider" : "pré-valider"} cette convention.`}
+          className={fr.cx("fr-mb-3w")}
+        />
+      )}
       <p>
         Veuillez saisir votre prénom et votre nom. En{" "}
         {newStatus === "ACCEPTED_BY_VALIDATOR" ? "validant" : "pré-validant"},
