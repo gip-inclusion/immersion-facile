@@ -9,7 +9,6 @@ import {
   defaultPerPageInWebPagination,
   type ExchangeFromDashboard,
   type ExchangeRead,
-  type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
   type WithDiscussionStatus,
 } from "shared";
@@ -28,7 +27,6 @@ export type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray = Omit<
 export type FetchDiscussionRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
-  viewer: ExchangeRole;
 };
 
 export type FetchDiscussionListRequestedPayload = {

@@ -81,7 +81,6 @@ export const DiscussionManageContent = ({
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const { discussion, isLoading } = useDiscussion(
     discussionId,
-    viewer,
     connectedUserJwt,
   );
   const dispatch = useDispatch();
@@ -97,7 +96,6 @@ export const DiscussionManageContent = ({
             discussionId,
             feedbackTopic: "dashboard-discussion",
             jwt: connectedUserJwt,
-            viewer,
           }),
         );
       }
@@ -374,9 +372,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 : discussion.businessName}
             </h1>
           </div>
-          {discussion.status === "ACCEPTED" &&
+          {(discussion.status === "ACCEPTED" &&
             discussion.candidateWarnedMethod !== null &&
-            discussion.conventionId === undefined && (
+            discussion.conventionId === undefined) ||
+            (viewer === "potentialBeneficiary" && (
               <Button
                 {...getActivateDraftConventionButtonProps({
                   ...props,
@@ -387,7 +386,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               >
                 Pré-remplir la convention
               </Button>
-            )}
+            ))}
           {discussion.status === "PENDING" && viewer === "establishment" && (
             <ButtonWithSubMenu
               priority="primary"

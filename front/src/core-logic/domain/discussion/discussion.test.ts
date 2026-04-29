@@ -46,7 +46,6 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: "missing-discussion-id",
         feedbackTopic: "dashboard-discussion",
-        viewer: "establishment",
       }),
     );
 
@@ -72,7 +71,6 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         feedbackTopic: "dashboard-discussion",
-        viewer: "establishment",
       }),
     );
 
@@ -97,7 +95,6 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         feedbackTopic: "dashboard-discussion",
-        viewer: "establishment",
       }),
     );
 
@@ -129,7 +126,6 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         feedbackTopic: "dashboard-discussion",
-        viewer: "establishment",
       }),
     );
 
@@ -145,7 +141,6 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         feedbackTopic: "dashboard-discussion",
-        viewer: "establishment",
       }),
     );
 
@@ -289,7 +284,6 @@ describe("Discussion slice", () => {
           jwt,
           discussionId: discussion.id,
           feedbackTopic: "dashboard-discussion",
-          viewer: "establishment",
         }),
       );
 

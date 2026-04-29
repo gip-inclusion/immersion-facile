@@ -199,7 +199,6 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   public getDiscussionById$({
     discussionId,
     jwt,
-    viewer,
   }: FetchDiscussionRequestedPayload): Observable<
     DiscussionReadDto | undefined
   > {
@@ -210,7 +209,6 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: {
             discussionId,
           },
-          queryParams: { userRole: viewer },
         })
         .then((response) =>
           match(response)
