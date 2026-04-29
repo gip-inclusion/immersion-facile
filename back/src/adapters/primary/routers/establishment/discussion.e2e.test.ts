@@ -68,6 +68,14 @@ describe("discussion e2e", () => {
     ])
     .build();
 
+  const userWithoutEstablishmentNorPotentialBeneficiaryRights =
+    new ConnectedUserBuilder()
+      .withId("user-without-establishment-nor-potential-beneficiary-rights")
+      .withEmail(
+        "user-without-establishment-nor-potential-beneficiary-rights@mail.com",
+      )
+      .buildUser();
+
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
     ({
@@ -99,18 +107,57 @@ describe("discussion e2e", () => {
     inMemoryUow.userRepository.users = [
       establishmentAdminUser,
       potentialBeneficiaryUser,
+      userWithoutEstablishmentNorPotentialBeneficiaryRights,
     ];
   });
 
   describe(`${displayRouteName(
     establishmentRoutes.getDiscussionById,
   )} returns the discussion`, () => {
-    it("gets the discussion for the establishment role", async () => {
+    it("401 - returns 401 if user is not authenticated", async () => {
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionById({
+          headers: { authorization: "" },
+          urlParams: { discussionId: "unrelevant-discussion-id" },
+        }),
+        {
+          status: 401,
+          body: { message: "Veuillez vous authentifier", status: 401 },
+        },
+      );
+    });
+    it("403 - returns 403 if user is not authorized to access the discussion", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail("someone-else@mail.com")
         .build();
 
       inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionById({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: userWithoutEstablishmentNorPotentialBeneficiaryRights.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 403,
+          body: {
+            message: errors.discussion.accessForbidden({
+              userId: userWithoutEstablishmentNorPotentialBeneficiaryRights.id,
+              discussionId: discussion.id,
+            }).message,
+            status: 403,
+          },
+        },
+      );
+    });
+    it("404 - returns 404 if discussion is not found", async () => {
+      const nonExistentDiscussionId = "11111111-1111-4111-8111-111111111111";
 
       expectHttpResponseToEqual(
         await httpClient.getDiscussionById({
@@ -120,16 +167,20 @@ describe("discussion e2e", () => {
               version: currentJwtVersions.connectedUser,
             }),
           },
-          urlParams: { discussionId: discussion.id },
+          urlParams: { discussionId: nonExistentDiscussionId },
         }),
         {
-          status: 200,
-          body: new DiscussionBuilder(discussion).buildRead(),
+          status: 404,
+          body: {
+            message: errors.discussion.notFound({
+              discussionId: nonExistentDiscussionId,
+            }).message,
+            status: 404,
+          },
         },
       );
     });
-
-    it("gets the discussion for the potentialBeneficiary role", async () => {
+    it("200 - returns the discussion for a user with only potentialBeneficiary rights", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
         .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
@@ -154,32 +205,7 @@ describe("discussion e2e", () => {
       );
     });
 
-    it("returns 200 for a user with only potentialBeneficiary rights", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret(existingEstablishment.establishment.siret)
-        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
-        .build();
-
-      inMemoryUow.discussionRepository.discussions = [discussion];
-
-      expectHttpResponseToEqual(
-        await httpClient.getDiscussionById({
-          headers: {
-            authorization: generateConnectedUserJwt({
-              userId: potentialBeneficiaryConnectedUser.id,
-              version: currentJwtVersions.connectedUser,
-            }),
-          },
-          urlParams: { discussionId: discussion.id },
-        }),
-        {
-          status: 200,
-          body: new DiscussionBuilder(discussion).buildRead(),
-        },
-      );
-    });
-
-    it("returns 200 for a user with only establishment rights", async () => {
+    it("200 - returns the discussion for a user with only establishment rights", async () => {
       const discussion = new DiscussionBuilder()
         .withSiret(existingEstablishment.establishment.siret)
         .withPotentialBeneficiaryEmail("someone-else@mail.com")

@@ -201,56 +201,149 @@ describe("Discussions", () => {
     });
 
     it("returns a different display status for potentialBeneficiary viewer than establishment on same discussion", () => {
-      const discussion = new DiscussionBuilder()
-        .withStatus({ status: "PENDING" })
-        .withExchanges([
-          createExchange({
-            sentAt: subDays(now, 3),
-            specificExchangeSender: {
-              sender: "potentialBeneficiary",
+      const discussionWithLastExchangeFromEstablishment =
+        new DiscussionBuilder()
+          .withStatus({ status: "PENDING" })
+          .withExchanges([
+            createExchange({
+              sentAt: subDays(now, 3),
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
+            }),
+            createExchange({
+              sentAt: subDays(now, 1),
+              specificExchangeSender: {
+                sender: "establishment",
+                email: "establishment@mail.com",
+                firstname: "billy",
+                lastname: "idol",
+              },
+            }),
+          ])
+          .buildRead();
+
+      const discussionWithLastExchangeFromPotentialBeneficiary =
+        new DiscussionBuilder()
+          .withStatus({ status: "PENDING" })
+          .withExchanges([
+            createExchange({
+              sentAt: subDays(now, 3),
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
+            }),
+            createExchange({
+              sentAt: subDays(now, 1),
+              specificExchangeSender: {
+                sender: "establishment",
+                email: "establishment@mail.com",
+                firstname: "billy",
+                lastname: "idol",
+              },
+            }),
+            createExchange({
+              sentAt: subDays(now, 1),
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
+            }),
+          ])
+          .buildRead();
+
+      const establishmentStatusForLastExchangeFromEstablishment =
+        getDiscussionDisplayStatus({
+          discussion: {
+            createdAt: discussionWithLastExchangeFromEstablishment.createdAt,
+            status: discussionWithLastExchangeFromEstablishment.status,
+            exchangesData: {
+              count:
+                discussionWithLastExchangeFromEstablishment.exchanges.length,
+              lastExchange:
+                discussionWithLastExchangeFromEstablishment.exchanges[
+                  discussionWithLastExchangeFromEstablishment.exchanges.length -
+                    1
+                ],
             },
-          }),
-          createExchange({
-            sentAt: subDays(now, 1),
-            specificExchangeSender: {
-              sender: "establishment",
-              email: "establishment@mail.com",
-              firstname: "billy",
-              lastname: "idol",
+          },
+          now,
+          viewer: "establishment",
+        });
+
+      const potentialBeneficiaryStatusForLastExchangeFromEstablishment =
+        getDiscussionDisplayStatus({
+          discussion: {
+            createdAt: discussionWithLastExchangeFromEstablishment.createdAt,
+            status: discussionWithLastExchangeFromEstablishment.status,
+            exchangesData: {
+              count:
+                discussionWithLastExchangeFromEstablishment.exchanges.length,
+              lastExchange:
+                discussionWithLastExchangeFromEstablishment.exchanges[
+                  discussionWithLastExchangeFromEstablishment.exchanges.length -
+                    1
+                ],
             },
-          }),
-        ])
-        .buildRead();
-
-      const establishmentStatus = getDiscussionDisplayStatus({
-        discussion: {
-          createdAt: discussion.createdAt,
-          status: discussion.status,
-          exchangesData: {
-            count: discussion.exchanges.length,
-            lastExchange: discussion.exchanges[discussion.exchanges.length - 1],
           },
-        },
-        now,
-        viewer: "establishment",
-      });
+          now,
+          viewer: "potentialBeneficiary",
+        });
 
-      const potentialBeneficiaryStatus = getDiscussionDisplayStatus({
-        discussion: {
-          createdAt: discussion.createdAt,
-          status: discussion.status,
-          exchangesData: {
-            count: discussion.exchanges.length,
-            lastExchange: discussion.exchanges[discussion.exchanges.length - 1],
+      const establishmentStatusForLastExchangeFromPotentialBeneficiary =
+        getDiscussionDisplayStatus({
+          discussion: {
+            createdAt:
+              discussionWithLastExchangeFromPotentialBeneficiary.createdAt,
+            status: discussionWithLastExchangeFromPotentialBeneficiary.status,
+            exchangesData: {
+              count:
+                discussionWithLastExchangeFromPotentialBeneficiary.exchanges
+                  .length,
+              lastExchange:
+                discussionWithLastExchangeFromPotentialBeneficiary.exchanges[
+                  discussionWithLastExchangeFromPotentialBeneficiary.exchanges
+                    .length - 1
+                ],
+            },
           },
-        },
-        now,
-        viewer: "potentialBeneficiary",
-      });
+          now,
+          viewer: "establishment",
+        });
 
-      expectToEqual(establishmentStatus, "answered");
-      expectToEqual(potentialBeneficiaryStatus, "needs-answer");
-      expectToEqual(establishmentStatus === potentialBeneficiaryStatus, false);
+      const potentialBeneficiaryStatusForLastExchangeFromPotentialBeneficiary =
+        getDiscussionDisplayStatus({
+          discussion: {
+            createdAt:
+              discussionWithLastExchangeFromPotentialBeneficiary.createdAt,
+            status: discussionWithLastExchangeFromPotentialBeneficiary.status,
+            exchangesData: {
+              count:
+                discussionWithLastExchangeFromPotentialBeneficiary.exchanges
+                  .length,
+              lastExchange:
+                discussionWithLastExchangeFromPotentialBeneficiary.exchanges[
+                  discussionWithLastExchangeFromPotentialBeneficiary.exchanges
+                    .length - 1
+                ],
+            },
+          },
+          now,
+          viewer: "potentialBeneficiary",
+        });
+
+      expect(establishmentStatusForLastExchangeFromEstablishment).toBe(
+        "answered",
+      );
+      expect(potentialBeneficiaryStatusForLastExchangeFromEstablishment).toBe(
+        "needs-answer",
+      );
+
+      expect(establishmentStatusForLastExchangeFromPotentialBeneficiary).toBe(
+        "needs-answer",
+      );
+      expect(
+        potentialBeneficiaryStatusForLastExchangeFromPotentialBeneficiary,
+      ).toBe("answered");
     });
   });
 
