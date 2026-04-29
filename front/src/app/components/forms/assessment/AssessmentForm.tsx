@@ -22,6 +22,7 @@ import {
   assessmentStatuses,
   type ConventionDto,
   type ConventionReadDto,
+  computeScheduledHoursForAssessment,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   type DotNestedKeys,
@@ -83,6 +84,7 @@ export const AssessmentForm = ({
   const initialValues: FormAssessmentDto = {
     conventionId: convention.id,
     conventionStartDate: convention.dateStart,
+    conventionTotalHours: convention.schedule.totalHours,
     establishmentFeedback: "",
     establishmentAdvices: "",
     endedWithAJob: null,
@@ -122,9 +124,8 @@ export const AssessmentForm = ({
     const validatedFields = await Promise.all(
       fieldsToValidate.map(async (key) => trigger(key)),
     );
-    if (validatedFields.every((validatedField) => validatedField)) {
+    if (validatedFields.every((validatedField) => validatedField))
       setCurrentStep(step);
-    }
   };
   useScrollTo(currentStep);
 
@@ -214,24 +215,22 @@ const AssessmentStatusSection = ({
     useState<number | null>(null);
   const [numberOfMissedMinutesDisplayed, setNumberOfMissedMinutesDisplayed] =
     useState<number | null>(null);
-  useEffect(() => {
-    if (
-      formValues.status === "PARTIALLY_COMPLETED" &&
-      formValues.numberOfMissedHours > 0
-    ) {
-      setNumberOfMissedHoursDisplayed(
-        Math.floor(formValues.numberOfMissedHours),
-      );
-      setNumberOfMissedMinutesDisplayed(
-        +(
-          (formValues.numberOfMissedHours -
-            Math.floor(formValues.numberOfMissedHours)) *
-          60
-        ).toFixed(2),
-      );
-    }
-  }, [formValues]);
+
   const assessmentDto = formAssessmentDtoToAssessmentInputDto(formValues);
+  const scheduledHours = computeScheduledHoursForAssessment({
+    convention,
+    status: formValues.status,
+    lastDayOfPresence:
+      formValues.status === "PARTIALLY_COMPLETED"
+        ? formValues.lastDayOfPresence
+        : undefined,
+  });
+
+  useEffect(() => {
+    if (formValues.conventionTotalHours !== scheduledHours)
+      setValue("conventionTotalHours", scheduledHours);
+  }, [scheduledHours, formValues.conventionTotalHours, setValue]);
+
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
@@ -259,11 +258,10 @@ const AssessmentStatusSection = ({
                 ...register("status"),
                 onChange: (event) => {
                   const { value } = event.target;
-                  if (
-                    value === "PARTIALLY_COMPLETED" &&
-                    !("numberOfMissedHours" in formValues)
-                  ) {
-                    setValue("numberOfMissedHours", 0);
+                  if (value === "PARTIALLY_COMPLETED") {
+                    if (!("numberOfMissedHours" in formValues))
+                      setValue("numberOfMissedHours", 0);
+                    setValue("lastDayOfPresence", convention.dateEnd);
                   }
                   setValue("status", value as AssessmentStatus);
                 },
@@ -320,14 +318,15 @@ const AssessmentStatusSection = ({
                       setValue(
                         "numberOfMissedHours",
                         value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
+                        { shouldValidate: true },
                       );
                     },
                     min: 0,
-                    max: convention.schedule.totalHours,
+                    max: scheduledHours,
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedHoursInput,
-                    value: numberOfMissedHoursDisplayed || "",
+                    value: numberOfMissedHoursDisplayed ?? "",
                   }}
                   {...getFieldError("numberOfMissedHours")}
                 />
@@ -341,6 +340,7 @@ const AssessmentStatusSection = ({
                       setValue(
                         "numberOfMissedHours",
                         (numberOfMissedHoursDisplayed ?? 0) + value / 60,
+                        { shouldValidate: true },
                       );
                     },
                     min: 0,
@@ -348,9 +348,8 @@ const AssessmentStatusSection = ({
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
-                    value: numberOfMissedMinutesDisplayed || "",
+                    value: numberOfMissedMinutesDisplayed ?? "",
                   }}
-                  {...getFieldError("numberOfMissedHours")}
                 />
               </div>
             </>
@@ -576,6 +575,7 @@ export const formAssessmentDtoToAssessmentInputDto = (
   const commonFields = {
     conventionId: formAssessmentDto.conventionId,
     conventionStartDate: formAssessmentDto.conventionStartDate,
+    conventionTotalHours: formAssessmentDto.conventionTotalHours,
     establishmentFeedback: formAssessmentDto.establishmentFeedback,
     establishmentAdvices: formAssessmentDto.establishmentAdvices,
     beneficiaryAgreement: formAssessmentDto.beneficiaryAgreement,
