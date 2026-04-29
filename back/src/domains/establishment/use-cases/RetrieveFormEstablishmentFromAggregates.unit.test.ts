@@ -1,6 +1,5 @@
 import {
   addressDtoToString,
-  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -154,44 +153,38 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       );
     });
 
-    it("throws if establishment is banned and user is not back office admin", async () => {
-      const connectedNonAdminUser = new ConnectedUserBuilder().build();
+    it("returns banned establishment if user is not back office admin but has ACCEPTED rights", async () => {
+      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+        {
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification: "L'entreprise est nantaise",
+        };
 
-      const bannedEstablishmentAggregate = new EstablishmentAggregateBuilder(
-        establishmentAggregate,
-      )
-        .withUserRights([
-          {
-            role: "establishment-admin",
-            status: "ACCEPTED",
-            userId: establishmentAdmin.id,
-            job,
-            phone,
-            shouldReceiveDiscussionNotifications: true,
-            isMainContactByPhone: false,
-          },
-        ])
-        .build();
-
-      const banEstablishmentPayload: BanEstablishmentPayload = {
-        siret: bannedEstablishmentAggregate.establishment.siret,
-        establishmentBannishmentJustification: "L'entreprise est nantaise",
+      const bannedEstablishmentAggregate = {
+        ...establishmentAggregate,
+        establishment: {
+          ...establishmentAggregate.establishment,
+          ...withBannedEstablishmentInformations,
+        },
       };
 
-      uow.userRepository.users = [establishmentAdmin, connectedNonAdminUser];
       uow.establishmentAggregateRepository.establishmentAggregates = [
         bannedEstablishmentAggregate,
       ];
-      uow.bannedEstablishmentRepository.bannedEstablishments = [
-        banEstablishmentPayload,
-      ];
 
-      await expectPromiseToFailWithError(
-        useCase.execute(banEstablishmentPayload.siret, {
-          userId: connectedNonAdminUser.id,
-        }),
-        errors.establishment.bannedEstablishment({
-          siret: banEstablishmentPayload.siret,
+      const establishmentForm = await useCase.execute(siret, {
+        userId: establishmentAdmin.id,
+      });
+
+      expectToEqual(
+        establishmentForm,
+        makeExpectedFormEstablishment({
+          establishmentAdmin,
+          establishmentAggregate: bannedEstablishmentAggregate,
+          establishmentContact,
+          job,
+          phone,
+          withBannedEstablishmentInformations,
         }),
       );
     });
