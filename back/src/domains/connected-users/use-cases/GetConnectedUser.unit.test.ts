@@ -561,6 +561,7 @@ describe("GetConnectedUser", () => {
                         },
                       ],
                       shouldReceiveDiscussionNotifications: true,
+                      isEstablishmentBanned: false,
                     },
                     {
                       siret: establishmentAggregate2.establishment.siret,
@@ -571,6 +572,7 @@ describe("GetConnectedUser", () => {
                       status: "ACCEPTED",
                       admins: [],
                       shouldReceiveDiscussionNotifications: true,
+                      isEstablishmentBanned: false,
                     },
                   ],
                   dashboards: {
@@ -596,6 +598,7 @@ describe("GetConnectedUser", () => {
                       role: "establishment-contact",
                       status: "PENDING",
                       shouldReceiveDiscussionNotifications: true,
+                      isEstablishmentBanned: false,
                     },
                   ],
                   dashboards: {

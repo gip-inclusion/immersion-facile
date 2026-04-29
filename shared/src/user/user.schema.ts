@@ -7,6 +7,7 @@ import {
 } from "../agency/agency.schema";
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
 import { emailSchema } from "../email/email.schema";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
 import { businessNameSchema } from "../establishment/businessName";
 import type {
   UserEstablishmentRightDetails,
@@ -100,23 +101,25 @@ const userEstablishmentRightDetailsCommonShape = {
 };
 
 const userEstablishmentRightDetailsSchema: ZodSchemaWithInputMatchingOutput<UserEstablishmentRightDetails> =
-  z.discriminatedUnion("status", [
-    z.object({
-      ...userEstablishmentRightDetailsCommonShape,
-      status: z.literal("ACCEPTED"),
-      admins: z.array(
-        z.object({
-          firstName: zStringCanBeEmpty,
-          lastName: zStringCanBeEmpty,
-          email: emailSchema,
-        }),
-      ),
-    }),
-    z.object({
-      ...userEstablishmentRightDetailsCommonShape,
-      status: z.literal("PENDING"),
-    }),
-  ]);
+  z
+    .discriminatedUnion("status", [
+      z.object({
+        ...userEstablishmentRightDetailsCommonShape,
+        status: z.literal("ACCEPTED"),
+        admins: z.array(
+          z.object({
+            firstName: zStringCanBeEmpty,
+            lastName: zStringCanBeEmpty,
+            email: emailSchema,
+          }),
+        ),
+      }),
+      z.object({
+        ...userEstablishmentRightDetailsCommonShape,
+        status: z.literal("PENDING"),
+      }),
+    ])
+    .and(withBannedEstablishmentInformationSchema);
 
 const dashboardsSchema: ZodSchemaWithInputMatchingOutput<
   WithAgencyDashboards & WithEstablishmentDashboards
