@@ -541,6 +541,7 @@ describe("discussion e2e", () => {
         {
           status: 202,
           body: {
+            establishmentName: discussion.businessName,
             reason: "discussion_completed",
             sender: "establishment",
           },

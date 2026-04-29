@@ -571,6 +571,7 @@ describe("InclusionConnected", () => {
               siret: "01234567890123",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: true,
+              isEstablishmentBanned: false,
             },
             {
               admins: [otherUserAdminData],
@@ -579,6 +580,7 @@ describe("InclusionConnected", () => {
               siret: "01234567890124",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: false,
+              isEstablishmentBanned: false,
             },
           ])
           .build();
@@ -659,6 +661,7 @@ describe("InclusionConnected", () => {
           siret: "01234567890124",
           status: "ACCEPTED",
           shouldReceiveDiscussionNotifications: true,
+          isEstablishmentBanned: false,
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -674,6 +677,7 @@ describe("InclusionConnected", () => {
               siret: "01234567890123",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: true,
+              isEstablishmentBanned: false,
             },
             otherEstablishmentToKeepData,
           ])
@@ -705,6 +709,7 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: true,
+              isEstablishmentBanned: false,
             },
             otherEstablishmentToKeepData,
           ],
@@ -755,6 +760,7 @@ describe("InclusionConnected", () => {
           siret: "01234567890124",
           status: "ACCEPTED",
           shouldReceiveDiscussionNotifications: true,
+          isEstablishmentBanned: false,
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -770,6 +776,7 @@ describe("InclusionConnected", () => {
               siret: "01234567890123",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: true,
+              isEstablishmentBanned: false,
             },
             otherEstablishmentData,
           ])
@@ -821,6 +828,7 @@ describe("InclusionConnected", () => {
               role: "establishment-contact",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: false,
+              isEstablishmentBanned: false,
             },
             otherEstablishmentData,
           ],
@@ -837,6 +845,7 @@ describe("InclusionConnected", () => {
               role: "establishment-contact",
               status: "ACCEPTED",
               shouldReceiveDiscussionNotifications: false,
+              isEstablishmentBanned: false,
             },
             otherEstablishmentData,
           ],

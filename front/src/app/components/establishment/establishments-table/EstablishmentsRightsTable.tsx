@@ -58,7 +58,7 @@ const makeEstablishmentRightLine = ({
     .with({ status: "ACCEPTED" }, (data) => [
       <EstablishmentLineBusinessName
         key={data.siret}
-        data={data}
+        data={{ ...data, isEstablishmentBanned: false }}
         isBackofficeAdmin={isBackofficeAdmin}
       />,
       <EstablishmentLineAdminsInfos key={data.siret} data={data} />,
@@ -73,7 +73,7 @@ const makeEstablishmentRightLine = ({
     .with({ status: "PENDING" }, (data) => [
       <EstablishmentLineBusinessName
         key={data.siret}
-        data={data}
+        data={{ ...data, isEstablishmentBanned: false }}
         isBackofficeAdmin={isBackofficeAdmin}
       />,
       <EstablishmentLineDesiredRoleInfos key={data.siret} data={data} />,
