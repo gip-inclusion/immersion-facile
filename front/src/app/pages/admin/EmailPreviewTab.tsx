@@ -462,6 +462,7 @@ export const defaultEmailValueByEmailKind: {
     sender: "establishment",
     requestEstablishmentRegistrationUrl:
       "https://www.fake-immersion-facile-base-url.com/rattachement-entreprise?siret=12345678901234",
+    establishmentName: "ESTABLISHMENT_NAME",
   },
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: ["undelivered@email.com", "whatever@email.com"],
