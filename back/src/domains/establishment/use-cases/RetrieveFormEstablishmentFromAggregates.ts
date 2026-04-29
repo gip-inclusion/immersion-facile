@@ -31,14 +31,6 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
     const currentUser = await uow.userRepository.getById(jwtPayload.userId);
     if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
-    if (
-      !currentUser.isBackofficeAdmin &&
-      (await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
-        siret,
-      ))
-    ) {
-      throw errors.establishment.bannedEstablishment({ siret });
-    }
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
