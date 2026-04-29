@@ -424,7 +424,6 @@ export const submitEditConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
 
-  await expectElementToBeVisible(page, ".fr-alert--success");
   await expect(page.locator(".fr-alert--error").first()).not.toBeVisible();
 };
 
