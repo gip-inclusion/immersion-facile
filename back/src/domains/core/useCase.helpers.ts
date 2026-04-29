@@ -87,6 +87,7 @@ export const useCaseLoggerWrapper = <
       const sqlQuery =
         error instanceof Error ? (error as any)?.sqlQuery : undefined;
       logger.error({
+        error,
         useCaseName,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
         searchParams,
