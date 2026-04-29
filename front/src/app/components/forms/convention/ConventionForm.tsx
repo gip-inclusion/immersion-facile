@@ -188,6 +188,7 @@ export const ConventionForm = ({
     ...(mode === "create-convention-from-scratch"
       ? { agencyReferent: agencyReferentName }
       : {}),
+    isEstablishmentBanned: false,
   }).current;
 
   useEffect(() => {
