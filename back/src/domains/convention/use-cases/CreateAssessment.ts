@@ -3,6 +3,7 @@ import {
   assessmentInputDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
+  computeScheduledHoursForAssessment,
   errors,
   ForbiddenError,
 } from "shared";
@@ -28,7 +29,7 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
   .withDeps<WithCreateNewEvent>()
   .build(
     async ({
-      inputParams: { conventionStartDate, ...assessment },
+      inputParams: { conventionStartDate, conventionTotalHours, ...assessment },
       uow,
       deps,
       currentUser: conventionJwtPayload,
@@ -58,9 +59,26 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         (new Date(assessment.lastDayOfPresence) <
           new Date(convention.dateStart) ||
           new Date(assessment.lastDayOfPresence) > new Date(convention.dateEnd))
-      ) {
+      )
         throw errors.assessment.lastDayOfPresenceNotInConventionRange();
-      }
+
+      const scheduledHours = computeScheduledHoursForAssessment({
+        convention,
+        status: assessment.status,
+        lastDayOfPresence:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? assessment.lastDayOfPresence
+            : undefined,
+      });
+
+      if (conventionTotalHours !== convention.schedule.totalHours)
+        throw errors.assessment.conventionTotalHoursMismatch(convention.id);
+
+      if (
+        assessment.status === "PARTIALLY_COMPLETED" &&
+        assessment.numberOfMissedHours > scheduledHours
+      )
+        throw errors.assessment.numberOfMissedHoursExceedsScheduled();
 
       const assessmentEntity = await createAssessmentEntityIfNotExist(
         uow,
