@@ -73,6 +73,7 @@ describe("CreateAssessment", () => {
   const assessmentInput: AssessmentInputDto = {
     ...assessment,
     conventionStartDate: validatedConvention.dateStart,
+    conventionTotalHours: validatedConvention.schedule.totalHours,
   };
 
   const tutorPayload: ConventionDomainJwtPayload = {
@@ -190,6 +191,7 @@ describe("CreateAssessment", () => {
           {
             ...partiallyCompletedAssessment,
             conventionStartDate: validatedConvention.dateStart,
+            conventionTotalHours: validatedConvention.schedule.totalHours,
           },
           tutorPayload,
         ),
@@ -219,6 +221,7 @@ describe("CreateAssessment", () => {
           {
             ...partiallyCompletedAssessment,
             conventionStartDate: validatedConvention.dateStart,
+            conventionTotalHours: validatedConvention.schedule.totalHours,
           },
           tutorPayload,
         ),
@@ -282,10 +285,26 @@ describe("CreateAssessment", () => {
               new Date(validatedConvention.dateStart),
               1,
             ).toISOString(),
+            conventionTotalHours: validatedConvention.schedule.totalHours,
           },
           tutorPayload,
         ),
         errors.assessment.conventionDateStartMismatch(validatedConvention.id),
+      );
+    });
+
+    it("throws bad request when convention total hours in inputs mismatch convention schedule from repo", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await expectPromiseToFailWithError(
+        createAssessment.execute(
+          {
+            ...assessmentInput,
+            conventionTotalHours: validatedConvention.schedule.totalHours + 1,
+          },
+          tutorPayload,
+        ),
+        errors.assessment.conventionTotalHoursMismatch(validatedConvention.id),
       );
     });
 
@@ -409,6 +428,7 @@ describe("CreateAssessment", () => {
         {
           ...partiallyCompletedAssessment,
           conventionStartDate: convention.dateStart,
+          conventionTotalHours: convention.schedule.totalHours,
         },
         {
           ...tutorPayload,
@@ -426,6 +446,57 @@ describe("CreateAssessment", () => {
           numberOfHoursActuallyMade: 25.5, // 4 days * 7 hours - 2.5 missed hours
         },
       ]);
+    });
+
+    it("rejects create assessment when missed hours exceed convention total hours (schema)", async () => {
+      const convention = new ConventionDtoBuilder(validatedConvention)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(new Date("2025-01-20").toISOString())
+        .withDateEnd(new Date("2025-01-24").toISOString())
+        .withSchedule(reasonableSchedule)
+        .build();
+
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: convention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: new Date("2025-01-23").toISOString(),
+        numberOfMissedHours: 100,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+
+      uow.conventionRepository.setConventions([convention]);
+
+      await expectPromiseToFailWithError(
+        createAssessment.execute(
+          {
+            ...partiallyCompletedAssessment,
+            conventionStartDate: convention.dateStart,
+            conventionTotalHours: convention.schedule.totalHours,
+          },
+          {
+            ...tutorPayload,
+            applicationId: convention.id,
+            role: "establishment-tutor",
+            emailHash: makeHashByRolesForTest(
+              convention,
+              counsellor,
+              validator,
+            )["establishment-tutor"],
+          },
+        ),
+        errors.inputs.badSchema({
+          useCaseName: "CreateAssessment",
+          flattenErrors: [
+            "numberOfMissedHours : Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+          ],
+        }),
+      );
     });
 
     it("should dispatch an AssessmentCreated event", async () => {
