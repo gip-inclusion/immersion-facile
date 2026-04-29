@@ -61,9 +61,12 @@ export type DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistratio
     requestEstablishmentRegistrationUrl: AbsoluteUrl;
   };
 
-export type DiscussionExchangeForbiddenParams =
+export type DiscussionExchangeForbiddenParams = (
   | DiscussionExchangeForbiddenParamsWithoutRequestEstablishmentRegistrationUrl
-  | DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl;
+  | DiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl
+) & {
+  establishmentName?: string;
+};
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 export type WithDiscussionId = {
