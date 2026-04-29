@@ -77,36 +77,52 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     { error: "Veuillez sélectionnez une option" },
   );
 
+const withBeneficiaryAgreementSchema = z.object({
+  beneficiaryAgreement: z.boolean().nullable(),
+  beneficiaryFeedback: zStringMinLength1Max3000.nullable(),
+  signedAt: makeDateStringSchema().nullable(),
+  createdAt: dateTimeIsoStringSchema,
+});
+
 export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =
   z
-    .object({
-      conventionId: z.string(),
-    })
+    .object({ conventionId: z.string() })
     .and(withAssessmentStatusSchema)
     .and(withEstablishmentCommentsSchema)
     .and(withEndedWithAJobSchema)
-    .and(
-      z.object({
-        beneficiaryAgreement: z.boolean().nullable(),
-        beneficiaryFeedback: zStringMinLength1Max3000.nullable(),
-        signedAt: makeDateStringSchema().nullable(),
-        createdAt: dateTimeIsoStringSchema,
-      }),
-    );
+    .and(withBeneficiaryAgreementSchema);
 
 export const assessmentInputDtoSchema: z.ZodType<
   AssessmentInputDto,
   FormAssessmentDto
-> = assessmentDtoSchema
-  .and(z.object({ conventionStartDate: makeDateStringSchema() }))
-  .superRefine((assessmentInput, context) => {
-    if (
-      assessmentInput.endedWithAJob &&
-      assessmentInput.contractStartDate < assessmentInput.conventionStartDate
-    )
-      context.addIssue({
+> = z
+  .object({ conventionId: z.string() })
+  .and(withAssessmentStatusSchema)
+  .and(
+    z.object({
+      conventionStartDate: makeDateStringSchema(),
+      conventionTotalHours: z.number(),
+    }),
+  )
+  .superRefine((data, ctx) => {
+    if (data.status !== "PARTIALLY_COMPLETED") return;
+    if (data.numberOfMissedHours > data.conventionTotalHours)
+      ctx.addIssue({
         code: "custom",
-        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: new Date(assessmentInput.conventionStartDate) })}.`,
+        message:
+          "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+        path: ["numberOfMissedHours"],
+      });
+  })
+  .and(withEstablishmentCommentsSchema)
+  .and(withEndedWithAJobSchema)
+  .and(withBeneficiaryAgreementSchema)
+  .superRefine((data, ctx) => {
+    if (!data.endedWithAJob) return;
+    if (data.contractStartDate < data.conventionStartDate)
+      ctx.addIssue({
+        code: "custom",
+        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${data.conventionStartDate}.`,
         path: ["contractStartDate"],
       });
   });

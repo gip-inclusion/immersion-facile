@@ -145,7 +145,8 @@ describe("Assessment schema", () => {
 describe("AssessmentInput schema", () => {
   it("rejects an assessmentInput when startContractDate is before convention start date", () => {
     const assessmentInput: AssessmentInputDto = {
-      conventionStartDate: "2025-05-01",
+      conventionStartDate: "2025-01-01",
+      conventionTotalHours: 0,
       status: "COMPLETED",
       endedWithAJob: true,
       typeOfContract: "CDI",
@@ -174,6 +175,7 @@ describe("AssessmentInput schema", () => {
   it("accepts an assessmentInput when startContractDate is equal or after convention start date", () => {
     const assessmentInput: AssessmentInputDto = {
       conventionStartDate: "2025-01-01",
+      conventionTotalHours: 0,
       status: "COMPLETED",
       endedWithAJob: true,
       typeOfContract: "CDI",
@@ -190,6 +192,35 @@ describe("AssessmentInput schema", () => {
     expectToEqual(
       assessmentInputDtoSchema.parse(assessmentInput),
       assessmentInput,
+    );
+  });
+
+  it("rejects an assessmentInput when missed hours exceed convention total hours", () => {
+    const assessmentInput: AssessmentInputDto = {
+      conventionStartDate: "2025-01-01",
+      conventionTotalHours: 10,
+      status: "PARTIALLY_COMPLETED",
+      lastDayOfPresence: "2025-01-10",
+      numberOfMissedHours: 10.5,
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      establishmentAdvices: "establishment advice",
+      establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
+      createdAt: new Date().toISOString(),
+    };
+
+    expect(() => assessmentInputDtoSchema.parse(assessmentInput)).toThrow(
+      new ZodError([
+        {
+          code: "custom",
+          message:
+            "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+          path: ["numberOfMissedHours"],
+        },
+      ]),
     );
   });
 });
