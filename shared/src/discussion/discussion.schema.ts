@@ -83,6 +83,7 @@ export const discussionUserMissingReason =
 const discussionOtherReasons = [
   "establishment_missing",
   "discussion_completed",
+  "establishment_banned",
 ] as const;
 export const discussionExchangeForbiddenReasons = [
   ...discussionUserMissingReason,
