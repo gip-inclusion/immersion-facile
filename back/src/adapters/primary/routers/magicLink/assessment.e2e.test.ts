@@ -106,6 +106,7 @@ describe("Assessment routes", () => {
       const assessment: AssessmentInputDto = {
         conventionId: convention.id,
         conventionStartDate: convention.dateStart,
+        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -140,6 +141,7 @@ describe("Assessment routes", () => {
       const assessment: AssessmentInputDto = {
         conventionId: convention.id,
         conventionStartDate: convention.dateStart,
+        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -165,6 +167,7 @@ describe("Assessment routes", () => {
       const assessment: AssessmentInputDto = {
         conventionId: convention.id,
         conventionStartDate: convention.dateStart,
+        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "",
         endedWithAJob: false,
@@ -202,6 +205,7 @@ describe("Assessment routes", () => {
       const assessment: AssessmentInputDto = {
         conventionId: anotherConvention.id,
         conventionStartDate: convention.dateStart,
+        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "mon feedback",
         endedWithAJob: false,
@@ -245,7 +249,11 @@ describe("Assessment routes", () => {
       };
 
       await httpClient.createAssessment({
-        body: { ...assessment, conventionStartDate: convention.dateStart },
+        body: {
+          ...assessment,
+          conventionStartDate: convention.dateStart,
+          conventionTotalHours: convention.schedule.totalHours,
+        },
         headers: { authorization: jwt },
       });
 
@@ -296,6 +304,7 @@ describe("Assessment routes", () => {
       const assessment: AssessmentInputDto = {
         conventionId: convention.id,
         conventionStartDate: convention.dateStart,
+        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "Feedback",
         endedWithAJob: false,

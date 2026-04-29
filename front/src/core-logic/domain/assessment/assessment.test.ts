@@ -32,6 +32,7 @@ describe("Immersion Assessment slice", () => {
           assessment: {
             conventionId: "23465",
             conventionStartDate: "2025-01-01",
+            conventionTotalHours: 0,
             status: "DID_NOT_SHOW",
             endedWithAJob: false,
             establishmentFeedback: "my feedback",
@@ -66,6 +67,7 @@ describe("Immersion Assessment slice", () => {
           assessment: {
             conventionId: "23465",
             conventionStartDate: "2025-01-01",
+            conventionTotalHours: 0,
             status: "DID_NOT_SHOW",
             endedWithAJob: false,
             establishmentFeedback: "my feedback",
