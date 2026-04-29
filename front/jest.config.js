@@ -6,7 +6,7 @@ module.exports = {
    "^.+\\.(m?[jt]sx?)$": ["@swc/jest"],
   },
   transformIgnorePatterns: [
-    "node_modules\\/(?!(.pnpm|@|parse5))"
+    "node_modules\\/(?!(.pnpm|@|parse5|uuid))"
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "mjs"],
     moduleNameMapper: {
