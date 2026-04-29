@@ -79,7 +79,7 @@
     "@sentry/profiling-node": "^10.45.0",
     "@types/geojson": "^7946.0.10",
     "aws4fetch": "^1.0.20",
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "body-parser": "^1.20.3",
     "bottleneck": "^2.19.5",
     "date-fns": "2.28.0",
