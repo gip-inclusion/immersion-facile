@@ -108,7 +108,7 @@
     "shared-routes": "^0.10.9",
     "ts-node": "^10.9.2",
     "ts-pattern": "5.7.0",
-    "uuid": "^8.3.2",
+    "uuid": "^14.0.0",
     "zod": "4.0.17",
     "zod-to-json-schema": "^3.21.4"
   },
