@@ -7,7 +7,7 @@ import type { ProConnectInfos } from "../auth/proConnect/proConnect.dto";
 import type { Email } from "../email/email.dto";
 import type {
   WithEstablishmentDashboards,
-  WithEstablishmentsData,
+  WithUserEstablishmentRightDetails,
 } from "../establishment/establishment";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
@@ -51,7 +51,7 @@ export type WithIsBackOfficeAdmin = {
 };
 
 export type UserWithRights = UserWithAgencyRights &
-  WithEstablishmentsData &
+  WithUserEstablishmentRightDetails &
   WithIsBackOfficeAdmin;
 
 export type ConnectedUser = UserWithRights & WithDashboards;

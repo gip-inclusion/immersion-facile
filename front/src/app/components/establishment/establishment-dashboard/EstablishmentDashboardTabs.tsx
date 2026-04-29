@@ -126,7 +126,11 @@ const makeEstablishmentDashboardTabs = (
   route: FrontEstablishmentDashboardRoute,
   userHasDiscussions: boolean,
 ): DashboardTab[] => {
-  const establishmentsArray = establishments ?? [];
+  const establishmentsArray = establishments
+    ? establishments.filter(
+        (establishment) => !establishment.isEstablishmentBanned,
+      )
+    : [];
   const userIsOnboarding = establishmentsArray.length === 0;
   const userCanManageEstablishments =
     establishmentsArray.filter(onlyAdminUserRightsWithStatusAccepted).length >

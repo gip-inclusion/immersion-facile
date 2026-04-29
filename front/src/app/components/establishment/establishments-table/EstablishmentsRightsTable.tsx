@@ -34,7 +34,10 @@ const makeEstablishmentRightLine = ({
 }): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[data.role];
   return [
-    EstablishmentLineBusinessName({ data, isBackofficeAdmin }),
+    EstablishmentLineBusinessName({
+      data: { ...data, isEstablishmentBanned: false },
+      isBackofficeAdmin,
+    }),
     EstablishmentLineAdminsInfos({ data }),
     <Badge
       small

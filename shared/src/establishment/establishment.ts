@@ -13,6 +13,7 @@ import type { SiretDto } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
+import type { WithBannedEstablishmentInformations } from "./bannedEstablishmentInformations";
 import {
   type BusinessName,
   businessNameSchema,
@@ -89,11 +90,13 @@ export type UserEstablishmentRightDetailsWithPendingStatus = {
   status: Extract<EstablishmentUserRightStatus, "PENDING">;
 };
 
-export type UserEstablishmentRightDetails =
+export type UserEstablishmentRightDetails = (
   | UserEstablishmentRightDetailsWithAcceptedStatus
-  | UserEstablishmentRightDetailsWithPendingStatus;
+  | UserEstablishmentRightDetailsWithPendingStatus
+) &
+  WithBannedEstablishmentInformations;
 
-export type WithEstablishmentsData = {
+export type WithUserEstablishmentRightDetails = {
   establishments?: UserEstablishmentRightDetails[];
 };
 
