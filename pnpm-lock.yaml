@@ -6,8 +6,9 @@ settings:
 
 overrides:
   '@isaacs/brace-expansion@<= 5.0.0': 5.0.1
+  '@vitejs/plugin-react@<4.3.2': 4.3.2
   ajv@<8.18.0: ^8.18.0
-  axios@< 1.15.0: 1.15.0
+  axios@< 1.15.2: 1.15.2
   brace-expansion@< 1.1.13: 1.1.13
   brace-expansion@>= 2.0.0 < 2.0.3: 2.0.3
   brace-expansion@>= 4.0.0 < 5.0.5: 5.0.5
@@ -20,6 +21,7 @@ overrides:
   diff@>=5.0.0 <5.2.2: 5.2.2
   dompurify@<=3.3.1: ^3.3.2
   esbuild@<= 0.24.2: ^0.25.0
+  follow-redirects@< 1.16.0: ^1.16.0
   form-data@< 2.5.4: ^2.5.4
   form-data@>= 4.0.0 < 4.0.4: ^4.0.4
   glob@>= 10.2.0 < 10.5.0: ^10.5.0
@@ -50,8 +52,9 @@ overrides:
   store2@< 2.14.4: ^2.14.4
   tar@<= 7.5.10: 7.5.11
   tar-fs@>= 2.0.0 < 2.1.4: ^2.1.4
+  uuid@< 14.0.0: 14.0.0
   xml2js@< 0.5.0: ^0.5.0
-  vite@<= 6.4.1: 6.4.2
+  vite@< 6.4.2: 6.4.2
   vite@>= 7.0.0 < 7.3.2: 7.3.2
   webpack@>= 5.49.0 <= 5.104.0: 5.104.1
   ws@>= 6.0.0 < 6.2.3: ^6.2.3
@@ -94,8 +97,8 @@ importers:
         specifier: ^1.0.20
         version: 1.0.20
       axios:
-        specifier: ^1.15.0
-        version: 1.15.0
+        specifier: ^1.15.2
+        version: 1.15.2
       body-parser:
         specifier: ^1.20.3
         version: 1.20.3
@@ -181,8 +184,8 @@ importers:
         specifier: 5.7.0
         version: 5.7.0
       uuid:
-        specifier: ^8.3.2
-        version: 8.3.2
+        specifier: ^14.0.0
+        version: 14.0.0
       zod:
         specifier: 4.0.17
         version: 4.0.17
@@ -246,7 +249,7 @@ importers:
         version: 8.3.4
       axios-mock-adapter:
         specifier: ^2.1.0
-        version: 2.1.0(axios@1.15.0)
+        version: 2.1.0(axios@1.15.2)
       bun:
         specifier: ^1.3.11
         version: 1.3.11
@@ -352,10 +355,10 @@ importers:
         version: 4.3.2(vite@6.4.2(@types/node@24.12.0)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
       autoprefixer:
         specifier: ^10.4.4
-        version: 10.4.7(postcss@8.5.6)
+        version: 10.4.7(postcss@8.5.12)
       axios:
-        specifier: ^1.15.0
-        version: 1.15.0
+        specifier: ^1.15.2
+        version: 1.15.2
       date-fns:
         specifier: 2.28.0
         version: 2.28.0
@@ -375,8 +378,8 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2
       postcss:
-        specifier: ^8.4.31
-        version: 8.5.6
+        specifier: ^8.5.10
+        version: 8.5.12
       ramda:
         specifier: ^0.30.1
         version: 0.30.1
@@ -444,8 +447,8 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
       uuid:
-        specifier: ^8.3.2
-        version: 8.3.2
+        specifier: ^14.0.0
+        version: 14.0.0
       vite:
         specifier: 6.4.2
         version: 6.4.2(@types/node@24.12.0)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
@@ -647,8 +650,8 @@ importers:
   shared:
     dependencies:
       axios:
-        specifier: ^1.15.0
-        version: 1.15.0
+        specifier: ^1.15.2
+        version: 1.15.2
       date-fns:
         specifier: 2.28.0
         version: 2.28.0
@@ -680,8 +683,8 @@ importers:
         specifier: ^5.7.0
         version: 5.7.0
       uuid:
-        specifier: ^8.3.2
-        version: 8.3.2
+        specifier: ^14.0.0
+        version: 14.0.0
       zod:
         specifier: 4.0.17
         version: 4.0.17
@@ -4422,12 +4425,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vitejs/plugin-react@3.1.0':
-    resolution: {integrity: sha512-AfgcRL8ZBhAlc3BFdigClmTUMISmmzHn7sB2h9U1odvc5U/MjWXsAaz18b/WoppUTDBzxOJwo2VdClfUcItu9g==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      vite: 6.4.2
-
   '@vitejs/plugin-react@4.3.2':
     resolution: {integrity: sha512-hieu+o05v4glEBucTcKMK3dlES0OeJlD9YVOAPraVMOInBCwzumaIFiUjr4bHK7NPgnAHgiskUoceKercrN8vg==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -4704,10 +4701,10 @@ packages:
   axios-mock-adapter@2.1.0:
     resolution: {integrity: sha512-AZUe4OjECGCNNssH8SOdtneiQELsqTsat3SQQCWLPjN436/H+L9AjWfV7bF+Zg/YL9cgbhrz5671hoh+Tbn98w==}
     peerDependencies:
-      axios: 1.15.0
+      axios: 1.15.2
 
-  axios@1.15.0:
-    resolution: {integrity: sha512-wWyJDlAatxk30ZJer+GeCWS209sA42X+N5jU2jy6oHTp7ufw8uzUTVFBX9+wTfAlhiJXGS0Bq7X6efruWjuK9Q==}
+  axios@1.15.2:
+    resolution: {integrity: sha512-wLrXxPtcrPTsNlJmKjkPnNPK2Ihe0hn0wGSaTEiHRPxwjvJwT3hKmXF4dpqxmPO9SoNb2FsYXj/xEo0gHN+D5A==}
 
   babel-core@7.0.0-bridge.0:
     resolution: {integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==}
@@ -5725,8 +5722,8 @@ packages:
     resolution: {integrity: sha512-fHNwawoA2LM7FsxhU/1lTRGq9n6/Q8k861eHgN7GKtamYt9Qrxpg/ZSrev8o1WX7fQ2D3Gg3+uvYN15PmsG7Yw==}
     engines: {node: '>=0.4.0'}
 
-  follow-redirects@1.15.11:
-    resolution: {integrity: sha512-deG2P0JfjrTxl50XGCDyfI97ZGVCxIpfKYmfyrQ54n5FO/0gfIES8C/Psl6kWVDolizcaaxZJnTS0QSMxvnsBQ==}
+  follow-redirects@1.16.0:
+    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -5975,10 +5972,6 @@ packages:
 
   has-symbols@1.1.0:
     resolution: {integrity: sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==}
-    engines: {node: '>= 0.4'}
-
-  has-tostringtag@1.0.0:
-    resolution: {integrity: sha512-kFjcSNhnlGV1kyoGk7OXKSawH5JOb/LzUc5w9B02hOTO0dfFRjbHQKvg1d6cf3HbeUmtU9VbbV3qzZ2Teh97WQ==}
     engines: {node: '>= 0.4'}
 
   has-tostringtag@1.0.2:
@@ -7520,12 +7513,8 @@ packages:
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
-  postcss@8.5.6:
-    resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
-    engines: {node: ^10 || ^12 || >=14}
-
-  postcss@8.5.8:
-    resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
+  postcss@8.5.12:
+    resolution: {integrity: sha512-W62t/Se6rA0Az3DfCL0AqJwXuKwBeYg6nOaIgzP+xZ7N5BFCI7DYi1qs6ygUYT6rvfi6t9k65UMLJC+PHZpDAA==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -9009,12 +8998,8 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
-  uuid@8.3.2:
-    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
-    hasBin: true
-
-  uuid@9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
     hasBin: true
 
   uvu@0.5.6:
@@ -12706,7 +12691,7 @@ snapshots:
       '@types/uuid': 9.0.8
       dequal: 2.0.3
       polished: 4.2.2
-      uuid: 9.0.1
+      uuid: 14.0.0
 
   '@storybook/addon-backgrounds@7.6.24':
     dependencies:
@@ -13235,7 +13220,7 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@2.80.0)
       '@storybook/builder-vite': 7.6.24(typescript@5.9.3)(vite@6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
       '@storybook/react': 7.6.24(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.9.3)
-      '@vitejs/plugin-react': 3.1.0(vite@6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+      '@vitejs/plugin-react': 4.3.2(vite@6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
       magic-string: 0.30.17
       react: 18.2.0
       react-docgen: 7.1.1
@@ -13729,7 +13714,7 @@ snapshots:
       '@swagger-api/apidom-core': 1.6.0
       '@swagger-api/apidom-error': 1.6.0
       '@types/ramda': 0.30.2
-      axios: 1.15.0
+      axios: 1.15.2
       minimatch: 10.2.3
       ramda: 0.30.1
       ramda-adjunct: 5.1.0(ramda@0.30.1)
@@ -14266,17 +14251,6 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react@3.1.0(vite@6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
-    dependencies:
-      '@babel/core': 7.28.5
-      '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
-      '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.5)
-      magic-string: 0.27.0
-      react-refresh: 0.14.2
-      vite: 6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
-    transitivePeerDependencies:
-      - supports-color
-
   '@vitejs/plugin-react@4.3.2(vite@6.4.2(@types/node@24.12.0)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
     dependencies:
       '@babel/core': 7.28.5
@@ -14285,6 +14259,17 @@ snapshots:
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
       vite: 6.4.2(@types/node@24.12.0)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@vitejs/plugin-react@4.3.2(vite@6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
+    dependencies:
+      '@babel/core': 7.28.5
+      '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
+      '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.5)
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.14.2
+      vite: 6.4.2(@types/node@25.0.6)(sass@1.97.3)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -14539,14 +14524,14 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  autoprefixer@10.4.7(postcss@8.5.6):
+  autoprefixer@10.4.7(postcss@8.5.12):
     dependencies:
       browserslist: 4.28.1
       caniuse-lite: 1.0.30001760
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.1.1
-      postcss: 8.5.6
+      postcss: 8.5.12
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.5: {}
@@ -14559,15 +14544,15 @@ snapshots:
 
   axe-core@4.11.0: {}
 
-  axios-mock-adapter@2.1.0(axios@1.15.0):
+  axios-mock-adapter@2.1.0(axios@1.15.2):
     dependencies:
-      axios: 1.15.0
+      axios: 1.15.2
       fast-deep-equal: 3.1.3
       is-buffer: 2.0.5
 
-  axios@1.15.0:
+  axios@1.15.2:
     dependencies:
-      follow-redirects: 1.15.11
+      follow-redirects: 1.16.0
       form-data: 4.0.5
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
@@ -15784,7 +15769,7 @@ snapshots:
 
   flow-parser@0.275.0: {}
 
-  follow-redirects@1.15.11: {}
+  follow-redirects@1.16.0: {}
 
   for-each@0.3.3:
     dependencies:
@@ -16056,10 +16041,6 @@ snapshots:
 
   has-symbols@1.1.0: {}
 
-  has-tostringtag@1.0.0:
-    dependencies:
-      has-symbols: 1.1.0
-
   has-tostringtag@1.0.2:
     dependencies:
       has-symbols: 1.1.0
@@ -16216,7 +16197,7 @@ snapshots:
   is-arguments@1.1.1:
     dependencies:
       call-bind: 1.0.2
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.2
 
   is-array-buffer@3.0.1:
     dependencies:
@@ -16418,7 +16399,7 @@ snapshots:
       call-bind: 1.0.2
       for-each: 0.3.3
       gopd: 1.2.0
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.2
 
   is-typed-array@1.1.15:
     dependencies:
@@ -17937,13 +17918,7 @@ snapshots:
 
   postcss-value-parser@4.2.0: {}
 
-  postcss@8.5.6:
-    dependencies:
-      nanoid: 3.3.11
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
-
-  postcss@8.5.8:
+  postcss@8.5.12:
     dependencies:
       nanoid: 3.3.11
       picocolors: 1.1.1
@@ -19661,9 +19636,7 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  uuid@8.3.2: {}
-
-  uuid@9.0.1: {}
+  uuid@14.0.0: {}
 
   uvu@0.5.6:
     dependencies:
@@ -19715,7 +19688,7 @@ snapshots:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
-      postcss: 8.5.8
+      postcss: 8.5.12
       rollup: 4.60.0
       tinyglobby: 0.2.15
     optionalDependencies:
@@ -19731,7 +19704,7 @@ snapshots:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
-      postcss: 8.5.8
+      postcss: 8.5.12
       rollup: 4.60.0
       tinyglobby: 0.2.15
     optionalDependencies:
@@ -19892,7 +19865,7 @@ snapshots:
       call-bind: 1.0.2
       for-each: 0.3.3
       gopd: 1.2.0
-      has-tostringtag: 1.0.0
+      has-tostringtag: 1.0.2
       is-typed-array: 1.1.10
 
   which@2.0.2:
