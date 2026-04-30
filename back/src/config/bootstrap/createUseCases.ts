@@ -48,6 +48,7 @@ import { makeGetConvention } from "../../domains/convention/use-cases/GetConvent
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { makeGetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeGetConventionsWithUnfinalizedAssessment } from "../../domains/convention/use-cases/GetConventionsWithUnfinalizedAssessment";
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
@@ -1043,6 +1044,11 @@ export const createUseCases = ({
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
     }),
+    getConventionsWithUnfinalizedAssessment:
+      makeGetConventionsWithUnfinalizedAssessment({
+        uowPerformer,
+        deps: { timeGateway: gateways.timeGateway },
+      }),
     transferConventionToAgency: makeTransferConventionToAgency({
       uowPerformer,
       deps: { createNewEvent },
