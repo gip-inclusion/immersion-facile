@@ -39,7 +39,7 @@ type MessageInputCommonFields = {
 };
 
 type MessageInputFromDashboard = MessageInputCommonFields & {
-  recipientRole: Extract<ExchangeRole, "potentialBeneficiary">;
+  recipientRole: ExchangeRole;
   attachments: never[];
 };
 
@@ -71,7 +71,7 @@ const messageInputCommonFieldsSchema = z.object({
 });
 
 const messageInputFromDashboardSchema = messageInputCommonFieldsSchema.extend({
-  recipientRole: z.literal("potentialBeneficiary"),
+  recipientRole: exchangeRoleSchema,
   attachments: z.array(z.never()),
 });
 

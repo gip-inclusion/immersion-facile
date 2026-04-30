@@ -132,7 +132,6 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
                 {
                   ...req.body,
                   discussionId: req.params.discussionId,
-                  recipientRole: "potentialBeneficiary",
                   attachments: [],
                 },
               ],

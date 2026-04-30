@@ -301,7 +301,9 @@ export type ExchangeRead = CommonExchange &
     | OmitFromExistingKeys<SpecificExchangeSender<"establishment">, "email">
   );
 
-export type ExchangeMessageFromDashboard = Pick<Exchange, "message">;
+export type ExchangeMessageFromDashboard = Pick<Exchange, "message"> & {
+  recipientRole: ExchangeRole;
+};
 
 export type ExchangeFromDashboard = ExchangeMessageFromDashboard &
   WithDiscussionId;
