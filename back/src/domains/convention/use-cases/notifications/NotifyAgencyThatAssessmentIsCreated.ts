@@ -6,37 +6,27 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   makeUrlWithQueryParams,
-  type WithAssessmentDto,
   withAssessmentSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { retrieveConventionWithAgency } from "../../entities/Convention";
 
-export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<WithAssessmentDto> {
-  protected inputSchema = withAssessmentSchema;
+export type NotifyAgencyThatAssessmentIsCreated = ReturnType<
+  typeof makeNotifyAgencyThatAssessmentIsCreated
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  readonly #config: AppConfig;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    config: AppConfig,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#config = config;
-  }
-
-  public async _execute(
-    { assessment }: WithAssessmentDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyAgencyThatAssessmentIsCreated = useCaseBuilder(
+  "NotifyAgencyThatAssessmentIsCreated",
+)
+  .withInput(withAssessmentSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    config: AppConfig;
+  }>()
+  .build(async ({ inputParams: { assessment }, uow, deps }) => {
     const { agency, convention } = await retrieveConventionWithAgency(
       uow,
       assessment.conventionId,
@@ -55,7 +45,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
       : uniq([...validatorEmails, ...counsellorEmails]);
 
     if (assessment.status === "DID_NOT_SHOW") {
-      await this.#saveNotificationAndRelatedEvent(uow, {
+      await deps.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
@@ -100,11 +90,11 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
       });
 
       await executeInSequence(agencyEmails, async (email) => {
-        const manageConventionLink = `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+        const manageConventionLink = `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
           `/${frontRoutes.manageConventionUserConnected}`,
           { conventionId: convention.id },
         )}`;
-        await this.#saveNotificationAndRelatedEvent(uow, {
+        await deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
@@ -139,5 +129,4 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         });
       });
     }
-  }
-}
+  });

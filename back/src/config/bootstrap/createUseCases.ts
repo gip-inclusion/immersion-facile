@@ -52,7 +52,7 @@ import { makeGetConventionTemplatesForCurrentUser } from "../../domains/conventi
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
-import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
+import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -468,12 +468,6 @@ export const createUseCases = ({
         ),
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          config,
-        ),
-      notifyAgencyThatAssessmentIsCreated:
-        new NotifyAgencyThatAssessmentIsCreated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
           config,
@@ -1192,6 +1186,14 @@ export const createUseCases = ({
       uowPerformer,
       deps: { saveNotificationAndRelatedEvent },
     }),
+    notifyAgencyThatAssessmentIsCreated:
+      makeNotifyAgencyThatAssessmentIsCreated({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          config,
+        },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

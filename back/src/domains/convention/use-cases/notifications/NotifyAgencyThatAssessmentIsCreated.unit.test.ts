@@ -28,7 +28,10 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createAssessmentEntity } from "../../entities/AssessmentEntity";
-import { NotifyAgencyThatAssessmentIsCreated } from "./NotifyAgencyThatAssessmentIsCreated";
+import {
+  makeNotifyAgencyThatAssessmentIsCreated,
+  type NotifyAgencyThatAssessmentIsCreated,
+} from "./NotifyAgencyThatAssessmentIsCreated";
 
 const agency = new AgencyDtoBuilder().build();
 const validator = new ConnectedUserBuilder()
@@ -74,11 +77,16 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     timeGateway = new CustomTimeGateway();
     config = new AppConfigBuilder().build();
-    usecase = new NotifyAgencyThatAssessmentIsCreated(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      config,
-    );
+    usecase = makeNotifyAgencyThatAssessmentIsCreated({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        config,
+      },
+    });
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
