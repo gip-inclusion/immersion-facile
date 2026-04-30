@@ -32,6 +32,7 @@ import {
   flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
   paginatedConventionWithBroadcastFeedbackSchema,
 } from "../convention/conventionWithBroadcastFeedback.schema";
+import { paginatedConventionWithUnfinalizedAssessmentSchema } from "../convention/conventionWithUnfinalizedAssessment.schema";
 import {
   conventionDraftSchema,
   shareConventionDraftByEmailSchema,
@@ -39,6 +40,7 @@ import {
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { paginationRequiredQueryParamsSchema } from "../pagination/pagination.schema";
 import { renewExpiredJwtResponseSchema } from "../tokens/jwt.schema";
 import {
   expressEmptyResponseBody,
@@ -306,6 +308,18 @@ export const authenticatedConventionRoutes = defineRoutes({
       flatGetConventionsWithErroredBroadcastFeedbackParamsSchema,
     responses: {
       200: paginatedConventionWithBroadcastFeedbackSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+    },
+  }),
+
+  getConventionsWithUnfinalizedAssessment: defineRoute({
+    method: "get",
+    url: "/conventions-with-unfinalized-assessment",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: paginationRequiredQueryParamsSchema,
+    responses: {
+      200: paginatedConventionWithUnfinalizedAssessmentSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
     },
