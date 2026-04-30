@@ -108,6 +108,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     await kyselyDb.deleteFrom("establishments").execute();
     await kyselyDb.deleteFrom("convention_templates").execute();
     await kyselyDb.deleteFrom("users").execute();
+    await kyselyDb.deleteFrom("banned_establishments").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       kyselyDb,
@@ -147,6 +148,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           .deleteFrom("establishments_location_positions")
           .execute();
         await kyselyDb.deleteFrom("establishments").execute();
+        await kyselyDb.deleteFrom("banned_establishments").execute();
       });
 
       describe("no filters provided", () => {
@@ -2358,6 +2360,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .deleteFrom("establishments_location_positions")
             .execute();
           await kyselyDb.deleteFrom("establishments").execute();
+          await kyselyDb.deleteFrom("banned_establishments").execute();
 
           const INDEX_OF_NOT_AVAILABLE_ESTABLISHMENT = 2;
           const INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT = 3;
@@ -4189,6 +4192,52 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishment],
+        );
+      });
+    });
+
+    describe("getEstablishmentAggregateBySiret bannishment info", () => {
+      const establishment = new EstablishmentAggregateBuilder()
+        .withUserRights([osefUserRight])
+        .build();
+
+      beforeEach(async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishment,
+        );
+      });
+
+      it("returns bannishment field at false when establishment is not banned", async () => {
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            establishment.establishment.siret,
+          ),
+          establishment,
+        );
+      });
+
+      it("returns bannishment true and the justification when establishment is banned", async () => {
+        const bannishmentJustification = "Fraude détectée lors d'un contrôle";
+        await kyselyDb
+          .insertInto("banned_establishments")
+          .values({
+            siret: establishment.establishment.siret,
+            bannishment_justification: bannishmentJustification,
+          })
+          .execute();
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            establishment.establishment.siret,
+          ),
+          {
+            ...establishment,
+            establishment: {
+              ...establishment.establishment,
+              isEstablishmentBanned: true,
+              establishmentBannishmentJustification: bannishmentJustification,
+            },
+          },
         );
       });
     });

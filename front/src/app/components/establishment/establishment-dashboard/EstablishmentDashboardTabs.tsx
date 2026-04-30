@@ -47,11 +47,14 @@ export const EstablishmentDashboardTabs = ({
   const { data: discussions, filters: discussionsFilters } = useAppSelector(
     discussionSelectors.discussionsWithPagination,
   );
+  const filteredDiscussions = discussions.filter(
+    (discussions) => !discussions.isEstablishmentBanned,
+  );
   const filtersAreEmpty = equals(
     discussionsFilters,
     initialDiscussionsWithPagination.filters,
   );
-  const userHasDiscussions = discussions.length > 0 || !filtersAreEmpty;
+  const userHasDiscussions = filteredDiscussions.length > 0 || !filtersAreEmpty;
 
   const tabs = useMemo(
     () =>

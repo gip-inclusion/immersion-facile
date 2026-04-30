@@ -64,6 +64,7 @@ const defaultDiscussion = {
   kind: "IF",
   contactMode: "EMAIL",
   locationId: "123e4567-e89b-12d3-a456-426614174000",
+  isEstablishmentBanned: false,
 } satisfies DiscussionDto;
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {

@@ -115,6 +115,7 @@ describe("PgEstablishmentLeadQueries", () => {
     await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("establishment_lead_events").execute();
+    await db.deleteFrom("banned_establishments").execute();
 
     establishmentLeadQueries = new PgEstablishmentLeadQueries(db);
     establishmentLeadRepository = new PgEstablishmentLeadRepository(db);
