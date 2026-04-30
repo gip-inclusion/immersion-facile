@@ -51,12 +51,20 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     _jwt: ConnectedUserJwt,
   ): Observable<EstablishmentPublicOption[]> {
     return of(
-      this.establishments.map((establishment) => ({
-        businessName: establishment.businessName,
-        businessNameCustomized: establishment.businessNameCustomized,
-        siret: establishment.siret,
-        userRightIds: ["1234567890"],
-      })),
+      this.establishments.map(
+        (establishment): EstablishmentPublicOption => ({
+          businessName: establishment.businessName,
+          businessNameCustomized: establishment.businessNameCustomized,
+          siret: establishment.siret,
+          ...(establishment.isEstablishmentBanned
+            ? {
+                isEstablishmentBanned: establishment.isEstablishmentBanned,
+                establishmentBannishmentJustification:
+                  establishment.establishmentBannishmentJustification,
+              }
+            : { isEstablishmentBanned: establishment.isEstablishmentBanned }),
+        }),
+      ),
     ).pipe(delay(this.delay));
   }
 
