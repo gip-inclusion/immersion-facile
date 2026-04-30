@@ -56,7 +56,7 @@ import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/conventio
 import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { makeNotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { makeNotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
-import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
+import { makeNotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
 import { makeNotifyBeneficiaryThatAssessmentNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentNeedsSignature";
@@ -441,11 +441,6 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
         config,
       ),
-      notifyAllActorsThatConventionIsRejected:
-        new NotifyAllActorsThatConventionIsRejected(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-        ),
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
@@ -1195,6 +1190,13 @@ export const createUseCases = ({
       }),
     notifyAllActorsThatConventionIsDeprecated:
       makeNotifyAllActorsThatConventionIsDeprecated({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+        },
+      }),
+    notifyAllActorsThatConventionIsRejected:
+      makeNotifyAllActorsThatConventionIsRejected({
         uowPerformer,
         deps: {
           saveNotificationAndRelatedEvent,
