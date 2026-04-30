@@ -16,9 +16,12 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyAllActorsThatConventionIsRejected } from "./NotifyAllActorsThatConventionIsRejected";
+import {
+  makeNotifyAllActorsThatConventionIsRejected,
+  type NotifyAllActorsThatConventionIsRejected,
+} from "./NotifyAllActorsThatConventionIsRejected";
 
-describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
+describe("NotifyAllActorsThatConventionIsRejected", () => {
   const beneficiaryRepresentative: BeneficiaryRepresentative = {
     role: "beneficiary-representative",
     email: "legal@representative.com",
@@ -77,13 +80,15 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    useCase = new NotifyAllActorsThatConventionIsRejected(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-    );
+    useCase = makeNotifyAllActorsThatConventionIsRejected({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+    });
 
     uow.userRepository.users = [counsellor1, counsellor2, validator];
   });
