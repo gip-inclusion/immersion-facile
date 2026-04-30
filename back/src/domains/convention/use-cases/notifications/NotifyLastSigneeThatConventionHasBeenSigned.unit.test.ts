@@ -19,7 +19,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyLastSigneeThatConventionHasBeenSigned } from "./NotifyLastSigneeThatConventionHasBeenSigned";
+import {
+  makeNotifyLastSigneeThatConventionHasBeenSigned,
+  type NotifyLastSigneeThatConventionHasBeenSigned,
+} from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;
@@ -51,12 +54,14 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       timeGateway,
     );
 
-    notifyLastSignee = new NotifyLastSigneeThatConventionHasBeenSigned(
-      new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
-      fakeGenerateMagicLinkUrlFn,
-      timeGateway,
-    );
+    notifyLastSignee = makeNotifyLastSigneeThatConventionHasBeenSigned({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        timeGateway,
+      },
+    });
   });
 
   it("Last signed by beneficiary, no more signees", async () => {

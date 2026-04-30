@@ -4,43 +4,30 @@ import {
   errors,
   frontRoutes,
   type Signatory,
-  type SignatoryRole,
   type TemplatedEmail,
-  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type NotifyLastSigneeThatConventionHasBeenSigned = ReturnType<
+  typeof makeNotifyLastSigneeThatConventionHasBeenSigned
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  timeGateway: TimeGateway;
+};
 
-  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-
-  readonly #timeGateway: TimeGateway;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    generateConventionStatusLinkUrl: GenerateConventionMagicLinkUrl,
-    timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-    this.#generateConventionMagicLinkUrl = generateConventionStatusLinkUrl;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#timeGateway = timeGateway;
-  }
-
-  protected async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyLastSigneeThatConventionHasBeenSigned = useCaseBuilder(
+  "NotifyLastSigneeThatConventionHasBeenSigned",
+)
+  .withInput(withConventionSchema)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { convention }, uow, deps }) => {
     const savedConvention = await uow.conventionRepository.getById(
       convention.id,
     );
@@ -48,32 +35,50 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     if (!savedConvention)
       throw errors.convention.notFound({ conventionId: convention.id });
 
-    const [agency] = await uow.agencyRepository.getByIds([
-      savedConvention.agencyId,
-    ]);
+    const agency = await uow.agencyRepository.getById(savedConvention.agencyId);
 
     if (!agency)
       throw errors.agency.notFound({
         agencyId: savedConvention.agencyId,
       });
 
-    return this.#onRepositoryConvention(uow, savedConvention, agency);
-  }
-
-  #emailToSend(
-    convention: ConventionDto,
-    lastSignee: { signedAt: string; email: string; role: SignatoryRole },
-    agency: AgencyWithUsersRights,
-  ): TemplatedEmail {
-    const magicLink = this.#generateConventionMagicLinkUrl({
-      targetRoute: frontRoutes.manageConvention,
-      id: convention.id,
-      role: lastSignee.role,
-      email: lastSignee.email,
-      now: this.#timeGateway.now(),
-      lifetime: "1Month",
+    await deps.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: makeEmail(savedConvention, agency, deps),
+      followedIds: {
+        conventionId: savedConvention.id,
+        agencyId: savedConvention.agencyId,
+        establishmentSiret: savedConvention.siret,
+      },
     });
+  });
 
+type Signee = Omit<Signatory, "signedAt"> & {
+  signedAt: string;
+};
+
+const getLastSignee = (signatories: Signatory[]): Signee | undefined =>
+  signatories
+    .filter(
+      (
+        signatory,
+      ): signatory is Signatory & {
+        signedAt: string;
+      } => signatory.signedAt !== undefined,
+    )
+    .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
+    .at(-1);
+
+const makeEmail = (
+  convention: ConventionDto,
+  agency: AgencyWithUsersRights,
+  deps: Deps,
+): TemplatedEmail => {
+  const lastSignee: Signee | undefined = getLastSignee(
+    Object.values(convention.signatories),
+  );
+
+  if (lastSignee)
     return {
       kind: "SIGNEE_HAS_SIGNED_CONVENTION",
       params: {
@@ -81,59 +86,20 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         internshipKind: convention.internshipKind,
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
-        magicLink,
+        magicLink: deps.generateConventionMagicLinkUrl({
+          targetRoute: frontRoutes.manageConvention,
+          id: convention.id,
+          role: lastSignee.role,
+          email: lastSignee.email,
+          now: deps.timeGateway.now(),
+          lifetime: "1Month",
+        }),
         agencyName: agency.name,
       },
       recipients: [lastSignee.email],
     };
-  }
 
-  #lastSigneeEmail(
-    signatories: Signatory[],
-  ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
-    const signatoryEmailsOrderedBySignedAt = signatories
-      .filter(
-        (
-          signatory,
-        ): signatory is Signatory & {
-          signedAt: string;
-        } => signatory.signedAt !== undefined,
-      )
-      .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
-      .map(({ email, signedAt, role }) => ({
-        email,
-        signedAt,
-        role,
-      }));
-    return signatoryEmailsOrderedBySignedAt.at(-1);
-  }
-
-  async #onRepositoryConvention(
-    uow: UnitOfWork,
-    convention: ConventionDto,
-    agency: AgencyWithUsersRights,
-  ): Promise<void> {
-    const lastSigneeEmail = this.#lastSigneeEmail(
-      Object.values(convention.signatories),
-    );
-    if (lastSigneeEmail) {
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: this.#emailToSend(
-          convention,
-          lastSigneeEmail,
-          agency,
-        ),
-        followedIds: {
-          conventionId: convention.id,
-          agencyId: convention.agencyId,
-          establishmentSiret: convention.siret,
-        },
-      });
-      return;
-    }
-    throw errors.convention.noSignatoryHasSigned({
-      conventionId: convention.id,
-    });
-  }
-}
+  throw errors.convention.noSignatoryHasSigned({
+    conventionId: convention.id,
+  });
+};
