@@ -26,7 +26,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyToAgencyConventionSubmitted } from "./NotifyToAgencyConventionSubmitted";
+import {
+  makeNotifyToAgencyConventionSubmitted,
+  type NotifyToAgencyConventionSubmitted,
+} from "./NotifyToAgencyConventionSubmitted";
 
 describe("NotifyToAgencyConventionSubmitted", () => {
   const validator = new ConnectedUserBuilder()
@@ -133,40 +136,34 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   });
 
   let notifyToAgencyConventionSubmitted: NotifyToAgencyConventionSubmitted;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let uow: InMemoryUnitOfWork;
   let config: AppConfig;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
-  const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
     uow = createInMemoryUow();
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+    notifyToAgencyConventionSubmitted = makeNotifyToAgencyConventionSubmitted({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+        config,
+      },
+    });
+
     uow.agencyRepository.agencies = [
       agencyWithOnlyValidator,
       agencyWithConsellorsAndValidator,
       agencyFtWithCounsellors,
     ];
     uow.userRepository.users = [validator, councellor1, councellor2];
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
-
-    const uowPerformer = new InMemoryUowPerformer({
-      ...uow,
-    });
-
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-
-    notifyToAgencyConventionSubmitted = new NotifyToAgencyConventionSubmitted(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
-      config,
-    );
   });
 
   it("Sends notification email to agency validator when it is initially submitted, and agency has no counsellor", async () => {
