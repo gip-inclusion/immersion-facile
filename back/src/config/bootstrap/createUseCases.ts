@@ -68,7 +68,7 @@ import { makeNotifySignatoriesThatConventionSubmittedNeedsSignature } from "../.
 import { makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
-import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
+import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
@@ -275,10 +275,6 @@ export const createUseCases = ({
       sendNotificationsInBatch: new SendNotificationInBatch(
         uowPerformer,
         gateways.notification,
-      ),
-      notifyUserAgencyRightRejected: new NotifyUserAgencyRightRejected(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
       ),
       initiateLoginByOAuth: new InitiateLoginByOAuth(
         uowPerformer,
@@ -1213,6 +1209,12 @@ export const createUseCases = ({
       },
     }),
     notifyUserAgencyRightChanged: makeNotifyUserAgencyRightChanged({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+      },
+    }),
+    notifyUserAgencyRightRejected: makeNotifyUserAgencyRightRejected({
       uowPerformer,
       deps: {
         saveNotificationAndRelatedEvent,
