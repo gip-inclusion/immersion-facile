@@ -15,6 +15,7 @@ import {
   type ConventionSupportedJwt,
   type ConventionTemplate,
   type ConventionTemplateId,
+  type ConventionWithUnfinalizedAssessment,
   type DashboardUrlAndName,
   type DataWithPagination,
   type EditConventionCounsellorNameRequestDto,
@@ -95,6 +96,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public getConventionsWithErroredBroadcastFeedbackResult$ = new Subject<
     DataWithPagination<ConventionWithBroadcastFeedback>
+  >();
+
+  public getConventionsWithUnfinalizedAssessmentResult$ = new Subject<
+    DataWithPagination<ConventionWithUnfinalizedAssessment>
   >();
 
   #agencies: { [id: string]: AgencyOption } = {};
@@ -286,5 +291,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: string,
   ): Observable<DataWithPagination<ConventionWithBroadcastFeedback>> {
     return this.getConventionsWithErroredBroadcastFeedbackResult$;
+  }
+
+  public getConventionsWithUnfinalizedAssessment$(
+    _params: Required<PaginationQueryParams>,
+    _jwt: string,
+  ): Observable<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
+    return this.getConventionsWithUnfinalizedAssessmentResult$;
   }
 }

@@ -15,6 +15,7 @@ import type {
   ConventionSupportedJwt,
   ConventionTemplate,
   ConventionTemplateId,
+  ConventionWithUnfinalizedAssessment,
   DashboardUrlAndName,
   DataWithPagination,
   EditConventionCounsellorNameRequestDto,
@@ -23,6 +24,7 @@ import type {
   FlatGetConventionsForAgencyUserParams,
   FlatGetConventionsWithErroredBroadcastFeedbackParams,
   MarkPartnersErroredConventionAsHandledRequest,
+  PaginationQueryParams,
   RenewConventionParams,
   SendSignatureLinkRequestDto,
   ShareConventionDraftByEmailDto,
@@ -499,6 +501,26 @@ export class HttpConventionGateway implements ConventionGateway {
     return from(
       this.authenticatedHttpClient
         .getConventionsWithErroredBroadcastFeedbackForAgencyUser({
+          queryParams: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getConventionsWithUnfinalizedAssessment$(
+    params: Required<PaginationQueryParams>,
+    jwt: string,
+  ): Observable<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
+    return from(
+      this.authenticatedHttpClient
+        .getConventionsWithUnfinalizedAssessment({
           queryParams: params,
           headers: { authorization: jwt },
         })
