@@ -2,12 +2,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import { subDays } from "date-fns";
 import { useCallback } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type ConventionReadDto,
+  type ConventionWithUnfinalizedAssessment,
   domElementIds,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   toDisplayedDate,
@@ -21,9 +20,6 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
-
-export const threeDaysAgo = subDays(new Date(), 3).toISOString();
-export const startOf2026 = new Date("2026-01-01").toISOString();
 
 export const ConventionsWithAssessmentToCompleteList = () => {
   const dispatch = useDispatch();
@@ -41,12 +37,7 @@ export const ConventionsWithAssessmentToCompleteList = () => {
         dispatch(
           connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
             {
-              params: {
-                sortBy: "dateEnd",
-                sortDirection: "asc",
-                assessmentCompletionStatus: ["to-complete", "to-sign"],
-                dateStartFrom: startOf2026,
-                dateEndTo: threeDaysAgo,
+              pagination: {
                 page,
                 perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
               },
@@ -106,7 +97,7 @@ export const ConventionsWithAssessmentToCompleteList = () => {
 const AssessmentToCompleteTaskItem = ({
   convention,
 }: {
-  convention: ConventionReadDto;
+  convention: ConventionWithUnfinalizedAssessment;
 }) => {
   const assessmentCompletionStatus = getAssessmentCompletionStatus(
     convention.assessment,
@@ -114,8 +105,9 @@ const AssessmentToCompleteTaskItem = ({
   const title = (
     <>
       <span className={fr.cx("fr-pr-2v")}>
-        {convention.signatories.beneficiary.firstName}{" "}
-        {convention.signatories.beneficiary.lastName}{" "}
+        {convention.beneficiary.firstname} {
+          convention.beneficiary.lastname
+        }{" "}
       </span>
       <Badge
         className={fr.cx("fr-badge--error", "fr-mx-2v")}
