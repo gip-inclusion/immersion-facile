@@ -64,7 +64,7 @@ import { makeNotifyConventionReminder } from "../../domains/convention/use-cases
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
 import { makeNotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { makeNotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
-import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
+import { makeNotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
@@ -398,15 +398,6 @@ export const createUseCases = ({
       // agencies
 
       // notifications
-      notifySignatoriesThatConventionSubmittedNeedsSignature:
-        new NotifySignatoriesThatConventionSubmittedNeedsSignature(
-          uowPerformer,
-          gateways.timeGateway,
-          gateways.shortLinkGenerator,
-          generateConventionMagicLinkUrl,
-          config,
-          saveNotificationAndRelatedEvent,
-        ),
       notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification:
         new NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification(
           uowPerformer,
@@ -1208,6 +1199,17 @@ export const createUseCases = ({
         config,
       },
     }),
+    notifySignatoriesThatConventionSubmittedNeedsSignature:
+      makeNotifySignatoriesThatConventionSubmittedNeedsSignature({
+        uowPerformer,
+        deps: {
+          config,
+          generateConventionMagicLinkUrl,
+          saveNotificationAndRelatedEvent,
+          shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+          timeGateway: gateways.timeGateway,
+        },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
