@@ -26,7 +26,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
+import {
+  makeNotifySignatoriesThatConventionSubmittedNeedsSignature,
+  type NotifySignatoriesThatConventionSubmittedNeedsSignature,
+} from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
   const config: AppConfig = new AppConfigBuilder({}).build();
@@ -59,14 +62,19 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     shortLinkGenerator = new DeterministShortLinkIdGeneratorGateway();
-    useCase = new NotifySignatoriesThatConventionSubmittedNeedsSignature(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-      shortLinkGenerator,
-      fakeGenerateMagicLinkUrlFn,
-      config,
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-    );
+    useCase = makeNotifySignatoriesThatConventionSubmittedNeedsSignature({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+        shortLinkIdGeneratorGateway: shortLinkGenerator,
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        config,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+      },
+    });
     uow.userRepository.users = [counsellor, validator];
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
