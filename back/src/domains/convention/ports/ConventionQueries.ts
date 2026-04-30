@@ -8,6 +8,7 @@ import type {
   ConventionStatus,
   ConventionsWithErroredBroadcastFeedbackFilters,
   ConventionWithBroadcastFeedback,
+  ConventionWithUnfinalizedAssessment,
   DataWithPagination,
   DateString,
   Email,
@@ -100,4 +101,10 @@ export interface ConventionQueries {
     pagination: PaginationQueryParams;
     filters?: ConventionsWithErroredBroadcastFeedbackFilters;
   }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
+
+  getConventionsWithUnfinalizedAssessmentForAgencyUser(params: {
+    userAgencyIds: AgencyId[];
+    pagination: Required<PaginationQueryParams>;
+    now: Date;
+  }): Promise<DataWithPagination<ConventionWithUnfinalizedAssessment>>;
 }

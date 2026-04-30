@@ -1,4 +1,4 @@
-import { addDays, isAfter, isBefore } from "date-fns";
+import { addDays, isAfter, isBefore, subMonths } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
@@ -9,6 +9,7 @@ import {
   type ConventionScope,
   type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
+  type ConventionWithUnfinalizedAssessment,
   conventionReadSchema,
   conventionSchema,
   conventionStatusesDemonstratingUserActivity,
@@ -326,6 +327,123 @@ export class InMemoryConventionQueries implements ConventionQueries {
       ...assesmentEntityToConventionAssessmentFields(assessment),
     };
   };
+
+  public async getConventionsWithUnfinalizedAssessmentForAgencyUser({
+    userAgencyIds,
+    pagination,
+    now,
+  }: {
+    userAgencyIds: AgencyId[];
+    pagination: Required<PaginationQueryParams>;
+    now: Date;
+  }): Promise<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
+    if (userAgencyIds.length === 0)
+      return {
+        data: [],
+        pagination: {
+          totalRecords: 0,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 0,
+        },
+      };
+
+    const threeMonthsAgo = subMonths(now, 3);
+    const signatureReleaseThreshold = addDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      1,
+    );
+
+    const conventionsForUser = this.conventionRepository.conventions
+      .filter((convention) => userAgencyIds.includes(convention.agencyId))
+      .filter((convention) => convention.status === "ACCEPTED_BY_VALIDATOR");
+
+    const matched =
+      conventionsForUser.flatMap<ConventionWithUnfinalizedAssessment>(
+        (convention) => {
+          const assessment = this.assessmentRepository.assessments.find(
+            (a) => a.conventionId === convention.id,
+          );
+
+          if (!assessment) {
+            const dateEnd = new Date(convention.dateEnd);
+            if (!isBefore(dateEnd, threeMonthsAgo) && !isAfter(dateEnd, now))
+              return [
+                {
+                  id: convention.id,
+                  dateEnd: convention.dateEnd,
+                  beneficiary: {
+                    firstname: convention.signatories.beneficiary.firstName,
+                    lastname: convention.signatories.beneficiary.lastName,
+                  },
+                  assessment: null,
+                },
+              ];
+            return [];
+          }
+
+          if (
+            assessment.status === "FINISHED" ||
+            assessment.status === "ABANDONED"
+          )
+            return [];
+
+          if (assessment.status === "DID_NOT_SHOW") return [];
+
+          const createdAt = new Date(assessment.createdAt);
+          const isAfterSignatureRelease = isAfter(
+            createdAt,
+            signatureReleaseThreshold,
+          );
+          const isWithinThreeMonths = !isBefore(createdAt, threeMonthsAgo);
+          const isUnsigned =
+            "signedAt" in assessment && assessment.signedAt === null;
+
+          if (!isAfterSignatureRelease || !isWithinThreeMonths || !isUnsigned)
+            return [];
+
+          return [
+            {
+              id: convention.id,
+              dateEnd: convention.dateEnd,
+              beneficiary: {
+                firstname: convention.signatories.beneficiary.firstName,
+                lastname: convention.signatories.beneficiary.lastName,
+              },
+              assessment: {
+                status: assessment.status,
+                endedWithAJob: assessment.endedWithAJob ?? false,
+                signedAt: assessment.signedAt ?? null,
+                createdAt: assessment.createdAt,
+              },
+            },
+          ];
+        },
+      );
+
+    const sorted = matched.sort((a, b) => {
+      const dateCompare =
+        new Date(a.dateEnd).getTime() - new Date(b.dateEnd).getTime();
+      if (dateCompare !== 0) return dateCompare;
+      return a.id.localeCompare(b.id);
+    });
+
+    const startIndex = (pagination.page - 1) * pagination.perPage;
+    const paginatedData = sorted.slice(
+      startIndex,
+      startIndex + pagination.perPage,
+    );
+
+    return {
+      data: paginatedData,
+      pagination: {
+        totalRecords: sorted.length,
+        currentPage: pagination.page,
+        totalPages: Math.max(Math.ceil(sorted.length / pagination.perPage), 1),
+        numberPerPage: pagination.perPage,
+      },
+    };
+  }
 
   public async getConventionsWithErroredBroadcastFeedbackForAgencyUser({
     userAgencyIds,
