@@ -1,6 +1,7 @@
 import {
   ConventionDtoBuilder,
   type ConventionReadDto,
+  type ConventionWithUnfinalizedAssessment,
   type DataWithPagination,
   expectToEqual,
 } from "shared";
@@ -124,9 +125,7 @@ describe("ConnectedUserConventionsToManage", () => {
       store.dispatch(
         connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
           {
-            params: {
-              assessmentCompletionStatus: ["to-complete", "to-sign"],
-            },
+            pagination: { page: 1, perPage: 10 },
             jwt: "my-jwt",
             feedbackTopic: "conventions-with-assessment-issue",
           },
@@ -140,24 +139,21 @@ describe("ConnectedUserConventionsToManage", () => {
         true,
       );
 
-      const agencyFields = {
-        agencyContactEmail: "contact@mail.com",
-        agencyName: "Agency Name",
-        agencyDepartment: "75",
-        agencyKind: "pole-emploi" as const,
-        agencySiret: "11112222000033",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [],
-      };
+      const convention = new ConventionDtoBuilder().build();
 
-      const convention: ConventionReadDto = {
-        ...new ConventionDtoBuilder().build(),
-        assessment: null,
-        ...agencyFields,
-      };
+      const conventionWithUnfinalizedAssessment: ConventionWithUnfinalizedAssessment =
+        {
+          id: convention.id,
+          dateEnd: convention.dateEnd,
+          beneficiary: {
+            firstname: convention.signatories.beneficiary.firstName,
+            lastname: convention.signatories.beneficiary.lastName,
+          },
+          assessment: null,
+        };
 
-      const result: DataWithPagination<ConventionReadDto> = {
-        data: [convention],
+      const result: DataWithPagination<ConventionWithUnfinalizedAssessment> = {
+        data: [conventionWithUnfinalizedAssessment],
         pagination: {
           totalRecords: 5,
           currentPage: 1,
@@ -165,7 +161,9 @@ describe("ConnectedUserConventionsToManage", () => {
           numberPerPage: 10,
         },
       };
-      dependencies.conventionGateway.getConventionsForUserResult$.next(result);
+      dependencies.conventionGateway.getConventionsWithUnfinalizedAssessmentResult$.next(
+        result,
+      );
 
       expectToEqual(
         connectedUserConventionsToManageSelectors.conventionsWithAssessmentIssue(
@@ -197,7 +195,7 @@ describe("ConnectedUserConventionsToManage", () => {
       store.dispatch(
         connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
           {
-            params: {},
+            pagination: { page: 1, perPage: 10 },
             jwt: "my-jwt",
             feedbackTopic: "conventions-with-assessment-issue",
           },
@@ -209,7 +207,7 @@ describe("ConnectedUserConventionsToManage", () => {
         ),
         true,
       );
-      dependencies.conventionGateway.getConventionsForUserResult$.error(
+      dependencies.conventionGateway.getConventionsWithUnfinalizedAssessmentResult$.error(
         new Error("assessment-issue-error"),
       );
       expectToEqual(

@@ -53,7 +53,10 @@ const getConventionsWithAssessmentIssueEpic: ConnectedUserConventionsToManageEpi
       ),
       switchMap((action) =>
         conventionGateway
-          .getConventionsForUser$(action.payload.params, action.payload.jwt)
+          .getConventionsWithUnfinalizedAssessment$(
+            action.payload.pagination,
+            action.payload.jwt,
+          )
           .pipe(
             map((response) =>
               connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueSucceeded(
