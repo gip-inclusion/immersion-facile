@@ -60,7 +60,7 @@ import { makeNotifyAllActorsThatConventionIsRejected } from "../../domains/conve
 import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
 import { makeNotifyBeneficiaryThatAssessmentNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentNeedsSignature";
-import { NotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
+import { makeNotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
@@ -324,14 +324,6 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
         createNewEvent,
       }),
-      notifyConventionReminder: new NotifyConventionReminder(
-        uowPerformer,
-        gateways.timeGateway,
-        saveNotificationsBatchAndRelatedEvent,
-        generateConventionMagicLinkUrl,
-        gateways.shortLinkGenerator,
-        config,
-      ),
 
       markPartnersErroredConventionAsHandled:
         new MarkPartnersErroredConventionAsHandled(
@@ -1202,6 +1194,16 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
         },
       }),
+    notifyConventionReminder: makeNotifyConventionReminder({
+      uowPerformer,
+      deps: {
+        config,
+        generateConventionMagicLinkUrl,
+        saveNotificationsBatchAndRelatedEvent,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
