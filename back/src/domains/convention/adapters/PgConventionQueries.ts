@@ -1,10 +1,11 @@
-import { addDays } from "date-fns";
+import { addDays, subMonths } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
   type AgencyId,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentCompletionStatusFilter,
+  type AssessmentStatus,
   assessmentStatuses,
   type BroadcastErrorKind,
   type ConventionAssessmentFields,
@@ -15,13 +16,17 @@ import {
   type ConventionStatus,
   type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
+  type ConventionWithUnfinalizedAssessment,
   calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
   conventionStatusesDemonstratingUserActivity,
   conventionWithBroadcastFeedbackSchema,
+  conventionWithUnfinalizedAssessmentSchema,
   type DataWithPagination,
   type DateFilter,
+  type DateString,
+  type DateTimeIsoString,
   errors,
   functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsFilters,
@@ -454,6 +459,131 @@ export class PgConventionQueries implements ConventionQueries {
     return {
       data: conventionsReadDto,
       pagination: calculatePaginationResult({ ...pagination, totalRecords }),
+    };
+  }
+
+  public async getConventionsWithUnfinalizedAssessmentForAgencyUser({
+    userAgencyIds,
+    pagination,
+    now,
+  }: {
+    userAgencyIds: AgencyId[];
+    pagination: Required<PaginationQueryParams>;
+    now: Date;
+  }): Promise<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
+    if (userAgencyIds.length === 0)
+      return {
+        data: [],
+        pagination: {
+          totalRecords: 0,
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 0,
+        },
+      };
+
+    const threeMonthsAgo = subMonths(now, 3);
+    const signatureReleaseThreshold = addDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      1,
+    );
+
+    const conventionsWithUnfinalizedAssessmentRows = this.transaction
+      .selectFrom("conventions")
+      .innerJoin(
+        "actors as beneficiary",
+        "beneficiary.id",
+        "conventions.beneficiary_id",
+      )
+      .leftJoin(
+        "immersion_assessments as ia",
+        "ia.convention_id",
+        "conventions.id",
+      )
+      .where("conventions.agency_id", "in", userAgencyIds)
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+      .where((eb) =>
+        eb.or([
+          eb.and([
+            eb("ia.convention_id", "is", null),
+            eb("conventions.date_end", ">=", threeMonthsAgo),
+            eb("conventions.date_end", "<=", now),
+          ]),
+          eb.and([
+            eb("ia.convention_id", "is not", null),
+            eb("ia.signed_at", "is", null),
+            eb("ia.status", "!=", "DID_NOT_SHOW"),
+            eb("ia.created_at", ">", signatureReleaseThreshold),
+            eb("ia.created_at", ">=", threeMonthsAgo),
+          ]),
+        ]),
+      );
+
+    const paginatedUnfinalizedAssessmentQuery =
+      conventionsWithUnfinalizedAssessmentRows
+        .select((eb) => [
+          eb.ref("conventions.id").as("id"),
+          sql<DateString>`date_to_iso(conventions.date_end)`.as("dateEnd"),
+          eb.ref("beneficiary.first_name").as("firstname"),
+          eb.ref("beneficiary.last_name").as("lastname"),
+          eb
+            .ref("ia.status")
+            .$castTo<AssessmentStatus | null>()
+            .as("assessmentStatus"),
+          eb.ref("ia.ended_with_a_job").as("assessmentEndedWithAJob"),
+          sql<DateString | null>`date_to_iso(ia.signed_at)`.as(
+            "assessmentSignedAt",
+          ),
+          sql<DateTimeIsoString | null>`date_to_iso(ia.created_at)`.as(
+            "assessmentCreatedAt",
+          ),
+        ])
+        .orderBy("conventions.date_end", "asc")
+        .orderBy("conventions.id", "asc")
+        .limit(pagination.perPage)
+        .offset((pagination.page - 1) * pagination.perPage);
+
+    const countQuery = conventionsWithUnfinalizedAssessmentRows.select((eb) =>
+      sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+    );
+
+    const [rows, countResult] = await Promise.all([
+      paginatedUnfinalizedAssessmentQuery.execute(),
+      countQuery.executeTakeFirstOrThrow(),
+    ]);
+
+    const data = rows.map((row) =>
+      validateAndParseZodSchema({
+        schemaName: "conventionWithUnfinalizedAssessmentSchema",
+        inputSchema: conventionWithUnfinalizedAssessmentSchema,
+        id: row.id,
+        schemaParsingInput: {
+          id: row.id,
+          dateEnd: row.dateEnd,
+          beneficiary: {
+            firstname: row.firstname,
+            lastname: row.lastname,
+          },
+          assessment:
+            row.assessmentStatus === null || row.assessmentCreatedAt === null
+              ? null
+              : {
+                  status: row.assessmentStatus,
+                  endedWithAJob: row.assessmentEndedWithAJob ?? false,
+                  signedAt: row.assessmentSignedAt,
+                  createdAt: row.assessmentCreatedAt,
+                },
+        },
+        logger,
+      }),
+    );
+
+    return {
+      data,
+      pagination: calculatePaginationResult({
+        ...pagination,
+        totalRecords: countResult.count,
+      }),
     };
   }
 

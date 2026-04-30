@@ -3413,6 +3413,434 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
+  describe("getConventionsWithUnfinalizedAssessmentForAgencyUser", () => {
+    const now = new Date("2026-06-15T10:00:00Z");
+    const threeMonthsAgo = subMonths(now, 3);
+    const lessThanThreeMonthsAgo = addDays(threeMonthsAgo, 2);
+    const moreThanThreeMonthsAgo = subDays(threeMonthsAgo, 2);
+    const afterSignatureRelease = addDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      10,
+    );
+    const beforeSignatureRelease = subDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      1,
+    );
+
+    const validatedConventionEnded5DaysAgo = new ConventionDtoBuilder()
+      .withId("11111111-1111-4111-8111-111111111111")
+      .withAgencyId(agencyIdA)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateStart(subDays(now, 30).toISOString())
+      .withDateEnd(subDays(now, 5).toISOString())
+      .build();
+
+    const validatedConventionEndedMoreThanThreeMonthsAgo =
+      new ConventionDtoBuilder()
+        .withId("22222222-2222-4222-8222-222222222222")
+        .withAgencyId(agencyIdA)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateEnd(moreThanThreeMonthsAgo.toISOString())
+        .build();
+
+    const validatedConventionEndedInTheFuture = new ConventionDtoBuilder()
+      .withId("33333333-3333-4333-8333-333333333333")
+      .withAgencyId(agencyIdA)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateEnd(addDays(now, 5).toISOString())
+      .build();
+
+    beforeEach(async () => {
+      await agencyRepo.insert(
+        toAgencyWithRights(
+          new AgencyDtoBuilder().withId(agencyIdA).withName("agency A").build(),
+          {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          },
+        ),
+      );
+    });
+
+    it("returns to-complete conventions whose dateEnd is within the last 3 months", async () => {
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [
+          {
+            id: validatedConventionEnded5DaysAgo.id,
+            dateEnd: validatedConventionEnded5DaysAgo.dateEnd,
+            beneficiary: {
+              firstname:
+                validatedConventionEnded5DaysAgo.signatories.beneficiary
+                  .firstName,
+              lastname:
+                validatedConventionEnded5DaysAgo.signatories.beneficiary
+                  .lastName,
+            },
+            assessment: null,
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 1,
+        },
+      });
+    });
+
+    it("excludes to-complete conventions ended more than 3 months ago", async () => {
+      await conventionRepository.save(
+        validatedConventionEndedMoreThanThreeMonthsAgo,
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("excludes to-complete conventions whose dateEnd is in the future", async () => {
+      await conventionRepository.save(validatedConventionEndedInTheFuture);
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("returns to-sign conventions with assessment created within last 3 months and after signature release", async () => {
+      await conventionRepository.save(
+        validatedConventionEndedMoreThanThreeMonthsAgo,
+      );
+
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEndedMoreThanThreeMonthsAgo.id)
+        .withCreatedAt(lessThanThreeMonthsAgo.toISOString())
+        .build();
+      await assessmentRepo.save(
+        createAssessmentEntity(
+          assessment,
+          validatedConventionEndedMoreThanThreeMonthsAgo,
+        ),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [
+          {
+            id: validatedConventionEndedMoreThanThreeMonthsAgo.id,
+            dateEnd: validatedConventionEndedMoreThanThreeMonthsAgo.dateEnd,
+            beneficiary: {
+              firstname:
+                validatedConventionEndedMoreThanThreeMonthsAgo.signatories
+                  .beneficiary.firstName,
+              lastname:
+                validatedConventionEndedMoreThanThreeMonthsAgo.signatories
+                  .beneficiary.lastName,
+            },
+            assessment: {
+              status: "COMPLETED",
+              endedWithAJob: false,
+              signedAt: null,
+              createdAt: assessment.createdAt,
+            },
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 1,
+        },
+      });
+    });
+
+    it("excludes assessments created more than 3 months ago", async () => {
+      await conventionRepository.save(
+        validatedConventionEndedMoreThanThreeMonthsAgo,
+      );
+
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEndedMoreThanThreeMonthsAgo.id)
+        .withCreatedAt(moreThanThreeMonthsAgo.toISOString())
+        .build();
+      await assessmentRepo.save(
+        createAssessmentEntity(
+          assessment,
+          validatedConventionEndedMoreThanThreeMonthsAgo,
+        ),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("excludes assessments created before the signature release date", async () => {
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEnded5DaysAgo.id)
+        .withCreatedAt(beforeSignatureRelease.toISOString())
+        .build();
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, validatedConventionEnded5DaysAgo),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result.data, []);
+    });
+
+    it("excludes assessments already signed (finalized)", async () => {
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEnded5DaysAgo.id)
+        .withCreatedAt(afterSignatureRelease.toISOString())
+        .withBeneficiarySignature({
+          beneficiaryAgreement: true,
+          beneficiaryFeedback: "ok",
+          signedAt: addDays(afterSignatureRelease, 1).toISOString(),
+        })
+        .build();
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, validatedConventionEnded5DaysAgo),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result.data, []);
+    });
+
+    it("excludes DID_NOT_SHOW assessments", async () => {
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      const assessment: AssessmentDto = {
+        conventionId: validatedConventionEnded5DaysAgo.id,
+        status: "DID_NOT_SHOW",
+        endedWithAJob: false,
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        establishmentFeedback: "no-show",
+        establishmentAdvices: "n/a",
+        signedAt: null,
+        createdAt: lessThanThreeMonthsAgo.toISOString(),
+      };
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, validatedConventionEnded5DaysAgo),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result.data, []);
+    });
+
+    it("excludes conventions whose status is not ACCEPTED_BY_VALIDATOR", async () => {
+      const conventionReadyToSign = new ConventionDtoBuilder()
+        .withId("99999999-9999-4999-8999-999999999999")
+        .withAgencyId(agencyIdA)
+        .withStatus("READY_TO_SIGN")
+        .withDateEnd(subDays(now, 10).toISOString())
+        .build();
+
+      await conventionRepository.save(conventionReadyToSign);
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("paginates results sorted by dateEnd ASC", async () => {
+      const conventionEarliest = new ConventionDtoBuilder()
+        .withId("11111111-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+        .withAgencyId(agencyIdA)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(subDays(now, 60).toISOString())
+        .withDateEnd(subDays(now, 30).toISOString())
+        .build();
+      const conventionMiddle = new ConventionDtoBuilder()
+        .withId("22222222-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+        .withAgencyId(agencyIdA)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(subDays(now, 45).toISOString())
+        .withDateEnd(subDays(now, 15).toISOString())
+        .build();
+      const conventionLatest = new ConventionDtoBuilder()
+        .withId("33333333-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+        .withAgencyId(agencyIdA)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(subDays(now, 25).toISOString())
+        .withDateEnd(subDays(now, 5).toISOString())
+        .build();
+
+      await Promise.all([
+        conventionRepository.save(conventionEarliest),
+        conventionRepository.save(conventionMiddle),
+        conventionRepository.save(conventionLatest),
+      ]);
+
+      const page1 =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 2 },
+            now,
+          },
+        );
+      const page2 =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 2, perPage: 2 },
+            now,
+          },
+        );
+
+      expectToEqual(page1, {
+        data: [
+          {
+            id: conventionEarliest.id,
+            dateEnd: conventionEarliest.dateEnd,
+            beneficiary: {
+              firstname: conventionEarliest.signatories.beneficiary.firstName,
+              lastname: conventionEarliest.signatories.beneficiary.lastName,
+            },
+            assessment: null,
+          },
+          {
+            id: conventionMiddle.id,
+            dateEnd: conventionMiddle.dateEnd,
+            beneficiary: {
+              firstname: conventionMiddle.signatories.beneficiary.firstName,
+              lastname: conventionMiddle.signatories.beneficiary.lastName,
+            },
+            assessment: null,
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 2,
+          numberPerPage: 2,
+          totalRecords: 3,
+        },
+      });
+
+      expectToEqual(page2, {
+        data: [
+          {
+            id: conventionLatest.id,
+            dateEnd: conventionLatest.dateEnd,
+            beneficiary: {
+              firstname: conventionLatest.signatories.beneficiary.firstName,
+              lastname: conventionLatest.signatories.beneficiary.lastName,
+            },
+            assessment: null,
+          },
+        ],
+        pagination: {
+          currentPage: 2,
+          totalPages: 2,
+          numberPerPage: 2,
+          totalRecords: 3,
+        },
+      });
+    });
+  });
+
   describe("getUserIdsWithNoActiveConvention", () => {
     it("returns empty array when given no users", async () => {
       expectToEqual(
