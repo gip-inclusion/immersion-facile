@@ -10,11 +10,7 @@ import {
 import { useDispatch } from "react-redux";
 import { NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE } from "shared";
 import { ConventionsToManageList } from "src/app/components/agency/agency-dashboard/ConventionsToManageList";
-import {
-  ConventionsWithAssessmentToCompleteList,
-  startOf2026,
-  threeDaysAgo,
-} from "src/app/components/agency/agency-dashboard/ConventionsWithAssessmentToCompleteList";
+import { ConventionsWithAssessmentToCompleteList } from "src/app/components/agency/agency-dashboard/ConventionsWithAssessmentToCompleteList";
 import { ConventionsWithBroadcastErrorList } from "src/app/components/agency/agency-dashboard/ConventionsWithBroadcastErrorList";
 import { hasUserRightsOnAgencyBroadcast } from "src/app/components/forms/convention/manage-actions/getButtonConfigBySubStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -88,12 +84,7 @@ export const AgencyTasks = ({
       dispatch(
         connectedUserConventionsToManageSlice.actions.getConventionsWithAssessmentIssueRequested(
           {
-            params: {
-              sortBy: "dateEnd",
-              sortDirection: "asc",
-              assessmentCompletionStatus: ["to-complete", "to-sign"],
-              dateStartFrom: startOf2026,
-              dateEndTo: threeDaysAgo,
+            pagination: {
               page: 1,
               perPage: NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
             },
