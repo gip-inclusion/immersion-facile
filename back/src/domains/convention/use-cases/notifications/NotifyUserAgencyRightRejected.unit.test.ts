@@ -18,9 +18,12 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyUserAgencyRightRejected } from "./NotifyUserAgencyRightRejected";
+import {
+  makeNotifyUserAgencyRightRejected,
+  type NotifyUserAgencyRightRejected,
+} from "./NotifyUserAgencyRightRejected";
 
-describe("Notify user agency right rejected", () => {
+describe("NotifyUserAgencyRightRejected", () => {
   const agency = new AgencyDtoBuilder().withId("agency-1").build();
 
   const user: User = {
@@ -42,13 +45,15 @@ describe("Notify user agency right rejected", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    notifyUserAgencyRightRejected = new NotifyUserAgencyRightRejected(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-    );
+    notifyUserAgencyRightRejected = makeNotifyUserAgencyRightRejected({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+    });
   });
 
   it("Throw when no agency were found", async () => {
