@@ -100,10 +100,21 @@ export const UserProfile = ({
 }: UserProfileProps) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
-  const userEstablishmentsRights =
+  const acceptedUserEstablishmentsRights =
     userWithRights.establishments?.filter(
       (userEstablishment) => userEstablishment.status === "ACCEPTED",
     ) || [];
+
+  const pendingUserEstablishmentsRights =
+    userWithRights.establishments?.filter(
+      (userEstablishment) => userEstablishment.status === "PENDING",
+    ) || [];
+
+  const allDisplayedEstablishmentsRights = [
+    ...acceptedUserEstablishmentsRights,
+    ...pendingUserEstablishmentsRights,
+  ];
+
   const userAgenciesRights = userWithRights.agencyRights;
 
   const {
@@ -146,9 +157,9 @@ export const UserProfile = ({
     },
     {
       tabId: "establishments",
-      label: `Entreprises (${userEstablishmentsRights.length})`,
+      label: `Entreprises (${allDisplayedEstablishmentsRights.length})`,
       content:
-        userEstablishmentsRights.length === 0 ? (
+        allDisplayedEstablishmentsRights.length === 0 ? (
           emptyContent.establishments
         ) : (
           <>
@@ -168,10 +179,28 @@ export const UserProfile = ({
                 </Button>
               </div>
             )}
-            <EstablishmentsTablesSection
-              withEstablishmentData={userEstablishmentsRights}
-              isBackofficeAdmin={currentUser?.isBackofficeAdmin}
-            />
+            {pendingUserEstablishmentsRights.length > 0 && (
+              <>
+                <h3 className={fr.cx("fr-h5", "fr-mt-2w")}>
+                  Demandes d'accès en cours
+                </h3>
+                <EstablishmentsTablesSection
+                  withEstablishmentData={pendingUserEstablishmentsRights}
+                  isBackofficeAdmin={currentUser?.isBackofficeAdmin}
+                />
+              </>
+            )}
+            {acceptedUserEstablishmentsRights.length > 0 && (
+              <>
+                <h3 className={fr.cx("fr-h5", "fr-mt-2w")}>
+                  Mes rattachements entreprises
+                </h3>
+                <EstablishmentsTablesSection
+                  withEstablishmentData={acceptedUserEstablishmentsRights}
+                  isBackofficeAdmin={currentUser?.isBackofficeAdmin}
+                />
+              </>
+            )}
           </>
         ),
     },

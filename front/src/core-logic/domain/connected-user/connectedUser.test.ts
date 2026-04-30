@@ -570,6 +570,7 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               siret: "01234567890123",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
             },
             {
               admins: [otherUserAdminData],
@@ -577,6 +578,7 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               siret: "01234567890124",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: false,
             },
           ])
           .build();
@@ -656,6 +658,7 @@ describe("InclusionConnected", () => {
           role: otherEstablishmentToKeepUserRight.role,
           siret: "01234567890124",
           status: "ACCEPTED",
+          shouldReceiveDiscussionNotifications: true,
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -670,6 +673,7 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               siret: "01234567890123",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
             },
             otherEstablishmentToKeepData,
           ])
@@ -700,6 +704,7 @@ describe("InclusionConnected", () => {
               siret: updatedFormEstablishment.siret,
               role: "establishment-admin",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
             },
             otherEstablishmentToKeepData,
           ],
@@ -749,6 +754,7 @@ describe("InclusionConnected", () => {
           role: otherEstablishmentUserRight.role,
           siret: "01234567890124",
           status: "ACCEPTED",
+          shouldReceiveDiscussionNotifications: true,
         };
         const user = new ConnectedUserBuilder()
           .withEmail(currentUserAdminData.email)
@@ -763,6 +769,7 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               siret: "01234567890123",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: true,
             },
             otherEstablishmentData,
           ])
@@ -813,6 +820,7 @@ describe("InclusionConnected", () => {
               siret: establishment.siret,
               role: "establishment-contact",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: false,
             },
             otherEstablishmentData,
           ],
@@ -828,6 +836,7 @@ describe("InclusionConnected", () => {
               siret: establishment.siret,
               role: "establishment-contact",
               status: "ACCEPTED",
+              shouldReceiveDiscussionNotifications: false,
             },
             otherEstablishmentData,
           ],

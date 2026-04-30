@@ -1,11 +1,16 @@
-import type { UserEstablishmentRightDetailsWithAcceptedStatus } from "shared";
+import type {
+  UserEstablishmentRightDetailsWithAcceptedStatus,
+  UserEstablishmentRightDetailsWithPendingStatus,
+} from "shared";
 import { EstablishmentsRightsTable } from "./EstablishmentsRightsTable";
 
 export const EstablishmentsTablesSection = ({
   withEstablishmentData,
   isBackofficeAdmin,
 }: {
-  withEstablishmentData?: UserEstablishmentRightDetailsWithAcceptedStatus[];
+  withEstablishmentData?:
+    | UserEstablishmentRightDetailsWithAcceptedStatus[]
+    | UserEstablishmentRightDetailsWithPendingStatus[];
   isBackofficeAdmin?: boolean;
 }) => (
   <>
