@@ -66,7 +66,7 @@ import { makeNotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/c
 import { makeNotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { makeNotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
-import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
+import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
@@ -398,11 +398,6 @@ export const createUseCases = ({
       // agencies
 
       // notifications
-      notifyToAgencyConventionSubmitted: new NotifyToAgencyConventionSubmitted(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        config,
-      ),
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
@@ -1214,6 +1209,13 @@ export const createUseCases = ({
           },
         },
       ),
+    notifyToAgencyConventionSubmitted: makeNotifyToAgencyConventionSubmitted({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+        config,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
