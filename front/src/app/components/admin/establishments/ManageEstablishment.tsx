@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -74,25 +74,29 @@ export const ManageEstablishment = (): JSX.Element => {
               {...makeFieldError(formState)("siret")}
             />
           </div>
-          <div className={fr.cx("fr-mt-2w", "fr-btns-group--inline")}>
-            <Button
-              id={domElementIds.admin.manageEstablishment.searchButton}
-              disabled={!formState.isValid}
-            >
-              Piloter l'entreprise
-            </Button>
-            <Button
-              id={domElementIds.admin.manageEstablishment.banButton}
-              disabled={!formState.isValid}
-              iconId="fr-icon-error-warning-line"
-              iconPosition="left"
-              type="button"
-              priority="secondary"
-              onClick={() => banEstablishmentModal.open()}
-            >
-              Bannir l'entreprise
-            </Button>
-          </div>
+          <ButtonsGroup
+            buttonsIconPosition="left"
+            alignment="left"
+            inlineLayoutWhen="always"
+            buttons={[
+              {
+                id: domElementIds.admin.manageEstablishment.searchButton,
+                disabled: !formState.isValid,
+                children: "Piloter l'entreprise",
+              },
+              {
+                id: domElementIds.admin.manageEstablishment.banButton,
+                disabled: !formState.isValid,
+                iconId: "fr-icon-error-warning-line",
+                iconPosition: "left",
+                type: "button",
+                priority: "secondary",
+                onClick: () => banEstablishmentModal.open(),
+                children: "Bannir l'entreprise",
+              },
+            ]}
+            className={fr.cx("fr-mt-2w")}
+          />
         </form>
       </div>
 

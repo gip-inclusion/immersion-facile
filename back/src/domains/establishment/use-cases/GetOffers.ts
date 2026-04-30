@@ -80,7 +80,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
-    const filteredData = result.data.filter(
+    const filteredResults = result.data.filter(
       (offer) => !bannedSirets.has(offer.siret),
     );
 
@@ -105,16 +105,16 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
     await uow.searchMadeRepository.insertSearchMade({
       ...searchMade,
       id: deps.uuidGenerator.new(),
-      needsToBeSearched: true,
-      numberOfResults: filteredData.length,
+      needsToBeSearched: true, // this is useless (legacy TODO : remove this column)
+      numberOfResults: filteredResults.length,
       apiConsumerName: apiConsumer?.name,
     });
 
     return {
-      data: filteredData,
+      data: filteredResults,
       pagination: {
         ...result.pagination,
-        totalRecords: filteredData.length,
+        totalRecords: filteredResults.length,
       },
     };
   });

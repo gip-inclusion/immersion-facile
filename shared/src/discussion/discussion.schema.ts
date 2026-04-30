@@ -337,33 +337,32 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
-  z
-    .object({
-      id: discussionIdSchema,
-      siret: siretSchema,
-      status: discussionStatusSchema,
-      appellation: appellationAndRomeDtoSchema,
-      businessName: zStringMinLength1Max1024,
-      createdAt: makeDateStringSchema(),
-      kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
-      city: zStringMinLength1Max1024,
-      exchangesData: z.object({
-        count: z.number(),
-        lastExchange: z
-          .object({
-            sender: exchangeRoleSchema,
-            sentAt: makeDateStringSchema(),
-          })
-          .nullable(),
-      }),
-      potentialBeneficiary: z.object({
-        firstName: firstnameMandatorySchema,
-        lastName: lastnameMandatorySchema,
-        phone: phoneNumberSchema.nullable(),
-      }),
-      immersionObjective: immersionObjectiveSchema.nullable(),
-      isEstablishmentBanned: z.boolean(),
-    });
+  z.object({
+    id: discussionIdSchema,
+    siret: siretSchema,
+    status: discussionStatusSchema,
+    appellation: appellationAndRomeDtoSchema,
+    businessName: zStringMinLength1Max1024,
+    createdAt: makeDateStringSchema(),
+    kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
+    city: zStringMinLength1Max1024,
+    exchangesData: z.object({
+      count: z.number(),
+      lastExchange: z
+        .object({
+          sender: exchangeRoleSchema,
+          sentAt: makeDateStringSchema(),
+        })
+        .nullable(),
+    }),
+    potentialBeneficiary: z.object({
+      firstName: firstnameMandatorySchema,
+      lastName: lastnameMandatorySchema,
+      phone: phoneNumberSchema.nullable(),
+    }),
+    immersionObjective: immersionObjectiveSchema.nullable(),
+    isEstablishmentBanned: z.boolean(),
+  });
 
 export const paginatedDiscussionListSchema = createPaginatedSchema(
   discussionInListSchema,

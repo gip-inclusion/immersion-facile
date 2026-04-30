@@ -349,7 +349,10 @@ type TestAcceptNewStatusParams = {
 } & ({ role: ConventionRole } | { userId: ConnectedTestUser });
 
 type UpdatedFields = Partial<
-  ConventionDto & {
+  Omit<
+    ConventionDto,
+    "isEstablishmentBanned" | "establishmentBannishmentJustification"
+  > & {
     establishmentRepresentativeSignedAt: string | undefined;
     beneficiarySignedAt: string | undefined;
   }
@@ -428,7 +431,7 @@ const makeTestAcceptsStatusUpdate =
     const expectedConvention = new ConventionDtoBuilder({
       ...originalConvention,
       ...restOfUpdatedFields,
-    } as ConventionDto) // Pas top mais sinon on typescript n'aime pas à cause de l'union discriminé de isEstablishmentBanned
+    })
       .withStatusJustification(
         restOfUpdatedFields.statusJustification
           ? restOfUpdatedFields.statusJustification

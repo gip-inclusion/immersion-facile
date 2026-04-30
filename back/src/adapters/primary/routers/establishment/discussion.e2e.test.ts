@@ -578,6 +578,7 @@ describe("discussion e2e", () => {
           body: {
             reason: "discussion_completed",
             sender: "potentialBeneficiary",
+            establishmentName: discussion.businessName,
           },
         },
       );
