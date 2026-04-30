@@ -39,11 +39,12 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  NotifyConventionReminder,
+  makeNotifyConventionReminder,
+  type NotifyConventionReminder,
   toSignatoriesSummary,
 } from "./NotifyConventionReminder";
 
-describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
+describe("NotifyConventionReminder use case", () => {
   const establishmentRepresentativeWithoutMobilePhone: EstablishmentRepresentative =
     {
       email: "boss@mail.com",
@@ -62,11 +63,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   beforeEach(() => {
     config = new AppConfigBuilder().build();
     timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
-    const saveNotificationsBatchAndRelatedEvent =
-      makeSaveNotificationsBatchAndRelatedEvent(uuidGenerator, timeGateway);
 
     expectSavedNotificationsBatchAndEvent =
       makeExpectSavedNotificationsBatchAndEvent(
@@ -74,14 +72,20 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.outboxRepository,
       );
 
-    useCase = new NotifyConventionReminder(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-      saveNotificationsBatchAndRelatedEvent,
-      fakeGenerateMagicLinkUrlFn,
-      shortLinkIdGeneratorGateway,
-      config,
-    );
+    useCase = makeNotifyConventionReminder({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        config,
+        timeGateway,
+        shortLinkIdGeneratorGateway,
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        saveNotificationsBatchAndRelatedEvent:
+          makeSaveNotificationsBatchAndRelatedEvent(
+            new UuidV4Generator(),
+            timeGateway,
+          ),
+      },
+    });
   });
 
   describe("Wrong paths", () => {
