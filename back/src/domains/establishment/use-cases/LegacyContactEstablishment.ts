@@ -57,6 +57,13 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       );
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
+    if (
+      await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        siret,
+      )
+    )
+      throw errors.establishment.bannedEstablishment({ siret });
+
     if (contactMode !== establishmentAggregate.establishment.contactMode)
       throw errors.establishment.contactRequestContactModeMismatch({
         siret,
@@ -224,6 +231,17 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       acquisitionKeyword: contactRequest.acquisitionKeyword,
       status: "PENDING",
       locationId: contactRequest.locationId,
+      ...(establishment.establishment.isEstablishmentBanned
+        ? {
+            isEstablishmentBanned:
+              establishment.establishment.isEstablishmentBanned,
+            establishmentBannishmentJustification:
+              establishment.establishment.establishmentBannishmentJustification,
+          }
+        : {
+            isEstablishmentBanned:
+              establishment.establishment.isEstablishmentBanned,
+          }),
     };
   }
 

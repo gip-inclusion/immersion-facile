@@ -26,6 +26,7 @@ import {
   type RejectionKind,
   type SiretDto,
   type UserId,
+  type WithBannedEstablishmentInformations,
   type WithDiscussionStatus,
 } from "shared";
 import { match, P } from "ts-pattern";
@@ -616,6 +617,22 @@ const discussionToPgAndPhoneInsert = async (
   };
 };
 
+const getBannedEstablishmentInfoFromPgDiscussion = (
+  discussion: GetDiscussionsResults[number]["discussion"],
+): WithBannedEstablishmentInformations => {
+  if (!discussion.isEstablishmentBanned)
+    return { isEstablishmentBanned: false };
+  if (!discussion.establishmentBannishmentJustification)
+    throw new Error(
+      `Missing establishmentBannishmentJustification for banned discussion ${discussion.id}`,
+    );
+  return {
+    isEstablishmentBanned: true,
+    establishmentBannishmentJustification:
+      discussion.establishmentBannishmentJustification,
+  };
+};
+
 const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
 ): WithDiscussionStatus => {
@@ -707,6 +724,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       id: discussion.id,
       locationId: discussion.locationId,
       ...getWithDiscussionStatusFromPgDiscussion(discussion),
+      ...getBannedEstablishmentInfoFromPgDiscussion(discussion),
     };
 
     const commonPotentialBeneficiary: PotentialBeneficiaryCommonProps = {
@@ -886,7 +904,15 @@ const executeGetDiscussions = (
       "d.potential_beneficiary_phone_id",
       "pn.id",
     )
-    .groupBy(["d.id", "d.created_at", "d.siret", "pn.phone_number"])
+    .leftJoin("banned_establishments as be", "be.siret", "d.siret")
+    .groupBy([
+      "d.id",
+      "d.created_at",
+      "d.siret",
+      "pn.phone_number",
+      "be.siret",
+      "be.bannishment_justification",
+    ])
     .orderBy("d.created_at", "desc")
     .orderBy("d.siret", "asc")
     .orderBy("d.updated_at", "desc")
@@ -949,6 +975,10 @@ const executeGetDiscussions = (
           candidateWarnedMethod: ref("d.candidate_warned_method"),
           kind: ref("d.kind"),
           locationId: sql<LocationId>`${ref("d.location_id")}`,
+          isEstablishmentBanned: sql<boolean>`${ref("be.siret")} IS NOT NULL`,
+          establishmentBannishmentJustification: ref(
+            "be.bannishment_justification",
+          ),
         }),
       ).as("discussion"),
     )
@@ -1031,7 +1061,12 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
         "discussions.appellation_code",
         "pad.ogr_appellation",
       )
-      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome"),
+      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
+      .leftJoin(
+        "banned_establishments",
+        "banned_establishments.siret",
+        "discussions.siret",
+      ),
     (b) => {
       if (!filters?.statuses || filters.statuses.length === 0) return b;
       return b.where("discussions.status", "in", filters.statuses);
@@ -1085,6 +1120,9 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
         ref("discussions.kind").as("kind"),
         ref("discussions.status").as("status"),
         ref("discussions.immersion_objective").as("immersionObjective"),
+        sql<boolean>`${ref("banned_establishments.siret")} IS NOT NULL`.as(
+          "isEstablishmentBanned",
+        ),
         jsonBuildObject({
           firstName: ref("potential_beneficiary_first_name"),
           lastName: ref("potential_beneficiary_last_name"),
@@ -1152,7 +1190,12 @@ const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({
         "discussions.appellation_code",
         "pad.ogr_appellation",
       )
-      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome"),
+      .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
+      .leftJoin(
+        "banned_establishments",
+        "banned_establishments.siret",
+        "discussions.siret",
+      ),
     (b) => {
       if (!filters?.statuses || filters.statuses.length === 0) return b;
       return b.where("discussions.status", "in", filters.statuses);
@@ -1206,6 +1249,9 @@ const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({
         ref("discussions.kind").as("kind"),
         ref("discussions.status").as("status"),
         ref("discussions.immersion_objective").as("immersionObjective"),
+        sql<boolean>`${ref("banned_establishments.siret")} IS NOT NULL`.as(
+          "isEstablishmentBanned",
+        ),
         jsonBuildObject({
           firstName: ref("potential_beneficiary_first_name"),
           lastName: ref("potential_beneficiary_last_name"),
