@@ -55,7 +55,7 @@ import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-
 import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { makeNotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
-import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
+import { makeNotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
@@ -443,11 +443,6 @@ export const createUseCases = ({
       ),
       notifyAllActorsThatConventionIsRejected:
         new NotifyAllActorsThatConventionIsRejected(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-        ),
-      notifyAllActorsThatConventionIsDeprecated:
-        new NotifyAllActorsThatConventionIsDeprecated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
@@ -1193,6 +1188,13 @@ export const createUseCases = ({
 
     notifyAllActorsThatConventionIsCancelled:
       makeNotifyAllActorsThatConventionIsCancelled({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+        },
+      }),
+    notifyAllActorsThatConventionIsDeprecated:
+      makeNotifyAllActorsThatConventionIsDeprecated({
         uowPerformer,
         deps: {
           saveNotificationAndRelatedEvent,

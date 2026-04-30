@@ -1,28 +1,23 @@
-import { errors, type WithConventionDto, withConventionSchema } from "shared";
+import { errors, withConventionSchema } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getAllConventionRecipientsEmail } from "../../entities/Convention";
 
-export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type NotifyAllActorsThatConventionIsDeprecated = ReturnType<
+  typeof makeNotifyAllActorsThatConventionIsDeprecated
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+};
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-  }
-
-  public async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyAllActorsThatConventionIsDeprecated = useCaseBuilder(
+  "NotifyAllActorsThatConventionIsDeprecated",
+)
+  .withInput(withConventionSchema)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { convention }, uow, deps }) => {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
@@ -34,7 +29,7 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
       await agencyWithRightToAgencyDto(uow, agency),
     );
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "DEPRECATED_CONVENTION_NOTIFICATION",
@@ -57,5 +52,4 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
         establishmentSiret: convention.siret,
       },
     });
-  }
-}
+  });

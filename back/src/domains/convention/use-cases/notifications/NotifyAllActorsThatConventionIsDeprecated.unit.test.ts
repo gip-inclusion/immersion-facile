@@ -16,7 +16,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyAllActorsThatConventionIsDeprecated } from "./NotifyAllActorsThatConventionIsDeprecated";
+import {
+  makeNotifyAllActorsThatConventionIsDeprecated,
+  type NotifyAllActorsThatConventionIsDeprecated,
+} from "./NotifyAllActorsThatConventionIsDeprecated";
 
 describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
   const beneficiaryRepresentative: BeneficiaryRepresentative = {
@@ -85,13 +88,15 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    useCase = new NotifyAllActorsThatConventionIsDeprecated(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-    );
+    useCase = makeNotifyAllActorsThatConventionIsDeprecated({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+    });
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
         [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
