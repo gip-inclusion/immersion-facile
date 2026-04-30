@@ -63,7 +63,7 @@ import { makeNotifyBeneficiaryThatAssessmentNeedsSignature } from "../../domains
 import { makeNotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
 import { makeNotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
-import { NotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
+import { makeNotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
@@ -416,11 +416,6 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
         ),
-      notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        config,
-      ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyConventionSubmitted(
         uowPerformer,
         saveNotificationAndRelatedEvent,
@@ -1206,6 +1201,13 @@ export const createUseCases = ({
           timeGateway: gateways.timeGateway,
         },
       }),
+    notifyNewConventionNeedsReview: makeNotifyNewConventionNeedsReview({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+        config,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
