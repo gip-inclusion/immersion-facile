@@ -499,6 +499,7 @@ describe("discussion e2e", () => {
           urlParams: { discussionId: discussion.id },
           body: {
             message: expectedExchange.message,
+            recipientRole: "potentialBeneficiary",
           },
         }),
         {
@@ -534,6 +535,7 @@ describe("discussion e2e", () => {
           urlParams: { discussionId: discussion.id },
           body: {
             message: "My fake message",
+            recipientRole: "potentialBeneficiary",
           },
         }),
         {
@@ -546,6 +548,38 @@ describe("discussion e2e", () => {
       );
 
       expectToEqual(inMemoryUow.discussionRepository.discussions, [discussion]);
+    });
+
+    it("202 - returns sender based on recipientRole", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.replyToDiscussion({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: user.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+          body: {
+            message: "My fake message",
+            recipientRole: "establishment",
+          },
+        }),
+        {
+          status: 202,
+          body: {
+            reason: "discussion_completed",
+            sender: "potentialBeneficiary",
+          },
+        },
+      );
     });
 
     it("200 - saves the exchange from a potential beneficiary connected user based on email", async () => {
@@ -581,6 +615,7 @@ describe("discussion e2e", () => {
           urlParams: { discussionId: discussion.id },
           body: {
             message: expectedExchange.message,
+            recipientRole: "establishment",
           },
         }),
         {

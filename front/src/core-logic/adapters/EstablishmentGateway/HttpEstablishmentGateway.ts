@@ -256,6 +256,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
           urlParams: { discussionId: payload.discussionId },
           body: {
             message: payload.message,
+            recipientRole: payload.recipientRole,
           },
         })
         .then((response) =>

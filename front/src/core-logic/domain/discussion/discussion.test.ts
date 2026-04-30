@@ -227,6 +227,7 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         message: "My message",
+        recipientRole: "potentialBeneficiary",
       };
 
       const expectedExchange: Exchange = {
@@ -277,6 +278,7 @@ describe("Discussion slice", () => {
         jwt,
         discussionId: discussion.id,
         message: "My message",
+        recipientRole: "potentialBeneficiary",
       };
 
       store.dispatch(

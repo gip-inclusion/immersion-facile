@@ -223,9 +223,10 @@ export const discussionRejectedSchema: ZodSchemaWithInputMatchingOutput<WithDisc
     .and(discussionRejectionSchema);
 
 export const withExchangeMessageSchema: ZodSchemaWithInputMatchingOutput<
-  Pick<ExchangeFromDashboard, "message">
+  Pick<ExchangeFromDashboard, "message" | "recipientRole">
 > = z.object({
   message: messageSchema,
+  recipientRole: exchangeRoleSchema,
 });
 
 export const exchangeMessageFromDashboardSchema: ZodSchemaWithInputMatchingOutput<ExchangeFromDashboard> =

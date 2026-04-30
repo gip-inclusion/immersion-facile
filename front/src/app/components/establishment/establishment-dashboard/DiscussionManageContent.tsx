@@ -604,6 +604,8 @@ const DiscussionExchangeMessageForm = ({
       resolver: zodResolver(exchangeMessageFromDashboardSchema),
       defaultValues: {
         message: "",
+        recipientRole:
+          viewer === "establishment" ? "potentialBeneficiary" : "establishment",
       },
     });
   const getFieldError = makeFieldError(formState);
@@ -619,6 +621,7 @@ const DiscussionExchangeMessageForm = ({
             jwt: connectedUserJwt,
             discussionId,
             message: data.message,
+            recipientRole: data.recipientRole,
           },
           feedbackTopic: "beneficiary-dashboard-discussion-send-message",
         }),
