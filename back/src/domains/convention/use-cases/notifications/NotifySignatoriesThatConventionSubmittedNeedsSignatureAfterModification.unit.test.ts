@@ -26,8 +26,9 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
+  makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification,
   NO_JUSTIFICATION,
-  NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification,
+  type NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification,
 } from "./NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification", () => {
@@ -46,13 +47,18 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     const uuidGenerator = new UuidV4Generator();
     timeGateway = new CustomTimeGateway(new Date());
     useCase =
-      new NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification(
-        new InMemoryUowPerformer(uow),
-        timeGateway,
-        shortLinkGenerator,
-        config,
-        makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
-        fakeGenerateMagicLinkUrlFn,
+      makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification(
+        {
+          uowPerformer: new InMemoryUowPerformer(uow),
+          deps: {
+            timeGateway,
+            config,
+            shortLinkIdGeneratorGateway: shortLinkGenerator,
+            generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+            saveNotificationAndRelatedEvent:
+              makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
+          },
+        },
       );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
