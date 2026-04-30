@@ -14,56 +14,37 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   makeUrlWithQueryParams,
   type TemplatedEmail,
-  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import type { CreateConventionMagicLinkPayloadProperties } from "../../../../utils/jwt";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type NotifyAllActorsOfFinalConventionValidation = ReturnType<
+  typeof makeNotifyAllActorsOfFinalConventionValidation
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  timeGateway: TimeGateway;
+  shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  config: AppConfig;
+};
 
-  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-
-  readonly #timeGateway: TimeGateway;
-
-  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-
-  readonly #config: AppConfig;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    timeGateway: TimeGateway,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    config: AppConfig,
-  ) {
-    super(uowPerformer);
-
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
-    this.#timeGateway = timeGateway;
-    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
-    this.#config = config;
-  }
-
-  public async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyAllActorsOfFinalConventionValidation = useCaseBuilder(
+  "NotifyAllActorsOfFinalConventionValidation",
+)
+  .withInput(withConventionSchema)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { convention }, uow, deps }) => {
     const [agencyWithRights] = await uow.agencyRepository.getByIds([
       convention.agencyId,
     ]);
@@ -109,111 +90,22 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ),
         ],
       );
-    for (const emailAndRole of recipientsRoleAndEmail) {
-      const { role, email: recipient } = emailAndRole;
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: await this.#prepareEmail(
-          convention,
-          role,
-          recipient,
-          uow,
-          agency,
-        ),
-        followedIds: {
-          conventionId: convention.id,
-          agencyId: convention.agencyId,
-          establishmentSiret: convention.siret,
-        },
-      });
+
+    for (const { email, role } of recipientsRoleAndEmail) {
+      await prepareEmail({ email, role, convention, deps, uow, agency }).then(
+        (templatedContent) =>
+          deps.saveNotificationAndRelatedEvent(uow, {
+            kind: "email",
+            templatedContent,
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+            },
+          }),
+      );
     }
-  }
-
-  async #prepareEmail(
-    convention: ConventionDto,
-    role: ConventionRole,
-    recipient: string,
-    uow: UnitOfWork,
-    agency: AgencyDto,
-  ): Promise<TemplatedEmail> {
-    const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
-      {
-        id: convention.id,
-        role,
-        email: recipient,
-        now: this.#timeGateway.now(),
-        expOverride:
-          this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
-      };
-    const shouldHaveAssessmentMagicLink =
-      (isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
-        role === "establishment-representative") ||
-      (!isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
-        role === "establishment-tutor");
-
-    const { beneficiary, beneficiaryRepresentative } = convention.signatories;
-
-    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-      config: this.#config,
-      conventionMagicLinkPayload,
-      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      uow,
-    });
-
-    const magicLink = agencyModifierRoles.includes(role as AgencyModifierRole)
-      ? `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-          `/${frontRoutes.manageConventionUserConnected}`,
-          { conventionId: convention.id },
-        )}`
-      : await makeShortMagicLink({
-          targetRoute: frontRoutes.conventionDocument,
-          lifetime: "1Month",
-        });
-
-    return {
-      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients: [recipient],
-      params: {
-        conventionId: convention.id,
-        internshipKind: convention.internshipKind,
-        beneficiaryFirstName: getFormattedFirstnameAndLastname({
-          firstname: beneficiary.firstName,
-        }),
-        beneficiaryLastName: getFormattedFirstnameAndLastname({
-          lastname: beneficiary.lastName,
-        }),
-        beneficiaryBirthdate: beneficiary.birthdate,
-        dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-        dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-        establishmentTutorName: getFormattedFirstnameAndLastname({
-          firstname: convention.establishmentTutor.firstName,
-          lastname: convention.establishmentTutor.lastName,
-        }),
-        businessName: convention.businessName,
-        immersionAppellationLabel:
-          convention.immersionAppellation.appellationLabel,
-        emergencyContactInfos: displayEmergencyContactInfos({
-          beneficiaryRepresentative,
-          beneficiary,
-        }),
-        agencyLogoUrl: agency.logoUrl ?? undefined,
-        magicLink,
-        assessmentMagicLink: shouldHaveAssessmentMagicLink
-          ? await makeShortMagicLink({
-              targetRoute: frontRoutes.assessment,
-              lifetime: "2Days",
-            })
-          : undefined,
-        validatorName: convention.validators?.agencyValidator
-          ? getFormattedFirstnameAndLastname(
-              convention.validators.agencyValidator,
-            )
-          : "",
-      },
-    };
-  }
-}
+  });
 
 const getFtAdvisorEmailAndRoleIfExist = (
   conventionFtUserAdvisor: ConventionFtUserAdvisorEntity | undefined,
@@ -221,3 +113,90 @@ const getFtAdvisorEmailAndRoleIfExist = (
   conventionFtUserAdvisor?.advisor?.email
     ? [{ role: "validator", email: conventionFtUserAdvisor.advisor.email }]
     : [];
+
+const prepareEmail = async ({
+  convention,
+  deps,
+  uow,
+  agency,
+  email,
+  role,
+}: {
+  role: ConventionRole;
+  email: Email;
+  convention: ConventionDto;
+  deps: Deps;
+  uow: UnitOfWork;
+  agency: AgencyDto;
+}): Promise<TemplatedEmail> => {
+  const shouldHaveAssessmentMagicLink =
+    (isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
+      role === "establishment-representative") ||
+    (!isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
+      role === "establishment-tutor");
+
+  const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
+    config: deps.config,
+    conventionMagicLinkPayload: {
+      id: convention.id,
+      role,
+      email,
+      now: deps.timeGateway.now(),
+      expOverride: deps.timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+    },
+    generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+    shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+    uow,
+  });
+
+  return {
+    kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+    recipients: [email],
+    params: {
+      conventionId: convention.id,
+      internshipKind: convention.internshipKind,
+      beneficiaryFirstName: getFormattedFirstnameAndLastname({
+        firstname: convention.signatories.beneficiary.firstName,
+      }),
+      beneficiaryLastName: getFormattedFirstnameAndLastname({
+        lastname: convention.signatories.beneficiary.lastName,
+      }),
+      beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+      dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+      dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+      establishmentTutorName: getFormattedFirstnameAndLastname({
+        firstname: convention.establishmentTutor.firstName,
+        lastname: convention.establishmentTutor.lastName,
+      }),
+      businessName: convention.businessName,
+      immersionAppellationLabel:
+        convention.immersionAppellation.appellationLabel,
+      emergencyContactInfos: displayEmergencyContactInfos({
+        beneficiaryRepresentative:
+          convention.signatories.beneficiaryRepresentative,
+        beneficiary: convention.signatories.beneficiary,
+      }),
+      agencyLogoUrl: agency.logoUrl ?? undefined,
+      magicLink: agencyModifierRoles.includes(role as AgencyModifierRole)
+        ? `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            `/${frontRoutes.manageConventionUserConnected}`,
+            { conventionId: convention.id },
+          )}`
+        : await makeShortMagicLink({
+            targetRoute: frontRoutes.conventionDocument,
+            lifetime: "1Month",
+          }),
+      assessmentMagicLink: shouldHaveAssessmentMagicLink
+        ? await makeShortMagicLink({
+            targetRoute: frontRoutes.assessment,
+            lifetime: "2Days",
+          })
+        : undefined,
+      validatorName: convention.validators?.agencyValidator
+        ? getFormattedFirstnameAndLastname(
+            convention.validators.agencyValidator,
+          )
+        : "",
+    },
+  };
+};
