@@ -35,4 +35,16 @@ export const toEstablishmentPublicOption = (
   businessName: establishmentAggregate.establishment.name,
   businessNameCustomized: establishmentAggregate.establishment.customizedName,
   siret: establishmentAggregate.establishment.siret,
+  ...(establishmentAggregate.establishment.isEstablishmentBanned
+    ? {
+        isEstablishmentBanned:
+          establishmentAggregate.establishment.isEstablishmentBanned,
+        establishmentBannishmentJustification:
+          establishmentAggregate.establishment
+            .establishmentBannishmentJustification,
+      }
+    : {
+        isEstablishmentBanned:
+          establishmentAggregate.establishment.isEstablishmentBanned,
+      }),
 });
