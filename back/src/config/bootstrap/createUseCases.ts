@@ -54,7 +54,7 @@ import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/
 import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
-import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
+import { makeNotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
 import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
@@ -446,12 +446,6 @@ export const createUseCases = ({
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
-      notifyAllActorsThatConventionIsCancelled:
-        new NotifyAllActorsThatConventionIsCancelled(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-        ),
-
       notifyAllActorsThatConventionIsDeprecated:
         new NotifyAllActorsThatConventionIsDeprecated(
           uowPerformer,
@@ -1194,6 +1188,14 @@ export const createUseCases = ({
           timeGateway: gateways.timeGateway,
           config,
           shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        },
+      }),
+
+    notifyAllActorsThatConventionIsCancelled:
+      makeNotifyAllActorsThatConventionIsCancelled({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
         },
       }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
