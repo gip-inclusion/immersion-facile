@@ -614,6 +614,138 @@ describe("authenticatedConventionRoutes", () => {
   });
 
   describe(`${displayRouteName(
+    authenticatedConventionRoutes.getConventionsWithUnfinalizedAssessment,
+  )}`, () => {
+    const now = new Date("2026-06-15T10:00:00.000Z");
+    const peAgency = new AgencyDtoBuilder()
+      .withId("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
+      .withKind("pole-emploi")
+      .build();
+
+    const convention1 = new ConventionDtoBuilder()
+      .withId("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+      .withAgencyId(peAgency.id)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateStart(new Date("2026-04-01").toISOString())
+      .withDateEnd(new Date("2026-06-10").toISOString())
+      .withBeneficiaryFirstName("Alice")
+      .withBeneficiaryLastName("Dupont")
+      .build();
+
+    const convention2 = new ConventionDtoBuilder()
+      .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
+      .withAgencyId(peAgency.id)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateStart(new Date("2026-02-01").toISOString())
+      .withDateEnd(new Date("2026-02-10").toISOString())
+      .withBeneficiaryFirstName("Bob")
+      .withBeneficiaryLastName("Martin")
+      .build();
+
+    const toSignAssessmentCreatedAt = addDays(
+      ASSESSEMENT_SIGNATURE_RELEASE_DATE,
+      30,
+    ).toISOString();
+
+    beforeEach(() => {
+      gateways.timeGateway.defaultDate = now;
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ];
+      inMemoryUow.conventionRepository.setConventions([
+        convention1,
+        convention2,
+      ]);
+      inMemoryUow.assessmentRepository.assessments = [
+        {
+          _entityName: "Assessment",
+          conventionId: convention2.id,
+          status: "COMPLETED",
+          endedWithAJob: false,
+          establishmentFeedback: "Tout va bien",
+          establishmentAdvices: "rien à dire",
+          numberOfHoursActuallyMade: 35,
+          beneficiaryAgreement: null,
+          beneficiaryFeedback: null,
+          signedAt: null,
+          createdAt: toSignAssessmentCreatedAt,
+        },
+      ];
+    });
+
+    it("401 - Unauthorized when not correctly authenticated", async () => {
+      const response = await httpClient.getConventionsWithUnfinalizedAssessment(
+        {
+          headers: { authorization: "invalid-token" },
+          queryParams: { page: 1, perPage: 10 },
+        },
+      );
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "Provided token is invalid",
+        },
+      });
+    });
+
+    it("200 - returns paginated conventions to-complete and to-sign", async () => {
+      const jwt = generateConnectedUserJwt({
+        userId: validator.id,
+        version: currentJwtVersions.connectedUser,
+        iat: Math.round(now.getTime() / 1000),
+      });
+
+      const response = await httpClient.getConventionsWithUnfinalizedAssessment(
+        {
+          headers: { authorization: jwt },
+          queryParams: { page: 1, perPage: 10 },
+        },
+      );
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          data: [
+            {
+              id: convention2.id,
+              dateEnd: convention2.dateEnd,
+              beneficiary: {
+                firstname: convention2.signatories.beneficiary.firstName,
+                lastname: convention2.signatories.beneficiary.lastName,
+              },
+              assessment: {
+                status: "COMPLETED",
+                endedWithAJob: false,
+                signedAt: null,
+                createdAt: toSignAssessmentCreatedAt,
+              },
+            },
+            {
+              id: convention1.id,
+              dateEnd: convention1.dateEnd,
+              beneficiary: {
+                firstname: convention1.signatories.beneficiary.firstName,
+                lastname: convention1.signatories.beneficiary.lastName,
+              },
+              assessment: null,
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 2,
+          },
+        },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
     authenticatedConventionRoutes.editConventionWithFinalStatus,
   )}`, () => {
     const conventionId = "add5c20e-6dd2-45af-affe-927358005251";

@@ -84,6 +84,17 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getConventionsWithUnfinalizedAssessment(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConventionsWithUnfinalizedAssessment.execute(
+          req.query,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   authenticatedConventionSharedRouter.markPartnersErroredConventionAsHandled(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
