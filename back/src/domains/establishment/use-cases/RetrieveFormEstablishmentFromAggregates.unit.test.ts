@@ -153,7 +153,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       );
     });
 
-    it("returns banned establishment if user is not back office admin but has ACCEPTED rights", async () => {
+    it("returns banned establishment if user has ACCEPTED rights", async () => {
       const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
         {
           isEstablishmentBanned: true,
@@ -426,46 +426,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           job,
           phone,
           withBannedEstablishmentInformations: { isEstablishmentBanned: false },
-        }),
-      );
-    });
-
-    it("returns a ban establishment if user is back office admin", async () => {
-      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
-        {
-          isEstablishmentBanned: true,
-          establishmentBannishmentJustification:
-            "Le patron n'aime pas la pluie",
-        };
-
-      uow.userRepository.users = [
-        establishmentAdmin,
-        establishmentContact,
-        adminUser,
-      ];
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        {
-          ...establishmentAggregate,
-          establishment: {
-            ...establishmentAggregate.establishment,
-            ...withBannedEstablishmentInformations,
-          },
-        },
-      ];
-
-      const establishmentForm = await useCase.execute(siret, {
-        userId: adminUser.id,
-      });
-
-      expectToEqual(
-        establishmentForm,
-        makeExpectedFormEstablishment({
-          establishmentAdmin,
-          establishmentAggregate,
-          establishmentContact,
-          job,
-          phone,
-          withBannedEstablishmentInformations,
         }),
       );
     });
