@@ -6,7 +6,6 @@ import {
   getFormattedFirstnameAndLastname,
   makeUrlWithQueryParams,
   type TemplatedEmail,
-  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -14,34 +13,25 @@ import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import type { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
 const logger = createLogger(__filename);
 
-export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type NotifyNewConventionNeedsReview = ReturnType<
+  typeof makeNotifyNewConventionNeedsReview
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  config: AppConfig;
+};
 
-  readonly #config: AppConfig;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    config: AppConfig,
-  ) {
-    super(uowPerformer);
-
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#config = config;
-  }
-
-  protected async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeNotifyNewConventionNeedsReview = useCaseBuilder(
+  "NotifyNewConventionNeedsReview",
+)
+  .withInput(withConventionSchema)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { convention }, uow, deps }) => {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
 
     if (!agency) {
@@ -51,16 +41,15 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       });
       return;
     }
-    const conventionAdvisorEntity =
-      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
-        convention.id,
-      );
-    const peAdvisor = conventionAdvisorEntity?.advisor;
 
     const recipients = determineRecipients(
       convention.status,
       await agencyWithRightToAgencyDto(uow, agency),
-      peAdvisor,
+      (
+        await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+          convention.id,
+        )
+      )?.advisor,
     );
 
     if (!recipients) {
@@ -91,7 +80,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
           businessName: convention.businessName,
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
-          manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+          manageConventionLink: `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
             `/${frontRoutes.manageConventionUserConnected}`,
             {
               conventionId: convention.id,
@@ -113,7 +102,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
 
     await Promise.all(
       emails.map((email) =>
-        this.#saveNotificationAndRelatedEvent(uow, {
+        deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: email,
           followedIds: {
@@ -124,8 +113,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
         }),
       ),
     );
-  }
-}
+  });
 
 type Recipient = {
   role: ConventionRole;

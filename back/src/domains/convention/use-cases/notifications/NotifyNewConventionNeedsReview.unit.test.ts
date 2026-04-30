@@ -25,9 +25,12 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyNewConventionNeedsReview } from "./NotifyNewConventionNeedsReview";
+import {
+  makeNotifyNewConventionNeedsReview,
+  type NotifyNewConventionNeedsReview,
+} from "./NotifyNewConventionNeedsReview";
 
-describe("NotifyConventionNeedsReview", () => {
+describe("NotifyNewConventionNeedsReview", () => {
   const validator1 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("validator1@unmail.com")
@@ -88,11 +91,16 @@ describe("NotifyConventionNeedsReview", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    notifyNewConventionNeedsReview = new NotifyNewConventionNeedsReview(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      config,
-    );
+    notifyNewConventionNeedsReview = makeNotifyNewConventionNeedsReview({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        config,
+      },
+    });
     uow.userRepository.users = [
       councellor1,
       councellor2,
