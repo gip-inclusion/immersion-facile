@@ -32,7 +32,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
+import {
+  makeNotifyAllActorsOfFinalConventionValidation,
+  type NotifyAllActorsOfFinalConventionValidation,
+} from "./NotifyAllActorsOfFinalConventionValidation";
 
 describe("NotifyAllActorsOfFinalConventionValidation", () => {
   type ActorForNotification = {
@@ -118,14 +121,19 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
     timeGateway = new CustomTimeGateway();
     shortLinkIdGenerator = new DeterministShortLinkIdGeneratorGateway();
     notifyAllActorsOfFinalConventionValidation =
-      new NotifyAllActorsOfFinalConventionValidation(
-        new InMemoryUowPerformer(uow),
-        makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-        fakeGenerateMagicLinkUrlFn,
-        timeGateway,
-        shortLinkIdGenerator,
-        config,
-      );
+      makeNotifyAllActorsOfFinalConventionValidation({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+            new UuidV4Generator(),
+            timeGateway,
+          ),
+          generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+          timeGateway,
+          shortLinkIdGeneratorGateway: shortLinkIdGenerator,
+          config,
+        },
+      });
 
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {

@@ -53,7 +53,7 @@ import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
-import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
+import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
@@ -430,15 +430,6 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
-        ),
-      notifyAllActorsOfFinalConventionValidation:
-        new NotifyAllActorsOfFinalConventionValidation(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
-          gateways.timeGateway,
-          gateways.shortLinkGenerator,
-          config,
         ),
       notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
         uowPerformer,
@@ -1192,6 +1183,17 @@ export const createUseCases = ({
         deps: {
           saveNotificationAndRelatedEvent,
           config,
+        },
+      }),
+    notifyAllActorsOfFinalConventionValidation:
+      makeNotifyAllActorsOfFinalConventionValidation({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
+          timeGateway: gateways.timeGateway,
+          config,
+          shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
         },
       }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
