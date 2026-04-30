@@ -560,6 +560,7 @@ describe("GetConnectedUser", () => {
                           lastName: notAdminUser.lastName,
                         },
                       ],
+                      shouldReceiveDiscussionNotifications: true,
                     },
                     {
                       siret: establishmentAggregate2.establishment.siret,
@@ -569,6 +570,7 @@ describe("GetConnectedUser", () => {
                       role: "establishment-contact",
                       status: "ACCEPTED",
                       admins: [],
+                      shouldReceiveDiscussionNotifications: true,
                     },
                   ],
                   dashboards: {
@@ -593,6 +595,7 @@ describe("GetConnectedUser", () => {
                         establishmentAggregate1.establishment.name,
                       role: "establishment-contact",
                       status: "PENDING",
+                      shouldReceiveDiscussionNotifications: true,
                     },
                   ],
                   dashboards: {

@@ -90,14 +90,19 @@ const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
     isNotifiedByEmail: z.boolean(),
   });
 
+const userEstablishmentRightDetailsCommonShape = {
+  siret: siretSchema,
+  businessName: businessNameSchema,
+  role: z.enum(establishmentsRoles, {
+    error: localization.invalidEnum,
+  }),
+  shouldReceiveDiscussionNotifications: z.boolean(),
+};
+
 const userEstablishmentRightDetailsSchema: ZodSchemaWithInputMatchingOutput<UserEstablishmentRightDetails> =
   z.discriminatedUnion("status", [
     z.object({
-      siret: siretSchema,
-      businessName: businessNameSchema,
-      role: z.enum(establishmentsRoles, {
-        error: localization.invalidEnum,
-      }),
+      ...userEstablishmentRightDetailsCommonShape,
       status: z.literal("ACCEPTED"),
       admins: z.array(
         z.object({
@@ -108,11 +113,7 @@ const userEstablishmentRightDetailsSchema: ZodSchemaWithInputMatchingOutput<User
       ),
     }),
     z.object({
-      siret: siretSchema,
-      businessName: businessNameSchema,
-      role: z.enum(establishmentsRoles, {
-        error: localization.invalidEnum,
-      }),
+      ...userEstablishmentRightDetailsCommonShape,
       status: z.literal("PENDING"),
     }),
   ]);

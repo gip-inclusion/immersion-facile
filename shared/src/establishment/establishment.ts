@@ -74,20 +74,23 @@ export type EstablishmentAdminPrivateData = {
   email: Email;
 };
 
-export type UserEstablishmentRightDetailsWithAcceptedStatus = {
+type UserEstablishmentRightDetailsCommon = {
   siret: SiretDto;
   businessName: BusinessName;
   role: EstablishmentRole;
-  status: Extract<EstablishmentUserRightStatus, "ACCEPTED">;
-  admins: EstablishmentAdminPrivateData[];
+  shouldReceiveDiscussionNotifications: boolean;
 };
 
-export type UserEstablishmentRightDetailsWithPendingStatus = {
-  siret: SiretDto;
-  businessName: BusinessName;
-  role: EstablishmentRole;
-  status: Extract<EstablishmentUserRightStatus, "PENDING">;
-};
+export type UserEstablishmentRightDetailsWithAcceptedStatus =
+  UserEstablishmentRightDetailsCommon & {
+    status: Extract<EstablishmentUserRightStatus, "ACCEPTED">;
+    admins: EstablishmentAdminPrivateData[];
+  };
+
+export type UserEstablishmentRightDetailsWithPendingStatus =
+  UserEstablishmentRightDetailsCommon & {
+    status: Extract<EstablishmentUserRightStatus, "PENDING">;
+  };
 
 export type UserEstablishmentRightDetails =
   | UserEstablishmentRightDetailsWithAcceptedStatus

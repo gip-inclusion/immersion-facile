@@ -73,6 +73,8 @@ const makeEstablishmentRights = async (
           : establishment.name,
         role: userRight.role,
         status: pendingUserRight.status,
+        shouldReceiveDiscussionNotifications:
+          pendingUserRight.shouldReceiveDiscussionNotifications,
       } satisfies UserEstablishmentRightDetailsWithPendingStatus;
     })
     .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
@@ -88,6 +90,8 @@ const makeEstablishmentRights = async (
           lastName,
           email,
         })),
+        shouldReceiveDiscussionNotifications:
+          acceptedUserRight.shouldReceiveDiscussionNotifications,
       } satisfies UserEstablishmentRightDetailsWithAcceptedStatus;
     })
     .exhaustive();
