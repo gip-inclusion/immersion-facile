@@ -2,6 +2,7 @@ import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   type AppellationAndRomeDto,
+  type BanEstablishmentPayload,
   DiscussionBuilder,
   errors,
   expectArraysToEqual,
@@ -333,6 +334,7 @@ describe("LegacyContactEstablishment", () => {
             },
           ],
           status: "PENDING",
+          isEstablishmentBanned: false,
         },
       ]);
     });
@@ -389,6 +391,7 @@ describe("LegacyContactEstablishment", () => {
           ],
           status: "PENDING",
           locationId: establishmentAggregate.establishment.locations[0].id,
+          isEstablishmentBanned: false,
         },
         {
           id: "discussion1",
@@ -421,6 +424,7 @@ describe("LegacyContactEstablishment", () => {
           ],
           status: "PENDING",
           locationId: establishmentAggregate.establishment.locations[0].id,
+          isEstablishmentBanned: false,
         },
       ];
 
@@ -582,6 +586,40 @@ describe("LegacyContactEstablishment", () => {
           ...validEmailRequest,
         }),
         errors.establishment.forbiddenUnavailable({
+          siret: validEmailRequest.siret,
+        }),
+      );
+    });
+
+    it("throw ForbiddenError when establishment is banned", async () => {
+      const banEstablishmentPayload: BanEstablishmentPayload = {
+        siret: establishmentAggregateWithEmailContact.establishment.siret,
+        establishmentBannishmentJustification:
+          "L'entreprise a délocalisé sa production hors de Pont-Labbé",
+      };
+      const establishmentAggregate = new EstablishmentAggregateBuilder(
+        establishmentAggregateWithEmailContact,
+      )
+        .withOffers([immersionOffer])
+        .withBannishmentInformations({
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            banEstablishmentPayload.establishmentBannishmentJustification,
+        })
+        .build();
+
+      uow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishmentPayload,
+      ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validEmailRequest,
+        }),
+        errors.establishment.bannedEstablishment({
           siret: validEmailRequest.siret,
         }),
       );

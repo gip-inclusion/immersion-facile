@@ -1,6 +1,7 @@
 import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
+  type BanEstablishmentPayload,
   type CommonDiscussionDto,
   type CreateDiscussion1Eleve1StageDto,
   type CreateDiscussionDto,
@@ -289,6 +290,20 @@ describe("ContactEstablishment", () => {
         updatedAt: now.toISOString(),
         status: "PENDING",
         locationId: validEmailRequest.locationId,
+        ...(establishmentAggregateWithEmail.establishment.isEstablishmentBanned
+          ? {
+              isEstablishmentBanned:
+                establishmentAggregateWithEmail.establishment
+                  .isEstablishmentBanned,
+              establishmentBannishmentJustification:
+                establishmentAggregateWithEmail.establishment
+                  .establishmentBannishmentJustification,
+            }
+          : {
+              isEstablishmentBanned:
+                establishmentAggregateWithEmail.establishment
+                  .isEstablishmentBanned,
+            }),
       });
 
       describe("with discussion kind IF", () => {
@@ -801,6 +816,7 @@ describe("ContactEstablishment", () => {
               resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
             },
             locationId: validEmailRequest.locationId,
+            isEstablishmentBanned: false,
           },
         ]);
 
@@ -968,6 +984,40 @@ describe("ContactEstablishment", () => {
           ...validEmailRequest,
         }),
         errors.establishment.forbiddenUnavailable({
+          siret: validEmailRequest.siret,
+        }),
+      );
+    });
+
+    it("throw ForbiddenError when establishment is banned", async () => {
+      const banEstablishmentPayload: BanEstablishmentPayload = {
+        siret: establishmentAggregateWithEmail.establishment.siret,
+        establishmentBannishmentJustification:
+          "L'entreprise a délocalisé sa production hors de Pont-Labbé",
+      };
+      const establishmentAggregate = new EstablishmentAggregateBuilder(
+        establishmentAggregateWithEmail,
+      )
+        .withOffers([immersionOffer])
+        .withBannishmentInformations({
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            banEstablishmentPayload.establishmentBannishmentJustification,
+        })
+        .build();
+
+      uow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishmentPayload,
+      ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      await expectPromiseToFailWithError(
+        contactEstablishment.execute({
+          ...validEmailRequest,
+        }),
+        errors.establishment.bannedEstablishment({
           siret: validEmailRequest.siret,
         }),
       );
