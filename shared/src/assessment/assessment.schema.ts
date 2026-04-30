@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { conventionIdSchema } from "../convention/convention.schema";
-import {
-  dateTimeIsoStringSchema,
-  makeDateStringSchema,
-  toDisplayedDate,
-} from "../utils/date";
+import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
 import {
   zStringMinLength1Max1024,
   zStringMinLength1Max3000,
