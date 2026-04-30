@@ -62,7 +62,7 @@ import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/conv
 import { makeNotifyBeneficiaryThatAssessmentNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentNeedsSignature";
 import { makeNotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
-import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
+import { makeNotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
@@ -415,13 +415,6 @@ export const createUseCases = ({
           config,
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
-        ),
-      notifyLastSigneeThatConventionHasBeenSigned:
-        new NotifyLastSigneeThatConventionHasBeenSigned(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
-          gateways.timeGateway,
         ),
       notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
         uowPerformer,
@@ -1204,6 +1197,15 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
       },
     }),
+    notifyLastSigneeThatConventionHasBeenSigned:
+      makeNotifyLastSigneeThatConventionHasBeenSigned({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
+          timeGateway: gateways.timeGateway,
+        },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
