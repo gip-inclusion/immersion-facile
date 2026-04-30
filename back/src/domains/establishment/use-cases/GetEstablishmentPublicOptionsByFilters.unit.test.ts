@@ -64,6 +64,11 @@ describe("GetEstablishmentPublicOptionsByFilters", () => {
           isMainContactByPhone: false,
         },
       ])
+      .withBannishmentInformations({
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification:
+          "Un employé a volé les tomates de Pouldergat",
+      })
       .build();
 
   beforeAll(() => {
