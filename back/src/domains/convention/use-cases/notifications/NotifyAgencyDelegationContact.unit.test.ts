@@ -11,7 +11,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyAgencyDelegationContact } from "./NotifyAgencyDelegationContact";
+import {
+  makeNotifyAgencyDelegationContact,
+  type NotifyAgencyDelegationContact,
+} from "./NotifyAgencyDelegationContact";
 
 describe("NotifyAgencyDelegationContact", () => {
   let usecase: NotifyAgencyDelegationContact;
@@ -26,10 +29,12 @@ describe("NotifyAgencyDelegationContact", () => {
       timeGateway,
     );
     uow = createInMemoryUow();
-    usecase = new NotifyAgencyDelegationContact(
-      new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
-    );
+    usecase = makeNotifyAgencyDelegationContact({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+      },
+    });
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,

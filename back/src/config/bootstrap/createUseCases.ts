@@ -51,7 +51,7 @@ import { makeGetConventionsForApiConsumer } from "../../domains/convention/use-c
 import { makeGetConventionTemplatesForCurrentUser } from "../../domains/convention/use-cases/GetConventionTemplatesForCurrentUser";
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
-import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
+import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
@@ -478,10 +478,6 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
           config,
         ),
-      notifyAgencyDelegationContact: new NotifyAgencyDelegationContact(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-      ),
 
       subscribeToWebhook: new SubscribeToWebhook(
         uowPerformer,
@@ -1191,6 +1187,10 @@ export const createUseCases = ({
       }),
     updateInvalidPhone: makeUpdateInvalidPhone({
       uowPerformer,
+    }),
+    notifyAgencyDelegationContact: makeNotifyAgencyDelegationContact({
+      uowPerformer,
+      deps: { saveNotificationAndRelatedEvent },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
