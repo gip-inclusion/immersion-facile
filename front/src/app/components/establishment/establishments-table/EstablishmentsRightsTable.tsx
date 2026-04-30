@@ -4,6 +4,7 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import type { ReactNode } from "react";
 import type {
   EstablishmentUserRightStatus,
+  UserEstablishmentRightDetails,
   UserEstablishmentRightDetailsWithAcceptedStatus,
   UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
@@ -17,9 +18,7 @@ export const EstablishmentsRightsTable = ({
   withEstablishmentData,
   isBackofficeAdmin,
 }: {
-  withEstablishmentData:
-    | UserEstablishmentRightDetailsWithAcceptedStatus[]
-    | UserEstablishmentRightDetailsWithPendingStatus[];
+  withEstablishmentData: UserEstablishmentRightDetails[];
   isBackofficeAdmin?: boolean;
 }) => (
   <>
@@ -30,7 +29,14 @@ export const EstablishmentsRightsTable = ({
       )}
       data={[...withEstablishmentData]
         .sort((a, b) => a.businessName.localeCompare(b.businessName))
-        .map((data) => makeEstablishmentRightLine({ data, isBackofficeAdmin }))}
+        .filter((data) => data.status === "ACCEPTED")
+        .map((data) =>
+          makeEstablishmentRightLine({
+            data,
+            isBackofficeAdmin,
+            isEstablishmentBanned: data.isEstablishmentBanned,
+          }),
+        )}
     />
   </>
 );
@@ -46,11 +52,13 @@ const getEstablishmentRightLineHeaders = (
 };
 const makeEstablishmentRightLine = ({
   data,
+  isEstablishmentBanned,
   isBackofficeAdmin,
 }: {
   data:
     | UserEstablishmentRightDetailsWithAcceptedStatus
     | UserEstablishmentRightDetailsWithPendingStatus;
+  isEstablishmentBanned: boolean;
   isBackofficeAdmin?: boolean;
 }): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[data.role];
@@ -58,7 +66,8 @@ const makeEstablishmentRightLine = ({
     .with({ status: "ACCEPTED" }, (data) => [
       <EstablishmentLineBusinessName
         key={data.siret}
-        data={{ ...data, isEstablishmentBanned: false }}
+        data={data}
+        isEstablishmentBanned={isEstablishmentBanned}
         isBackofficeAdmin={isBackofficeAdmin}
       />,
       <EstablishmentLineAdminsInfos key={data.siret} data={data} />,
@@ -73,7 +82,8 @@ const makeEstablishmentRightLine = ({
     .with({ status: "PENDING" }, (data) => [
       <EstablishmentLineBusinessName
         key={data.siret}
-        data={{ ...data, isEstablishmentBanned: false }}
+        data={data}
+        isEstablishmentBanned={isEstablishmentBanned}
         isBackofficeAdmin={isBackofficeAdmin}
       />,
       <EstablishmentLineDesiredRoleInfos key={data.siret} data={data} />,
