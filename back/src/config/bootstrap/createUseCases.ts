@@ -67,7 +67,7 @@ import { makeNotifyNewConventionNeedsReview } from "../../domains/convention/use
 import { makeNotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
-import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
+import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
@@ -275,10 +275,6 @@ export const createUseCases = ({
       sendNotificationsInBatch: new SendNotificationInBatch(
         uowPerformer,
         gateways.notification,
-      ),
-      notifyUserAgencyRightChanged: new NotifyUserAgencyRightChanged(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
       ),
       notifyUserAgencyRightRejected: new NotifyUserAgencyRightRejected(
         uowPerformer,
@@ -1214,6 +1210,12 @@ export const createUseCases = ({
       deps: {
         saveNotificationAndRelatedEvent,
         config,
+      },
+    }),
+    notifyUserAgencyRightChanged: makeNotifyUserAgencyRightChanged({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
       },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;

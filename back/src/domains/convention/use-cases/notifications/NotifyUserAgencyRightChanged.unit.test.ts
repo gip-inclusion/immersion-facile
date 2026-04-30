@@ -17,7 +17,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { NotifyUserAgencyRightChanged } from "./NotifyUserAgencyRightChanged";
+import {
+  makeNotifyUserAgencyRightChanged,
+  type NotifyUserAgencyRightChanged,
+} from "./NotifyUserAgencyRightChanged";
 
 describe("NotifyUserAgencyRightChanged", () => {
   const user = new ConnectedUserBuilder()
@@ -40,13 +43,15 @@ describe("NotifyUserAgencyRightChanged", () => {
       uow.outboxRepository,
     );
 
-    notifyUserAgencyRightChanged = new NotifyUserAgencyRightChanged(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
-        new CustomTimeGateway(),
-      ),
-    );
+    notifyUserAgencyRightChanged = makeNotifyUserAgencyRightChanged({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          new CustomTimeGateway(),
+        ),
+      },
+    });
   });
 
   describe("Wrong paths", () => {

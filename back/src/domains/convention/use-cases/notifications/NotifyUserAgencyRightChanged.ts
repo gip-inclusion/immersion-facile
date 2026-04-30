@@ -1,43 +1,31 @@
-import {
-  errors,
-  type WithAgencyIdAndUserId,
-  withAgencyIdAndUserIdSchema,
-} from "shared";
+import { errors, withAgencyIdAndUserIdSchema } from "shared";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export class NotifyUserAgencyRightChanged extends TransactionalUseCase<
-  WithAgencyIdAndUserId,
-  void
-> {
-  protected inputSchema = withAgencyIdAndUserIdSchema;
+export type NotifyUserAgencyRightChanged = ReturnType<
+  typeof makeNotifyUserAgencyRightChanged
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+};
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-  }
+export const makeNotifyUserAgencyRightChanged = useCaseBuilder(
+  "NotifyUserAgencyRightChanged",
+)
+  .withInput(withAgencyIdAndUserIdSchema)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { agencyId, userId }, uow, deps }) => {
+    const agency = await uow.agencyRepository.getById(agencyId);
+    if (!agency) throw errors.agency.notFound({ agencyId });
 
-  protected async _execute(
-    params: WithAgencyIdAndUserId,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const agency = await uow.agencyRepository.getById(params.agencyId);
-    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
-
-    const user = await uow.userRepository.getById(params.userId);
-    if (!user) throw errors.user.notFound({ userId: params.userId });
+    const user = await uow.userRepository.getById(userId);
+    if (!user) throw errors.user.notFound({ userId });
 
     const agencyRight = agency.usersRights[user.id];
 
     if (agencyRight && !agencyRight.roles.includes("to-review"))
-      await this.#saveNotificationAndRelatedEvent(uow, {
+      await deps.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "IC_USER_RIGHTS_HAS_CHANGED",
@@ -56,5 +44,4 @@ export class NotifyUserAgencyRightChanged extends TransactionalUseCase<
           userId: user.id,
         },
       });
-  }
-}
+  });
