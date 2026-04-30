@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { conventionIdSchema } from "../convention/convention.schema";
-import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
+import {
+  dateTimeIsoStringSchema,
+  makeDateStringSchema,
+  toDisplayedDate,
+} from "../utils/date";
 import {
   zStringMinLength1Max1024,
   zStringMinLength1Max3000,
@@ -102,7 +106,7 @@ export const assessmentInputDtoSchema: z.ZodType<
     )
       context.addIssue({
         code: "custom",
-        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${assessmentInput.conventionStartDate}.`,
+        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: new Date(assessmentInput.conventionStartDate) })}.`,
         path: ["contractStartDate"],
       });
   });

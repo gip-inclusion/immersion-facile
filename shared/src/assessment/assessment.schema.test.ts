@@ -145,7 +145,7 @@ describe("Assessment schema", () => {
 describe("AssessmentInput schema", () => {
   it("rejects an assessmentInput when startContractDate is before convention start date", () => {
     const assessmentInput: AssessmentInputDto = {
-      conventionStartDate: "2025-01-01",
+      conventionStartDate: "2025-05-01",
       status: "COMPLETED",
       endedWithAJob: true,
       typeOfContract: "CDI",
@@ -164,7 +164,7 @@ describe("AssessmentInput schema", () => {
         {
           code: "custom",
           message:
-            "La date début du contrat ne peut pas être antérieure à la date de début d'immersion: 2025-01-01.",
+            "La date début du contrat ne peut pas être antérieure à la date de début d'immersion: 01/05/2025.",
           path: ["contractStartDate"],
         },
       ]),
