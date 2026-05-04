@@ -16,13 +16,12 @@ import {
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type AssessmentInputDto,
+  type AssessmentDto,
   type AssessmentStatus,
-  assessmentInputDtoSchema,
+  assessmentDtoSchema,
   assessmentStatuses,
   type ConventionDto,
   type ConventionReadDto,
-  computeScheduledHoursForAssessment,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   type DotNestedKeys,
@@ -52,10 +51,7 @@ type AssessmentFormProperties = {
 
 export type OnStepChange = (
   step: Step,
-  fieldsToValidate: (
-    | keyof AssessmentInputDto
-    | DotNestedKeys<AssessmentInputDto>
-  )[],
+  fieldsToValidate: (keyof AssessmentDto | DotNestedKeys<AssessmentDto>)[],
 ) => void;
 
 type Step = 1 | 2 | 3;
@@ -83,8 +79,6 @@ export const AssessmentForm = ({
 
   const initialValues: FormAssessmentDto = {
     conventionId: convention.id,
-    conventionStartDate: convention.dateStart,
-    conventionTotalHours: convention.schedule.totalHours,
     establishmentFeedback: "",
     establishmentAdvices: "",
     endedWithAJob: null,
@@ -95,7 +89,7 @@ export const AssessmentForm = ({
     createdAt: new Date().toISOString(),
   };
   const methods = useForm<FormAssessmentDto>({
-    resolver: zodResolver(assessmentInputDtoSchema),
+    resolver: zodResolver(assessmentDtoSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -110,8 +104,10 @@ export const AssessmentForm = ({
 
     dispatch(
       assessmentSlice.actions.creationRequested({
-        assessment: formAssessmentDtoToAssessmentInputDto(values),
-        jwt,
+        assessmentAndJwt: {
+          assessment: formAssessmentDtoToAssessmentDto(values),
+          jwt,
+        },
         feedbackTopic: "assessment",
       }),
     );
@@ -124,8 +120,9 @@ export const AssessmentForm = ({
     const validatedFields = await Promise.all(
       fieldsToValidate.map(async (key) => trigger(key)),
     );
-    if (validatedFields.every((validatedField) => validatedField))
+    if (validatedFields.every((validatedField) => validatedField)) {
       setCurrentStep(step);
+    }
   };
   useScrollTo(currentStep);
 
@@ -208,29 +205,31 @@ const AssessmentStatusSection = ({
   onStepChange: OnStepChange;
 }) => {
   const { register, formState, watch, setValue } =
-    useFormContext<AssessmentInputDto>();
+    useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
     useState<number | null>(null);
   const [numberOfMissedMinutesDisplayed, setNumberOfMissedMinutesDisplayed] =
     useState<number | null>(null);
-
-  const assessmentDto = formAssessmentDtoToAssessmentInputDto(formValues);
-  const scheduledHours = computeScheduledHoursForAssessment({
-    convention,
-    status: formValues.status,
-    lastDayOfPresence:
-      formValues.status === "PARTIALLY_COMPLETED"
-        ? formValues.lastDayOfPresence
-        : undefined,
-  });
-
   useEffect(() => {
-    if (formValues.conventionTotalHours !== scheduledHours)
-      setValue("conventionTotalHours", scheduledHours);
-  }, [scheduledHours, formValues.conventionTotalHours, setValue]);
-
+    if (
+      formValues.status === "PARTIALLY_COMPLETED" &&
+      formValues.numberOfMissedHours > 0
+    ) {
+      setNumberOfMissedHoursDisplayed(
+        Math.floor(formValues.numberOfMissedHours),
+      );
+      setNumberOfMissedMinutesDisplayed(
+        +(
+          (formValues.numberOfMissedHours -
+            Math.floor(formValues.numberOfMissedHours)) *
+          60
+        ).toFixed(2),
+      );
+    }
+  }, [formValues]);
+  const assessmentDto = formAssessmentDtoToAssessmentDto(formValues);
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
@@ -258,10 +257,11 @@ const AssessmentStatusSection = ({
                 ...register("status"),
                 onChange: (event) => {
                   const { value } = event.target;
-                  if (value === "PARTIALLY_COMPLETED") {
-                    if (!("numberOfMissedHours" in formValues))
-                      setValue("numberOfMissedHours", 0);
-                    setValue("lastDayOfPresence", convention.dateEnd);
+                  if (
+                    value === "PARTIALLY_COMPLETED" &&
+                    !("numberOfMissedHours" in formValues)
+                  ) {
+                    setValue("numberOfMissedHours", 0);
                   }
                   setValue("status", value as AssessmentStatus);
                 },
@@ -318,15 +318,14 @@ const AssessmentStatusSection = ({
                       setValue(
                         "numberOfMissedHours",
                         value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
-                        { shouldValidate: true },
                       );
                     },
                     min: 0,
-                    max: scheduledHours,
+                    max: convention.schedule.totalHours,
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedHoursInput,
-                    value: numberOfMissedHoursDisplayed ?? "",
+                    value: numberOfMissedHoursDisplayed || "",
                   }}
                   {...getFieldError("numberOfMissedHours")}
                 />
@@ -340,7 +339,6 @@ const AssessmentStatusSection = ({
                       setValue(
                         "numberOfMissedHours",
                         (numberOfMissedHoursDisplayed ?? 0) + value / 60,
-                        { shouldValidate: true },
                       );
                     },
                     min: 0,
@@ -348,8 +346,9 @@ const AssessmentStatusSection = ({
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
-                    value: numberOfMissedMinutesDisplayed ?? "",
+                    value: numberOfMissedMinutesDisplayed || "",
                   }}
+                  {...getFieldError("numberOfMissedHours")}
                 />
               </div>
             </>
@@ -406,8 +405,8 @@ const AssessmentContractSection = ({
 }: {
   onStepChange: OnStepChange;
 }) => {
-  const { register, watch, setValue, formState, getValues } =
-    useFormContext<AssessmentInputDto>();
+  const { register, watch, setValue, formState } =
+    useFormContext<AssessmentDto>();
   const endedWithAJobValue = watch("endedWithAJob");
   const getFieldError = makeFieldError(formState);
   return (
@@ -460,7 +459,6 @@ const AssessmentContractSection = ({
               nativeInputProps={{
                 ...register("contractStartDate"),
                 id: domElementIds.assessment.contractStartDateInput,
-                min: getValues("conventionStartDate"),
                 type: "date",
               }}
               {...getFieldError("contractStartDate")}
@@ -512,7 +510,7 @@ const AssessmentCommentsSection = ({
   objective: string;
 }) => {
   const isLoading = useAppSelector(assessmentSelectors.isLoading);
-  const { register, formState } = useFormContext<AssessmentInputDto>();
+  const { register, formState } = useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   return (
     <div className={fr.cx("fr-grid-row")}>
@@ -569,13 +567,11 @@ const AssessmentCommentsSection = ({
   );
 };
 
-export const formAssessmentDtoToAssessmentInputDto = (
+export const formAssessmentDtoToAssessmentDto = (
   formAssessmentDto: FormAssessmentDto,
-): AssessmentInputDto => {
+): AssessmentDto => {
   const commonFields = {
     conventionId: formAssessmentDto.conventionId,
-    conventionStartDate: formAssessmentDto.conventionStartDate,
-    conventionTotalHours: formAssessmentDto.conventionTotalHours,
     establishmentFeedback: formAssessmentDto.establishmentFeedback,
     establishmentAdvices: formAssessmentDto.establishmentAdvices,
     beneficiaryAgreement: formAssessmentDto.beneficiaryAgreement,
@@ -583,7 +579,7 @@ export const formAssessmentDtoToAssessmentInputDto = (
     signedAt: formAssessmentDto.signedAt,
   };
 
-  let assessmentDto: AssessmentInputDto = {
+  let assessmentDto: AssessmentDto = {
     ...commonFields,
     status: "COMPLETED",
     endedWithAJob: false,
