@@ -37,6 +37,8 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
             serviceName: "any-service-name",
             consumerId: null,
             consumerName: "any-consumer-name",
+            conventionId: "1",
+            agencyId: "any-agency-id",
             occurredAt: "2024-07-01T00:00:00.000Z",
             handledByAgency: true,
             requestParams: {
@@ -161,6 +163,8 @@ describe("ConnectedUserConventionsWithBroadcastFeedback", () => {
             serviceName: "any-service-name",
             consumerId: null,
             consumerName: "any-consumer-name",
+            conventionId: "1",
+            agencyId: "any-agency-id",
             occurredAt: "2024-07-01T00:00:00.000Z",
             handledByAgency: true,
             requestParams: {

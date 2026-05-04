@@ -30,6 +30,8 @@ describe("GetLastBroadcastFeedback", () => {
     serviceName: "test-service",
     consumerId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
     consumerName: "Test Consumer",
+    conventionId: convention.id,
+    agencyId: agency.id,
     subscriberErrorFeedback: {
       message: "Test error message",
       error: { code: "TEST_ERROR" },
@@ -122,6 +124,8 @@ describe("GetLastBroadcastFeedback", () => {
         serviceName: "error-service",
         consumerId: "error-consumer",
         consumerName: "Error Consumer",
+        conventionId: convention.id,
+        agencyId: agency.id,
         subscriberErrorFeedback: {
           message: "Connection timeout",
           error: { timeout: 5000 },

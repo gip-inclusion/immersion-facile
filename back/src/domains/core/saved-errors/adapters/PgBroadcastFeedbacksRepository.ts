@@ -1,5 +1,6 @@
 import { sql } from "kysely";
 import {
+  type AgencyId,
   type BroadcastFeedback,
   type ConventionId,
   type ConventionLastBroadcastFeedbackResponse,
@@ -34,6 +35,8 @@ export class PgBroadcastFeedbacksRepository
             ),
             "bf.handled_by_agency as handledByAgency",
             "bf.response as response",
+            "bf.convention_id as conventionId",
+            "bf.agency_id as agencyId",
             sql<number>`
               ROW_NUMBER() OVER (
                 PARTITION BY (bf.request_params->>'conventionId')
@@ -52,6 +55,9 @@ export class PgBroadcastFeedbacksRepository
     return {
       consumerId: result.consumerId,
       consumerName: result.consumerName,
+      conventionId: (result.conventionId ??
+        result.requestParams.conventionId) as ConventionId,
+      agencyId: result.agencyId as AgencyId | null,
       handledByAgency: result.handledByAgency,
       occurredAt: result.occurredAt,
       requestParams: result.requestParams,
@@ -89,6 +95,8 @@ export class PgBroadcastFeedbacksRepository
       handledByAgency,
       consumerName,
       consumerId,
+      conventionId,
+      agencyId,
     } = broadcastFeedback;
 
     await this.transaction
@@ -97,6 +105,8 @@ export class PgBroadcastFeedbacksRepository
         service_name: serviceName,
         consumer_name: consumerName,
         consumer_id: consumerId,
+        convention_id: conventionId,
+        agency_id: agencyId,
         ...(subscriberErrorFeedback
           ? {
               subscriber_error_feedback: JSON.stringify({

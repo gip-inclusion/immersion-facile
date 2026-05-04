@@ -2487,6 +2487,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const firstBroadcast: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: conventionIdA,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2507,6 +2509,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const lastBroadcast: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: convention.id,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-30T00:00:00.000Z",
@@ -2580,6 +2584,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const firstBroadcast: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: conventionIdA,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2600,6 +2606,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const lastBroadcast: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: convention.id,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-30T00:00:00.000Z",
@@ -2655,6 +2663,8 @@ describe("Pg implementation of ConventionQueries", () => {
       const errorBroadcast: BroadcastFeedback = {
         consumerId: null,
         consumerName: "any-consumer-name",
+        conventionId: cancelledConventionId,
+        agencyId: agencyIdA,
         serviceName:
           "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
         occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2689,6 +2699,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const priorSuccessBroadcast: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: cancelledConventionId,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-06-01T00:00:00.000Z",
@@ -2793,6 +2805,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const handledErrorFeedback: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: conventionA.id,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2813,6 +2827,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const unhandledErrorFeedback: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: conventionB.id,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-02T00:00:00.000Z",
@@ -2889,6 +2905,8 @@ describe("Pg implementation of ConventionQueries", () => {
         const unhandledErrorFeedback: BroadcastFeedback = {
           consumerId: null,
           consumerName: "any-consumer-name",
+          conventionId: convention.id,
+          agencyId: agencyIdA,
           serviceName:
             "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
           occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2956,6 +2974,8 @@ describe("Pg implementation of ConventionQueries", () => {
       const broadcast1: BroadcastFeedback = {
         consumerId: null,
         consumerName: "any-consumer-name",
+        conventionId: convention1.id,
+        agencyId: agencyIdA,
         serviceName:
           "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
         occurredAt: "2024-07-01T00:00:00.000Z",
@@ -2975,6 +2995,7 @@ describe("Pg implementation of ConventionQueries", () => {
       };
       const broadcast2: BroadcastFeedback = {
         ...broadcast1,
+        conventionId: convention2.id,
         occurredAt: "2024-07-02T00:00:00.000Z",
         requestParams: {
           conventionId: convention2.id,
@@ -2983,6 +3004,7 @@ describe("Pg implementation of ConventionQueries", () => {
       };
       const broadcast3: BroadcastFeedback = {
         ...broadcast1,
+        conventionId: convention3.id,
         occurredAt: "2024-07-03T00:00:00.000Z",
         requestParams: {
           conventionId: convention3.id,
@@ -3169,6 +3191,8 @@ describe("Pg implementation of ConventionQueries", () => {
       const managedErrorFeedback: BroadcastFeedback = {
         consumerId: null,
         consumerName: "any-consumer-name",
+        conventionId: conventionWithManagedError.id,
+        agencyId: agencyIdA,
         serviceName:
           "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
         occurredAt: "2024-07-01T00:00:00.000Z",
@@ -3190,6 +3214,8 @@ describe("Pg implementation of ConventionQueries", () => {
       const unmanagedErrorFeedback: BroadcastFeedback = {
         consumerId: null,
         consumerName: "any-consumer-name",
+        conventionId: conventionWithUnmanagedError.id,
+        agencyId: agencyIdA,
         serviceName:
           "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
         occurredAt: "2024-07-02T00:00:00.000Z",
@@ -3210,6 +3236,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const managedErrorFeedbackInReview: BroadcastFeedback = {
         ...managedErrorFeedback,
+        conventionId: conventionInReviewWithManagedError.id,
         occurredAt: "2024-07-03T00:00:00.000Z",
         requestParams: {
           conventionId: conventionInReviewWithManagedError.id,
@@ -3565,6 +3592,8 @@ describe("Pg implementation of ConventionQueries", () => {
           {
             consumerId: null,
             consumerName: "any-consumer-name",
+            conventionId: conventionBefore2025.id,
+            agencyId: agencyIdA,
             serviceName:
               "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
             occurredAt: "2024-07-01T00:00:00.000Z",
@@ -3585,6 +3614,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
         const errorFeedbackAfter2025: BroadcastFeedback = {
           ...errorFeedbackWithConventionSubmitedBefore2025,
+          conventionId: conventionAfter2025.id,
           occurredAt: "2025-07-01T00:00:00.000Z",
           requestParams: {
             conventionId: conventionAfter2025.id,
