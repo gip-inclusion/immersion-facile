@@ -907,14 +907,73 @@ describe("Update Establishment aggregate from form data", () => {
       });
 
       it("sends a notification to added and updated user & update formEstablishment and userRights on repository with a IC payload with user with establishment-admin rights", async () => {
-        uow.userRepository.users = [user];
+        const pendingContactUserToAccept = new UserBuilder()
+          .withId("pending-contact-user")
+          .withEmail("pending.contact@mail.com")
+          .withFirstName("Pat")
+          .withLastName("Pending")
+          .build();
+
+        const pendingContactUserToReject = new UserBuilder()
+          .withId("rejected-pending-contact-user")
+          .withEmail("rejected.pending@mail.com")
+          .withFirstName("Rej")
+          .withLastName("Ected")
+          .build();
+
+        const existingAdminRight: EstablishmentAdminRight = {
+          role: "establishment-admin",
+          status: "ACCEPTED",
+          job: "",
+          phone: "",
+          userId: user.id,
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
+        };
+
+        const initialPendingContactRight: EstablishmentContactRight = {
+          userId: pendingContactUserToAccept.id,
+          role: "establishment-contact",
+          status: "PENDING",
+          shouldReceiveDiscussionNotifications: true,
+        };
+
+        const initialRejectedPendingContactRight: EstablishmentContactRight = {
+          userId: pendingContactUserToReject.id,
+          role: "establishment-contact",
+          status: "PENDING",
+          shouldReceiveDiscussionNotifications: true,
+        };
+
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          {
+            ...existingEstablishmentAggregate,
+            userRights: [
+              existingAdminRight,
+              initialPendingContactRight,
+              initialRejectedPendingContactRight,
+            ],
+          },
+        ];
+
+        uow.userRepository.users = [
+          user,
+          pendingContactUserToAccept,
+          pendingContactUserToReject,
+        ];
+
         uuidGenerator.setNextUuids([
           "next-user-1",
           "notification-id-1",
           "event-id-1",
           "notification-id-2",
           "event-id-2",
+          "notification-id-3",
+          "event-id-3",
+          "notification-id-4",
+          "event-id-4",
         ]);
+
         const newAdminEmail = "new.admin@gmail.com";
         const newAdminRight: EstablishmentAdminRight = {
           role: "establishment-admin",
@@ -925,6 +984,7 @@ describe("Update Establishment aggregate from form data", () => {
           shouldReceiveDiscussionNotifications: true,
           isMainContactByPhone: true,
         };
+
         const updatedFormEstablishmentWithUserRights: FormEstablishmentDto = {
           ...updatedFormEstablishment,
           userRights: [
@@ -932,6 +992,12 @@ describe("Update Establishment aggregate from form data", () => {
               role: "establishment-contact",
               status: "ACCEPTED",
               email: user.email,
+              shouldReceiveDiscussionNotifications: true,
+            },
+            {
+              role: "establishment-contact",
+              status: "ACCEPTED",
+              email: pendingContactUserToAccept.email,
               shouldReceiveDiscussionNotifications: true,
             },
             {
@@ -945,6 +1011,7 @@ describe("Update Establishment aggregate from form data", () => {
             },
           ],
         };
+
         await updateEstablishmentAggregateFromFormUseCase.execute(
           { formEstablishment: updatedFormEstablishmentWithUserRights },
           {
@@ -964,6 +1031,12 @@ describe("Update Establishment aggregate from form data", () => {
                   status: "ACCEPTED",
                   shouldReceiveDiscussionNotifications: true,
                 },
+                {
+                  userId: pendingContactUserToAccept.id,
+                  role: "establishment-contact",
+                  status: "ACCEPTED",
+                  shouldReceiveDiscussionNotifications: true,
+                },
                 newAdminRight,
               ],
             },
@@ -972,6 +1045,8 @@ describe("Update Establishment aggregate from form data", () => {
 
         expectObjectsToMatch(uow.userRepository.users, [
           user,
+          pendingContactUserToAccept,
+          pendingContactUserToReject,
           {
             id: newAdminRight.userId,
             email: newAdminEmail,
@@ -991,10 +1066,9 @@ describe("Update Establishment aggregate from form data", () => {
                   updatedFormEstablishmentWithUserRights.businessNameCustomized ??
                   updatedFormEstablishmentWithUserRights.businessName,
                 firstName: "",
-                lastName: "", // User is not connected at this moment, can't have firstname / lastname
-                triggeredByUserFirstName:
-                  connectedBackofficeAdminUser.firstName,
-                triggeredByUserLastName: connectedBackofficeAdminUser.lastName,
+                lastName: "",
+                triggeredByUserFirstName: user.firstName,
+                triggeredByUserLastName: user.lastName,
                 role: "establishment-admin",
                 immersionBaseUrl,
               },
@@ -1008,12 +1082,41 @@ describe("Update Establishment aggregate from form data", () => {
                   updatedFormEstablishmentWithUserRights.businessName,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                triggeredByUserFirstName:
-                  connectedBackofficeAdminUser.firstName,
-                triggeredByUserLastName: connectedBackofficeAdminUser.lastName,
+                triggeredByUserFirstName: user.firstName,
+                triggeredByUserLastName: user.lastName,
                 updatedRole: "establishment-contact",
               },
               recipients: [user.email],
+            },
+            {
+              kind: "ESTABLISHMENT_USER_RIGHTS_STATUS_UPDATED",
+              params: {
+                businessName:
+                  updatedFormEstablishmentWithUserRights.businessNameCustomized ??
+                  updatedFormEstablishmentWithUserRights.businessName,
+                firstName: pendingContactUserToAccept.firstName,
+                lastName: pendingContactUserToAccept.lastName,
+                triggeredByUserFirstName: user.firstName,
+                triggeredByUserLastName: user.lastName,
+                updatedStatus: "ACCEPTED",
+                immersionBaseUrl,
+              },
+              recipients: [pendingContactUserToAccept.email],
+            },
+            {
+              kind: "ESTABLISHMENT_USER_RIGHTS_STATUS_UPDATED",
+              params: {
+                businessName:
+                  updatedFormEstablishmentWithUserRights.businessNameCustomized ??
+                  updatedFormEstablishmentWithUserRights.businessName,
+                firstName: pendingContactUserToReject.firstName,
+                lastName: pendingContactUserToReject.lastName,
+                triggeredByUserFirstName: user.firstName,
+                triggeredByUserLastName: user.lastName,
+                updatedStatus: "REJECTED",
+                immersionBaseUrl,
+              },
+              recipients: [pendingContactUserToReject.email],
             },
           ],
         });

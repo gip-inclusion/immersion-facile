@@ -727,6 +727,15 @@ export const defaultEmailValueByEmailKind: {
     role: "establishment-admin",
     immersionBaseUrl: "http://some-base-url.com",
   },
+  ESTABLISHMENT_USER_RIGHTS_STATUS_UPDATED: {
+    businessName: "BUSINESS_NAME",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+    triggeredByUserFirstName: "ADMIN_FIRST_NAME",
+    triggeredByUserLastName: "ADMIN_LAST_NAME",
+    updatedStatus: "ACCEPTED",
+    immersionBaseUrl: "http://some-base-url.com",
+  },
   DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",

@@ -65,6 +65,12 @@ export const onlyAdminUserRightsWithStatusAccepted =
 export const onlyContactUserRightsWithStatusAccepted =
   makeOnlyTargetRoleAndAcceptedStatus("establishment-contact");
 
+export const onlyUserRightWithStatusAccepted = ({
+  status,
+}: {
+  status: EstablishmentUserRightStatus;
+}) => status === "ACCEPTED";
+
 const contactModesWithoutWelcomeAddress: NotEmptyArray<ContactMode> = [
   "EMAIL",
   "PHONE",
