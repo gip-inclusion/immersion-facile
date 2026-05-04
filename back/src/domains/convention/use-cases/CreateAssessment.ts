@@ -1,9 +1,8 @@
 import {
   type AssessmentDto,
-  assessmentInputDtoSchema,
+  assessmentDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  computeScheduledHoursForAssessment,
   errors,
   ForbiddenError,
 } from "shared";
@@ -23,13 +22,13 @@ type WithCreateNewEvent = { createNewEvent: CreateNewEvent };
 
 export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
 export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
-  .withInput(assessmentInputDtoSchema)
+  .withInput<AssessmentDto>(assessmentDtoSchema)
   .withOutput<void>()
   .withCurrentUser<ConventionRelatedJwtPayload | undefined>()
   .withDeps<WithCreateNewEvent>()
   .build(
     async ({
-      inputParams: { conventionStartDate, conventionTotalHours, ...assessment },
+      inputParams: assessment,
       uow,
       deps,
       currentUser: conventionJwtPayload,
@@ -41,9 +40,6 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         uow,
         assessment.conventionId,
       );
-
-      if (conventionStartDate !== convention.dateStart)
-        throw errors.assessment.conventionDateStartMismatch(convention.id);
 
       await throwForbiddenIfNotAllowedForAssessments({
         mode: "CreateAssessment",
@@ -59,26 +55,9 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         (new Date(assessment.lastDayOfPresence) <
           new Date(convention.dateStart) ||
           new Date(assessment.lastDayOfPresence) > new Date(convention.dateEnd))
-      )
+      ) {
         throw errors.assessment.lastDayOfPresenceNotInConventionRange();
-
-      const scheduledHours = computeScheduledHoursForAssessment({
-        convention,
-        status: assessment.status,
-        lastDayOfPresence:
-          assessment.status === "PARTIALLY_COMPLETED"
-            ? assessment.lastDayOfPresence
-            : undefined,
-      });
-
-      if (conventionTotalHours !== convention.schedule.totalHours)
-        throw errors.assessment.conventionTotalHoursMismatch(convention.id);
-
-      if (
-        assessment.status === "PARTIALLY_COMPLETED" &&
-        assessment.numberOfMissedHours > scheduledHours
-      )
-        throw errors.assessment.numberOfMissedHoursExceedsScheduled();
+      }
 
       const assessmentEntity = await createAssessmentEntityIfNotExist(
         uow,

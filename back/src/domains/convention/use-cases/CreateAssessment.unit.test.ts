@@ -1,8 +1,7 @@
-import { addDays, subDays, subMilliseconds } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
-  type AssessmentInputDto,
   allRoles,
   ConnectedUserBuilder,
   type ConventionDomainJwtPayload,
@@ -70,11 +69,6 @@ describe("CreateAssessment", () => {
     signedAt: null,
     createdAt: new Date("2025-01-01").toISOString(),
   };
-  const assessmentInput: AssessmentInputDto = {
-    ...assessment,
-    conventionStartDate: validatedConvention.dateStart,
-    conventionTotalHours: validatedConvention.schedule.totalHours,
-  };
 
   const tutorPayload: ConventionDomainJwtPayload = {
     applicationId: validatedConvention.id,
@@ -129,14 +123,14 @@ describe("CreateAssessment", () => {
   describe("wrong path", () => {
     it("throws forbidden if no magicLink payload is provided", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, undefined),
+        createAssessment.execute(assessment, undefined),
         new ForbiddenError("No magic link provided"),
       );
     });
 
     it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           ...tutorPayload,
           applicationId: "otherId",
         }),
@@ -148,7 +142,7 @@ describe("CreateAssessment", () => {
       const notFoundId = "not-found-id";
       await expectPromiseToFailWithError(
         createAssessment.execute(
-          { ...assessmentInput, conventionId: notFoundId },
+          { ...assessment, conventionId: notFoundId },
           { ...tutorPayload, applicationId: notFoundId },
         ),
         errors.convention.notFound({ conventionId: notFoundId }),
@@ -164,7 +158,7 @@ describe("CreateAssessment", () => {
         },
       ];
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, tutorPayload),
+        createAssessment.execute(assessment, tutorPayload),
         errors.assessment.alreadyExist(assessment.conventionId),
       );
     });
@@ -187,14 +181,7 @@ describe("CreateAssessment", () => {
         createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...partiallyCompletedAssessment,
-            conventionStartDate: validatedConvention.dateStart,
-            conventionTotalHours: validatedConvention.schedule.totalHours,
-          },
-          tutorPayload,
-        ),
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
         errors.assessment.lastDayOfPresenceNotInConventionRange(),
       );
     });
@@ -217,14 +204,7 @@ describe("CreateAssessment", () => {
         createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...partiallyCompletedAssessment,
-            conventionStartDate: validatedConvention.dateStart,
-            conventionTotalHours: validatedConvention.schedule.totalHours,
-          },
-          tutorPayload,
-        ),
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
         errors.assessment.lastDayOfPresenceNotInConventionRange(),
       );
     });
@@ -240,7 +220,7 @@ describe("CreateAssessment", () => {
       uow.conventionRepository.setConventions([convention]);
 
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, tutorPayload),
+        createAssessment.execute(assessment, tutorPayload),
         errors.assessment.badStatus(status),
       );
     });
@@ -249,7 +229,7 @@ describe("CreateAssessment", () => {
       failingRoles,
     )("throws forbidden if the jwt role is '%s'", async (role) => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           applicationId: validatedConvention.id,
           emailHash: makeHashByRolesForTest(
             validatedConvention,
@@ -264,47 +244,14 @@ describe("CreateAssessment", () => {
 
     it("throws forbidden if user doesnt have allowed assessment role on convention", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
-          userId: userWithoutRoleOnConvention.id,
-        }),
+        createAssessment.execute(
+          assessment,
+
+          {
+            userId: userWithoutRoleOnConvention.id,
+          },
+        ),
         errors.assessment.forbidden("CreateAssessment"),
-      );
-    });
-
-    it("throws bad request when convention start date in inputs mismatch convention start date in convention from repo", async () => {
-      uow.conventionRepository.setConventions([validatedConvention]);
-
-      await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...assessment,
-            endedWithAJob: true,
-            typeOfContract: "CDI",
-            contractStartDate: validatedConvention.dateStart,
-            conventionStartDate: subMilliseconds(
-              new Date(validatedConvention.dateStart),
-              1,
-            ).toISOString(),
-            conventionTotalHours: validatedConvention.schedule.totalHours,
-          },
-          tutorPayload,
-        ),
-        errors.assessment.conventionDateStartMismatch(validatedConvention.id),
-      );
-    });
-
-    it("throws bad request when convention total hours in inputs mismatch convention schedule from repo", async () => {
-      uow.conventionRepository.setConventions([validatedConvention]);
-
-      await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...assessmentInput,
-            conventionTotalHours: validatedConvention.schedule.totalHours + 1,
-          },
-          tutorPayload,
-        ),
-        errors.assessment.conventionTotalHoursMismatch(validatedConvention.id),
       );
     });
 
@@ -325,7 +272,7 @@ describe("CreateAssessment", () => {
         }),
       ];
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           ...tutorPayload,
           emailHash: makeHashByRolesForTest(
             validatedConvention,
@@ -351,7 +298,7 @@ describe("CreateAssessment", () => {
         .build();
       uow.conventionRepository.setConventions([convention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         ...tutorPayload,
         role,
         emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
@@ -371,7 +318,7 @@ describe("CreateAssessment", () => {
     it("should save the Assessment when user is validator on convention", async () => {
       uow.conventionRepository.setConventions([validatedConvention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         userId: validator.id,
       });
 
@@ -387,7 +334,7 @@ describe("CreateAssessment", () => {
     it("should save the Assessment when user is counsellor on convention", async () => {
       uow.conventionRepository.setConventions([validatedConvention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         userId: counsellor.id,
       });
 
@@ -424,20 +371,13 @@ describe("CreateAssessment", () => {
 
       uow.conventionRepository.setConventions([convention]);
 
-      await createAssessment.execute(
-        {
-          ...partiallyCompletedAssessment,
-          conventionStartDate: convention.dateStart,
-          conventionTotalHours: convention.schedule.totalHours,
-        },
-        {
-          ...tutorPayload,
-          role: "establishment-tutor",
-          emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
-            "establishment-tutor"
-          ],
-        },
-      );
+      await createAssessment.execute(partiallyCompletedAssessment, {
+        ...tutorPayload,
+        role: "establishment-tutor",
+        emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
+          "establishment-tutor"
+        ],
+      });
 
       expectArraysToEqual(uow.assessmentRepository.assessments, [
         {
@@ -448,59 +388,8 @@ describe("CreateAssessment", () => {
       ]);
     });
 
-    it("rejects create assessment when missed hours exceed convention total hours (schema)", async () => {
-      const convention = new ConventionDtoBuilder(validatedConvention)
-        .withStatus("ACCEPTED_BY_VALIDATOR")
-        .withDateStart(new Date("2025-01-20").toISOString())
-        .withDateEnd(new Date("2025-01-24").toISOString())
-        .withSchedule(reasonableSchedule)
-        .build();
-
-      const partiallyCompletedAssessment: AssessmentDto = {
-        conventionId: convention.id,
-        status: "PARTIALLY_COMPLETED",
-        lastDayOfPresence: new Date("2025-01-23").toISOString(),
-        numberOfMissedHours: 100,
-        endedWithAJob: false,
-        establishmentFeedback: "Ca c'est bien passé",
-        establishmentAdvices: "mon conseil",
-        beneficiaryAgreement: null,
-        beneficiaryFeedback: null,
-        signedAt: null,
-        createdAt: new Date("2025-01-01").toISOString(),
-      };
-
-      uow.conventionRepository.setConventions([convention]);
-
-      await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...partiallyCompletedAssessment,
-            conventionStartDate: convention.dateStart,
-            conventionTotalHours: convention.schedule.totalHours,
-          },
-          {
-            ...tutorPayload,
-            applicationId: convention.id,
-            role: "establishment-tutor",
-            emailHash: makeHashByRolesForTest(
-              convention,
-              counsellor,
-              validator,
-            )["establishment-tutor"],
-          },
-        ),
-        errors.inputs.badSchema({
-          useCaseName: "CreateAssessment",
-          flattenErrors: [
-            "numberOfMissedHours : Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
-          ],
-        }),
-      );
-    });
-
     it("should dispatch an AssessmentCreated event", async () => {
-      await createAssessment.execute(assessmentInput, tutorPayload);
+      await createAssessment.execute(assessment, tutorPayload);
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         {

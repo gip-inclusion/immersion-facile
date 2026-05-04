@@ -3,7 +3,6 @@ import {
   AgencyDtoBuilder,
   type AssessmentDto,
   AssessmentDtoBuilder,
-  type AssessmentInputDto,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
   ConventionDtoBuilder,
@@ -103,10 +102,8 @@ describe("Assessment routes", () => {
       gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLinkAssessment"]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
-      const assessment: AssessmentInputDto = {
+      const assessment: AssessmentDto = {
         conventionId: convention.id,
-        conventionStartDate: convention.dateStart,
-        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -138,10 +135,8 @@ describe("Assessment routes", () => {
     });
 
     it("fails with 401 if jwt is not valid", async () => {
-      const assessment: AssessmentInputDto = {
+      const assessment: AssessmentDto = {
         conventionId: convention.id,
-        conventionStartDate: convention.dateStart,
-        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -164,10 +159,8 @@ describe("Assessment routes", () => {
     });
 
     it("fails with 400 if some data is not valid", async () => {
-      const assessment: AssessmentInputDto = {
+      const assessment: AssessmentDto = {
         conventionId: convention.id,
-        conventionStartDate: convention.dateStart,
-        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "",
         endedWithAJob: false,
@@ -202,10 +195,8 @@ describe("Assessment routes", () => {
 
       inMemoryUow.conventionRepository.setConventions([anotherConvention]);
 
-      const assessment: AssessmentInputDto = {
+      const assessment: AssessmentDto = {
         conventionId: anotherConvention.id,
-        conventionStartDate: convention.dateStart,
-        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "mon feedback",
         endedWithAJob: false,
@@ -237,7 +228,6 @@ describe("Assessment routes", () => {
     it("returns 200 if the jwt is valid and assessment is assessmentDto", async () => {
       const assessment: AssessmentDto = {
         conventionId: convention.id,
-
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -249,11 +239,7 @@ describe("Assessment routes", () => {
       };
 
       await httpClient.createAssessment({
-        body: {
-          ...assessment,
-          conventionStartDate: convention.dateStart,
-          conventionTotalHours: convention.schedule.totalHours,
-        },
+        body: assessment,
         headers: { authorization: jwt },
       });
 
@@ -301,10 +287,8 @@ describe("Assessment routes", () => {
     conventionMagicLinkRoutes.deleteAssessment,
   )} to delete assessment`, () => {
     it("returns 204 when admin deletes existing assessment", async () => {
-      const assessment: AssessmentInputDto = {
+      const assessment: AssessmentDto = {
         conventionId: convention.id,
-        conventionStartDate: convention.dateStart,
-        conventionTotalHours: convention.schedule.totalHours,
         status: "COMPLETED",
         establishmentFeedback: "Feedback",
         endedWithAJob: false,

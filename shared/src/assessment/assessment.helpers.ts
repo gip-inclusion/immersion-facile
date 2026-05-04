@@ -22,22 +22,6 @@ export const isBeforeAssessmentSignatureReleaseDate = (
     new Date(assessmentCreatedAt),
     addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
   );
-export const computeScheduledHoursForAssessment = ({
-  convention,
-  status,
-  lastDayOfPresence,
-}: {
-  convention: ConventionDto;
-  status: AssessmentStatus | null;
-  lastDayOfPresence: DateString | undefined;
-}): number =>
-  status === "PARTIALLY_COMPLETED" && lastDayOfPresence
-    ? calculateTotalImmersionHoursBetweenDateComplex({
-        complexSchedule: convention.schedule.complexSchedule,
-        dateStart: convention.dateStart,
-        dateEnd: lastDayOfPresence,
-      })
-    : convention.schedule.totalHours;
 
 export const computeTotalHours = ({
   convention,
