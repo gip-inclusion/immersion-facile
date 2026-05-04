@@ -138,6 +138,8 @@ describe("BroadcastConventionAgain", () => {
           serviceName: broadcastToFtServiceName,
           consumerId: "my-consumer-id",
           consumerName: "My consumer name",
+          conventionId: convention.id,
+          agencyId: agency.id,
           requestParams: {
             conventionId: convention.id,
           },
@@ -174,6 +176,8 @@ describe("BroadcastConventionAgain", () => {
           serviceName: broadcastToFtServiceName,
           consumerId: "my-consumer-id",
           consumerName: "My consumer name",
+          conventionId: convention.id,
+          agencyId: agency.id,
           requestParams: {
             conventionId: convention.id,
           },

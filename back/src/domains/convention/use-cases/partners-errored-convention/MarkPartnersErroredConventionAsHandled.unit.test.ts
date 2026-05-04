@@ -84,6 +84,8 @@ describe("mark partners errored convention as handled", () => {
       serviceName: broadcastToFtServiceName,
       consumerName: "Yolo",
       consumerId: "yolo-id",
+      conventionId,
+      agencyId: agency.id,
       requestParams: {
         conventionId,
       },
@@ -158,6 +160,8 @@ describe("mark partners errored convention as handled", () => {
       serviceName: broadcastToFtServiceName,
       consumerId: "my-consumer-id",
       consumerName: "My consumer name",
+      conventionId,
+      agencyId: agency.id,
       requestParams: {
         conventionId,
       },

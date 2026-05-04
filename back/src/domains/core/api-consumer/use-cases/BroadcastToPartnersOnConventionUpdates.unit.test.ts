@@ -343,6 +343,8 @@ describe("Broadcast to partners on updated convention", () => {
     const expectedBroadcastFeedback: BroadcastFeedback = {
       consumerId: apiConsumer1.id,
       consumerName: apiConsumer1.name,
+      conventionId: convention1.id,
+      agencyId: convention1.agencyId,
       handledByAgency: false,
       subscriberErrorFeedback: errorResponse.subscriberErrorFeedback,
       occurredAt: now.toISOString(),
@@ -390,6 +392,8 @@ describe("Broadcast to partners on updated convention", () => {
     const expectedBroadcastFeedback: BroadcastFeedback = {
       consumerId: apiConsumer1.id,
       consumerName: apiConsumer1.name,
+      conventionId: convention1.id,
+      agencyId: convention1.agencyId,
       handledByAgency: false,
       occurredAt: now.toISOString(),
       requestParams: {

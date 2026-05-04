@@ -1,4 +1,5 @@
 import type {
+  AgencyId,
   ApiConsumerId,
   ApiConsumerName,
   ConventionId,
@@ -26,6 +27,8 @@ export type BroadcastFeedback = {
   serviceName: string;
   consumerId: ApiConsumerId | null;
   consumerName: ApiConsumerName;
+  conventionId: ConventionId;
+  agencyId: AgencyId | null;
   subscriberErrorFeedback?: SubscriberErrorFeedback;
   requestParams: ConventionBroadcastRequestParams;
   response?: BroadcastFeedbackResponse;
