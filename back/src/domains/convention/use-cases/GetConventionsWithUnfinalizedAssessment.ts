@@ -3,7 +3,6 @@ import {
   type ConventionWithUnfinalizedAssessment,
   type DataWithPagination,
   getPaginationParamsForWeb,
-  type PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
 } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -16,9 +15,7 @@ export type GetConventionsWithUnfinalizedAssessment = ReturnType<
 export const makeGetConventionsWithUnfinalizedAssessment = useCaseBuilder(
   "GetConventionsWithUnfinalizedAssessment",
 )
-  .withInput<Required<PaginationQueryParams>>(
-    paginationRequiredQueryParamsSchema,
-  )
+  .withInput(paginationRequiredQueryParamsSchema)
   .withOutput<DataWithPagination<ConventionWithUnfinalizedAssessment>>()
   .withCurrentUser<ConnectedUser>()
   .withDeps<{ timeGateway: TimeGateway }>()
