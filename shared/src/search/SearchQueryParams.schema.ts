@@ -8,7 +8,7 @@ import {
   paginationQueryParamsSchema,
   sortDirectionSchema,
 } from "../pagination/pagination.schema";
-import { withOptionnalRemoteWorkModesSchema } from "../remoteWorkMode/remoteWorkMode.schema";
+import { withOptionalRemoteWorkModesSchema } from "../remoteWorkMode/remoteWorkMode.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -126,7 +126,7 @@ export const getOffersFlatParamsSchema: z.ZodType<
   .and(paginationQueryParamsSchema)
   .and(geoParamsAndSortSchema)
   .and(withAcquisitionSchema)
-  .and(withOptionnalRemoteWorkModesSchema);
+  .and(withOptionalRemoteWorkModesSchema);
 
 export const getExternalOffersFlatParamsSchema: z.ZodType<
   GetExternalOffersFlatQueryParams,
