@@ -17,7 +17,7 @@ export const remoteWorkModeShape = {
 export const withRemoteWorkModeSchema: ZodSchemaWithInputMatchingOutput<WithRemoteWorkMode> =
   z.object(remoteWorkModeShape);
 
-export const withOptionnalRemoteWorkModesSchema: ZodSchemaWithInputMatchingOutput<WithOptionalRemoteWorkModes> =
+export const withOptionalRemoteWorkModesSchema: ZodSchemaWithInputMatchingOutput<WithOptionalRemoteWorkModes> =
   z.object({
     remoteWorkModes: z.array(remoteWorkModeSchema).optional(),
   });
