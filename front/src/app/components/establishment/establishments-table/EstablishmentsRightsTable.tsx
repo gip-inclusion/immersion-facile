@@ -7,6 +7,7 @@ import type {
   UserEstablishmentRightDetailsWithAcceptedStatus,
   UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
+import { match } from "ts-pattern";
 import { establishmentRoleToDisplay } from "../establishment-users";
 import { EstablishmentLineAdminsInfos } from "./establishment-line/EstablishmentLineAdminInfos";
 import { EstablishmentLineBusinessName } from "./establishment-line/EstablishmentLineBusinessName";
@@ -39,7 +40,7 @@ const getEstablishmentRightLineHeaders = (
 ) => {
   const strategy: Record<EstablishmentUserRightStatus, string[]> = {
     ACCEPTED: ["Établissement", "Administrateurs", "Rôle"],
-    PENDING: ["Établissement", "Rôle et préférences demandées"],
+    PENDING: ["Établissement", "Rôle et préférences demandés"],
   };
   return strategy[status];
 };
@@ -53,28 +54,29 @@ const makeEstablishmentRightLine = ({
   isBackofficeAdmin?: boolean;
 }): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[data.role];
-  return data.status === "ACCEPTED"
-    ? [
-        <EstablishmentLineBusinessName
-          key={data.siret}
-          data={data}
-          isBackofficeAdmin={isBackofficeAdmin}
-        />,
-        <EstablishmentLineAdminsInfos key={data.siret} data={data} />,
-        <Badge
-          small
-          className={fr.cx(roleDisplay.className, "fr-mr-1w")}
-          key={roleDisplay.label}
-        >
-          {roleDisplay.label}
-        </Badge>,
-      ]
-    : [
-        <EstablishmentLineBusinessName
-          key={data.siret}
-          data={data}
-          isBackofficeAdmin={isBackofficeAdmin}
-        />,
-        <EstablishmentLineDesiredRoleInfos key={data.siret} data={data} />,
-      ];
+  return match(data)
+    .with({ status: "ACCEPTED" }, (data) => [
+      <EstablishmentLineBusinessName
+        key={data.siret}
+        data={data}
+        isBackofficeAdmin={isBackofficeAdmin}
+      />,
+      <EstablishmentLineAdminsInfos key={data.siret} data={data} />,
+      <Badge
+        small
+        className={fr.cx(roleDisplay.className, "fr-mr-1w")}
+        key={roleDisplay.label}
+      >
+        {roleDisplay.label}
+      </Badge>,
+    ])
+    .with({ status: "PENDING" }, (data) => [
+      <EstablishmentLineBusinessName
+        key={data.siret}
+        data={data}
+        isBackofficeAdmin={isBackofficeAdmin}
+      />,
+      <EstablishmentLineDesiredRoleInfos key={data.siret} data={data} />,
+    ])
+    .exhaustive();
 };
