@@ -56,10 +56,8 @@ export const makeSaveNotificationAndRelatedEvent =
       priority: options?.priority,
     });
 
-    await Promise.all([
-      uow.notificationRepository.save(notification),
-      uow.outboxRepository.save(event),
-    ]);
+    await uow.notificationRepository.save(notification);
+    await uow.outboxRepository.save(event);
 
     return notification;
   };
@@ -99,10 +97,8 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
       priority: options?.priority ?? defaultPriority,
     });
 
-    await Promise.all([
-      uow.notificationRepository.saveBatch(notifications),
-      uow.outboxRepository.save(event),
-    ]);
+    await uow.notificationRepository.saveBatch(notifications);
+    await uow.outboxRepository.save(event);
 
     return notifications;
   };
