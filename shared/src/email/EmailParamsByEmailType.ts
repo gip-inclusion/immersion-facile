@@ -527,4 +527,13 @@ export type EmailParamsByEmailType = {
     recipientsInEmailInError: string[];
     errorMessage: string;
   };
+  ESTABLISHMENT_USER_RIGHT_IS_PENDING: {
+    establishmentDashboardUrl: AbsoluteUrl;
+    adminFirstName: string | undefined;
+    adminLastName: string | undefined;
+    pendingUserFirstName: string | undefined;
+    pendingUserLastName: string | undefined;
+    pendingUserRole: EstablishmentRole;
+    pendingUserEmail: Email;
+  };
 };

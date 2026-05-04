@@ -208,13 +208,8 @@ describe("RegisterUserOnEstablishment", () => {
           topic: "PendingUserRightRegisteredOnEstablishment",
           payload: {
             siret: establishmentAggregate.establishment.siret,
-            userRight: {
-              userId: anyConnectedUser.id,
-              role: "establishment-contact",
-              status: "PENDING",
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-            },
+            userId: anyConnectedUser.id,
+            role: "establishment-contact",
             triggeredBy: {
               kind: "connected-user",
               userId: anyConnectedUser.id,
