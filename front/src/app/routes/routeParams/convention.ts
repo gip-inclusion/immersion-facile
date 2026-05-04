@@ -357,6 +357,7 @@ export const conventionPresentationFromConventionDraft = (
     phone: conventionDraft.establishmentTutor?.phone ?? "",
     job: conventionDraft.establishmentTutor?.job ?? "",
   },
+  isEstablishmentBanned: false,
   signatories: {
     beneficiary: {
       role: "beneficiary",
