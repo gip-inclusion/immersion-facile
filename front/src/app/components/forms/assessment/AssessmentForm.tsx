@@ -349,6 +349,7 @@ const AssessmentStatusSection = ({
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
                     value: numberOfMissedMinutesDisplayed || "",
                   }}
+                  {...getFieldError("numberOfMissedHours")}
                 />
               </div>
             </>
