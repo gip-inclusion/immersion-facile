@@ -30,7 +30,6 @@ import {
   makeApiConsumerActionButtons,
 } from "src/app/contents/admin/apiConsumer";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   buttonsToModalButtons,
@@ -40,6 +39,7 @@ import {
 } from "src/app/utils/createFormModal";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 
@@ -70,7 +70,7 @@ export const ApiConsumersSection = () => {
   });
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const dispatch = useDispatch();
-  const adminToken = useAdminToken();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const feedback = useFeedbackTopic("api-consumer-global");
   const renewFeedback = useFeedbackTopic("api-consumer-renew");
   const revokeFeedback = useFeedbackTopic("api-consumer-revoke");
@@ -84,24 +84,28 @@ export const ApiConsumersSection = () => {
     useState<ApiConsumer | null>(null);
 
   useEffect(() => {
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(
+          connectedUserJwt,
+        ),
       );
     return () => {
       dispatch(apiConsumerSlice.actions.clearApiConsumersRequested());
     };
-  }, [adminToken, dispatch]);
+  }, [connectedUserJwt, dispatch]);
 
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(
+          connectedUserJwt,
+        ),
       );
-  }, [isApiConsumerModalOpened, dispatch, adminToken]);
+  }, [isApiConsumerModalOpened, dispatch, connectedUserJwt]);
 
   const [currentApiConsumerToEdit, setCurrentApiConsumerToEdit] =
     useState<ApiConsumer>(defaultApiConsumerValues(uuidV4()));
@@ -121,9 +125,11 @@ export const ApiConsumersSection = () => {
 
   const onConfirmTokenModalClose = () => {
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(
+          connectedUserJwt,
+        ),
       );
     apiConsumerModal.close();
   };
@@ -142,22 +148,22 @@ export const ApiConsumersSection = () => {
   };
 
   const onConfirmRevoke = () => {
-    if (!adminToken || !apiConsumerToActOn) return;
+    if (!connectedUserJwt || !apiConsumerToActOn) return;
     dispatch(
       apiConsumerSlice.actions.revokeApiConsumerRequested({
         apiConsumerId: apiConsumerToActOn.id,
-        adminToken,
+        adminToken: connectedUserJwt,
         feedbackTopic: "api-consumer-revoke",
       }),
     );
   };
 
   const onConfirmRenewKey = () => {
-    if (!adminToken || !apiConsumerToActOn) return;
+    if (!connectedUserJwt || !apiConsumerToActOn) return;
     dispatch(
       apiConsumerSlice.actions.renewApiConsumerKeyRequested({
         apiConsumerId: apiConsumerToActOn.id,
-        adminToken,
+        adminToken: connectedUserJwt,
         feedbackTopic: "api-consumer-renew",
       }),
     );
@@ -167,9 +173,11 @@ export const ApiConsumersSection = () => {
     revokeApiConsumerModal.close();
     setApiConsumerToActOn(null);
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(
+          connectedUserJwt,
+        ),
       );
   };
 
@@ -178,9 +186,11 @@ export const ApiConsumersSection = () => {
     setApiConsumerToActOn(null);
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
+        apiConsumerSlice.actions.retrieveApiConsumersRequested(
+          connectedUserJwt,
+        ),
       );
   };
 

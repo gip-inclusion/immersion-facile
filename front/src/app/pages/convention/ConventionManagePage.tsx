@@ -6,8 +6,9 @@ import {
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { match } from "ts-pattern";
 import type { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
@@ -19,15 +20,16 @@ type ConventionManagePageProps = {
 };
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
-  const adminToken = useAdminToken();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+
   const jwtParams: JwtKindProps | undefined = match(route)
     .with(
       {
         name: "adminConventionDetail",
       },
       () =>
-        (adminToken
-          ? { jwt: adminToken, kind: "connected user backoffice" }
+        (connectedUserJwt
+          ? { jwt: connectedUserJwt, kind: "connected user backoffice" }
           : undefined) satisfies JwtKindProps | undefined,
     )
     .with(

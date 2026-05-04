@@ -25,7 +25,6 @@ import { OffersSettingsSection } from "src/app/components/forms/establishment/se
 import { SummarySection } from "src/app/components/forms/establishment/sections/SummarySection";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { type routes, useRoute } from "src/app/routes/routes";
@@ -86,7 +85,6 @@ export type OnStepChange = (
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
-  const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
 
   const isEstablishmentCreation = route.name === "formEstablishment";
@@ -197,7 +195,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useEffect(() => {
     match({
       route: currentRoute,
-      adminJwt,
       connectedUserJwt,
     })
       .with(
@@ -223,7 +220,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
       )
       .with(
-        { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          connectedUserJwt: P.nullish,
+        },
         () => {
           throw errors.user.notBackOfficeAdmin();
         },
@@ -231,14 +231,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "manageEstablishmentAdmin" },
-          adminJwt: P.not(P.nullish),
+          connectedUserJwt: P.not(P.nullish),
         },
-        ({ route, adminJwt }) =>
+        ({ route, connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.fetchEstablishmentRequested({
               establishmentRequested: {
                 siret: route.params.siret,
-                jwt: adminJwt,
+                jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
             }),
@@ -270,7 +270,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
       )
       .exhaustive();
-  }, [adminJwt, dispatch, connectedUserJwt, currentRoute]);
+  }, [dispatch, connectedUserJwt, currentRoute]);
 
   useEffect(() => {
     reset({
@@ -304,7 +304,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [dispatch]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
-    match({ route, adminJwt, connectedUserJwt })
+    match({ route, connectedUserJwt })
       .with(
         {
           route: {
@@ -324,14 +324,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "manageEstablishmentAdmin" },
-          adminJwt: P.not(P.nullish),
+          connectedUserJwt: P.not(P.nullish),
         },
-        ({ adminJwt }) =>
+        ({ connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.updateEstablishmentRequested({
               establishmentUpdate: {
                 formEstablishment,
-                jwt: adminJwt,
+                jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
             }),
@@ -367,7 +367,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "manageEstablishmentAdmin" },
-          adminJwt: P.nullish,
+          connectedUserJwt: P.nullish,
         },
         () => {
           throw frontErrors.generic.unauthorized();
