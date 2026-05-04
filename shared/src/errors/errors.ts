@@ -238,18 +238,6 @@ export const errors = {
       new BadRequestError(
         `Impossible de relancer la demande de completion du bilan pour les conventions se terminant dans plus d'un jour.`,
       ),
-    conventionDateStartMismatch: (conventionId: ConventionId) =>
-      new BadRequestError(
-        `Il y a un écart entre la date de démarrage de l'immersion '${conventionId}' dans la convention et celle indiquée dans les paramètre de la demande.`,
-      ),
-    conventionTotalHoursMismatch: (conventionId: ConventionId) =>
-      new BadRequestError(
-        `Il y a un écart entre le nombre total d'heures prévues dans la convention '${conventionId}' et celui indiqué dans les paramètres de la demande.`,
-      ),
-    numberOfMissedHoursExceedsScheduled: () =>
-      new BadRequestError(
-        "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
-      ),
     conventionIdMismatch: () =>
       new ForbiddenError(
         "Il y a un décalage d'identifiant de convention dans les données envoyées.",
