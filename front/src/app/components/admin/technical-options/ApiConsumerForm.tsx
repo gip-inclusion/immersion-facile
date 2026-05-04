@@ -20,9 +20,10 @@ import {
 import { allAgencyKindListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFormModal } from "src/app/utils/createFormModal";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 export const ApiConsumerForm = ({
   initialValues,
@@ -36,7 +37,7 @@ export const ApiConsumerForm = ({
     mode: "onTouched",
     defaultValues: initialValues,
   });
-  const adminToken = useAdminToken();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const { getValues, register, setValue, handleSubmit, formState, reset } =
     methods;
@@ -46,11 +47,11 @@ export const ApiConsumerForm = ({
   const getFieldError = makeFieldError(formState);
 
   const onValidSubmit = (values: ApiConsumer) => {
-    adminToken &&
+    connectedUserJwt &&
       dispatch(
         apiConsumerSlice.actions.saveApiConsumerRequested({
           apiConsumer: values,
-          adminToken,
+          adminToken: connectedUserJwt,
           feedbackTopic: "api-consumer-global",
         }),
       );

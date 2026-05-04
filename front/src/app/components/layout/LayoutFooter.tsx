@@ -138,12 +138,6 @@ const links: NavLink[] = [
     id: linksIds.civilService,
     target: "_blank",
   },
-  {
-    label: "api.gouv.fr",
-    href: "https://api.gouv.fr/",
-    id: linksIds.inclusion,
-    target: "_blank",
-  },
 ];
 
 export const immersionFacileSupportUrl: AbsoluteUrl =

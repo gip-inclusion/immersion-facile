@@ -1,7 +1,8 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
@@ -13,11 +14,12 @@ export const AdminConventionDetail = ({
   route,
 }: ConventionManageAdminPageProps) => {
   const conventionId = route.params.conventionId;
-  const backOfficeJwt = useAdminToken();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const isBackOfficeAdmin = useAppSelector(authSelectors.isAdminConnected);
 
-  return backOfficeJwt ? (
+  return connectedUserJwt && isBackOfficeAdmin ? (
     <ConventionManageContent
-      jwtParams={{ jwt: backOfficeJwt, kind: "connected user backoffice" }}
+      jwtParams={{ jwt: connectedUserJwt, kind: "connected user backoffice" }}
       conventionId={conventionId}
     />
   ) : (

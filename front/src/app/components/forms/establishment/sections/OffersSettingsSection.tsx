@@ -39,7 +39,6 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -97,7 +96,7 @@ export const OffersSettingsSection = ({
 }) => {
   const { setValue, watch, clearErrors, getValues, register, formState } =
     useFormContext<FormEstablishmentDto>();
-  const adminJwt = useAdminToken();
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const route = useRoute() as RouteByMode[Mode];
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
 
@@ -150,17 +149,17 @@ export const OffersSettingsSection = ({
       `! Etes-vous sûr de vouloir supprimer cet établissement ? !
                 (cette opération est irréversible 💀)`,
     );
-    if (confirmed && adminJwt)
+    if (confirmed && connectedUserJwt)
       dispatch(
         establishmentSlice.actions.deleteEstablishmentRequested({
           establishmentDelete: {
             siret: formValues.siret,
-            jwt: adminJwt,
+            jwt: connectedUserJwt,
           },
           feedbackTopic: "form-establishment",
         }),
       );
-    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
+    if (confirmed && !connectedUserJwt) alert("Vous n'êtes pas admin.");
   };
 
   const availableForImmersion = isAvailableForImmersion();
