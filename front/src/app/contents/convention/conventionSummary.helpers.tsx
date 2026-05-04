@@ -602,7 +602,16 @@ const makeEstablishmentSubSections = (
   return [
     {
       key: "establishment",
-      header: { title: "Entreprise" },
+      header: {
+        title: "Entreprise",
+        badge: !convention.isEstablishmentBanned
+          ? undefined
+          : ({
+              severity: "error",
+              small: true,
+              children: "ENTREPRISE BANNIE",
+            } satisfies BadgeProps),
+      },
       fields: [
         {
           key: "businessName",

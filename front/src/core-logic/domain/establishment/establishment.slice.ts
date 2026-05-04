@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
+  type BanEstablishmentPayload,
   type ConnectedUserJwt,
   defaultMaxContactsPerMonth,
   type EstablishmentNameAndAdmins,
@@ -41,6 +42,10 @@ export type UserRegistrationOnEstablishmentPayload = {
   jwt: ConnectedUserJwt;
 };
 
+export type BanEstablishmentRequestPayload = BanEstablishmentPayload & {
+  jwt: ConnectedUserJwt;
+};
+
 export type EstablishmentRequestedPayload = SiretAndJwtPayload;
 
 export const defaultFormEstablishmentValue = (
@@ -64,6 +69,7 @@ export const defaultFormEstablishmentValue = (
     jobSeekers: true,
     students: true,
   },
+  isEstablishmentBanned: false,
 });
 
 export type EstablishmentState = {
@@ -242,6 +248,26 @@ export const establishmentSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+
+    banEstablishmentRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<BanEstablishmentRequestPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    banEstablishmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    banEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+
     clearEstablishmentRequested: () => initialState,
   },
   extraReducers(builder) {

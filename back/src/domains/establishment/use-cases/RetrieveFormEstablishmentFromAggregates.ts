@@ -29,15 +29,15 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   ) {
     if (!jwtPayload) throw errors.user.noJwtProvided();
 
+    const currentUser = await uow.userRepository.getById(jwtPayload.userId);
+    if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
+
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
 
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
-
-    const currentUser = await uow.userRepository.getById(jwtPayload.userId);
-    if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
 
     if (
       establishmentAggregate.userRights.some(
@@ -87,6 +87,16 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       nextAvailabilityDate:
         establishmentAggregate.establishment.nextAvailabilityDate,
       searchableBy: establishmentAggregate.establishment.searchableBy,
+      ...(establishmentAggregate.establishment.isEstablishmentBanned
+        ? {
+            isEstablishmentBanned: true,
+            establishmentBannishmentJustification:
+              establishmentAggregate.establishment
+                .establishmentBannishmentJustification,
+          }
+        : {
+            isEstablishmentBanned: false,
+          }),
       ...(establishmentAggregate.establishment.contactMode === "IN_PERSON"
         ? {
             potentialBeneficiaryWelcomeAddress:

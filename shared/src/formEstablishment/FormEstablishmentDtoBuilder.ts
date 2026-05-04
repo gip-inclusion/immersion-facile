@@ -147,6 +147,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   },
   acquisitionKeyword: undefined,
   acquisitionCampaign: undefined,
+  isEstablishmentBanned: false,
 };
 
 export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
@@ -200,6 +201,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   fitForDisabledWorkers: "no",
   isEngagedEnterprise: false,
   nextAvailabilityDate: new Date("2025-02-01").toISOString(),
+  isEstablishmentBanned: false,
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -227,6 +229,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   },
   acquisitionKeyword: undefined,
   acquisitionCampaign: undefined,
+  isEstablishmentBanned: false,
 };
 
 export class FormEstablishmentDtoBuilder

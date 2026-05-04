@@ -1,4 +1,5 @@
 import {
+  type BanEstablishmentPayload,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
@@ -110,6 +111,30 @@ describe("formCompletion Routes", () => {
           message:
             "Schema validation failed in usecase GetSiret for element with id not_a_valid_siret. See issues for details.",
           issues: ["siret : SIRET doit être composé de 14 chiffres"],
+        },
+      });
+    });
+
+    it("403 - siret already banned", async () => {
+      const banEstablishmentPayload: BanEstablishmentPayload = {
+        siret: "12345678912345",
+        establishmentBannishmentJustification:
+          "Le cidre vendu n'est pas breton",
+      };
+
+      inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishmentPayload,
+      ];
+
+      const response = await httpClient.getSiretInfo({
+        urlParams: { siret: banEstablishmentPayload.siret },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: `L'entreprise avec le siret '${banEstablishmentPayload.siret}' est bannie`,
         },
       });
     });

@@ -349,7 +349,10 @@ type TestAcceptNewStatusParams = {
 } & ({ role: ConventionRole } | { userId: ConnectedTestUser });
 
 type UpdatedFields = Partial<
-  ConventionDto & {
+  Omit<
+    ConventionDto,
+    "isEstablishmentBanned" | "establishmentBannishmentJustification"
+  > & {
     establishmentRepresentativeSignedAt: string | undefined;
     beneficiarySignedAt: string | undefined;
   }

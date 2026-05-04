@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Card from "@codegouvfr/react-dsfr/Card";
 import Input from "@codegouvfr/react-dsfr/Input";
@@ -147,9 +148,20 @@ export const RequestRegisterEstablishmentsForUserForm = ({
               >
                 <Card
                   title={
-                    establishmentPublicOption.businessNameCustomized
-                      ? establishmentPublicOption.businessNameCustomized
-                      : establishmentPublicOption.businessName
+                    <div className={fr.cx("fr-grid-row--center")}>
+                      <div className={fr.cx("fr-col-12")}>
+                        {establishmentPublicOption.businessNameCustomized
+                          ? establishmentPublicOption.businessNameCustomized
+                          : establishmentPublicOption.businessName}
+                      </div>
+                      {establishmentPublicOption.isEstablishmentBanned && (
+                        <div className={fr.cx("fr-col-12")}>
+                          <Badge severity="error" small>
+                            ENTREPRISE BANNIE
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
                   }
                   desc={establishmentPublicOption.siret}
                   endDetail={
@@ -163,10 +175,12 @@ export const RequestRegisterEstablishmentsForUserForm = ({
                       size="small"
                       id={`${domElementIds.myProfileEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
                       disabled={
+                        establishmentPublicOption.isEstablishmentBanned ||
                         getStatusOnEstablishment(
                           establishmentPublicOption.siret,
                         ) !== undefined
                       }
+                      className={fr.cx("fr-mt-auto")}
                     >
                       {match(
                         getStatusOnEstablishment(

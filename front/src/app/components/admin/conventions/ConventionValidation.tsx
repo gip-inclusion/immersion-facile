@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { intersection } from "ramda";
@@ -218,6 +219,16 @@ export const ConventionValidation = ({
       {isConventionRenewed(convention) && (
         <ConventionRenewedInformations renewed={convention.renewed} />
       )}
+
+      {convention.isEstablishmentBanned && !convention.dateValidation && (
+        <Alert
+          severity="error"
+          description="L’entreprise liée à cette convention a été bannie d’Immersion Facilitée suite à des signalements. Nous vous recommandons de ne pas valider cette convention."
+          small
+          className={fr.cx("fr-mb-5v")}
+        />
+      )}
+
       <ConventionSummary
         illustration={commonIllustrations.documentsAdministratifs}
         submittedAt={toDisplayedDate({

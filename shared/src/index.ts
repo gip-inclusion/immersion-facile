@@ -68,6 +68,7 @@ export * from "./environment";
 export * from "./errors/errors";
 export * from "./errors/ftConnectErrors";
 export * from "./errors/httpErrors";
+export * from "./establishment/bannedEstablishmentInformations";
 export * from "./establishment/businessAddress";
 export * from "./establishment/businessName";
 export * from "./establishment/establishment";

@@ -96,6 +96,7 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("exchanges").execute();
     await db.deleteFrom("convention_templates").execute();
     await db.deleteFrom("users").execute();
+    await db.deleteFrom("banned_establishments").execute();
 
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
@@ -399,6 +400,44 @@ describe("PgDiscussionRepository", () => {
 
       it("getById undefined when there is no discussion", async () => {
         expectToEqual(await pgDiscussionRepository.getById(uuid()), undefined);
+      });
+
+      it("getById returns isEstablishmentBanned: false when establishment is not banned", async () => {
+        const discussion = new DiscussionBuilder()
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120098")
+          .withSiret("11112222333300")
+          .build();
+
+        await pgDiscussionRepository.insert(discussion);
+
+        expectToEqual(await pgDiscussionRepository.getById(discussion.id), {
+          ...discussion,
+          isEstablishmentBanned: false,
+        });
+      });
+
+      it("getById fills isEstablishmentBanned and establishmentBannishmentJustification when establishment is banned", async () => {
+        const siret = "11112222333300";
+        const bannishmentJustification = "Fraude détectée lors d'un contrôle";
+        const discussion = new DiscussionBuilder()
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120099")
+          .withSiret(siret)
+          .build();
+
+        await pgDiscussionRepository.insert(discussion);
+        await db
+          .insertInto("banned_establishments")
+          .values({
+            siret,
+            bannishment_justification: bannishmentJustification,
+          })
+          .execute();
+
+        expectToEqual(await pgDiscussionRepository.getById(discussion.id), {
+          ...discussion,
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification: bannishmentJustification,
+        });
       });
     });
 
@@ -2429,6 +2468,7 @@ describe("PgDiscussionRepository", () => {
         businessName: discussion2.businessName,
         createdAt: discussion2.createdAt,
         kind: discussion2.kind,
+        isEstablishmentBanned: false,
         potentialBeneficiary: {
           firstName: discussion2.potentialBeneficiary.firstName,
           lastName: discussion2.potentialBeneficiary.lastName,
@@ -2447,6 +2487,7 @@ describe("PgDiscussionRepository", () => {
         businessName: discussion3.businessName,
         createdAt: discussion3.createdAt,
         kind: discussion3.kind,
+        isEstablishmentBanned: false,
         potentialBeneficiary: {
           firstName: discussion3.potentialBeneficiary.firstName,
           lastName: discussion3.potentialBeneficiary.lastName,
@@ -2465,6 +2506,7 @@ describe("PgDiscussionRepository", () => {
         businessName: discussion4.businessName,
         createdAt: discussion4.createdAt,
         kind: discussion4.kind,
+        isEstablishmentBanned: false,
         potentialBeneficiary: {
           firstName: discussion4.potentialBeneficiary.firstName,
           lastName: discussion4.potentialBeneficiary.lastName,
@@ -2695,6 +2737,7 @@ describe("PgDiscussionRepository", () => {
           businessName: discussionWhereUserIsEstablishment.businessName,
           createdAt: discussionWhereUserIsEstablishment.createdAt,
           kind: discussionWhereUserIsEstablishment.kind,
+          isEstablishmentBanned: false,
           potentialBeneficiary: {
             firstName:
               discussionWhereUserIsEstablishment.potentialBeneficiary.firstName,
@@ -2717,6 +2760,7 @@ describe("PgDiscussionRepository", () => {
           businessName: discussionWhereUserIsPotentialBeneficiary.businessName,
           createdAt: discussionWhereUserIsPotentialBeneficiary.createdAt,
           kind: discussionWhereUserIsPotentialBeneficiary.kind,
+          isEstablishmentBanned: false,
           potentialBeneficiary: {
             firstName:
               discussionWhereUserIsPotentialBeneficiary.potentialBeneficiary

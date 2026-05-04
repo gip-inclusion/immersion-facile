@@ -758,6 +758,8 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' a déjà un droit sur l'entreprise '${siret}'.`,
       ),
+    bannedEstablishment: ({ siret }: { siret: SiretDto }) =>
+      new ForbiddenError(`L'entreprise avec le siret '${siret}' est bannie`),
   },
   establishmentLead: {
     notFound: ({ siret }: { siret: SiretDto }) =>
@@ -769,6 +771,12 @@ export const errors = {
     notFound: ({ siret }: { siret: string }) =>
       new NotFoundError(
         `Les informations de marketing d'entreprise avec le siret '${siret}' ne sont pas trouvés.`,
+      ),
+  },
+  bannedEstablishment: {
+    alreadyBanned: ({ siret }: { siret: SiretDto }) =>
+      new ConflictError(
+        `L'établissement avec le siret '${siret}' est déjà banni.`,
       ),
   },
   establishmentCsv: {

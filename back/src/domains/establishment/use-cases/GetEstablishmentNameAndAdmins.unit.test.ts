@@ -83,6 +83,30 @@ describe("GetEstablishmentNameAndAdmins", () => {
                 businessName: establishment.establishment.name,
                 status: "ACCEPTED",
                 admins: [],
+                isEstablishmentBanned: false,
+              },
+            ],
+            agencyRights: [],
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
+          },
+        },
+        {
+          name: "when user have establishment rights and establishment is banned",
+          currentUser: {
+            ...establishmentContactUser,
+            establishments: [
+              {
+                role: "establishment-contact",
+                siret: establishment.establishment.siret,
+                businessName: establishment.establishment.name,
+                status: "ACCEPTED",
+                admins: [],
+                isEstablishmentBanned: true,
+                establishmentBannishmentJustification:
+                  "Ils diffusent du rock pendant les fest noz",
               },
             ],
             agencyRights: [],

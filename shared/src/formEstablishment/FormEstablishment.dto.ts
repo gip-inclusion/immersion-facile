@@ -3,6 +3,7 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition, LocationId } from "../address/address.dto";
 import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import type { Email } from "../email/email.dto";
+import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations";
 import type {
   BusinessName,
   BusinessNameCustomized,
@@ -138,7 +139,7 @@ export type CommonFormEstablishmentDto = {
   source: FormEstablishmentSource;
   website?: EstablishmentWebSite;
   searchableBy: EstablishmentSearchableBy;
-};
+} & WithBannedEstablishmentInformations;
 
 type GenericFormEstablishmentDto<T extends ContactMode> =
   CommonFormEstablishmentDto &

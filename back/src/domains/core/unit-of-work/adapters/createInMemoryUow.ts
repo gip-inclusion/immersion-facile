@@ -9,6 +9,7 @@ import { InMemoryConventionRepository } from "../../../convention/adapters/InMem
 import { InMemoryConventionsToSyncRepository } from "../../../convention/adapters/InMemoryConventionsToSyncRepository";
 import { InMemoryConventionTemplateQueries } from "../../../convention/adapters/InMemoryConventionTemplateQueries";
 import { InMemoryNpsRepository } from "../../../convention/adapters/InMemoryNpsRepository";
+import { InMemoryBannedEstablishmentRepository } from "../../../establishment/adapters/InMemoryBannedEstablishmentRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../../establishment/adapters/InMemoryDeletedEstablishmentRepository";
 import { InMemoryDiscussionRepository } from "../../../establishment/adapters/InMemoryDiscussionRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
@@ -38,6 +39,8 @@ export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
   const agencyRepository = new InMemoryAgencyRepository();
+  const bannedEstablishmentRepository =
+    new InMemoryBannedEstablishmentRepository();
   const conventionRepository = new InMemoryConventionRepository();
   const notificationRepository = new InMemoryNotificationRepository();
   const userRepository = new InMemoryUserRepository();
@@ -61,6 +64,7 @@ export const createInMemoryUow = () => {
     agencyGroupRepository: new InMemoryAgencyGroupRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
     userRepository,
+    bannedEstablishmentRepository,
     broadcastFeedbacksRepository,
     conventionQueries,
     conventionRepository,

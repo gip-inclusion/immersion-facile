@@ -14,6 +14,10 @@ import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import {
+  type WithBannedEstablishmentInformations,
+  withBannedEstablishmentInformationSchema,
+} from "./bannedEstablishmentInformations";
+import {
   type BusinessName,
   businessNameSchema,
   customizedNameSchema,
@@ -42,11 +46,13 @@ export const getEstablishmentPublicOptionsByFiltersSchema: ZodSchemaWithInputMat
   });
 
 export const establishmentPublicOptionSchema: ZodSchemaWithInputMatchingOutput<EstablishmentPublicOption> =
-  z.object({
-    businessName: businessNameSchema,
-    businessNameCustomized: customizedNameSchema.optional(),
-    siret: siretSchema,
-  });
+  z
+    .object({
+      businessName: businessNameSchema,
+      businessNameCustomized: customizedNameSchema.optional(),
+      siret: siretSchema,
+    })
+    .and(withBannedEstablishmentInformationSchema);
 
 export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
   EstablishmentPublicOption[]
@@ -66,7 +72,8 @@ export type RegisterUserOnEstablishmentPayload = {
 export type EstablishmentPublicOption = Pick<
   FormEstablishmentDto,
   "businessName" | "businessNameCustomized" | "siret"
->;
+> &
+  WithBannedEstablishmentInformations;
 
 export type EstablishmentAdminPrivateData = {
   firstName: string;
@@ -89,11 +96,13 @@ export type UserEstablishmentRightDetailsWithPendingStatus = {
   status: Extract<EstablishmentUserRightStatus, "PENDING">;
 };
 
-export type UserEstablishmentRightDetails =
+export type UserEstablishmentRightDetails = (
   | UserEstablishmentRightDetailsWithAcceptedStatus
-  | UserEstablishmentRightDetailsWithPendingStatus;
+  | UserEstablishmentRightDetailsWithPendingStatus
+) &
+  WithBannedEstablishmentInformations;
 
-export type WithEstablishmentsData = {
+export type WithUserEstablishmentRightDetails = {
   establishments?: UserEstablishmentRightDetails[];
 };
 

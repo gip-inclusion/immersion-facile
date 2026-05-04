@@ -239,6 +239,39 @@ const userRegistrationOnEstablishmentEpic: AppEpic<EstablishmentAction> = (
     ),
   );
 
+const banEstablishmentEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(establishmentSlice.actions.banEstablishmentRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .banEstablishment$(
+          {
+            siret: action.payload.siret,
+            establishmentBannishmentJustification:
+              action.payload.establishmentBannishmentJustification,
+          },
+          action.payload.jwt,
+        )
+        .pipe(
+          map(() =>
+            establishmentSlice.actions.banEstablishmentSucceeded({
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            establishmentSlice.actions.banEstablishmentFailed({
+              feedbackTopic: action.payload.feedbackTopic,
+              errorMessage: error.message,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const establishmentEpics = [
   fetchEstablishmentEpic,
   fetchEstablishmentNameAndAdminEpic,
@@ -247,6 +280,7 @@ export const establishmentEpics = [
   editFormEstablishmentEpic,
   deleteFormEstablishmentEpic,
   userRegistrationOnEstablishmentEpic,
+  banEstablishmentEpic,
 ];
 
 const hasPayloadJwt = (payload: unknown): payload is SiretAndJwtPayload =>

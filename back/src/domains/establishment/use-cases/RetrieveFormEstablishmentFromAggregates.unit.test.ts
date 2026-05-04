@@ -9,6 +9,7 @@ import {
   type SiretDto,
   type User,
   UserBuilder,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import {
   createInMemoryUow,
@@ -151,6 +152,42 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         errors.user.unauthorized(),
       );
     });
+
+    it("returns banned establishment if user has ACCEPTED rights", async () => {
+      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+        {
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification: "L'entreprise est nantaise",
+        };
+
+      const bannedEstablishmentAggregate = {
+        ...establishmentAggregate,
+        establishment: {
+          ...establishmentAggregate.establishment,
+          ...withBannedEstablishmentInformations,
+        },
+      };
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        bannedEstablishmentAggregate,
+      ];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: establishmentAdmin.id,
+      });
+
+      expectToEqual(
+        establishmentForm,
+        makeExpectedFormEstablishment({
+          establishmentAdmin,
+          establishmentAggregate: bannedEstablishmentAggregate,
+          establishmentContact,
+          job,
+          phone,
+          withBannedEstablishmentInformations,
+        }),
+      );
+    });
   });
 
   describe("Right paths", () => {
@@ -206,6 +243,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentAdmin: adminWithoutFirstNameAndLastName,
           job,
           phone,
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -369,6 +407,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -386,6 +425,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           establishmentContact,
           job,
           phone,
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
         }),
       );
     });
@@ -398,12 +438,14 @@ const makeExpectedFormEstablishment = ({
   establishmentAdmin,
   job,
   phone,
+  withBannedEstablishmentInformations,
 }: {
   establishmentAggregate: EstablishmentAggregate;
   establishmentContact: User;
   establishmentAdmin: User;
   job: string;
   phone: string;
+  withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
 }): FormEstablishmentDto => ({
   siret: establishmentAggregate.establishment.siret,
   source: "immersion-facile",
@@ -451,4 +493,5 @@ const makeExpectedFormEstablishment = ({
     jobSeekers: true,
     students: false,
   },
+  ...withBannedEstablishmentInformations,
 });

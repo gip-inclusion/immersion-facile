@@ -9,6 +9,7 @@ import type { ConventionRepository } from "../../../convention/ports/ConventionR
 import type { ConventionsToSyncRepository } from "../../../convention/ports/ConventionsToSyncRepository";
 import type { ConventionTemplateQueries } from "../../../convention/ports/ConventionTemplateQueries";
 import type { NpsRepository } from "../../../convention/ports/NpsRepository";
+import type { BannedEstablishmentRepository } from "../../../establishment/ports/BannedEstablishmentRepository";
 import type { DeletedEstablishmentRepository } from "../../../establishment/ports/DeletedEstablishmentRepository";
 import type { DiscussionRepository } from "../../../establishment/ports/DiscussionRepository";
 import type { EstablishmentAggregateRepository } from "../../../establishment/ports/EstablishmentAggregateRepository";
@@ -39,6 +40,7 @@ export type UnitOfWork = {
   agencyRepository: AgencyRepository;
   apiConsumerRepository: ApiConsumerRepository;
   assessmentRepository: AssessmentRepository;
+  bannedEstablishmentRepository: BannedEstablishmentRepository;
   conventionDraftRepository: ConventionDraftRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
   conventionFranceTravailAdvisorRepository: ConventionFranceTravailAdvisorRepository;

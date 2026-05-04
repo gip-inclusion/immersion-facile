@@ -32,6 +32,7 @@ export const establishmentRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
+      403: httpErrorSchema,
     },
   }),
   updateFormEstablishment: defineRoute({
@@ -55,7 +56,7 @@ export const establishmentRoutes = defineRoutes({
     responses: {
       200: formEstablishmentSchema,
       401: httpErrorSchema,
-      403: renewExpiredJwtResponseSchema,
+      403: renewExpiredJwtResponseSchema || httpErrorSchema,
       404: httpErrorSchema,
     },
   }),

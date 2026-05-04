@@ -1,5 +1,6 @@
 import {
   type AdminFormEstablishmentUserRight,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   defaultCountryCode,
   defaultValidFormEstablishment,
@@ -41,6 +42,16 @@ describe("Add form establishment", () => {
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   const user = new ConnectedUserBuilder().withId(uuid()).buildUser();
+
+  const adminFormRight: AdminFormEstablishmentUserRight = {
+    role: "establishment-admin",
+    status: "ACCEPTED",
+    email: "mail@mail.com",
+    job: "osef",
+    phone: "+33600000000",
+    shouldReceiveDiscussionNotifications: true,
+    isMainContactByPhone: false,
+  };
 
   beforeEach(async () => {
     ({
@@ -88,16 +99,6 @@ describe("Add form establishment", () => {
     it(`${displayRouteName(
       establishmentRoutes.addFormEstablishment,
     )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
-      const adminFormRight: AdminFormEstablishmentUserRight = {
-        role: "establishment-admin",
-        status: "ACCEPTED",
-        email: "mail@mail.com",
-        job: "osef",
-        phone: "+33600000000",
-        shouldReceiveDiscussionNotifications: true,
-        isMainContactByPhone: false,
-      };
-
       const response = await httpClient.addFormEstablishment({
         body: FormEstablishmentDtoBuilder.valid()
           .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
@@ -196,6 +197,44 @@ describe("Add form establishment", () => {
           ],
         },
       );
+    });
+
+    it(`${displayRouteName(
+      establishmentRoutes.addFormEstablishment,
+    )} 403 if establishment siret is banned`, async () => {
+      const banEstablishmentPayload: BanEstablishmentPayload = {
+        siret: "12345678912345",
+        establishmentBannishmentJustification:
+          "Le patron normand a dit que le Mont Saint-Michel n'était pas breton",
+      };
+
+      inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishmentPayload,
+      ];
+
+      const response = await httpClient.addFormEstablishment({
+        headers: {
+          authorization: generateConnectedUserJwt(
+            createConnectedUserJwtPayload({
+              userId: user.id,
+              durationHours: 1,
+              now: new Date(),
+            }),
+          ),
+        },
+        body: FormEstablishmentDtoBuilder.valid()
+          .withSiret(banEstablishmentPayload.siret)
+          .withUserRights([adminFormRight])
+          .build(),
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: `L'entreprise avec le siret '${banEstablishmentPayload.siret}' est bannie`,
+        },
+      });
     });
   });
 });

@@ -19,7 +19,10 @@ import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { emailAttachements } from "./email.content";
-import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
+import {
+  immersionFacileContactEmail,
+  immersionFacileDelegationEmail,
+} from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind?: InternshipKind) =>
   internshipKind === "mini-stage-cci"
@@ -2907,6 +2910,19 @@ export const discussionExchangeForbiddenContents = (
 
         Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
     },
+    establishment_banned: {
+      content: `
+        Vous avez tenté de répondre à un candidat via Immersion Facilitée depuis un email de candidature Immersion Facilitée.
+
+        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
+        <ul>
+          <li>Votre établissement ${params.establishmentName} n'a plus accès aux services d'Immersion Facilitée.</li>
+          <li>Vous ne pouvez plus échanger avec les candidats via notre plateforme.</li>
+          <li>Toutes vos demandes en cours sont annulées.</li>
+        </ul>
+        Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
+      `,
+    },
   },
   potentialBeneficiary: {
     user_unknown_or_missing_rights_on_establishment: {
@@ -2927,6 +2943,19 @@ export const discussionExchangeForbiddenContents = (
         Elle ne recevra pas votre message et ne propose plus d’immersion pour le moment.
 
         Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+    },
+    establishment_banned: {
+      content: `
+        Vous avez tenté d'envoyer un message à l'entreprise ${params.establishmentName} concernant votre immersion.
+
+        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
+        <ul>
+          <li>L'entreprise ${params.establishmentName} n'est plus disponible sur notre site.</li>
+          <li>Les échanges avec cet établissement sont désormais fermés.</li>
+          <li>Votre candidature auprès de cette entreprise est annulée.</li>
+        </ul>
+        Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
+      `,
     },
   },
 });

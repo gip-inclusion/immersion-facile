@@ -1,9 +1,15 @@
 import {
+  type BanEstablishmentPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   type SiretEstablishmentDto,
 } from "shared";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
 import { type GetSiret, makeGetSiret } from "./GetSiret";
 
@@ -17,11 +23,15 @@ const validEstablishment: SiretEstablishmentDto = {
 
 describe("GetSiret", () => {
   let siretGateway: InMemorySiretGateway;
+  let uow: InMemoryUnitOfWork;
+  let uowPerformer: InMemoryUowPerformer;
   let getSiret: GetSiret;
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
-    getSiret = makeGetSiret({ deps: { siretGateway } });
+    uow = createInMemoryUow();
+    uowPerformer = new InMemoryUowPerformer(uow);
+    getSiret = makeGetSiret({ deps: { siretGateway }, uowPerformer });
   });
 
   describe("checking for business being opened", () => {
@@ -68,6 +78,24 @@ describe("GetSiret", () => {
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "42942942942900" }),
       errors.siretApi.tooManyRequests({ serviceName: "Sirene API" }),
+    );
+  });
+
+  it("throws when siret is banned", async () => {
+    const banEstablishmentPayload: BanEstablishmentPayload = {
+      siret: "12345678912345",
+      establishmentBannishmentJustification: "Valid justification",
+    };
+
+    uow.bannedEstablishmentRepository.bannedEstablishments = [
+      banEstablishmentPayload,
+    ];
+
+    await expectPromiseToFailWithError(
+      getSiret.execute({ siret: banEstablishmentPayload.siret }),
+      errors.establishment.bannedEstablishment({
+        siret: banEstablishmentPayload.siret,
+      }),
     );
   });
 });

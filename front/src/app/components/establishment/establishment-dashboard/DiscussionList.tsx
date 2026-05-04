@@ -137,7 +137,9 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
     >
       <WithFeedbackReplacer topic="establishment-dashboard-discussion-list">
         {match({
-          discussions,
+          filteredDiscussions: discussions.filter(
+            (discussion) => !discussion.isEstablishmentBanned,
+          ),
           viewer,
         })
 
@@ -157,10 +159,10 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
             ),
           )
           .with(
-            { discussions: P.not(P.nullish), viewer: "establishment" },
-            () => (
+            { filteredDiscussions: P.not(P.nullish), viewer: "establishment" },
+            ({ filteredDiscussions }) => (
               <EstablishmentDiscussionTable
-                discussions={discussions}
+                discussions={filteredDiscussions}
                 filters={filters}
                 isLoading={isLoading}
                 connectedUserJwt={connectedUserJwt}
@@ -172,10 +174,13 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
             ),
           )
           .with(
-            { discussions: P.not(P.nullish), viewer: "potentialBeneficiary" },
-            () => (
+            {
+              filteredDiscussions: P.not(P.nullish),
+              viewer: "potentialBeneficiary",
+            },
+            ({ filteredDiscussions }) => (
               <BeneficiaryDiscussionTable
-                discussions={discussions}
+                discussions={filteredDiscussions}
                 filters={filters}
                 isLoading={isLoading}
                 connectedUserJwt={connectedUserJwt}

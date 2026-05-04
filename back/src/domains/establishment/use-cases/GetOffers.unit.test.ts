@@ -561,6 +561,36 @@ describe("GetOffers", () => {
     ]);
   });
 
+  it("should not include offers from banned establishment", async () => {
+    uow.bannedEstablishmentRepository.bannedEstablishments = [
+      {
+        siret: establishment1.establishment.siret,
+        establishmentBannishmentJustification:
+          "Des crêpes à la poêle ? Sérieusement ??",
+      },
+    ];
+
+    const result: DataWithPagination<InternalOfferDto> =
+      await getOffers.execute(
+        { sortBy: "score", sortOrder: "desc" },
+        undefined,
+      );
+
+    expect(result.data).toHaveLength(2);
+    expect(
+      result.data.every(
+        (offer) => offer.siret !== establishment1.establishment.siret,
+      ),
+    ).toBe(true);
+    expect(result.data.map((offer) => offer.siret)).toEqual(
+      expect.arrayContaining([
+        establishment2.establishment.siret,
+        establishment3.establishment.siret,
+      ]),
+    );
+    expect(result.pagination.totalRecords).toBe(2);
+  });
+
   describe("wrong path", () => {
     it("should throw when sort is distance but no location is provided", async () => {
       await expectPromiseToFailWithError(

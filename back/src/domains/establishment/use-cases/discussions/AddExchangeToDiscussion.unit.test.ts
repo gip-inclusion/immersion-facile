@@ -746,6 +746,7 @@ describe("AddExchangeToDiscussion", () => {
             const expectedResult: DiscussionExchangeForbiddenParams = {
               sender: "establishment",
               reason: "discussion_completed",
+              establishmentName: pendingDiscussion1.businessName,
             };
             expectToEqual(
               await addExchangeToDiscussion.execute(
@@ -818,6 +819,7 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "establishment",
+              establishmentName: discussionRejected.businessName,
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -869,6 +871,7 @@ describe("AddExchangeToDiscussion", () => {
             expectToEqual(result, {
               reason: "discussion_completed",
               sender: "potentialBeneficiary",
+              establishmentName: discussionRejected.businessName,
             });
 
             expectToEqual(uow.discussionRepository.discussions, [
@@ -888,6 +891,7 @@ describe("AddExchangeToDiscussion", () => {
                   params: {
                     reason: "discussion_completed",
                     sender: "potentialBeneficiary",
+                    establishmentName: pendingDiscussion1.businessName,
                   },
                   recipients: [discussionRejected.potentialBeneficiary.email],
                 },
@@ -989,6 +993,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
+            establishmentName: pendingDiscussion1.businessName,
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1009,6 +1014,7 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "establishment",
+                  establishmentName: pendingDiscussion1.businessName,
                 },
                 recipients: [adminUserEstablishment1.email],
               },
@@ -1036,6 +1042,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "establishment",
+            establishmentName: pendingDiscussion1.businessName,
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1086,6 +1093,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(result, {
             reason: "establishment_missing",
             sender: "potentialBeneficiary",
+            establishmentName: pendingDiscussion1.businessName,
           });
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -1106,6 +1114,7 @@ describe("AddExchangeToDiscussion", () => {
                 params: {
                   reason: "establishment_missing",
                   sender: "potentialBeneficiary",
+                  establishmentName: pendingDiscussion1.businessName,
                 },
                 recipients: [pendingDiscussion1.potentialBeneficiary.email],
               },

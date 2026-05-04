@@ -45,6 +45,10 @@ export type ManageEstablishmentAdminForm = {
   siret: SiretDto;
 };
 
+export type BanEstablishmentAdminForm = {
+  establishmentBannishmentJustification: string;
+};
+
 export type UpdateAgencyStatusParams = {
   id: AgencyId;
 } & UpdateAgencyStatusParamsWithoutId;

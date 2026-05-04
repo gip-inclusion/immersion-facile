@@ -3,6 +3,7 @@ import {
   type FormEstablishmentDto,
   noContactPerMonth,
   populatePropIfDefined,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
@@ -26,6 +27,7 @@ export const makeEstablishmentAggregate = async ({
   nafAndNumberOfEmployee,
   score,
   existingEntity,
+  withBannedEstablishmentInformations,
 }: {
   uow: UnitOfWork;
   timeGateway: TimeGateway;
@@ -35,6 +37,7 @@ export const makeEstablishmentAggregate = async ({
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
   score: number;
   existingEntity?: EstablishmentEntity;
+  withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
 }): Promise<EstablishmentAggregate> => {
   const establishmentUsersIds = await Promise.all(
     formEstablishment.userRights.map(({ email }) =>
@@ -131,6 +134,7 @@ export const makeEstablishmentAggregate = async ({
         potentialBeneficiaryWelcomeAddress:
           formEstablishment.potentialBeneficiaryWelcomeAddress,
       }),
+      ...withBannedEstablishmentInformations,
     },
     userRights: updatedUserRights,
     offers: formEstablishment.offers.map((offer) => ({

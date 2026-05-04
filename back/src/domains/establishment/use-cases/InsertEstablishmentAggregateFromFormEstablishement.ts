@@ -42,6 +42,16 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   ): Promise<void> {
     if (!currentUser) throw errors.user.noJwtProvided();
 
+    if (
+      await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        formEstablishment.siret,
+      )
+    ) {
+      throw errors.establishment.bannedEstablishment({
+        siret: formEstablishment.siret,
+      });
+    }
+
     const existingEstablishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
@@ -75,6 +85,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
             ? undefined
             : formEstablishment.businessNameCustomized,
       },
+      withBannedEstablishmentInformations: { isEstablishmentBanned: false },
     });
 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(

@@ -20,7 +20,10 @@ import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InM
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import type { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
+import type {
+  EstablishmentAdminRight,
+  EstablishmentAggregate,
+} from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -181,6 +184,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: false,
         },
+        isEstablishmentBanned: false,
       },
       status: 200,
     });
@@ -250,6 +254,90 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
+        isEstablishmentBanned: false,
+      },
+      status: 200,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 200 if banned establishment and user is back office admin`, async () => {
+    const establishmentBannishmentJustification =
+      "Un employé a mangé du beurre doux";
+    const bannedEstablishmentAggregate: EstablishmentAggregate = {
+      ...establishmentAggregate,
+      establishment: {
+        ...establishmentAggregate.establishment,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
+      },
+    };
+
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      bannedEstablishmentAggregate,
+    ];
+
+    const response = await httpClient.getFormEstablishment({
+      headers: {
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
+      },
+      urlParams: {
+        siret: bannedEstablishmentAggregate.establishment.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        siret: establishmentAggregate.establishment.siret,
+        source: "immersion-facile",
+        website: establishmentAggregate.establishment.website,
+        additionalInformation:
+          establishmentAggregate.establishment.additionalInformation,
+        businessName: establishmentAggregate.establishment.name,
+        businessAddresses: [
+          {
+            id: establishmentAggregate.establishment.locations[0].id,
+            rawAddress: addressDtoToString(
+              establishmentAggregate.establishment.locations[0].address,
+            ),
+          },
+        ],
+        naf: establishmentAggregate.establishment?.nafDto,
+        offers: [
+          {
+            appellationCode: establishmentAggregate.offers[0].appellationCode,
+            appellationLabel: establishmentAggregate.offers[0].appellationLabel,
+            romeCode: establishmentAggregate.offers[0].romeCode,
+            romeLabel: establishmentAggregate.offers[0].romeLabel,
+            remoteWorkMode: "ON_SITE",
+          },
+        ],
+        fitForDisabledWorkers:
+          establishmentAggregate.establishment.fitForDisabledWorkers,
+        maxContactsPerMonth:
+          establishmentAggregate.establishment.maxContactsPerMonth,
+        userRights: [
+          {
+            role: "establishment-admin",
+            status: "ACCEPTED",
+            email: establishmentAdmin.email,
+            job: establishmentAdminRight.job,
+            phone: establishmentAdminRight.phone,
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+          {
+            role: "establishment-contact",
+            status: "ACCEPTED",
+            email: establishmentContact.email,
+            shouldReceiveDiscussionNotifications: true,
+          },
+        ],
+        contactMode: establishmentAggregate.establishment.contactMode,
+        searchableBy: establishmentAggregate.establishment.searchableBy,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
       },
       status: 200,
     });
@@ -329,6 +417,95 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         status: 401,
       },
       status: 401,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 200 if banned establishment and user is not back office admin`, async () => {
+    const establishmentBannishmentJustification =
+      "Un employé a mangé du beurre doux";
+    const bannedEstablishmentAggregate: EstablishmentAggregate = {
+      ...establishmentAggregate,
+      establishment: {
+        ...establishmentAggregate.establishment,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
+      },
+    };
+
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      bannedEstablishmentAggregate,
+    ];
+
+    const response = await httpClient.getFormEstablishment({
+      headers: {
+        authorization: generateConnectedUserJwt(
+          createConnectedUserJwtPayload({
+            userId: establishmentAdmin.id,
+            durationHours: 1,
+            now: new Date(),
+          }),
+        ),
+      },
+      urlParams: {
+        siret: bannedEstablishmentAggregate.establishment.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        siret: establishmentAggregate.establishment.siret,
+        source: "immersion-facile",
+        website: establishmentAggregate.establishment.website,
+        additionalInformation:
+          establishmentAggregate.establishment.additionalInformation,
+        businessName: establishmentAggregate.establishment.name,
+        businessAddresses: [
+          {
+            id: establishmentAggregate.establishment.locations[0].id,
+            rawAddress: addressDtoToString(
+              establishmentAggregate.establishment.locations[0].address,
+            ),
+          },
+        ],
+        naf: establishmentAggregate.establishment?.nafDto,
+        offers: [
+          {
+            appellationCode: establishmentAggregate.offers[0].appellationCode,
+            appellationLabel: establishmentAggregate.offers[0].appellationLabel,
+            romeCode: establishmentAggregate.offers[0].romeCode,
+            romeLabel: establishmentAggregate.offers[0].romeLabel,
+            remoteWorkMode: "ON_SITE",
+          },
+        ],
+        fitForDisabledWorkers:
+          establishmentAggregate.establishment.fitForDisabledWorkers,
+        maxContactsPerMonth:
+          establishmentAggregate.establishment.maxContactsPerMonth,
+        userRights: [
+          {
+            role: "establishment-admin",
+            status: "ACCEPTED",
+            email: establishmentAdmin.email,
+            job: establishmentAdminRight.job,
+            phone: establishmentAdminRight.phone,
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+          {
+            role: "establishment-contact",
+            status: "ACCEPTED",
+            email: establishmentContact.email,
+            shouldReceiveDiscussionNotifications: true,
+          },
+        ],
+        contactMode: establishmentAggregate.establishment.contactMode,
+        searchableBy: establishmentAggregate.establishment.searchableBy,
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification,
+      },
+      status: 200,
     });
   });
 

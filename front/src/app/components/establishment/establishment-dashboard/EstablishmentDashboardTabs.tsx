@@ -47,11 +47,14 @@ export const EstablishmentDashboardTabs = ({
   const { data: discussions, filters: discussionsFilters } = useAppSelector(
     discussionSelectors.discussionsWithPagination,
   );
+  const filteredDiscussions = discussions.filter(
+    (discussions) => !discussions.isEstablishmentBanned,
+  );
   const filtersAreEmpty = equals(
     discussionsFilters,
     initialDiscussionsWithPagination.filters,
   );
-  const userHasDiscussions = discussions.length > 0 || !filtersAreEmpty;
+  const userHasDiscussions = filteredDiscussions.length > 0 || !filtersAreEmpty;
 
   const tabs = useMemo(
     () =>
@@ -126,7 +129,11 @@ const makeEstablishmentDashboardTabs = (
   route: FrontEstablishmentDashboardRoute,
   userHasDiscussions: boolean,
 ): DashboardTab[] => {
-  const establishmentsArray = establishments ?? [];
+  const establishmentsArray = establishments
+    ? establishments.filter(
+        (establishment) => !establishment.isEstablishmentBanned,
+      )
+    : [];
   const userIsOnboarding = establishmentsArray.length === 0;
   const userCanManageEstablishments =
     establishmentsArray.filter(onlyAdminUserRightsWithStatusAccepted).length >

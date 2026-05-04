@@ -1,6 +1,7 @@
 import {
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   type ContactFormEstablishmentUserRight,
   defaultAddress,
@@ -524,6 +525,32 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
         }),
         errors.user.noJwtProvided(),
+      );
+    });
+
+    it("Can't create establishment when establishment siret is banned", async () => {
+      const banEstablishment: BanEstablishmentPayload = {
+        siret: "12345678912345",
+        establishmentBannishmentJustification: "Justification valide",
+      };
+
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret(banEstablishment.siret)
+        .withUserRights([formAdminRight])
+        .build();
+
+      uow.bannedEstablishmentRepository.bannedEstablishments = [
+        banEstablishment,
+      ];
+
+      await expectPromiseToFailWithError(
+        insertEstablishmentAggregateFromForm.execute(
+          { formEstablishment },
+          { ...connectedUser, isBackofficeAdmin: true },
+        ),
+        errors.establishment.bannedEstablishment({
+          siret: banEstablishment.siret,
+        }),
       );
     });
   });

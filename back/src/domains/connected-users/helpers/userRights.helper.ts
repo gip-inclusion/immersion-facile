@@ -6,12 +6,14 @@ import {
   type UserId,
   type UserWithAdminRights,
   type UserWithRights,
-  type WithEstablishmentsData,
+  type WithBannedEstablishmentInformations,
+  type WithUserEstablishmentRightDetails,
 } from "shared";
 import { match } from "ts-pattern";
 import { getAgencyRightByUserId } from "../../../utils/agency";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../../establishment/entities/EstablishmentEntity";
 
 export const getUserWithRights = async (
   uow: UnitOfWork,
@@ -31,7 +33,7 @@ export const getUserWithRights = async (
 const withEstablishments = async (
   uow: UnitOfWork,
   user: UserWithAdminRights,
-): Promise<WithEstablishmentsData> => {
+): Promise<WithUserEstablishmentRightDetails> => {
   const establishmentAggregates =
     await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
       {
@@ -50,7 +52,7 @@ const makeEstablishmentRights = async (
   uow: UnitOfWork,
   { establishment, userRights }: EstablishmentAggregate,
   userId: UserId,
-) => {
+): Promise<UserEstablishmentRightDetails> => {
   const userRight = userRights.find((userRight) => userRight.userId === userId);
   if (!userRight) {
     throw errors.establishment.noUserRights({
@@ -66,7 +68,7 @@ const makeEstablishmentRights = async (
 
   return match(userRight)
     .with({ status: "PENDING" }, (pendingUserRight) => {
-      return {
+      const userRightDetailsWithPendingStatus = {
         siret: establishment.siret,
         businessName: establishment.customizedName
           ? establishment.customizedName
@@ -74,9 +76,14 @@ const makeEstablishmentRights = async (
         role: userRight.role,
         status: pendingUserRight.status,
       } satisfies UserEstablishmentRightDetailsWithPendingStatus;
+
+      return {
+        ...userRightDetailsWithPendingStatus,
+        ...makeWithBanEstablishmentInformations(establishment),
+      };
     })
     .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
-      return {
+      const userRightDetailsWithAcceptedStatus = {
         siret: establishment.siret,
         businessName: establishment.customizedName
           ? establishment.customizedName
@@ -89,6 +96,22 @@ const makeEstablishmentRights = async (
           email,
         })),
       } satisfies UserEstablishmentRightDetailsWithAcceptedStatus;
+
+      return {
+        ...userRightDetailsWithAcceptedStatus,
+        ...makeWithBanEstablishmentInformations(establishment),
+      } satisfies UserEstablishmentRightDetails;
     })
     .exhaustive();
 };
+
+const makeWithBanEstablishmentInformations = (
+  establishment: EstablishmentEntity,
+): WithBannedEstablishmentInformations =>
+  establishment.isEstablishmentBanned
+    ? {
+        isEstablishmentBanned: establishment.isEstablishmentBanned,
+        establishmentBannishmentJustification:
+          establishment.establishmentBannishmentJustification,
+      }
+    : { isEstablishmentBanned: establishment.isEstablishmentBanned };

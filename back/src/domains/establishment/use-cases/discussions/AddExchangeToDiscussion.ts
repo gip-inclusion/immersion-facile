@@ -367,6 +367,7 @@ const notifyForbidden = async ({
               ? "potentialBeneficiary"
               : "establishment",
           reason,
+          establishmentName: discussion.businessName,
         };
 
   if (source === "inbound-parsing" && isMessageInputFromEmail(messageInput))

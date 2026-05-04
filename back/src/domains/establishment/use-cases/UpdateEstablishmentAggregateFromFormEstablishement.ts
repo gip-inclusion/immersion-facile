@@ -72,6 +72,15 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
         userId: triggeredByUser.id,
       });
 
+    if (
+      await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        inputParams.formEstablishment.siret,
+      )
+    )
+      throw errors.establishment.bannedEstablishment({
+        siret: inputParams.formEstablishment.siret,
+      });
+
     const establishmentAggregate = await makeEstablishmentAggregate({
       uow,
       timeGateway: deps.timeGateway,
@@ -86,6 +95,22 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
           initialEstablishmentAggregate.establishment.numberEmployeesRange,
       },
       score: initialEstablishmentAggregate.establishment.score,
+      withBannedEstablishmentInformations: {
+        ...(initialEstablishmentAggregate.establishment.isEstablishmentBanned
+          ? {
+              isEstablishmentBanned:
+                initialEstablishmentAggregate.establishment
+                  .isEstablishmentBanned,
+              establishmentBannishmentJustification:
+                initialEstablishmentAggregate.establishment
+                  .establishmentBannishmentJustification,
+            }
+          : {
+              isEstablishmentBanned:
+                initialEstablishmentAggregate.establishment
+                  .isEstablishmentBanned,
+            }),
+      },
     });
 
     const userRightsAdded = getUserRightsAdded(
