@@ -45,6 +45,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public paginatedConventionsParams: GetPaginatedConventionsForAgencyUserParams[] =
     [];
 
+  public getConventionsWithUnfinalizedAssessmentForAgencyUserParams: Parameters<
+    ConventionQueries["getConventionsWithUnfinalizedAssessmentForAgencyUser"]
+  >[0][] = [];
+
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
@@ -337,6 +341,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
     pagination: Required<PaginationQueryParams>;
     now: Date;
   }): Promise<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
+    this.getConventionsWithUnfinalizedAssessmentForAgencyUserParams.push({
+      userAgencyIds,
+      pagination,
+      now,
+    });
+
     if (userAgencyIds.length === 0)
       return {
         data: [],

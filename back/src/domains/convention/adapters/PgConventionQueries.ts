@@ -500,7 +500,7 @@ export class PgConventionQueries implements ConventionQueries {
         "ia.convention_id",
         "conventions.id",
       )
-      .where("conventions.agency_id", "in", userAgencyIds)
+      .where((eb) => isInArray(eb, "conventions.agency_id", userAgencyIds))
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where((eb) =>
         eb.or([
