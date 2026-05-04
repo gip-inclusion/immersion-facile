@@ -2809,6 +2809,49 @@ L'équipe d'Immersion Facilitée`,
         L'équipe Immersion Facile`,
       }),
     },
+    ESTABLISHMENT_USER_RIGHT_IS_PENDING: {
+      niceName:
+        "Espace Entreprise - Administrateur - Demande de rattachement en attente",
+      tags: [
+        "template:espaceEntreprise_demandeDeRattachement",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+      ],
+      createEmailVariables: ({
+        establishmentDashboardUrl,
+        adminFirstName,
+        adminLastName,
+        pendingUserFirstName,
+        pendingUserLastName,
+        pendingUserRole,
+        pendingUserEmail,
+      }) => ({
+        subject:
+          "Immersion Facilitée - Demande de rattachement en attente pour votre entreprise",
+        content: `
+        Bonjour ${adminFirstName} ${adminLastName},
+
+        Un utilisateur a demandé à être ajouté comme ${pendingUserRole} pour votre entreprise.
+
+        Pour accéder à l'espace entreprise, veuillez cliquer sur le bouton ci-dessous :
+
+        • ${pendingUserFirstName && pendingUserLastName ? `<strong>${pendingUserFirstName} ${pendingUserLastName}</strong> (${pendingUserEmail})` : `<strong>${pendingUserEmail}</strong>`}
+        `,
+        buttons: [
+          {
+            label: "Gérer les utilisateurs de mon entreprise",
+            url: establishmentDashboardUrl,
+          },
+        ],
+        subContent: `
+        En acceptant cette demande, vous permettez à vos collaborateurs d’accéder aux conventions et aux candidatures de votre entreprise.
+        
+        <strong>Besoin d'aide ?</strong> Retrouvez notre article : <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/gestion-des-utilisateurs-et-droits-pour-une-entreprise-6w4pr9/">Comment gérer les collaborateurs de mon entreprise</a>
+
+        ${defaultSignature("immersion")}`,
+      }),
+    },
   });
 
 const greetingsWithConventionId = (

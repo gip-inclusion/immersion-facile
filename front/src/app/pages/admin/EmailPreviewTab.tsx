@@ -750,4 +750,13 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
   },
+  ESTABLISHMENT_USER_RIGHT_IS_PENDING: {
+    establishmentDashboardUrl: "http://example.com",
+    adminFirstName: "ADMIN_FIRST_NAME",
+    adminLastName: "ADMIN_LAST_NAME",
+    pendingUserFirstName: "PENDING_USER_FIRST_NAME",
+    pendingUserLastName: "PENDING_USER_LAST_NAME",
+    pendingUserEmail: "PENDING_USER_EMAIL",
+    pendingUserRole: "establishment-contact",
+  },
 };

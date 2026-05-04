@@ -58,10 +58,8 @@ export const makeRegisterUserOnEstablishment = useCaseBuilder(
         topic: "PendingUserRightRegisteredOnEstablishment",
         payload: {
           siret: payload.siret,
-          userRight: {
-            ...payload.userRight,
-            userId: currentUser.id,
-          },
+          role: payload.userRight.role,
+          userId: currentUser.id,
           triggeredBy: { kind: "connected-user", userId: currentUser.id },
         },
       }),

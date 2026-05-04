@@ -216,7 +216,9 @@ const getUseCasesByTopics = (
     extractSiretFromArg(useCases.markEstablishmentLeadAsRegistrationAccepted),
   ],
   EstablishmentDeleted: [],
-  PendingUserRightRegisteredOnEstablishment: [],
+  PendingUserRightRegisteredOnEstablishment: [
+    useCases.notifyEstablishmentAdminsThatUserRightIsPending,
+  ],
   // Establishment lead related
   EstablishmentLeadReminderSent: [],
 

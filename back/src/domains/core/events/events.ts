@@ -32,8 +32,8 @@ import { z } from "zod";
 import type { DeleteUserInputSchema } from "../../connected-users/use-cases/DeleteUser";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type {
+  EstablishmentUserRight,
   WithEstablishmentAggregate,
-  WithEstablishmentUserRight,
 } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
@@ -141,7 +141,7 @@ export type DomainEvent =
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"AllEstablishmentUsersDeleted", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"EstablishmentDeleted", WithSiretDto & WithTriggeredBy>
-  | GenericEvent<"PendingUserRightRegisteredOnEstablishment", WithSiretDto & WithEstablishmentUserRight & WithTriggeredBy>
+  | GenericEvent<"PendingUserRightRegisteredOnEstablishment", WithSiretDto & Pick<EstablishmentUserRight, "role" | "userId"> & WithTriggeredBy>
 
   // CONTACT REQUEST RELATED
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
