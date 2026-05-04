@@ -15,6 +15,7 @@ import type {
   DiscussionKind,
   ExchangeRole,
 } from "../discussion/discussion.dto";
+import type { EstablishmentUserRightStatus } from "../formEstablishment/FormEstablishment.dto";
 import type { AgencyRole, EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
@@ -356,6 +357,17 @@ export type EmailParamsByEmailType = {
     triggeredByUserFirstName: string;
     triggeredByUserLastName: string;
     updatedRole: EstablishmentRole;
+  };
+  ESTABLISHMENT_USER_RIGHTS_STATUS_UPDATED: {
+    businessName: string;
+    firstName: string;
+    lastName: string;
+    triggeredByUserFirstName: string;
+    triggeredByUserLastName: string;
+    updatedStatus:
+      | Extract<EstablishmentUserRightStatus, "ACCEPTED">
+      | "REJECTED";
+    immersionBaseUrl: AbsoluteUrl;
   };
   FULL_PREVIEW_EMAIL: {
     agencyLogoUrl: AbsoluteUrl | undefined;

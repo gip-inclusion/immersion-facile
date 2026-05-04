@@ -1796,6 +1796,43 @@ Tél : ${beneficiaryPhone}`,
         subContent: defaultSignature("immersion"),
       }),
     },
+    ESTABLISHMENT_USER_RIGHTS_STATUS_UPDATED: {
+      niceName: "Espace Entreprise - Entreprise - Statut demande rattachement",
+      tags: [
+        "template:compte_etablissement_statutRattachement",
+        "theme:espaceEntreprise",
+        "acteur:entreprise",
+        "role:admin",
+        "role:contact",
+      ],
+      createEmailVariables: ({
+        businessName,
+        firstName,
+        lastName,
+        updatedStatus,
+        immersionBaseUrl,
+      }) => ({
+        subject: `Mise à jour de votre accès à l'entreprise ${businessName}`,
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `
+          Un administrateur de l'entreprise ${businessName} a traité votre demande de rattachement
+          <strong>Statut de votre demande : </strong>${updatedStatus === "ACCEPTED" ? "Acceptée" : "Refusée"}
+         
+         ${updatedStatus === "ACCEPTED" ? "Félicitations ! Vous pouvez désormais accéder aux conventions et aux candidatures de l'espace de l'entreprise." : "Votre demande n'a pas été accepté. Si vous pensez qu'il s'agit d'une erreur, nous vous invitons à contacter directement l'administrateur de l'établissement au sein de votre structure."}
+        `,
+        buttons:
+          updatedStatus === "ACCEPTED"
+            ? [
+                {
+                  label: "Accéder à mon espace",
+                  url: `${immersionBaseUrl}/${frontRoutes.establishmentDashboard}`,
+                },
+              ]
+            : [],
+        subContent: defaultSignature("immersion"),
+      }),
+    },
+
     FULL_PREVIEW_EMAIL: {
       niceName: "Tech - Preview email complet (tous les blocs)",
       tags: [
