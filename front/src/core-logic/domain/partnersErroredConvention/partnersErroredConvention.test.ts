@@ -108,6 +108,8 @@ describe("Broadcast feedback in store", () => {
       serviceName: "test-service",
       consumerId: "consumer-1",
       consumerName: "Test Consumer",
+      conventionId: fakeConventionId,
+      agencyId: "any-agency-id",
       requestParams: {
         conventionId: fakeConventionId,
       },
@@ -179,6 +181,8 @@ describe("Broadcast feedback in store", () => {
       serviceName: "test-service",
       consumerId: "consumer-1",
       consumerName: "Test Consumer",
+      conventionId: fakeConventionId,
+      agencyId: "any-agency-id",
       requestParams: {
         conventionId: fakeConventionId,
       },

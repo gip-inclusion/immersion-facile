@@ -243,6 +243,8 @@ const notifySubscriber = ({
       await uow.broadcastFeedbacksRepository.save({
         consumerId: apiConsumer.id,
         consumerName: apiConsumer.name,
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
         handledByAgency: false,
         subscriberErrorFeedback: response.subscriberErrorFeedback,
         occurredAt: deps.timeGateway.now().toISOString(),
@@ -263,6 +265,8 @@ const notifySubscriber = ({
     await uow.broadcastFeedbacksRepository.save({
       consumerId: apiConsumer.id,
       consumerName: apiConsumer.name,
+      conventionId: convention.id,
+      agencyId: convention.agencyId,
       handledByAgency: false,
       occurredAt: deps.timeGateway.now().toISOString(),
       requestParams: {

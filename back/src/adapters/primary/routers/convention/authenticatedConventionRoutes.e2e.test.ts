@@ -191,6 +191,8 @@ describe("authenticatedConventionRoutes", () => {
         serviceName: broadcastToFtServiceName,
         consumerName: "France Travail",
         consumerId: null,
+        conventionId,
+        agencyId: agency.id,
         subscriberErrorFeedback: { message: "Some message" },
         requestParams: { conventionId },
         response: { httpStatus: 500 },
@@ -210,6 +212,8 @@ describe("authenticatedConventionRoutes", () => {
             serviceName: broadcastToFtServiceName,
             consumerName: "France Travail",
             consumerId: null,
+            conventionId,
+            agencyId: agency.id,
             subscriberErrorFeedback: {
               message: "Some message",
             },
