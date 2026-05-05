@@ -860,7 +860,7 @@ const establishmentsEqual = (
 };
 
 const makeEstablishmentAggregateFromDb = (
-  aggregate: any,
+  aggregate: any, // TODO Enlever le any
 ): EstablishmentAggregate => {
   return {
     establishment: {
