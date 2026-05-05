@@ -38,20 +38,97 @@ jobs:
               tag_name: releaseTag,
               previous_tag_name: latestTag
             });
-            
+
             const isPrerelease = ${{ inputs.prerelease }};
-            
+
             console.log({
               latestTag,
               releaseTag,
               isPrerelease,
             })
 
-            const result = await github.request(`POST /repos/${{ github.repository }}/releases`, {
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const categories = {
+              bugFix: { title: "🐛 Bug fixes", lines: [] },
+              feature: { title: "✨ Features", lines: [] },
+              tech: { title: "🛠️ Tech", lines: [] },
+              security: { title: "🔒 Sécurité", lines: [] },
+            };
+
+            const categorize = (issue) => {
+              if (!issue) return "feature";
+              const labelNames = (issue.labels?.nodes ?? []).map((l) => l.name);
+              const typeName = issue.issueType?.name;
+              if (typeName === "Sécurité") return "security";
+              if (typeName === "Bug") return "bugFix";
+              if (labelNames.includes("Tech")) return "tech";
+              return "feature";
+            };
+
+            const fetchIssue = async (issueNumber) => {
+              const query = `
+                query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      number
+                      labels(first: 20) { nodes { name } }
+                      issueType { name }
+                    }
+                  }
+                }
+              `;
+              try {
+                const result = await github.graphql(query, { owner, repo, issueNumber });
+                return result.repository.issue;
+              } catch (err) {
+                console.warn(`Could not fetch issue #${issueNumber}: ${err.message}`);
+                return null;
+              }
+            };
+
+            const body = releaseNotes.data.body ?? "";
+            const lines = body.split("\n");
+            const issueRefRegex = /^\*\s+#(\d+)\b/;
+
+            const whatsChangedIdx = lines.findIndex((l) => l.startsWith("## What's Changed"));
+            const sectionEndIdx = whatsChangedIdx >= 0
+              ? lines.findIndex((l, i) => i > whatsChangedIdx && (l.startsWith("##") || l.startsWith("**")))
+              : -1;
+            const sectionLines = whatsChangedIdx >= 0
+              ? lines.slice(whatsChangedIdx + 1, sectionEndIdx === -1 ? lines.length : sectionEndIdx)
+              : [];
+            const trailingLines = sectionEndIdx === -1 ? [] : lines.slice(sectionEndIdx);
+
+            const categorized = await Promise.all(
+              sectionLines.map(async (line) => {
+                const issueMatch = line.match(issueRefRegex);
+                if (!issueMatch) return null;
+                const issue = await fetchIssue(parseInt(issueMatch[1], 10));
+                return { line, category: categorize(issue) };
+              })
+            );
+
+            for (const item of categorized) {
+              if (item) categories[item.category].lines.push(item.line);
+            }
+
+            const newBodyParts = [];
+            for (const cat of Object.values(categories)) {
+              if (cat.lines.length === 0) continue;
+              newBodyParts.push(`## ${cat.title}`);
+              newBodyParts.push(...cat.lines);
+              newBodyParts.push("");
+            }
+            newBodyParts.push(...trailingLines);
+            const newBody = newBodyParts.join("\n");
+
+            await github.request(`POST /repos/${{ github.repository }}/releases`, {
               tag_name: releaseTag,
               prerelease: isPrerelease,
               name: releaseNotes.data.name,
-              body: releaseNotes.data.body,
+              body: newBody,
             });
       - name: Delete old prereleases (if pre-release)
         if: ${{ inputs.prerelease }}
