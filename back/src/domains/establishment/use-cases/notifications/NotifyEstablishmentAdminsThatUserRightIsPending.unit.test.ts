@@ -201,5 +201,101 @@ describe("NotifyEstablishmentAdminsThatUserRightIsPending", () => {
         ],
       });
     });
+
+    it("should notify only establishment admins with ACCEPTED status when one admin remains PENDING", async () => {
+      const acceptedAdmin1 = new UserBuilder()
+        .withId("admin-accepted-1")
+        .withEmail("admin-accepted-1@example.com")
+        .withFirstName("Alice")
+        .withLastName("One")
+        .build();
+      const acceptedAdmin2 = new UserBuilder()
+        .withId("admin-accepted-2")
+        .withEmail("admin-accepted-2@example.com")
+        .withFirstName("Bob")
+        .withLastName("Two")
+        .build();
+      const acceptedAdmin3 = new UserBuilder()
+        .withId("admin-accepted-3")
+        .withEmail("admin-accepted-3@example.com")
+        .withFirstName("Carol")
+        .withLastName("Three")
+        .build();
+      const pendingAdmin = new UserBuilder()
+        .withId("admin-pending")
+        .withEmail("admin-pending@example.com")
+        .withFirstName("Dan")
+        .withLastName("PendingAdmin")
+        .build();
+
+      const adminRightBase = {
+        role: "establishment-admin" as const,
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
+        job: "osef",
+        phone: "0600000000",
+      };
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        {
+          ...establishmentAggregate,
+          userRights: [
+            {
+              ...adminRightBase,
+              userId: acceptedAdmin1.id,
+              status: "ACCEPTED",
+            },
+            { ...adminRightBase, userId: pendingAdmin.id, status: "PENDING" },
+            {
+              ...adminRightBase,
+              userId: acceptedAdmin2.id,
+              status: "ACCEPTED",
+            },
+            {
+              ...adminRightBase,
+              userId: acceptedAdmin3.id,
+              status: "ACCEPTED",
+            },
+          ],
+        },
+      ];
+
+      uow.userRepository.users = [
+        acceptedAdmin1,
+        acceptedAdmin2,
+        acceptedAdmin3,
+        pendingAdmin,
+        pendingUser,
+      ];
+
+      const pendingUserRequest: NotifyEstablishmentAdminsThatUserRightIsPendingRequestedPayload =
+        {
+          siret: establishmentAggregate.establishment.siret,
+          userId: pendingUser.id,
+          role: "establishment-contact",
+        };
+
+      await notifyEstablishmentAdminsThatUserRightIsPending.execute(
+        pendingUserRequest,
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [acceptedAdmin1, acceptedAdmin2, acceptedAdmin3].map(
+          (admin) => ({
+            kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
+            recipients: [admin.email],
+            params: {
+              establishmentDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+              adminFirstName: admin.firstName,
+              adminLastName: admin.lastName,
+              pendingUserFirstName: pendingUser.firstName,
+              pendingUserLastName: pendingUser.lastName,
+              pendingUserRole: pendingUserRequest.role,
+              pendingUserEmail: pendingUser.email,
+            },
+          }),
+        ),
+      });
+    });
   });
 });
