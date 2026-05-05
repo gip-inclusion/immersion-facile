@@ -28,10 +28,10 @@
 
     .fr-modal & {
       position: static;
+    }
 
-      &--opened {
-        position: absolute;
-      }
+    .fr-modal--opened & {
+      position: absolute;
     }
   }
 
