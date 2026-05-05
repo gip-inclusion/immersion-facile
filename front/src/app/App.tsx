@@ -43,13 +43,7 @@ export const App = () => {
           userConsent={!!consent?.finalityConsent?.support}
         />
       )}
-      {ENV.envType !== "staging" && (
-        <TagContainer
-          containerUrl={
-            "https://cdn.tagcommander.com/7774/uat/tc_ImmersionFacile_31.js"
-          }
-        />
-      )}
+      <TagContainer environment={ENV.envType} />
     </ErrorBoundary>
   );
 };

@@ -1,5 +1,15 @@
 import { createConsentManagement } from "@codegouvfr/react-dsfr/consentManagement";
 
+type PianoConsent = {
+  pianoMode: "optin" | "optout";
+};
+
+declare global {
+  interface Window {
+    pianoConsent?: PianoConsent;
+  }
+}
+
 export const { ConsentBannerAndConsentManagement, useConsent } =
   createConsentManagement({
     finalityDescription: () => ({
@@ -20,6 +30,28 @@ export const { ConsentBannerAndConsentManagement, useConsent } =
                 <p>
                   <a
                     href="https://www.metabase.com/hosting/subprocessors/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Voir le site officiel
+                  </a>
+                  .
+                </p>
+              </>
+            ),
+          },
+          piano: {
+            title: "Piano Analytics",
+            description: (
+              <>
+                <p>
+                  Piano Analytics est un outil de mesure d’audience qui nous
+                  permet d’analyser la frequentation du site et d’ameliorer son
+                  contenu.
+                </p>
+                <p>
+                  <a
+                    href="https://www.piano.io/legal/privacy-policy/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -64,9 +96,12 @@ export const { ConsentBannerAndConsentManagement, useConsent } =
     personalDataPolicyLinkProps: {
       href: "/pages/politique-de-confidentialite",
     },
-    consentCallback: (arg) => {
-      // biome-ignore lint/suspicious/noConsole: <explanation>
-      console.log(arg);
+    consentCallback: ({ finalityConsent }) => {
+      if (finalityConsent.statistics.piano) {
+        window.pianoConsent = {
+          pianoMode: finalityConsent.statistics.piano ? "optin" : "optout",
+        };
+      }
     },
   });
 
