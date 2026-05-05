@@ -62,8 +62,9 @@ export const BusinessAndAdminSection = ({
           <Alert
             severity="info"
             small
+            className={fr.cx("fr-mb-2w")}
             description={
-              <div>
+              <>
                 Un ou plusieurs utilisateurs ont demandé l'accès à votre
                 entreprise.{" "}
                 <a
@@ -72,7 +73,7 @@ export const BusinessAndAdminSection = ({
                 >
                   Veuillez examiner leur demande.
                 </a>
-              </div>
+              </>
             }
           />
         )}
