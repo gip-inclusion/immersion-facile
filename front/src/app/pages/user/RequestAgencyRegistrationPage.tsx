@@ -22,10 +22,22 @@ export const RequestAgencyRegistrationPage = () => {
       <MainWrapper
         layout={"default"}
         vSpacing={0}
+        className={fr.cx("fr-mb-8w")}
         pageHeader={
           <PageHeader
             title={"Demander l'accès à des organismes"}
             breadcrumbs={<Breadcrumbs />}
+            badge={
+              <Button
+                linkProps={routes.myProfile().link}
+                priority={"secondary"}
+                size="small"
+                className={fr.cx("fr-mb-6w")}
+                iconId="fr-icon-arrow-go-back-line"
+              >
+                Retourner sur mon profil
+              </Button>
+            }
           >
             Bonjour {currentUser.firstName} {currentUser.lastName}, recherchez
             un organisme afin d'accéder aux conventions et statistiques de ce
@@ -35,16 +47,6 @@ export const RequestAgencyRegistrationPage = () => {
       >
         <Feedback topics={["dashboard-agency-register-user"]} closable />
         <RegisterAgenciesForm currentUser={currentUser} />
-        <div className={fr.cx("fr-my-6w")}>
-          <Button
-            linkProps={{
-              href: `${routes.myProfile().href}`,
-            }}
-            priority={"secondary"}
-          >
-            Retourner sur mon profil
-          </Button>
-        </div>
       </MainWrapper>
     </HeaderFooterLayout>
   );

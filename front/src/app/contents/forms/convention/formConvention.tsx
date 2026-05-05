@@ -400,7 +400,7 @@ const establishmentTutorSection = ({
   "establishmentTutor.email": {
     label: "Email du tuteur",
     hintText:
-      "Le tuteur recevra une copie de la convention à cette adresse email. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
+      "Le tuteur recevra une copie de la convention et devra compléter le bilan via cette adresse email. Pensez à bien vérifier son exactitude. Ex: nom@entreprise.com",
     id: establishmentTutorSectionIds.email,
     required: !isConventionTemplate,
   },
@@ -524,7 +524,7 @@ const establishmentRepresentativeSection = ({
   "signatories.establishmentRepresentative.email": {
     label: "Indiquez l'e-mail du représentant de l'entreprise",
     hintText:
-      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Ex: nom@entreprise.com",
     id: establishmentRepresentativeSectionIds.email,
     required: !isConventionTemplate,
   },
