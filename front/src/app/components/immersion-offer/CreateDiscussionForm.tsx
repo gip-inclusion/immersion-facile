@@ -30,6 +30,7 @@ import {
   labelsForImmersionObjective,
   toLowerCaseWithoutDiacritics,
 } from "shared";
+import { PhoneInput } from "src/app/components/forms/commons/PhoneInput";
 import {
   getDefaultAppellationCode,
   makeContactInputsLabelsByKey,
@@ -250,11 +251,17 @@ export const CreateDiscussionForm = ({
             )
           }
         />
-        <Input
+        <PhoneInput
           label={inputsLabelsByKey.potentialBeneficiaryPhone}
-          nativeInputProps={{
-            ...register("potentialBeneficiaryPhone"),
-            type: "phone",
+          inputProps={{
+            label: inputsLabelsByKey.potentialBeneficiaryPhone,
+            nativeInputProps: {
+              ...register("potentialBeneficiaryPhone"),
+              type: "phone",
+            },
+          }}
+          onPhoneNumberChange={(phoneNumber) => {
+            setValue("potentialBeneficiaryPhone", phoneNumber);
           }}
           {...getFieldError("potentialBeneficiaryPhone")}
         />
