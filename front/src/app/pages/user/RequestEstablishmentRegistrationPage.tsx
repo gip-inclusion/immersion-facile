@@ -25,7 +25,9 @@ export const RequestEstablishmentRegistrationPage = () => {
           <Button
             linkProps={routes.myProfile().link}
             priority={"secondary"}
+            size="small"
             className={fr.cx("fr-mb-6w")}
+            iconId="fr-icon-arrow-go-back-line"
           >
             Retourner sur mon profil
           </Button>

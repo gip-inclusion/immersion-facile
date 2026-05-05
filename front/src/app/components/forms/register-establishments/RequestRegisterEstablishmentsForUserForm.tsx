@@ -25,7 +25,7 @@ import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
 const establishmentRegisterEstablishmentModal = createFormModal({
@@ -50,6 +50,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
   const establishmentPublicOptions = useAppSelector(
     establishmentSelectors.establishmentPublicOptions,
   );
+  const establishmentPublicOptionsLength = establishmentPublicOptions.length;
   const establishmentSearchBySiretOrNameInput =
     useRef<ElementRef<"input">>(null);
   const debouncedInputValue = useDebounce(inputValue, 500);
@@ -132,12 +133,33 @@ export const RequestRegisterEstablishmentsForUserForm = ({
       </a>
       {inputValue && (
         <div className={fr.cx("fr-mt-4w")}>
-          <strong>Résultats pour votre recherche "{inputValue}"</strong>
+          <strong>
+            {match(establishmentPublicOptionsLength)
+              .with(1, () => `Résultat pour votre recherche "${inputValue}"`)
+              .with(
+                P.number.gte(2),
+                () => `Résultats pour votre recherche "${inputValue}"`,
+              )
+              .otherwise(
+                () =>
+                  `Aucun résultat ne correspond à la recherche "${inputValue}"`,
+              )}
+          </strong>
           <p className={fr.cx("fr-hint-text")}>
-            {establishmentPublicOptions.length}{" "}
-            {establishmentPublicOptions.length <= 1
-              ? "entreprise trouvée"
-              : "entreprises trouvées"}
+            {match(establishmentPublicOptionsLength)
+              .with(
+                1,
+                () => `${establishmentPublicOptionsLength} entreprise trouvée`,
+              )
+              .with(
+                P.number.gte(2),
+                () =>
+                  `${establishmentPublicOptionsLength} entreprises trouvées`,
+              )
+              .otherwise(
+                () =>
+                  "Vous pouvez créer une nouvelle entreprise en suivant le bouton ci-dessous.",
+              )}
           </p>
           <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
             {establishmentPublicOptions.map((establishmentPublicOption) => (

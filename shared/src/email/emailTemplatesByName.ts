@@ -1130,13 +1130,21 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         "role:admin",
         "role:contact",
       ],
-      createEmailVariables: (params) => ({
-        subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
-        greetings: "Bonjour,",
-        content: `Un candidat souhaite faire une immersion dans votre entreprise ${params.businessName} (${params.businessAddress}).
+      createEmailVariables: (params) => {
+        const hasAdditionnalInformation =
+          params.kind === "IF" &&
+          params.potentialBeneficiaryExperienceAdditionalInformation;
+        const hasLevelOfEducation =
+          params.kind === "1_ELEVE_1_STAGE" && params.levelOfEducation;
+        const hasResumeLink =
+          params.kind === "IF" && params.potentialBeneficiaryResumeLink;
 
-Immersion souhaitée :
+        return {
+          subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
+          greetings: "Bonjour,",
+          content: `Un candidat souhaite faire une immersion dans votre entreprise ${params.businessName} (${params.businessAddress}).
 
+<strong>Immersion souhaitée :</strong>
     • Métier : ${params.appellationLabel}.
     • Dates d’immersion envisagées : ${params.potentialBeneficiaryDatePreferences}.
     • ${
@@ -1145,44 +1153,40 @@ Immersion souhaitée :
         : ""
     }
 
-Profil du candidat :
+    ${[
+      hasAdditionnalInformation || hasLevelOfEducation || hasResumeLink
+        ? "<strong>Profil du candidat :</strong>\n"
+        : "",
 
-    ${
-      params.kind === "IF" &&
-      params.potentialBeneficiaryExperienceAdditionalInformation
-        ? `• Informations supplémentaires sur l'expérience du candidat : ${params.potentialBeneficiaryExperienceAdditionalInformation}.`
-        : ""
-    }
-    ${
-      params.kind === "1_ELEVE_1_STAGE" && params.levelOfEducation
-        ? `• Je suis en ${params.levelOfEducation}.`
-        : ""
-    }
-    ${
-      params.kind === "IF" && params.potentialBeneficiaryResumeLink
-        ? `• CV du candidat : ${params.potentialBeneficiaryResumeLink}.`
-        : ""
-    }`,
-        buttons: [
-          {
-            label: "Répondre au candidat via mon espace",
-            target: "_blank",
-            url: params.discussionUrl,
-          },
-        ],
-        highlight: {
-          content: `
+      hasAdditionnalInformation &&
+        `• Informations supplémentaires sur l'expérience du candidat : ${params.potentialBeneficiaryExperienceAdditionalInformation}.\n`,
+      hasLevelOfEducation && `• Je suis en ${params.levelOfEducation}.\n`,
+      hasResumeLink &&
+        `• CV du candidat : ${params.potentialBeneficiaryResumeLink}.`,
+    ]
+      .filter(Boolean)
+      .join("")}`,
+          buttons: [
+            {
+              label: "Répondre au candidat via mon espace",
+              target: "_blank",
+              url: params.discussionUrl,
+            },
+          ],
+          highlight: {
+            content: `
           Ce candidat attend une réponse, vous pouvez :
 
           - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${params.potentialBeneficiaryPhone}`,
-        },
-        subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
+          },
+          subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
         Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
 
         ${defaultSignature("immersion")}`,
-      }),
+        };
+      },
     },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
       niceName: "Établissement - MER - instructions par mail (Legacy)",
