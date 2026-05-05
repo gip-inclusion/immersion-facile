@@ -92,6 +92,21 @@ describe("createOpenApiSpecV3", () => {
     });
   });
 
+  describe("documents getOffers query parameters", () => {
+    const getOffersRoute = spec.paths![getOffersPath]?.get;
+
+    if (!getOffersRoute)
+      throw new Error("Missing GET operation for getOffer in OpenAPI spec");
+
+    it("documents sirets parameter with bracket notation hint", () => {
+      const siretsParam = getOffersRoute.parameters?.find(
+        (p) => (p as OpenAPI.ParameterObject).name === "sirets",
+      );
+
+      expect(siretsParam).toBeDefined();
+    });
+  });
+
   describe("documents getOffer URL parameters", () => {
     if (!getOfferPath) throw new Error("Missing getOffer path in OpenAPI spec");
     const getOfferRoute = spec.paths![getOfferPath]?.get;

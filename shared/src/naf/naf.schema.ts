@@ -1,4 +1,3 @@
-import { keys } from "ramda";
 import { z } from "zod";
 import { searchTextAlphaSchema } from "../search/searchText.schema";
 import {
@@ -6,35 +5,16 @@ import {
   stringWithMaxLength255,
   zStringMinLength1Max1024,
 } from "../utils/string.schema";
-import {
-  localization,
-  type ZodSchemaWithInputMatchingOutput,
-} from "../zodUtils";
-import {
-  type NafCode,
-  type NafDto,
-  type NafNomenclature,
-  type NafSectionLabel,
-  type NafSectionSuggestion,
-  type NafSectionSuggestionsParams,
-  type NafSectorCode,
-  type NafSousClasseLabel,
-  nafSectorCodes,
-  nafSectorLabels,
-  type WithNafCodes,
+import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
+import type {
+  NafCode,
+  NafDto,
+  NafNomenclature,
+  NafSectionSuggestion,
+  NafSectionSuggestionsParams,
+  NafSousClasseLabel,
+  WithNafCodes,
 } from "./naf.dto";
-
-export const validNafSectorCodes = keys(nafSectorLabels).filter(
-  (val) => val !== "0",
-);
-
-export const nafSectorCodeSchema: ZodSchemaWithInputMatchingOutput<NafSectorCode> =
-  z.enum(nafSectorCodes, {
-    error: localization.invalidEnum,
-  });
-
-export const nafSectionLabelSchema: ZodSchemaWithInputMatchingOutput<NafSectionLabel> =
-  stringWithMaxLength255;
 
 export const nafSousClasseLabelSchema: ZodSchemaWithInputMatchingOutput<NafSousClasseLabel> =
   stringWithMaxLength255;
@@ -65,11 +45,6 @@ export const nafSchema: ZodSchemaWithInputMatchingOutput<NafDto> = z.object({
   code: nafCodeSchema,
   nomenclature: nafNomenclatureSchema,
 });
-
-const nafDivisionRegex = /\d{2}/;
-export const nafDivisionSchema = z
-  .string()
-  .regex(nafDivisionRegex, "Division NAF incorrect");
 
 export const nafSectionSuggestionSchema: ZodSchemaWithInputMatchingOutput<NafSectionSuggestion> =
   z.object({

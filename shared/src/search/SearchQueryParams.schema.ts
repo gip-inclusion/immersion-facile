@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { type ZodType, z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressDepartmentCodeSchema } from "../address/address.schema";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
-import { nafCodesSchema, withNafCodesSchema } from "../naf/naf.schema";
+import { nafCodeSchema, withNafCodesSchema } from "../naf/naf.schema";
 import type { SortDirection } from "../pagination/pagination.dto";
 import {
   paginationQueryParamsSchema,
@@ -102,6 +102,14 @@ const geoParamsAndSortSchema = z.discriminatedUnion("sortBy", [
   geoParamsByDistanceSchema,
 ]);
 
+const singleOrArray = <T>(
+  schema: ZodType<T>,
+): ZodType<Array<T> | undefined, Array<T> | undefined> =>
+  z.preprocess(
+    (value) => (Array.isArray(value) ? value : [value]),
+    z.array(schema),
+  );
+
 export const getOffersFlatParamsSchema: z.ZodType<
   GetOffersFlatQueryParams,
   Omit<GetOffersFlatQueryParams, "sortOrder"> & {
@@ -109,12 +117,14 @@ export const getOffersFlatParamsSchema: z.ZodType<
   }
 > = z
   .object({
-    appellationCodes: z.array(appellationCodeSchema).optional(),
-    departmentCodes: z.array(addressDepartmentCodeSchema).optional(),
-    fitForDisabledWorkers: z.array(fitForDisabledWorkersSchema).optional(),
-    locationIds: z.array(zUuidLike).optional(),
-    nafCodes: nafCodesSchema.optional(),
-    sirets: z.array(siretSchema).optional(),
+    appellationCodes: singleOrArray(appellationCodeSchema).optional(),
+    departmentCodes: singleOrArray(addressDepartmentCodeSchema).optional(),
+    fitForDisabledWorkers: singleOrArray(
+      fitForDisabledWorkersSchema,
+    ).optional(),
+    locationIds: singleOrArray(zUuidLike).optional(),
+    nafCodes: singleOrArray(nafCodeSchema).optional(),
+    sirets: singleOrArray(siretSchema).optional(),
     searchableBy: z
       .enum(["students", "jobSeekers"], {
         error: localization.invalidEnum,
@@ -136,7 +146,7 @@ export const getExternalOffersFlatParamsSchema: z.ZodType<
 > = z
   .object({
     appellationCode: appellationCodeSchema,
-    nafCodes: nafCodesSchema.optional(),
+    nafCodes: singleOrArray(nafCodeSchema).optional(),
   })
   .and(paginationQueryParamsSchema)
   .and(latLonDistanceSchema)
