@@ -70,7 +70,7 @@
     "sass": "^1.97.3",
     "scss-mapper": "workspace:*",
     "shared": "workspace:*",
-    "shared-routes": "^0.10.9",
+    "shared-routes": "^0.10.10",
     "swagger-ui-react": "^5.32.0",
     "ts-pattern": "^5.7.0",
     "tss-react": "^4.5.2",
