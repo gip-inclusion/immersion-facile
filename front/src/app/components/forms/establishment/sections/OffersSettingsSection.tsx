@@ -22,6 +22,7 @@ import {
   type FormEstablishmentUserRight,
   getFormattedFirstnameAndLastname,
   immersionFacileContactEmail,
+  onlyUserRightWithStatusAccepted,
   toDateUTCString,
   toDisplayedDate,
   toDisplayedPhoneNumber,
@@ -737,6 +738,7 @@ const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
           return userRight.isMainContactByPhone === true;
         }) ?? establishment.userRights[0]);
   const usersToContactOptions: SelectProps.Option[] = establishment.userRights
+    .filter(onlyUserRightWithStatusAccepted)
     .filter((userRight) =>
       contactMode === "IN_PERSON" ? true : userRight.phone,
     )
