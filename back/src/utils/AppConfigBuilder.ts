@@ -23,6 +23,7 @@ const defaultConfigParams = {
   ADMIN_EMAIL: "myAdmin@mail.com",
   REPORTING_GATEWAY: "EXCEL",
   STORAGE_ROOT: "NOT PROVIDED",
+  CORS_ALLOWED_ORIGINS: "http://localhost:3000",
 };
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfigBuilder implements Builder<AppConfig> {

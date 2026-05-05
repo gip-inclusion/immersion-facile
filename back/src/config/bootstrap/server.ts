@@ -29,6 +29,7 @@ import type { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapter
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { legacyCreateLogger } from "../../utils/logger";
 import type { AppConfig } from "./appConfig";
+import { makeCorsPolicy } from "./corsPolicy";
 import { createAppDependencies } from "./createAppDependencies";
 import type { Gateways } from "./createGateways";
 import { detectHtmlInParamsMiddleware } from "./detectHtmlInParamsMiddleware";
@@ -51,6 +52,7 @@ export const createApp = async (
   config: AppConfig,
 ): Promise<CreateAppProperties> => {
   const app = express();
+  const corsPolicy = makeCorsPolicy(config);
 
   app.set("query parser", (str: string) =>
     qs.parse(str, {
@@ -95,10 +97,10 @@ export const createApp = async (
   app.use(createApiKeyAuthRouterV2(deps));
   app.use(createApiKeyAuthRouterV3(deps));
   // ----
-  app.use(createFormCompletionRouter(deps));
-  app.use(createNafRouter(deps));
+  app.use(corsPolicy, createFormCompletionRouter(deps));
+  app.use(corsPolicy, createNafRouter(deps));
   app.use(createTechnicalRouter(deps, config.inboundEmailAllowedIps));
-  app.use(createAddressRouter(deps));
+  app.use(corsPolicy, createAddressRouter(deps));
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createFtConnectRouter(deps));
