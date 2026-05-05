@@ -59,11 +59,11 @@ jobs:
 
             const categorize = (issue) => {
               if (!issue) return "feature";
-              const labelNames = (issue.labels?.nodes ?? []).map((l) => l.name);
+              const labelNames = (issue.labels?.nodes ?? []).map((l) => l.name.toLowerCase());
               const typeName = issue.issueType?.name;
               if (typeName === "Sécurité") return "security";
               if (typeName === "Bug") return "bugFix";
-              if (labelNames.includes("Tech")) return "tech";
+              if (labelNames.includes("tech")) return "tech";
               return "feature";
             };
 
