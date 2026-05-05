@@ -659,6 +659,8 @@ export class PgConventionQueries implements ConventionQueries {
             lastBroadcastFeedback: {
               consumerId: row.consumerId,
               consumerName: row.consumerName,
+              conventionId: row.conventionId,
+              agencyId: row.agencyId,
               handledByAgency: row.handledByAgency,
               occurredAt: row.occurredAt,
               requestParams: row.requestParams,

@@ -232,6 +232,8 @@ interface BroadcastFeedbacks {
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;
   response: JSONColumnType<BroadcastFeedbackResponse> | null;
+  convention_id: string | null;
+  agency_id: string | null;
 }
 
 type ConventionObjectiveType =

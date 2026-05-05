@@ -448,6 +448,7 @@ const createBroadcastFeedbackBaseBuilder = ({
         )
         .select((eb) => [
           eb.ref("c.id").as("conventionId"),
+          eb.ref("c.agency_id").as("agencyId"),
           eb.ref("c.status").as("status"),
           eb.ref("beneficiary.first_name").as("bFirstName"),
           eb.ref("beneficiary.last_name").as("bLastName"),

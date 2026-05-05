@@ -272,6 +272,8 @@ describe("Broadcasts events to France Travail", () => {
       {
         consumerId: null,
         consumerName: "France Travail",
+        conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
+        agencyId: conventionLinkedToFTWithoutFederatedIdentity.agencyId,
         serviceName: broadcastToFtServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
@@ -313,6 +315,8 @@ describe("Broadcasts events to France Travail", () => {
       {
         consumerId: null,
         consumerName: "France Travail",
+        conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
+        agencyId: conventionLinkedToFTWithoutFederatedIdentity.agencyId,
         serviceName: broadcastToFtServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,

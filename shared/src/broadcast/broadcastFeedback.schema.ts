@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { agencyIdSchema } from "../agency/agency.schema";
 import {
   apiConsumerIdSchema,
   apiConsumerNameSchema,
@@ -42,6 +43,8 @@ export const broadcastFeedbackSchema: ZodSchemaWithInputMatchingOutput<Conventio
       serviceName: z.string(),
       consumerId: apiConsumerIdSchema.nullable(),
       consumerName: apiConsumerNameSchema,
+      conventionId: conventionIdSchema,
+      agencyId: agencyIdSchema.nullable(),
       subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
       requestParams: conventionBroadcastRequestParamsSchema,
       response: broadcastFeedbackResponseSchema.optional(),
