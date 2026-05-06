@@ -11,6 +11,7 @@ import {
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { match } from "ts-pattern";
+import { makeCorsPolicy } from "../../../../config/bootstrap/corsPolicy";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
@@ -31,6 +32,7 @@ export const createTechnicalRouter = (
   inboundEmailAllowIps: string[],
 ) => {
   const technicalRouter = Router();
+  const corsPolicy = makeCorsPolicy(deps.config);
 
   const upload = multer({ storage: multer.memoryStorage() });
 
@@ -126,7 +128,7 @@ export const createTechnicalRouter = (
       ),
   );
 
-  technicalSharedRouter.openApiSpec(async (req, res) =>
+  technicalSharedRouter.openApiSpec(corsPolicy, async (req, res) =>
     sendHttpResponse(req, res, async () =>
       match(req.query.version)
         .with("v2", () => createOpenApiSpecV2(deps.config.envType))
@@ -158,7 +160,7 @@ export const createTechnicalRouter = (
       ),
   );
 
-  technicalSharedRouter.validateEmail(async (req, res) =>
+  technicalSharedRouter.validateEmail(corsPolicy, async (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.validateEmail.execute(req.query),
     ),

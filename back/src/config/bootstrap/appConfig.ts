@@ -150,6 +150,12 @@ export class AppConfig {
     });
   }
 
+  public get corsAllowedOrigins(): string[] {
+    return parseStringList(
+      this.#throwIfNotDefinedOrDefault("CORS_ALLOWED_ORIGINS"),
+    );
+  }
+
   public get redisUrl() {
     return this.#throwIfNotDefinedOrDefault("REDIS_URL");
   }
