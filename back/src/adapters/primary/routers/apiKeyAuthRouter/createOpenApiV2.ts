@@ -147,7 +147,6 @@ const errorDescriptionsAndSchemas = {
 
 export const createOpenApiSpecV2 = (envType: string) =>
   generateOpenApi(envType)({
-
     [conventionSection]: {
       getConventionById: {
         summary: "Récupération d'une convention",
