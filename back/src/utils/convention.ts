@@ -6,9 +6,11 @@ import {
   type ConventionStatus,
   type Email,
   errors,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import type { BannedEstablishment } from "../domains/establishment/ports/BannedEstablishmentRepository";
 import { agencyWithRightToAgencyDto } from "./agency";
 
 export const conventionEmailsByRole =
@@ -54,6 +56,20 @@ export const conventionDtoToConventionReadDto = async (
   if (!agencyWithRights)
     throw errors.agency.notFound({ agencyId: conventionDto.agencyId });
 
+  const bannedEstablishment: BannedEstablishment | undefined =
+    await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+      conventionDto.siret,
+    );
+
+  const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+    bannedEstablishment
+      ? {
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            bannedEstablishment.establishmentBannishmentJustification,
+        }
+      : { isEstablishmentBanned: false };
+
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
   const agencyRefersTo = agency.refersToAgencyId
@@ -85,6 +101,7 @@ export const conventionDtoToConventionReadDto = async (
         }
       : {}),
     ...assesmentEntityToConventionAssessmentFields(assessment),
+    ...withBannedEstablishmentInformations,
   };
 };
 

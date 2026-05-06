@@ -78,6 +78,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       signedAt: assessment.signedAt,
       createdAt: assessment.createdAt,
     },
+    isEstablishmentBanned: false,
   };
 
   beforeEach(() => {

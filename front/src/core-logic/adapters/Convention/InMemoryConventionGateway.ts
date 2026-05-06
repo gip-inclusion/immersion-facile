@@ -263,6 +263,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencyCounsellorEmails: [],
       agencyValidatorEmails: ["validator@mail.com"],
       assessment: null,
+      isEstablishmentBanned: false,
     };
   }
 

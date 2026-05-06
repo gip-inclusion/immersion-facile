@@ -13,10 +13,7 @@ import {
   legacyAssessmentStatuses,
 } from "../assessment/assessment.dto";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
-import {
-  type WithBannedEstablishmentInformations,
-  withBannedEstablishmentInformationSchema,
-} from "../establishment/bannedEstablishmentInformations";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
 import { businessAddressSchema } from "../establishment/businessAddress";
 import { businessNameSchema } from "../establishment/businessName";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
@@ -336,42 +333,22 @@ const cciSignatoriesSchema: ZodSchemaWithInputMatchingOutput<
   beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
 });
 
-const immersionConventionCoreSchema = (
-  conventionCommonSchema as unknown as z.ZodObject<any>
-).extend({
+export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
+  ConventionCommon & ConventionInternshipKindSpecific<"immersion">
+> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
   internshipKind: z.literal("immersion"),
   signatories: immersionSignatoriesSchema,
-});
-
-const miniStageConventionCoreSchema = (
-  conventionCommonSchema as unknown as z.ZodObject<any>
-).extend({
-  internshipKind: z.literal("mini-stage-cci"),
-  signatories: cciSignatoriesSchema,
-});
-
-export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon &
-    ConventionInternshipKindSpecific<"immersion"> &
-    WithBannedEstablishmentInformations
-> = immersionConventionCoreSchema.and(
-  withBannedEstablishmentInformationSchema,
-) as unknown as ZodSchemaWithInputMatchingOutput<
-  ConventionCommon &
-    ConventionInternshipKindSpecific<"immersion"> &
-    WithBannedEstablishmentInformations
+}) as unknown as ZodSchemaWithInputMatchingOutput<
+  ConventionCommon & ConventionInternshipKindSpecific<"immersion">
 >;
 
 export const miniStageConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon &
-    ConventionInternshipKindSpecific<"mini-stage-cci"> &
-    WithBannedEstablishmentInformations
-> = miniStageConventionCoreSchema.and(
-  withBannedEstablishmentInformationSchema,
-) as unknown as ZodSchemaWithInputMatchingOutput<
-  ConventionCommon &
-    ConventionInternshipKindSpecific<"mini-stage-cci"> &
-    WithBannedEstablishmentInformations
+  ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
+> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
+  internshipKind: z.literal("mini-stage-cci"),
+  signatories: cciSignatoriesSchema,
+}) as unknown as ZodSchemaWithInputMatchingOutput<
+  ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
 >;
 
 // https://github.com/colinhacks/zod#discriminated-unions
@@ -390,16 +367,10 @@ export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingO
 
 export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
   (
-    z
-      .looseObject({})
-      .pipe(
-        z
-          .discriminatedUnion("internshipKind", [
-            immersionConventionCoreSchema,
-            miniStageConventionCoreSchema,
-          ])
-          .and(withBannedEstablishmentInformationSchema) as any,
-      ) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
+    z.discriminatedUnion("internshipKind", [
+      immersionConventionSchema as unknown as z.ZodObject<any>,
+      miniStageConventionSchema as unknown as z.ZodObject<any>,
+    ]) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
   )
     .check((ctx) => {
       if (
@@ -571,25 +542,27 @@ export const conventionAssessmentFieldsSchema = z
 
 export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionReadDto> =
   conventionSchema.and(
-    z.object({
-      agencyName: agencyNameSchema,
-      agencyDepartment: addressDepartmentCodeSchema,
-      agencyKind: agencyKindSchema,
-      agencyContactEmail: emailSchema,
-      agencySiret: siretSchema,
-      agencyCounsellorEmails: z.array(emailSchema),
-      agencyValidatorEmails: z.array(emailSchema),
-      agencyRefersTo: z
-        .object({
-          id: refersToAgencyIdSchema,
-          name: zStringMinLength1Max1024,
-          contactEmail: emailSchema,
-          kind: agencyKindSchema,
-          siret: siretSchema,
-        })
-        .optional(),
-      assessment: conventionAssessmentFieldsSchema,
-    }),
+    z
+      .object({
+        agencyName: agencyNameSchema,
+        agencyDepartment: addressDepartmentCodeSchema,
+        agencyKind: agencyKindSchema,
+        agencyContactEmail: emailSchema,
+        agencySiret: siretSchema,
+        agencyCounsellorEmails: z.array(emailSchema),
+        agencyValidatorEmails: z.array(emailSchema),
+        agencyRefersTo: z
+          .object({
+            id: refersToAgencyIdSchema,
+            name: zStringMinLength1Max1024,
+            contactEmail: emailSchema,
+            kind: agencyKindSchema,
+            siret: siretSchema,
+          })
+          .optional(),
+        assessment: conventionAssessmentFieldsSchema,
+      })
+      .and(withBannedEstablishmentInformationSchema),
   );
 
 export const withConventionSchema: ZodSchemaWithInputMatchingOutput<WithConventionDto> =

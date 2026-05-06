@@ -328,6 +328,7 @@ describe("InclusionConnected", () => {
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
       assessment: null,
+      isEstablishmentBanned: false,
     };
 
     const adminUser: ConnectedUser = {

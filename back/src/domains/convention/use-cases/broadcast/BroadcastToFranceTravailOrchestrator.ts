@@ -1,9 +1,14 @@
-import { type ConventionReadDto, errors } from "shared";
+import {
+  type ConventionReadDto,
+  errors,
+  type WithBannedEstablishmentInformations,
+} from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { getReferedAgency } from "../../../core/api-consumer/helpers/agency";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { BannedEstablishment } from "../../../establishment/ports/BannedEstablishmentRepository";
 import { getOnlyAssessmentDto } from "../../entities/AssessmentEntity";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type {
@@ -31,6 +36,22 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
       );
       if (!convention)
         throw errors.convention.notFound({ conventionId: params.conventionId });
+
+      const bannedEstablishment: BannedEstablishment | undefined =
+        await uowPerformer.perform(async (uow) => {
+          return uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+            convention.siret,
+          );
+        });
+
+      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+        bannedEstablishment
+          ? {
+              isEstablishmentBanned: true,
+              establishmentBannishmentJustification:
+                bannedEstablishment.establishmentBannishmentJustification,
+            }
+          : { isEstablishmentBanned: false };
 
       const { agency, agencyWithRights, referredAgency } =
         await uowPerformer.perform(async (uow) => {
@@ -75,6 +96,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
         agencyCounsellorEmails: agency.counsellorEmails,
         agencyValidatorEmails: agency.validatorEmails,
         ...assessmentFields,
+        ...withBannedEstablishmentInformations,
       };
 
       const assessmentDto = assessment

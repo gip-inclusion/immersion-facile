@@ -9,6 +9,7 @@ import {
   type Signatories,
   statusTransitionConfigs,
   updateConventionRequestSchema,
+  type WithBannedEstablishmentInformations,
   type WithConventionIdLegacy,
 } from "shared";
 import {
@@ -70,6 +71,15 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
         isValidatorOfAgencyRefersToAllowed:
           conventionFromRepo.status !== "ACCEPTED_BY_COUNSELLOR",
       });
+
+      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+        conventionReadDto.isEstablishmentBanned
+          ? {
+              isEstablishmentBanned: true,
+              establishmentBannishmentJustification:
+                conventionReadDto.establishmentBannishmentJustification,
+            }
+          : { isEstablishmentBanned: false };
 
       const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
@@ -141,6 +151,7 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
             ...conventionWithSignatoriesSignedAtAndDateApprovalCleared,
             ...agencyDtoToConventionAgencyFields(agency),
             ...assessmentFields,
+            ...withBannedEstablishmentInformations,
           },
           jwtPayload,
           now: deps.timeGateway.now().toISOString(),

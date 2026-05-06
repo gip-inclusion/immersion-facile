@@ -49,6 +49,7 @@ const broadcastParams = (): BroadcastConventionParams => {
       agencyValidatorEmails: ["validator@mail.com"],
       agencyRefersTo: undefined,
       assessment: null,
+      isEstablishmentBanned: false,
     },
   };
 };

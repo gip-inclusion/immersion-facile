@@ -8,6 +8,7 @@ import {
   ConnectedUserBuilder,
   type ConnectedUserJwt,
   ConventionDtoBuilder,
+  type ConventionReadDto,
   type ConventionTemplate,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -366,7 +367,7 @@ describe("authenticatedConventionRoutes", () => {
         agencyRefersTo: undefined,
       };
 
-      const conventionRead1 = {
+      const conventionRead1: ConventionReadDto = {
         ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
@@ -375,12 +376,14 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        isEstablishmentBanned: false,
       };
 
-      const conventionRead2 = {
+      const conventionRead2: ConventionReadDto = {
         ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
+        isEstablishmentBanned: false,
       };
 
       expectHttpResponseToEqual(response, {
@@ -444,7 +447,7 @@ describe("authenticatedConventionRoutes", () => {
         agencyRefersTo: undefined,
       };
 
-      const conventionRead1 = {
+      const conventionRead1: ConventionReadDto = {
         ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
@@ -453,6 +456,7 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        isEstablishmentBanned: false,
       };
 
       expectHttpResponseToEqual(response, {
@@ -564,7 +568,7 @@ describe("authenticatedConventionRoutes", () => {
         agencyRefersTo: undefined,
       };
 
-      const conventionRead1 = {
+      const conventionRead1: ConventionReadDto = {
         ...conventionWithAssessment,
         ...agencyFields,
         assessment: {
@@ -573,12 +577,14 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        isEstablishmentBanned: false,
       };
 
-      const conventionRead2 = {
+      const conventionRead2: ConventionReadDto = {
         ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
+        isEstablishmentBanned: false,
       };
 
       expectHttpResponseToEqual(response, {

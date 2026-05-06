@@ -220,6 +220,7 @@ describe("conventionDtoSchema", () => {
           signedAt: null,
           createdAt: new Date().toISOString(),
         },
+        isEstablishmentBanned: false,
       };
       expect(() =>
         conventionReadSchema.parse(validConventionRead),
@@ -243,6 +244,9 @@ describe("conventionDtoSchema", () => {
           signedAt: null,
           createdAt: new Date().toISOString(),
         },
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification:
+          "Achète du Coca-Cola au lieu du Breizh-Cola",
       };
       expectDtoInvalidWithIssueMessages(
         conventionReadSchema,
