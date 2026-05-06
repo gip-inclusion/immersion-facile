@@ -1,13 +1,12 @@
-import {
-  getOffersFlatParamsSchema,
-  httpErrorSchema,
-  internalOfferSchema,
-  paginatedSearchResultsSchema,
-  withAuthorizationHeaders,
-} from "shared";
+import { httpErrorSchema, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { contactEstablishmentPublicV3Schema } from "../DtoAndSchemas/v3/input/ContactEstablishmentPublicV3.schema";
+import { getOffersFlatParamsSchemaPublicV3Schema } from "../DtoAndSchemas/v3/input/GetOffersPublicV3.schema";
+import {
+  paginatedSearchResultsPublicV3Schema,
+  searchImmersionResultPublicV3Schema,
+} from "../DtoAndSchemas/v3/output/SearchImmersionResultPublicV3.schema";
 
 export type PublicApiV3SearchEstablishmentRoutes =
   typeof publicApiV3SearchEstablishmentRoutes;
@@ -32,7 +31,7 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
     url: "/v3/offers/:siret/:appellationCode/:locationId?",
     ...withAuthorizationHeaders,
     responses: {
-      200: internalOfferSchema,
+      200: searchImmersionResultPublicV3Schema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
@@ -44,9 +43,9 @@ export const publicApiV3SearchEstablishmentRoutes = defineRoutes({
     method: "get",
     url: "/v3/offers",
     ...withAuthorizationHeaders,
-    queryParamsSchema: getOffersFlatParamsSchema,
+    queryParamsSchema: getOffersFlatParamsSchemaPublicV3Schema,
     responses: {
-      200: paginatedSearchResultsSchema,
+      200: paginatedSearchResultsPublicV3Schema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
