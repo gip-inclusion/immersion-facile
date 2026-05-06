@@ -11,7 +11,7 @@ import { connectedUserSelectors } from "src/core-logic/domain/connected-user/con
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
-type MyProfileProps = {
+type MyProfileMainTabProps = {
   route: Route<
     typeof routes.myProfileAgencies | typeof routes.myProfileEstablishments
   >;
@@ -22,7 +22,7 @@ const linkToUpdateAccountInfo =
     ? "https://app.moncomptepro.beta.gouv.fr/personal-information"
     : "https://app-preprod.moncomptepro.beta.gouv.fr/personal-information";
 
-export const MyProfile = ({ route }: MyProfileProps) => {
+export const MyProfileMainTab = ({ route }: MyProfileMainTabProps) => {
   const dispatch = useDispatch();
 
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);

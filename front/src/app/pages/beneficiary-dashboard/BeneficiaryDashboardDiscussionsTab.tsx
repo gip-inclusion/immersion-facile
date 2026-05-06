@@ -9,7 +9,7 @@ import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 
-export const BeneficiaryDashboardPage = () => {
+export const BeneficiaryDashboardDiscussionsTab = () => {
   const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
   const isLoadingDiscussionList = useAppSelector(discussionSelectors.isLoading);
 

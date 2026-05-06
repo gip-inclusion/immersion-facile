@@ -2,20 +2,20 @@ import type { ReactElement } from "react";
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
-  ConnectedPrivateRoute,
+  ConnectedPrivateRoutePage,
   type FrontDashboardRoute,
-} from "src/app/pages/auth/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoutePage";
 
-type DashboardPrivateRouteProps = {
+type DashboardPrivateRoutePageProps = {
   route: FrontDashboardRoute;
   children: ReactElement;
 };
 
-export const DashboardPrivateRoute = ({
+export const DashboardPrivateRoutePage = ({
   route,
   children,
-}: DashboardPrivateRouteProps) => (
-  <ConnectedPrivateRoute
+}: DashboardPrivateRoutePageProps) => (
+  <ConnectedPrivateRoutePage
     route={route}
     oAuthConnectionPageHeader={
       <PageHeader
@@ -25,5 +25,5 @@ export const DashboardPrivateRoute = ({
     }
   >
     {children}
-  </ConnectedPrivateRoute>
+  </ConnectedPrivateRoutePage>
 );

@@ -13,7 +13,7 @@ import {
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { loginByEmailFeedbackTopic } from "src/app/pages/auth/ConnectedPrivateRoute";
+import { loginByEmailFeedbackTopic } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { routes, useRoute } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
