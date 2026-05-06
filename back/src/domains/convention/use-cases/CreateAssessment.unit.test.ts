@@ -209,6 +209,58 @@ describe("CreateAssessment", () => {
       );
     });
 
+    it("throws bad request if contract start date is before immersion start", async () => {
+      const assessmentWithInvalidContractDate: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "COMPLETED",
+        endedWithAJob: true,
+        typeOfContract: "CDI",
+        contractStartDate: subDays(
+          new Date(validatedConvention.dateStart),
+          1,
+        ).toISOString(),
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+      await expectPromiseToFailWithError(
+        createAssessment.execute(
+          assessmentWithInvalidContractDate,
+          tutorPayload,
+        ),
+        errors.assessment.contractStartDateBeforeImmersionStart({
+          immersionDateStart: validatedConvention.dateStart,
+        }),
+      );
+    });
+
+    it("throws bad request if number of missed hours exceeds scheduled hours in the presence period", async () => {
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: subDays(
+          new Date(validatedConvention.dateEnd),
+          1,
+        ).toISOString(),
+        numberOfMissedHours: 10_000,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+
+      await expectPromiseToFailWithError(
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
+        errors.assessment.numberOfMissedHoursExceedsScheduled(),
+      );
+    });
+
     it.each(
       failingStatuses.map((status) => ({ status })),
     )("throws bad request if the Convention status is '$status'", async ({

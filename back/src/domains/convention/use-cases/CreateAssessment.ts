@@ -3,6 +3,7 @@ import {
   assessmentDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
+  calculateTotalImmersionHoursBetweenDateComplex,
   errors,
   ForbiddenError,
 } from "shared";
@@ -58,6 +59,29 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
       ) {
         throw errors.assessment.lastDayOfPresenceNotInConventionRange();
       }
+
+      if (
+        assessment.endedWithAJob === true &&
+        convention.dateStart > assessment.contractStartDate
+      )
+        throw errors.assessment.contractStartDateBeforeImmersionStart({
+          immersionDateStart: convention.dateStart,
+        });
+
+      const scheduledHours = calculateTotalImmersionHoursBetweenDateComplex({
+        complexSchedule: convention.schedule.complexSchedule,
+        dateStart: convention.dateStart,
+        dateEnd:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? (assessment.lastDayOfPresence ?? convention.dateEnd)
+            : convention.dateEnd,
+      });
+
+      if (
+        assessment.status === "PARTIALLY_COMPLETED" &&
+        assessment.numberOfMissedHours > scheduledHours
+      )
+        throw errors.assessment.numberOfMissedHoursExceedsScheduled();
 
       const assessmentEntity = await createAssessmentEntityIfNotExist(
         uow,
