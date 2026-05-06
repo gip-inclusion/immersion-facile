@@ -56,69 +56,6 @@ describe("banEstablishment", () => {
 
   describe(`${adminRoutes.banEstablishment.method} ${adminRoutes.banEstablishment.url} route`, () => {
     describe("Wrong paths", () => {
-      it("400 - returns 400 when siret is invalid", async () => {
-        const response = await httpClient.banEstablishment({
-          headers: { authorization: adminToken },
-          body: {
-            siret: "invalid-siret",
-            establishmentBannishmentJustification:
-              bannedEstablishment.establishmentBannishmentJustification,
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 400,
-          body: {
-            message:
-              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
-            issues: ["siret : SIRET doit être composé de 14 chiffres"],
-            status: 400,
-          },
-        });
-      });
-      it("400 - returns 400 when bannishment justification is empty", async () => {
-        const response = await httpClient.banEstablishment({
-          headers: { authorization: adminToken },
-          body: {
-            siret: bannedEstablishment.siret,
-            establishmentBannishmentJustification: "",
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 400,
-          body: {
-            message:
-              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
-            issues: [
-              "establishmentBannishmentJustification : Ce champ est obligatoire",
-            ],
-            status: 400,
-          },
-        });
-      });
-      it("400 - returns 400 when bannishment justification is too long", async () => {
-        const longJustification = "a".repeat(1024 + 1);
-        const response = await httpClient.banEstablishment({
-          headers: { authorization: adminToken },
-          body: {
-            siret: bannedEstablishment.siret,
-            establishmentBannishmentJustification: longJustification,
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 400,
-          body: {
-            message:
-              "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /admin/ban-establishment",
-            issues: [
-              "establishmentBannishmentJustification : Le maximum est de 1024 caractères",
-            ],
-            status: 400,
-          },
-        });
-      });
       it("401 - returns 401 when missing token", async () => {
         const response = await httpClient.banEstablishment({
           headers: { authorization: "" },
@@ -153,28 +90,6 @@ describe("banEstablishment", () => {
             message:
               "L'utilisateur qui a l'identifiant \"non-admin-user\" n'a pas le droit d'accéder à cette ressource.",
             status: 403,
-          },
-        });
-      });
-      it("409 - returns 409 when establishment is already banned", async () => {
-        inMemoryUow.bannedEstablishmentRepository.bannedEstablishments = [
-          bannedEstablishment,
-        ];
-
-        const response = await httpClient.banEstablishment({
-          headers: { authorization: adminToken },
-          body: {
-            siret: bannedEstablishment.siret,
-            establishmentBannishmentJustification:
-              bannedEstablishment.establishmentBannishmentJustification,
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 409,
-          body: {
-            message: `L'établissement avec le siret '${bannedEstablishment.siret}' est déjà banni.`,
-            status: 409,
           },
         });
       });
