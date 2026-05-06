@@ -15,6 +15,7 @@ import {
   type ConventionReadDto,
   getDaysBetween,
   isConventionRenewed,
+  isConventionValidated,
   type PhoneNumber,
   type Role,
   relativeTimeFormat,
@@ -127,6 +128,7 @@ export const ConventionValidation = ({
     intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0 &&
     currentUser &&
     hasUserRightsOnAgencyBroadcast(currentUser);
+  const shouldShowAssessmentBadge = isConventionValidated(convention);
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
@@ -176,20 +178,22 @@ export const ConventionValidation = ({
             Erreur de synchronisation
           </Badge>
         )}
-        <Badge
-          className={fr.cx("fr-mr-2w")}
-          severity={
-            getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
-              getAssessmentCompletionStatus(convention.assessment)
-            ].severity
-          }
-        >
-          {
-            getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
-              getAssessmentCompletionStatus(convention.assessment)
-            ].shortLabel
-          }
-        </Badge>
+        {shouldShowAssessmentBadge && (
+          <Badge
+            className={fr.cx("fr-mr-2w")}
+            severity={
+              getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
+                getAssessmentCompletionStatus(convention.assessment)
+              ].severity
+            }
+          >
+            {
+              getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
+                getAssessmentCompletionStatus(convention.assessment)
+              ].shortLabel
+            }
+          </Badge>
+        )}
       </div>
       <h1 className={fr.cx("fr-h3")}>{title}</h1>
       {convention.statusJustification && (
