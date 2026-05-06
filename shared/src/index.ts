@@ -44,6 +44,7 @@ export * from "./convention/conventionTemplate.schema";
 export * from "./convention/conventionWithBroadcastFeedback.dto";
 export * from "./convention/conventionWithBroadcastFeedback.schema";
 export * from "./convention/conventionWithUnfinalizedAssessment.dto";
+export * from "./convention/conventionWithUnfinalizedAssessment.dto";
 export * from "./convention/conventionWithUnfinalizedAssessment.schema";
 export * from "./convention/shareConventionDraftByEmail.dto";
 export * from "./convention/shareConventionDraftByEmail.schema";

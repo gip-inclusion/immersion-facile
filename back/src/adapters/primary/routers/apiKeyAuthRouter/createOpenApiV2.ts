@@ -184,6 +184,7 @@ const conventionExample: ConventionReadDto = {
     signedAt: null,
     createdAt: new Date("2025-01-01").toISOString(),
   },
+  isEstablishmentBanned: false,
 };
 
 const callbackBodySchema: ZodSchemaWithInputMatchingOutput<ConventionUpdatedSubscriptionCallbackBody> =

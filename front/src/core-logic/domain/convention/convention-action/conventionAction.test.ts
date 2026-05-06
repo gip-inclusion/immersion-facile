@@ -38,6 +38,7 @@ const convention: ConventionReadDto = {
   ...agencyFields,
   ...new ConventionDtoBuilder().notSigned().build(),
   assessment: null,
+  isEstablishmentBanned: false,
 };
 
 describe("convention action slice", () => {
@@ -105,6 +106,7 @@ describe("convention action slice", () => {
             .withStatus("CANCELLED")
             .build(),
           assessment: null,
+          isEstablishmentBanned: false,
         };
 
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -206,6 +208,7 @@ describe("convention action slice", () => {
             .withStatus("DEPRECATED")
             .build(),
           assessment: null,
+          isEstablishmentBanned: false,
         };
 
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -306,6 +309,7 @@ describe("convention action slice", () => {
             .withStatus("REJECTED")
             .build(),
           assessment: null,
+          isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -406,6 +410,7 @@ describe("convention action slice", () => {
             .withStatus("ACCEPTED_BY_VALIDATOR")
             .build(),
           assessment: null,
+          isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -507,6 +512,7 @@ describe("convention action slice", () => {
             .withStatus("ACCEPTED_BY_COUNSELLOR")
             .build(),
           assessment: null,
+          isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
 
@@ -622,6 +628,7 @@ describe("convention action slice", () => {
           .withAgencyId("agency-transferred-id")
           .build(),
         assessment: null,
+        isEstablishmentBanned: false,
       };
       feedGatewayWithConvention(conventionWithAgencyChanged);
 
@@ -729,6 +736,7 @@ describe("convention action slice", () => {
           .withAgencyReferent({ firstname: "jean", lastname: "pierre" })
           .build(),
         assessment: null,
+        isEstablishmentBanned: false,
       };
 
       feedGatewayWithConvention(conventionWithCounsellorNameChanged);
@@ -978,6 +986,7 @@ describe("convention action slice", () => {
           .signedByEstablishmentRepresentative(new Date().toISOString())
           .build(),
         assessment: null,
+        isEstablishmentBanned: false,
       };
 
       feedGatewayWithConvention(signedConvention);

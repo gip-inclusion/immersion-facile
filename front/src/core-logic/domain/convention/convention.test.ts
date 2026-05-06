@@ -33,6 +33,7 @@ describe("Convention slice", () => {
     agencyCounsellorEmails: [],
     agencyValidatorEmails: ["validator@mail.com"],
     assessment: null,
+    isEstablishmentBanned: false as const,
   };
   const convention = new ConventionDtoBuilder()
     .withStatus("READY_TO_SIGN")
@@ -58,7 +59,7 @@ describe("Convention slice", () => {
           convention: {
             ...convention,
             ...conventionReadDtoRemainingProps,
-          },
+          } satisfies ConventionReadDto,
           feedbackTopic: "convention-form",
         }),
       );
@@ -210,6 +211,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         }),
       );
@@ -268,6 +270,7 @@ describe("Convention slice", () => {
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
         assessment: null,
+        isEstablishmentBanned: false,
       };
       // tester l'état initiale
       expectConventionState({
@@ -321,6 +324,7 @@ describe("Convention slice", () => {
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
         assessment: null,
+        isEstablishmentBanned: false,
       };
       expectConventionState({
         isLoading: false,
@@ -386,6 +390,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -443,6 +448,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -494,6 +500,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -537,6 +544,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -582,6 +590,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -635,6 +644,7 @@ describe("Convention slice", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: ["validator@mail.com"],
             assessment: null,
+            isEstablishmentBanned: false,
           };
           expectConventionState({
             isLoading: false,
@@ -687,6 +697,7 @@ describe("Convention slice", () => {
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
         assessment: null,
+        isEstablishmentBanned: false,
       };
       ({ store, dependencies } = createTestStore({
         convention: {
@@ -734,6 +745,7 @@ describe("Convention slice", () => {
         agencyCounsellorEmails: [],
         agencyValidatorEmails: ["validator@mail.com"],
         assessment: null,
+        isEstablishmentBanned: false,
       };
 
       ({ store, dependencies } = createTestStore({
@@ -958,6 +970,7 @@ describe("Convention slice", () => {
       agencyCounsellorEmails: [],
       agencyValidatorEmails: ["validator@mail.com"],
       assessment: null,
+      isEstablishmentBanned: false,
     };
     ({ store } = createTestStore({
       convention: {

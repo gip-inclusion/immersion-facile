@@ -185,6 +185,7 @@ describe("Convention routes", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
         status: 200,
       });
@@ -282,6 +283,7 @@ describe("Convention routes", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         ],
         status: 200,

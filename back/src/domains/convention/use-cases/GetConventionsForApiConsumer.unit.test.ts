@@ -99,6 +99,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
             agencyValidatorEmails: agencyFranceTravail.validatorEmails,
             assessment: null,
+            isEstablishmentBanned: false,
           },
         ]);
       });
@@ -132,6 +133,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
             agencyValidatorEmails: agencyFranceTravail.validatorEmails,
             assessment: null,
+            isEstablishmentBanned: false,
           },
         ]);
       });
@@ -184,6 +186,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencyCounsellorEmails: agencyMissionLocale.counsellorEmails,
             agencyValidatorEmails: agencyMissionLocale.validatorEmails,
             assessment: null,
+            isEstablishmentBanned: false,
           },
         ]);
       });

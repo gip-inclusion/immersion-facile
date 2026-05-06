@@ -62,6 +62,7 @@ const conventionReadDtoFrom = ({
         createdAt: assessment.createdAt,
       }
     : null,
+  isEstablishmentBanned: false,
 });
 
 describe("Broadcasts events to France Travail", () => {

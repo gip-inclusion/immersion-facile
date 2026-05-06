@@ -3,7 +3,7 @@ import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   type ConnectedUser,
-  type ConventionDto,
+  type ConventionReadDto,
   type ConventionStatus,
   conventionStatusesWithValidator,
   type DeleteAssessmentRequestDto,
@@ -53,7 +53,7 @@ export type ModalWrapperProps = {
       | WithConventionId
       | MarkPartnersErroredConventionAsHandledRequest,
   ) => void;
-  convention: ConventionDto;
+  convention: ConventionReadDto;
   currentSignatoryRoles: Role[];
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>

@@ -374,8 +374,7 @@ export type ConventionDto = ConventionCommon &
   (
     | ConventionInternshipKindSpecific<"immersion">
     | ConventionInternshipKindSpecific<"mini-stage-cci">
-  ) &
-  WithBannedEstablishmentInformations;
+  );
 
 export type Signatories<T extends InternshipKind = InternshipKind> = {
   beneficiary: Beneficiary<T>;
@@ -490,7 +489,8 @@ export type ConventionAssessmentFields = {
 
 export type ConventionReadDto = ConventionDto &
   ConventionAgencyFields &
-  ConventionAssessmentFields;
+  ConventionAssessmentFields &
+  WithBannedEstablishmentInformations;
 
 export type WithConventionIdLegacy = {
   id: ConventionId;

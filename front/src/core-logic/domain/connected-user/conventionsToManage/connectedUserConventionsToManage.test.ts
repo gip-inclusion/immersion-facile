@@ -56,6 +56,7 @@ describe("ConnectedUserConventionsToManage", () => {
       ...new ConventionDtoBuilder().build(),
       ...agencyFields,
       assessment: null,
+      isEstablishmentBanned: false,
     };
 
     const result: DataWithPagination<ConventionReadDto> = {

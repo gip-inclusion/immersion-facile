@@ -1,10 +1,5 @@
 import { values } from "ramda";
-import {
-  type ConventionDto,
-  type ConventionId,
-  type ConventionReadDto,
-  errors,
-} from "shared";
+import { type ConventionDto, type ConventionId, errors } from "shared";
 import type { ConventionRepository } from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {
@@ -54,7 +49,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
     if (this.#conventions[convention.id])
       throw errors.convention.conflict({ conventionId: convention.id });
 
-    this.#conventions[convention.id] = dropConventionReadFields(convention);
+    this.#conventions[convention.id] = convention;
   }
 
   // for test purpose
@@ -62,7 +57,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
     this.#conventions = conventions.reduce<Record<ConventionId, ConventionDto>>(
       (acc, convention) => ({
         ...acc,
-        [convention.id]: dropConventionReadFields(convention),
+        [convention.id]: convention,
       }),
       {},
     );
@@ -72,25 +67,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
     const id = convention.id;
     if (!this.#conventions[id]) return;
 
-    this.#conventions[id] = dropConventionReadFields(convention);
+    this.#conventions[id] = convention;
     return id;
   }
 }
-
-const dropConventionReadFields = (
-  convention: ConventionReadDto | ConventionDto,
-): ConventionDto => {
-  const {
-    agencyCounsellorEmails: _1,
-    agencyValidatorEmails: _2,
-    agencyDepartment: _3,
-    agencyKind: _4,
-    agencyName: _5,
-    agencySiret: _6,
-    agencyContactEmail: _7,
-    agencyRefersTo: _8,
-    assessment: _9,
-    ...conventionWithoutReadFields
-  } = convention as ConventionReadDto;
-  return conventionWithoutReadFields;
-};

@@ -53,6 +53,7 @@ export const createInMemoryUow = () => {
     userRepository,
     assessmentRepository,
     broadcastFeedbacksRepository,
+    bannedEstablishmentRepository,
   );
   const featureFlagRepository = new InMemoryFeatureFlagRepository();
 
