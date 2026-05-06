@@ -1,12 +1,12 @@
 import type { ZodSchemaWithInputMatchingOutput } from "shared";
 import {
   appellationCodeSchema,
-  contactLevelsOfEducation,
   contactModeSchema,
   emailSchema,
   firstnameMandatorySchema,
   immersionObjectiveSchema,
   lastnameMandatorySchema,
+  localization,
   phoneNumberSchema,
   siretSchema,
   withAcquisitionSchema,
@@ -52,7 +52,9 @@ const contactEstablishmentPublicV31Eleve1StageSchema =
       immersionObjective: z.literal(
         "Découvrir un métier ou un secteur d'activité",
       ),
-      levelOfEducation: z.enum(contactLevelsOfEducation),
+      levelOfEducation: z.enum(["3ème", "2nde"], {
+        error: localization.invalidEnum,
+      }),
     }),
   );
 
