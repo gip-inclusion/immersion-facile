@@ -12,6 +12,7 @@ import type {
 } from "../discussion/discussion.dto";
 import { isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl } from "../discussion/discussion.schema";
 import type { AgencyRole } from "../role/role.dto";
+import { titleByRole } from "../role/role.utils";
 import { frontRoutes } from "../routes/route.utils";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { displayDuration, oneMinuteInSeconds } from "../utils/durations";
@@ -1811,26 +1812,30 @@ Tél : ${beneficiaryPhone}`,
         lastName,
         updatedStatus,
         immersionBaseUrl,
-      }) => ({
-        subject: `Mise à jour de votre accès à l'entreprise ${businessName}`,
-        greetings: `Bonjour ${firstName} ${lastName},`,
-        content: `
+      }) => {
+        const userFullName =
+          firstName && lastName ? ` ${firstName} ${lastName}` : "";
+        return {
+          subject: `Mise à jour de votre accès à l'entreprise ${businessName}`,
+          greetings: `Bonjour${userFullName},`,
+          content: `
           Un administrateur de l'entreprise ${businessName} a traité votre demande de rattachement
           <strong>Statut de votre demande : </strong>${updatedStatus === "ACCEPTED" ? "Acceptée" : "Refusée"}
          
          ${updatedStatus === "ACCEPTED" ? "Félicitations ! Vous pouvez désormais accéder aux conventions et aux candidatures de l'espace de l'entreprise." : "Votre demande n'a pas été accepté. Si vous pensez qu'il s'agit d'une erreur, nous vous invitons à contacter directement l'administrateur de l'établissement au sein de votre structure."}
         `,
-        buttons:
-          updatedStatus === "ACCEPTED"
-            ? [
-                {
-                  label: "Accéder à mon espace",
-                  url: `${immersionBaseUrl}/${frontRoutes.establishmentDashboard}`,
-                },
-              ]
-            : [],
-        subContent: defaultSignature("immersion"),
-      }),
+          buttons:
+            updatedStatus === "ACCEPTED"
+              ? [
+                  {
+                    label: "Accéder à mon espace",
+                    url: `${immersionBaseUrl}/${frontRoutes.establishmentDashboard}`,
+                  },
+                ]
+              : [],
+          subContent: defaultSignature("immersion"),
+        };
+      },
     },
 
     FULL_PREVIEW_EMAIL: {
@@ -2863,31 +2868,38 @@ L'équipe d'Immersion Facilitée`,
         pendingUserLastName,
         pendingUserRole,
         pendingUserEmail,
-      }) => ({
-        subject:
-          "Immersion Facilitée - Demande de rattachement en attente pour votre entreprise",
-        content: `
-        Bonjour ${adminFirstName} ${adminLastName},
+      }) => {
+        const adminFullName =
+          adminFirstName && adminLastName
+            ? ` ${adminFirstName} ${adminLastName}`
+            : "";
+        const pendingUserFullNameOrEmail =
+          pendingUserFirstName && pendingUserLastName
+            ? `<strong>${pendingUserFirstName} ${pendingUserLastName}</strong> (${pendingUserEmail})`
+            : `<strong>${pendingUserEmail}</strong>`;
+        return {
+          subject:
+            "Immersion Facilitée - Demande de rattachement en attente pour votre entreprise",
+          content: `
+        Bonjour${adminFullName},
 
-        Un utilisateur a demandé à être ajouté comme ${pendingUserRole} pour votre entreprise.
-
-        Pour accéder à l'espace entreprise, veuillez cliquer sur le bouton ci-dessous :
-
-        • ${pendingUserFirstName && pendingUserLastName ? `<strong>${pendingUserFirstName} ${pendingUserLastName}</strong> (${pendingUserEmail})` : `<strong>${pendingUserEmail}</strong>`}
+        Vous avez une nouvelle demande de rattachement à votre espace entreprise Immersion Facilitée :
+        - ${pendingUserFullNameOrEmail} - ${titleByRole[pendingUserRole]}
         `,
-        buttons: [
-          {
-            label: "Gérer les utilisateurs de mon entreprise",
-            url: establishmentDashboardUrl,
-          },
-        ],
-        subContent: `
+          buttons: [
+            {
+              label: "Gérer les utilisateurs de mon entreprise",
+              url: establishmentDashboardUrl,
+            },
+          ],
+          subContent: `
         En acceptant cette demande, vous permettez à vos collaborateurs d’accéder aux conventions et aux candidatures de votre entreprise.
         
         <strong>Besoin d'aide ?</strong> Retrouvez notre article : <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/gestion-des-utilisateurs-et-droits-pour-une-entreprise-6w4pr9/">Comment gérer les collaborateurs de mon entreprise</a>
 
         ${defaultSignature("immersion")}`,
-      }),
+        };
+      },
     },
   });
 
