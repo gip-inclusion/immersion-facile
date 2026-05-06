@@ -2,7 +2,6 @@ import { uniq } from "ramda";
 import { filter, map, switchMap } from "rxjs";
 import {
   type AbsoluteUrl,
-  type CSVBoolean,
   csvBooleanToBoolean,
   defaultMaxContactsPerMonth,
   type EstablishmentCSVRow,
@@ -15,7 +14,6 @@ import {
   type FormEstablishmentUserRight,
   formEstablishmentSchema,
   keys,
-  noContactPerMonth,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -116,8 +114,8 @@ export const candidateEstablishmentMapper = (
       isEngagedEnterprise: csvBooleanToBoolean(
         establishmentRow.isEngagedEnterprise,
       ),
-      maxContactsPerMonth: calculateMaxContactsPerMonth(
-        establishmentRow.isSearchable,
+      maxContactsPerMonth: getMaxContactsPerMonth(
+        establishmentRow.maxContactPerMonth,
       ),
       searchableBy: {
         jobSeekers: csvBooleanToBoolean(
@@ -136,11 +134,11 @@ export const candidateEstablishmentMapper = (
   return { formEstablishment: mappedEstablishment, zodErrors: errors };
 };
 
-const calculateMaxContactsPerMonth = (isSearchable?: CSVBoolean) => {
-  if (isSearchable === undefined) return defaultMaxContactsPerMonth;
-  return csvBooleanToBoolean(isSearchable)
-    ? defaultMaxContactsPerMonth
-    : noContactPerMonth;
+const getMaxContactsPerMonth = (maxContactPerMonth?: string): number => {
+  if (maxContactPerMonth === "") return defaultMaxContactsPerMonth;
+
+  const value = Number(maxContactPerMonth);
+  return Number.isNaN(value) ? defaultMaxContactsPerMonth : value;
 };
 
 export const establishmentBatchEpics = [

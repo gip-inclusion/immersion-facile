@@ -19,6 +19,7 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   zStringCanBeEmpty,
   zStringCanBeEmptyMax9200,
+  zStringMinLength1Max8,
   zStringMinLength1Max255,
   zStringMinLength1Max1024,
 } from "../utils/string.schema";
@@ -309,7 +310,7 @@ export const establishmentCSVRowSchema: ZodSchemaWithInputMatchingOutput<Establi
     offers_appellation_code: zStringMinLength1Max1024,
     isEngagedEnterprise: csvBooleanSchema,
     contactMode: contactModeSchema,
-    isSearchable: csvBooleanSchema,
+    maxContactPerMonth: zStringMinLength1Max8.optional(),
     website: zStringCanBeEmpty,
     additionalInformation: zStringCanBeEmptyMax9200,
     fitForDisabledWorkers: csvBooleanSchema,
