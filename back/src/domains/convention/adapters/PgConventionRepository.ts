@@ -5,6 +5,7 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionId,
+  conventionSchema,
   type DateString,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
@@ -74,19 +75,7 @@ export class PgConventionRepository implements ConventionRepository {
   ): Promise<ConventionDto | undefined> {
     const readDto = await getReadConventionById(this.transaction, conventionId);
     if (!readDto) return;
-    const {
-      agencyName: _1,
-      agencyDepartment: _2,
-      agencyKind: _3,
-      agencySiret: _4,
-      agencyCounsellorEmails: _5,
-      agencyValidatorEmails: _6,
-      agencyContactEmail: _7,
-      agencyRefersTo: _8,
-      assessment: _9,
-      ...dto
-    } = readDto;
-    return dto;
+    return conventionSchema.parse(readDto);
   }
 
   public async save(
