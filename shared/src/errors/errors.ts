@@ -50,6 +50,7 @@ import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import type { UserId } from "../user/user.dto";
 import {
+  convertLocaleDateToUtcTimezoneDate,
   type DateRange,
   type OptionalDateRange,
   toDisplayedDate,
@@ -212,6 +213,18 @@ export const errors = {
       new BadRequestError(
         `La date du dernier jour de présence doit être comprise entre la date de début et la date de fin de l'immersion.`,
       ),
+    numberOfMissedHoursExceedsScheduled: () =>
+      new BadRequestError(
+        "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+      ),
+    contractStartDateBeforeImmersionStart: ({
+      immersionDateStart,
+    }: {
+      immersionDateStart: string;
+    }) =>
+      new BadRequestError(
+        `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: convertLocaleDateToUtcTimezoneDate(new Date(immersionDateStart)) })}.`,
+      ),
     alreadyExist: (conventionId: ConventionId) =>
       new ConflictError(
         `Il n'est pas possible de créer le bilan car un bilan existe déjà pour la convention '${conventionId}'.`,
@@ -237,10 +250,6 @@ export const errors = {
     conventionEndingInMoreThanOneDay: () =>
       new BadRequestError(
         `Impossible de relancer la demande de completion du bilan pour les conventions se terminant dans plus d'un jour.`,
-      ),
-    conventionDateStartMismatch: (conventionId: ConventionId) =>
-      new BadRequestError(
-        `Il y a un écart entre la date de démarrage de l'immersion '${conventionId}' dans la convention et celle indiquée dans les paramètre de la demande.`,
       ),
     conventionIdMismatch: () =>
       new ForbiddenError(

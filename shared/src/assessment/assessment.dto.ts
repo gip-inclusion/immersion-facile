@@ -63,10 +63,6 @@ export type AssessmentDto = (
   createdAt: DateTimeIsoString;
 };
 
-export type AssessmentInputDto = AssessmentDto & {
-  conventionStartDate: DateString;
-};
-
 export type WithAssessmentDto = {
   assessment: AssessmentDto;
 };
@@ -100,7 +96,6 @@ export type LegacyAssessmentDto = {
 
 export type CreateFormAssessmentInitialValues = {
   conventionId: ConventionId;
-  conventionStartDate: DateString;
 } & (WithEndedWithAJob | { endedWithAJob: null }) &
   WithEstablishmentComments & {
     status: null;
@@ -111,5 +106,5 @@ export type CreateFormAssessmentInitialValues = {
   };
 
 export type FormAssessmentDto =
-  | AssessmentInputDto
+  | AssessmentDto
   | CreateFormAssessmentInitialValues;

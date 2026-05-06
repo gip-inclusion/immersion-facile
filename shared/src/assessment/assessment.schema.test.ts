@@ -1,11 +1,8 @@
 import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import { type DateRange, withDateRangeSchema } from "../utils/date";
-import type { AssessmentDto, AssessmentInputDto } from "./assessment.dto";
-import {
-  assessmentDtoSchema,
-  assessmentInputDtoSchema,
-} from "./assessment.schema";
+import type { AssessmentDto } from "./assessment.dto";
+import { assessmentDtoSchema } from "./assessment.schema";
 
 describe("Assessment schema date range", () => {
   it("accepts valid date range", () => {
@@ -141,59 +138,6 @@ describe("Assessment schema", () => {
     expect(() => assessmentDtoSchema.parse(assessment)).toThrow();
   });
 });
-
-describe("AssessmentInput schema", () => {
-  it("rejects an assessmentInput when startContractDate is before convention start date", () => {
-    const assessmentInput: AssessmentInputDto = {
-      conventionStartDate: "2025-05-01",
-      status: "COMPLETED",
-      endedWithAJob: true,
-      typeOfContract: "CDI",
-      contractStartDate: "2024-12-31",
-      conventionId: "my-convention-id",
-      establishmentAdvices: "establishment advice",
-      establishmentFeedback: "establishment feedback",
-      beneficiaryAgreement: null,
-      beneficiaryFeedback: null,
-      signedAt: null,
-      createdAt: new Date().toISOString(),
-    };
-
-    expect(() => assessmentInputDtoSchema.parse(assessmentInput)).toThrow(
-      new ZodError([
-        {
-          code: "custom",
-          message:
-            "La date début du contrat ne peut pas être antérieure à la date de début d'immersion: 01/05/2025.",
-          path: ["contractStartDate"],
-        },
-      ]),
-    );
-  });
-
-  it("accepts an assessmentInput when startContractDate is equal or after convention start date", () => {
-    const assessmentInput: AssessmentInputDto = {
-      conventionStartDate: "2025-01-01",
-      status: "COMPLETED",
-      endedWithAJob: true,
-      typeOfContract: "CDI",
-      contractStartDate: "2025-01-01",
-      conventionId: "my-convention-id",
-      establishmentAdvices: "establishment advice",
-      establishmentFeedback: "establishment feedback",
-      beneficiaryAgreement: null,
-      beneficiaryFeedback: null,
-      signedAt: null,
-      createdAt: new Date().toISOString(),
-    };
-
-    expectToEqual(
-      assessmentInputDtoSchema.parse(assessmentInput),
-      assessmentInput,
-    );
-  });
-});
-
 const expectDateRangeToFailWithError = (
   dateRange: DateRange,
   issueMessages: string[],

@@ -1,9 +1,7 @@
 import { from, type Observable } from "rxjs";
 import {
   type AssessmentDto,
-  type AssessmentInputDto,
   type ConventionId,
-  type ConventionJwt,
   type ConventionMagicLinkRoutes,
   type ConventionSupportedJwt,
   type DeleteAssessmentRequestDto,
@@ -19,7 +17,10 @@ import {
   throwBadRequestWithExplicitMessage,
   throwTooManyRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
+import type {
+  AssessmentAndJwt,
+  AssessmentGateway,
+} from "src/core-logic/ports/AssessmentGateway";
 import { match, P } from "ts-pattern";
 
 export class HttpAssessmentGateway implements AssessmentGateway {
@@ -47,10 +48,10 @@ export class HttpAssessmentGateway implements AssessmentGateway {
     );
   }
 
-  public createAssessment$(
-    assessment: AssessmentInputDto,
-    jwt: ConventionJwt,
-  ): Observable<void> {
+  public createAssessment$({
+    jwt,
+    assessment,
+  }: AssessmentAndJwt): Observable<void> {
     return from(
       this.httpClient
         .createAssessment({

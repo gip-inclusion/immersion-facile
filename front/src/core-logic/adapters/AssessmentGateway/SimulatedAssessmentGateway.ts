@@ -1,15 +1,16 @@
 import { delay, type Observable, of, throwError } from "rxjs";
 import type {
   AssessmentDto,
-  AssessmentInputDto,
   ConventionId,
-  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   SignAssessmentRequestDto,
   WithConventionId,
 } from "shared";
-import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
+import type {
+  AssessmentAndJwt,
+  AssessmentGateway,
+} from "src/core-logic/ports/AssessmentGateway";
 
 export const failedId = "failed-id";
 export const failedIdError = new Error("Failed Id");
@@ -26,10 +27,7 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       : of(undefined).pipe(delay(this.latency));
   }
 
-  public createAssessment$(
-    assessment: AssessmentInputDto,
-    _jwt: ConventionJwt,
-  ): Observable<void> {
+  public createAssessment$({ assessment }: AssessmentAndJwt): Observable<void> {
     return assessment.conventionId === failedId
       ? throwError(failedIdError)
       : of(undefined).pipe(delay(this.latency));

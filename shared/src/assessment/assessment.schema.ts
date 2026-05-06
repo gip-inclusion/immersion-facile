@@ -1,6 +1,9 @@
 import { z } from "zod";
+import type { ConventionReadDto } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
+import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
 import {
+  convertLocaleDateToUtcTimezoneDate,
   dateTimeIsoStringSchema,
   makeDateStringSchema,
   toDisplayedDate,
@@ -18,7 +21,6 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
-  type AssessmentInputDto,
   type DeleteAssessmentRequestDto,
   type FormAssessmentDto,
   type LegacyAssessmentDto,
@@ -77,7 +79,7 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =
+export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
   z
     .object({
       conventionId: z.string(),
@@ -94,26 +96,45 @@ export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto
       }),
     );
 
-export const assessmentInputDtoSchema: z.ZodType<
-  AssessmentInputDto,
-  FormAssessmentDto
-> = assessmentDtoSchema
-  .and(z.object({ conventionStartDate: makeDateStringSchema() }))
-  .superRefine((assessmentInput, context) => {
-    if (
-      assessmentInput.endedWithAJob &&
-      assessmentInput.contractStartDate < assessmentInput.conventionStartDate
-    )
-      context.addIssue({
-        code: "custom",
-        message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: new Date(assessmentInput.conventionStartDate) })}.`,
-        path: ["contractStartDate"],
-      });
-  });
+export const assessmentFormSchema = (
+  convention: ConventionReadDto,
+): z.ZodType<AssessmentDto, FormAssessmentDto> =>
+  assessmentDtoSchema
+    .superRefine((formValues, ctx) => {
+      if (
+        formValues.endedWithAJob &&
+        formValues.contractStartDate &&
+        convention.dateStart > formValues.contractStartDate
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)) })}.`,
+          path: ["contractStartDate"],
+        });
+      }
+    })
+    .superRefine((formValues, ctx) => {
+      if (formValues.status !== "PARTIALLY_COMPLETED") return;
+
+      const scheduledHoursInPresencePeriod =
+        calculateTotalImmersionHoursBetweenDateComplex({
+          complexSchedule: convention.schedule.complexSchedule,
+          dateStart: convention.dateStart,
+          dateEnd: formValues.lastDayOfPresence ?? convention.dateEnd,
+        });
+
+      if (formValues.numberOfMissedHours > scheduledHoursInPresencePeriod)
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+          path: ["numberOfMissedHours"],
+        });
+    });
 
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
-  { assessment: AssessmentDto }
+  { assessment: FormAssessmentDto }
 > = z.object({
   assessment: assessmentDtoSchema,
 });

@@ -16,9 +16,9 @@ import {
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type AssessmentInputDto,
+  type AssessmentDto,
   type AssessmentStatus,
-  assessmentInputDtoSchema,
+  assessmentFormSchema,
   assessmentStatuses,
   type ConventionDto,
   type ConventionReadDto,
@@ -51,10 +51,7 @@ type AssessmentFormProperties = {
 
 export type OnStepChange = (
   step: Step,
-  fieldsToValidate: (
-    | keyof AssessmentInputDto
-    | DotNestedKeys<AssessmentInputDto>
-  )[],
+  fieldsToValidate: (keyof AssessmentDto | DotNestedKeys<AssessmentDto>)[],
 ) => void;
 
 type Step = 1 | 2 | 3;
@@ -82,10 +79,9 @@ export const AssessmentForm = ({
 
   const initialValues: FormAssessmentDto = {
     conventionId: convention.id,
-    conventionStartDate: convention.dateStart,
     establishmentFeedback: "",
     establishmentAdvices: "",
-    endedWithAJob: null,
+    endedWithAJob: false,
     status: null,
     beneficiaryAgreement: null,
     beneficiaryFeedback: null,
@@ -93,7 +89,7 @@ export const AssessmentForm = ({
     createdAt: new Date().toISOString(),
   };
   const methods = useForm<FormAssessmentDto>({
-    resolver: zodResolver(assessmentInputDtoSchema),
+    resolver: zodResolver(assessmentFormSchema(convention)),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -108,8 +104,10 @@ export const AssessmentForm = ({
 
     dispatch(
       assessmentSlice.actions.creationRequested({
-        assessment: formAssessmentDtoToAssessmentInputDto(values),
-        jwt,
+        assessmentAndJwt: {
+          assessment: formAssessmentDtoToAssessmentDto(values),
+          jwt,
+        },
         feedbackTopic: "assessment",
       }),
     );
@@ -156,7 +154,10 @@ export const AssessmentForm = ({
               />
             ))
             .with(2, () => (
-              <AssessmentContractSection onStepChange={onStepChange} />
+              <AssessmentContractSection
+                convention={convention}
+                onStepChange={onStepChange}
+              />
             ))
             .with(3, () => (
               <AssessmentCommentsSection
@@ -207,7 +208,7 @@ const AssessmentStatusSection = ({
   onStepChange: OnStepChange;
 }) => {
   const { register, formState, watch, setValue } =
-    useFormContext<AssessmentInputDto>();
+    useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
@@ -231,7 +232,7 @@ const AssessmentStatusSection = ({
       );
     }
   }, [formValues]);
-  const assessmentDto = formAssessmentDtoToAssessmentInputDto(formValues);
+  const assessmentDto = formAssessmentDtoToAssessmentDto(formValues);
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
@@ -350,7 +351,6 @@ const AssessmentStatusSection = ({
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
                     value: numberOfMissedMinutesDisplayed || "",
                   }}
-                  {...getFieldError("numberOfMissedHours")}
                 />
               </div>
             </>
@@ -404,11 +404,13 @@ const AssessmentStatusSection = ({
 
 const AssessmentContractSection = ({
   onStepChange,
+  convention,
 }: {
   onStepChange: OnStepChange;
+  convention: ConventionReadDto;
 }) => {
-  const { register, watch, setValue, formState, getValues } =
-    useFormContext<AssessmentInputDto>();
+  const { register, watch, setValue, formState } =
+    useFormContext<AssessmentDto>();
   const endedWithAJobValue = watch("endedWithAJob");
   const getFieldError = makeFieldError(formState);
   return (
@@ -461,8 +463,8 @@ const AssessmentContractSection = ({
               nativeInputProps={{
                 ...register("contractStartDate"),
                 id: domElementIds.assessment.contractStartDateInput,
-                min: getValues("conventionStartDate"),
                 type: "date",
+                min: toDateUTCString(new Date(convention.dateStart)),
               }}
               {...getFieldError("contractStartDate")}
             />
@@ -513,7 +515,7 @@ const AssessmentCommentsSection = ({
   objective: string;
 }) => {
   const isLoading = useAppSelector(assessmentSelectors.isLoading);
-  const { register, formState } = useFormContext<AssessmentInputDto>();
+  const { register, formState } = useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   return (
     <div className={fr.cx("fr-grid-row")}>
@@ -570,12 +572,11 @@ const AssessmentCommentsSection = ({
   );
 };
 
-export const formAssessmentDtoToAssessmentInputDto = (
+export const formAssessmentDtoToAssessmentDto = (
   formAssessmentDto: FormAssessmentDto,
-): AssessmentInputDto => {
+): AssessmentDto => {
   const commonFields = {
     conventionId: formAssessmentDto.conventionId,
-    conventionStartDate: formAssessmentDto.conventionStartDate,
     establishmentFeedback: formAssessmentDto.establishmentFeedback,
     establishmentAdvices: formAssessmentDto.establishmentAdvices,
     beneficiaryAgreement: formAssessmentDto.beneficiaryAgreement,
@@ -583,7 +584,7 @@ export const formAssessmentDtoToAssessmentInputDto = (
     signedAt: formAssessmentDto.signedAt,
   };
 
-  let assessmentDto: AssessmentInputDto = {
+  let assessmentDto: AssessmentDto = {
     ...commonFields,
     status: "COMPLETED",
     endedWithAJob: false,
