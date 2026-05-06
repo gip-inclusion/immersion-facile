@@ -162,6 +162,7 @@ jobs:
       PASS_EMPLOI_GATEWAY: IN_MEMORY
       PDF_GENERATOR_GATEWAY: IN_MEMORY
       SHORT_LINK_ID_GENERATOR_GATEWAY: NANO_ID
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
       # The following keys are for local use only, they are considered compromised and shall never be use on any of our environements
       JWT_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgevZzL1gdAFr88hb2\nOF/2NxApJCzGCEDdfSp6VQO30hyhRANCAAQRWz+jn65BtOMvdyHKcvjBeBSDZH2r\n1RTwjmYSi9R/zpBnuQ4EiMnCqfMPWiZqB4QdbAd0E7oH50VpuZ1P087G\n-----END PRIVATE KEY-----"
       JWT_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9\nq9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==\n-----END PUBLIC KEY-----\n"
