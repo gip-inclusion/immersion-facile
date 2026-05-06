@@ -115,15 +115,12 @@ export class InMemoryEstablishmentAggregateRepository
     );
     if (!offer) return;
 
-    const { isSearchable: _, ...rest } =
-      buildSearchImmersionResultDtoForSiretRomeAndLocation({
-        establishmentAgg: aggregate,
-        searchedAppellationCode: offer.appellationCode,
-        locationId,
-        remoteWorkMode: offer.remoteWorkMode,
-      });
-
-    return rest;
+    return buildSearchImmersionResultDtoForSiretRomeAndLocation({
+      establishmentAgg: aggregate,
+      searchedAppellationCode: offer.appellationCode,
+      locationId,
+      remoteWorkMode: offer.remoteWorkMode,
+    });
   }
 
   public getSiretOfEstablishmentsToSuggestUpdate(): Promise<SiretDto[]> {
@@ -445,8 +442,6 @@ const buildSearchImmersionResultDtoForSiretRomeAndLocation = ({
       ? distanceBetweenCoordinatesInMeters(location.position, position)
       : undefined,
     position: location.position,
-    isSearchable:
-      !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
     nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
     locationId: location.id,
     updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),

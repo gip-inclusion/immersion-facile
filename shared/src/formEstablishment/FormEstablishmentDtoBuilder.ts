@@ -15,10 +15,7 @@ import type {
   FormEstablishmentSource,
   FormEstablishmentUserRight,
 } from "./FormEstablishment.dto";
-import {
-  defaultMaxContactsPerMonth,
-  noContactPerMonth,
-} from "./FormEstablishment.schema";
+import { defaultMaxContactsPerMonth } from "./FormEstablishment.schema";
 
 type TestAddress = {
   formAddress: FormEstablishmentAddress;
@@ -404,8 +401,7 @@ const formEstablishmentToEstablishmentCsvRow = (
       .map((offer) => offer.appellationCode)
       .join(","),
     isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-    isSearchable:
-      establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
+    maxContactPerMonth: String(establishment.maxContactsPerMonth),
     fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
     searchableByStudents: establishment.searchableBy.students ? "1" : "0",
     searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",

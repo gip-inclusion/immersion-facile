@@ -51,6 +51,7 @@ import type {
   OfferWithSiret,
   RepositorySearchImmersionResult,
   RepositorySearchResultDto,
+  SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
 import type { ExtractAddedOrMissingSearchFiltersKeys } from "../ports/SearchMadeRepository";
@@ -460,7 +461,7 @@ export class PgEstablishmentAggregateRepository
 
     if (!searchResult) return;
 
-    const { isSearchable: _, nextAvailabilityDate: __, ...rest } = searchResult;
+    const { nextAvailabilityDate: __, ...rest } = searchResult;
 
     return rest;
   }
@@ -1182,7 +1183,10 @@ const searchImmersionResultsQuery = async (
     offset,
     shouldCountAll,
   }: SearchImmersionResultsParams,
-) => {
+): Promise<{
+  totalRecords: number | undefined;
+  data: SearchImmersionResult[];
+}> => {
   const { geoParams } = filters;
 
   const countAllRecords = async () => {
@@ -1296,7 +1300,6 @@ const searchImmersionResultsQuery = async (
         remoteWorkMode: result.remoteWorkMode,
         siret: result.siret,
         voluntaryToImmersion: Boolean(result.voluntaryToImmersion),
-        isSearchable: !result.isMaxDiscussionsForPeriodReached,
         customizedName: result.customizedName,
         distance_m: result.distance_m,
         fitForDisabledWorkers: result.fitForDisabledWorkers,
@@ -1307,7 +1310,7 @@ const searchImmersionResultsQuery = async (
         updatedAt: result.updatedAt,
         website: result.website,
         isAvailable: !result.isMaxDiscussionsForPeriodReached,
-      };
+      } satisfies SearchImmersionResult;
     }),
   };
 };

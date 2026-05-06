@@ -10,10 +10,7 @@ import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hook
 import type { FormFieldAttributesForContent } from "../types";
 
 type FormEstablishmentFieldKeys =
-  | Exclude<
-      keyof FormEstablishmentDto,
-      "id" | "naf" | "source" | "isSearchable"
-    >
+  | Exclude<keyof FormEstablishmentDto, "id" | "naf" | "source">
   | "maxContactsPerMonthWhenAvailable"
   | `userRights.0.${
       | keyof FormEstablishmentUserRight
