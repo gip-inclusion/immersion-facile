@@ -21,6 +21,7 @@ import {
   type PaginationQueryParams,
   type SiretDto,
   type UserId,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
@@ -28,6 +29,8 @@ import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type { InMemoryBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
+import type { InMemoryBannedEstablishmentRepository } from "../../establishment/adapters/InMemoryBannedEstablishmentRepository";
+import type { BannedEstablishment } from "../../establishment/ports/BannedEstablishmentRepository";
 import type {
   ConventionQueries,
   GetConventionIdsParams,
@@ -50,6 +53,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly userRepository: InMemoryUserRepository,
     private readonly assessmentRepository: InMemoryAssessmentRepository,
     private readonly broadcastFeedbacksRepository: InMemoryBroadcastFeedbacksRepository,
+    private readonly bannedEstablishmentRepository: InMemoryBannedEstablishmentRepository,
   ) {}
 
   public async getUserIdsWithNoActiveConvention({
@@ -264,6 +268,20 @@ export class InMemoryConventionQueries implements ConventionQueries {
   #addAgencyAndAssessmentDataToConvention = async (
     convention: ConventionDto,
   ): Promise<ConventionReadDto> => {
+    const bannedEstablishment: BannedEstablishment | undefined =
+      await this.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+        convention.siret,
+      );
+
+    const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+      bannedEstablishment
+        ? {
+            isEstablishmentBanned: true,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
+          }
+        : { isEstablishmentBanned: false };
+
     const agency = this.agencyRepository.agencies.find(
       (agency) => agency.id === convention.agencyId,
     );
@@ -324,6 +342,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           }
         : undefined,
       ...assesmentEntityToConventionAssessmentFields(assessment),
+      ...withBannedEstablishmentInformations,
     };
   };
 

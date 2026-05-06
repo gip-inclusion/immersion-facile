@@ -450,6 +450,7 @@ const ConventionFormContent = ({
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
       assessment: null,
+      isEstablishmentBanned: false,
     };
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({

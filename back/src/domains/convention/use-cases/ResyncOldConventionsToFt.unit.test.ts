@@ -118,6 +118,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
         {
@@ -132,6 +133,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
       ]);
@@ -267,6 +269,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
         {
@@ -281,6 +284,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
       ]);
@@ -391,6 +395,7 @@ describe("ResyncOldConventionsToFt use case", () => {
             agencyCounsellorEmails: [],
             agencyValidatorEmails: [],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
       ]);
@@ -457,6 +462,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         },
       ]);
@@ -512,6 +518,7 @@ describe("ResyncOldConventionsToFt use case", () => {
               status: "FINISHED",
               createdAt: new Date("2023-03-11").toISOString(),
             },
+            isEstablishmentBanned: false,
           },
         },
       ]);

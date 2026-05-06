@@ -7,7 +7,6 @@ import type { Dispatch, SetStateAction } from "react";
 import type {
   AbsoluteUrl,
   ConventionDraftDto,
-  ConventionDto,
   ConventionReadDto,
   ConventionStatus,
   DeleteAssessmentRequestDto,
@@ -49,7 +48,7 @@ type VerificationActionModalParams = {
   ) => void;
   initialStatus: ConventionStatus;
   verificationAction: VerificationActionWithModal;
-  convention: ConventionDto;
+  convention: ConventionReadDto;
   currentSignatoryRoles: Role[];
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>

@@ -6,7 +6,7 @@ import { pick } from "ramda";
 import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
-  type ConventionDto,
+  type ConventionReadDto,
   type ConventionStatusWithValidator,
   domElementIds,
   type UpdateConventionStatusRequestDto,
@@ -28,7 +28,7 @@ export const ValidatorModalContent = ({
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithValidator;
-  convention: ConventionDto;
+  convention: ConventionReadDto;
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;

@@ -25,6 +25,7 @@ import {
   type SearchTextAlphaNumeric,
   type SiretDto,
   type UserWithAdminRights,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -118,6 +119,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencySiret: "11112222000033",
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+        withBannedEstablishmentInformations: { isEstablishmentBanned: false },
       });
 
       // Act
@@ -146,6 +148,9 @@ describe("Pg implementation of ConventionQueries", () => {
         withRefersToAgency: referringAgency,
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+        withBannedEstablishmentInformations: {
+          isEstablishmentBanned: false,
+        },
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -177,6 +182,7 @@ describe("Pg implementation of ConventionQueries", () => {
           signedAt: null,
           createdAt: new Date("2025-01-01").toISOString(),
         },
+        withBannedEstablishmentInformations: { isEstablishmentBanned: false },
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -201,6 +207,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionStatus: "IN_REVIEW",
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+        withBannedEstablishmentInformations: { isEstablishmentBanned: false },
       });
       cciConvention = await insertAgencyAndConvention({
         conventionId: conventionIdB,
@@ -214,6 +221,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionStatus: "READY_TO_SIGN",
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+        withBannedEstablishmentInformations: { isEstablishmentBanned: false },
       });
       await insertAgencyAndConvention({
         conventionId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
@@ -227,6 +235,7 @@ describe("Pg implementation of ConventionQueries", () => {
         conventionStatus: "IN_REVIEW",
         conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
+        withBannedEstablishmentInformations: { isEstablishmentBanned: false },
       });
     });
 
@@ -968,6 +977,7 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionUpdatedAt,
     validatorUser,
     assessment,
+    withBannedEstablishmentInformations,
   }: {
     conventionId: ConventionId;
     agencyId: string;
@@ -982,6 +992,7 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionUpdatedAt: DateString;
     validatorUser: UserWithAdminRights;
     assessment?: AssessmentEntity;
+    withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
   }): Promise<ConventionReadDto> => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
@@ -1092,6 +1103,7 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyCounsellorEmails: [],
       updatedAt: conventionUpdatedAt,
       ...assesmentEntityToConventionAssessmentFields(assessment),
+      ...withBannedEstablishmentInformations,
     } satisfies ConventionReadDto;
   };
 
@@ -1266,7 +1278,12 @@ describe("Pg implementation of ConventionQueries", () => {
         totalRecords: 4,
       });
       expectToEqual(resultPage1.data, [
-        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
         {
           ...conventionC,
           ...agencyFields,
@@ -1276,6 +1293,7 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
       ]);
 
@@ -1291,8 +1309,18 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(resultPage2.data.length).toBe(2);
       expectToEqual(resultPage2.data, [
-        { ...conventionB, ...agencyFields, assessment: null },
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
       expectToEqual(resultPage2.pagination, {
         currentPage: 2,
@@ -1314,7 +1342,14 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expectToEqual(resultPage3, {
-        data: [{ ...conventionB, ...agencyFields, assessment: null }],
+        data: [
+          {
+            ...conventionB,
+            ...agencyFields,
+            assessment: null,
+            isEstablishmentBanned: false,
+          },
+        ],
         pagination: {
           currentPage: 3,
           totalPages: 4,
@@ -1338,8 +1373,18 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(2);
       expectToEqual(result.data, [
-        { ...conventionD, ...differentAgencyFields, assessment: null },
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1389,7 +1434,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [
-        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1405,7 +1455,12 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         });
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1423,7 +1478,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1456,7 +1516,12 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1473,7 +1538,12 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expectToEqual(result.data, [
-        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1490,7 +1560,12 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expectToEqual(result.data, [
-        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1522,8 +1597,14 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
-        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1580,6 +1661,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: oldAssessmentWithoutSignature.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1628,6 +1710,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 ).toISOString(),
                 createdAt: completedAssessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1681,6 +1764,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1728,11 +1812,13 @@ describe("Pg implementation of ConventionQueries", () => {
               ...recentConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              isEstablishmentBanned: false,
             },
             {
               ...oldConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1813,11 +1899,13 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
             {
               ...validatedConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1872,6 +1960,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
             {
               ...anotherValidatedConvention,
@@ -1882,6 +1971,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt,
                 createdAt: signedAssessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           ]);
         });
@@ -1927,9 +2017,24 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(5);
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
-        { ...sameDateStartConvention, ...agencyFields, assessment: null },
-        { ...conventionB, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...sameDateStartConvention,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
         {
           ...conventionC,
           ...agencyFields,
@@ -1939,8 +2044,14 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
-        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -1957,7 +2068,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(2);
       expectToEqual(result.data, [
-        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
         {
           ...conventionC,
           ...agencyFields,
@@ -1967,6 +2083,7 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
       ]);
     });
@@ -1992,7 +2109,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -2017,9 +2139,20 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
-        { ...conventionB, ...agencyFields, assessment: null },
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
 
       const allConventionsBelongToUsersAgency = result.data.every(
@@ -2095,9 +2228,20 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
-        { ...conventionB, ...agencyFields, assessment: null },
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
 
       // Verify all returned conventions belong to the specified agency
@@ -2121,7 +2265,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(4);
       expectToEqual(result.data, [
-        { ...conventionD, ...differentAgencyFields, assessment: null },
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
         {
           ...conventionC,
           ...agencyFields,
@@ -2131,9 +2280,20 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          isEstablishmentBanned: false,
         },
-        { ...conventionB, ...agencyFields, assessment: null },
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionB,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
 
@@ -2154,7 +2314,12 @@ describe("Pg implementation of ConventionQueries", () => {
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data, [
-        { ...conventionA, ...agencyFields, assessment: null },
+        {
+          ...conventionA,
+          ...agencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
       ]);
     });
   });

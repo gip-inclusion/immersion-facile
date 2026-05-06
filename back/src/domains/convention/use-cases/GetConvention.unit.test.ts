@@ -463,6 +463,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         );
       });
@@ -491,6 +492,7 @@ describe("Get Convention", () => {
                 signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           );
         });
@@ -513,6 +515,7 @@ describe("Get Convention", () => {
               agencyCounsellorEmails: agency.counsellorEmails,
               agencyValidatorEmails: agency.validatorEmails,
               assessment: null,
+              isEstablishmentBanned: false,
             },
           );
         });
@@ -562,6 +565,7 @@ describe("Get Convention", () => {
                 signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
+              isEstablishmentBanned: false,
             },
           );
         });
@@ -590,6 +594,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         );
       });
@@ -654,6 +659,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         );
       });
@@ -715,6 +721,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            isEstablishmentBanned: false,
           },
         );
       });
@@ -739,6 +746,7 @@ describe("Get Convention", () => {
             agencyCounsellorEmails: [counsellor.email],
             agencyValidatorEmails: [validator.email],
             assessment: null,
+            isEstablishmentBanned: false,
           },
         );
       });
@@ -770,6 +778,7 @@ describe("Get Convention", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          isEstablishmentBanned: false,
         });
       });
 
@@ -798,6 +807,7 @@ describe("Get Convention", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          isEstablishmentBanned: false,
         });
       });
     });

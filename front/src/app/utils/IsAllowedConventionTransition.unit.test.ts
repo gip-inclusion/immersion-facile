@@ -16,6 +16,7 @@ const convention: ConventionReadDto = {
   agencyName: "Agence de cap emploi",
   agencyDepartment: "75",
   assessment: null,
+  isEstablishmentBanned: false,
 };
 
 type TestCase = {

@@ -115,7 +115,6 @@ const validConvention: ConventionDto = {
   internshipKind: "immersion",
   signatories: { beneficiary, establishmentRepresentative },
   establishmentTutor,
-  isEstablishmentBanned: false,
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {

@@ -1339,45 +1339,6 @@ describe("PgConventionRepository", () => {
     });
   });
 
-  describe("isEstablishmentBanned", () => {
-    const updatedAt = new Date().toISOString();
-
-    const convention = new ConventionDtoBuilder()
-      .withId("bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb")
-      .withAgencyId(agency.id)
-      .withSiret("12345678901234")
-      .build();
-
-    it("returns correctly isBanEstablishment field when siret is not in banned establishments repo", async () => {
-      await conventionRepository.save(convention, updatedAt);
-
-      expectToEqual(await conventionRepository.getById(convention.id), {
-        ...convention,
-        updatedAt,
-        isEstablishmentBanned: false,
-      });
-    });
-
-    it("returns correctly isBanEstablishment and establishmentBannishmentJustification when siret is in banned establishments repo", async () => {
-      const justification = "L'entreprise insulte les bénéficiaires de ploucs";
-      await db
-        .insertInto("banned_establishments")
-        .values({
-          siret: convention.siret,
-          bannishment_justification: justification,
-        })
-        .execute();
-      await conventionRepository.save(convention, updatedAt);
-
-      expectToEqual(await conventionRepository.getById(convention.id), {
-        ...convention,
-        updatedAt,
-        isEstablishmentBanned: true,
-        establishmentBannishmentJustification: justification,
-      });
-    });
-  });
-
   const expectConventionHaveBeneficiaryCurrentEmployer = async (
     conventionRepository: PgConventionRepository,
     conventionId: ConventionId,

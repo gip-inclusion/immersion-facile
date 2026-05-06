@@ -13,6 +13,7 @@ import {
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
+  conventionSchema,
   type DateTimeIsoString,
   errors,
   type FeatureFlags,
@@ -348,7 +349,9 @@ export const signConvention = async ({
   if (!isAllowedToSign(role))
     throw errors.convention.roleNotAllowedToSign({ role });
 
-  const signedConvention = signConventionDtoWithRole(convention, role, now);
+  const signedConvention = conventionSchema.parse(
+    signConventionDtoWithRole(convention, role, now),
+  );
   throwIfTransitionNotAllowed({
     roles: [role],
     targetStatus: signedConvention.status,

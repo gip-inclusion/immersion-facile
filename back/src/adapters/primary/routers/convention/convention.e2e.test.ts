@@ -416,6 +416,7 @@ describe("convention e2e", () => {
             signedAt: null,
             createdAt: new Date("2025-01-01").toISOString(),
           },
+          isEstablishmentBanned: false,
         },
       });
     });
@@ -669,6 +670,7 @@ describe("convention e2e", () => {
             agencyValidatorEmails: [],
             agencyRefersTo: undefined,
             assessment: null,
+            isEstablishmentBanned: false,
           },
         },
       ]);

@@ -48,6 +48,7 @@ describe("ConnectedUserConventionList", () => {
       .build(),
     ...agencyFields,
     assessment: null,
+    isEstablishmentBanned: false,
   };
 
   const convention2: ConventionReadDto = {
@@ -57,6 +58,7 @@ describe("ConnectedUserConventionList", () => {
       .build(),
     ...agencyFields,
     assessment: null,
+    isEstablishmentBanned: false,
   };
 
   const conventionsWithPagination: DataWithPagination<ConventionReadDto> = {
