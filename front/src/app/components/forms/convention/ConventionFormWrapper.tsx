@@ -38,7 +38,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
+import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -83,7 +83,7 @@ export type SupportedConventionRoutes =
   | ConventionImmersionPageRoute
   | ConventionMiniStagePageRoute
   | ConventionImmersionForExternalsRoute
-  | ConventionTemplatePageRoute;
+  | ConventionTemplateFormRoute;
 
 export const ConventionFormWrapper = ({
   internshipKind,

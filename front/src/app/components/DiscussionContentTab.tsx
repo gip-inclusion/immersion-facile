@@ -4,7 +4,7 @@ import { DiscussionManageContent } from "src/app/components/establishment/establ
 import type {
   FrontBeneficiaryDashboardRoute,
   FrontEstablishmentDashboardRoute,
-} from "src/app/pages/auth/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { useRoute } from "src/app/routes/routes";
 
 export const DiscussionTabContent = ({ viewer }: { viewer: ExchangeRole }) => {

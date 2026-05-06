@@ -16,14 +16,14 @@ import { conventionTemplateSlice } from "src/core-logic/domain/convention-templa
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
-export type ConventionTemplatePageRoute = Route<
+export type ConventionTemplateFormRoute = Route<
   typeof routes.conventionTemplate
 >;
 
-export const ConventionTemplatePage = ({
+export const ConventionTemplateForm = ({
   route,
 }: {
-  route: ConventionTemplatePageRoute;
+  route: ConventionTemplateFormRoute;
 }) => {
   const { fromRoute, conventionTemplateId } = route.params;
   const dispatch = useDispatch();

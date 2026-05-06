@@ -32,7 +32,7 @@ import {
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
-import type { ConventionTemplatePageRoute } from "src/app/pages/convention/ConventionTemplatePage";
+import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
 import { routes, useRoute } from "src/app/routes/routes";
 import {
   commonIllustrations,
@@ -119,7 +119,7 @@ export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute
   | FrontEstablishmentDashboardRoute
   | FrontBeneficiaryDashboardRoute
-  | ConventionTemplatePageRoute;
+  | ConventionTemplateFormRoute;
 
 type ConnectPrivateRoute =
   | FrontAdminRoute
@@ -127,13 +127,14 @@ type ConnectPrivateRoute =
   | Route<typeof routes.formEstablishment>
   | Route<typeof routes.myProfile>
   | Route<typeof routes.myProfileAgencies>
+  | Route<typeof routes.myProfileAgencyRegistration>
   | Route<typeof routes.myProfileEstablishments>
   | Route<typeof routes.myProfileEstablishmentRegistration>
   | Route<typeof routes.addAgency>
   | Route<typeof routes.manageConventionConnectedUser>
   | Route<typeof routes.beneficiaryDashboardDiscussions>;
 
-type ConnectedPrivateRouteProps = {
+type ConnectedPrivateRoutePageProps = {
   route: ConnectPrivateRoute;
   children: ReactNode;
   oAuthConnectionPageHeader: ReactElement;
@@ -146,12 +147,12 @@ type ConnectedPrivateRouteProps = {
 
 export const loginByEmailFeedbackTopic: FeedbackTopic = "login-by-email";
 
-export const ConnectedPrivateRoute = ({
+export const ConnectedPrivateRoutePage = ({
   route,
   children,
   allowAdminOnly,
   mainWrapperProps,
-}: ConnectedPrivateRouteProps) => {
+}: ConnectedPrivateRoutePageProps) => {
   const dispatch = useDispatch();
   const isConnectedUser = useAppSelector(authSelectors.isConnectedUser);
   const authIsLoading = useAppSelector(authSelectors.isLoading);

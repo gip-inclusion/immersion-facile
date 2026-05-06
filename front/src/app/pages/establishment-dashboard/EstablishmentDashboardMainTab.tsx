@@ -5,7 +5,7 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EstablishmentDashboardTabs } from "src/app/components/establishment/establishment-dashboard/EstablishmentDashboardTabs";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { FrontEstablishmentDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
+import type { FrontEstablishmentDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
@@ -17,7 +17,7 @@ import { establishmentSelectors } from "src/core-logic/domain/establishment/esta
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { EstablishmentDashboardAccessNotAllowedContent } from "../../components/establishment/establishment-dashboard/EstablishmentDashboardAccessNotAllowedContent";
 
-export const EstablishmentDashboardPage = ({
+export const EstablishmentDashboardMainTab = ({
   route,
 }: {
   route: FrontEstablishmentDashboardRoute;

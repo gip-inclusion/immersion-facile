@@ -3,12 +3,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Loader, PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { RequestRegisterEstablishmentsForUserForm } from "src/app/components/forms/register-establishments/RequestRegisterEstablishmentsForUserForm";
+import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 
-export const RequestEstablishmentRegistrationPage = () => {
+export const RequestAgencyRegistrationTab = () => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const isLoading = useAppSelector(connectedUserSelectors.isLoading);
   if (isLoading) {
@@ -19,7 +19,7 @@ export const RequestEstablishmentRegistrationPage = () => {
   return (
     <>
       <PageHeader
-        title={"Se rattacher à une entreprise"}
+        title={"Demander l'accès à des organismes"}
         breadcrumbs={<Breadcrumbs />}
         badge={
           <Button
@@ -31,17 +31,13 @@ export const RequestEstablishmentRegistrationPage = () => {
           </Button>
         }
       >
-        Bonjour {currentUser.firstName} {currentUser.lastName}, recherchez une
-        entreprise afin d'accéder aux offres et mises en relation de cette
-        dernière. Un administrateur vérifiera et validera votre demande.
+        Bonjour {currentUser.firstName} {currentUser.lastName}, recherchez un
+        organisme afin d'accéder aux conventions et statistiques de ce dernier.
+        Un administrateur vérifiera et validera votre demande.
       </PageHeader>
       <div className={fr.cx("fr-container", "fr-mt-2w", "fr-mb-8w")}>
-        <Feedback
-          topics={["my-profile-establishment-registration"]}
-          closable
-          className={fr.cx("fr-mb-2w")}
-        />
-        <RequestRegisterEstablishmentsForUserForm currentUser={currentUser} />
+        <Feedback topics={["dashboard-agency-register-user"]} closable />
+        <RegisterAgenciesForm currentUser={currentUser} />
       </div>
     </>
   );
