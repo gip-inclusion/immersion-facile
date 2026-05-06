@@ -8,11 +8,11 @@ import { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 import { HeaderFooterLayout } from "./HeaderFooterLayout";
 
-type StandardLayoutProps = {
+type StandardLayoutPageProps = {
   route: Route<typeof routes.standard>;
 };
 
-export const StandardLayout = ({ route }: StandardLayoutProps) => {
+export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
   const { page, version, allVersions } = getStandardContents(
     route.params.pagePath as StandardPageSlugs,
     route.params.version,

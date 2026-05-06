@@ -8,7 +8,7 @@ import { type AgencyRight, distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
+import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -17,7 +17,8 @@ import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.cont
 import { match, P } from "ts-pattern";
 import { AgencyDashboard } from "../../components/agency/agency-dashboard/AgencyDashboard";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
-export const AgencyDashboardPage = ({
+
+export const AgencyDashboardMainTab = ({
   route,
 }: {
   route: FrontAgencyDashboardRoute;

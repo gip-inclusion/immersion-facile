@@ -1,7 +1,7 @@
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AddAgencyForm } from "src/app/components/forms/agency/AddAgencyForm";
-import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
+import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import type { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
@@ -10,7 +10,7 @@ export const AddAgencyPage = ({
 }: {
   route: Route<typeof routes.addAgency>;
 }) => (
-  <ConnectedPrivateRoute
+  <ConnectedPrivateRoutePage
     route={route}
     oAuthConnectionPageHeader={
       <PageHeader
@@ -21,5 +21,5 @@ export const AddAgencyPage = ({
   >
     <Breadcrumbs />
     <AddAgencyForm />
-  </ConnectedPrivateRoute>
+  </ConnectedPrivateRoutePage>
 );

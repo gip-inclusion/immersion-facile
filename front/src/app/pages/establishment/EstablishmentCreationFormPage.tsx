@@ -1,7 +1,7 @@
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
+import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import type { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
@@ -12,7 +12,7 @@ type EstablishmentCreationFormPage = {
 export const EstablishmentCreationFormPage = ({
   route,
 }: EstablishmentCreationFormPage) => (
-  <ConnectedPrivateRoute
+  <ConnectedPrivateRoutePage
     route={route}
     oAuthConnectionPageHeader={
       <PageHeader
@@ -22,5 +22,5 @@ export const EstablishmentCreationFormPage = ({
     }
   >
     <EstablishmentForm mode="create" />
-  </ConnectedPrivateRoute>
+  </ConnectedPrivateRoutePage>
 );

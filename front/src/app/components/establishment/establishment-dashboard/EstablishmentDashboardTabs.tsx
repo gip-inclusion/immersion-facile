@@ -20,7 +20,7 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
   EstablishmentDashboardRouteName,
   FrontEstablishmentDashboardRoute,
-} from "src/app/pages/auth/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { routes } from "src/app/routes/routes";

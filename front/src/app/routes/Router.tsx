@@ -19,35 +19,35 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
-import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
+import { AgencyDashboardMainTab } from "src/app/pages/agency-dashboard/AgencyDashboardMainTab";
 import { ConventionManageConnectedUser } from "src/app/pages/agency-dashboard/ConventionManageConnectedUser";
-import { AdminPrivateRoute } from "src/app/pages/auth/AdminPrivateRoute";
-import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
-import { DashboardPrivateRoute } from "src/app/pages/auth/DashboardPrivateRoute";
+import { AdminPrivateRoutePage } from "src/app/pages/auth/AdminPrivateRoutePage";
+import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
+import { DashboardPrivateRoutePage } from "src/app/pages/auth/DashboardPrivateRoutePage";
 import { MagicLinkInterstitialPage } from "src/app/pages/auth/MagicLinkInterstitialPage";
-import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
+import { BeneficiaryDashboardDiscussionsTab } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardDiscussionsTab";
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
-import { ConventionTemplatePage } from "src/app/pages/convention/ConventionTemplatePage";
+import { ConventionTemplateForm } from "src/app/pages/convention/ConventionTemplateForm";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
-import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
+import { EstablishmentDashboardMainTab } from "src/app/pages/establishment-dashboard/EstablishmentDashboardMainTab";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
-import { MyProfile } from "src/app/pages/user/MyProfile";
-import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
-import { RequestEstablishmentRegistrationPage } from "src/app/pages/user/RequestEstablishmentRegistrationPage";
+import { MyProfileMainTab } from "src/app/pages/user/MyProfileMainTab";
+import { RequestAgencyRegistrationTab } from "src/app/pages/user/tabs/RequestAgencyRegistrationTab";
+import { RequestEstablishmentRegistrationTab } from "src/app/pages/user/tabs/RequestEstablishmentRegistrationTab";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { store } from "src/config/dependencies";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
-import { StandardLayout } from "../components/layout/StandardLayout";
+import { StandardLayoutPage } from "../components/layout/StandardLayoutPage";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
 import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
@@ -81,9 +81,9 @@ const adminRoutes: {
   (acc, tabRouteName) => ({
     ...acc,
     [tabRouteName]: (route: Route<any>) => (
-      <AdminPrivateRoute route={route}>
+      <AdminPrivateRoutePage route={route}>
         <AdminTabs route={route} />
-      </AdminPrivateRoute>
+      </AdminPrivateRoutePage>
     ),
   }),
 
@@ -160,95 +160,95 @@ const getPageByRouteName: {
 } = {
   addAgency: (route) => <AddAgencyPage route={route} />,
   admin: (route) => (
-    <AdminPrivateRoute route={routes.adminConventions(route.params)}>
+    <AdminPrivateRoutePage route={routes.adminConventions(route.params)}>
       <AdminTabs route={routes.adminConventions(route.params)} />
-    </AdminPrivateRoute>
+    </AdminPrivateRoutePage>
   ),
   ...adminRoutes,
   adminConventionDetail: (route) => (
-    <AdminPrivateRoute route={route}>
+    <AdminPrivateRoutePage route={route}>
       <AdminConventionDetail route={route} />
-    </AdminPrivateRoute>
+    </AdminPrivateRoutePage>
   ),
   adminAgencyDetail: (route) => (
-    <AdminPrivateRoute route={route}>
+    <AdminPrivateRoutePage route={route}>
       <AdminAgencyDetail route={route} />
-    </AdminPrivateRoute>
+    </AdminPrivateRoutePage>
   ),
   adminUserDetail: (route) => (
     <RedirectTo route={routes.adminUserDetailAgencies(route.params)} />
   ),
   adminUserDetailAgencies: (route) => (
-    <AdminPrivateRoute route={route}>
+    <AdminPrivateRoutePage route={route}>
       <AdminUserDetail route={route} />
-    </AdminPrivateRoute>
+    </AdminPrivateRoutePage>
   ),
   adminUserDetailEstablishments: (route) => (
-    <AdminPrivateRoute route={route}>
+    <AdminPrivateRoutePage route={route}>
       <AdminUserDetail route={route} />
-    </AdminPrivateRoute>
+    </AdminPrivateRoutePage>
   ),
   agencyDashboard: (route) => (
     <RedirectTo route={routes.agencyDashboardMain(route.params)} />
   ),
   agencyDashboardMain: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   agencyDashboardOnboarding: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   agencyDashboardSynchronisedConventions: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   agencyDashboardAgencies: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   agencyDashboardAgencyDetails: (route) => (
-    <DashboardPrivateRoute route={route}>
+    <DashboardPrivateRoutePage route={route}>
       <AgencyDetailForAgencyDashboard route={route} />
-    </DashboardPrivateRoute>
+    </DashboardPrivateRoutePage>
   ),
   agencyManagement: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   establishmentManagement: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   statsEstablishmentDetails: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <AgencyDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <AgencyDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   conventionTemplate: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <ConventionTemplatePage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <ConventionTemplateForm route={route} />
+    </DashboardPrivateRoutePage>
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
   beneficiaryDashboard: (route) => (
     <RedirectTo route={routes.beneficiaryDashboardDiscussions(route.params)} />
   ),
   beneficiaryDashboardDiscussions: (route) => (
-    <ConnectedPrivateRoute
+    <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
       }
     >
-      <BeneficiaryDashboardPage />
-    </ConnectedPrivateRoute>
+      <BeneficiaryDashboardDiscussionsTab />
+    </ConnectedPrivateRoutePage>
   ),
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
@@ -271,19 +271,19 @@ const getPageByRouteName: {
     />
   ),
   establishmentDashboardConventions: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <EstablishmentDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <EstablishmentDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   establishmentDashboardFormEstablishment: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <EstablishmentDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <EstablishmentDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   establishmentDashboardDiscussions: (route) => (
-    <DashboardPrivateRoute route={route}>
-      <EstablishmentDashboardPage route={route} />
-    </DashboardPrivateRoute>
+    <DashboardPrivateRoutePage route={route}>
+      <EstablishmentDashboardMainTab route={route} />
+    </DashboardPrivateRoutePage>
   ),
   formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
   group: (route) => <GroupPage route={route} />,
@@ -297,42 +297,52 @@ const getPageByRouteName: {
   searchResultExternal: () => <SearchResultPage isExternal={true} />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionConnectedUser: (route) => (
-    <ConnectedPrivateRoute
+    <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à cette convention" />
       }
     >
       <ConventionManageConnectedUser route={route} />
-    </ConnectedPrivateRoute>
+    </ConnectedPrivateRoutePage>
   ),
   myProfile: (route) => (
     <RedirectTo route={routes.myProfileAgencies(route.params)} />
   ),
   myProfileAgencies: (route) => (
-    <ConnectedPrivateRoute
+    <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
       }
     >
-      <MyProfile route={route} />
-    </ConnectedPrivateRoute>
+      <MyProfileMainTab route={route} />
+    </ConnectedPrivateRoutePage>
   ),
 
   myProfileEstablishments: (route) => (
-    <ConnectedPrivateRoute
+    <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
       }
     >
-      <MyProfile route={route} />
-    </ConnectedPrivateRoute>
+      <MyProfileMainTab route={route} />
+    </ConnectedPrivateRoutePage>
   ),
-  myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
+  myProfileAgencyRegistration: (route) => (
+    <ConnectedPrivateRoutePage
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
+      }
+    >
+      <RequestAgencyRegistrationTab />
+    </ConnectedPrivateRoutePage>
+  ),
+
   myProfileEstablishmentRegistration: (route) => (
-    <ConnectedPrivateRoute
+    <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
@@ -341,8 +351,8 @@ const getPageByRouteName: {
         vSpacing: 0,
       }}
     >
-      <RequestEstablishmentRegistrationPage />
-    </ConnectedPrivateRoute>
+      <RequestEstablishmentRegistrationTab />
+    </ConnectedPrivateRoutePage>
   ),
   openApiDoc: (route: Route<typeof routes.openApiDoc>) => {
     if (route.params.version === "v3") return <OpenApiDocV3Page />;
@@ -375,7 +385,7 @@ const getPageByRouteName: {
   ),
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
-      <StandardLayout route={route} />
+      <StandardLayoutPage route={route} />
     ) : (
       <ErrorPage error={frontErrors.generic.pageNotFound()} />
     ),
