@@ -17,7 +17,6 @@ import type {
   RomeCode,
   RomeLabel,
   SiretDto,
-  WithIsAvailable,
 } from "shared";
 
 export type SearchImmersionResultPublicV3 = {
@@ -44,7 +43,8 @@ export type SearchImmersionResultPublicV3 = {
   updatedAt?: DateTimeIsoString;
   createdAt?: DateTimeIsoString;
   remoteWorkMode: RemoteWorkMode;
-} & WithIsAvailable;
+  isAvailable: boolean;
+};
 
 export const domainToSearchImmersionResultPublicV3 = (
   searchImmersionResult: InternalOfferDto,
