@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 import {
   type AssessmentDto,
   type AssessmentStatus,
-  assessmentDtoSchema,
+  assessmentFormSchema,
   assessmentStatuses,
   type ConventionDto,
   type ConventionReadDto,
@@ -81,7 +81,7 @@ export const AssessmentForm = ({
     conventionId: convention.id,
     establishmentFeedback: "",
     establishmentAdvices: "",
-    endedWithAJob: null,
+    endedWithAJob: false,
     status: null,
     beneficiaryAgreement: null,
     beneficiaryFeedback: null,
@@ -89,7 +89,7 @@ export const AssessmentForm = ({
     createdAt: new Date().toISOString(),
   };
   const methods = useForm<FormAssessmentDto>({
-    resolver: zodResolver(assessmentDtoSchema),
+    resolver: zodResolver(assessmentFormSchema(convention)),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -154,7 +154,10 @@ export const AssessmentForm = ({
               />
             ))
             .with(2, () => (
-              <AssessmentContractSection onStepChange={onStepChange} />
+              <AssessmentContractSection
+                convention={convention}
+                onStepChange={onStepChange}
+              />
             ))
             .with(3, () => (
               <AssessmentCommentsSection
@@ -348,7 +351,6 @@ const AssessmentStatusSection = ({
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
                     value: numberOfMissedMinutesDisplayed || "",
                   }}
-                  {...getFieldError("numberOfMissedHours")}
                 />
               </div>
             </>
@@ -402,8 +404,10 @@ const AssessmentStatusSection = ({
 
 const AssessmentContractSection = ({
   onStepChange,
+  convention,
 }: {
   onStepChange: OnStepChange;
+  convention: ConventionReadDto;
 }) => {
   const { register, watch, setValue, formState } =
     useFormContext<AssessmentDto>();
@@ -460,6 +464,7 @@ const AssessmentContractSection = ({
                 ...register("contractStartDate"),
                 id: domElementIds.assessment.contractStartDateInput,
                 type: "date",
+                min: toDateUTCString(new Date(convention.dateStart)),
               }}
               {...getFieldError("contractStartDate")}
             />
