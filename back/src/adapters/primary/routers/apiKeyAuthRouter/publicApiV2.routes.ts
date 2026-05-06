@@ -13,59 +13,11 @@ import {
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import type { EstablishmentStat } from "../../../../domains/core/statistics/use-cases/GetEstablishmentStats";
-import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import {
   conventionReadPublicListV2Schema,
   conventionReadPublicV2Schema,
 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
 import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
-import { searchParamsPublicV2Schema } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.schema";
-import { searchResultPublicV2Schema } from "../DtoAndSchemas/v2/output/searchImmersionResultPublicV2.schema";
-
-export type PublicApiV2SearchEstablishmentRoutes =
-  typeof publicApiV2SearchEstablishmentRoutes;
-export const publicApiV2SearchEstablishmentRoutes = defineRoutes({
-  getOfferBySiretAndAppellationCode: defineRoute({
-    method: "get",
-    url: "/v2/search/:siret/:appellationCode",
-    ...withAuthorizationHeaders,
-    responses: {
-      200: searchResultPublicV2Schema,
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-      429: httpErrorSchema,
-    },
-  }),
-  searchImmersion: defineRoute({
-    method: "get",
-    url: "/v2/search",
-    queryParamsSchema: searchParamsPublicV2Schema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: z.array(searchResultPublicV2Schema),
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      429: httpErrorSchema,
-    },
-  }),
-  contactEstablishment: defineRoute({
-    method: "post",
-    url: "/v2/contact-establishment",
-    requestBodySchema: contactEstablishmentPublicV2Schema,
-    ...withAuthorizationHeaders,
-    responses: {
-      201: z.void(),
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-      429: httpErrorSchema,
-    },
-  }),
-});
 
 export type PublicApiV2ConventionRoutes = typeof publicApiV2ConventionRoutes;
 export const publicApiV2ConventionRoutes = defineRoutes({
