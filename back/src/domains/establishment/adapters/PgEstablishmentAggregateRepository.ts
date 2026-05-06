@@ -1279,39 +1279,41 @@ const searchImmersionResultsQuery = async (
 
   return {
     totalRecords,
-    data: results.map(({ search_immersion_result: result }) => {
-      if (!result.naf) throw new Error("Missing naf.");
-      if (!result.name) throw new Error("Missing name.");
+    data: results.map(
+      ({ search_immersion_result: result }): SearchImmersionResult => {
+        if (!result.naf) throw new Error("Missing naf.");
+        if (!result.name) throw new Error("Missing name.");
 
-      return {
-        address: result.address,
-        appellations: result.appellations,
-        establishmentScore: result.establishmentScore,
-        locationId: result.locationId,
-        naf: result.naf,
-        nafLabel: result.nafLabel,
-        additionalInformation: result.additionalInformation,
-        contactMode: result.contactMode,
-        createdAt: result.createdAt,
-        name: result.name,
-        position: result.position,
-        rome: result.rome,
-        romeLabel: result.romeLabel,
-        remoteWorkMode: result.remoteWorkMode,
-        siret: result.siret,
-        voluntaryToImmersion: Boolean(result.voluntaryToImmersion),
-        customizedName: result.customizedName,
-        distance_m: result.distance_m,
-        fitForDisabledWorkers: result.fitForDisabledWorkers,
-        nextAvailabilityDate: result.nextAvailabilityDate
-          ? new Date(result.nextAvailabilityDate).toISOString()
-          : undefined,
-        numberOfEmployeeRange: result.numberOfEmployeeRange,
-        updatedAt: result.updatedAt,
-        website: result.website,
-        isAvailable: !result.isMaxDiscussionsForPeriodReached,
-      } satisfies SearchImmersionResult;
-    }),
+        return {
+          address: result.address,
+          appellations: result.appellations,
+          establishmentScore: result.establishmentScore,
+          locationId: result.locationId,
+          naf: result.naf,
+          nafLabel: result.nafLabel,
+          additionalInformation: result.additionalInformation,
+          contactMode: result.contactMode,
+          createdAt: result.createdAt,
+          name: result.name,
+          position: result.position,
+          rome: result.rome,
+          romeLabel: result.romeLabel,
+          remoteWorkMode: result.remoteWorkMode,
+          siret: result.siret,
+          voluntaryToImmersion: Boolean(result.voluntaryToImmersion),
+          customizedName: result.customizedName,
+          distance_m: result.distance_m,
+          fitForDisabledWorkers: result.fitForDisabledWorkers,
+          nextAvailabilityDate: result.nextAvailabilityDate
+            ? new Date(result.nextAvailabilityDate).toISOString()
+            : undefined,
+          numberOfEmployeeRange: result.numberOfEmployeeRange,
+          updatedAt: result.updatedAt,
+          website: result.website,
+          isAvailable: !result.isMaxDiscussionsForPeriodReached,
+        };
+      },
+    ),
   };
 };
 

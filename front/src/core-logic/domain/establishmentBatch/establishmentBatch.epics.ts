@@ -114,7 +114,7 @@ export const candidateEstablishmentMapper = (
       isEngagedEnterprise: csvBooleanToBoolean(
         establishmentRow.isEngagedEnterprise,
       ),
-      maxContactsPerMonth: makeMaxContactsPerMonth(
+      maxContactsPerMonth: getMaxContactsPerMonth(
         establishmentRow.maxContactPerMonth,
       ),
       searchableBy: {
@@ -134,7 +134,7 @@ export const candidateEstablishmentMapper = (
   return { formEstablishment: mappedEstablishment, zodErrors: errors };
 };
 
-const makeMaxContactsPerMonth = (maxContactPerMonth?: string): number => {
+const getMaxContactsPerMonth = (maxContactPerMonth?: string): number => {
   if (maxContactPerMonth === "") return defaultMaxContactsPerMonth;
 
   const value = Number(maxContactPerMonth);
