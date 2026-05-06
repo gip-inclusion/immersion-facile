@@ -160,8 +160,6 @@ import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetG
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
-import { LegacyContactEstablishment } from "../../domains/establishment/use-cases/LegacyContactEstablishment";
-import { LegacySearchImmersion } from "../../domains/establishment/use-cases/LegacySearchImmersion";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
@@ -326,12 +324,6 @@ export const createUseCases = ({
           gateways.timeGateway,
         ),
 
-      // immersionOffer
-      legacySearchImmersion: new LegacySearchImmersion(
-        uowPerformer,
-        gateways.laBonneBoiteGateway,
-        uuidGenerator,
-      ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
         uowPerformer,
@@ -368,13 +360,6 @@ export const createUseCases = ({
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
         config.immersionFacileBaseUrl,
-      ),
-      legacyContactEstablishment: new LegacyContactEstablishment(
-        uowPerformer,
-        createNewEvent,
-        uuidGenerator,
-        gateways.timeGateway,
-        config.minimumNumberOfDaysBetweenSimilarContactRequests,
       ),
 
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(

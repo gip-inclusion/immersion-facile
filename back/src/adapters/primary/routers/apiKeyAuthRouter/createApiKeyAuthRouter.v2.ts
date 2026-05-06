@@ -1,46 +1,27 @@
 import { Router } from "express";
-import { andThen, keys, map } from "ramda";
+import { keys } from "ramda";
 import {
-  type ApiConsumer,
   type ConventionStatus,
   defaultPageInPagination,
   defaultPerPageInApiPagination,
   errors,
   eventToRightName,
   isApiConsumerAllowed,
-  type LocationId,
-  pipeWithValue,
-  type SiretDto,
-  type WithAcquisition,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { validateAndParseZodSchema } from "../../../../config/helpers/validateAndParseZodSchema";
 import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
-import type { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
-import { createLogger } from "../../../../utils/logger";
-import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
-import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadToConventionReadPublicV2 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.dto";
 import { getConventionsByFiltersV2ToDomain } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
-import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
-  publicApiV2SearchEstablishmentRoutes,
   publicApiV2StatisticsRoutes,
   publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 
-const logger = createLogger(__filename);
-
 export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   const v2ExpressRouter = Router({ mergeParams: true });
-
-  const searchEstablishmentV2Router = createExpressSharedRouter(
-    publicApiV2SearchEstablishmentRoutes,
-    v2ExpressRouter,
-  );
 
   const conventionV2Router = createExpressSharedRouter(
     publicApiV2ConventionRoutes,
@@ -55,93 +36,6 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   const webhooksV2Router = createExpressSharedRouter(
     publicApiV2WebhooksRoutes,
     v2ExpressRouter,
-  );
-
-  searchEstablishmentV2Router.searchImmersion(
-    deps.apiConsumerMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (
-          !req.apiConsumer ||
-          !isApiConsumerAllowed({
-            apiConsumer: req.apiConsumer,
-            rightName: "searchEstablishment",
-            consumerKind: "READ",
-          })
-        )
-          throw errors.apiConsumer.forbidden();
-        return pipeWithValue(
-          deps.useCases.legacySearchImmersion.execute(
-            {
-              ...req.query,
-              sortedBy: req.query.sortedBy ?? "distance",
-            },
-            req.apiConsumer,
-          ),
-          andThen(map(domainToSearchImmersionResultPublicV2)),
-        );
-      }),
-  );
-
-  searchEstablishmentV2Router.getOfferBySiretAndAppellationCode(
-    deps.apiConsumerMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (
-          !req.apiConsumer ||
-          !isApiConsumerAllowed({
-            apiConsumer: req.apiConsumer,
-            rightName: "searchEstablishment",
-            consumerKind: "READ",
-          })
-        )
-          throw errors.apiConsumer.forbidden();
-
-        return deps.useCases.getSearchResultBySearchQuery
-          .execute(
-            {
-              ...req.params,
-              locationId: await getFirstLocationIdOrThrow(
-                deps.uowPerformer,
-                req.params.siret,
-              ),
-            },
-            req.apiConsumer,
-          )
-          .then(domainToSearchImmersionResultPublicV2);
-      }),
-  );
-
-  searchEstablishmentV2Router.contactEstablishment(
-    deps.apiConsumerMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res.status(201), () => {
-        if (
-          !req.apiConsumer ||
-          !isApiConsumerAllowed({
-            apiConsumer: req.apiConsumer,
-            rightName: "searchEstablishment",
-            consumerKind: "READ",
-          })
-        )
-          throw errors.apiConsumer.forbidden();
-        return pipeWithValue(
-          validateAndParseZodSchema({
-            schemaName: "contactEstablishmentPublicV2Schema",
-            inputSchema: contactEstablishmentPublicV2Schema,
-            schemaParsingInput: req.body,
-            logger,
-          }),
-          contactEstablishmentPublicV2ToDomain(() =>
-            getFirstLocationIdOrThrow(deps.uowPerformer, req.body.siret),
-          ),
-          andThen((contactRequest) =>
-            deps.useCases.legacyContactEstablishment.execute(
-              addAcquisitionParams(contactRequest, req.apiConsumer),
-            ),
-          ),
-        );
-      }),
   );
 
   conventionV2Router.getConventionById(deps.apiConsumerMiddleware, (req, res) =>
@@ -264,31 +158,3 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
 
   return v2ExpressRouter;
 };
-
-const getFirstLocationIdOrThrow = (
-  uowPerformer: UnitOfWorkPerformer,
-  siret: SiretDto,
-): Promise<LocationId> =>
-  uowPerformer.perform((uow) =>
-    uow.establishmentAggregateRepository
-      .getEstablishmentAggregateBySiret(siret)
-      .then((aggregate) => {
-        if (!aggregate) throw errors.establishment.notFound({ siret });
-        const firstLocationId = aggregate.establishment.locations.at(0)?.id;
-        if (!firstLocationId) throw errors.establishment.noLocation({ siret });
-        return firstLocationId;
-      }),
-  );
-
-const addAcquisitionParams = <T>(
-  obj: T,
-  apiConsumer: ApiConsumer | undefined,
-): T & WithAcquisition => ({
-  ...obj,
-  ...(apiConsumer
-    ? {
-        acquisitionCampaign: "api-consumer",
-        acquisitionKeyword: `${apiConsumer.id} - ${apiConsumer.name}`,
-      }
-    : {}),
-});
