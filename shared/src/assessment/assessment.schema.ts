@@ -1,6 +1,13 @@
 import { z } from "zod";
+import type { ConventionReadDto } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
-import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
+import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
+import {
+  convertLocaleDateToUtcTimezoneDate,
+  dateTimeIsoStringSchema,
+  makeDateStringSchema,
+  toDisplayedDate,
+} from "../utils/date";
 import {
   zStringMinLength1Max1024,
   zStringMinLength1Max3000,
@@ -88,6 +95,42 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
         createdAt: dateTimeIsoStringSchema,
       }),
     );
+
+export const assessmentFormSchema = (
+  convention: ConventionReadDto,
+): z.ZodType<AssessmentDto, FormAssessmentDto> =>
+  assessmentDtoSchema
+    .superRefine((formValues, ctx) => {
+      if (
+        formValues.endedWithAJob &&
+        formValues.contractStartDate &&
+        convention.dateStart > formValues.contractStartDate
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)) })}.`,
+          path: ["contractStartDate"],
+        });
+      }
+    })
+    .superRefine((formValues, ctx) => {
+      if (formValues.status !== "PARTIALLY_COMPLETED") return;
+
+      const scheduledHoursInPresencePeriod =
+        calculateTotalImmersionHoursBetweenDateComplex({
+          complexSchedule: convention.schedule.complexSchedule,
+          dateStart: convention.dateStart,
+          dateEnd: formValues.lastDayOfPresence ?? convention.dateEnd,
+        });
+
+      if (formValues.numberOfMissedHours > scheduledHoursInPresencePeriod)
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+          path: ["numberOfMissedHours"],
+        });
+    });
 
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
