@@ -80,7 +80,7 @@ describe("Convention slice", () => {
           title: "La convention a bien été créée",
         },
       );
-      expect(store.getState().convention.convention?.status).toBe(
+      expect(store.getState().convention.conventionRead?.status).toBe(
         "READY_TO_SIGN",
       );
       expectAddConventionToHaveBeenCalled(1);
@@ -101,6 +101,7 @@ describe("Convention slice", () => {
           },
           jwt: "some-correct-jwt",
           convention: null,
+          conventionRead: null,
           conventionStatusDashboardUrl: null,
           isLoading: false,
           currentSignatoryRole: null,
@@ -201,18 +202,7 @@ describe("Convention slice", () => {
       store.dispatch(
         conventionSlice.actions.showSummaryChangeRequested({
           showSummary: true,
-          convention: {
-            ...convention,
-            agencyName: "agency",
-            agencyDepartment: "75",
-            agencyContactEmail: "contact@mail.com",
-            agencyKind: "pole-emploi",
-            agencySiret: "11112222000033",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
-            assessment: null,
-            isEstablishmentBanned: false,
-          },
+          convention,
         }),
       );
       dependencies.conventionGateway.getSimilarConventionsResult$.next([
@@ -230,7 +220,7 @@ describe("Convention slice", () => {
     it("stores null as Convention without a convention matching in backend", () => {
       expectConventionState({
         isLoading: false,
-        convention: null,
+        conventionRead: null,
       });
       store.dispatch(
         conventionSlice.actions.fetchConventionRequested({
@@ -242,7 +232,7 @@ describe("Convention slice", () => {
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(undefined);
       expectConventionState({
-        convention: null,
+        conventionRead: null,
         isLoading: false,
       });
     });
@@ -275,7 +265,7 @@ describe("Convention slice", () => {
       // tester l'état initiale
       expectConventionState({
         isLoading: false,
-        convention: null,
+        conventionRead: null,
       });
 
       //dispatch fetch convention
@@ -290,7 +280,7 @@ describe("Convention slice", () => {
       //test state
       expectConventionState({
         isLoading: true,
-        convention: null,
+        conventionRead: null,
       });
 
       //feed gateway
@@ -299,7 +289,7 @@ describe("Convention slice", () => {
       //test state
       expectConventionState({
         isLoading: false,
-        convention: {
+        conventionRead: {
           ...conventionRead,
           signatories: {
             ...conventionRead.signatories,
@@ -328,7 +318,7 @@ describe("Convention slice", () => {
       };
       expectConventionState({
         isLoading: false,
-        convention: null,
+        conventionRead: null,
       });
       store.dispatch(
         conventionSlice.actions.fetchConventionRequested({
@@ -340,7 +330,7 @@ describe("Convention slice", () => {
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(conventionRead);
       expectConventionState({
-        convention: conventionRead,
+        conventionRead: conventionRead,
         isLoading: false,
       });
     });
@@ -348,7 +338,7 @@ describe("Convention slice", () => {
     it("stores error if failure during fetch", () => {
       expectConventionState({
         isLoading: false,
-        convention: null,
+        conventionRead: null,
       });
       store.dispatch(
         conventionSlice.actions.fetchConventionRequested({
@@ -360,7 +350,7 @@ describe("Convention slice", () => {
       expectConventionState({ isLoading: true });
       feedGatewayWithErrorOnConventionFetch(new Error("I failed !"));
       expectConventionState({
-        convention: null,
+        conventionRead: null,
         isLoading: false,
       });
       expectToEqual(
@@ -394,7 +384,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -406,7 +396,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -452,7 +442,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -464,7 +454,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -504,7 +494,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -516,7 +506,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -548,7 +538,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -560,7 +550,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -594,7 +584,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -606,7 +596,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -648,7 +638,7 @@ describe("Convention slice", () => {
           };
           expectConventionState({
             isLoading: false,
-            convention: null,
+            conventionRead: null,
           });
           store.dispatch(
             conventionSlice.actions.fetchConventionRequested({
@@ -660,7 +650,7 @@ describe("Convention slice", () => {
           expectConventionState({ isLoading: true });
           feedGatewayWithConvention(conventionRead);
           expectConventionState({
-            convention: conventionRead,
+            conventionRead: conventionRead,
             isLoading: false,
             formUi: {
               preselectedAgencyId: null,
@@ -712,7 +702,8 @@ describe("Convention slice", () => {
           },
           jwt: null,
           isLoading: false,
-          convention,
+          convention: null,
+          conventionRead: convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
           similarConventionIds: [],
@@ -761,7 +752,8 @@ describe("Convention slice", () => {
           },
           jwt: null,
           isLoading: false,
-          convention,
+          convention: null,
+          conventionRead: convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
           similarConventionIds: [],
@@ -846,6 +838,7 @@ describe("Convention slice", () => {
         },
         jwt: null,
         convention: null,
+        conventionRead: null,
         conventionStatusDashboardUrl: null,
         isLoading: false,
         currentSignatoryRole: null,
@@ -875,6 +868,7 @@ describe("Convention slice", () => {
         },
         jwt: null,
         convention: null,
+        conventionRead: null,
         conventionStatusDashboardUrl: null,
         isLoading: false,
         currentSignatoryRole: null,
@@ -908,6 +902,7 @@ describe("Convention slice", () => {
         },
         jwt: null,
         convention: null,
+        conventionRead: null,
         conventionStatusDashboardUrl: null,
         isLoading: false,
         currentSignatoryRole: null,
@@ -984,17 +979,18 @@ describe("Convention slice", () => {
           showSummary: false,
         },
         jwt: null,
-        convention,
+        convention: null,
+        conventionRead: convention,
         conventionStatusDashboardUrl: null,
         isLoading: false,
         currentSignatoryRole: null,
         similarConventionIds: [],
       },
     }));
-    expectConventionState({ convention });
+    expectConventionState({ conventionRead: convention });
     store.dispatch(conventionSlice.actions.clearFetchedConvention());
     expectConventionState({
-      convention: initialConventionState.convention,
+      conventionRead: initialConventionState.conventionRead,
       formUi: initialConventionState.formUi,
     });
   });

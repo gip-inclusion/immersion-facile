@@ -57,7 +57,7 @@ describe("convention action slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
-          convention,
+          conventionRead: convention,
         },
       }));
     });
@@ -67,7 +67,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.cancelConventionRequested({
@@ -113,7 +113,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention: conventionwithStatusChanged,
+          conventionRead: conventionwithStatusChanged,
         });
       });
 
@@ -121,7 +121,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.cancelConventionRequested({
@@ -158,7 +158,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
       });
     });
@@ -168,7 +168,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.deprecateConventionRequested({
@@ -215,7 +215,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention: conventionwithStatusChanged,
+          conventionRead: conventionwithStatusChanged,
         });
       });
 
@@ -223,7 +223,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.deprecateConventionRequested({
@@ -259,7 +259,7 @@ describe("convention action slice", () => {
         );
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
       });
     });
@@ -269,7 +269,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.rejectConventionRequested({
@@ -315,7 +315,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention: conventionwithStatusChanged,
+          conventionRead: conventionwithStatusChanged,
         });
       });
 
@@ -323,7 +323,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.rejectConventionRequested({
@@ -359,7 +359,7 @@ describe("convention action slice", () => {
         );
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
       });
     });
@@ -369,7 +369,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.acceptByValidatorRequested({
@@ -416,7 +416,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention: conventionwithStatusChanged,
+          conventionRead: conventionwithStatusChanged,
         });
       });
 
@@ -424,7 +424,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.acceptByValidatorRequested({
@@ -461,7 +461,7 @@ describe("convention action slice", () => {
         );
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
       });
     });
@@ -471,7 +471,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.acceptByCounsellorRequested({
@@ -518,7 +518,7 @@ describe("convention action slice", () => {
 
         expectConventionState({
           isLoading: false,
-          convention: conventionwithStatusChanged,
+          conventionRead: conventionwithStatusChanged,
         });
       });
 
@@ -526,7 +526,7 @@ describe("convention action slice", () => {
         expectInitialConventionActionAndFeedbackState();
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
         store.dispatch(
           conventionActionSlice.actions.acceptByCounsellorRequested({
@@ -563,7 +563,7 @@ describe("convention action slice", () => {
         );
         expectConventionState({
           isLoading: false,
-          convention,
+          conventionRead: convention,
         });
       });
     });
@@ -573,7 +573,7 @@ describe("convention action slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
-          convention,
+          conventionRead: convention,
         },
       }));
     });
@@ -581,7 +581,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
       store.dispatch(
         conventionActionSlice.actions.transferConventionToAgencyRequested({
@@ -634,7 +634,7 @@ describe("convention action slice", () => {
 
       expectConventionState({
         isLoading: false,
-        convention: conventionWithAgencyChanged,
+        conventionRead: conventionWithAgencyChanged,
       });
     });
 
@@ -642,7 +642,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
       store.dispatch(
         conventionActionSlice.actions.transferConventionToAgencyRequested({
@@ -678,7 +678,7 @@ describe("convention action slice", () => {
       );
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
     });
   });
@@ -688,7 +688,7 @@ describe("convention action slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
-          convention,
+          conventionRead: convention,
         },
       }));
     });
@@ -696,7 +696,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
       store.dispatch(
         conventionActionSlice.actions.editCounsellorNameRequested({
@@ -743,7 +743,7 @@ describe("convention action slice", () => {
 
       expectConventionState({
         isLoading: false,
-        convention: conventionWithCounsellorNameChanged,
+        conventionRead: conventionWithCounsellorNameChanged,
       });
     });
 
@@ -751,7 +751,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
       store.dispatch(
         conventionActionSlice.actions.editCounsellorNameRequested({
@@ -788,7 +788,7 @@ describe("convention action slice", () => {
       );
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
     });
   });
@@ -943,7 +943,7 @@ describe("convention action slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
-          convention,
+          conventionRead: convention,
         },
       }));
     });
@@ -952,7 +952,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
 
       store.dispatch(
@@ -993,7 +993,7 @@ describe("convention action slice", () => {
 
       expectConventionState({
         isLoading: false,
-        convention: signedConvention,
+        conventionRead: signedConvention,
       });
     });
 
@@ -1001,7 +1001,7 @@ describe("convention action slice", () => {
       expectInitialConventionActionAndFeedbackState();
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
 
       store.dispatch(
@@ -1031,7 +1031,7 @@ describe("convention action slice", () => {
 
       expectConventionState({
         isLoading: false,
-        convention,
+        conventionRead: convention,
       });
     });
   });

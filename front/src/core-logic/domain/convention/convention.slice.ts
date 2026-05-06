@@ -3,6 +3,7 @@ import type {
   AbsoluteUrl,
   AgencyId,
   ConventionDraftId,
+  ConventionDto,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
@@ -30,7 +31,8 @@ export interface ConventionState {
   };
   jwt: string | null;
   isLoading: boolean;
-  convention: ConventionReadDto | null;
+  convention: ConventionDto | null;
+  conventionRead: ConventionReadDto | null;
   conventionStatusDashboardUrl: AbsoluteUrl | null;
   currentSignatoryRole: SignatoryRole | null;
   similarConventionIds: ConventionId[];
@@ -48,6 +50,7 @@ export const initialConventionState: ConventionState = {
   },
   jwt: null,
   convention: null,
+  conventionRead: null,
   conventionStatusDashboardUrl: null,
   isLoading: false,
   currentSignatoryRole: null,
@@ -68,7 +71,7 @@ export const conventionSlice = createSlice({
       action: PayloadAction<
         | {
             showSummary: true;
-            convention: ConventionReadDto;
+            convention: ConventionDto;
             fromConventionDraftId?: ConventionDraftId;
           }
         | { showSummary: false }
@@ -95,7 +98,7 @@ export const conventionSlice = createSlice({
       }>,
     ) => {
       state.isLoading = true;
-      state.convention = action.payload.convention;
+      state.conventionRead = action.payload.convention;
     },
     updateConventionSucceeded: (
       state,
@@ -141,7 +144,7 @@ export const conventionSlice = createSlice({
         convention: ConventionReadDto | undefined;
       }>,
     ) => {
-      state.convention = action.payload.convention ?? null;
+      state.conventionRead = action.payload.convention ?? null;
       state.isLoading = false;
     },
     fetchConventionFailed: (
@@ -194,7 +197,7 @@ export const conventionSlice = createSlice({
     },
 
     clearFetchedConvention: (state) => {
-      state.convention = initialConventionState.convention;
+      state.conventionRead = initialConventionState.conventionRead;
       state.formUi = initialConventionState.formUi;
     },
 

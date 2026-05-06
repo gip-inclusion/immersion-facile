@@ -12,7 +12,7 @@ const conventionState = (state: RootState) => state.convention;
 
 const convention = createSelector(
   conventionState,
-  ({ convention }) => convention,
+  ({ conventionRead: convention }) => convention,
 );
 
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
@@ -50,7 +50,7 @@ type SignatoryData = {
 
 const signatoryData = createSelector(
   conventionState,
-  ({ convention, currentSignatoryRole }): SignatoryData => {
+  ({ conventionRead: convention, currentSignatoryRole }): SignatoryData => {
     if (!convention || !currentSignatoryRole)
       return { signatory: null, signedAtFieldName: null };
     return signatoryDataFromConvention(convention, currentSignatoryRole);

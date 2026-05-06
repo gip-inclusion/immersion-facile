@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   type AgencyOption,
   addressDtoToString,
+  type ConventionDto,
   type ConventionFormInitialValues,
   type ConventionPresentation,
   type ConventionReadDto,
@@ -53,7 +54,6 @@ import {
   remoteWorkModes,
   replaceEmptyValuesByUndefinedFromObject,
   toConventionTemplate,
-  undefinedIfEmptyString,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -431,27 +431,7 @@ const ConventionFormContent = ({
         agencyId: convention.agencyId ?? "",
       });
     }
-    const conventionToSave: ConventionReadDto = {
-      ...conventionSchema.parse(convention),
-      agencyDepartment: convention.agencyDepartment ?? "",
-      workConditions: undefinedIfEmptyString(convention.workConditions),
-      agencyReferent: {
-        firstname: undefinedIfEmptyString(convention.agencyReferent?.firstname),
-        lastname: undefinedIfEmptyString(convention.agencyReferent?.lastname),
-      },
-      establishmentNumberEmployeesRange:
-        establishmentNumberEmployeesRange === ""
-          ? undefined
-          : establishmentNumberEmployeesRange,
-      agencySiret: "",
-      agencyKind: selectedAgency.kind,
-      agencyName: selectedAgency.name,
-      agencyContactEmail: "",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [],
-      assessment: null,
-      isEstablishmentBanned: false,
-    };
+    const conventionToSave: ConventionDto = conventionSchema.parse(convention);
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
