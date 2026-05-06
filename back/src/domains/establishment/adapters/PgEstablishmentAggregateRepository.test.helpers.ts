@@ -68,14 +68,12 @@ export const makeExpectedSearchResult = ({
     voluntaryToImmersion:
       establishmentAggregate.establishment.voluntaryToImmersion,
     website: establishmentAggregate.establishment.website,
-    isSearchable:
-      !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
     updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
     remoteWorkMode: remoteWorkMode ?? firstOffer.remoteWorkMode,
     isAvailable:
       !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached,
-  } as RepositorySearchResultDto; // d'où le as
+  } satisfies RepositorySearchResultDto;
 };
 
 export const sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults = (
