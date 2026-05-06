@@ -1,20 +1,20 @@
 import type { ReactNode } from "react";
 import { PageHeader } from "react-design-system";
 import {
-  ConnectedPrivateRoute,
+  ConnectedPrivateRoutePage,
   type FrontAdminRoute,
-} from "src/app/pages/auth/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoutePage";
 
-type AdminPrivateRouteProps = {
+type AdminPrivateRoutePageProps = {
   route: FrontAdminRoute;
   children: ReactNode;
 };
 
-export const AdminPrivateRoute = ({
+export const AdminPrivateRoutePage = ({
   route,
   children,
-}: AdminPrivateRouteProps) => (
-  <ConnectedPrivateRoute
+}: AdminPrivateRoutePageProps) => (
+  <ConnectedPrivateRoutePage
     allowAdminOnly={true}
     route={route}
     oAuthConnectionPageHeader={
@@ -22,5 +22,5 @@ export const AdminPrivateRoute = ({
     }
   >
     {children}
-  </ConnectedPrivateRoute>
+  </ConnectedPrivateRoutePage>
 );

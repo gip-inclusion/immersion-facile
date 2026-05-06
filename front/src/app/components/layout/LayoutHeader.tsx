@@ -17,7 +17,7 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
   type AgencyDashboardRouteName,
   agencyDashboardRoutes,
-} from "src/app/pages/auth/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
