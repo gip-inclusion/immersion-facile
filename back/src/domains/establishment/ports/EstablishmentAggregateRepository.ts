@@ -28,7 +28,6 @@ export type RepositorySearchImmersionResult = Omit<
 >;
 export type OfferWithSiret = OfferEntity & { siret: SiretDto };
 export type SearchImmersionResult = InternalOfferDto & {
-  isSearchable: boolean;
   nextAvailabilityDate?: DateTimeIsoString;
 };
 

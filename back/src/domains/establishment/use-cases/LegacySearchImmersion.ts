@@ -96,7 +96,7 @@ export class LegacySearchImmersion extends TransactionalUseCase<
 
     const searchResultsInRepo =
       voluntaryToImmersion !== false && repositorySearchResults.length > 0
-        ? repositorySearchResults.map(({ isSearchable: _, ...rest }) => rest)
+        ? repositorySearchResults
         : [];
 
     const lbbSirets = lbbSearchResults.map(({ siret }) => siret);

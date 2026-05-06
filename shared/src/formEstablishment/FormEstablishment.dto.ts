@@ -173,7 +173,7 @@ export type EstablishmentCSVRow = {
   offers_appellation_code: string;
   contactMode: ContactMode;
   isEngagedEnterprise: CSVBoolean;
-  isSearchable?: CSVBoolean;
+  maxContactPerMonth?: CSVOptionalString;
   website: CSVOptionalString;
   additionalInformation: CSVOptionalString;
   fitForDisabledWorkers?: CSVBoolean;
