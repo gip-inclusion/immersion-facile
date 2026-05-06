@@ -50,6 +50,7 @@ import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import type { UserId } from "../user/user.dto";
 import {
+  convertLocaleDateToUtcTimezoneDate,
   type DateRange,
   type OptionalDateRange,
   toDisplayedDate,
@@ -211,6 +212,18 @@ export const errors = {
     lastDayOfPresenceNotInConventionRange: () =>
       new BadRequestError(
         `La date du dernier jour de présence doit être comprise entre la date de début et la date de fin de l'immersion.`,
+      ),
+    numberOfMissedHoursExceedsScheduled: () =>
+      new BadRequestError(
+        "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+      ),
+    contractStartDateBeforeImmersionStart: ({
+      immersionDateStart,
+    }: {
+      immersionDateStart: string;
+    }) =>
+      new BadRequestError(
+        `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: convertLocaleDateToUtcTimezoneDate(new Date(immersionDateStart)) })}.`,
       ),
     alreadyExist: (conventionId: ConventionId) =>
       new ConflictError(
