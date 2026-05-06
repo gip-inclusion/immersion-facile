@@ -226,6 +226,7 @@ interface Agencies extends WithAcquisition {
 interface BannedEstablishments {
   siret: string;
   bannishment_justification: string;
+  created_at: Generated<Timestamp>;
 }
 
 interface BroadcastFeedbacks {

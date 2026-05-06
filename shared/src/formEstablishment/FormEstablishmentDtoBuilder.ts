@@ -3,6 +3,8 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
+import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations";
+import type { NafDto } from "../naf/naf.dto";
 import type { SiretDto } from "../siret/siret";
 import type {
   ContactMode,
@@ -359,6 +361,19 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       searchableBy: { jobSeekers, students },
+    });
+  }
+
+  public withNaf(naf?: NafDto) {
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, naf });
+  }
+
+  public withBannishmentInformations(
+    bannishmentInformations: WithBannedEstablishmentInformations,
+  ) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      ...bannishmentInformations,
     });
   }
 

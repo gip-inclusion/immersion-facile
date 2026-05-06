@@ -13,6 +13,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: "text",
       notNull: true,
     },
+    created_at: { type: "timestamptz", default: pgm.func("now()") },
   });
 }
 
