@@ -272,15 +272,17 @@ export const errors = {
       new BadRequestError(
         `Impossible de relancer la demande de completion du bilan pour les conventions ayant le statut "${status}".`,
       ),
-    smsAssessmentLinkAlreadySent: ({
+    assessmentLinkAlreadySent: ({
+      notificationKind,
       minHoursBetweenReminder,
       timeRemaining,
     }: {
+      notificationKind: NotificationKind;
       minHoursBetweenReminder: number;
       timeRemaining: string;
     }) =>
       new TooManyRequestApiError(
-        `Une relance de demande de completion du bilan a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
+        `Une relance a été envoyée il y a moins de ${minHoursBetweenReminder}h par ${notificationKind}. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
   auth: {
@@ -571,17 +573,19 @@ export const errors = {
       new ForbiddenError(
         `Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à envoyer un lien de signature.`,
       ),
-    smsSignatureLinkAlreadySent: ({
-      signatoryRole,
+    signatureLinkAlreadySent: ({
+      signatoryRole: _signatoryRole,
+      notificationKind,
       minHoursBetweenReminder,
       timeRemaining,
     }: {
       signatoryRole: SignatoryRole;
+      notificationKind: NotificationKind;
       minHoursBetweenReminder: number;
       timeRemaining: string;
     }) =>
       new TooManyRequestApiError(
-        `Une relance de signature au ${titleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
+        `Une relance a été envoyée il y a moins de ${minHoursBetweenReminder}h par ${notificationKind}. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
     validatorOfAgencyRefersToNotAllowed: () =>
       new ForbiddenError(
