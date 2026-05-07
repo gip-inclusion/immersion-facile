@@ -7,8 +7,8 @@ import type {
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
+  SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
-  WithConventionId,
 } from "shared";
 
 export interface AssessmentGateway {
@@ -29,7 +29,7 @@ export interface AssessmentGateway {
     jwt: string;
   }): Observable<AssessmentDto | LegacyAssessmentDto>;
   sendAssessmentLink$(
-    params: WithConventionId,
+    params: SendAssessmentLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }

@@ -6,8 +6,8 @@ import type {
   ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
+  SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
-  WithConventionId,
 } from "shared";
 import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
@@ -64,7 +64,7 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentLink$(
-    _params: WithConventionId,
+    _params: SendAssessmentLinkRequestDto,
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return of(undefined).pipe(delay(this.latency));

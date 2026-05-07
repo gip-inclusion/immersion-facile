@@ -9,8 +9,8 @@ import {
   type DeleteAssessmentRequestDto,
   errors,
   type LegacyAssessmentDto,
+  type SendAssessmentLinkRequestDto,
   type SignAssessmentRequestDto,
-  type WithConventionId,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -113,7 +113,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentLink$(
-    params: WithConventionId,
+    params: SendAssessmentLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(
