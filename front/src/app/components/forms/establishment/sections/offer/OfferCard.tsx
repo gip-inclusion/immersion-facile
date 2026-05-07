@@ -8,7 +8,7 @@ import {
   remoteWorkModeLabels,
   removeAtIndex,
 } from "shared";
-import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
+import type { Mode } from "src/app/routes/routes.hooks";
 
 export const OfferCard = ({
   index,

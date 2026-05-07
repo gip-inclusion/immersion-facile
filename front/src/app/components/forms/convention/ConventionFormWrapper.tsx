@@ -41,7 +41,8 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { useConventionRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -51,7 +52,6 @@ import { conventionDraftSelectors } from "src/core-logic/domain/convention/conve
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
-import type { Route } from "type-route";
 
 const {
   Component: ConfirmDuplicateConventionModal,
@@ -90,7 +90,7 @@ export const ConventionFormWrapper = ({
   mode,
 }: ConventionFormWrapperProps) => {
   const showSummary = useAppSelector(conventionSelectors.showSummary);
-  const route = useRoute() as SupportedConventionRoutes;
+  const route = useConventionRoute([routes.conventionImmersion.name]);
   const routeJwt = "jwt" in route.params ? route.params.jwt : undefined;
   const routeConventionDraftId =
     "conventionDraftId" in route.params
@@ -408,7 +408,7 @@ const ConventionSummarySection = ({
   );
   const [isModalClosedWithoutSignature, setIsModalClosedWithoutSignature] =
     useState<boolean>(false);
-  const route = useRoute() as Route<typeof routes.conventionImmersion>;
+  const route = useConventionRoute([routes.conventionImmersion.name]);
 
   const isEditingConvention = !!route.params.jwt;
   const shouldShowDuplicateWarning =

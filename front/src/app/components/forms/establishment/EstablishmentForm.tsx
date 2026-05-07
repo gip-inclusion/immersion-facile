@@ -28,7 +28,7 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { type routes, useRoute } from "src/app/routes/routes";
+import { type Mode, useEstablishmentRoute } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -39,15 +39,6 @@ import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice"
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { match, P } from "ts-pattern";
-import type { Route } from "type-route";
-
-export type RouteByMode = {
-  create: Route<typeof routes.formEstablishment>;
-  edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
-  admin: Route<typeof routes.manageEstablishmentAdmin>;
-};
-
-export type Mode = keyof RouteByMode;
 
 type EstablishmentFormProps = {
   mode: Mode;
@@ -86,7 +77,11 @@ export type OnStepChange = (
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
-  const route = useRoute() as RouteByMode[Mode];
+  const route = useEstablishmentRoute([
+    "formEstablishment",
+    "manageEstablishmentAdmin",
+    "establishmentDashboardFormEstablishment",
+  ]);
 
   const isEstablishmentCreation = route.name === "formEstablishment";
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
