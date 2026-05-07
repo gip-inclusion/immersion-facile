@@ -1,6 +1,10 @@
 import type { AgencyId } from "../agency/agency.dto";
-import type { ConventionId } from "../convention/convention.dto";
+import type {
+  ConventionId,
+  WithConventionId,
+} from "../convention/convention.dto";
 import type { TemplatedEmail } from "../email/email";
+import type { SignatoryRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { TemplatedSms } from "../sms/smsTemplateByName";
 import type { Flavor } from "../typeFlavors";
@@ -65,4 +69,13 @@ export type EmailNotification = Extract<Notification, { kind: "email" }>;
 export type NotificationsByKind = {
   emails: EmailNotification[];
   sms: SmsNotification[];
+};
+
+export type SendSignatureLinkRequestDto = WithConventionId & {
+  signatoryRole: SignatoryRole;
+  notificationKind: NotificationKind;
+};
+
+export type SendAssessmentLinkRequestDto = WithConventionId & {
+  notificationKind: NotificationKind;
 };

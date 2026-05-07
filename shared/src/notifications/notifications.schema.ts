@@ -2,6 +2,7 @@ import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
+import { signatoryRoleSchema } from "../role/role.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { userIdSchema } from "../user/user.schema";
@@ -10,15 +11,19 @@ import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
-import type {
-  EmailNotification,
-  FollowedIds,
-  NotificationCommonFields,
-  NotificationErrored,
-  NotificationId,
-  NotificationState,
-  NotificationsByKind,
-  SmsNotification,
+import {
+  type EmailNotification,
+  type FollowedIds,
+  type NotificationCommonFields,
+  type NotificationErrored,
+  type NotificationId,
+  type NotificationKind,
+  type NotificationState,
+  type NotificationsByKind,
+  notificationKinds,
+  type SendAssessmentLinkRequestDto,
+  type SendSignatureLinkRequestDto,
+  type SmsNotification,
 } from "./notifications.dto";
 
 export const notificationIdSchema: ZodSchemaWithInputMatchingOutput<NotificationId> =
@@ -81,4 +86,21 @@ export const notificationsByKindSchema: ZodSchemaWithInputMatchingOutput<Notific
   z.object({
     emails: z.array(emailNotificationSchema),
     sms: z.array(smsNotificationSchema),
+  });
+
+export const notificationKindSchema: ZodSchemaWithInputMatchingOutput<NotificationKind> =
+  z.enum(notificationKinds, {
+    error: localization.invalidEnum,
+  });
+
+export const sendSignatureLinkRequestSchema: ZodSchemaWithInputMatchingOutput<SendSignatureLinkRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    signatoryRole: signatoryRoleSchema,
+    notificationKind: notificationKindSchema,
+  });
+export const sendAssessmentLinkRequestSchema: ZodSchemaWithInputMatchingOutput<SendAssessmentLinkRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    notificationKind: notificationKindSchema,
   });
