@@ -16,8 +16,7 @@ import {
   type TranscientData,
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
-import { type routes, useRoute } from "src/app/routes/routes";
-import type { Route } from "type-route";
+import { useCreateDiscussionRoute } from "src/app/routes/routes.hooks";
 import { makeContactInputsLabelsByKey } from "./contactUtils";
 
 const transcientPreferencesModal = createModal({
@@ -48,9 +47,10 @@ type TranscientPreferencesDisplayProps = TranscientPreferencesDisplayBaseProps &
 export const TranscientPreferencesDisplay = (
   props: TranscientPreferencesDisplayProps,
 ) => {
-  const route = useRoute() as Route<
-    typeof routes.searchResult | typeof routes.searchResultForStudent
-  >;
+  const route = useCreateDiscussionRoute([
+    "searchResult",
+    "searchResultForStudent",
+  ]);
   const { scope, onPreferencesChange, mode } = props;
   const {
     getTranscientDataForScope,

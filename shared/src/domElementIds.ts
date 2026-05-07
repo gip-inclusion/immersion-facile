@@ -226,7 +226,10 @@ export const domElementIds = {
       "im-contact-establishment__contact-in-person-button--student",
     contactInPersonForm: "im-contact-form--in-person-student",
   },
-  searchResultExternal: {},
+  searchResultExternal: {
+    contactByMailButton:
+      "im-contact-establishment__contact-email-button--external",
+  },
   addAgency: {
     login: {
       byEmailButton: "im-login-form__connect-button--agency-email",

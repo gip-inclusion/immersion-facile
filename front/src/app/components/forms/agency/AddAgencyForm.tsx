@@ -37,7 +37,8 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
@@ -46,7 +47,6 @@ import {
   agenciesSlice,
 } from "src/core-logic/domain/agencies/agencies.slice";
 import { match, P } from "ts-pattern";
-import type { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import mushroomImage from "../../../../assets/img/mushroom.webp";
 import roundSquareImage from "../../../../assets/img/round-square.webp";
@@ -180,6 +180,9 @@ type AgencyFormProps = {
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 
+const useAddAgencyRoute =
+  makeUseTypedRoute<(typeof routes.addAgency)["name"]>();
+
 const AgencyForm = ({
   refersToOtherAgency,
   preSelectedKind,
@@ -189,7 +192,7 @@ const AgencyForm = ({
   const { getFormErrors, getFormFields } = getFormContents(
     formAgencyFieldsLabels,
   );
-  const { params } = useRoute() as Route<typeof routes.addAgency>;
+  const { params } = useAddAgencyRoute([routes.addAgency.name]);
   const { siret } = params;
   const formContents = getFormFields();
   const acquisitionParams = useGetAcquisitionParams();

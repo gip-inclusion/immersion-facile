@@ -17,7 +17,8 @@ import { PhoneInput } from "src/app/components/forms/commons/PhoneInput";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { mergeUserRights } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
-import { type routes, useRoute } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import {
   type createFormModal,
   useFormModal,
@@ -25,7 +26,6 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import type { Route } from "type-route";
 
 type EstablishmentUserUserFormProps = {
   alreadyExistingUserRight:
@@ -41,6 +41,15 @@ type EstablishmentUserFormEmptyValues = OmitFromExistingKeys<
   "role"
 > & { role?: EstablishmentRole };
 
+const useEstablishmentUserFormRoute =
+  makeUseTypedRoute<
+    (
+      | typeof routes.establishmentDashboardFormEstablishment
+      | typeof routes.adminEstablishments
+      | typeof routes.myProfileEstablishmentRegistration
+    )["name"]
+  >();
+
 export const EstablishmentUserForm = ({
   alreadyExistingUserRight,
   establishmentUsersEditModal,
@@ -50,11 +59,11 @@ export const EstablishmentUserForm = ({
     establishmentSelectors.formEstablishment,
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const route = useRoute() as Route<
-    | typeof routes.establishmentDashboardFormEstablishment
-    | typeof routes.adminEstablishments
-    | typeof routes.myProfileEstablishmentRegistration
-  >;
+  const route = useEstablishmentUserFormRoute([
+    "establishmentDashboardFormEstablishment",
+    "adminEstablishments",
+    "myProfileEstablishmentRegistration",
+  ]);
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";
   const isMyProfileEstablishmentRegistration =

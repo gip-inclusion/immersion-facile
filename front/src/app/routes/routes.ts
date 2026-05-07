@@ -165,9 +165,10 @@ const conventionTemplateFromRouteValues = [
   "agencyDashboard",
 ] as const;
 
-const isConventionTemplateFromRoute = (
-  value: string,
-): value is "agencyDashboard" | "establishmentDashboard" =>
+export const isConventionTemplateFromRoute = (
+  value: unknown,
+): value is ConventionTemplateFromRoute =>
+  typeof value === "string" &&
   conventionTemplateFromRouteValues.some((v) => v === value);
 
 export const conventionTemplateFromRouteSerializer: ValueSerializer<
