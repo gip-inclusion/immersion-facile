@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { ConventionSupportedJwt, WithConventionId } from "shared";
+import type {
+  ConventionSupportedJwt,
+  SendAssessmentLinkRequestDto,
+} from "shared";
 
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
@@ -18,7 +21,7 @@ export const sendAssessmentLinkSlice = createSlice({
     sendAssessmentLinkRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        WithConventionId & { jwt: ConventionSupportedJwt }
+        SendAssessmentLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
       state.isSending = true;
@@ -27,7 +30,7 @@ export const sendAssessmentLinkSlice = createSlice({
     sendAssessmentLinkSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        WithConventionId & { jwt: ConventionSupportedJwt }
+        SendAssessmentLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
       state.isSending = false;
