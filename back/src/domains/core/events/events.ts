@@ -7,6 +7,7 @@ import {
   type DeleteAssessmentRequestDto,
   type Flavor,
   type InitiateLoginByEmailParams,
+  type NotificationKind,
   type RangeOfPosition,
   type RejectConnectedUserRoleForAgencyParams,
   type Role,
@@ -128,8 +129,8 @@ export type DomainEvent =
   | GenericEvent<"ConventionTransferredToAgency", WithConventionDto & TransferConventionToAgencyPayload & WithTriggeredBy>
   | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
   | GenericEvent<"ConventionWithFinalStatusEdited", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
-  | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: "sms" } & WithTriggeredBy>
+  | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: NotificationKind } & WithTriggeredBy>
+  | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: NotificationKind } & WithTriggeredBy>
   // UNHAPPY PATHS
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
