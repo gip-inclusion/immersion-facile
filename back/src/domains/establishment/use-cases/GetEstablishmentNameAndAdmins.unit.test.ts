@@ -105,6 +105,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
                 businessName: establishment.establishment.name,
                 status: "ACCEPTED",
                 admins: [],
+                shouldReceiveDiscussionNotifications: false,
                 isEstablishmentBanned: true,
                 establishmentBannishmentJustification:
                   "Ils diffusent du rock pendant les fest noz",

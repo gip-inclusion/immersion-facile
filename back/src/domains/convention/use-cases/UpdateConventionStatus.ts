@@ -4,6 +4,7 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionRole,
   type ConventionStatus,
+  conventionSchema,
   type DateString,
   errors,
   type Role,
@@ -121,7 +122,7 @@ export const makeUpdateConventionStatus = useCaseBuilder(
     };
 
     const updatedConvention: ConventionDto = {
-      ...conventionRead,
+      ...conventionSchema.parse(conventionRead),
       status: inputParams.status,
       dateValidation: validatedConventionStatuses.includes(inputParams.status)
         ? conventionUpdatedAt
