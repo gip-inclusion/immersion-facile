@@ -13,12 +13,12 @@ import {
   toDisplayedPhoneNumber,
 } from "shared";
 import type {
-  Mode,
   OnStepChange,
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
 import { SearchResultPreview } from "src/app/components/forms/establishment/SearchResultPreview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import type { Mode } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 

@@ -35,11 +35,11 @@ import { SearchResultContactSection } from "src/app/components/search/SearchResu
 import { SearchResultLabels } from "src/app/components/search/SearchResultLabels";
 import { defaultPageMetaContents } from "src/app/contents/meta/metaContents";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { useSearchResultRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
-import type { Route } from "type-route";
 
 const SearchResultSection = ({
   title,
@@ -83,11 +83,11 @@ const getMetaForSearchResult = (
 };
 
 export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
-  const route = useRoute() as Route<
-    | typeof routes.searchResult
-    | typeof routes.searchResultExternal
-    | typeof routes.searchResultForStudent
-  >;
+  const route = useSearchResultRoute([
+    "searchResult",
+    "searchResultForStudent",
+    "searchResultExternal",
+  ]);
   const currentSearchResult = useAppSelector(
     searchSelectors.currentSearchResult,
   );

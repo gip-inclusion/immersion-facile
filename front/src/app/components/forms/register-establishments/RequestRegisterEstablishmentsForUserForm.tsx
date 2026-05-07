@@ -21,13 +21,13 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { match, P } from "ts-pattern";
-import type { Route } from "type-route";
 
 const establishmentRegisterEstablishmentModal = createFormModal({
   id: "establishment-register-establishment-modal",
@@ -36,15 +36,20 @@ const establishmentRegisterEstablishmentModal = createFormModal({
   doSubmitClosesModal: false,
 });
 
+const useMyProfileEstablishmentRegistrationRoute =
+  makeUseTypedRoute<
+    (typeof routes.myProfileEstablishmentRegistration)["name"]
+  >();
+
 export const RequestRegisterEstablishmentsForUserForm = ({
   currentUser,
 }: {
   currentUser: ConnectedUser;
 }) => {
   const dispatch = useDispatch();
-  const route = useRoute() as Route<
-    typeof routes.myProfileEstablishmentRegistration
-  >;
+  const route = useMyProfileEstablishmentRegistrationRoute([
+    "myProfileEstablishmentRegistration",
+  ]);
   const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const isLoading = useAppSelector(establishmentSelectors.isLoading);

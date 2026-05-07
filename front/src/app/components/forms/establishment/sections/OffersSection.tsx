@@ -14,7 +14,6 @@ import {
   removeAtIndex,
 } from "shared";
 import type {
-  Mode,
   OnStepChange,
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
@@ -30,6 +29,7 @@ import {
   getFormContents,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
+import type { Mode } from "src/app/routes/routes.hooks";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { v4 as uuidV4 } from "uuid";
 

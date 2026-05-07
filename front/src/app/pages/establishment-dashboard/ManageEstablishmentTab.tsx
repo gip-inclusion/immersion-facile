@@ -6,24 +6,29 @@ import { HeadingSection } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds, type UserEstablishmentRightDetails } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
-import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
   establishments: UserEstablishmentRightDetails[];
 };
 
+const useEstablishmentDashboardFormEstablishmentRoute =
+  makeUseTypedRoute<
+    (typeof routes.establishmentDashboardFormEstablishment)["name"]
+  >();
+
 export const ManageEstablishmentsTab = ({
   establishments,
 }: ManageEstablishmentTabProps) => {
   const dispatch = useDispatch();
-  const route = useRoute() as Route<
-    typeof routes.establishmentDashboardFormEstablishment
-  >;
+  const route = useEstablishmentDashboardFormEstablishmentRoute([
+    "establishmentDashboardFormEstablishment",
+  ]);
   const { siret } = route.params;
   const initialUrlParams = getUrlParameters(window.location);
   if (establishments.length === 1) {

@@ -128,6 +128,20 @@ export const frontErrors = {
         buttons: [HomeButton, ContactUsButton()],
       });
     },
+    wrongRoute: ({
+      supportedRoutes,
+      originalRoute,
+    }: {
+      supportedRoutes: string[];
+      originalRoute: string;
+    }) => {
+      const description = `La page à laquelle vous essayez d'accéder est mal configurée. Les routes supportées sont : ${supportedRoutes.join(", ")}. La route originale est : ${originalRoute}.`;
+      return new FrontSpecificError({
+        title: "Erreur technique",
+        description,
+        buttons: [HomeButton, ContactUsButton()],
+      });
+    },
   },
   convention: {
     cancelled: ({

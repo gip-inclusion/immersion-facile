@@ -68,7 +68,6 @@ import {
 import {
   type ConventionFormMode,
   creationFormModes,
-  type SupportedConventionRoutes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
@@ -94,7 +93,12 @@ import {
   makeConventionPresentationFromConventionTemplate,
   makeEmptyConventionInitialValues,
 } from "src/app/routes/routeParams/convention";
-import { type ftConnectParams, routes, useRoute } from "src/app/routes/routes";
+import {
+  type ftConnectParams,
+  isConventionTemplateFromRoute,
+  routes,
+} from "src/app/routes/routes";
+import { useConventionRoute } from "src/app/routes/routes.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
@@ -187,7 +191,7 @@ export const ConventionForm = ({
   mode: ConventionFormMode;
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
-  const route = useRoute() as SupportedConventionRoutes;
+  const route = useConventionRoute([routes.conventionImmersion.name]);
   const dispatch = useDispatch();
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -381,7 +385,7 @@ const ConventionFormContent = ({
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
-  const route = useRoute() as SupportedConventionRoutes;
+  const route = useConventionRoute([routes.conventionImmersion.name]);
   const fromPeConnectedUser =
     "fedIdProvider" in route.params
       ? route.params.fedIdProvider === "peConnect"
@@ -530,12 +534,15 @@ const ConventionFormContent = ({
     );
 
     if (mode === "create-convention-template") {
+      const fromRouteParam =
+        "fromRoute" in route.params ? route.params.fromRoute : undefined;
+      const fromRoute = isConventionTemplateFromRoute(fromRouteParam)
+        ? fromRouteParam
+        : "agencyDashboard";
+
       routes
         .conventionTemplate({
-          fromRoute:
-            "fromRoute" in route.params
-              ? route.params.fromRoute
-              : "agencyDashboard",
+          fromRoute,
           conventionTemplateId: conventionToSave.id,
         })
         .replace();

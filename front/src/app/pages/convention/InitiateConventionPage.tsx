@@ -4,11 +4,14 @@ import { MainWrapper, NavCard, PageHeader } from "react-design-system";
 import { domElementIds, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes, useRoute } from "src/app/routes/routes";
-import type { Route } from "type-route";
+import { routes } from "src/app/routes/routes";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
+
+const useInitiateConventionRoute =
+  makeUseTypedRoute<(typeof routes.initiateConvention)["name"]>();
 
 export const InitiateConventionPage = () => {
-  const route = useRoute() as Route<typeof routes.initiateConvention>;
+  const route = useInitiateConventionRoute(["initiateConvention"]);
   const [showCandidateOptions, setShowCandidateOptions] = useState<boolean>(
     route.params.skipFirstStep !== undefined,
   );
