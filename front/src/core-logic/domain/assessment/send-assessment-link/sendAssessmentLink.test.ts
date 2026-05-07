@@ -27,6 +27,7 @@ describe("sendAssessmentLink slice", () => {
     store.dispatch(
       sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
         conventionId: "fake-covention-id",
+        notificationKind: "sms",
         jwt: "fake-jwt",
         feedbackTopic: "send-assessment-link",
       }),
@@ -45,9 +46,9 @@ describe("sendAssessmentLink slice", () => {
       {
         level: "success",
         message:
-          "Le destinataire devrait le recevoir dans les prochaines minutes.",
+          "Le destinataire devrait la recevoir dans les prochaines minutes.",
         on: "create",
-        title: "Le SMS a bien été envoyé",
+        title: "La relance a bien été envoyée",
       },
     );
   });
@@ -56,6 +57,7 @@ describe("sendAssessmentLink slice", () => {
     store.dispatch(
       sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
         conventionId: "fake-covention-id",
+        notificationKind: "sms",
         jwt: "fake-jwt",
         feedbackTopic: "send-assessment-link",
       }),
@@ -63,7 +65,8 @@ describe("sendAssessmentLink slice", () => {
     expectSendAssessmentLinkState({
       isSending: true,
     });
-    const errorMessage = "Une erreur est survenue lors de l'envoi du SMS.";
+    const errorMessage =
+      "Une erreur est survenue lors de l'envoi de la relance.";
     feedGatewayWithSendAssessmentLinkFailure(new Error(errorMessage));
     expectSendAssessmentLinkState({
       isSending: false,
@@ -75,7 +78,7 @@ describe("sendAssessmentLink slice", () => {
         level: "error",
         message: errorMessage,
         on: "create",
-        title: "Problème lors de l'envoi SMS",
+        title: "Problème lors de l'envoi de la relance",
       },
     );
   });

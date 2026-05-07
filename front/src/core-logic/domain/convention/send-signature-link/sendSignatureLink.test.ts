@@ -28,6 +28,7 @@ describe("sendSignatureLink slice", () => {
       sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
         conventionId: "fake-covention-id",
         signatoryRole: "beneficiary",
+        notificationKind: "sms",
         jwt: "fake-jwt",
         feedbackTopic: "send-signature-link",
       }),
@@ -46,9 +47,9 @@ describe("sendSignatureLink slice", () => {
       {
         level: "success",
         message:
-          "Le destinataire devrait le recevoir dans les prochaines minutes.",
+          "Le destinataire devrait la recevoir dans les prochaines minutes.",
         on: "create",
-        title: "Le SMS a bien été envoyé",
+        title: "La relance a bien été envoyée",
       },
     );
   });
@@ -58,6 +59,7 @@ describe("sendSignatureLink slice", () => {
       sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
         conventionId: "fake-covention-id",
         signatoryRole: "beneficiary",
+        notificationKind: "sms",
         jwt: "fake-jwt",
         feedbackTopic: "send-signature-link",
       }),
@@ -65,7 +67,8 @@ describe("sendSignatureLink slice", () => {
     expectSendSignatureLinkState({
       isSending: true,
     });
-    const errorMessage = "Une erreur est survenue lors de l'envoi du SMS.";
+    const errorMessage =
+      "Une erreur est survenue lors de l'envoi de la relance.";
     feedGatewayWithSendSignatureLinkFailure(new Error(errorMessage));
     expectSendSignatureLinkState({
       isSending: false,
@@ -77,7 +80,7 @@ describe("sendSignatureLink slice", () => {
         level: "error",
         message: errorMessage,
         on: "create",
-        title: "Problème lors de l'envoi SMS",
+        title: "Problème lors de l'envoi de la relance",
       },
     );
   });
