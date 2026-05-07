@@ -845,7 +845,10 @@ describe("convention e2e", () => {
 
       const response = await magicLinkRequest.sendAssessmentLink({
         headers: { authorization: jwt },
-        body: { conventionId: conventionWithValidStatus.id },
+        body: {
+          conventionId: conventionWithValidStatus.id,
+          notificationKind: "sms",
+        },
       });
 
       expectHttpResponseToEqual(response, {
@@ -876,7 +879,10 @@ describe("convention e2e", () => {
 
       const response = await magicLinkRequest.sendAssessmentLink({
         headers: { authorization: jwt },
-        body: { conventionId: conventionReadyToSign.id },
+        body: {
+          conventionId: conventionReadyToSign.id,
+          notificationKind: "sms",
+        },
       });
 
       expectHttpResponseToEqual(response, {
@@ -909,7 +915,10 @@ describe("convention e2e", () => {
 
       const response = await magicLinkRequest.sendAssessmentLink({
         headers: { authorization: jwt },
-        body: { conventionId: conventionWithValidStatus.id },
+        body: {
+          conventionId: conventionWithValidStatus.id,
+          notificationKind: "sms",
+        },
       });
 
       expectHttpResponseToEqual(response, {
@@ -924,7 +933,7 @@ describe("convention e2e", () => {
     it("401 - Invalid JWT", async () => {
       const response = await magicLinkRequest.sendAssessmentLink({
         headers: { authorization: "invalid-token" },
-        body: { conventionId: convention.id },
+        body: { conventionId: convention.id, notificationKind: "sms" },
       });
 
       expectHttpResponseToEqual(response, {
@@ -948,7 +957,7 @@ describe("convention e2e", () => {
 
       const response = await magicLinkRequest.sendAssessmentLink({
         headers: { authorization: jwt },
-        body: { conventionId: unknownId },
+        body: { conventionId: unknownId, notificationKind: "sms" },
       });
 
       expectHttpResponseToEqual(response, {

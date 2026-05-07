@@ -157,7 +157,11 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.sendSignatureLink.execute(
-          { conventionId: req.body.conventionId, role: req.body.signatoryRole },
+          {
+            conventionId: req.body.conventionId,
+            signatoryRole: req.body.signatoryRole,
+            notificationKind: req.body.notificationKind,
+          },
           getConventionRelatedJwtPayload(req.payloads),
         ),
       ),
