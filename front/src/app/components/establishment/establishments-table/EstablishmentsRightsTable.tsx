@@ -29,7 +29,6 @@ export const EstablishmentsRightsTable = ({
       )}
       data={[...withEstablishmentData]
         .sort((a, b) => a.businessName.localeCompare(b.businessName))
-        .filter((data) => data.status === "ACCEPTED")
         .map((data) =>
           makeEstablishmentRightLine({
             data,

@@ -57,6 +57,7 @@ const resetDb = async (db: KyselyDb) => {
   await db.deleteFrom("outbox_failures").execute();
   await db.deleteFrom("outbox_publications").execute();
   await db.deleteFrom("outbox").execute();
+  await db.deleteFrom("banned_establishments").execute();
 
   // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Reset Db done");
