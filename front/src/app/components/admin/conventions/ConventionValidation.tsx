@@ -14,12 +14,14 @@ import {
   agencyModifierRoles,
   allSignatoryRoles,
   type ConventionReadDto,
+  conventionSignatoryRoleBySignatoryKey,
   getDaysBetween,
   isConventionRenewed,
   isConventionValidated,
-  type PhoneNumber,
+  type NotificationKind,
   type Role,
   relativeTimeFormat,
+  type Signatory,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -88,10 +90,7 @@ export const ConventionValidation = ({
   );
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
-    useState<{
-      signatoryRole: SignatoryRole;
-      signatoryPhone: PhoneNumber;
-    } | null>(null);
+    useState<Signatory | null>(null);
 
   const [signatureLinksSent, setSignatureLinksSent] =
     useState<SignatureLinkState>({
@@ -134,32 +133,36 @@ export const ConventionValidation = ({
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
 
-  const onSubmitSendSignatureLink = () => {
-    if (signatoryToSendSignatureLink) {
-      const { signatoryRole } = signatoryToSendSignatureLink;
+  const onSubmitSendSignatureLink = ({
+    notificationKind,
+    signatoryRole,
+  }: {
+    notificationKind: NotificationKind;
+    signatoryRole: SignatoryRole;
+  }) => {
+    dispatch(
+      sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
+        conventionId: convention.id,
+        signatoryRole,
+        notificationKind,
+        jwt: jwtParams.jwt,
+        feedbackTopic: "send-signature-link",
+      }),
+    );
 
-      dispatch(
-        sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
-          conventionId: convention.id,
-          signatoryRole,
-          jwt: jwtParams.jwt,
-          feedbackTopic: "send-signature-link",
-        }),
-      );
-
-      setSignatureLinksSent((prev) => ({
-        ...prev,
-        [signatoryRole]: true,
-      }));
-    }
+    setSignatureLinksSent((prev) => ({
+      ...prev,
+      [signatoryRole]: true,
+    }));
   };
 
-  const onSubmitSendAssessmentLink = () => {
+  const onSubmitSendAssessmentLink = (notificationKind: NotificationKind) => {
     setIsAssessmentLinkSent(true);
 
     dispatch(
       sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
         conventionId: convention.id,
+        notificationKind,
         jwt: jwtParams.jwt,
         feedbackTopic: "send-assessment-link",
       }),
@@ -242,12 +245,19 @@ export const ConventionValidation = ({
           convention,
           sendSignatureLinkButtonProps({
             signatureLinksSent,
-            onClick: ({ signatoryRole, signatoryPhone }) => {
-              sendSignatureLinkModal.open();
+            onClick: ({ signatoryRole, signatoryPhone, signatoryEmail }) => {
+              const signatoryKey =
+                conventionSignatoryRoleBySignatoryKey[signatoryRole];
+              const selectedSignatory = convention.signatories[signatoryKey];
+              if (!selectedSignatory) return;
               setSignatoryToSendSignatureLink({
-                signatoryRole,
-                signatoryPhone,
+                role: signatoryRole,
+                phone: signatoryPhone,
+                email: signatoryEmail,
+                firstName: selectedSignatory.firstName,
+                lastName: selectedSignatory.lastName,
               });
+              sendSignatureLinkModal.open();
             },
           }),
           shouldShowAssessmentReminderButton
@@ -263,12 +273,12 @@ export const ConventionValidation = ({
       />
 
       <SendSignatureLinkModalWrapper
-        signatory={signatoryToSendSignatureLink?.signatoryRole}
-        signatoryPhone={signatoryToSendSignatureLink?.signatoryPhone}
+        signatory={signatoryToSendSignatureLink ?? undefined}
         onConfirm={onSubmitSendSignatureLink}
       />
       <SendAssessmentLinkModalWrapper
         phone={convention.establishmentTutor.phone}
+        email={convention.establishmentTutor.email}
         onConfirm={onSubmitSendAssessmentLink}
       />
     </>
