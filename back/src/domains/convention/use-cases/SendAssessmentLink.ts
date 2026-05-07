@@ -3,13 +3,17 @@ import {
   agencyModifierRoles,
   allDefaultPhoneNumbers,
   allSignatoryRoles,
+  assessmentEmailSender,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
+  type NotificationKind,
+  type SendAssessmentLinkRequestDto,
+  sendAssessmentLinkRequestSchema,
   type UserId,
-  withConventionIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
@@ -32,9 +36,8 @@ import { throwErrorIfPhoneNumberNotValid } from "../entities/Convention";
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
 export type SendAssessmentLink = ReturnType<typeof makeSendAssessmentLink>;
-
 export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
-  .withInput<{ conventionId: ConventionId }>(withConventionIdSchema)
+  .withInput<SendAssessmentLinkRequestDto>(sendAssessmentLinkRequestSchema)
   .withOutput<void>()
   .withCurrentUser<ConventionRelatedJwtPayload>()
   .withDeps<{
@@ -46,6 +49,7 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
     createNewEvent: CreateNewEvent;
   }>()
   .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+    const notificationKind = inputParams.notificationKind;
     const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
@@ -93,45 +97,60 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
       deps.timeGateway.now(),
     );
 
-    throwErrorIfPhoneNumberNotValid({
-      conventionId: convention.id,
-      phone: convention.establishmentTutor.phone,
-      role: "establishment-tutor",
-    });
-
     await throwErrorIfAssessmentAlreadyFullfilled(convention.id, uow);
 
     await throwErrorIfAssessmentLinkAlreadySent({
       timeGateway: deps.timeGateway,
+      notificationKind,
+      tutorEmail: convention.establishmentTutor.email,
       tutorPhoneNumber: convention.establishmentTutor.phone,
       notificationRepository: uow.notificationRepository,
       conventionId: convention.id,
     });
 
-    const recipientPhone = convention.establishmentTutor.phone;
-    if (allDefaultPhoneNumbers.includes(recipientPhone)) {
-      return;
-    }
-
-    await sendSms({
-      conventionMagicLinkPayload: {
-        id: convention.id,
+    if (notificationKind === "sms") {
+      const recipientPhone = convention.establishmentTutor.phone;
+      throwErrorIfPhoneNumberNotValid({
+        conventionId: convention.id,
+        phone: recipientPhone,
         role: "establishment-tutor",
-        email: convention.establishmentTutor.email,
-        now: deps.timeGateway.now(),
-      },
-      userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
-      recipientPhone,
-      uow,
-      convention: conventionRead,
-      ...deps,
-    });
+      });
+
+      if (allDefaultPhoneNumbers.includes(recipientPhone)) return;
+
+      await sendSms({
+        conventionMagicLinkPayload: {
+          id: convention.id,
+          role: "establishment-tutor",
+          email: convention.establishmentTutor.email,
+          now: deps.timeGateway.now(),
+        },
+        userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
+        recipientPhone,
+        uow,
+        convention: conventionRead,
+        ...deps,
+      });
+    }
+    if (notificationKind === "email") {
+      await sendEmail({
+        conventionMagicLinkPayload: {
+          id: convention.id,
+          role: "establishment-tutor",
+          email: convention.establishmentTutor.email,
+          now: deps.timeGateway.now(),
+        },
+        uow,
+        convention: conventionRead,
+        ...deps,
+      });
+    }
 
     const event = deps.createNewEvent({
       topic: "AssessmentReminderManuallySent",
       payload: {
         convention,
-        transport: "sms",
+        transport: notificationKind,
         triggeredBy:
           "userId" in jwtPayload
             ? {
@@ -219,31 +238,104 @@ const sendSms = async ({
   });
 };
 
+const sendEmail = async ({
+  conventionMagicLinkPayload,
+  saveNotificationAndRelatedEvent,
+  generateConventionMagicLinkUrl,
+  shortLinkIdGeneratorGateway,
+  config,
+  convention,
+  uow,
+}: {
+  conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties;
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  config: AppConfig;
+  convention: ConventionReadDto;
+  uow: UnitOfWork;
+}) => {
+  const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
+    config,
+    conventionMagicLinkPayload: conventionMagicLinkPayload,
+    generateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
+    shortLinkIdGeneratorGateway: shortLinkIdGeneratorGateway,
+    uow,
+  });
+  const assessmentCreationLink = await makeShortMagicLink({
+    targetRoute: frontRoutes.assessment,
+    lifetime: "2Days",
+    extraQueryParams: { mtm_source: "email-assessment-link" },
+  });
+
+  await saveNotificationAndRelatedEvent(uow, {
+    kind: "email",
+    followedIds: {
+      conventionId: convention.id,
+      agencyId: convention.agencyId,
+      establishmentSiret: convention.siret,
+    },
+    templatedContent: {
+      kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      recipients: [convention.establishmentTutor.email],
+      sender: assessmentEmailSender,
+      params: {
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.signatories.beneficiary.lastName,
+        }),
+        conventionId: convention.id,
+        establishmentTutorName: getFormattedFirstnameAndLastname({
+          firstname: convention.establishmentTutor.firstName,
+          lastname: convention.establishmentTutor.lastName,
+        }),
+        agencyLogoUrl: undefined,
+        assessmentCreationLink,
+        internshipKind: convention.internshipKind,
+      },
+    },
+  });
+};
+
 const throwErrorIfAssessmentLinkAlreadySent = async ({
   notificationRepository,
   timeGateway,
+  notificationKind,
   conventionId,
+  tutorEmail,
   tutorPhoneNumber,
 }: {
   notificationRepository: NotificationRepository;
   timeGateway: TimeGateway;
+  notificationKind: NotificationKind;
   conventionId: ConventionId;
+  tutorEmail: string;
   tutorPhoneNumber: string;
 }) => {
-  const lastSms = await notificationRepository.getLastSmsNotificationByFilter({
-    smsKind: "ReminderForAssessment",
-    conventionId,
-    recipientPhoneNumber: tutorPhoneNumber,
-  });
+  const lastNotification =
+    notificationKind === "sms"
+      ? await notificationRepository.getLastSmsNotificationByFilter({
+          smsKind: "ReminderForAssessment",
+          conventionId,
+          recipientPhoneNumber: tutorPhoneNumber,
+        })
+      : await notificationRepository.getLastEmailNotificationByFilter({
+          emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+          conventionId,
+          recipientEmail: tutorEmail,
+        });
 
-  const lastSmsCreatedAt = lastSms && new Date(lastSms.createdAt);
+  const lastNotificationCreatedAt =
+    lastNotification && new Date(lastNotification.createdAt);
 
   if (
-    lastSmsCreatedAt &&
-    lastSmsCreatedAt >
+    lastNotificationCreatedAt &&
+    lastNotificationCreatedAt >
       subHours(timeGateway.now(), MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER)
   ) {
-    const nextAllowedTime = lastSmsCreatedAt;
+    const nextAllowedTime = lastNotificationCreatedAt;
     nextAllowedTime.setHours(
       nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
     );
@@ -255,7 +347,8 @@ const throwErrorIfAssessmentLinkAlreadySent = async ({
     );
     const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
 
-    throw errors.assessment.smsAssessmentLinkAlreadySent({
+    throw errors.assessment.assessmentLinkAlreadySent({
+      notificationKind,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
       timeRemaining: formattedTimeRemaining,
     });
