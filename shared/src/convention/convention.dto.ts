@@ -503,10 +503,6 @@ export type WithConventionDto = {
   convention: ConventionDto;
 };
 
-export type SendSignatureLinkRequestDto = WithConventionId & {
-  signatoryRole: SignatoryRole;
-};
-
 export type TransferConventionToAgencyRequestDto = WithConventionId & {
   agencyId: AgencyId;
   justification: string;
