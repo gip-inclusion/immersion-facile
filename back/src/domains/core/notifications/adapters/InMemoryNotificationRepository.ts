@@ -27,6 +27,7 @@ import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import type {
   DeleteNotificationsParams,
   EmailNotificationFilters,
+  EmailNotificationForReminderFilters,
   FilterUserDeletionWarningNotificationsParams,
   NotificationRepository,
   SmsNotificationFilters,
@@ -83,6 +84,25 @@ export class InMemoryNotificationRepository implements NotificationRepository {
           return false;
 
         return filters.conventionId === notification.followedIds.conventionId;
+      },
+    );
+  }
+
+  async getLastEmailNotificationByFilter(
+    filters: EmailNotificationForReminderFilters,
+  ): Promise<EmailNotification | undefined> {
+    return this.notifications.find(
+      (notification): notification is EmailNotification => {
+        if (notification.kind !== "email") return false;
+        if (
+          !notification.templatedContent.recipients.includes(
+            filters.recipientEmail,
+          )
+        )
+          return false;
+        if (notification.templatedContent.kind !== filters.emailKind)
+          return false;
+        return notification.followedIds.conventionId === filters.conventionId;
       },
     );
   }
