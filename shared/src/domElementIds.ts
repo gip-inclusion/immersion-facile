@@ -483,11 +483,15 @@ export const domElementIds = {
       "im-convention-validation__send-signature-link-modal-form",
     submitSendSignatureLinkModalButton:
       "im-convention-validation__send-signature-link-modal-button",
+    sendSignatureLinkModalReminderKindOptions:
+      "im-convention-validation__send-signature-link-modal-reminder-kind-options",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     sendAssessmentLinkModal:
       "im-convention-validation__send-assessment-link-modal",
     openSendAssessmentLinkModal:
       "im-convention-validation__open-send-assessment-link-modal",
+    sendAssessmentLinkModalReminderKindOptions:
+      "im-convention-validation__send-assessment-link-modal-reminder-kind-options",
     signModal: "im-convention-validation__sign-modal",
     signModalForm: "im-convention-validation__sign-modal-form",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
