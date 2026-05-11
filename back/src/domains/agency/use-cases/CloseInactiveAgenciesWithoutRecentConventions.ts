@@ -1,6 +1,8 @@
 import { subMonths } from "date-fns";
 import { toPairs, uniq } from "ramda";
 import {
+  type AgencyKind,
+  type AgencyStatus,
   type AgencyWithUsersRights,
   executeInSequence,
   isTruthy,
@@ -14,6 +16,7 @@ import type {
 } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type CloseInactiveAgenciesWithoutRecentConventionsInput = {
@@ -38,63 +41,81 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
   .withInput(closeInactiveAgenciesWithoutRecentConventionsInputSchema)
   .withOutput<CloseInactiveAgenciesWithoutRecentConventionsResult>()
   .withDeps<{
+    uowPerformer: UnitOfWorkPerformer;
     timeGateway: TimeGateway;
     saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
+    batchSize: number;
   }>()
-  .build(async ({ uow, deps, inputParams }) => {
+  .notTransactional()
+  .build(async ({ deps, inputParams }) => {
+    const { uowPerformer } = deps;
     const { numberOfMonthsWithoutConvention } = inputParams;
     const now = deps.timeGateway.now();
     const noConventionSince = subMonths(now, numberOfMonthsWithoutConvention);
 
-    const activeAgencies = await uow.agencyRepository.getAgencies({
-      filters: {
-        status: ["active", "from-api-PE"],
-        kinds: [
-          "mission-locale",
-          "operateur-cep",
-          "cap-emploi",
-          "conseil-departemental",
-          "structure-IAE",
-          "fonction-publique",
-          "cci",
-          "cma",
-          "chambre-agriculture",
-          "autre",
-        ],
-        createdAtBefore: noConventionSince,
-      },
-    });
-
-    const agenciesToClose = await getAgenciesToClose(
-      activeAgencies,
-      uow,
-      noConventionSince,
-    );
-
-    if (agenciesToClose.length === 0) {
-      return {
-        numberOfAgenciesClosed: 0,
-      };
-    }
-
-    const notifications = await getNotificationsForClosedAgencies(
-      agenciesToClose,
-      uow,
-      numberOfMonthsWithoutConvention,
-    );
-
-    await executeInSequence(agenciesToClose, (agency) =>
-      uow.agencyRepository.update({
-        id: agency.id,
-        status: "closed",
-        statusJustification: "Agence fermée automatiquement pour inactivité",
-      }),
-    );
-    await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
-
-    return {
-      numberOfAgenciesClosed: agenciesToClose.map((agency) => agency.id).length,
+    const filters = {
+      status: ["active", "from-api-PE"] satisfies AgencyStatus[],
+      kinds: [
+        "mission-locale",
+        "operateur-cep",
+        "cap-emploi",
+        "conseil-departemental",
+        "structure-IAE",
+        "fonction-publique",
+        "cci",
+        "cma",
+        "chambre-agriculture",
+        "autre",
+      ] satisfies AgencyKind[],
+      createdAtBefore: noConventionSince,
     };
+
+    const perPage = deps.batchSize;
+    let page = 1;
+    let totalPages = 1;
+    let numberOfAgenciesClosed = 0;
+
+    do {
+      await uowPerformer.perform(async (uow) => {
+        const { data: activeAgencies, pagination } =
+          await uow.agencyRepository.getAgencies({
+            filters,
+            pagination: { page, perPage },
+          });
+
+        totalPages = pagination.totalPages;
+
+        const agenciesToClose = await getAgenciesToClose(
+          activeAgencies,
+          uow,
+          noConventionSince,
+        );
+
+        if (agenciesToClose.length > 0) {
+          const notifications = await getNotificationsForClosedAgencies(
+            agenciesToClose,
+            uow,
+            numberOfMonthsWithoutConvention,
+          );
+
+          await executeInSequence(agenciesToClose, (agency) =>
+            uow.agencyRepository.update({
+              id: agency.id,
+              status: "closed",
+              statusJustification:
+                "Agence fermée automatiquement pour inactivité",
+            }),
+          );
+
+          await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
+          numberOfAgenciesClosed += agenciesToClose.length;
+        }
+      });
+
+      page += 1;
+    } while (page <= totalPages);
+
+    return { numberOfAgenciesClosed };
   });
 
 const getNotificationsForClosedAgencies = async (

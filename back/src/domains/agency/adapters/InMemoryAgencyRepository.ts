@@ -8,12 +8,16 @@ import {
   type AgencyStatus,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
+  calculateLimitAndOffsetFromPagination,
+  calculatePaginationResult,
+  type DataWithPagination,
   type DateString,
   type DepartmentCode,
   errors,
   type GeoPositionDto,
   isTruthy,
   isWithAgencyRole,
+  type PaginationQueryParams,
   type SiretDto,
   type UserId,
   type WithGeoPosition,
@@ -117,12 +121,12 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 
   public async getAgencies({
     filters = {},
-    limit,
+    pagination,
   }: {
     filters?: GetAgenciesFilters;
-    limit?: number;
-  }): Promise<AgencyWithUsersRights[]> {
-    const filteredAgencies = Object.values(this.#agencies)
+    pagination?: PaginationQueryParams;
+  }): Promise<DataWithPagination<AgencyWithUsersRights>> {
+    const allFiltered = Object.values(this.#agencies)
       .filter(isTruthy)
       .filter(
         (agency) =>
@@ -140,12 +144,27 @@ export class InMemoryAgencyRepository implements AgencyRepository {
             agencyCreatedAtBefore(agency, filters?.createdAtBefore),
             agencyHasUserIds(agency, filters?.userIds),
           ].includes(false),
-      )
-      .slice(0, limit);
+      );
 
-    return filters?.position
-      ? filteredAgencies.sort(sortByNearestFrom(filters.position.position))
-      : filteredAgencies;
+    const sorted = filters?.position
+      ? allFiltered.sort(sortByNearestFrom(filters.position.position))
+      : allFiltered;
+
+    const totalRecords = sorted.length;
+    const resolvedPagination = {
+      page: pagination?.page ?? 1,
+      perPage: pagination?.perPage ?? (totalRecords || 1),
+    };
+    const { limit, offset } =
+      calculateLimitAndOffsetFromPagination(resolvedPagination);
+
+    return {
+      data: sorted.slice(offset, offset + limit),
+      pagination: calculatePaginationResult({
+        ...resolvedPagination,
+        totalRecords,
+      }),
+    };
   }
 
   public async getAgenciesRelatedToAgency(

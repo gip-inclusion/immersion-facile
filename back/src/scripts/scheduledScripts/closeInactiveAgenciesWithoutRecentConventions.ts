@@ -21,9 +21,10 @@ const closeInactiveAgenciesWithoutRecentConventionsScript = async () => {
   const timeGateway = new RealTimeGateway();
   const closeInactiveAgenciesWithoutRecentConventions =
     makeCloseInactiveAgenciesWithoutRecentConventions({
-      uowPerformer,
       deps: {
+        uowPerformer,
         timeGateway,
+        batchSize: 500,
         saveNotificationsBatchAndRelatedEvent:
           makeSaveNotificationsBatchAndRelatedEvent(
             new UuidV4Generator(),

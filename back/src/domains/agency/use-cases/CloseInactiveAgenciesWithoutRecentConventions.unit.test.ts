@@ -73,9 +73,10 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
     timeGateway = new CustomTimeGateway(defaultDate);
     closeInactiveAgenciesWithoutRecentConventions =
       makeCloseInactiveAgenciesWithoutRecentConventions({
-        uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
+          uowPerformer: new InMemoryUowPerformer(uow),
           timeGateway,
+          batchSize: 100,
           saveNotificationsBatchAndRelatedEvent:
             makeSaveNotificationsBatchAndRelatedEvent(
               new UuidV4Generator(),
@@ -465,7 +466,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
       });
 
       expectToEqual(uow.agencyRepository.agencies, [
-        recentlyCreatedAgencyWithRights, // Should remain active
+        recentlyCreatedAgencyWithRights,
         {
           ...oldAgencyWithRights,
           status: "closed",
@@ -480,6 +481,90 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             recipients: [admin2.email],
             params: {
               agencyName: oldAgency.name,
+              numberOfMonthsWithoutConvention,
+            },
+          },
+        ],
+      });
+    });
+
+    it("should close agencies found on subsequent pages", async () => {
+      const agency3 = AgencyDtoBuilder.create("agency3-id")
+        .withName("Agency 3")
+        .withStatus("active")
+        .withCreatedAt(subMonths(defaultDate, 7).toISOString())
+        .build();
+
+      const agency1WithRights = toAgencyWithRights(agency1, {
+        [admin1.id]: { isNotifiedByEmail: true, roles: ["agency-admin"] },
+      });
+      const agency2WithRights = toAgencyWithRights(agency2, {
+        [admin1.id]: { isNotifiedByEmail: true, roles: ["agency-admin"] },
+      });
+      const agency3WithRights = toAgencyWithRights(agency3, {
+        [admin2.id]: { isNotifiedByEmail: true, roles: ["agency-admin"] },
+      });
+
+      const recentConventionForAgency1 = new ConventionDtoBuilder()
+        .withId("convention-agency1-id")
+        .withAgencyId(agency1.id)
+        .withStatus("IN_REVIEW")
+        .withDateSubmission(subDays(new Date(), 30).toISOString())
+        .build();
+      const recentConventionForAgency2 = new ConventionDtoBuilder()
+        .withId("convention-agency2-id")
+        .withAgencyId(agency2.id)
+        .withStatus("IN_REVIEW")
+        .withDateSubmission(subDays(new Date(), 30).toISOString())
+        .build();
+
+      uow.agencyRepository.agencies = [
+        agency1WithRights,
+        agency2WithRights,
+        agency3WithRights,
+      ];
+      uow.userRepository.users = [admin1, admin2];
+      uow.conventionRepository.setConventions([
+        recentConventionForAgency1,
+        recentConventionForAgency2,
+      ]);
+
+      const closeInactiveAgenciesWithoutRecentConventions =
+        makeCloseInactiveAgenciesWithoutRecentConventions({
+          deps: {
+            uowPerformer: new InMemoryUowPerformer(uow),
+            timeGateway,
+            saveNotificationsBatchAndRelatedEvent:
+              makeSaveNotificationsBatchAndRelatedEvent(
+                new UuidV4Generator(),
+                timeGateway,
+              ),
+            batchSize: 2,
+          },
+        });
+
+      const result =
+        await closeInactiveAgenciesWithoutRecentConventions.execute({
+          numberOfMonthsWithoutConvention,
+        });
+
+      expectToEqual(result, { numberOfAgenciesClosed: 1 });
+      expectToEqual(uow.agencyRepository.agencies, [
+        agency1WithRights,
+        agency2WithRights,
+        {
+          ...agency3WithRights,
+          status: "closed",
+          statusJustification: "Agence fermée automatiquement pour inactivité",
+        },
+      ]);
+      expectSavedNotificationsBatchAndEvent({
+        emails: [
+          {
+            kind: "AGENCY_CLOSED_FOR_INACTIVITY",
+            recipients: [admin2.email],
+            params: {
+              agencyName: agency3.name,
               numberOfMonthsWithoutConvention,
             },
           },

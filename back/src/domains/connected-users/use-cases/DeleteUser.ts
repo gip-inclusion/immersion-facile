@@ -57,9 +57,10 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
       const userToDelete = await uow.userRepository.getById(inputParams.userId);
       if (!userToDelete) throw errors.user.notFound(inputParams);
 
-      const agenciesWithUserRight = await uow.agencyRepository.getAgencies({
-        filters: { userIds: [userToDelete.id] },
-      });
+      const { data: agenciesWithUserRight } =
+        await uow.agencyRepository.getAgencies({
+          filters: { userIds: [userToDelete.id] },
+        });
       const establishmentsWithUserRight =
         await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           { userId: userToDelete.id },

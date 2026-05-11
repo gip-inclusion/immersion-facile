@@ -154,17 +154,20 @@ describe("PgAgencyRepository", () => {
     });
 
     it("inserts unknown agencies", async () => {
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       await agencyRepository.insert(agency1);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1]);
 
       await agencyRepository.insert(agency2);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1, agency2]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
+        agency1,
+        agency2,
+      ]);
     });
 
     it("save correct agency right even if user is counsellor and validator", async () => {
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       const agencyWithSameCounsellorAndValidator = toAgencyWithRights(
         agency1builder.build(),
@@ -177,7 +180,7 @@ describe("PgAgencyRepository", () => {
       );
       await agencyRepository.insert(agencyWithSameCounsellorAndValidator);
 
-      expectToEqual(await agencyRepository.getAgencies({}), [
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
         agencyWithSameCounsellorAndValidator,
       ]);
     });
@@ -197,7 +200,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.insert(agency);
 
-      expectToEqual(await agencyRepository.getAgencies({}), [agency]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency]);
     });
 
     it("doesn't insert entities with existing ids without throwing conflic error", async () => {
@@ -205,7 +208,7 @@ describe("PgAgencyRepository", () => {
       // j'ai du mal à comprendre pourquoi on veut avoir ce type de comportement pour un insert.
       // peut être étudier la notion de save() d'entité complète pour symplifier le repo
       // et adapter la logique métier en conséquence
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       const agency1a = toAgencyWithRights(
         agency1builder.withName("agency1a").build(),
@@ -221,14 +224,14 @@ describe("PgAgencyRepository", () => {
       );
 
       await agencyRepository.insert(agency1a);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1a]);
 
       await expectPromiseToFailWithError(
         agencyRepository.insert(agency1b),
         errors.agency.alreadyExist(agency1b.id),
       );
 
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1a]);
     });
 
     it("inserts agency with delegationAgencyInfo null", async () => {
@@ -288,7 +291,10 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agency2);
 
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1, agency2]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
+        agency1,
+        agency2,
+      ]);
     });
   });
 
@@ -301,10 +307,10 @@ describe("PgAgencyRepository", () => {
     );
 
     it("updates the entire entity", async () => {
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       await agencyRepository.insert(agency1);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1]);
 
       const updatedAgency1 = toAgencyWithRights(
         agency1builder
@@ -333,14 +339,16 @@ describe("PgAgencyRepository", () => {
       );
 
       await agencyRepository.update(updatedAgency1);
-      expectToEqual(await agencyRepository.getAgencies({}), [updatedAgency1]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
+        updatedAgency1,
+      ]);
     });
 
     it("updates the only some fields", async () => {
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       await agencyRepository.insert(agency1);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency1]);
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1]);
 
       const updatedFields: Partial<AgencyWithoutRights> = {
         status: "rejected",
@@ -353,7 +361,7 @@ describe("PgAgencyRepository", () => {
         ...updatedFields,
       });
 
-      expectToEqual(await agencyRepository.getAgencies({}), [
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
         { ...agency1, ...updatedFields },
       ]);
 
@@ -361,7 +369,7 @@ describe("PgAgencyRepository", () => {
     });
 
     it("switch the counsellor to validator", async () => {
-      expectToEqual(await agencyRepository.getAgencies({}), []);
+      expectToEqual((await agencyRepository.getAgencies({})).data, []);
 
       const agencyWithTwoStepValidation = toAgencyWithRights(
         agency1builder.withStatus("active").build(),
@@ -372,7 +380,7 @@ describe("PgAgencyRepository", () => {
       );
 
       await agencyRepository.insert(agencyWithTwoStepValidation);
-      expectToEqual(await agencyRepository.getAgencies({}), [
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
         agencyWithTwoStepValidation,
       ]);
 
@@ -390,7 +398,7 @@ describe("PgAgencyRepository", () => {
         id: agencyWithTwoStepValidation.id,
         ...updatedAgencyRights,
       });
-      expectToEqual(await agencyRepository.getAgencies({}), [
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
         { ...agencyWithTwoStepValidation, ...updatedAgencyRights },
       ]);
     });
@@ -811,7 +819,7 @@ describe("PgAgencyRepository", () => {
     );
 
     it("returns empty list for empty table", async () => {
-      const agencies = await agencyRepository.getAgencies({});
+      const { data: agencies } = await agencyRepository.getAgencies({});
       expect(agencies).toEqual([]);
     });
 
@@ -831,7 +839,7 @@ describe("PgAgencyRepository", () => {
           ),
         ]);
 
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { status: activeAgencyStatuses },
         });
         expectToEqual(agencies, [
@@ -858,16 +866,18 @@ describe("PgAgencyRepository", () => {
         ]);
 
         expectToEqual(
-          await agencyRepository.getAgencies({
-            filters: {
-              status: activeAgencyStatuses,
-              position: {
-                position: { lat: 48.866667, lon: 2.333333 },
-                distance_km: 10,
+          (
+            await agencyRepository.getAgencies({
+              filters: {
+                status: activeAgencyStatuses,
+                position: {
+                  position: { lat: 48.866667, lon: 2.333333 },
+                  distance_km: 10,
+                },
               },
-            },
-            limit: 2,
-          }),
+              pagination: { page: 1, perPage: 2 },
+            })
+          ).data,
           [agency1PEVitrySurSeine, agency2PEVitryLeFrancois],
         );
       });
@@ -894,7 +904,7 @@ describe("PgAgencyRepository", () => {
           agencyRepository.insert(closedAgency),
         ]);
 
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { status: ["closed"] },
         });
         expectToEqual(agencies, [closedAgency]);
@@ -913,9 +923,11 @@ describe("PgAgencyRepository", () => {
 
       it("miniStage kinds", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { kinds: miniStageAgencyKinds },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { kinds: miniStageAgencyKinds },
+            })
+          ).data,
         ).toEqual([
           agencyParisCci,
           agencyParisChambreAgriculture,
@@ -925,9 +937,11 @@ describe("PgAgencyRepository", () => {
 
       it("pole emploi kind", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { kinds: ["pole-emploi"] },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { kinds: ["pole-emploi"] },
+            })
+          ).data,
         ).toEqual([agency1PEVitrySurSeine]);
       });
     });
@@ -943,17 +957,21 @@ describe("PgAgencyRepository", () => {
 
       it("returns all agencies filtered by name", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { nameIncludes: "Vitry" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { nameIncludes: "Vitry" },
+            })
+          ).data,
         ).toEqual([agency1PEVitrySurSeine, agency2PEVitryLeFrancois]);
       });
 
       it("returns nothing on no match in names", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { nameIncludes: "Vitre" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { nameIncludes: "Vitre" },
+            })
+          ).data,
         ).toEqual([]);
       });
     });
@@ -968,25 +986,70 @@ describe("PgAgencyRepository", () => {
 
       it("returns all agencies filtered by sirets", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { sirets: [agency1PEVitrySurSeine.agencySiret] },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { sirets: [agency1PEVitrySurSeine.agencySiret] },
+            })
+          ).data,
         ).toEqual([agency1PEVitrySurSeine]);
       });
       it("returns nothing on missing sirets", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { sirets: ["00000000000000"] },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { sirets: ["00000000000000"] },
+            })
+          ).data,
         ).toEqual([]);
       });
 
       it("returns all on empty sirets", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { sirets: [] },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { sirets: [] },
+            })
+          ).data,
         ).toEqual([agency1PEVitrySurSeine, agency2PEVitryLeFrancois]);
+      });
+    });
+
+    describe("pagination", () => {
+      beforeEach(async () => {
+        await Promise.all([
+          agencyRepository.insert(agency1PEVitrySurSeine),
+          agencyRepository.insert(agency2PEVitryLeFrancois),
+          agencyRepository.insert(agency3PEVitrolles),
+        ]);
+      });
+
+      it("returns correct pagination metadata for page 1", async () => {
+        const result = await agencyRepository.getAgencies({
+          pagination: { page: 1, perPage: 2 },
+        });
+        expectToEqual(result.data, [
+          agency1PEVitrySurSeine,
+          agency2PEVitryLeFrancois,
+        ]);
+        expectToEqual(result.pagination, {
+          totalRecords: 3,
+          totalPages: 2,
+          currentPage: 1,
+          numberPerPage: 2,
+        });
+      });
+
+      it("returns second page with correct data and metadata", async () => {
+        const result = await agencyRepository.getAgencies({
+          pagination: { page: 2, perPage: 2 },
+        });
+        expectToEqual(result.data, [agency3PEVitrolles]);
+        expectToEqual(result.pagination, {
+          totalRecords: 3,
+          totalPages: 2,
+          currentPage: 2,
+          numberPerPage: 2,
+        });
       });
     });
 
@@ -1020,25 +1083,31 @@ describe("PgAgencyRepository", () => {
 
       it("2 on departmentCode 75", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { departmentCode: "75" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { departmentCode: "75" },
+            })
+          ).data,
         ).toEqual([agencyParisCci, agencyWithParisInCoveredDepartments]);
       });
 
       it("1 on departmentCode 51", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { departmentCode: "51" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { departmentCode: "51" },
+            })
+          ).data,
         ).toEqual([agency2PEVitryLeFrancois]);
       });
 
       it("0 on departmentCode 02", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { departmentCode: "01" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { departmentCode: "01" },
+            })
+          ).data,
         ).toEqual([]);
       });
 
@@ -1089,11 +1158,13 @@ describe("PgAgencyRepository", () => {
           ]);
 
           expectToEqual(
-            await agencyRepository.getAgencies({
-              filters: {
-                departmentCode: "95",
-              },
-            }),
+            (
+              await agencyRepository.getAgencies({
+                filters: {
+                  departmentCode: "95",
+                },
+              })
+            ).data,
             [cergyAgency],
           );
         });
@@ -1151,7 +1222,7 @@ describe("PgAgencyRepository", () => {
           ),
         ]);
 
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: {
             position: {
               position: placeStanislasPosition,
@@ -1188,7 +1259,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("should not return refered agencies when the filter is provided with true", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { doesNotReferToOtherAgency: true },
         });
 
@@ -1243,7 +1314,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("returns only agencies created before or on the specified date", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { createdAtBefore: baseDate },
         });
 
@@ -1252,7 +1323,7 @@ describe("PgAgencyRepository", () => {
 
       it("returns nothing when filter date is before all agencies", async () => {
         const veryOldDate = subDays(dateBefore, 10);
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { createdAtBefore: veryOldDate },
         });
 
@@ -1261,7 +1332,7 @@ describe("PgAgencyRepository", () => {
 
       it("returns all agencies when filter date is after all agencies", async () => {
         const futureDate = subDays(dateAfter, -10);
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { createdAtBefore: futureDate },
         });
 
@@ -1273,7 +1344,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("works in combination with other filters", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: {
             createdAtBefore: baseDate,
             status: activeAgencyStatuses,
@@ -1339,7 +1410,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("returns only agencies with rights made to specified userIds only - single user", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { userIds: [validator1.id] },
         });
 
@@ -1351,7 +1422,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("returns only agencies with rights made to specified userIds only - multiple users", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { userIds: [counsellor1.id, counsellor2.id] },
         });
 
@@ -1363,7 +1434,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("returns nothing when user has no rights on agencies", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { userIds: [validator2.id] },
         });
 
@@ -1371,7 +1442,7 @@ describe("PgAgencyRepository", () => {
       });
 
       it("returns nothing if empty userIds specified", async () => {
-        const agencies = await agencyRepository.getAgencies({
+        const { data: agencies } = await agencyRepository.getAgencies({
           filters: { userIds: [] },
         });
 
