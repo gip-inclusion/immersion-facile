@@ -15,7 +15,7 @@ import {
 } from "../address/address.dto";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
-import type { PhoneNumber } from "./phone.dto";
+import { allDefaultPhoneNumbers, type PhoneNumber } from "./phone.dto";
 
 export const phoneNumberSchema: ZodSchemaWithInputMatchingOutput<PhoneNumber> =
   zStringMinLength1Max1024.transform((phone, ctx) => {
@@ -33,7 +33,8 @@ export const phoneNumberSchema: ZodSchemaWithInputMatchingOutput<PhoneNumber> =
   });
 
 export const isValidMobilePhone = (phoneNumber: PhoneNumber): boolean =>
-  parsePhoneNumber(phoneNumber).getType() === "MOBILE";
+  parsePhoneNumber(phoneNumber).getType() === "MOBILE" &&
+  !allDefaultPhoneNumbers.includes(phoneNumber);
 
 export const toDisplayedPhoneNumber = (
   phoneNumber: string,

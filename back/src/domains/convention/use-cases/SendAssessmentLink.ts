@@ -1,7 +1,6 @@
 import { addDays, subHours } from "date-fns";
 import {
   agencyModifierRoles,
-  allDefaultPhoneNumbers,
   allSignatoryRoles,
   assessmentEmailSender,
   type ConventionId,
@@ -115,8 +114,6 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
         phone: recipientPhone,
         role: "establishment-tutor",
       });
-
-      if (allDefaultPhoneNumbers.includes(recipientPhone)) return;
 
       await sendSms({
         conventionMagicLinkPayload: {

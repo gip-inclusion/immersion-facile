@@ -546,7 +546,6 @@ describe("Send signature link", () => {
 
     it("throws bad request if signatory has already signed", async () => {
       const conventionAlreadySigned = new ConventionDtoBuilder(convention)
-        .withBeneficiaryPhone("+33600000000")
         .withBeneficiarySignedAt(new Date())
         .build();
       uow.conventionRepository.setConventions([conventionAlreadySigned]);
@@ -983,7 +982,7 @@ describe("Send signature link", () => {
       ]);
     });
 
-    it("does not send sms when signatory phone is default phone number", async () => {
+    it("throws bad request when signatory phone is default phone number", async () => {
       const conventionWithDefaultPhone = new ConventionDtoBuilder(convention)
         .withBeneficiaryPhone(defaultPhoneNumber)
         .build();
@@ -999,18 +998,20 @@ describe("Send signature link", () => {
       ];
       uow.userRepository.users = [notConnectedUser];
 
-      await usecase.execute(
-        {
-          conventionId,
-          signatoryRole: "beneficiary",
-          notificationKind: "sms",
-        },
-        validatorJwtPayload,
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
+            signatoryRole: "beneficiary",
+            notificationKind: "sms",
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.invalidMobilePhoneNumber({
+          conventionId: conventionWithDefaultPhone.id,
+          role: "beneficiary",
+        }),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
-      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
     });
 
     it("send signature link if requested for another signatory", async () => {

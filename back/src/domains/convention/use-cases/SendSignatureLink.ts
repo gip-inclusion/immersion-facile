@@ -1,7 +1,6 @@
 import { subHours } from "date-fns";
 import {
   agencyModifierRoles,
-  allDefaultPhoneNumbers,
   allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
@@ -141,7 +140,6 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
         signatoryKey,
         signatoryRole,
       });
-      if (allDefaultPhoneNumbers.includes(signatory.phone)) return;
       await sendSms(commonParams);
     }
     if (notificationKind === "email") {
