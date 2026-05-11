@@ -7,10 +7,7 @@ import type {
   SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
 } from "shared";
-import type {
-  AssessmentAndJwt,
-  AssessmentGateway,
-} from "src/core-logic/ports/AssessmentGateway";
+import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
 export class TestAssessmentGateway implements AssessmentGateway {
   // test purpose
@@ -20,7 +17,10 @@ export class TestAssessmentGateway implements AssessmentGateway {
   public getResponse$ = new Subject<AssessmentDto>();
   public sendAssessmentLinkResponse$ = new Subject<void>();
 
-  public createAssessment$(_params: AssessmentAndJwt): Observable<void> {
+  public createAssessment$(
+    _params: AssessmentDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
     return this.creationResponse$;
   }
 

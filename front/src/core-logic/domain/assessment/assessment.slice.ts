@@ -11,7 +11,6 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import type { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
 
 export interface AssessmentState {
   isLoading: boolean;
@@ -30,7 +29,8 @@ export const assessmentSlice = createSlice({
     creationRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
-        assessmentAndJwt: AssessmentAndJwt;
+        assessment: AssessmentDto;
+        jwt: ConventionSupportedJwt;
       }>,
     ) => {
       state.isLoading = true;

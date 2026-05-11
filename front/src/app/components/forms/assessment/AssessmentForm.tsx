@@ -104,10 +104,8 @@ export const AssessmentForm = ({
 
     dispatch(
       assessmentSlice.actions.creationRequested({
-        assessmentAndJwt: {
-          assessment: formAssessmentDtoToAssessmentDto(values),
-          jwt,
-        },
+        assessment: formAssessmentDtoToAssessmentDto(values),
+        jwt,
         feedbackTopic: "assessment",
       }),
     );
