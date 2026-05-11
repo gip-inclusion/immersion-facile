@@ -11,6 +11,9 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   activeAgencyStatuses,
+  calculateLimitAndOffsetFromPagination,
+  calculatePaginationResult,
+  type DataWithPagination,
   type DateString,
   type DelegationAgencyInfo,
   type DepartmentCode,
@@ -18,6 +21,7 @@ import {
   isTruthy,
   isWithAgencyRole,
   type OmitFromExistingKeys,
+  type PaginationQueryParams,
   pipeWithValue,
   type SiretDto,
   type UserId,
@@ -237,11 +241,11 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getAgencies({
     filters = {},
-    limit,
+    pagination,
   }: {
     filters?: GetAgenciesFilters;
-    limit?: number;
-  }): Promise<AgencyWithUsersRights[]> {
+    pagination?: PaginationQueryParams;
+  }): Promise<DataWithPagination<AgencyWithUsersRights>> {
     const {
       departmentCode,
       kinds,
@@ -257,9 +261,20 @@ export class PgAgencyRepository implements AgencyRepository {
 
     rest satisfies Record<string, never>;
 
-    if (userIds?.length === 0) return [];
+    if (userIds?.length === 0)
+      return {
+        data: [],
+        pagination: calculatePaginationResult({
+          page: pagination?.page ?? 1,
+          perPage: Math.min(
+            pagination?.perPage ?? MAX_AGENCIES_RETURNED,
+            MAX_AGENCIES_RETURNED,
+          ),
+          totalRecords: 0,
+        }),
+      };
 
-    const builder = pipeWithValue(
+    const filteredBuilder = pipeWithValue(
       this.#getAgencyWithJsonBuiltQueryBuilder(),
       (b) =>
         departmentCode
@@ -312,19 +327,36 @@ export class PgAgencyRepository implements AgencyRepository {
               ),
             )
           : b,
-      (b) =>
-        b.limit(
-          Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
-        ),
-    ).orderBy("agencies.id asc");
+    );
 
-    return builder
-      .execute()
-      .then((results) =>
-        results
-          .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
-          .filter(isTruthy),
-      );
+    const resolvedPagination = {
+      page: pagination?.page ?? 1,
+      perPage: Math.min(
+        pagination?.perPage ?? MAX_AGENCIES_RETURNED,
+        MAX_AGENCIES_RETURNED,
+      ),
+    };
+    const { limit, offset } =
+      calculateLimitAndOffsetFromPagination(resolvedPagination);
+
+    const results = await filteredBuilder
+      .select(sql<number>`CAST(COUNT(*) OVER() AS INT)`.as("total_count"))
+      .orderBy("agencies.id asc")
+      .limit(limit)
+      .offset(offset)
+      .execute();
+
+    const totalRecords = results[0]?.total_count ?? 0;
+
+    return {
+      data: results
+        .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
+        .filter(isTruthy),
+      pagination: calculatePaginationResult({
+        ...resolvedPagination,
+        totalRecords,
+      }),
+    };
   }
 
   public async getAgenciesRelatedToAgency(

@@ -7,9 +7,11 @@ import type {
   AgencyRight,
   AgencyStatus,
   AgencyWithUsersRights,
+  DataWithPagination,
   DateString,
   DepartmentCode,
   OmitFromExistingKeys,
+  PaginationQueryParams,
   SiretDto,
   UserId,
   WithUserFilters,
@@ -57,8 +59,8 @@ export interface AgencyRepository {
   getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]>;
   getAgencies(props: {
     filters?: GetAgenciesFilters;
-    limit?: number;
-  }): Promise<AgencyWithUsersRights[]>;
+    pagination?: PaginationQueryParams;
+  }): Promise<DataWithPagination<AgencyWithUsersRights>>;
 
   getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyWithUsersRights[]>;
   getAllAgenciesWithUsersToReview(): Promise<AgencyWithNumberOfUsersToReview[]>;

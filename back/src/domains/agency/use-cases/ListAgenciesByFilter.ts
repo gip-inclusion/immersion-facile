@@ -23,7 +23,7 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
       inputParams;
 
     const extraFilters = getFiltersFromFilterKind(filterKind);
-    const agencies = await uow.agencyRepository.getAgencies({
+    const { data: agencies } = await uow.agencyRepository.getAgencies({
       filters: {
         nameIncludes,
         departmentCode,

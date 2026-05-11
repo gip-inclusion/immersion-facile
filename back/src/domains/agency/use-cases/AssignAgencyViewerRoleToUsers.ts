@@ -39,7 +39,7 @@ export const makeAssignAgencyViewerRole = useCaseBuilder(
       };
     }
 
-    const targetAgencies = await uow.agencyRepository.getAgencies({
+    const { data: targetAgencies } = await uow.agencyRepository.getAgencies({
       filters: {
         kinds: agencyKinds,
         status: ["active", "from-api-PE"],

@@ -180,7 +180,7 @@ const linkUsersToExistingAgency = async ({
   const chunks = splitEvery(chunkSize, keys(rowsBySiret));
 
   await executeInSequence(chunks, async (sirets) => {
-    const agenciesIF = await agencyRepository.getAgencies({
+    const { data: agenciesIF } = await agencyRepository.getAgencies({
       filters: {
         sirets,
       },
