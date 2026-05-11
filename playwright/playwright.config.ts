@@ -1,4 +1,6 @@
+import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+import dotEnv from "dotenv";
 import { e2eBackendEnv, frontPort } from "./e2e-backend-env";
 
 /**
@@ -8,34 +10,30 @@ import { e2eBackendEnv, frontPort } from "./e2e-backend-env";
 const backPort = 1234;
 const baseURL = process.env.BASE_URL || `http://localhost:${frontPort}`;
 
-const secrets = {
-  PC_USERNAME: process.env.PC_USERNAME!,
-  PC_PASSWORD: process.env.PC_PASSWORD!,
-  PC_ADMIN_PASSWORD: process.env.PC_ADMIN_PASSWORD!,
-  PRO_CONNECT_CLIENT_SECRET: process.env.PRO_CONNECT_CLIENT_SECRET!,
-  SIRENE_INSEE_CLIENT_ID: process.env.SIRENE_INSEE_CLIENT_ID!,
-  SIRENE_INSEE_CLIENT_SECRET: process.env.SIRENE_INSEE_CLIENT_SECRET!,
-  SIRENE_INSEE_USERNAME: process.env.SIRENE_INSEE_USERNAME!,
-  SIRENE_INSEE_PASSWORD: process.env.SIRENE_INSEE_PASSWORD!,
-  API_KEY_OPEN_CAGE_DATA_GEOCODING:
-    process.env.API_KEY_OPEN_CAGE_DATA_GEOCODING!,
-  API_KEY_OPEN_CAGE_DATA_GEOSEARCH:
-    process.env.API_KEY_OPEN_CAGE_DATA_GEOSEARCH!,
-};
+const loadEnvFile = (path: string): Record<string, string> =>
+  dotEnv.config({ path, processEnv: {} }).parsed ?? {};
 
-const backendEnv = {
+const playwrightEnv = loadEnvFile(resolve(__dirname, ".env"));
+const backendEnv = loadEnvFile(resolve(__dirname, "../back/.env"));
+
+const backWebServerEnv = {
   ...e2eBackendEnv,
-  PC_USERNAME: secrets.PC_USERNAME,
-  PC_PASSWORD: secrets.PC_PASSWORD,
-  PC_ADMIN_PASSWORD: secrets.PC_ADMIN_PASSWORD,
-  PRO_CONNECT_CLIENT_SECRET: secrets.PRO_CONNECT_CLIENT_SECRET,
-  API_KEY_OPEN_CAGE_DATA_GEOCODING: secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING,
-  API_KEY_OPEN_CAGE_DATA_GEOSEARCH: secrets.API_KEY_OPEN_CAGE_DATA_GEOSEARCH,
-  SIRENE_INSEE_CLIENT_ID: secrets.SIRENE_INSEE_CLIENT_ID,
-  SIRENE_INSEE_CLIENT_SECRET: secrets.SIRENE_INSEE_CLIENT_SECRET,
-  SIRENE_INSEE_USERNAME: secrets.SIRENE_INSEE_USERNAME,
-  SIRENE_INSEE_PASSWORD: secrets.SIRENE_INSEE_PASSWORD,
-  DATABASE_URL: process.env.E2E_DATABASE_URL ?? "",
+  PC_USERNAME:
+    playwrightEnv.PC_USERNAME ??
+    "recette+playwright@immersion-facile.beta.gouv.fr",
+  PC_PASSWORD: playwrightEnv.PC_PASSWORD ?? "password123",
+  PC_ADMIN_PASSWORD: playwrightEnv.PC_ADMIN_PASSWORD ?? "password123",
+  PRO_CONNECT_CLIENT_SECRET: backendEnv.PRO_CONNECT_CLIENT_SECRET,
+  API_KEY_OPEN_CAGE_DATA_GEOCODING: backendEnv.API_KEY_OPEN_CAGE_DATA_GEOCODING,
+  API_KEY_OPEN_CAGE_DATA_GEOSEARCH: backendEnv.API_KEY_OPEN_CAGE_DATA_GEOSEARCH,
+  SIRENE_INSEE_CLIENT_ID: backendEnv.SIRENE_INSEE_CLIENT_ID,
+  SIRENE_INSEE_CLIENT_SECRET: backendEnv.SIRENE_INSEE_CLIENT_SECRET,
+  SIRENE_INSEE_USERNAME: backendEnv.SIRENE_INSEE_USERNAME,
+  SIRENE_INSEE_PASSWORD: backendEnv.SIRENE_INSEE_PASSWORD,
+  DATABASE_URL:
+    process.env.E2E_DATABASE_URL ??
+    "postgresql://immersion:pg_password@localhost:5432/immersion-db",
+  CORS_ALLOWED_ORIGINS: "http://localhost:3000",
 };
 
 export default defineConfig({
@@ -74,7 +72,7 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
       cwd: "..",
-      env: backendEnv,
+      env: backWebServerEnv,
     },
     {
       command: "pnpm front dev",
