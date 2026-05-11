@@ -488,7 +488,7 @@ export class PgConventionQueries implements ConventionQueries {
       1,
     );
 
-    const conventionsWithUnfinalizedAssessmentRows = this.transaction
+    const conventionsWithoutAssessmentRows = this.transaction
       .selectFrom("conventions")
       .innerJoin(
         "actors as beneficiary",
@@ -502,28 +502,53 @@ export class PgConventionQueries implements ConventionQueries {
       )
       .where((eb) => isInArray(eb, "conventions.agency_id", userAgencyIds))
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
-      .where((eb) =>
-        eb.or([
-          eb.and([
-            eb("ia.convention_id", "is", null),
-            eb("conventions.date_end", ">=", threeMonthsAgo),
-            eb("conventions.date_end", "<=", now),
-          ]),
-          eb.and([
-            eb("ia.convention_id", "is not", null),
-            eb("ia.signed_at", "is", null),
-            eb("ia.status", "!=", "DID_NOT_SHOW"),
-            eb("ia.created_at", ">", signatureReleaseThreshold),
-            eb("ia.created_at", ">=", threeMonthsAgo),
-          ]),
-        ]),
-      );
+      .where("ia.convention_id", "is", null)
+      .where("conventions.date_end", ">=", threeMonthsAgo)
+      .where("conventions.date_end", "<=", now);
 
-    const paginatedUnfinalizedAssessmentQuery =
-      conventionsWithUnfinalizedAssessmentRows
-        .select((eb) => [
+    const conventionsWithAssessmentToSignRows = this.transaction
+      .selectFrom("conventions")
+      .innerJoin(
+        "actors as beneficiary",
+        "beneficiary.id",
+        "conventions.beneficiary_id",
+      )
+      .innerJoin(
+        "immersion_assessments as ia",
+        "ia.convention_id",
+        "conventions.id",
+      )
+      .where((eb) => isInArray(eb, "conventions.agency_id", userAgencyIds))
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
+      .where("ia.signed_at", "is", null)
+      .where("ia.status", "!=", "DID_NOT_SHOW")
+      .where("ia.created_at", ">", signatureReleaseThreshold)
+      .where("ia.created_at", ">=", threeMonthsAgo);
+
+    const paginatedUnfinalizedAssessmentQuery = conventionsWithoutAssessmentRows
+      .select((eb) => [
+        eb.ref("conventions.id").as("id"),
+        sql<DateString>`date_to_iso(conventions.date_end)`.as("dateEnd"),
+        eb.ref("conventions.date_end").as("dateEndRaw"),
+        eb.ref("beneficiary.first_name").as("firstname"),
+        eb.ref("beneficiary.last_name").as("lastname"),
+        eb
+          .ref("ia.status")
+          .$castTo<AssessmentStatus | null>()
+          .as("assessmentStatus"),
+        eb.ref("ia.ended_with_a_job").as("assessmentEndedWithAJob"),
+        sql<DateString | null>`date_to_iso(ia.signed_at)`.as(
+          "assessmentSignedAt",
+        ),
+        sql<DateTimeIsoString | null>`date_to_iso(ia.created_at)`.as(
+          "assessmentCreatedAt",
+        ),
+      ])
+      .unionAll(
+        conventionsWithAssessmentToSignRows.select((eb) => [
           eb.ref("conventions.id").as("id"),
           sql<DateString>`date_to_iso(conventions.date_end)`.as("dateEnd"),
+          eb.ref("conventions.date_end").as("dateEndRaw"),
           eb.ref("beneficiary.first_name").as("firstname"),
           eb.ref("beneficiary.last_name").as("lastname"),
           eb
@@ -537,20 +562,34 @@ export class PgConventionQueries implements ConventionQueries {
           sql<DateTimeIsoString | null>`date_to_iso(ia.created_at)`.as(
             "assessmentCreatedAt",
           ),
-        ])
-        .orderBy("conventions.date_end", "asc")
-        .orderBy("conventions.id", "asc")
-        .limit(pagination.perPage)
-        .offset((pagination.page - 1) * pagination.perPage);
+        ]),
+      )
+      .orderBy("dateEndRaw", "asc")
+      .orderBy("id", "asc")
+      .limit(pagination.perPage)
+      .offset((pagination.page - 1) * pagination.perPage);
 
-    const countQuery = conventionsWithUnfinalizedAssessmentRows.select((eb) =>
-      sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+    const countWithoutAssessmentQuery = conventionsWithoutAssessmentRows.select(
+      (eb) => sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
     );
+    const countWithAssessmentToSignQuery =
+      conventionsWithAssessmentToSignRows.select((eb) =>
+        sql<number>`CAST(${eb.fn.countAll()} AS INT)`.as("count"),
+      );
 
-    const [rows, countResult] = await Promise.all([
+    const [
+      rows,
+      countWithoutAssessmentResult,
+      countWithAssessmentToSignResult,
+    ] = await Promise.all([
       paginatedUnfinalizedAssessmentQuery.execute(),
-      countQuery.executeTakeFirstOrThrow(),
+      countWithoutAssessmentQuery.executeTakeFirstOrThrow(),
+      countWithAssessmentToSignQuery.executeTakeFirstOrThrow(),
     ]);
+
+    const totalRecords =
+      countWithoutAssessmentResult.count +
+      countWithAssessmentToSignResult.count;
 
     const data = rows.map((row) =>
       validateAndParseZodSchema({
@@ -582,7 +621,7 @@ export class PgConventionQueries implements ConventionQueries {
       data,
       pagination: calculatePaginationResult({
         ...pagination,
-        totalRecords: countResult.count,
+        totalRecords,
       }),
     };
   }
