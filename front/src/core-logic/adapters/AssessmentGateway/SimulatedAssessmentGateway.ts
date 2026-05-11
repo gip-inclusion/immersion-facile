@@ -7,10 +7,7 @@ import type {
   SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
 } from "shared";
-import type {
-  AssessmentAndJwt,
-  AssessmentGateway,
-} from "src/core-logic/ports/AssessmentGateway";
+import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
 export const failedId = "failed-id";
 export const failedIdError = new Error("Failed Id");
@@ -27,7 +24,10 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       : of(undefined).pipe(delay(this.latency));
   }
 
-  public createAssessment$({ assessment }: AssessmentAndJwt): Observable<void> {
+  public createAssessment$(
+    assessment: AssessmentDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
     return assessment.conventionId === failedId
       ? throwError(failedIdError)
       : of(undefined).pipe(delay(this.latency));

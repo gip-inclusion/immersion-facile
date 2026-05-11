@@ -1,8 +1,10 @@
 import { ZodError } from "zod";
+import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
+import type { ConventionReadDto } from "../convention/convention.dto";
 import { expectToEqual } from "../test.helpers";
 import { type DateRange, withDateRangeSchema } from "../utils/date";
 import type { AssessmentDto } from "./assessment.dto";
-import { assessmentDtoSchema } from "./assessment.schema";
+import { assessmentDtoSchema, assessmentFormSchema } from "./assessment.schema";
 
 describe("Assessment schema date range", () => {
   it("accepts valid date range", () => {
@@ -138,6 +140,93 @@ describe("Assessment schema", () => {
     expect(() => assessmentDtoSchema.parse(assessment)).toThrow();
   });
 });
+
+describe("Assessment form schema", () => {
+  const convention: ConventionReadDto = {
+    ...new ConventionDtoBuilder()
+      .withDateStart("2024-01-10")
+      .withDateEnd("2024-01-20")
+      .build(),
+    agencyName: "My agency",
+    agencyDepartment: "75",
+    agencyKind: "pole-emploi",
+    agencyContactEmail: "agency@mail.fr",
+    agencySiret: "77567187800032",
+    agencyCounsellorEmails: [],
+    agencyValidatorEmails: [],
+    assessment: null,
+  };
+
+  const validAssessment: AssessmentDto = {
+    status: "PARTIALLY_COMPLETED",
+    conventionId: "my-convention-id",
+    endedWithAJob: true,
+    typeOfContract: "CDI",
+    contractStartDate: "2024-01-15",
+    lastDayOfPresence: "2024-01-18",
+    numberOfMissedHours: 0,
+    establishmentAdvices: "establishment advices",
+    establishmentFeedback: "establishment feedback",
+    beneficiaryAgreement: null,
+    beneficiaryFeedback: null,
+    signedAt: null,
+    createdAt: "2024-01-01T00:00:00.000Z",
+  };
+
+  it("accepts a valid form assessment", () => {
+    const parsedAssessment =
+      assessmentFormSchema(convention).parse(validAssessment);
+    expectToEqual(parsedAssessment, validAssessment);
+  });
+
+  it("rejects contractStartDate before convention start date", () => {
+    const invalidAssessment = {
+      ...validAssessment,
+      contractStartDate: "2024-01-09",
+    };
+
+    expect(() =>
+      assessmentFormSchema(convention).parse(invalidAssessment),
+    ).toThrow();
+
+    try {
+      assessmentFormSchema(convention).parse(invalidAssessment);
+    } catch (error) {
+      expect(error instanceof ZodError).toBeTruthy();
+      if (error instanceof ZodError) {
+        expectToEqual(error.issues[0].path, ["contractStartDate"]);
+        expect(error.issues[0].message).toContain(
+          "La date début du contrat ne peut pas être antérieure à la date de début d'immersion",
+        );
+      }
+    }
+  });
+
+  it("rejects numberOfMissedHours above planned immersion hours", () => {
+    const invalidAssessment = {
+      ...validAssessment,
+      numberOfMissedHours: 999,
+    };
+
+    expect(() =>
+      assessmentFormSchema(convention).parse(invalidAssessment),
+    ).toThrow();
+
+    try {
+      assessmentFormSchema(convention).parse(invalidAssessment);
+    } catch (error) {
+      expect(error instanceof ZodError).toBeTruthy();
+      if (error instanceof ZodError) {
+        expectToEqual(error.issues[0].path, ["numberOfMissedHours"]);
+        expectToEqual(
+          error.issues[0].message,
+          "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+        );
+      }
+    }
+  });
+});
+
 const expectDateRangeToFailWithError = (
   dateRange: DateRange,
   issueMessages: string[],

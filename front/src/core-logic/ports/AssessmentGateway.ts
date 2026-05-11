@@ -9,13 +9,11 @@ import type {
   SignAssessmentRequestDto,
 } from "shared";
 
-export type AssessmentAndJwt = {
-  assessment: AssessmentDto;
-  jwt: string;
-};
-
 export interface AssessmentGateway {
-  createAssessment$(params: AssessmentAndJwt): Observable<void>;
+  createAssessment$(
+    params: AssessmentDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
   signAssessment$(
     params: SignAssessmentRequestDto,
     jwt: ConventionSupportedJwt,
