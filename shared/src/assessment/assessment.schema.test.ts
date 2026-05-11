@@ -155,6 +155,7 @@ describe("Assessment form schema", () => {
     agencyCounsellorEmails: [],
     agencyValidatorEmails: [],
     assessment: null,
+    isEstablishmentBanned: false,
   };
 
   const validAssessment: AssessmentDto = {
