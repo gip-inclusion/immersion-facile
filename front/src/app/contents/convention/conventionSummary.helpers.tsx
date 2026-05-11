@@ -16,7 +16,6 @@ import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
-  allDefaultPhoneNumbers,
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
@@ -937,10 +936,8 @@ export const SendSignatureLinkModalWrapper = ({
     NotificationKind | undefined
   >();
   const hasMobilePhone =
-    !!signatory?.phone &&
-    isValidMobilePhone(signatory.phone) &&
-    !allDefaultPhoneNumbers.includes(signatory.phone);
-  const selectedReminderKind = hasMobilePhone ? notificationKind : "email";
+    !!signatory?.phone && isValidMobilePhone(signatory.phone);
+  const selectedNotificationKind = hasMobilePhone ? notificationKind : "email";
 
   return createPortal(
     <sendSignatureLinkModal.Component
@@ -958,12 +955,12 @@ export const SendSignatureLinkModalWrapper = ({
           id: domElementIds.manageConvention.submitSendSignatureLinkModalButton,
           priority: "primary",
           children: "Envoyer la relance",
-          disabled: !selectedReminderKind || !signatory,
+          disabled: !selectedNotificationKind || !signatory,
           onClick: () =>
-            selectedReminderKind &&
+            selectedNotificationKind &&
             signatory &&
             onConfirm({
-              notificationKind: selectedReminderKind,
+              notificationKind: selectedNotificationKind,
               signatoryRole: signatory.role,
             }),
         },
@@ -1051,8 +1048,7 @@ export const SendAssessmentLinkModalWrapper = ({
   const [notificationKind, setNotificationKind] = useState<
     NotificationKind | undefined
   >();
-  const hasMobilePhone =
-    isValidMobilePhone(phone) && !allDefaultPhoneNumbers.includes(phone);
+  const hasMobilePhone = isValidMobilePhone(phone);
   const selectedReminderKind = hasMobilePhone ? notificationKind : "email";
   return createPortal(
     <sendAssessmentLinkModal.Component

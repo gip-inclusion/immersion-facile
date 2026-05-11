@@ -751,8 +751,8 @@ describe("SendAssessmentLink", () => {
     });
 
     it.each([
-      "+33600000000", // metropole
-      "+33785689727", // metropole
+      "+33611111111", // métropole
+      "+33785689727", // métropole
       "+262639000001", // Mayotte
       "+590690000001", // Guadeloupe
       "+590691282545", // Guadeloupe
@@ -877,7 +877,7 @@ describe("SendAssessmentLink", () => {
       ]);
     });
 
-    it("does not send sms when recipient phone is default phone number", async () => {
+    it("throws bad request when tutor phone is default phone number", async () => {
       const conventionWithDefaultTutorPhone = new ConventionDtoBuilder(
         convention,
       )
@@ -899,17 +899,19 @@ describe("SendAssessmentLink", () => {
         }),
       ];
 
-      await usecase.execute(
-        {
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: conventionWithDefaultTutorPhone.id,
+            notificationKind: "sms",
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.invalidMobilePhoneNumber({
           conventionId: conventionWithDefaultTutorPhone.id,
-          notificationKind: "sms",
-        },
-        validatorJwtPayload,
+          role: "establishment-tutor",
+        }),
       );
-
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
-      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
     });
 
     it("sends assessment link by email", async () => {

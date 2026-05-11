@@ -52,7 +52,6 @@ describe("phonesShema", () => {
   });
 
   it.each<string>([
-    "+33600000000",
     "+33785689727",
     "+262639000001",
     "+590690000001",
@@ -72,6 +71,14 @@ describe("phonesShema", () => {
   ])("should be a valid mobile phone number (FR and other countries) %s", async (phone) => {
     expect(isValidMobilePhone(phone)).toBe(true);
   });
+
+  it.each<string>([
+    "+33600000000",
+    "+33600000001",
+  ])("default placeholder phones must not count as valid mobile for SMS eligibility %s", (phone) => {
+    expect(isValidMobilePhone(phone)).toBe(false);
+  });
+
   it.each<string>([
     "+41000123456", // CH
     "+390012345678", // IT
