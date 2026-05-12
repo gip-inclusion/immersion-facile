@@ -12,7 +12,7 @@ export const configureSentry = (
     return;
   }
   Sentry.init({
-    dsn: "https://eb7a121cd835308163ca9966e5c82c98@o4508405260615680.ingest.de.sentry.io/4508999044038736",
+    dsn: "https://b2ec1b4e1c0b71ef7b919083f5422019@o4510900710146048.ingest.de.sentry.io/4511375925182544",
     integrations: [
       Sentry.httpIntegration(),
       Sentry.nativeNodeFetchIntegration(),
