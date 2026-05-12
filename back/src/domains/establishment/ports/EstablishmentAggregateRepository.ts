@@ -46,6 +46,8 @@ type GetOffersFilters = {
   remoteWorkModes?: RemoteWorkMode[];
   searchableBy?: EstablishmentSearchableByValue; // if not defined -> return all
   sirets?: SiretDto[];
+  /** SIRET excluded from results and total count (e.g. banned establishments). */
+  excludedSirets?: SiretDto[];
   showOnlyAvailableOffers: boolean;
   departmentCodes?: DepartmentCode[];
 };

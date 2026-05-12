@@ -194,6 +194,11 @@ export class InMemoryEstablishmentAggregateRepository
           ? filters.sirets.includes(aggregate.establishment.siret)
           : true,
       )
+      .filter((aggregate) =>
+        filters.excludedSirets?.length
+          ? !filters.excludedSirets.includes(aggregate.establishment.siret)
+          : true,
+      )
       .filter((aggregate) => {
         if (filters.fitForDisabledWorkers === undefined) return true;
         return filters.fitForDisabledWorkers.includes(

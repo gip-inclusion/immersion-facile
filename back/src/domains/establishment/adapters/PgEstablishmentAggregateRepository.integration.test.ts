@@ -204,6 +204,32 @@ describe("PgEstablishmentAggregateRepository", () => {
             ),
           );
         });
+
+        it("excludes excludedSirets from total count and from rows", async () => {
+          await Promise.all(
+            baseTestEstablishmentAggregates.map((establishmentAggregate) =>
+              pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                establishmentAggregate,
+              ),
+            ),
+          );
+          const excludedSiret =
+            establishmentWithOfferA1101_AtPosition.establishment.siret;
+          const result = await pgEstablishmentAggregateRepository.getOffers({
+            pagination: { page: 1, perPage: 20 },
+            sort: defaultSort,
+            filters: {
+              ...defaultFilters,
+              excludedSirets: [excludedSiret],
+            },
+          });
+
+          expectToEqual(result.pagination.totalRecords, 5);
+          expect(
+            result.data.every((offer) => offer.siret !== excludedSiret),
+          ).toBe(true);
+        });
+
         it("returns all results when no filters are provided (object with keys and values undefined)", async () => {
           await Promise.all(
             baseTestEstablishmentAggregates.map((establishmentAggregate) =>
