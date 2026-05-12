@@ -11,6 +11,7 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { runPromisesSequentially } from "../../../../utils/promises";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
@@ -43,26 +44,27 @@ export const makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModi
     .build(async ({ inputParams: { convention }, uow, deps }) => {
       const { agency, convention: conventionReadDto } =
         await retrieveConventionWithAgency(uow, convention.id);
-      await Promise.all(
+      await runPromisesSequentially(
         values(conventionReadDto.signatories)
           .filter(filterNotFalsy)
           .filter((signatory) => !signatory.signedAt)
-          .map(async (signatory) =>
-            deps.saveNotificationAndRelatedEvent(uow, {
-              kind: "email",
-              templatedContent: await makeEmail(
-                signatory,
-                conventionReadDto,
-                agency,
-                uow,
-                deps,
-              ),
-              followedIds: {
-                conventionId: conventionReadDto.id,
-                agencyId: conventionReadDto.agencyId,
-                establishmentSiret: conventionReadDto.siret,
-              },
-            }),
+          .map(
+            (signatory) => async () =>
+              deps.saveNotificationAndRelatedEvent(uow, {
+                kind: "email",
+                templatedContent: await makeEmail(
+                  signatory,
+                  conventionReadDto,
+                  agency,
+                  uow,
+                  deps,
+                ),
+                followedIds: {
+                  conventionId: conventionReadDto.id,
+                  agencyId: conventionReadDto.agencyId,
+                  establishmentSiret: conventionReadDto.siret,
+                },
+              }),
           ),
       );
     });

@@ -9,6 +9,7 @@ import {
   localization,
 } from "shared";
 import { z } from "zod";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
@@ -55,18 +56,20 @@ export const makeContactRequestReminder = useCaseBuilder(
         limit: MAX_DISCUSSIONS,
       })
       .then((discussions) =>
-        Promise.all(
-          discussions.map((discussion) =>
-            makeNotification({ uow, discussion, mode, domain: deps.domain }),
+        runPromisesSequentially(
+          discussions.map(
+            (discussion) => () =>
+              makeNotification({ uow, discussion, mode, domain: deps.domain }),
           ),
         ),
       )
       .then(async (maybeNotifications) => {
         const notifications = maybeNotifications.filter(isTruthy);
 
-        await Promise.all(
-          notifications.map((notification) =>
-            deps.saveNotificationAndRelatedEvent(uow, notification),
+        await runPromisesSequentially(
+          notifications.map(
+            (notification) => () =>
+              deps.saveNotificationAndRelatedEvent(uow, notification),
           ),
         );
 

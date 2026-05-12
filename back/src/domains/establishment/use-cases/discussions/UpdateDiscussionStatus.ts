@@ -78,22 +78,20 @@ export const makeUpdateDiscussionStatus = useCaseBuilder(
       return false;
     };
 
-    await Promise.all([
-      uow.discussionRepository.update(updatedDiscussion),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "DiscussionStatusManuallyUpdated",
-          payload: {
-            discussion: updatedDiscussion,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
-            ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
+    await uow.discussionRepository.update(updatedDiscussion);
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "DiscussionStatusManuallyUpdated",
+        payload: {
+          discussion: updatedDiscussion,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+          ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
+        },
+      }),
+    );
   });
 
 const userHasRights = async ({

@@ -88,16 +88,14 @@ export const makeEditConventionCounsellorName = useCaseBuilder(
       },
     };
 
-    await Promise.all([
-      uow.conventionRepository.update(updatedConvention),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConventionCounsellorNameEdited",
-          payload: {
-            conventionId: updatedConvention.id,
-            triggeredBy,
-          },
-        }),
-      ),
-    ]);
+    await uow.conventionRepository.update(updatedConvention);
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConventionCounsellorNameEdited",
+        payload: {
+          conventionId: updatedConvention.id,
+          triggeredBy,
+        },
+      }),
+    );
   });

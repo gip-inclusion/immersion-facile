@@ -90,25 +90,22 @@ export const makeTransferConventionToAgency = useCaseBuilder(
       agencyId: inputParams.agencyId,
     };
 
-    await Promise.all([
-      uow.conventionRepository.update(updatedConvention),
-      requestedAgency.kind !== "pole-emploi"
-        ? uow.conventionFranceTravailAdvisorRepository.deleteByConventionId(
-            convention.id,
-          )
-        : undefined,
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConventionTransferredToAgency",
-          payload: {
-            convention: updatedConvention,
-            agencyId: inputParams.agencyId,
-            justification: inputParams.justification,
-            previousAgencyId: convention.agencyId,
-            shouldNotifyActors: true,
-            triggeredBy,
-          },
-        }),
-      ),
-    ]);
+    await uow.conventionRepository.update(updatedConvention);
+    if (requestedAgency.kind !== "pole-emploi")
+      await uow.conventionFranceTravailAdvisorRepository.deleteByConventionId(
+        convention.id,
+      );
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConventionTransferredToAgency",
+        payload: {
+          convention: updatedConvention,
+          agencyId: inputParams.agencyId,
+          justification: inputParams.justification,
+          previousAgencyId: convention.agencyId,
+          shouldNotifyActors: true,
+          triggeredBy,
+        },
+      }),
+    );
   });

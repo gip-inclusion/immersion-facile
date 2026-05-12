@@ -6,6 +6,7 @@ import {
   castError,
   type ReminderKind,
 } from "shared";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { DomainEvent } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -80,14 +81,17 @@ export const makeConventionsReminder = useCaseBuilder("ConventionsReminder")
       ),
     ];
 
-    const results: { id: ConventionId; error?: Error }[] = await Promise.all(
-      events.map(({ event, id }) =>
-        uow.outboxRepository
-          .save(event)
-          .then(() => ({ id }))
-          .catch((error) => ({ id, error: castError(error) })),
-      ),
-    );
+    const results: { id: ConventionId; error?: Error }[] =
+      await runPromisesSequentially(
+        events.map(
+          ({ event, id }) =>
+            () =>
+              uow.outboxRepository
+                .save(event)
+                .then(() => ({ id }))
+                .catch((error) => ({ id, error: castError(error) })),
+        ),
+      );
 
     return {
       success: results.filter(

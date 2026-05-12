@@ -32,12 +32,13 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
     { convention: conventionFromEvent }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [conventionFtAdvisor, convention] = await Promise.all([
-      uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+    const conventionFtAdvisor =
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
         conventionFromEvent.id,
-      ),
-      uow.conventionRepository.getById(conventionFromEvent.id),
-    ]);
+      );
+    const convention = await uow.conventionRepository.getById(
+      conventionFromEvent.id,
+    );
 
     if (!convention) return;
 

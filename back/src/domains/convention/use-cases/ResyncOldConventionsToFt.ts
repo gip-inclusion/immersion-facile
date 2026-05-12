@@ -1,5 +1,6 @@
 import { type ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -39,15 +40,16 @@ export const makeResyncOldConventionsToFt = useCaseBuilder(
       const conventionsToSync =
         await uow.conventionsToSyncRepository.getToProcessOrError(limit);
 
-      await Promise.all(
-        conventionsToSync.map((conventionToSync) =>
-          handleConventionToSync({
-            uow,
-            conventionToSyncId: conventionToSync.id,
-            report,
-            timeGateway,
-            standardBroadcastToFTUsecase,
-          }),
+      await runPromisesSequentially(
+        conventionsToSync.map(
+          (conventionToSync) => () =>
+            handleConventionToSync({
+              uow,
+              conventionToSyncId: conventionToSync.id,
+              report,
+              timeGateway,
+              standardBroadcastToFTUsecase,
+            }),
         ),
       );
 

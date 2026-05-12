@@ -306,14 +306,11 @@ export class PgNotificationRepository implements NotificationRepository {
       },
     );
 
-    await Promise.all([
-      smsNotifications.length > 0
-        ? this.#saveSmsNotifications(smsNotifications)
-        : null,
-      emailNotifications.length > 0
-        ? this.#saveEmailNotifications(emailNotifications)
-        : null,
-    ]);
+    if (smsNotifications.length > 0)
+      await this.#saveSmsNotifications(smsNotifications);
+
+    if (emailNotifications.length > 0)
+      await this.#saveEmailNotifications(emailNotifications);
   }
 
   async updateState({

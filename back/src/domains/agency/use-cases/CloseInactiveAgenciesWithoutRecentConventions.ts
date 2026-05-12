@@ -8,6 +8,7 @@ import {
   type UserWithAdminRights,
 } from "shared";
 import { z } from "zod";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationsBatchAndRelatedEvent,
@@ -83,13 +84,15 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
       numberOfMonthsWithoutConvention,
     );
 
-    await Promise.all(
-      agenciesToClose.map((agency) =>
-        uow.agencyRepository.update({
-          id: agency.id,
-          status: "closed",
-          statusJustification: "Agence fermée automatiquement pour inactivité",
-        }),
+    await runPromisesSequentially(
+      agenciesToClose.map(
+        (agency) => () =>
+          uow.agencyRepository.update({
+            id: agency.id,
+            status: "closed",
+            statusJustification:
+              "Agence fermée automatiquement pour inactivité",
+          }),
       ),
     );
     await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);

@@ -99,19 +99,17 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
               kind: "connected-user",
               userId: conventionJwtPayload.userId,
             };
-      await Promise.all([
-        uow.assessmentRepository.save(assessmentEntity),
-        uow.outboxRepository.save(
-          deps.createNewEvent({
-            topic: "AssessmentCreated",
-            payload: {
-              convention,
-              assessment,
-              triggeredBy,
-            },
-          }),
-        ),
-      ]);
+      await uow.assessmentRepository.save(assessmentEntity);
+      await uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "AssessmentCreated",
+          payload: {
+            convention,
+            assessment,
+            triggeredBy,
+          },
+        }),
+      );
     },
   );
 

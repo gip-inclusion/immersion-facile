@@ -11,6 +11,7 @@ import {
 } from "shared";
 import type { GenerateConnectedUserLoginUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
+import { runPromisesSequentially } from "../../../../../utils/promises";
 import {
   type AgencyRightOfUser,
   removeAgencyRightsForUser,
@@ -112,26 +113,24 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
         ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
         : this.#onProConnectProvider(uow, ongoingOAuth, code as OAuthCode));
 
-    await Promise.all([
-      uow.userRepository.save({
-        ...newOrUpdatedUser,
-        lastLoginAt: this.#timeGateway.now().toISOString(),
-      }),
-      uow.ongoingOAuthRepository.save(updatedOngoingOAuth),
-      uow.outboxRepository.save(
-        this.#createNewEvent({
-          topic: "UserAuthenticatedSuccessfully",
-          payload: {
+    await uow.userRepository.save({
+      ...newOrUpdatedUser,
+      lastLoginAt: this.#timeGateway.now().toISOString(),
+    });
+    await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "UserAuthenticatedSuccessfully",
+        payload: {
+          userId: newOrUpdatedUser.id,
+          codeSafir: accessToken?.payload.structure_pe ?? null,
+          triggeredBy: {
+            kind: "connected-user",
             userId: newOrUpdatedUser.id,
-            codeSafir: accessToken?.payload.structure_pe ?? null,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: newOrUpdatedUser.id,
-            },
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
 
     return {
       provider: ongoingOAuth.provider,
@@ -266,11 +265,10 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     userToKeepId: UserId;
     userToDeleteId: UserId;
   }): Promise<void> {
-    const [userToDeleteAgencyRights, userToKeepAgencyRights] =
-      await Promise.all([
-        uow.agencyRepository.getAgenciesRightsByUserId(userToDeleteId),
-        uow.agencyRepository.getAgenciesRightsByUserId(userToKeepId),
-      ]);
+    const userToDeleteAgencyRights =
+      await uow.agencyRepository.getAgenciesRightsByUserId(userToDeleteId);
+    const userToKeepAgencyRights =
+      await uow.agencyRepository.getAgenciesRightsByUserId(userToKeepId);
 
     const newAgenciesRightForUser = userToDeleteAgencyRights.reduce<
       AgencyRightOfUser[]
@@ -295,15 +293,17 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       ];
     }, []);
 
-    await Promise.all(
-      newAgenciesRightForUser.map(async (agencyRightsForUser) =>
-        updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
+    await runPromisesSequentially(
+      newAgenciesRightForUser.map(
+        (agencyRightsForUser) => () =>
+          updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
       ),
     );
 
-    await Promise.all(
-      userToDeleteAgencyRights.map(async (agencyRightsForUser) =>
-        removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
+    await runPromisesSequentially(
+      userToDeleteAgencyRights.map(
+        (agencyRightsForUser) => () =>
+          removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
       ),
     );
 

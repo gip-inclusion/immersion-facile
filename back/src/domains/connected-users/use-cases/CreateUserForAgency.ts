@@ -73,25 +73,23 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
       agency.refersToAgencyId,
     );
 
-    await Promise.all([
-      uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedAgencyRights,
-      }),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConnectedUserAgencyRightChanged",
-          payload: {
-            agencyId: agency.id,
-            userId: user.id,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.agencyRepository.update({
+      id: agency.id,
+      usersRights: updatedAgencyRights,
+    });
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConnectedUserAgencyRightChanged",
+        payload: {
+          agencyId: agency.id,
+          userId: user.id,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
 
     return {
       ...user,

@@ -97,35 +97,33 @@ export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
       ...agency.validatorEmails,
     ]);
 
-    await Promise.all([
-      ...sendAgencyEmails({
-        agencyCounsellorsAndValidatorsEmails,
-        convention,
-        uow,
-        justification,
-        previousAgencyName: previousAgency.name,
-        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+    await sendAgencyEmails({
+      agencyCounsellorsAndValidatorsEmails,
+      convention,
+      uow,
+      justification,
+      previousAgencyName: previousAgency.name,
+      saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+      config: deps.config,
+    });
+    await sendSignatoriesEmail(
+      signatoriesRecipientsRoleAndEmail,
+      convention,
+      uow,
+      justification,
+      agency,
+      previousAgency.name,
+      {
         config: deps.config,
-      }),
-      ...sendSignatoriesEmail(
-        signatoriesRecipientsRoleAndEmail,
-        convention,
-        uow,
-        justification,
-        agency,
-        previousAgency.name,
-        {
-          config: deps.config,
-          timeGateway: deps.timeGateway,
-          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
-        },
-      ),
-    ]);
+        timeGateway: deps.timeGateway,
+        generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+      },
+    );
   });
 
-const sendAgencyEmails = ({
+const sendAgencyEmails = async ({
   agencyCounsellorsAndValidatorsEmails,
   convention,
   uow,
@@ -142,8 +140,8 @@ const sendAgencyEmails = ({
   config: AppConfig;
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 }) => {
-  return agencyCounsellorsAndValidatorsEmails.map((email) =>
-    saveNotificationAndRelatedEvent(uow, {
+  for (const email of agencyCounsellorsAndValidatorsEmails)
+    await saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
@@ -174,11 +172,10 @@ const sendAgencyEmails = ({
         agencyId: convention.agencyId,
         establishmentSiret: convention.siret,
       },
-    }),
-  );
+    });
 };
 
-const sendSignatoriesEmail = (
+const sendSignatoriesEmail = async (
   signatoriesRecipientsRoleAndEmail: { role: ConventionRole; email: Email }[],
   convention: ConventionDto,
   uow: UnitOfWork,
@@ -193,7 +190,7 @@ const sendSignatoriesEmail = (
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   },
 ) => {
-  return signatoriesRecipientsRoleAndEmail.map(async (emailAndRole) => {
+  for (const emailAndRole of signatoriesRecipientsRoleAndEmail) {
     const { role, email } = emailAndRole;
     const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: deps.config,
@@ -213,7 +210,7 @@ const sendSignatoriesEmail = (
       lifetime: "1Month",
     });
 
-    return deps.saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "CONVENTION_TRANSFERRED_SIGNATORY_NOTIFICATION",
@@ -236,5 +233,5 @@ const sendSignatoriesEmail = (
         establishmentSiret: convention.siret,
       },
     });
-  });
+  }
 };

@@ -19,6 +19,7 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -203,7 +204,7 @@ const sendAssessmentNotifications = async (
 
   // TODO : Tentative de save les notifs en un appel db avec saveNotificationsBatchAndRelatedEvent
   // problème de test avec des notifs/event de notif existants
-  await Promise.all(
+  await runPromisesSequentially(
     [
       ...(isTutorNotificationNotSent
         ? [
@@ -232,31 +233,24 @@ const sendAssessmentNotifications = async (
       ...(isBeneficiaryNotificationNotSent
         ? [makeBeneficiaryNotification(convention)]
         : []),
-    ].map((notif) => deps.saveNotificationAndRelatedEvent(uow, notif)),
+    ].map((notif) => () => deps.saveNotificationAndRelatedEvent(uow, notif)),
   );
 
-  await Promise.all([
-    ...(isTutorNotificationNotSent
-      ? [
-          uow.outboxRepository.save(
-            deps.createNewEvent({
-              topic: "EmailWithLinkToCreateAssessmentSent",
-              payload: { id: convention.id },
-            }),
-          ),
-        ]
-      : []),
-    ...(isBeneficiaryNotificationNotSent
-      ? [
-          uow.outboxRepository.save(
-            deps.createNewEvent({
-              topic: "BeneficiaryAssessmentEmailSent",
-              payload: { id: convention.id },
-            }),
-          ),
-        ]
-      : []),
-  ]);
+  if (isTutorNotificationNotSent)
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: { id: convention.id },
+      }),
+    );
+
+  if (isBeneficiaryNotificationNotSent)
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "BeneficiaryAssessmentEmailSent",
+        payload: { id: convention.id },
+      }),
+    );
 
   return { id: convention.id };
 };

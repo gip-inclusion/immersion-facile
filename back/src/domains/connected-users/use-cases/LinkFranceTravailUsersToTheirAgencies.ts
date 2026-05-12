@@ -14,6 +14,7 @@ import {
   getAgencyAndAdminEmailsByAgencyId,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -50,15 +51,16 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
       await uow.agencyRepository.getBySafirAndActiveStatus(codeSafir);
 
     if (agenciesWithSafir.length) {
-      await Promise.all(
-        agenciesWithSafir.map(async (agencyWithSafir) => {
-          return updateActiveAgencyWithSafir(
-            uow,
-            agencyWithSafir,
-            userId,
-            deps.createNewEvent,
-          );
-        }),
+      await runPromisesSequentially(
+        agenciesWithSafir.map(
+          (agencyWithSafir) => () =>
+            updateActiveAgencyWithSafir(
+              uow,
+              agencyWithSafir,
+              userId,
+              deps.createNewEvent,
+            ),
+        ),
       );
       return;
     }
@@ -83,26 +85,24 @@ const updateActiveAgencyWithSafir = async (
   userId: string,
   createNewEvent: CreateNewEvent,
 ): Promise<void> => {
-  await Promise.all([
-    uow.agencyRepository.update({
-      id: agencyWithSafir.id,
-      usersRights: {
-        ...agencyWithSafir.usersRights,
-        [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+  await uow.agencyRepository.update({
+    id: agencyWithSafir.id,
+    usersRights: {
+      ...agencyWithSafir.usersRights,
+      [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+    },
+  });
+  await uow.outboxRepository.save(
+    createNewEvent({
+      topic: "AgencyUpdated",
+      payload: {
+        agencyId: agencyWithSafir.id,
+        triggeredBy: {
+          kind: "crawler",
+        },
       },
     }),
-    uow.outboxRepository.save(
-      createNewEvent({
-        topic: "AgencyUpdated",
-        payload: {
-          agencyId: agencyWithSafir.id,
-          triggeredBy: {
-            kind: "crawler",
-          },
-        },
-      }),
-    ),
-  ]);
+  );
 };
 
 const updateAgenciesOfGroup = async (

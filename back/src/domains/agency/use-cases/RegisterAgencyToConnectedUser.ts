@@ -1,4 +1,5 @@
 import { agencyIdsSchema, type ConnectedUser, errors } from "shared";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
@@ -26,31 +27,33 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
-    await Promise.all([
-      ...agencies.map(({ id, usersRights }) =>
-        uow.agencyRepository.update({
-          id,
-          usersRights: {
-            ...usersRights,
-            [currentUser.id]: {
-              isNotifiedByEmail: false,
-              roles: ["to-review"],
-            },
-          },
-        }),
-      ),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "AgencyRegisteredToConnectedUser",
-          payload: {
-            userId: currentUser.id,
-            agencyIds,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
-          },
-        }),
+    await runPromisesSequentially([
+      ...agencies.map(
+        ({ id, usersRights }) =>
+          () =>
+            uow.agencyRepository.update({
+              id,
+              usersRights: {
+                ...usersRights,
+                [currentUser.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["to-review"],
+                },
+              },
+            }),
       ),
     ]);
+    uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "AgencyRegisteredToConnectedUser",
+        payload: {
+          userId: currentUser.id,
+          agencyIds,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
+          },
+        },
+      }),
+    );
   });

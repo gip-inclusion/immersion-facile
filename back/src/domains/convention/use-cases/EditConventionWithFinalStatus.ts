@@ -82,19 +82,17 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
 
     const updatedConvention: ConventionDto = conventionValidation.data;
 
-    await Promise.all([
-      uow.conventionRepository.update(updatedConvention),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConventionWithFinalStatusEdited",
-          payload: {
-            convention: updatedConvention,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.conventionRepository.update(updatedConvention);
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConventionWithFinalStatusEdited",
+        payload: {
+          convention: updatedConvention,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
   });

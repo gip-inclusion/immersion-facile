@@ -8,6 +8,7 @@ import {
   errors,
   type UserId,
 } from "shared";
+import { runPromisesSequentially } from "../../../utils/promises";
 import { createOrGetUserIdByEmail } from "../../core/authentication/connected-user/entities/user.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
@@ -37,8 +38,8 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
     const validatorUserIdsForAgency: WithUserIdAndIsNotified[] =
       rest.refersToAgencyId
         ? await getReferredAgencyValidatorUserIds(uow, rest.refersToAgencyId)
-        : await Promise.all(
-            validatorEmails.map(async (email) => ({
+        : await runPromisesSequentially(
+            validatorEmails.map((email) => async () => ({
               userId: await createOrGetUserIdByEmail(
                 uow,
                 deps.timeGateway,
@@ -50,8 +51,8 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
           );
 
     const counsellorUserIdsForAgency: WithUserIdAndIsNotified[] =
-      await Promise.all(
-        counsellorEmails.map(async (email) => ({
+      await runPromisesSequentially(
+        counsellorEmails.map((email) => async () => ({
           userId: await createOrGetUserIdByEmail(
             uow,
             deps.timeGateway,
@@ -82,14 +83,15 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
     if (!siretEstablishmentDto)
       throw errors.agency.invalidSiret({ siret: agency.agencySiret });
 
-    await Promise.all([
-      uow.agencyRepository.insert(agency),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "NewAgencyAdded",
-          payload: { agencyId: agency.id, triggeredBy: null },
-        }),
-      ),
+    await uow.agencyRepository.insert(agency);
+    await runPromisesSequentially([
+      () =>
+        uow.outboxRepository.save(
+          deps.createNewEvent({
+            topic: "NewAgencyAdded",
+            payload: { agencyId: agency.id, triggeredBy: null },
+          }),
+        ),
     ]);
   });
 

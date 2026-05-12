@@ -67,32 +67,30 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
           }
         : null;
 
-    await Promise.all([
-      uow.discussionRepository.update({
-        ...discussion,
-        updatedAt: deps.timeGateway.now().toISOString(),
-        status: "REJECTED",
-        rejectionKind: "DEPRECATED",
-      }),
-      deps.saveNotificationsBatchAndRelatedEvent(uow, [
-        ...(establishmentNotification ? [establishmentNotification] : []),
-        {
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",
-            recipients: [discussion.potentialBeneficiary.email],
-            params: {
-              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-              businessName: discussion.businessName,
-              searchPageUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.search}`,
-              discussionCreatedAt: discussion.createdAt,
-            },
-          },
-          followedIds: {
-            establishmentSiret: discussion.siret,
+    await uow.discussionRepository.update({
+      ...discussion,
+      updatedAt: deps.timeGateway.now().toISOString(),
+      status: "REJECTED",
+      rejectionKind: "DEPRECATED",
+    });
+    await deps.saveNotificationsBatchAndRelatedEvent(uow, [
+      ...(establishmentNotification ? [establishmentNotification] : []),
+      {
+        kind: "email",
+        templatedContent: {
+          kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",
+          recipients: [discussion.potentialBeneficiary.email],
+          params: {
+            beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+            beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+            businessName: discussion.businessName,
+            searchPageUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.search}`,
+            discussionCreatedAt: discussion.createdAt,
           },
         },
-      ]),
+        followedIds: {
+          establishmentSiret: discussion.siret,
+        },
+      },
     ]);
   });

@@ -6,6 +6,7 @@ import {
   siretSchema,
 } from "shared";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -41,22 +42,24 @@ export class SuggestEstablishmentReengagement extends TransactionalUseCase<
 
     const admins = await uow.userRepository.getByIds(adminIds);
 
-    await Promise.all(
-      admins.map(async (user) =>
-        this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
-            sender: immersionFacileNoReplyEmailSender,
-            recipients: [user.email],
-            params: {
-              businessName: establishment.customizedName ?? establishment.name,
+    await runPromisesSequentially(
+      admins.map(
+        (user) => () =>
+          this.#saveNotificationAndRelatedEvent(uow, {
+            kind: "email",
+            templatedContent: {
+              kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
+              sender: immersionFacileNoReplyEmailSender,
+              recipients: [user.email],
+              params: {
+                businessName:
+                  establishment.customizedName ?? establishment.name,
+              },
             },
-          },
-          followedIds: {
-            establishmentSiret: siret,
-          },
-        }).catch((error) => notifyErrorObjectToTeam(error)),
+            followedIds: {
+              establishmentSiret: siret,
+            },
+          }).catch((error) => notifyErrorObjectToTeam(error)),
       ),
     );
   }

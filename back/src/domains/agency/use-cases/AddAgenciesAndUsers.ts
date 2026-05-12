@@ -18,6 +18,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
+import { runPromisesSequentially } from "../../../utils/promises";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
@@ -90,11 +91,12 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     const chunks = splitEvery(chunkSize, inputParams);
     const siretsInIF = uniq(
       flatten(
-        await Promise.all(
-          chunks.map(async (importedAgencies) =>
-            uow.agencyRepository.getExistingActiveSirets(
-              importedAgencies.map((importedAgency) => importedAgency.SIRET),
-            ),
+        await runPromisesSequentially(
+          chunks.map(
+            (importedAgencies) => () =>
+              uow.agencyRepository.getExistingActiveSirets(
+                importedAgencies.map((importedAgency) => importedAgency.SIRET),
+              ),
           ),
         ),
       ),
@@ -188,8 +190,8 @@ const linkUsersToExistingAgency = async ({
       },
     });
 
-    await Promise.all(
-      sirets.map(async (siret) => {
+    await runPromisesSequentially(
+      sirets.map((siret) => async () => {
         const agencyIF = agenciesIF.find(
           (agencyIF) => agencyIF.agencySiret === siret,
         );
@@ -204,10 +206,10 @@ const linkUsersToExistingAgency = async ({
           userId: string;
           roles: AgencyRole[];
           isNotifiedByEmail: boolean;
-        }[] = await Promise.all(
+        }[] = await runPromisesSequentially(
           rowsBySiret[siret]
             .map((row) => row["E-mail authentification"])
-            .map(async (email) => {
+            .map((email) => async () => {
               const user = await userRepository.findByEmail(email);
 
               if (!user) {
@@ -399,8 +401,8 @@ const createOrUpdateUsers = async ({
   const uniqEmails = uniq(emails);
 
   const newUsersCount = (
-    await Promise.all(
-      uniqEmails.map(async (email) => {
+    await runPromisesSequentially(
+      uniqEmails.map((email) => async () => {
         const newUserUUid = uuidGenerator.new();
         const user = await getUserByEmailAndCreateIfMissing({
           userRepository,

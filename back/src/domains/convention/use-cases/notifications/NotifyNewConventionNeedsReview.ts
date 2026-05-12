@@ -11,6 +11,7 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
+import { runPromisesSequentially } from "../../../../utils/promises";
 import type { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
@@ -100,17 +101,18 @@ export const makeNotifyNewConventionNeedsReview = useCaseBuilder(
       })),
     );
 
-    await Promise.all(
-      emails.map((email) =>
-        deps.saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: email,
-          followedIds: {
-            conventionId: convention.id,
-            agencyId: convention.agencyId,
-            establishmentSiret: convention.siret,
-          },
-        }),
+    await runPromisesSequentially(
+      emails.map(
+        (email) => () =>
+          deps.saveNotificationAndRelatedEvent(uow, {
+            kind: "email",
+            templatedContent: email,
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+            },
+          }),
       ),
     );
   });
