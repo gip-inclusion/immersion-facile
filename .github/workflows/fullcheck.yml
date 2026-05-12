@@ -211,8 +211,11 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm playwright install
 
-      - name: Install bun
-        run: npm install -g bun@1.2.10 # do NOT use pnpm here, for bun, it will FAIL
+      - name: Post install bun
+        run: |
+          cd back/node_modules/bun
+          node install.js
+          cd ../../..
 
       - name: Run Playwright tests
         run: pnpm playwright test:ci
