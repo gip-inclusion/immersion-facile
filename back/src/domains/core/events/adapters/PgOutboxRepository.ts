@@ -162,11 +162,9 @@ export class PgOutboxRepository implements OutboxRepository {
       eventInDb.publications,
     );
 
-    await Promise.all(
-      newPublications.map((publication) =>
-        this.#saveNewPublication(event.id, publication),
-      ),
-    );
+    for (const publication of newPublications) {
+      await this.#saveNewPublication(event.id, publication);
+    }
 
     if (event.publications.length === 0) {
       logger.info({

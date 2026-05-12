@@ -13,6 +13,7 @@ import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -95,8 +96,8 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
     logger.info({ message: `processing ${conventions.length} conventions` });
 
     const errors: Record<ConventionId, Error> = {};
-    await Promise.all(
-      conventions.map(async (convention) => {
+    await runPromisesSequentially(
+      conventions.map((convention) => async () => {
         await this.#sendOneEmailWithEstablishmentLeadReminder(
           uow,
           this.#config,

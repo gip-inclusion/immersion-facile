@@ -17,23 +17,21 @@ export const makeUpdateAgency = useCaseBuilder("UpdateAgency")
       ...agencyToUpdate
     } = agency;
 
-    await Promise.all([
-      uow.agencyRepository.update(agencyToUpdate).catch((error) => {
-        if (error.message === `Agency ${agency.id} does not exist`)
-          throw errors.agency.notFound({ agencyId: agency.id });
-        throw error;
-      }),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "AgencyUpdated",
-          payload: {
-            agencyId: agency.id,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.agencyRepository.update(agencyToUpdate).catch((error) => {
+      if (error.message === `Agency ${agency.id} does not exist`)
+        throw errors.agency.notFound({ agencyId: agency.id });
+      throw error;
+    });
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "AgencyUpdated",
+        payload: {
+          agencyId: agency.id,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
   });

@@ -157,34 +157,30 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
           now: deps.timeGateway.now().toISOString(),
         });
 
-        await Promise.all([
-          uow.conventionRepository.update(signedConvention),
-          uow.outboxRepository.save(
-            deps.createNewEvent({
-              topic: "ConventionModifiedAndSigned",
-              payload: {
-                convention: signedConvention,
-                triggeredBy,
-              },
-            }),
-          ),
-        ]);
+        await uow.conventionRepository.update(signedConvention);
+        await uow.outboxRepository.save(
+          deps.createNewEvent({
+            topic: "ConventionModifiedAndSigned",
+            payload: {
+              convention: signedConvention,
+              triggeredBy,
+            },
+          }),
+        );
       } else {
-        await Promise.all([
-          uow.conventionRepository.update(
-            conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-          ),
-          uow.outboxRepository.save(
-            deps.createNewEvent({
-              topic: "ConventionSubmittedAfterModification",
-              payload: {
-                convention:
-                  conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-                triggeredBy,
-              },
-            }),
-          ),
-        ]);
+        await uow.conventionRepository.update(
+          conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+        );
+        await uow.outboxRepository.save(
+          deps.createNewEvent({
+            topic: "ConventionSubmittedAfterModification",
+            payload: {
+              convention:
+                conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+              triggeredBy,
+            },
+          }),
+        );
       }
 
       return { id: conventionFromRepo.id };

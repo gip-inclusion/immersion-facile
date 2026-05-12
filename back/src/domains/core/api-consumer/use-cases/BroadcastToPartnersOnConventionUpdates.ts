@@ -12,6 +12,7 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { createLogger } from "../../../../utils/logger";
+import { runPromisesSequentially } from "../../../../utils/promises";
 import {
   type WithConventionIdAndPreviousAgencyId,
   withConventionIdAndPreviousAgencySchema,
@@ -141,8 +142,11 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
       });
     }
 
-    await Promise.all(
-      apiConsumers.map(notifySubscriber({ uow, conventionRead, deps })),
+    await runPromisesSequentially(
+      apiConsumers.map(
+        (apiConsumer) => () =>
+          notifySubscriber({ uow, conventionRead, deps })(apiConsumer),
+      ),
     );
   });
 

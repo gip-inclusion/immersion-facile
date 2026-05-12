@@ -35,25 +35,23 @@ export const makeRenewApiConsumerKey = useCaseBuilder("RenewApiConsumerKey")
 
     const now = setMilliseconds(deps.timeGateway.now(), 0);
 
-    await Promise.all([
-      uow.apiConsumerRepository.save({
-        ...existingApiConsumer,
-        currentKeyIssuedAt: now.toISOString(),
-        revokedAt: null,
-      }),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ApiConsumerKeyRenewed",
-          payload: {
-            consumerId,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.apiConsumerRepository.save({
+      ...existingApiConsumer,
+      currentKeyIssuedAt: now.toISOString(),
+      revokedAt: null,
+    });
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ApiConsumerKeyRenewed",
+        payload: {
+          consumerId,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
 
     return deps.generateApiConsumerJwt({
       id: consumerId,

@@ -9,6 +9,7 @@ import {
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
 } from "shared";
+import { runPromisesSequentially } from "../../../utils/promises";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -137,7 +138,7 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
         .filter((userRight) =>
           onlyUserRightWithStatusAccepted({ status: userRight.status }),
         )
-        .map(async (userRight) => {
+        .map((userRight) => async () => {
           const user = await uow.userRepository.getById(userRight.userId);
           if (!user) throw errors.user.notFound({ userId: userRight.userId });
           return deps.saveNotificationAndRelatedEvent(uow, {
@@ -165,7 +166,7 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
         });
 
     const makeUserRightsUpdatedWithSameStatusNotifications = () =>
-      userRightsUpdatedWithSameStatus.map(async (userRight) => {
+      userRightsUpdatedWithSameStatus.map((userRight) => async () => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
         return deps.saveNotificationAndRelatedEvent(uow, {
@@ -225,14 +226,19 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
       });
     };
 
-    await Promise.all([
+    await runPromisesSequentially([
       ...makeUserRightsAddedNotifications(),
       ...makeUserRightsUpdatedWithSameStatusNotifications(),
-      ...userRightsUpdatedWithNewStatus.map((userRight) =>
-        notifyUserRightStatusChangeByEmail(userRight.userId, "ACCEPTED"),
+      ...userRightsUpdatedWithNewStatus.map(
+        (userRight) => () =>
+          notifyUserRightStatusChangeByEmail(userRight.userId, "ACCEPTED"),
       ),
-      ...pendingUserRightsRemoved.map((removedUserRight) =>
-        notifyUserRightStatusChangeByEmail(removedUserRight.userId, "REJECTED"),
+      ...pendingUserRightsRemoved.map(
+        (removedUserRight) => () =>
+          notifyUserRightStatusChangeByEmail(
+            removedUserRight.userId,
+            "REJECTED",
+          ),
       ),
     ]);
 

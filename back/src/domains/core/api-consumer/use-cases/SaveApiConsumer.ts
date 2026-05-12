@@ -55,27 +55,25 @@ export class SaveApiConsumer extends TransactionalUseCase<
 
     const keyIssuedAt = setMilliseconds(this.#timeGateway.now(), 0);
 
-    await Promise.all([
-      uow.apiConsumerRepository.save(
-        this.#buildApiConsumerWithoutSubscription({
-          input,
-          existingApiConsumer,
-          keyIssuedAt,
-        }),
-      ),
-      uow.outboxRepository.save(
-        this.#createNewEvent({
-          topic: "ApiConsumerSaved",
-          payload: {
-            consumerId: input.id,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.apiConsumerRepository.save(
+      this.#buildApiConsumerWithoutSubscription({
+        input,
+        existingApiConsumer,
+        keyIssuedAt,
+      }),
+    );
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "ApiConsumerSaved",
+        payload: {
+          consumerId: input.id,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
 
     return isNewApiConsumer
       ? this.#generateApiConsumerJwt({

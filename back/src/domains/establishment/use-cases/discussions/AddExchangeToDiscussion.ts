@@ -24,6 +24,7 @@ import {
   type UserId,
 } from "shared";
 import { z } from "zod";
+import { runPromisesSequentially } from "../../../../utils/promises";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -133,14 +134,15 @@ export const makeAddExchangeToDiscussion = useCaseBuilder(
             makeDashboardMessageWithUserId(messageInput, currentUser),
           );
 
-    return Promise.all(
-      messageInputsWithIdentity.map((messageInput) =>
-        processSendMessage({
-          uow,
-          source: inputParams.source,
-          messageInput,
-          deps,
-        }),
+    return runPromisesSequentially(
+      messageInputsWithIdentity.map(
+        (messageInput) => () =>
+          processSendMessage({
+            uow,
+            source: inputParams.source,
+            messageInput,
+            deps,
+          }),
       ),
     ).then((exchanges) => exchanges[0]);
   });
@@ -319,19 +321,17 @@ const addExchangeAndSendEvent = async ({
     ...exchangeSender,
   };
 
-  await Promise.all([
-    uow.discussionRepository.update({
-      ...discussion,
-      updatedAt: deps.timeGateway.now().toISOString(),
-      exchanges: [...discussion.exchanges, exchange],
+  await uow.discussionRepository.update({
+    ...discussion,
+    updatedAt: deps.timeGateway.now().toISOString(),
+    exchanges: [...discussion.exchanges, exchange],
+  });
+  await uow.outboxRepository.save(
+    deps.createNewEvent({
+      topic: "ExchangeAddedToDiscussion",
+      payload: { discussionId: discussion.id, siret: discussion.siret },
     }),
-    uow.outboxRepository.save(
-      deps.createNewEvent({
-        topic: "ExchangeAddedToDiscussion",
-        payload: { discussionId: discussion.id, siret: discussion.siret },
-      }),
-    ),
-  ]);
+  );
 
   return exchange;
 };

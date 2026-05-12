@@ -13,6 +13,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import z from "zod";
+import { runPromisesSequentially } from "../../../utils/promises";
 import {
   type DomainEvent,
   type TriggeredBy,
@@ -67,36 +68,43 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
       if (inputParams.partialDelete)
         throw new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED");
 
-      const updatedAgencies = await Promise.all(
-        agenciesWithUserRight.map(updateAgency(uow, userToDelete.id)),
+      const updatedAgencies = await runPromisesSequentially(
+        agenciesWithUserRight.map(
+          (agency) => () => updateAgency(uow, userToDelete.id)(agency),
+        ),
       );
 
-      const updatedEstablishments = await Promise.all(
+      const updatedEstablishments = await runPromisesSequentially(
         establishmentsWithUserRight.map(
-          updateEstablishment(uow, userToDelete.id),
+          (establishment) => () =>
+            updateEstablishment(uow, userToDelete.id)(establishment),
         ),
       );
 
-      await Promise.all([
-        ...updatedEstablishments.map((establishment) =>
-          uow.establishmentAggregateRepository.updateEstablishmentAggregate(
-            establishment,
-            timeGateway.now(),
+      await runPromisesSequentially([
+        ...updatedEstablishments.map(
+          (establishment) => () =>
+            uow.establishmentAggregateRepository.updateEstablishmentAggregate(
+              establishment,
+              timeGateway.now(),
+            ),
+        ),
+        ...updatedAgencies.map(
+          (agency) => () => uow.agencyRepository.update(agency),
+        ),
+        () => uow.userRepository.delete(userToDelete.id),
+        () =>
+          uow.outboxRepository.saveNewEventsBatch(
+            makeEvents({
+              createNewEvent,
+              userToDelete,
+              updatedEstablishments,
+              updatedAgencies,
+              triggeredBy: {
+                kind: "crawler",
+              },
+            }),
           ),
-        ),
-        ...updatedAgencies.map((agency) => uow.agencyRepository.update(agency)),
-        uow.userRepository.delete(userToDelete.id),
-        uow.outboxRepository.saveNewEventsBatch(
-          makeEvents({
-            createNewEvent,
-            userToDelete,
-            updatedEstablishments,
-            updatedAgencies,
-            triggeredBy: {
-              kind: "crawler",
-            },
-          }),
-        ),
       ]);
     },
   );

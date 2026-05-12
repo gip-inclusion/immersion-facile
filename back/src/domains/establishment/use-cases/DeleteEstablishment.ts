@@ -5,6 +5,7 @@ import {
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
+import { runPromisesSequentially } from "../../../utils/promises";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -50,17 +51,17 @@ export class DeleteEstablishment extends TransactionalUseCase<
 
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    await Promise.all([
-      uow.establishmentAggregateRepository.delete(siret),
-      ...groupsUpdatedWithoutSiret.map((group) =>
-        uow.groupRepository.save(group),
+    await uow.establishmentAggregateRepository.delete(siret);
+    await runPromisesSequentially(
+      groupsUpdatedWithoutSiret.map(
+        (group) => () => uow.groupRepository.save(group),
       ),
-      uow.deletedEstablishmentRepository.save({
-        siret,
-        createdAt: establishmentAggregate.establishment.createdAt,
-        deletedAt: this.timeGateway.now(),
-      }),
-    ]);
+    );
+    await uow.deletedEstablishmentRepository.save({
+      siret,
+      createdAt: establishmentAggregate.establishment.createdAt,
+      deletedAt: this.timeGateway.now(),
+    });
 
     const adminIds = establishmentAggregate.userRights
       .filter(({ role }) => role === "establishment-admin")

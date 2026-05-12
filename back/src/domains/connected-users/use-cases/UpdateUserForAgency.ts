@@ -87,29 +87,27 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
 
     validateAgencyRights(agency.id, updatedRights, agency.refersToAgencyId);
 
-    await Promise.all([
-      uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedRights,
-      }),
-      updateIfUserEmailChanged(
-        userToUpdate,
-        inputParams.email,
-        uow.userRepository,
-      ),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConnectedUserAgencyRightChanged",
-          payload: {
-            ...inputParams,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.agencyRepository.update({
+      id: agency.id,
+      usersRights: updatedRights,
+    });
+    await updateIfUserEmailChanged(
+      userToUpdate,
+      inputParams.email,
+      uow.userRepository,
+    );
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConnectedUserAgencyRightChanged",
+        payload: {
+          ...inputParams,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
   });
 
 const rejectEmailModificationIfNotAdminNorOwnEmail = (

@@ -1,6 +1,7 @@
 import type { AgencyKind, UserId } from "shared";
 import { agencyKindSchema, userIdSchema } from "shared";
 import { z } from "zod";
+import { runPromisesSequentially } from "../../../utils/promises";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 type AssignAgencyViewerRoleInput = {
@@ -50,8 +51,8 @@ export const makeAssignAgencyViewerRole = useCaseBuilder(
     let agencyUpdatesFailed = 0;
     let agenciesSkipped = 0;
 
-    await Promise.all(
-      targetAgencies.map(async (agency) => {
+    await runPromisesSequentially(
+      targetAgencies.map((agency) => async () => {
         const updatedUsersRights = { ...agency.usersRights };
         let hasChanges = false;
 

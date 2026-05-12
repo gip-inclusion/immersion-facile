@@ -29,22 +29,20 @@ export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
 
     const { [userToUpdate.id]: _, ...updatedUserRights } = agency.usersRights;
 
-    await Promise.all([
-      uow.agencyRepository.update({
-        id: agency.id,
-        usersRights: updatedUserRights,
-      }),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConnectedUserAgencyRightRejected",
-          payload: {
-            ...inputParams,
-            triggeredBy: {
-              kind: "connected-user",
-              userId: currentUser.id,
-            },
+    await uow.agencyRepository.update({
+      id: agency.id,
+      usersRights: updatedUserRights,
+    });
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConnectedUserAgencyRightRejected",
+        payload: {
+          ...inputParams,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: currentUser.id,
           },
-        }),
-      ),
-    ]);
+        },
+      }),
+    );
   });
