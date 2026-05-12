@@ -55,18 +55,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
 
-      - name: Cache Playwright Browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Install Playwright browsers if not cached
-        if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
-        run: pnpm playwright install
-
       - name: ${{matrix.command}}
         run: ${{matrix.command}}
 
@@ -204,12 +192,14 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers if not cached
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm playwright install
+        run: |
+          if [ -z "$(ls -A ~/.cache/ms-playwright 2>/dev/null)" ]; then
+            pnpm playwright install
+          fi
 
       - name: Post install bun
         run: |
