@@ -2,7 +2,7 @@ import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeRemindAgencyAdminThatNewUserRequestAgencyRight } from "../../domains/convention/use-cases/RemindAgencyAdminThatNewUserRequestAgencyRight";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
-import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
@@ -24,7 +24,7 @@ const remindAgencyAdminThatNewUserRequestAgencyRightScript = async () => {
         saveNotificationsBatchAndRelatedEvent:
           makeSaveNotificationsBatchAndRelatedEvent(
             new UuidV4Generator(),
-            new CustomTimeGateway(),
+            new RealTimeGateway(),
           ),
         immersionBaseUrl: config.immersionFacileBaseUrl,
       },

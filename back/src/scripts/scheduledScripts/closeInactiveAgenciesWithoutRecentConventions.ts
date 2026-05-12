@@ -2,7 +2,7 @@ import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { makeCloseInactiveAgenciesWithoutRecentConventions } from "../../domains/agency/use-cases/CloseInactiveAgenciesWithoutRecentConventions";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
-import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
@@ -18,7 +18,7 @@ const closeInactiveAgenciesWithoutRecentConventionsScript = async () => {
     createMakeProductionPgPool(config),
   );
 
-  const timeGateway = new CustomTimeGateway();
+  const timeGateway = new RealTimeGateway();
   const closeInactiveAgenciesWithoutRecentConventions =
     makeCloseInactiveAgenciesWithoutRecentConventions({
       uowPerformer,

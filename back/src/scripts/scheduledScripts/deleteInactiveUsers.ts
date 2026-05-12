@@ -4,7 +4,7 @@ import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { inactiveUsersCleanupBatchSize } from "../../domains/core/authentication/connected-user/use-cases/inactiveUserConstants";
 import { makeTriggerEventsToDeleteInactiveUsers } from "../../domains/core/authentication/connected-user/use-cases/TriggerEventsToDeleteInactiveUsers";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../../utils/logger";
@@ -19,7 +19,7 @@ const triggerEventsToDeleteInactiveUsersScript = async () => {
     createMakeProductionPgPool(config),
   );
 
-  const timeGateway = new CustomTimeGateway();
+  const timeGateway = new RealTimeGateway();
   const uuidGenerator = new UuidV4Generator();
 
   const triggerEventsToDeleteInactiveUsers =
