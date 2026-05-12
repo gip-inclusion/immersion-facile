@@ -32,7 +32,10 @@ type SearchMadeFilters = {
 };
 
 type _CheckExaustiveSearchFilters = ExpectTrue<
-  ExtractAddedOrMissingSearchFiltersKeys<SearchMadeFilters, "geoParams">
+  ExtractAddedOrMissingSearchFiltersKeys<
+    SearchMadeFilters,
+    "geoParams" | "excludedSirets"
+  >
 >;
 
 export type SearchMadeCommon = SearchMadeFilters & {

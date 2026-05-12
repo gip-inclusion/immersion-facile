@@ -21,7 +21,8 @@ type SearchFilterKey = (typeof searchFilters)[number];
 export type SearchImmersionFiltersKey =
   | keyof Pick<GetOffersFlatQueryParams, SearchFilterKey>
   | "geoParams"
-  | "romeCodes";
+  | "romeCodes"
+  | "excludedSirets";
 
 export type ExtractAddedOrMissingSearchFiltersKeys<
   T extends object,
