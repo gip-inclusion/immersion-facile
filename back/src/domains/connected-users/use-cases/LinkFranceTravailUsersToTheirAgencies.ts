@@ -5,6 +5,7 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
+  executeInSequence,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserWithRights,
   type ZodSchemaWithInputMatchingOutput,
@@ -14,7 +15,6 @@ import {
   getAgencyAndAdminEmailsByAgencyId,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
-import { runPromisesSequentially } from "../../../utils/promises";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -51,15 +51,12 @@ export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
       await uow.agencyRepository.getBySafirAndActiveStatus(codeSafir);
 
     if (agenciesWithSafir.length) {
-      await runPromisesSequentially(
-        agenciesWithSafir.map(
-          (agencyWithSafir) => () =>
-            updateActiveAgencyWithSafir(
-              uow,
-              agencyWithSafir,
-              userId,
-              deps.createNewEvent,
-            ),
+      await executeInSequence(agenciesWithSafir, (agencyWithSafir) =>
+        updateActiveAgencyWithSafir(
+          uow,
+          agencyWithSafir,
+          userId,
+          deps.createNewEvent,
         ),
       );
       return;

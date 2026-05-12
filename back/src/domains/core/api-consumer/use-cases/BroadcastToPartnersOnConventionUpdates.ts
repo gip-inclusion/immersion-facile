@@ -5,6 +5,7 @@ import {
   type AppellationAndRomeDto,
   type ConventionReadDto,
   errors,
+  executeInSequence,
   isApiConsumerAllowed,
   pipeWithValue,
   type WithBannedEstablishmentInformations,
@@ -12,7 +13,6 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
 import { createLogger } from "../../../../utils/logger";
-import { runPromisesSequentially } from "../../../../utils/promises";
 import {
   type WithConventionIdAndPreviousAgencyId,
   withConventionIdAndPreviousAgencySchema,
@@ -142,11 +142,8 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
       });
     }
 
-    await runPromisesSequentially(
-      apiConsumers.map(
-        (apiConsumer) => () =>
-          notifySubscriber({ uow, conventionRead, deps })(apiConsumer),
-      ),
+    await executeInSequence(apiConsumers, (apiConsumer) =>
+      notifySubscriber({ uow, conventionRead, deps })(apiConsumer),
     );
   });
 

@@ -3,13 +3,13 @@ import {
   createOpaqueEmail,
   type DateRange,
   type DiscussionDto,
+  executeInSequence,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   isTruthy,
   localization,
 } from "shared";
 import { z } from "zod";
-import { runPromisesSequentially } from "../../../utils/promises";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
@@ -56,21 +56,15 @@ export const makeContactRequestReminder = useCaseBuilder(
         limit: MAX_DISCUSSIONS,
       })
       .then((discussions) =>
-        runPromisesSequentially(
-          discussions.map(
-            (discussion) => () =>
-              makeNotification({ uow, discussion, mode, domain: deps.domain }),
-          ),
+        executeInSequence(discussions, (discussion) =>
+          makeNotification({ uow, discussion, mode, domain: deps.domain }),
         ),
       )
       .then(async (maybeNotifications) => {
         const notifications = maybeNotifications.filter(isTruthy);
 
-        await runPromisesSequentially(
-          notifications.map(
-            (notification) => () =>
-              deps.saveNotificationAndRelatedEvent(uow, notification),
-          ),
+        await executeInSequence(notifications, (notification) =>
+          deps.saveNotificationAndRelatedEvent(uow, notification),
         );
 
         return { numberOfNotifications: notifications.length };
