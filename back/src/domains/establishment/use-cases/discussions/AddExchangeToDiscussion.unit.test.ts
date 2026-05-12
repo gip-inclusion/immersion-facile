@@ -283,15 +283,15 @@ describe("AddExchangeToDiscussion", () => {
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion2.id,
-                siret: pendingDiscussion2.siret,
+                discussionId: pendingDiscussion1.id,
+                siret: pendingDiscussion1.siret,
               },
             },
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion1.id,
-                siret: pendingDiscussion1.siret,
+                discussionId: pendingDiscussion2.id,
+                siret: pendingDiscussion2.siret,
               },
             },
           ]);
@@ -437,15 +437,15 @@ describe("AddExchangeToDiscussion", () => {
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion2.id,
-                siret: pendingDiscussion2.siret,
+                discussionId: pendingDiscussion1.id,
+                siret: pendingDiscussion1.siret,
               },
             },
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion1.id,
-                siret: pendingDiscussion1.siret,
+                discussionId: pendingDiscussion2.id,
+                siret: pendingDiscussion2.siret,
               },
             },
           ]);
