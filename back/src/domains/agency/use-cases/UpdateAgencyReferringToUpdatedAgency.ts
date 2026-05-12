@@ -3,10 +3,10 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   errors,
+  executeInSequence,
   keys,
   withAgencyIdSchema,
 } from "shared";
-import { runPromisesSequentially } from "../../../utils/promises";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
@@ -28,25 +28,23 @@ export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
     const relatedAgencies =
       await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
 
-    await runPromisesSequentially(
-      relatedAgencies.map(({ usersRights, id }) => async () => {
-        await uow.agencyRepository.update({
-          id,
-          usersRights: updateRights(usersRights, updatedAgency),
-        });
-        await uow.outboxRepository.save(
-          deps.createNewEvent({
-            topic: "AgencyUpdated",
-            payload: {
-              agencyId: id,
-              triggeredBy: {
-                kind: "crawler",
-              },
+    await executeInSequence(relatedAgencies, async ({ usersRights, id }) => {
+      await uow.agencyRepository.update({
+        id,
+        usersRights: updateRights(usersRights, updatedAgency),
+      });
+      await uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: id,
+            triggeredBy: {
+              kind: "crawler",
             },
-          }),
-        );
-      }),
-    );
+          },
+        }),
+      );
+    });
   });
 
 const updateRights = (

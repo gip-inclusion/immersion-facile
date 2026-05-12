@@ -3,6 +3,7 @@ import {
   type ConventionDto,
   type Email,
   errors,
+  executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   makeUrlWithQueryParams,
@@ -10,7 +11,6 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { runPromisesSequentially } from "../../../../utils/promises";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
@@ -83,44 +83,41 @@ const sendEmailToRecipients = async ({
   uow: UnitOfWork;
   deps: Deps;
 }) => {
-  await runPromisesSequentially(
-    recipients.map(
-      (email) => () =>
-        saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-            recipients: [email],
-            params: {
-              internshipKind: convention.internshipKind,
-              agencyName: agency.name,
-              agencyReferentName: getFormattedFirstnameAndLastname(
-                convention.agencyReferent ?? {},
-              ),
-              businessName: convention.businessName,
-              dateEnd: convention.dateEnd,
-              dateStart: convention.dateStart,
-              conventionId: convention.id,
-              firstName: getFormattedFirstnameAndLastname({
-                firstname: convention.signatories.beneficiary.firstName,
-              }),
-              lastName: getFormattedFirstnameAndLastname({
-                lastname: convention.signatories.beneficiary.lastName,
-              }),
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: convention.id },
-              )}`,
-              agencyLogoUrl: agency.logoUrl ?? undefined,
-              warning,
-            },
-          },
-          followedIds: {
-            conventionId: convention.id,
-            agencyId: convention.agencyId,
-            establishmentSiret: convention.siret,
-          },
-        }),
-    ),
+  await executeInSequence(recipients, (email) =>
+    saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        recipients: [email],
+        params: {
+          internshipKind: convention.internshipKind,
+          agencyName: agency.name,
+          agencyReferentName: getFormattedFirstnameAndLastname(
+            convention.agencyReferent ?? {},
+          ),
+          businessName: convention.businessName,
+          dateEnd: convention.dateEnd,
+          dateStart: convention.dateStart,
+          conventionId: convention.id,
+          firstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          lastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
+          manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
+            `/${frontRoutes.manageConventionUserConnected}`,
+            { conventionId: convention.id },
+          )}`,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
+          warning,
+        },
+      },
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+      },
+    }),
   );
 };

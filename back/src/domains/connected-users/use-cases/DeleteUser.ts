@@ -5,6 +5,7 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   errors,
+  executeInSequence,
   isNotEmptyArray,
   type UserId,
   type UserWithAdminRights,
@@ -13,7 +14,6 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import z from "zod";
-import { runPromisesSequentially } from "../../../utils/promises";
 import {
   type DomainEvent,
   type TriggeredBy,
@@ -68,44 +68,37 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
       if (inputParams.partialDelete)
         throw new Error("HYBRYD BEHAVIOR NOT IMPLEMENTED");
 
-      const updatedAgencies = await runPromisesSequentially(
-        agenciesWithUserRight.map(
-          (agency) => () => updateAgency(uow, userToDelete.id)(agency),
-        ),
+      const updatedAgencies = await executeInSequence(
+        agenciesWithUserRight,
+        updateAgency(uow, userToDelete.id),
       );
 
-      const updatedEstablishments = await runPromisesSequentially(
-        establishmentsWithUserRight.map(
-          (establishment) => () =>
-            updateEstablishment(uow, userToDelete.id)(establishment),
-        ),
+      const updatedEstablishments = await executeInSequence(
+        establishmentsWithUserRight,
+        updateEstablishment(uow, userToDelete.id),
       );
 
-      await runPromisesSequentially([
-        ...updatedEstablishments.map(
-          (establishment) => () =>
-            uow.establishmentAggregateRepository.updateEstablishmentAggregate(
-              establishment,
-              timeGateway.now(),
-            ),
+      await executeInSequence(updatedEstablishments, (establishment) =>
+        uow.establishmentAggregateRepository.updateEstablishmentAggregate(
+          establishment,
+          timeGateway.now(),
         ),
-        ...updatedAgencies.map(
-          (agency) => () => uow.agencyRepository.update(agency),
-        ),
-        () => uow.userRepository.delete(userToDelete.id),
-        () =>
-          uow.outboxRepository.saveNewEventsBatch(
-            makeEvents({
-              createNewEvent,
-              userToDelete,
-              updatedEstablishments,
-              updatedAgencies,
-              triggeredBy: {
-                kind: "crawler",
-              },
-            }),
-          ),
-      ]);
+      );
+      await executeInSequence(updatedAgencies, (agency) =>
+        uow.agencyRepository.update(agency),
+      );
+      await uow.userRepository.delete(userToDelete.id);
+      await uow.outboxRepository.saveNewEventsBatch(
+        makeEvents({
+          createNewEvent,
+          userToDelete,
+          updatedEstablishments,
+          updatedAgencies,
+          triggeredBy: {
+            kind: "crawler",
+          },
+        }),
+      );
     },
   );
 

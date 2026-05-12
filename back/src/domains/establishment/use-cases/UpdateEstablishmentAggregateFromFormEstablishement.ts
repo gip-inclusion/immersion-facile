@@ -4,12 +4,12 @@ import {
   type ConnectedUserDomainJwtPayload,
   type EstablishmentUserRightStatus,
   errors,
+  executeInSequence,
   onlyAdminUserRightsWithStatusAccepted,
   onlyUserRightWithStatusAccepted,
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
 } from "shared";
-import { runPromisesSequentially } from "../../../utils/promises";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -133,40 +133,42 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
       initialEstablishmentAggregate,
     );
 
-    const makeUserRightsAddedNotifications = () =>
-      userRightsAdded
-        .filter((userRight) =>
-          onlyUserRightWithStatusAccepted({ status: userRight.status }),
-        )
-        .map((userRight) => async () => {
-          const user = await uow.userRepository.getById(userRight.userId);
-          if (!user) throw errors.user.notFound({ userId: userRight.userId });
-          return deps.saveNotificationAndRelatedEvent(uow, {
-            kind: "email",
-            templatedContent: {
-              kind: "ESTABLISHMENT_USER_RIGHTS_ADDED",
-              recipients: [user.email],
-              params: {
-                businessName:
-                  establishmentAggregate.establishment.customizedName ??
-                  establishmentAggregate.establishment.name,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                triggeredByUserFirstName: triggeredByUser.firstName,
-                triggeredByUserLastName: triggeredByUser.lastName,
-                role: userRight.role,
-                immersionBaseUrl: deps.immersionBaseUrl,
-              },
+    const addedRightsWithAcceptedStatus = userRightsAdded.filter((userRight) =>
+      onlyUserRightWithStatusAccepted({ status: userRight.status }),
+    );
+    await executeInSequence(
+      addedRightsWithAcceptedStatus,
+      async (userRight) => {
+        const user = await uow.userRepository.getById(userRight.userId);
+        if (!user) throw errors.user.notFound({ userId: userRight.userId });
+        return deps.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            kind: "ESTABLISHMENT_USER_RIGHTS_ADDED",
+            recipients: [user.email],
+            params: {
+              businessName:
+                establishmentAggregate.establishment.customizedName ??
+                establishmentAggregate.establishment.name,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              triggeredByUserFirstName: triggeredByUser.firstName,
+              triggeredByUserLastName: triggeredByUser.lastName,
+              role: userRight.role,
+              immersionBaseUrl: deps.immersionBaseUrl,
             },
-            followedIds: {
-              userId: userRight.userId,
-              establishmentSiret: establishmentAggregate.establishment.siret,
-            },
-          });
+          },
+          followedIds: {
+            userId: userRight.userId,
+            establishmentSiret: establishmentAggregate.establishment.siret,
+          },
         });
+      },
+    );
 
-    const makeUserRightsUpdatedWithSameStatusNotifications = () =>
-      userRightsUpdatedWithSameStatus.map((userRight) => async () => {
+    await executeInSequence(
+      userRightsUpdatedWithSameStatus,
+      async (userRight) => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
         return deps.saveNotificationAndRelatedEvent(uow, {
@@ -190,7 +192,8 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
             establishmentSiret: establishmentAggregate.establishment.siret,
           },
         });
-      });
+      },
+    );
 
     const businessNameForUserRightsEmails =
       establishmentAggregate.establishment.customizedName ??
@@ -226,21 +229,12 @@ export const makeUpdateEstablishmentAggregateFromForm = useCaseBuilder(
       });
     };
 
-    await runPromisesSequentially([
-      ...makeUserRightsAddedNotifications(),
-      ...makeUserRightsUpdatedWithSameStatusNotifications(),
-      ...userRightsUpdatedWithNewStatus.map(
-        (userRight) => () =>
-          notifyUserRightStatusChangeByEmail(userRight.userId, "ACCEPTED"),
-      ),
-      ...pendingUserRightsRemoved.map(
-        (removedUserRight) => () =>
-          notifyUserRightStatusChangeByEmail(
-            removedUserRight.userId,
-            "REJECTED",
-          ),
-      ),
-    ]);
+    await executeInSequence(userRightsUpdatedWithNewStatus, (userRight) =>
+      notifyUserRightStatusChangeByEmail(userRight.userId, "ACCEPTED"),
+    );
+    await executeInSequence(pendingUserRightsRemoved, (removedUserRight) =>
+      notifyUserRightStatusChangeByEmail(removedUserRight.userId, "REJECTED"),
+    );
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,

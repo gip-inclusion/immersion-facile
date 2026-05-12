@@ -6,9 +6,9 @@ import {
   type AgencyWithUsersRights,
   createAgencySchema,
   errors,
+  executeInSequence,
   type UserId,
 } from "shared";
-import { runPromisesSequentially } from "../../../utils/promises";
 import { createOrGetUserIdByEmail } from "../../core/authentication/connected-user/entities/user.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
@@ -38,30 +38,26 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
     const validatorUserIdsForAgency: WithUserIdAndIsNotified[] =
       rest.refersToAgencyId
         ? await getReferredAgencyValidatorUserIds(uow, rest.refersToAgencyId)
-        : await runPromisesSequentially(
-            validatorEmails.map((email) => async () => ({
-              userId: await createOrGetUserIdByEmail(
-                uow,
-                deps.timeGateway,
-                deps.uuidGenerator,
-                { email },
-              ),
-              isNotifiedByEmail: true,
-            })),
-          );
+        : await executeInSequence(validatorEmails, async (email) => ({
+            userId: await createOrGetUserIdByEmail(
+              uow,
+              deps.timeGateway,
+              deps.uuidGenerator,
+              { email },
+            ),
+            isNotifiedByEmail: true,
+          }));
 
     const counsellorUserIdsForAgency: WithUserIdAndIsNotified[] =
-      await runPromisesSequentially(
-        counsellorEmails.map((email) => async () => ({
-          userId: await createOrGetUserIdByEmail(
-            uow,
-            deps.timeGateway,
-            deps.uuidGenerator,
-            { email },
-          ),
-          isNotifiedByEmail: true,
-        })),
-      );
+      await executeInSequence(counsellorEmails, async (email) => ({
+        userId: await createOrGetUserIdByEmail(
+          uow,
+          deps.timeGateway,
+          deps.uuidGenerator,
+          { email },
+        ),
+        isNotifiedByEmail: true,
+      }));
 
     const agency: AgencyWithUsersRights = {
       ...rest,
@@ -84,15 +80,12 @@ export const makeAddAgency = useCaseBuilder("AddAgency")
       throw errors.agency.invalidSiret({ siret: agency.agencySiret });
 
     await uow.agencyRepository.insert(agency);
-    await runPromisesSequentially([
-      () =>
-        uow.outboxRepository.save(
-          deps.createNewEvent({
-            topic: "NewAgencyAdded",
-            payload: { agencyId: agency.id, triggeredBy: null },
-          }),
-        ),
-    ]);
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "NewAgencyAdded",
+        payload: { agencyId: agency.id, triggeredBy: null },
+      }),
+    );
   });
 
 const makeUserRights = (

@@ -18,13 +18,13 @@ import {
   emailSchema,
   errors,
   exchangeRoleSchema,
+  executeInSequence,
   frontRoutes,
   localization,
   messageSchema,
   type UserId,
 } from "shared";
 import { z } from "zod";
-import { runPromisesSequentially } from "../../../../utils/promises";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -134,17 +134,18 @@ export const makeAddExchangeToDiscussion = useCaseBuilder(
             makeDashboardMessageWithUserId(messageInput, currentUser),
           );
 
-    return runPromisesSequentially(
-      messageInputsWithIdentity.map(
-        (messageInput) => () =>
-          processSendMessage({
-            uow,
-            source: inputParams.source,
-            messageInput,
-            deps,
-          }),
-      ),
-    ).then((exchanges) => exchanges[0]);
+    const exchanges = await executeInSequence<
+      MessageInputFromDashboardWithUserId | MessageInputFromInboundParsing,
+      Exchange | DiscussionExchangeForbiddenParams
+    >(messageInputsWithIdentity, (messageInput) =>
+      processSendMessage({
+        uow,
+        source: inputParams.source,
+        messageInput,
+        deps,
+      }),
+    );
+    return exchanges[0];
   });
 
 const processSendMessage = async ({

@@ -19,7 +19,6 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { runPromisesSequentially } from "../../../utils/promises";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -204,36 +203,38 @@ const sendAssessmentNotifications = async (
 
   // TODO : Tentative de save les notifs en un appel db avec saveNotificationsBatchAndRelatedEvent
   // problème de test avec des notifs/event de notif existants
-  await runPromisesSequentially(
-    [
-      ...(isTutorNotificationNotSent
-        ? [
-            makeTutorAssessmentNotification(
-              convention,
-              agency,
-              await prepareConventionMagicShortLinkMaker({
-                config: deps.config,
-                conventionMagicLinkPayload: {
-                  id: convention.id,
-                  email: convention.establishmentTutor.email,
-                  role: "establishment-tutor",
-                  now: deps.timeGateway.now(),
-                },
-                generateConventionMagicLinkUrl:
-                  deps.generateConventionMagicLinkUrl,
-                shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-                uow,
-              })({
-                targetRoute: frontRoutes.assessment,
-                lifetime: "2Days",
-              }),
-            ),
-          ]
-        : []),
-      ...(isBeneficiaryNotificationNotSent
-        ? [makeBeneficiaryNotification(convention)]
-        : []),
-    ].map((notif) => () => deps.saveNotificationAndRelatedEvent(uow, notif)),
+  const notificationsToSend = [
+    ...(isTutorNotificationNotSent
+      ? [
+          makeTutorAssessmentNotification(
+            convention,
+            agency,
+            await prepareConventionMagicShortLinkMaker({
+              config: deps.config,
+              conventionMagicLinkPayload: {
+                id: convention.id,
+                email: convention.establishmentTutor.email,
+                role: "establishment-tutor",
+                now: deps.timeGateway.now(),
+              },
+              generateConventionMagicLinkUrl:
+                deps.generateConventionMagicLinkUrl,
+              shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+              uow,
+            })({
+              targetRoute: frontRoutes.assessment,
+              lifetime: "2Days",
+            }),
+          ),
+        ]
+      : []),
+    ...(isBeneficiaryNotificationNotSent
+      ? [makeBeneficiaryNotification(convention)]
+      : []),
+  ];
+
+  await executeInSequence(notificationsToSend, (notif) =>
+    deps.saveNotificationAndRelatedEvent(uow, notif),
   );
 
   if (isTutorNotificationNotSent)

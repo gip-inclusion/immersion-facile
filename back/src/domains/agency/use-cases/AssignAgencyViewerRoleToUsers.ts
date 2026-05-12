@@ -1,7 +1,6 @@
 import type { AgencyKind, UserId } from "shared";
-import { agencyKindSchema, userIdSchema } from "shared";
+import { agencyKindSchema, executeInSequence, userIdSchema } from "shared";
 import { z } from "zod";
-import { runPromisesSequentially } from "../../../utils/promises";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 type AssignAgencyViewerRoleInput = {
@@ -51,51 +50,49 @@ export const makeAssignAgencyViewerRole = useCaseBuilder(
     let agencyUpdatesFailed = 0;
     let agenciesSkipped = 0;
 
-    await runPromisesSequentially(
-      targetAgencies.map((agency) => async () => {
-        const updatedUsersRights = { ...agency.usersRights };
-        let hasChanges = false;
+    await executeInSequence(targetAgencies, async (agency) => {
+      const updatedUsersRights = { ...agency.usersRights };
+      let hasChanges = false;
 
-        users.forEach((user) => {
-          const existingRight = agency.usersRights[user.id];
+      users.forEach((user) => {
+        const existingRight = agency.usersRights[user.id];
 
-          if (existingRight?.roles.includes("agency-viewer")) {
-            return;
-          }
-
-          updatedUsersRights[user.id] = existingRight
-            ? {
-                roles: [...existingRight.roles, "agency-viewer"],
-                isNotifiedByEmail: existingRight.isNotifiedByEmail,
-              }
-            : {
-                roles: ["agency-viewer"],
-                isNotifiedByEmail: false,
-              };
-
-          hasChanges = true;
-        });
-
-        if (hasChanges) {
-          return uow.agencyRepository
-            .update({
-              id: agency.id,
-              usersRights: updatedUsersRights,
-            })
-            .then(() => {
-              agenciesSuccessfullyUpdated++;
-            })
-            .catch((error) => {
-              agencyUpdatesFailed++;
-              console.error(
-                `Failed to update agency ${agency.id} with user rights:`,
-                error,
-              );
-            });
+        if (existingRight?.roles.includes("agency-viewer")) {
+          return;
         }
-        agenciesSkipped++;
-      }),
-    );
+
+        updatedUsersRights[user.id] = existingRight
+          ? {
+              roles: [...existingRight.roles, "agency-viewer"],
+              isNotifiedByEmail: existingRight.isNotifiedByEmail,
+            }
+          : {
+              roles: ["agency-viewer"],
+              isNotifiedByEmail: false,
+            };
+
+        hasChanges = true;
+      });
+
+      if (hasChanges) {
+        return uow.agencyRepository
+          .update({
+            id: agency.id,
+            usersRights: updatedUsersRights,
+          })
+          .then(() => {
+            agenciesSuccessfullyUpdated++;
+          })
+          .catch((error) => {
+            agencyUpdatesFailed++;
+            console.error(
+              `Failed to update agency ${agency.id} with user rights:`,
+              error,
+            );
+          });
+      }
+      agenciesSkipped++;
+    });
 
     return {
       agenciesSuccessfullyUpdated,

@@ -1,6 +1,7 @@
 import {
   errors,
   establishmentRoleSchema,
+  executeInSequence,
   frontRoutes,
   onlyAdminUserRightsWithStatusAccepted,
   siretSchema,
@@ -9,7 +10,6 @@ import {
 } from "shared";
 import z from "zod";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { runPromisesSequentially } from "../../../../utils/promises";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { EstablishmentUserRight } from "../../entities/EstablishmentAggregate";
@@ -59,28 +59,25 @@ export const makeNotifyEstablishmentAdminsThatUserRightIsPending =
       if (!pendingUser)
         throw errors.user.notFound({ userId: inputParams.userId });
 
-      await runPromisesSequentially(
-        adminUsers.map(
-          (adminUser) => () =>
-            deps.saveNotificationAndRelatedEvent(uow, {
-              kind: "email",
-              templatedContent: {
-                kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
-                recipients: [adminUser.email],
-                params: {
-                  establishmentDashboardUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
-                  adminFirstName: adminUser.firstName,
-                  adminLastName: adminUser.lastName,
-                  pendingUserFirstName: pendingUser.firstName,
-                  pendingUserLastName: pendingUser.lastName,
-                  pendingUserRole: inputParams.role,
-                  pendingUserEmail: pendingUser.email,
-                },
-              },
-              followedIds: {
-                establishmentSiret: inputParams.siret,
-              },
-            }),
-        ),
+      await executeInSequence(adminUsers, (adminUser) =>
+        deps.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
+            recipients: [adminUser.email],
+            params: {
+              establishmentDashboardUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+              adminFirstName: adminUser.firstName,
+              adminLastName: adminUser.lastName,
+              pendingUserFirstName: pendingUser.firstName,
+              pendingUserLastName: pendingUser.lastName,
+              pendingUserRole: inputParams.role,
+              pendingUserEmail: pendingUser.email,
+            },
+          },
+          followedIds: {
+            establishmentSiret: inputParams.siret,
+          },
+        }),
       );
     });

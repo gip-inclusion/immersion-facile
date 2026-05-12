@@ -3,6 +3,7 @@ import {
   type AfterOAuthSuccessRedirectionResponse,
   type EmailAuthCodeJwt,
   errors,
+  executeInSequence,
   type OAuthCode,
   type OAuthSuccessLoginParams,
   oAuthSuccessLoginParamsSchema,
@@ -11,7 +12,6 @@ import {
 } from "shared";
 import type { GenerateConnectedUserLoginUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
-import { runPromisesSequentially } from "../../../../../utils/promises";
 import {
   type AgencyRightOfUser,
   removeAgencyRightsForUser,
@@ -293,18 +293,12 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       ];
     }, []);
 
-    await runPromisesSequentially(
-      newAgenciesRightForUser.map(
-        (agencyRightsForUser) => () =>
-          updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
-      ),
+    await executeInSequence(newAgenciesRightForUser, (agencyRightsForUser) =>
+      updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
     );
 
-    await runPromisesSequentially(
-      userToDeleteAgencyRights.map(
-        (agencyRightsForUser) => () =>
-          removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
-      ),
+    await executeInSequence(userToDeleteAgencyRights, (agencyRightsForUser) =>
+      removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
     );
 
     await uow.userRepository.delete(userToDeleteId);

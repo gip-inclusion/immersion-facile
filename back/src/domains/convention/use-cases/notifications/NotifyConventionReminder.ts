@@ -12,6 +12,7 @@ import {
   type EstablishmentRepresentative,
   type ExtractFromExisting,
   errors,
+  executeInSequence,
   filterNotFalsy,
   frontRoutes,
   type GenericActor,
@@ -27,7 +28,6 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { runPromisesSequentially } from "../../../../utils/promises";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import type {
   NotificationContentAndFollowedIds,
@@ -119,17 +119,16 @@ const onAgencyReminder = async ({
 
   await deps.saveNotificationsBatchAndRelatedEvent(
     uow,
-    await runPromisesSequentially(
-      counsellorsAndValidatorsEmails.map(
-        (counsellorOrValidatorEmail) => () =>
-          createAgencyReminderEmail({
-            counsellorOrValidatorEmail,
-            conventionRead,
-            agency,
-            reminderKind,
-            config: deps.config,
-          }),
-      ),
+    await executeInSequence(
+      counsellorsAndValidatorsEmails,
+      (counsellorOrValidatorEmail) =>
+        createAgencyReminderEmail({
+          counsellorOrValidatorEmail,
+          conventionRead,
+          agency,
+          reminderKind,
+          config: deps.config,
+        }),
     ),
   );
 };
@@ -164,29 +163,25 @@ const onSignatoriesReminder = async ({
       : [conventionRead.establishmentTutor]),
   ];
 
-  const templatedEmails: TemplatedEmail[] = await runPromisesSequentially(
-    emailActors.map(
-      (actor) => () =>
-        makeSignatoryReminderEmail({
-          actor,
-          conventionRead: conventionRead,
-          uow,
-          deps,
-        }),
-    ),
+  const templatedEmails: TemplatedEmail[] = await executeInSequence(
+    emailActors,
+    (actor) =>
+      makeSignatoryReminderEmail({
+        actor,
+        conventionRead: conventionRead,
+        uow,
+        deps,
+      }),
   );
 
-  const templatedSms = await runPromisesSequentially(
-    smsSignatories.map(
-      (signatory) => () =>
-        prepareSmsReminderParams({
-          actor: signatory,
-          conventionRead,
-          uow,
-          reminderKind,
-          deps,
-        }),
-    ),
+  const templatedSms = await executeInSequence(smsSignatories, (signatory) =>
+    prepareSmsReminderParams({
+      actor: signatory,
+      conventionRead,
+      uow,
+      reminderKind,
+      deps,
+    }),
   );
 
   const followedIds = {

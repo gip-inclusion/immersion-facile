@@ -2,10 +2,10 @@ import {
   addressDtoToString,
   type ConnectedUser,
   errors,
+  executeInSequence,
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
-import { runPromisesSequentially } from "../../../utils/promises";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -52,10 +52,8 @@ export class DeleteEstablishment extends TransactionalUseCase<
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     await uow.establishmentAggregateRepository.delete(siret);
-    await runPromisesSequentially(
-      groupsUpdatedWithoutSiret.map(
-        (group) => () => uow.groupRepository.save(group),
-      ),
+    await executeInSequence(groupsUpdatedWithoutSiret, (group) =>
+      uow.groupRepository.save(group),
     );
     await uow.deletedEstablishmentRepository.save({
       siret,

@@ -18,7 +18,6 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
-import { runPromisesSequentially } from "../../../utils/promises";
 import { getUserByEmailAndCreateIfMissing } from "../../connected-users/helpers/connectedUser.helper";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
@@ -91,12 +90,9 @@ export const makeAddAgenciesAndUsers = useCaseBuilder("AddAgenciesAndUsers")
     const chunks = splitEvery(chunkSize, inputParams);
     const siretsInIF = uniq(
       flatten(
-        await runPromisesSequentially(
-          chunks.map(
-            (importedAgencies) => () =>
-              uow.agencyRepository.getExistingActiveSirets(
-                importedAgencies.map((importedAgency) => importedAgency.SIRET),
-              ),
+        await executeInSequence(chunks, (importedAgencies) =>
+          uow.agencyRepository.getExistingActiveSirets(
+            importedAgencies.map((importedAgency) => importedAgency.SIRET),
           ),
         ),
       ),
@@ -190,61 +186,57 @@ const linkUsersToExistingAgency = async ({
       },
     });
 
-    await runPromisesSequentially(
-      sirets.map((siret) => async () => {
-        const agencyIF = agenciesIF.find(
-          (agencyIF) => agencyIF.agencySiret === siret,
+    await executeInSequence(sirets, async (siret) => {
+      const agencyIF = agenciesIF.find(
+        (agencyIF) => agencyIF.agencySiret === siret,
+      );
+      if (!agencyIF) {
+        usecaseErrors[siret] = new NotFoundError(
+          `Agency with siret ${siret} not found in IF`,
         );
-        if (!agencyIF) {
-          usecaseErrors[siret] = new NotFoundError(
-            `Agency with siret ${siret} not found in IF`,
-          );
-          return;
-        }
+        return;
+      }
 
-        const agencyUsersRights: {
-          userId: string;
-          roles: AgencyRole[];
-          isNotifiedByEmail: boolean;
-        }[] = await runPromisesSequentially(
-          rowsBySiret[siret]
-            .map((row) => row["E-mail authentification"])
-            .map((email) => async () => {
-              const user = await userRepository.findByEmail(email);
+      const agencyUsersRights: {
+        userId: string;
+        roles: AgencyRole[];
+        isNotifiedByEmail: boolean;
+      }[] = await executeInSequence(
+        rowsBySiret[siret].map((row) => row["E-mail authentification"]),
+        async (email) => {
+          const user = await userRepository.findByEmail(email);
 
-              if (!user) {
-                throw new Error(
-                  `Should not happen: User ${email} of siret ${siret} should already be created`,
-                );
-              }
+          if (!user)
+            throw new Error(
+              `Should not happen: User ${email} of siret ${siret} should already be created`,
+            );
 
-              const userWithRoles = agencyIF.usersRights[user.id] ?? undefined;
+          const userWithRoles = agencyIF.usersRights[user.id] ?? undefined;
 
-              return {
-                userId: user.id,
-                roles: uniq([
-                  ...(userWithRoles ? userWithRoles.roles : []),
-                  "agency-admin",
-                  "validator",
-                ]),
-                isNotifiedByEmail: userWithRoles?.isNotifiedByEmail ?? true,
-              };
-            }),
-        );
+          return {
+            userId: user.id,
+            roles: uniq([
+              ...(userWithRoles ? userWithRoles.roles : []),
+              "agency-admin",
+              "validator",
+            ]),
+            isNotifiedByEmail: userWithRoles?.isNotifiedByEmail ?? true,
+          };
+        },
+      );
 
-        await agencyRepository.update({
-          id: agencyIF.id,
-          usersRights: {
-            ...agencyIF.usersRights,
-            ...agencyUsersRights.reduce((acc, curr) => {
-              const { roles, isNotifiedByEmail } = curr;
-              acc[curr.userId] = { roles, isNotifiedByEmail };
-              return acc;
-            }, {} as AgencyUsersRights),
-          },
-        });
-      }),
-    );
+      await agencyRepository.update({
+        id: agencyIF.id,
+        usersRights: {
+          ...agencyIF.usersRights,
+          ...agencyUsersRights.reduce((acc, curr) => {
+            const { roles, isNotifiedByEmail } = curr;
+            acc[curr.userId] = { roles, isNotifiedByEmail };
+            return acc;
+          }, {} as AgencyUsersRights),
+        },
+      });
+    });
   });
 };
 
@@ -401,19 +393,17 @@ const createOrUpdateUsers = async ({
   const uniqEmails = uniq(emails);
 
   const newUsersCount = (
-    await runPromisesSequentially(
-      uniqEmails.map((email) => async () => {
-        const newUserUUid = uuidGenerator.new();
-        const user = await getUserByEmailAndCreateIfMissing({
-          userRepository,
-          timeGateway: timeGateway,
-          userIdIfNew: newUserUUid,
-          userEmail: email,
-        });
+    await executeInSequence(uniqEmails, async (email) => {
+      const newUserUUid = uuidGenerator.new();
+      const user = await getUserByEmailAndCreateIfMissing({
+        userRepository,
+        timeGateway: timeGateway,
+        userIdIfNew: newUserUUid,
+        userEmail: email,
+      });
 
-        return user.id === newUserUUid;
-      }),
-    )
+      return user.id === newUserUUid;
+    })
   ).filter(Boolean).length;
 
   return {
