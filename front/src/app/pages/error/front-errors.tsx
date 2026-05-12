@@ -68,16 +68,6 @@ export const frontErrors = {
               Vous pouvez demander un nouveau lien ci-dessous. Il vous sera
               envoyé par email dans les 2 à 3 minutes.
             </p>
-            <p>
-              Vous n'avez pas reçu le lien ?{" "}
-              <a
-                href={immersionFacileSupportUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contactez-nous
-              </a>
-            </p>
           </>
         ),
         buttons: [RenewJwtButton],
