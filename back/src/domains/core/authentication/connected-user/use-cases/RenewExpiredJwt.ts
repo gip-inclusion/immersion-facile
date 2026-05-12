@@ -257,17 +257,21 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     email: string,
     params: MagicLinkRenewalParams,
   ): Promise<void> {
-    await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "MAGIC_LINK_RENEWAL",
-        recipients: [email],
-        params,
+    await this.#saveNotificationAndRelatedEvent(
+      uow,
+      {
+        kind: "email",
+        templatedContent: {
+          kind: "MAGIC_LINK_RENEWAL",
+          recipients: [email],
+          params,
+        },
+        followedIds: {
+          conventionId: params.conventionId,
+        },
       },
-      followedIds: {
-        conventionId: params.conventionId,
-      },
-    });
+      { priority: 2 },
+    );
   }
 
   #findRouteToRenew(originalUrl: string) {
