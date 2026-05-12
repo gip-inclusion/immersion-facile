@@ -10,8 +10,15 @@ import { e2eBackendEnv, frontPort } from "./e2e-backend-env";
 const backPort = 1234;
 const baseURL = process.env.BASE_URL || `http://localhost:${frontPort}`;
 
-const loadEnvFile = (path: string): Record<string, string> =>
-  dotEnv.config({ path, processEnv: {} }).parsed ?? {};
+const loadEnvFile = (path: string): Record<string, string> => {
+  const merged: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env))
+    if (value !== undefined) merged[key] = value;
+  return {
+    ...merged,
+    ...(dotEnv.config({ path, processEnv: {} }).parsed ?? {}),
+  };
+};
 
 const playwrightEnv = loadEnvFile(resolve(__dirname, ".env"));
 const backendEnv = loadEnvFile(resolve(__dirname, "../back/.env"));
