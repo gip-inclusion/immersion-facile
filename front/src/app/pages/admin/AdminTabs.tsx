@@ -1,5 +1,6 @@
 import { Tabs, type TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
+import { useDispatch } from "react-redux";
 
 import {
   type AdminTabRouteName,
@@ -18,6 +19,7 @@ import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { UsersTab } from "src/app/pages/admin/UsersTab";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
 type RawAdminTab = Prettify<
@@ -75,12 +77,14 @@ const getAdminTabs = (currentTab: AdminTabRouteName) =>
 export const AdminTabs = ({ route }: { route: FrontAdminRouteTab }) => {
   const currentTab = route.name;
   const tabs = getAdminTabs(route.name);
+  const dispatch = useDispatch();
 
   return (
     <Tabs
       tabs={tabs}
       selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
       onTabChange={(tab) => {
+        dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
         routes[tab as AdminTabRouteName]().push();
       }}
       id="admin-tabs"
