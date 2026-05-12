@@ -1,4 +1,4 @@
-import "./instrumentSentryCron";
+import "../instrumentSentryCron";
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { createMakeProductionPgPool } from "../../config/pg/pgPool";
 import { inactiveUsersCleanupBatchSize } from "../../domains/core/authentication/connected-user/use-cases/inactiveUserConstants";
