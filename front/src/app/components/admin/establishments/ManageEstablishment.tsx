@@ -54,7 +54,7 @@ export const ManageEstablishment = (): JSX.Element => {
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ siret }) =>
-            routes.manageEstablishmentAdmin({ siret }).push(),
+            routes.adminEstablishmentDetail({ siret }).push(),
           )}
         >
           <div className={fr.cx("fr-grid-row")}>

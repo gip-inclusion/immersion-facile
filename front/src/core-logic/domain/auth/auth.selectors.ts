@@ -1,7 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { authFailed, type ConnectedUserJwt } from "shared";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
-import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const rootAuthSelector = createRootSelector((state) => state.auth);
@@ -53,11 +52,11 @@ const connectedUserJwt = createSelector(
       : undefined,
 );
 
-const isAdminConnected = createSelector(
-  connectedUserSelectors.currentUser,
-  isConnectedUser,
-  (user, isConnectedUser) =>
-    (isConnectedUser && user?.isBackofficeAdmin) ?? false,
+const isAdminConnected = createRootSelector(
+  ({ auth, connectedUser }) =>
+    (auth.federatedIdentityWithUser?.provider === "proConnect" ||
+      auth.federatedIdentityWithUser?.provider === "email") &&
+    !!connectedUser.currentUser?.isBackofficeAdmin,
 );
 
 const userIsDefined = (

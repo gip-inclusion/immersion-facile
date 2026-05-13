@@ -40,7 +40,7 @@ export const EstablishmentLineBusinessName = ({
         id={`${domElementIds.profile.adminEstablishmentLink}-${data.siret}`}
         size="small"
         linkProps={
-          routes.manageEstablishmentAdmin({
+          routes.adminEstablishmentDetail({
             siret: data.siret,
           }).link
         }

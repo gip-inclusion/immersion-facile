@@ -146,14 +146,19 @@ const myProfile = defineRoute(
 
 const agencyDashboardAgencies = agencyDashboard.extend("/agences");
 
-const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
-  adminTabRouteNames.reduce(
-    (acc, adminTabName) => ({
-      ...acc,
-      [adminTabName]: admin.extend(`/${adminTabs[adminTabName].slug}`),
-    }),
-    {} as Record<AdminTabRouteName, typeof admin>,
-  );
+const {
+  adminConventions,
+  adminAgencies,
+  adminUsers,
+  adminEstablishments,
+  ...restOfAdminRoutes
+} = adminTabRouteNames.reduce(
+  (acc, adminTabName) => ({
+    ...acc,
+    [adminTabName]: admin.extend(`/${adminTabs[adminTabName].slug}`),
+  }),
+  {} as Record<AdminTabRouteName, typeof admin>,
+);
 
 const conventionTemplateFromRouteValues = [
   "establishmentDashboard",
@@ -207,6 +212,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   adminAgencyDetail: adminAgencies.extend(
     { agencyId: param.path.string },
     ({ agencyId }) => `/${agencyId}`,
+  ),
+  adminEstablishments,
+  adminEstablishmentDetail: adminEstablishments.extend(
+    { siret: param.path.string },
+    ({ siret }) => `/${siret}`,
   ),
   agencyDashboard,
   agencyDashboardMain: agencyDashboard.extend("/dashboard"),
@@ -416,10 +426,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   manageConventionConnectedUser: defineRoute(
     { ...connectedUserParams, conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionUserConnected}`,
-  ),
-  manageEstablishmentAdmin: defineRoute(
-    { siret: param.query.string },
-    () => `/${frontRoutes.manageEstablishmentAdmin}`,
   ),
   openApiDoc: defineRoute(
     { version: param.query.optional.string },
