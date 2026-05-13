@@ -99,7 +99,7 @@ export const OffersSettingsSection = ({
     useFormContext<FormEstablishmentDto>();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const route = useRoute() as RouteByMode[Mode];
-  const isEstablishmentAdmin = route.name === "adminEstablishmentDetail";
+  const isEstablishmentAdmin = route.name === "adminEstablishments";
 
   const dispatch = useDispatch();
   const isStepMode = currentStep !== null;

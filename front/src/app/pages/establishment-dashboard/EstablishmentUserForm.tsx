@@ -52,14 +52,14 @@ export const EstablishmentUserForm = ({
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const route = useRoute() as Route<
     | typeof routes.establishmentDashboardFormEstablishment
-    | typeof routes.adminEstablishmentDetail
+    | typeof routes.adminEstablishments
     | typeof routes.myProfileEstablishmentRegistration
   >;
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";
   const isMyProfileEstablishmentRegistration =
     route.name === "myProfileEstablishmentRegistration";
-  const isManageEstablishmentAdmin = route.name === "adminEstablishmentDetail";
+  const isManageEstablishmentAdmin = route.name === "adminEstablishments";
   const dispatch = useDispatch();
   const emptyValues = {
     email: "",
