@@ -44,7 +44,7 @@ import type { Route } from "type-route";
 export type RouteByMode = {
   create: Route<typeof routes.formEstablishment>;
   edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
-  admin: Route<typeof routes.manageEstablishmentAdmin>;
+  admin: Route<typeof routes.adminEstablishmentDetail>;
 };
 
 export type Mode = keyof RouteByMode;
@@ -89,7 +89,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const route = useRoute() as RouteByMode[Mode];
 
   const isEstablishmentCreation = route.name === "formEstablishment";
-  const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
+  const isEstablishmentAdmin = route.name === "adminEstablishmentDetail";
   const isEstablishmentDashboard =
     route.name === "establishmentDashboardFormEstablishment";
 
@@ -222,7 +222,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishmentDetail" },
           connectedUserJwt: P.nullish,
         },
         () => {
@@ -231,7 +231,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishmentDetail" },
           connectedUserJwt: P.not(P.nullish),
         },
         ({ route, connectedUserJwt }) =>
@@ -324,7 +324,16 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishmentDetail" },
+          connectedUserJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
+      )
+      .with(
+        {
+          route: { name: "adminEstablishmentDetail" },
           connectedUserJwt: P.not(P.nullish),
         },
         ({ connectedUserJwt }) =>
@@ -365,15 +374,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           throw frontErrors.generic.unauthorized();
         },
       )
-      .with(
-        {
-          route: { name: "manageEstablishmentAdmin" },
-          connectedUserJwt: P.nullish,
-        },
-        () => {
-          throw frontErrors.generic.unauthorized();
-        },
-      )
+
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },
