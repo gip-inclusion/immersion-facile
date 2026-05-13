@@ -37,7 +37,7 @@ export const App = () => {
     >
       <ConsentManager />
       <Router />
-      {ENV.crispWebSiteId && ENV.envType !== "local" && (
+      {ENV.crispWebSiteId && (
         <CrispChat
           crispWebsiteId={ENV.crispWebSiteId}
           userConsent={!!consent?.finalityConsent?.support}
