@@ -56,8 +56,7 @@ export type FrontAdminRoute =
   | Route<typeof routes.adminUserDetailAgencies>
   | Route<typeof routes.adminUserDetailEstablishments>
   | Route<typeof routes.adminConventionDetail>
-  | Route<typeof routes.adminAgencyDetail>
-  | Route<typeof routes.adminEstablishmentDetail>;
+  | Route<typeof routes.adminAgencyDetail>;
 
 export const agencyDashboardTabsList = [
   "agencyDashboardMain",

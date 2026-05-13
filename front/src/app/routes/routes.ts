@@ -213,11 +213,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { agencyId: param.path.string },
     ({ agencyId }) => `/${agencyId}`,
   ),
-  adminEstablishments,
-  adminEstablishmentDetail: adminEstablishments.extend(
-    { siret: param.path.string },
+  adminEstablishments: adminEstablishments.extend(
+    { siret: param.path.optional.string },
     ({ siret }) => `/${siret}`,
   ),
+
   agencyDashboard,
   agencyDashboardMain: agencyDashboard.extend("/dashboard"),
   agencyDashboardOnboarding: agencyDashboard.extend("/onboarding"),
