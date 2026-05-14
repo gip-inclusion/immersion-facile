@@ -4,6 +4,7 @@ import { addBusinessDays, format } from "date-fns";
 import {
   type AgencyId,
   addressRoutes,
+  type ConventionId,
   domElementIds,
   executeInSequence,
   frontRoutes,
@@ -512,4 +513,60 @@ export const shareConventionDraftByEmail = async (page: Page) => {
   await page.click(
     `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormCancelButton}`,
   );
+};
+
+export const navigateToAgencyDashboardMain = async (page: Page) => {
+  await page.click("#fr-header-main-navigation-button-3");
+  await page.click(`#${domElementIds.header.navLinks.agency.dashboard}`);
+  await expect(
+    page.locator(`#${domElementIds.agencyDashboard.dashboard.tabContainer}`),
+  ).toBeVisible();
+};
+
+export const openManageConventionPageFromDashboard = async (
+  page: Page,
+  conventionId: ConventionId,
+): Promise<Page> => {
+  const goToConventionButton = page.locator(
+    `#${domElementIds.agencyDashboard.dashboard.goToConventionButton}--${conventionId}`,
+  );
+  await expect(goToConventionButton).toBeVisible();
+  const [manageConventionPage] = await Promise.all([
+    page.context().waitForEvent("page"),
+    goToConventionButton.click(),
+  ]);
+  await manageConventionPage.waitForLoadState("domcontentloaded");
+  await manageConventionPage.waitForURL(
+    `**/${frontRoutes.manageConventionUserConnected}?conventionId=${conventionId}`,
+  );
+  return manageConventionPage;
+};
+
+export const clickbuttonInSubMenu = async (
+  page: Page,
+  subMenuButtonId: string,
+  buttonId: string,
+) => {
+  const subMenuButton = page.locator(`#${subMenuButtonId}`);
+  await expect(subMenuButton).toBeVisible();
+  const subMenu = page.locator(`#${subMenuButtonId}-submenu`);
+  const subMenuContainer = subMenu.locator("..");
+  await subMenuButton.click();
+  await expect(subMenuContainer).toHaveClass(
+    /im-button-with-sub-menu--is-opened/,
+  );
+
+  const button = page.locator(`#${buttonId}`);
+  await expect(button).toBeVisible();
+  await button.click();
+};
+
+export const fillJustificationTextarea = async (
+  page: Page,
+  formId: string,
+  value: string,
+) => {
+  await page
+    .locator(`form#${formId} textarea[name="statusJustification"]`)
+    .fill(value);
 };

@@ -4,6 +4,7 @@ import {
   type AgencyKind,
   type AgencyUsersRights,
   type Email,
+  SEED_AGENCY_WITH_REFERS_TO_ID,
   SEED_FT_AGENCY_ID,
   type UserId,
 } from "shared";
@@ -106,10 +107,31 @@ export const insertSpecificAgenciesWithUserRight = async ({
     .withAddress(seedAddresses[3])
     .build();
 
+  const agencyWithRefersTo = new AgencyDtoBuilder()
+    .withId(SEED_AGENCY_WITH_REFERS_TO_ID)
+    .withName("Agence manage tests Playwright (double validation)")
+    .withSignature("Agence manage double validation signature")
+    .withKind("autre")
+    .withStatus("active")
+    .withAddress(seedAddresses[1])
+    .withRefersToAgencyInfo({
+      refersToAgencyId: SEED_FT_AGENCY_ID,
+      refersToAgencyName: "PE Paris",
+      refersToAgencyContactEmail: "osef",
+    })
+    .build();
+
   const connectedValidator: AgencyUsersRights = {
     [userId]: {
       isNotifiedByEmail: true,
       roles: ["validator"],
+    },
+  };
+
+  const connectedCounsellor: AgencyUsersRights = {
+    [userId]: {
+      isNotifiedByEmail: true,
+      roles: ["counsellor"],
     },
   };
 
@@ -124,6 +146,9 @@ export const insertSpecificAgenciesWithUserRight = async ({
   );
   await uow.agencyRepository.insert(
     toAgencyWithRights(missionLocaleAgency, connectedValidator),
+  );
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(agencyWithRefersTo, connectedCounsellor),
   );
 
   return {
