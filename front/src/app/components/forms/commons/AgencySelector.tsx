@@ -119,16 +119,22 @@ export const AgencySelector = ({
     control,
   });
 
-  const allowedAgencyKinds = useMemo(
-    (): AllowedAgencyKindToAdd[] =>
+  const allowedAgencyKinds = useMemo((): AllowedAgencyKindToAdd[] => {
+    if (
+      !isAllAgencyKinds(agencyKindValue) &&
       isSelectableAgencyKind(
         agencyKindValue,
         shouldFilterDelegationPrescriptionAgencyKind,
       )
-        ? [agencyKindValue]
-        : initialAgencyKinds,
-    [agencyKindValue, initialAgencyKinds],
-  );
+    )
+      return [agencyKindValue];
+
+    return initialAgencyKinds;
+  }, [
+    agencyKindValue,
+    initialAgencyKinds,
+    shouldFilterDelegationPrescriptionAgencyKind,
+  ]);
 
   const agencyPlaceholder = getAgencyPlaceholder(
     agencyDepartment,
