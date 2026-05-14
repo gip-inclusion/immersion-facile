@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { domElementIds } from "shared";
+import { domElementIds, SEED_FT_AGENCY_ID } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete, test } from "../../utils/utils";
@@ -118,9 +118,9 @@ test.describe("User workflow", () => {
       await goToMyProfilePage(page);
 
       await page
-        .locator("tr")
-        .filter({ hasText: "PE Paris" })
-        .locator(`[id^=${domElementIds.profile.editRoleButton}]`)
+        .locator(
+          `#${domElementIds.profile.editRoleButton}-${SEED_FT_AGENCY_ID}`,
+        )
         .click();
       await expect(
         page.locator(
