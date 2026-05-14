@@ -100,6 +100,25 @@ const topics = [
   "user",
 ] as const;
 
+export const conventionManageFeedbackTopicsToClearOnUnmount: FeedbackTopic[] = [
+  "convention-form",
+  "convention-action-edit",
+  "send-signature-link",
+  "send-assessment-link",
+  "convention-action-sign",
+  "convention-action-accept-by-counsellor",
+  "convention-action-accept-by-validator",
+  "convention-action-reject",
+  "convention-action-deprecate",
+  "convention-action-cancel",
+  "convention-action-renew",
+  "convention-action-edit-counsellor-name",
+  "delete-assessment",
+  "partner-conventions",
+  "edit-convention-with-final-status",
+  "broadcast-convention-again",
+];
+
 export type FeedbackTopic = (typeof topics)[number];
 
 export const feedbacks: Record<
