@@ -91,7 +91,6 @@ import {
   type ConventionValidatorInputNames,
   conventionObjectiveOptions,
   conventionStatuses,
-  conventionStatusesWithoutJustificationNorValidator,
   conventionStatusesWithValidator,
   DATE_CONSIDERED_OLD,
   type EditConventionCounsellorNameRequestDto,
@@ -120,6 +119,7 @@ import {
   type UpdateConventionStatusWithoutJustification,
   type UpdateConventionStatusWithValidator,
   unvalidatedConventionStatuses,
+  updateConventionStatusWithoutJustificationTargetStatuses,
   type WithConventionDto,
   type WithConventionId,
   type WithConventionIdLegacy,
@@ -585,7 +585,7 @@ export const updateConventionRequestSchema: ZodSchemaWithInputMatchingOutput<Upd
 
 export const updateConventionStatusWithoutJustificationSchema: ZodSchemaWithInputMatchingOutput<UpdateConventionStatusWithoutJustification> =
   z.object({
-    status: z.enum(conventionStatusesWithoutJustificationNorValidator, {
+    status: z.enum(updateConventionStatusWithoutJustificationTargetStatuses, {
       error: localization.invalidEnum,
     }),
     conventionId: conventionIdSchema,

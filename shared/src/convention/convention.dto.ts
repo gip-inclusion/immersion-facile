@@ -71,14 +71,19 @@ export const isBeneficiaryStudent = (
 ): beneficiary is Beneficiary<"mini-stage-cci"> =>
   "levelOfEducation" in beneficiary;
 
-type ConventionStatusWithoutJustificationNorValidator =
-  (typeof conventionStatusesWithoutJustificationNorValidator)[number];
-
 export const conventionStatusesWithoutJustificationNorValidator = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "IN_REVIEW",
 ] as const;
+
+export const updateConventionStatusWithoutJustificationTargetStatuses = [
+  "READY_TO_SIGN",
+  "PARTIALLY_SIGNED",
+] as const;
+
+export type UpdateConventionStatusWithoutJustificationTargetStatus =
+  (typeof updateConventionStatusWithoutJustificationTargetStatuses)[number];
 
 export const isUnvalidatedConventionStatus = (
   status: ConventionStatus | null,
@@ -528,7 +533,7 @@ export type UpdateConventionStatusWithValidator = {
 };
 
 export type UpdateConventionStatusWithoutJustification = {
-  status: ConventionStatusWithoutJustificationNorValidator;
+  status: UpdateConventionStatusWithoutJustificationTargetStatus;
   conventionId: ConventionId;
 };
 
