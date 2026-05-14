@@ -42,6 +42,7 @@ import {
   conventionReadSchema,
   conventionSchema,
   editConventionWithFinalStatusRequestSchema,
+  updateConventionStatusRequestSchema,
 } from "./convention.schema";
 import {
   getConventionTooLongMessageAndPath,
@@ -1482,6 +1483,18 @@ describe("editConventionWithFinalStatusRequestSchema", () => {
         updatedBeneficiaryBirthDate: "",
       }),
     ).toThrow();
+  });
+});
+
+describe("updateConventionStatusRequestSchema", () => {
+  it("rejects IN_REVIEW", () => {
+    const conventionId = new ConventionDtoBuilder().build().id;
+    expect(() =>
+      updateConventionStatusRequestSchema.parse({
+        status: "IN_REVIEW",
+        conventionId,
+      }),
+    ).toThrow(ZodError);
   });
 });
 

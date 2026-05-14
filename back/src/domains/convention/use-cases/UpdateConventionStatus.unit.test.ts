@@ -100,28 +100,6 @@ describe("UpdateConventionStatus", () => {
     });
   });
 
-  describe("* -> IN_REVIEW transition", () => {
-    acceptStatusTransitionTests({
-      updateStatusParams: {
-        status: "IN_REVIEW",
-        conventionId: conventionWithAgencyOneStepValidationId,
-      },
-      expectedDomainTopic: "ConventionFullySigned",
-      allowedMagicLinkRoles: validSignatoryRoles,
-      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
-      allowedInitialStatuses: ["PARTIALLY_SIGNED"],
-    });
-    rejectStatusTransitionTests({
-      updateStatusParams: {
-        status: "IN_REVIEW",
-        conventionId: conventionWithAgencyOneStepValidationId,
-      },
-      allowedMagicLinkRoles: validSignatoryRoles,
-      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
-      allowedInitialStatuses: ["PARTIALLY_SIGNED"],
-    });
-  });
-
   describe("* -> ACCEPTED_BY_COUNSELLOR transition", () => {
     const dateApproval = new Date("2021-09-01T10:10:00.000Z");
     acceptStatusTransitionTests({
