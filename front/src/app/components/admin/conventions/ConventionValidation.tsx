@@ -115,7 +115,9 @@ export const ConventionValidation = ({
     intersection(roles, [...agencyModifierRoles, "back-office"]).length > 0 &&
     currentUser &&
     hasUserRightsOnAgencyBroadcast(currentUser);
-  const shouldShowAssessmentBadge = isConventionValidated(convention);
+  const shouldShowAssessmentBadge =
+    isConventionValidated(convention) &&
+    !isConventionEndingInOneDayOrMore(convention);
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;

@@ -18,6 +18,8 @@ import {
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
   getFormattedFirstnameAndLastname,
+  isConventionEndingInOneDayOrMore,
+  isConventionValidated,
   isNotEmptyArray,
   toDisplayedDate,
 } from "shared";
@@ -362,24 +364,27 @@ export const ConventionList = () => {
                   </Badge>
                 </Fragment>,
                 <Fragment key={`${convention.id}-assessment`}>
-                  {convention.status === "ACCEPTED_BY_VALIDATOR" && (
-                    <Badge
-                      small
-                      severity={
-                        getAssessmentLabelsAndSeverityByStatus({
-                          isPlural: false,
-                        })[getAssessmentCompletionStatus(convention.assessment)]
-                          .severity
-                      }
-                    >
-                      {
-                        getAssessmentLabelsAndSeverityByStatus({
-                          isPlural: false,
-                        })[getAssessmentCompletionStatus(convention.assessment)]
-                          .shortLabel
-                      }
-                    </Badge>
-                  )}
+                  {isConventionValidated(convention) &&
+                    !isConventionEndingInOneDayOrMore(convention) && (
+                      <Badge
+                        small
+                        severity={
+                          getAssessmentLabelsAndSeverityByStatus({
+                            isPlural: false,
+                          })[
+                            getAssessmentCompletionStatus(convention.assessment)
+                          ].severity
+                        }
+                      >
+                        {
+                          getAssessmentLabelsAndSeverityByStatus({
+                            isPlural: false,
+                          })[
+                            getAssessmentCompletionStatus(convention.assessment)
+                          ].shortLabel
+                        }
+                      </Badge>
+                    )}
                 </Fragment>,
 
                 <Fragment key={`${convention.id}-beneficiary`}>
