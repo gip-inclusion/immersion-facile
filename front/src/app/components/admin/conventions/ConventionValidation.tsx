@@ -16,6 +16,7 @@ import {
   type ConventionReadDto,
   conventionSignatoryRoleBySignatoryKey,
   getDaysBetween,
+  isConventionEndingInOneDayOrMore,
   isConventionRenewed,
   isConventionValidated,
   type NotificationKind,
@@ -39,10 +40,7 @@ import {
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
-import {
-  canAssessmentBeFilled,
-  isConventionEndingInOneDayOrMore,
-} from "src/core-logic/domain/convention/convention.utils";
+import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import {

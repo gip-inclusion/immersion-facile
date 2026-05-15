@@ -1,4 +1,4 @@
-import { differenceInISOWeekYears } from "date-fns";
+import { addDays, differenceInISOWeekYears, isAfter } from "date-fns";
 import { keys, mapObjIndexed, values } from "ramda";
 import { agencyRoleIsNotToReview } from "../agency/agency.utils";
 import {
@@ -18,6 +18,7 @@ import type {
 import type { DateString } from "../utils/date";
 import type {
   ConventionDto,
+  ConventionReadDto,
   ConventionRenewed,
   ConventionStatus,
   FlatGetConventionsForAgencyUserParams,
@@ -319,3 +320,7 @@ export const getConventionManageAllowedRoles = (
   if (establishmentRights) roles.push(establishmentRights.role);
   return roles;
 };
+
+export const isConventionEndingInOneDayOrMore = (
+  convention: ConventionReadDto,
+) => isAfter(new Date(convention.dateEnd), addDays(new Date(), 1));

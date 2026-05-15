@@ -1862,6 +1862,77 @@ describe("Pg implementation of ConventionQueries", () => {
 
           expectToEqual(result.data, []);
         });
+
+        it("should exclude convention without assessment when dateEnd is in more than one day", async () => {
+          const now = new Date();
+          const conventionEndingInMoreThanOneDay = new ConventionDtoBuilder()
+            .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3")
+            .withSiret("12345678901236")
+            .withAgencyId(agencyId)
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .withDateStart(subDays(now, 10).toISOString())
+            .withDateEnd(addDays(now, 5).toISOString())
+            .withSchedule(reasonableSchedule)
+            .withUpdatedAt(anyConventionUpdatedAt)
+            .build();
+
+          await conventionRepository.save(
+            conventionEndingInMoreThanOneDay,
+            anyConventionUpdatedAt,
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["to-complete"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, []);
+        });
+
+        it("should return convention without assessment when dateEnd is within one day", async () => {
+          const now = new Date();
+          const conventionEndingWithinOneDay = new ConventionDtoBuilder()
+            .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4")
+            .withSiret("12345678901237")
+            .withAgencyId(agencyId)
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .withDateStart(subDays(now, 10).toISOString())
+            .withDateEnd(addDays(now, 1).toISOString())
+            .withSchedule(reasonableSchedule)
+            .withUpdatedAt(anyConventionUpdatedAt)
+            .build();
+
+          await conventionRepository.save(
+            conventionEndingWithinOneDay,
+            anyConventionUpdatedAt,
+          );
+
+          const result =
+            await conventionQueries.getPaginatedConventionsForAgencyUser({
+              agencyUserId: validator.id,
+              pagination: { page: 1, perPage: 10 },
+              filters: { assessmentCompletionStatus: ["to-complete"] },
+              sort: {
+                by: "dateSubmission",
+                direction: "desc",
+              },
+            });
+
+          expectToEqual(result.data, [
+            {
+              ...conventionEndingWithinOneDay,
+              ...agencyFields,
+              assessment: null,
+              isEstablishmentBanned: false,
+            },
+          ]);
+        });
       });
 
       describe("when multiple filters", () => {
