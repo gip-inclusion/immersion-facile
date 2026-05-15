@@ -15,6 +15,7 @@ import {
   establishmentsRoles,
   hasAllowedRole,
   hasAllowedRoleOnAssessment,
+  isConventionEndingInOneDayOrMore,
   isConventionRenewed,
   isConventionValidated,
   type MarkPartnersErroredConventionAsHandledRequest,
@@ -36,10 +37,7 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { getConventionSubStatus } from "src/app/utils/conventionSubStatus";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
-import {
-  canAssessmentBeFilled,
-  isConventionEndingInOneDayOrMore,
-} from "src/core-logic/domain/convention/convention.utils";
+import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { match, P } from "ts-pattern";
 export type ButtonConfiguration = {

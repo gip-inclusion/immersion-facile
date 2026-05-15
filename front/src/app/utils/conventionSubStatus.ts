@@ -1,8 +1,9 @@
-import type { ConventionReadDto, ConventionStatus } from "shared";
 import {
-  isConventionAlreadyStarted,
+  type ConventionReadDto,
+  type ConventionStatus,
   isConventionEndingInOneDayOrMore,
-} from "src/core-logic/domain/convention/convention.utils";
+} from "shared";
+import { isConventionAlreadyStarted } from "src/core-logic/domain/convention/convention.utils";
 import { match } from "ts-pattern";
 
 const subStatusesByStatus = {

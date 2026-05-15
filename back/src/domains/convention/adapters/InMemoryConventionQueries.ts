@@ -16,6 +16,7 @@ import {
   type DataWithPagination,
   errors,
   type GetPaginatedConventionsFilters,
+  isConventionEndingInOneDayOrMore,
   isFunctionalBroadcastFeedbackError,
   isUnvalidatedConventionStatus,
   NotFoundError,
@@ -741,7 +742,9 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       !isAssessmentSigned &&
       isAssessementAfterSignatureRelease &&
       assessment.status !== "DID_NOT_SHOW";
-    const isAssessmentToBeCompleted = convention.assessment === null;
+    const isAssessmentToBeCompleted =
+      convention.assessment === null &&
+      !isConventionEndingInOneDayOrMore(convention);
 
     return (
       (hasFinalizedFilter && isAssessmentFinalized) ||

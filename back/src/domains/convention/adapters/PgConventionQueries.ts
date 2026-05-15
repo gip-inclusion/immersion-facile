@@ -836,7 +836,12 @@ const filterByAssessmentCompletionStatus =
             );
         }
         if (hasToBeCompletedFilter)
-          conditions.push(eb("ia.convention_id", "is", null));
+          conditions.push(
+            eb.and([
+              eb("ia.convention_id", "is", null),
+              eb("conventions.date_end", "<=", addDays(new Date(), 1)),
+            ]),
+          );
 
         return eb.or(conditions);
       });
