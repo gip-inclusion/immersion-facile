@@ -982,6 +982,8 @@ export const domElementIds = {
     },
     registerAgencies: {
       newAgencyButton: "im-register-agencies__new-agency-button",
+      showRegistrationFormButton:
+        "im-register-agencies__show-registration-form-button",
       table: "im-register-agencies-table",
       search: "im-register-agencies__search",
       submitButton: "im-register-agencies__submit-button",

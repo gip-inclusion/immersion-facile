@@ -1,14 +1,15 @@
 import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotEnv from "dotenv";
-import { e2eBackendEnv, frontPort } from "./e2e-backend-env";
+import { backPort, e2eBackendEnv, frontPort } from "./e2e-backend-env";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 
-const backPort = 1234;
 const baseURL = process.env.BASE_URL || `http://localhost:${frontPort}`;
+const reuseExistingServer =
+  !process.env.CI && process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER !== "false";
 
 const loadEnvFile = (path: string): Record<string, string> => {
   const merged: Record<string, string> = {};
@@ -25,6 +26,10 @@ const backendEnv = loadEnvFile(resolve(__dirname, "../back/.env"));
 
 const backWebServerEnv = {
   ...e2eBackendEnv,
+  API_JWT_PRIVATE_KEY: backendEnv.API_JWT_PRIVATE_KEY,
+  API_JWT_PUBLIC_KEY: backendEnv.API_JWT_PUBLIC_KEY,
+  JWT_PRIVATE_KEY: backendEnv.JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY: backendEnv.JWT_PUBLIC_KEY,
   PC_USERNAME:
     playwrightEnv.PC_USERNAME ??
     "recette+playwright@immersion-facile.beta.gouv.fr",
@@ -40,7 +45,8 @@ const backWebServerEnv = {
   DATABASE_URL:
     process.env.E2E_DATABASE_URL ??
     "postgresql://immersion:pg_password@localhost:5432/immersion-db",
-  CORS_ALLOWED_ORIGINS: "http://localhost:3000",
+  CORS_ALLOWED_ORIGINS: baseURL,
+  PORT: backPort.toString(),
 };
 
 export default defineConfig({
@@ -76,7 +82,7 @@ export default defineConfig({
     {
       command: "pnpm back dev:no-typecheck",
       url: `http://localhost:${backPort}`,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer,
       timeout: 120000,
       cwd: "..",
       env: backWebServerEnv,
@@ -84,10 +90,11 @@ export default defineConfig({
     {
       command: "pnpm front dev",
       url: baseURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer,
       timeout: 120000,
       cwd: "..",
       env: {
+        BACKEND_PORT: backPort.toString(),
         PORT: frontPort.toString(),
         VITE_GATEWAY: "HTTP",
         VITE_ENV_TYPE: "local",

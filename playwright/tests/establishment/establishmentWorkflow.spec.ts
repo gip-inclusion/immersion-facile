@@ -127,18 +127,20 @@ test.describe("Establishment creation and modification workflow", () => {
         );
         await siretInput.waitFor();
         await siretInput.fill(siret);
+        const establishmentResponsePromise = page.waitForResponse((response) =>
+          response.url().includes(`/api/form-establishments/${siret}`),
+        );
         await page.click(
           `#${domElementIds.admin.manageEstablishment.searchButton}`,
         );
+        const establishmentResponse = await establishmentResponsePromise;
+        if (establishmentResponse.status() === 404) return;
+
         const deleteButton = page.locator(
           `#${domElementIds.admin.manageEstablishment.submitDeleteButton}`,
         );
-        try {
-          await deleteButton.waitFor({ timeout: 10_000 });
-          await deleteButton.click();
-        } catch {
-          // Establishment does not exist yet, nothing to clean up
-        }
+        await deleteButton.waitFor({ timeout: 10_000 });
+        await deleteButton.click();
       });
     }
   });
