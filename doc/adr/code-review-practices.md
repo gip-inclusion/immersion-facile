@@ -17,6 +17,8 @@ Les revues sans prise de position claire génèrent peu de débat constructif et
 - Toute revue doit se conclure par une **approbation** ou une **demande de changement** explicite.
 - Éviter de laisser des commentaires sans prise de position : cela dilue la critique et nuit à la qualité du débat.
 
+Remarque : les commentaires sont possibles pour certains cas comme les départs en vacances, les self-comments, ou certains autres cas à la marge.
+
 ### Questions et incompréhensions
 
 En cas de question ou d'incompréhension sur le code reviewé, **aller directement demander au développeur** plutôt que de laisser un commentaire sur la PR.
