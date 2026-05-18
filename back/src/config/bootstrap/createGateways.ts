@@ -383,7 +383,8 @@ export const createGateways = async (
 
   return {
     crispGateway: createCrispGateway(config),
-    disconnectCache: disconnectCache,
+    disconnectCache,
+    withCache,
     addressApi: addressGateway,
     appellationsGateway: appellationsGateway(config),
     dashboardGateway: createDashboardGateway(config),

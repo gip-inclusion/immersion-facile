@@ -3,10 +3,10 @@ import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { FeatureFlagQueries } from "../ports/FeatureFlagQueries";
 
 export class PgFeatureFlagQueries implements FeatureFlagQueries {
-  constructor(private transaction: KyselyDb) {}
+  constructor(private db: KyselyDb) {}
 
   public async getAll(): Promise<FeatureFlags> {
-    const result = await this.transaction
+    const result = await this.db
       .selectFrom("feature_flags")
       .selectAll()
       .execute();

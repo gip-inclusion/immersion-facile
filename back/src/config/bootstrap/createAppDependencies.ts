@@ -43,6 +43,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const { uowPerformer, inMemoryUow, queries } = createDbRelatedSystems(
     config,
     getPgPoolFn,
+    gateways.withCache,
   );
 
   const eventBus = new InMemoryEventBus(

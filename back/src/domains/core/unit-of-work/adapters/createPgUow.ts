@@ -23,8 +23,11 @@ import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsum
 import { PgOngoingOAuthRepository } from "../../authentication/connected-user/adapters/PgOngoingOAuthRepository";
 import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
 import { PgConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/adapters/PgConventionFranceTravailAdvisorRepository";
+import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
+import { makeCachedFeatureFlagQueries } from "../../feature-flags/adapters/makeCachedFeatureFlagQueries";
 import { PgFeatureFlagQueries } from "../../feature-flags/adapters/PgFeatureFlagQueries";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
 import { PgNafRepository } from "../../naf/adapters/PgNafRepository";
@@ -91,10 +94,16 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   };
 };
 
-export const createPgQueries = (kysely: KyselyDb): OutOfTransactionQueries => ({
+export const createPgQueries = (
+  kysely: KyselyDb,
+  withCache: WithCache = withNoCache,
+): OutOfTransactionQueries => ({
   convention: new PgConventionQueries(kysely),
   establishmentLead: new PgEstablishmentLeadQueries(kysely),
   shortLink: new PgShortLinkRepository(kysely),
   statistic: new PgStatisticQueries(kysely),
-  featureFlag: new PgFeatureFlagQueries(kysely),
+  featureFlag: makeCachedFeatureFlagQueries({
+    featureFlagQueries: new PgFeatureFlagQueries(kysely),
+    withCache,
+  }),
 });
