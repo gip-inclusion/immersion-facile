@@ -552,4 +552,3 @@ export const validateEstablishmentFormFields = async ({
     onSuccess();
   }
 };
-}
