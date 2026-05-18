@@ -851,7 +851,6 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           
           Nous vous invitons à contacter l'entreprise si vous souhaitez obtenir des précisions supplémentaires.
           
-          La fiche bilan a également été communiquée au candidat.
           ${
             agencyReferentName &&
             `

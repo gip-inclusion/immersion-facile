@@ -1,10 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  type AssessmentStatus,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -36,6 +37,8 @@ interface AssessmentPageProps {
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const dispatch = useDispatch();
+  const [submittedAssessmentStatus, setSubmittedAssessmentStatus] =
+    useState<AssessmentStatus | null>(null);
 
   useEffect(
     () => () => {
@@ -114,13 +117,15 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
               Votre implication contribue à améliorer notre site et à enrichir
               le dossier du candidat.
             </p>
-            <p>
-              {convention?.signatories.beneficiary.firstName}{" "}
-              {convention?.signatories.beneficiary.lastName} recevra un mail
-              pour consulter le bilan, le signer et, s’il le souhaite, ajouter
-              un commentaire. Une fois signé, la version finale au format PDF
-              sera automatiquement envoyée à toutes les parties
-            </p>
+            {submittedAssessmentStatus !== "DID_NOT_SHOW" && (
+              <p>
+                {convention?.signatories.beneficiary.firstName}{" "}
+                {convention?.signatories.beneficiary.lastName} recevra un mail
+                pour consulter le bilan, le signer et, s’il le souhaite, ajouter
+                un commentaire. Une fois signé, la version finale au format PDF
+                sera automatiquement envoyée à toutes les parties
+              </p>
+            )}
             {roles.includes("establishment-tutor") ? (
               <Highlight>
                 {isEstablishmentRegistered ? (
@@ -208,6 +213,9 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                 convention={convention}
                 jwt={route.params.jwt}
                 currentUserRoles={roles}
+                onAssessmentSubmitted={(assessment) =>
+                  setSubmittedAssessmentStatus(assessment.status)
+                }
               />
             )}
           </MainWrapper>

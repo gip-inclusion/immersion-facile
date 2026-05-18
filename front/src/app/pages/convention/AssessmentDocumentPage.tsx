@@ -414,54 +414,57 @@ export const AssessmentDocumentPage = ({
                 ),
               }}
             />
-            {!isAssessmentLegacy && !isBeforeSignatureReleaseDate && (
-              <>
-                <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
-                  Signature de la personne en immersion
-                </h2>
-                {isSignedByBeneficiary ? (
-                  <>
-                    <p>
-                      Personne en immersion :{" "}
-                      {getFormattedFirstnameAndLastname({
-                        firstname: convention.signatories.beneficiary.firstName,
-                        lastname: convention.signatories.beneficiary.lastName,
-                      })}
-                    </p>
-                    <ul>
-                      <li>
-                        <strong>Choix exprimés :</strong>{" "}
-                        {assessment.beneficiaryAgreement
-                          ? "J'ai bien lu, je suis d'accord"
-                          : "J'ai bien lu, je ne suis pas d'accord"}
-                      </li>
-                      {assessment.signedAt && (
+            {!isAssessmentLegacy &&
+              !isBeforeSignatureReleaseDate &&
+              assessment.status !== "DID_NOT_SHOW" && (
+                <>
+                  <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+                    Signature de la personne en immersion
+                  </h2>
+                  {isSignedByBeneficiary ? (
+                    <>
+                      <p>
+                        Personne en immersion :{" "}
+                        {getFormattedFirstnameAndLastname({
+                          firstname:
+                            convention.signatories.beneficiary.firstName,
+                          lastname: convention.signatories.beneficiary.lastName,
+                        })}
+                      </p>
+                      <ul>
                         <li>
-                          <strong>Date de signature :</strong>{" "}
-                          {toDisplayedDate({
-                            date: new Date(assessment.signedAt),
-                            withHours: false,
-                          })}
+                          <strong>Choix exprimés :</strong>{" "}
+                          {assessment.beneficiaryAgreement
+                            ? "J'ai bien lu, je suis d'accord"
+                            : "J'ai bien lu, je ne suis pas d'accord"}
                         </li>
-                      )}
-                    </ul>
+                        {assessment.signedAt && (
+                          <li>
+                            <strong>Date de signature :</strong>{" "}
+                            {toDisplayedDate({
+                              date: new Date(assessment.signedAt),
+                              withHours: false,
+                            })}
+                          </li>
+                        )}
+                      </ul>
 
-                    {assessment.beneficiaryFeedback && (
-                      <>
-                        <strong>Commentaire :</strong>
-                        <p>{assessment.beneficiaryFeedback}</p>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <p>
-                    La personne en immersion n'a pas encore signé ce bilan. Ce
-                    document est une version provisoire et ne constitue pas un
-                    bilan finalisé.
-                  </p>
-                )}
-              </>
-            )}
+                      {assessment.beneficiaryFeedback && (
+                        <>
+                          <strong>Commentaire :</strong>
+                          <p>{assessment.beneficiaryFeedback}</p>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <p>
+                      La personne en immersion n'a pas encore signé ce bilan. Ce
+                      document est une version provisoire et ne constitue pas un
+                      bilan finalisé.
+                    </p>
+                  )}
+                </>
+              )}
           </>
         )}
         <hr className={fr.cx("fr-hr", "fr-mb-6w", "fr-mt-10w")} />
