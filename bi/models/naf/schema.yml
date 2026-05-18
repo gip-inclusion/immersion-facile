@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: naf_nomenclature
+    description: |
+      NAF Rev2 nomenclature enriched with sub-class and section labels.
+      Grain: 1 row per NAF/APE code.
+    columns:
+      - name: naf_code
+        description: NAF/APE code without dot (e.g. 1013A)
+        tests:
+          - unique
+          - not_null
+      - name: naf_code_with_dot
+        description: NAF/APE sub-class code with dot (e.g. 10.13A)
+      - name: naf_label
+        description: Label of the NAF/APE sub-class
+      - name: naf_section_code
+        description: NAF section code
+      - name: naf_section_label
+        description: Label of the NAF section

@@ -130,6 +130,8 @@ models:
         description: Source of establishment data (e.g., form, API)
       - name: establishment_naf_code
         description: NAF/APE code of the establishment
+      - name: establishment_naf_label
+        description: Label of the establishment NAF/APE code
       - name: establishment_name
         description: Official name of the establishment
       - name: establishment_customized_name
@@ -313,10 +315,16 @@ models:
         description: Full label of the ROME code (e.g., "Commerce")
       - name: appellation_label
         description: Full label of the job appellation (long form)
+      - name: establishment_department_code
+        description: Department code of the establishment
       - name: establishment_department_name
         description: Department name of the establishment
       - name: establishment_region_name
         description: Region name of the establishment
+      - name: establishment_naf_code
+        description: NAF/APE code of the establishment
+      - name: establishment_naf_label
+        description: Label of the establishment NAF/APE code
       - name: immersion_objective
         description: Objective of the immersion (e.g., "Confirmer un projet professionnel", "Découvrir un métier ou un secteur d'activité", "Initier une démarche de recrutement")
       - name: is_referenced_establishment
