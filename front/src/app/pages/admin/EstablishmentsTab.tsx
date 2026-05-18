@@ -20,21 +20,24 @@ export const EstablishmentsTab = () => {
   if (error)
     return <Alert severity="error" title="Erreur" description={error} />;
 
-  return siret ? (
-    <>
-      <Button
-        linkProps={routes.adminEstablishments().link}
-        iconId="fr-icon-arrow-go-back-line"
-        iconPosition="left"
-        size="small"
-        priority="tertiary"
-        className={cx("fr-mb-2w")}
-      >
-        Retour
-      </Button>
-      <EstablishmentForm mode="admin" />
-    </>
-  ) : (
+  if (siret)
+    return (
+      <>
+        <Button
+          linkProps={routes.adminEstablishments().link}
+          iconId="fr-icon-arrow-go-back-line"
+          iconPosition="left"
+          size="small"
+          priority="tertiary"
+          className={cx("fr-mb-2w")}
+        >
+          Retour
+        </Button>
+        <EstablishmentForm mode="admin" />
+      </>
+    );
+
+  return (
     <div className={cx("admin-tab__import-establishments")}>
       <Feedback topics={["ban-establishment"]} className={fr.cx("fr-mb-2w")} />
       <ManageEstablishment />
