@@ -89,9 +89,11 @@ export const fillConventionForm = async (page: Page) => {
   );
   await openConventionAccordionSection(page, 2); // Open Establishment section
 
-  await page
-    .locator(`#${domElementIds.conventionImmersion.conventionSection.siret}`)
-    .pressSequentially(getRandomSiret());
+  const siretInput = page.locator(
+    `#${domElementIds.conventionImmersion.conventionSection.siret}`,
+  );
+  await siretInput.clear();
+  await siretInput.pressSequentially(getRandomSiret());
 
   const establishmentFirstName = page.locator(
     `#${domElementIds.conventionImmersion.establishmentRepresentativeSection.firstName}`,

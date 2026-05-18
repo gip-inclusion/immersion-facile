@@ -1,4 +1,5 @@
 import { execSync, spawn } from "node:child_process";
+import { generateKeyPairSync } from "node:crypto";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
@@ -17,6 +18,47 @@ type ContainerState = {
   connectionUri: string;
   host: string;
   port: number;
+};
+
+type JwtEnv = {
+  API_JWT_PRIVATE_KEY: string;
+  API_JWT_PUBLIC_KEY: string;
+  JWT_PRIVATE_KEY: string;
+  JWT_PUBLIC_KEY: string;
+};
+
+const generateJwtKeyPair = () => {
+  const { privateKey, publicKey } = generateKeyPairSync("ec", {
+    namedCurve: "P-256",
+    privateKeyEncoding: {
+      type: "pkcs8",
+      format: "pem",
+    },
+    publicKeyEncoding: {
+      type: "spki",
+      format: "pem",
+    },
+  });
+
+  return { privateKey, publicKey };
+};
+
+const ensureJwtEnv = (): JwtEnv => {
+  const jwtKeyPair = generateJwtKeyPair();
+  const apiJwtKeyPair = generateJwtKeyPair();
+
+  const jwtEnv = {
+    JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY ?? jwtKeyPair.privateKey,
+    JWT_PUBLIC_KEY: process.env.JWT_PUBLIC_KEY ?? jwtKeyPair.publicKey,
+    API_JWT_PRIVATE_KEY:
+      process.env.API_JWT_PRIVATE_KEY ?? apiJwtKeyPair.privateKey,
+    API_JWT_PUBLIC_KEY:
+      process.env.API_JWT_PUBLIC_KEY ?? apiJwtKeyPair.publicKey,
+  };
+
+  Object.assign(process.env, jwtEnv);
+
+  return jwtEnv;
 };
 
 const parseArgs = () => {
@@ -133,7 +175,11 @@ const runPlaywright = (
   const playwright = spawn("pnpm", ["exec", "playwright", "test", ...args], {
     stdio: "inherit",
     cwd: __dirname,
-    env: { ...process.env, E2E_DATABASE_URL: connectionUri },
+    env: {
+      ...process.env,
+      E2E_DATABASE_URL: connectionUri,
+      PLAYWRIGHT_REUSE_EXISTING_SERVER: "false",
+    },
   });
   playwright.on("close", (code) => onClose(code ?? 0));
 };
@@ -141,6 +187,7 @@ const runPlaywright = (
 const main = async () => {
   process.env.TESTCONTAINERS_REUSE_ENABLE = "false";
   process.env.TESTCONTAINERS_RYUK_DISABLED = "true";
+  ensureJwtEnv();
 
   const { flags, playwrightArgs } = parseArgs();
 

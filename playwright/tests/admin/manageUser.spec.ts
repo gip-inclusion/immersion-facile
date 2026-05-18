@@ -90,11 +90,12 @@ test.describe("Manage users in admin", () => {
       )
       .first()
       .click();
-    const availableRolesCount = await page
-      .locator(
-        `[for^="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}"]`,
-      )
-      .count();
-    expect(availableRolesCount).toBe(3); // administrateur, validateur, lecteur
+    const roleOptions = page.locator(
+      `#${domElementIds.admin.agencyTab.editAgencyManageUserModal}`,
+    );
+    await expect(roleOptions.getByText("Administrateur")).toBeVisible();
+    await expect(roleOptions.getByText("Validateur")).toBeVisible();
+    await expect(roleOptions.getByText("Lecteur")).toBeVisible();
+    await expect(roleOptions.getByText("Pré-validateur")).not.toBeVisible();
   });
 });

@@ -1,4 +1,5 @@
 const frontPort = 3000;
+const backPort = 1234;
 
 export const e2eBackendEnv = {
   NODE_ENV: "local",
@@ -13,14 +14,6 @@ export const e2eBackendEnv = {
   PASS_EMPLOI_GATEWAY: "IN_MEMORY",
   PDF_GENERATOR_GATEWAY: "IN_MEMORY",
   SHORT_LINK_ID_GENERATOR_GATEWAY: "NANO_ID",
-  JWT_PRIVATE_KEY:
-    "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgevZzL1gdAFr88hb2\nOF/2NxApJCzGCEDdfSp6VQO30hyhRANCAAQRWz+jn65BtOMvdyHKcvjBeBSDZH2r\n1RTwjmYSi9R/zpBnuQ4EiMnCqfMPWiZqB4QdbAd0E7oH50VpuZ1P087G\n-----END PRIVATE KEY-----",
-  JWT_PUBLIC_KEY:
-    "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9\nq9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==\n-----END PUBLIC KEY-----\n",
-  API_JWT_PRIVATE_KEY:
-    "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIPnK7kOKC6VqJwmsXCcCgNfVEAMyt0IFm68g/dwg3/iVoAoGCCqGSM49\nAwEHoUQDQgAEXNo97BD4w2huuAYsmINnn/+TPolxYUexkcD49YyxsjJPA2d91B2r\nDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END EC PRIVATE KEY-----",
-  API_JWT_PUBLIC_KEY:
-    "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXNo97BD4w2huuAYsmINnn/+TPolx\nYUexkcD49YyxsjJPA2d91B2rDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END PUBLIC KEY-----",
   DOMAIN: `localhost:${frontPort}`,
   REPOSITORIES: "PG",
   INBOUND_EMAIL_ALLOWED_IPS: "::ffff:127.0.0.1",
@@ -31,4 +24,4 @@ export const e2eBackendEnv = {
   CACHE: "NONE",
 };
 
-export { frontPort };
+export { backPort, frontPort };

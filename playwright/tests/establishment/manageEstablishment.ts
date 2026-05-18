@@ -114,32 +114,26 @@ const checkEstablishment = async (
     throw new Error("Missing website for updatedEstablishmentInfos");
 
   await expect(
-    await page
-      .locator(
-        `#${domElementIds.formEstablishment.admin.maxContactsPerMonthValue}`,
-      )
-      .textContent(),
-  ).toBe(maxContactsPerMonth.toString());
+    page.locator(
+      `#${domElementIds.formEstablishment.admin.maxContactsPerMonthValue}`,
+    ),
+  ).toHaveText(maxContactsPerMonth.toString());
 
   await expect(
-    await page
-      .locator(
-        `#${domElementIds.formEstablishment.admin.nextAvailabilityDateValue}`,
-      )
-      .textContent(),
-  ).toBe(
+    page.locator(
+      `#${domElementIds.formEstablishment.admin.nextAvailabilityDateValue}`,
+    ),
+  ).toHaveText(
     toDisplayedDate({
       date: new Date(nextAvailabilityDate),
     }),
   );
 
   await expect(
-    await page
-      .locator(
-        `#${domElementIds.formEstablishment.admin.businessNameCustomized}`,
-      )
-      .inputValue(),
-  ).toBe(businessNameCustomized);
+    page.locator(
+      `#${domElementIds.formEstablishment.admin.businessNameCustomized}`,
+    ),
+  ).toHaveValue(businessNameCustomized);
 
   await expect(
     await page.locator(
@@ -190,16 +184,12 @@ const checkEstablishment = async (
   ).toBeChecked();
 
   await expect(
-    await page
-      .locator(`#${domElementIds.formEstablishment.admin.website}`)
-      .inputValue(),
-  ).toBe(website);
+    page.locator(`#${domElementIds.formEstablishment.admin.website}`),
+  ).toHaveValue(website);
 
   await expect(
-    await page
-      .locator(
-        `#${domElementIds.formEstablishment.admin.additionalInformation}`,
-      )
-      .inputValue(),
-  ).toBe(additionalInformation);
+    page.locator(
+      `#${domElementIds.formEstablishment.admin.additionalInformation}`,
+    ),
+  ).toHaveValue(additionalInformation);
 };
