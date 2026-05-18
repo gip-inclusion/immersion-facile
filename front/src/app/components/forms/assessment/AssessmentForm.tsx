@@ -47,6 +47,7 @@ type AssessmentFormProperties = {
   convention: ConventionReadDto;
   jwt: string;
   currentUserRoles: Role[];
+  onAssessmentSubmitted: (assessment: AssessmentDto) => void;
 };
 
 export type OnStepChange = (
@@ -73,6 +74,7 @@ const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
 export const AssessmentForm = ({
   convention,
   jwt,
+  onAssessmentSubmitted,
 }: AssessmentFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
@@ -102,9 +104,13 @@ export const AssessmentForm = ({
       );
     }
 
+    const assessment = formAssessmentDtoToAssessmentDto(values);
+
+    onAssessmentSubmitted?.(assessment);
+
     dispatch(
       assessmentSlice.actions.creationRequested({
-        assessment: formAssessmentDtoToAssessmentDto(values),
+        assessment,
         jwt,
         feedbackTopic: "assessment",
       }),
