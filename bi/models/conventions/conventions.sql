@@ -10,6 +10,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_agency_status ON {{ this }} (agency_status)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_agency_kind ON {{ this }} (agency_kind)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_siret ON {{ this }} (siret)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_establishment_naf_code ON {{ this }} (establishment_naf_code)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_start ON {{ this }} (date_start)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_end ON {{ this }} (date_end)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_submission ON {{ this }} (date_submission)",
@@ -105,6 +106,7 @@ case
 end as is_referenced_establishment,
 estab.source_provider as establishment_source_provider,
 estab.naf_code as establishment_naf_code,
+naf.naf_label as establishment_naf_label,
 estab.name as establishment_name,
 estab.customized_name as establishment_customized_name,
 estab.welcome_address_street_number_and_address as establishment_address,
@@ -252,6 +254,8 @@ left join {{ source('immersion', 'establishments') }} as estab
     on estab.siret = c.siret
 left join {{ source('immersion', 'public_department_region') }} as dept_estab
     on dept_estab.department_code = estab.welcome_address_department_code
+left join {{ ref('naf_nomenclature') }} as naf
+    on naf.naf_code = regexp_replace(upper(estab.naf_code), '[^0-9A-Z]', '', 'g')
 
 -- Assessment
 left join {{ source('immersion', 'immersion_assessments') }} as ass
