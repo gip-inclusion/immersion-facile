@@ -259,10 +259,22 @@ const AssessmentStatusSection = ({
                 onChange: (event) => {
                   const { value } = event.target;
                   if (
+                    value === "PARTIALLY_COMPLETED" ||
+                    value === "COMPLETED"
+                  ) {
+                    setValue("establishmentAdvices", "");
+                    setValue("establishmentFeedback", "");
+                  }
+                  if (
                     value === "PARTIALLY_COMPLETED" &&
                     !("numberOfMissedHours" in formValues)
                   ) {
                     setValue("numberOfMissedHours", 0);
+                  }
+                  if (value === "DID_NOT_SHOW") {
+                    setValue("establishmentAdvices", "Non applicable");
+                    setValue("establishmentFeedback", "Non applicable");
+                    setValue("endedWithAJob", false);
                   }
                   setValue("status", value as AssessmentStatus);
                 },
@@ -380,21 +392,28 @@ const AssessmentStatusSection = ({
               currentStep: 1,
             }),
           },
-          {
-            children: "Passer à l'étape suivante",
-            onClick: () =>
-              onStepChange(2, [
-                "status",
-                ...(formValues.status === "PARTIALLY_COMPLETED"
-                  ? (["numberOfMissedHours", "lastDayOfPresence"] as const)
-                  : []),
-              ]),
-            type: "button",
-            priority: "primary",
-            id: domElementIds.assessment.nextButtonFromStepAndMode({
-              currentStep: 1,
-            }),
-          },
+          formValues.status === "DID_NOT_SHOW"
+            ? {
+                children: "Envoyer le bilan",
+                type: "submit",
+                priority: "primary",
+                id: domElementIds.assessment.formSubmitButton,
+              }
+            : {
+                children: "Passer à l'étape suivante",
+                onClick: () =>
+                  onStepChange(2, [
+                    "status",
+                    ...(formValues.status === "PARTIALLY_COMPLETED"
+                      ? (["numberOfMissedHours", "lastDayOfPresence"] as const)
+                      : []),
+                  ]),
+                type: "button",
+                priority: "primary",
+                id: domElementIds.assessment.nextButtonFromStepAndMode({
+                  currentStep: 1,
+                }),
+              },
         ]}
       />
     </>
