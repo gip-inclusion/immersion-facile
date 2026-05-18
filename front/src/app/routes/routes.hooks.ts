@@ -42,8 +42,10 @@ export const makeUseTypedRoute =
   ) =>
     useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
-export const useConventionRoute =
-  makeUseTypedRoute<(typeof routes.conventionImmersion)["name"]>();
+export const useConventionRoute = makeUseTypedRoute<
+  | (typeof routes.conventionImmersion)["name"]
+  | (typeof routes.conventionTemplate)["name"]
+>();
 
 export type RouteByMode = {
   create: Route<typeof routes.formEstablishment>;

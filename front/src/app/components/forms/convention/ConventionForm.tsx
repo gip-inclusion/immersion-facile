@@ -151,7 +151,10 @@ export const ConventionForm = ({
   mode: ConventionFormMode;
   fromConventionTemplateId?: ConventionTemplateId;
 }) => {
-  const route = useConventionRoute([routes.conventionImmersion.name]);
+  const route = useConventionRoute([
+    routes.conventionImmersion.name,
+    routes.conventionTemplate.name,
+  ]);
   const dispatch = useDispatch();
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const fetchedConventionDraft = useAppSelector(
@@ -350,7 +353,10 @@ const ConventionFormContent = ({
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
-  const route = useConventionRoute([routes.conventionImmersion.name]);
+  const route = useConventionRoute([
+    routes.conventionImmersion.name,
+    routes.conventionTemplate.name,
+  ]);
   const fromPeConnectedUser =
     "fedIdProvider" in route.params
       ? route.params.fedIdProvider === "peConnect"
