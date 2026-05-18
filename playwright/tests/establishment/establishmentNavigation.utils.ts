@@ -39,7 +39,13 @@ export const goToManageEtablishmentBySiretInAdmin = async (
   );
   await siretInputLocator.waitFor();
   await siretInputLocator.fill(siret);
+  const establishmentResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes(`/api/form-establishments/${siret}`) &&
+      response.status() === 200,
+  );
   await page.click(`#${domElementIds.admin.manageEstablishment.searchButton}`);
+  await establishmentResponsePromise;
 
   await waitForVisibleLoaderHidden(page, ".im-loader");
 

@@ -172,7 +172,17 @@ export const goToAddAgencyForm = async (page: Page) => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.agency}`);
   await page.click(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`);
-  await page.click(
+
+  const newAgencyButton = page.locator(
     `#${domElementIds.agencyDashboard.registerAgencies.newAgencyButton}`,
   );
+  const showRegistrationFormButton = page.locator(
+    `#${domElementIds.agencyDashboard.registerAgencies.showRegistrationFormButton}`,
+  );
+
+  await expect(newAgencyButton.or(showRegistrationFormButton)).toBeVisible();
+  if (await showRegistrationFormButton.isVisible())
+    await showRegistrationFormButton.click();
+
+  await newAgencyButton.click();
 };
