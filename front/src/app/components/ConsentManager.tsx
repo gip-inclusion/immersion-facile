@@ -46,8 +46,8 @@ export const { ConsentBannerAndConsentManagement, useConsent } =
               <>
                 <p>
                   Piano Analytics est un outil de mesure d’audience qui nous
-                  permet d’analyser la frequentation du site et d’ameliorer son
-                  contenu.
+                  permet d’analyser la fréquentation du site et d’améliorer son
+                  contenu sur la base de données de navigation anonymes.
                 </p>
                 <p>
                   <a
