@@ -1,8 +1,7 @@
-import { addDays, subDays, subMilliseconds } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
-  type AssessmentInputDto,
   allRoles,
   ConnectedUserBuilder,
   type ConventionDomainJwtPayload,
@@ -70,10 +69,6 @@ describe("CreateAssessment", () => {
     signedAt: null,
     createdAt: new Date("2025-01-01").toISOString(),
   };
-  const assessmentInput: AssessmentInputDto = {
-    ...assessment,
-    conventionStartDate: validatedConvention.dateStart,
-  };
 
   const tutorPayload: ConventionDomainJwtPayload = {
     applicationId: validatedConvention.id,
@@ -128,14 +123,14 @@ describe("CreateAssessment", () => {
   describe("wrong path", () => {
     it("throws forbidden if no magicLink payload is provided", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, undefined),
+        createAssessment.execute(assessment, undefined),
         new ForbiddenError("No magic link provided"),
       );
     });
 
     it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           ...tutorPayload,
           applicationId: "otherId",
         }),
@@ -147,7 +142,7 @@ describe("CreateAssessment", () => {
       const notFoundId = "not-found-id";
       await expectPromiseToFailWithError(
         createAssessment.execute(
-          { ...assessmentInput, conventionId: notFoundId },
+          { ...assessment, conventionId: notFoundId },
           { ...tutorPayload, applicationId: notFoundId },
         ),
         errors.convention.notFound({ conventionId: notFoundId }),
@@ -163,7 +158,7 @@ describe("CreateAssessment", () => {
         },
       ];
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, tutorPayload),
+        createAssessment.execute(assessment, tutorPayload),
         errors.assessment.alreadyExist(assessment.conventionId),
       );
     });
@@ -186,13 +181,7 @@ describe("CreateAssessment", () => {
         createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
-        createAssessment.execute(
-          {
-            ...partiallyCompletedAssessment,
-            conventionStartDate: validatedConvention.dateStart,
-          },
-          tutorPayload,
-        ),
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
         errors.assessment.lastDayOfPresenceNotInConventionRange(),
       );
     });
@@ -215,14 +204,60 @@ describe("CreateAssessment", () => {
         createdAt: new Date("2025-01-01").toISOString(),
       };
       await expectPromiseToFailWithError(
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
+        errors.assessment.lastDayOfPresenceNotInConventionRange(),
+      );
+    });
+
+    it("throws bad request if contract start date is before immersion start", async () => {
+      const assessmentWithInvalidContractDate: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "COMPLETED",
+        endedWithAJob: true,
+        typeOfContract: "CDI",
+        contractStartDate: subDays(
+          new Date(validatedConvention.dateStart),
+          1,
+        ).toISOString(),
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+      await expectPromiseToFailWithError(
         createAssessment.execute(
-          {
-            ...partiallyCompletedAssessment,
-            conventionStartDate: validatedConvention.dateStart,
-          },
+          assessmentWithInvalidContractDate,
           tutorPayload,
         ),
-        errors.assessment.lastDayOfPresenceNotInConventionRange(),
+        errors.assessment.contractStartDateBeforeImmersionStart({
+          immersionDateStart: validatedConvention.dateStart,
+        }),
+      );
+    });
+
+    it("throws bad request if number of missed hours exceeds scheduled hours in the presence period", async () => {
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: subDays(
+          new Date(validatedConvention.dateEnd),
+          1,
+        ).toISOString(),
+        numberOfMissedHours: 10_000,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+
+      await expectPromiseToFailWithError(
+        createAssessment.execute(partiallyCompletedAssessment, tutorPayload),
+        errors.assessment.numberOfMissedHoursExceedsScheduled(),
       );
     });
 
@@ -237,7 +272,7 @@ describe("CreateAssessment", () => {
       uow.conventionRepository.setConventions([convention]);
 
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, tutorPayload),
+        createAssessment.execute(assessment, tutorPayload),
         errors.assessment.badStatus(status),
       );
     });
@@ -246,7 +281,7 @@ describe("CreateAssessment", () => {
       failingRoles,
     )("throws forbidden if the jwt role is '%s'", async (role) => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           applicationId: validatedConvention.id,
           emailHash: makeHashByRolesForTest(
             validatedConvention,
@@ -261,31 +296,14 @@ describe("CreateAssessment", () => {
 
     it("throws forbidden if user doesnt have allowed assessment role on convention", async () => {
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
-          userId: userWithoutRoleOnConvention.id,
-        }),
-        errors.assessment.forbidden("CreateAssessment"),
-      );
-    });
-
-    it("throws bad request when convention start date in inputs mismatch convention start date in convention from repo", async () => {
-      uow.conventionRepository.setConventions([validatedConvention]);
-
-      await expectPromiseToFailWithError(
         createAssessment.execute(
+          assessment,
+
           {
-            ...assessment,
-            endedWithAJob: true,
-            typeOfContract: "CDI",
-            contractStartDate: validatedConvention.dateStart,
-            conventionStartDate: subMilliseconds(
-              new Date(validatedConvention.dateStart),
-              1,
-            ).toISOString(),
+            userId: userWithoutRoleOnConvention.id,
           },
-          tutorPayload,
         ),
-        errors.assessment.conventionDateStartMismatch(validatedConvention.id),
+        errors.assessment.forbidden("CreateAssessment"),
       );
     });
 
@@ -306,7 +324,7 @@ describe("CreateAssessment", () => {
         }),
       ];
       await expectPromiseToFailWithError(
-        createAssessment.execute(assessmentInput, {
+        createAssessment.execute(assessment, {
           ...tutorPayload,
           emailHash: makeHashByRolesForTest(
             validatedConvention,
@@ -332,7 +350,7 @@ describe("CreateAssessment", () => {
         .build();
       uow.conventionRepository.setConventions([convention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         ...tutorPayload,
         role,
         emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
@@ -352,7 +370,7 @@ describe("CreateAssessment", () => {
     it("should save the Assessment when user is validator on convention", async () => {
       uow.conventionRepository.setConventions([validatedConvention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         userId: validator.id,
       });
 
@@ -368,7 +386,7 @@ describe("CreateAssessment", () => {
     it("should save the Assessment when user is counsellor on convention", async () => {
       uow.conventionRepository.setConventions([validatedConvention]);
 
-      await createAssessment.execute(assessmentInput, {
+      await createAssessment.execute(assessment, {
         userId: counsellor.id,
       });
 
@@ -405,19 +423,13 @@ describe("CreateAssessment", () => {
 
       uow.conventionRepository.setConventions([convention]);
 
-      await createAssessment.execute(
-        {
-          ...partiallyCompletedAssessment,
-          conventionStartDate: convention.dateStart,
-        },
-        {
-          ...tutorPayload,
-          role: "establishment-tutor",
-          emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
-            "establishment-tutor"
-          ],
-        },
-      );
+      await createAssessment.execute(partiallyCompletedAssessment, {
+        ...tutorPayload,
+        role: "establishment-tutor",
+        emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
+          "establishment-tutor"
+        ],
+      });
 
       expectArraysToEqual(uow.assessmentRepository.assessments, [
         {
@@ -429,7 +441,7 @@ describe("CreateAssessment", () => {
     });
 
     it("should dispatch an AssessmentCreated event", async () => {
-      await createAssessment.execute(assessmentInput, tutorPayload);
+      await createAssessment.execute(assessment, tutorPayload);
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         {

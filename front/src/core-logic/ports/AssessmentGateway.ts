@@ -1,20 +1,18 @@
 import type { Observable } from "rxjs";
 import type {
   AssessmentDto,
-  AssessmentInputDto,
   ConventionId,
-  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
+  SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
-  WithConventionId,
 } from "shared";
 
 export interface AssessmentGateway {
   createAssessment$(
-    params: AssessmentInputDto,
-    jwt: ConventionJwt,
+    params: AssessmentDto,
+    jwt: ConventionSupportedJwt,
   ): Observable<void>;
   signAssessment$(
     params: SignAssessmentRequestDto,
@@ -29,7 +27,7 @@ export interface AssessmentGateway {
     jwt: string;
   }): Observable<AssessmentDto | LegacyAssessmentDto>;
   sendAssessmentLink$(
-    params: WithConventionId,
+    params: SendAssessmentLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }

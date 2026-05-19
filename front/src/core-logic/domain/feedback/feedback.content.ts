@@ -158,39 +158,39 @@ export const feedbacks: Record<
   "send-signature-link": {
     "create.success": {
       action: sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded,
-      title: "Le SMS a bien été envoyé",
+      title: "La relance a bien été envoyée",
       message:
-        "Le destinataire devrait le recevoir dans les prochaines minutes.",
+        "Le destinataire devrait la recevoir dans les prochaines minutes.",
     },
     "create.info": {
       action: sendSignatureLinkSlice.actions.sendSignatureLinkRequested,
-      title: "Le sms est en cours d'envoi",
+      title: "La relance est en cours d'envoi",
       message:
-        "Le sms est en cours d'envoi au signataire. Cela peut prendre une quinzaine de secondes.",
+        "La relance est en cours d'envoi. Cela peut prendre une quinzaine de secondes.",
     },
     "create.error": {
       action: sendSignatureLinkSlice.actions.sendSignatureLinkFailed,
-      title: "Problème lors de l'envoi SMS",
-      message: "Une erreur est survenue lors de l'envoi du SMS.",
+      title: "Problème lors de l'envoi de la relance",
+      message: "Une erreur est survenue lors de l'envoi de la relance.",
     },
   },
   "send-assessment-link": {
     "create.success": {
       action: sendAssessmentLinkSlice.actions.sendAssessmentLinkSucceeded,
-      title: "Le SMS a bien été envoyé",
+      title: "La relance a bien été envoyée",
       message:
-        "Le destinataire devrait le recevoir dans les prochaines minutes.",
+        "Le destinataire devrait la recevoir dans les prochaines minutes.",
     },
     "create.info": {
       action: sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested,
-      title: "Le sms est en cours d'envoi",
+      title: "La relance est en cours d'envoi",
       message:
-        "Le sms est en cours d'envoi au signataire. Cela peut prendre une quinzaine de secondes.",
+        "La relance est en cours d'envoi. Cela peut prendre une quinzaine de secondes.",
     },
     "create.error": {
       action: sendAssessmentLinkSlice.actions.sendAssessmentLinkFailed,
-      title: "Problème lors de l'envoi SMS",
-      message: "Une erreur est survenue lors de l'envoi du SMS.",
+      title: "Problème lors de l'envoi de la relance",
+      message: "Une erreur est survenue lors de l'envoi de la relance.",
     },
   },
   "beneficiary-dashboard-discussion-list": {

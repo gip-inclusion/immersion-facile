@@ -917,6 +917,7 @@ const makeEstablishmentAggregateFromDb = (
 export type SearchImmersionFilters = {
   appellationCodes?: AppellationCode[];
   departmentCodes?: DepartmentCode[];
+  excludedSirets?: SiretDto[];
   fitForDisabledWorkers?: FitForDisableWorkerOption[];
   geoParams?: GeoParams;
   locationIds?: LocationId[];
@@ -945,6 +946,7 @@ const checkHasNoJoinFilters = (filters: SearchImmersionFilters): boolean => {
     romeCodes: !filters.romeCodes,
     appellationCodes: !filters.appellationCodes?.length,
     sirets: !filters.sirets?.length,
+    excludedSirets: !filters.excludedSirets?.length,
     nafCodes: !filters.nafCodes?.length,
     remoteWorkModes: !filters.remoteWorkModes?.length,
     locationIds: !filters.locationIds?.length,
@@ -963,6 +965,7 @@ const makeGetFilteredResultsSubQueryBuilder = ({
   const {
     appellationCodes,
     departmentCodes,
+    excludedSirets,
     fitForDisabledWorkers,
     geoParams,
     locationIds,
@@ -990,6 +993,10 @@ const makeGetFilteredResultsSubQueryBuilder = ({
                   eb("next_availability_date", "is", null),
                 ]),
               ),
+            (qb) =>
+              excludedSirets?.length
+                ? qb.where("establishments.siret", "not in", excludedSirets)
+                : qb,
             (qb) =>
               showOnlyAvailableOffers === true
                 ? qb.whereRef(

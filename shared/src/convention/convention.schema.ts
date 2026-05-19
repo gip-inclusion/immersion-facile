@@ -26,7 +26,6 @@ import {
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { remoteWorkModeSchema } from "../remoteWorkMode/remoteWorkMode.schema";
 import { allRoles } from "../role/role.dto";
-import { signatoryRoleSchema } from "../role/role.schema";
 import {
   appellationAndRomeDtoSchema,
   appellationCodeSchema,
@@ -112,7 +111,6 @@ import {
   levelsOfEducation,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
-  type SendSignatureLinkRequestDto,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   type Signatories,
   type TransferConventionToAgencyRequestDto,
@@ -661,12 +659,6 @@ export const generateMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Ge
       error: localization.invalidEnum,
     }),
     expired: z.boolean(), //< defaults to false
-  });
-
-export const sendSignatureLinkRequestSchema: ZodSchemaWithInputMatchingOutput<SendSignatureLinkRequestDto> =
-  z.object({
-    conventionId: conventionIdSchema,
-    signatoryRole: signatoryRoleSchema,
   });
 
 export const transferConventionToAgencyRequestSchema: ZodSchemaWithInputMatchingOutput<TransferConventionToAgencyRequestDto> =

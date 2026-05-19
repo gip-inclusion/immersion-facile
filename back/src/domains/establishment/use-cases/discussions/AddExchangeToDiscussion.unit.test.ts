@@ -954,6 +954,153 @@ describe("AddExchangeToDiscussion", () => {
       );
     });
 
+    describe("when establishment is banned", () => {
+      const bannedEstablishment = new EstablishmentAggregateBuilder(
+        establishment1,
+      )
+        .withBannishmentInformations({
+          isEstablishmentBanned: true,
+          establishmentBannishmentJustification:
+            "Ils ont ramené un yacht dans le golf du Morbihan",
+        })
+        .build();
+
+      beforeEach(() => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          bannedEstablishment,
+        ];
+      });
+      describe("when sender is establishment", () => {
+        it("through inbound parsing, do not save the new exchange in the discussion and notify sender that establishment is banned", async () => {
+          const [firstInboundParsingItem] = createInboundParsingResponse([
+            `firstname1_lastname1__${pendingDiscussion1.id}_b@${replyDomain}`,
+          ]).items;
+
+          const result = await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "potentialBeneficiary",
+                  senderEmail: adminUserEstablishment1.email,
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: firstInboundParsingItem.Subject,
+                },
+              ],
+            },
+            undefined,
+          );
+
+          expectToEqual(result, {
+            reason: "establishment_banned",
+            sender: "establishment",
+            establishmentName: pendingDiscussion1.businessName,
+          } satisfies DiscussionExchangeForbiddenParams);
+
+          expectToEqual(uow.discussionRepository.discussions, [
+            pendingDiscussion1,
+            pendingDiscussion2,
+          ]);
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "NotificationAdded",
+            },
+          ]);
+
+          expectSavedNotificationsAndEvents({
+            emails: [
+              {
+                kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+                params: {
+                  reason: "establishment_banned",
+                  sender: "establishment",
+                  establishmentName: pendingDiscussion1.businessName,
+                },
+                recipients: [adminUserEstablishment1.email],
+              },
+            ],
+            sms: [],
+          });
+        });
+      });
+
+      describe("when sender is beneficiary", () => {
+        it("through inbound parsing, do not save the new exchange in the discussion and notify sender that establishment is banned", async () => {
+          const [firstInboundParsingItem] = createInboundParsingResponse([
+            `firstname1_lastname1__${pendingDiscussion1.id}_b@${replyDomain}`,
+          ]).items;
+
+          const result = await addExchangeToDiscussion.execute(
+            {
+              source: "inbound-parsing",
+              messageInputs: [
+                {
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                  message: firstInboundParsingItem.RawHtmlBody!,
+                  discussionId: pendingDiscussion1.id,
+                  recipientRole: "establishment",
+                  senderEmail: pendingDiscussion1.potentialBeneficiary.email,
+                  sentAt: new Date(
+                    firstInboundParsingItem.SentAtDate,
+                  ).toISOString(),
+                  attachments:
+                    firstInboundParsingItem.Attachments?.map((attachment) => ({
+                      name: attachment.Name,
+                      link: attachment.DownloadToken,
+                    })) ?? [],
+                  subject: firstInboundParsingItem.Subject,
+                },
+              ],
+            },
+            undefined,
+          );
+
+          expectToEqual(result, {
+            reason: "establishment_banned",
+            sender: "potentialBeneficiary",
+            establishmentName: pendingDiscussion1.businessName,
+          } satisfies DiscussionExchangeForbiddenParams);
+
+          expectToEqual(uow.discussionRepository.discussions, [
+            pendingDiscussion1,
+            pendingDiscussion2,
+          ]);
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "NotificationAdded",
+            },
+          ]);
+
+          expectSavedNotificationsAndEvents({
+            emails: [
+              {
+                kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+                params: {
+                  reason: "establishment_banned",
+                  sender: "potentialBeneficiary",
+                  establishmentName: pendingDiscussion1.businessName,
+                },
+                recipients: [pendingDiscussion1.potentialBeneficiary.email],
+              },
+            ],
+            sms: [],
+          });
+        });
+      });
+    });
+
     describe("when establishment does not exist", () => {
       beforeEach(() => {
         uow.establishmentAggregateRepository.establishmentAggregates = [];

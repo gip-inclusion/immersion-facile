@@ -3,7 +3,6 @@ import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import {
   assessmentDtoSchema,
-  assessmentInputDtoSchema,
   deleteAssessmentRequestDtoSchema,
   legacyAssessmentDtoSchema,
   signAssessmentRequestDtoSchema,
@@ -20,7 +19,6 @@ import {
   markPartnersErroredConventionAsHandledRequestSchema,
   paginatedConventionReadSchema,
   renewConventionParamsSchema,
-  sendSignatureLinkRequestSchema,
   transferConventionToAgencyRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
@@ -40,6 +38,10 @@ import {
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import {
+  sendAssessmentLinkRequestSchema,
+  sendSignatureLinkRequestSchema,
+} from "../notifications/notifications.schema";
 import { paginationRequiredQueryParamsSchema } from "../pagination/pagination.schema";
 import { renewExpiredJwtResponseSchema } from "../tokens/jwt.schema";
 import {
@@ -53,7 +55,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/assessment",
     method: "post",
     ...withAuthorizationHeaders,
-    requestBodySchema: assessmentInputDtoSchema,
+    requestBodySchema: assessmentDtoSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
@@ -185,7 +187,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
   sendAssessmentLink: defineRoute({
     url: "/auth/assessment/send-assessment-link",
     method: "post",
-    requestBodySchema: withConventionIdSchema,
+    requestBodySchema: sendAssessmentLinkRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

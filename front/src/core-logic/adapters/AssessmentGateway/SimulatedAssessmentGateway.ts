@@ -1,13 +1,11 @@
 import { delay, type Observable, of, throwError } from "rxjs";
 import type {
   AssessmentDto,
-  AssessmentInputDto,
   ConventionId,
-  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
+  SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
-  WithConventionId,
 } from "shared";
 import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
@@ -27,8 +25,8 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
   }
 
   public createAssessment$(
-    assessment: AssessmentInputDto,
-    _jwt: ConventionJwt,
+    assessment: AssessmentDto,
+    _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return assessment.conventionId === failedId
       ? throwError(failedIdError)
@@ -64,7 +62,7 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentLink$(
-    _params: WithConventionId,
+    _params: SendAssessmentLinkRequestDto,
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return of(undefined).pipe(delay(this.latency));

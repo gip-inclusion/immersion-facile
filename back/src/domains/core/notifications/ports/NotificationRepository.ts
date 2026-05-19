@@ -29,6 +29,12 @@ export type SmsNotificationFilters = {
   smsKind: TemplatedSms["kind"];
 };
 
+export type EmailNotificationForReminderFilters = {
+  recipientEmail: Email;
+  conventionId: ConventionId;
+  emailKind: EmailType;
+};
+
 export type DeleteNotificationsParams = {
   limit: number;
   createdAt: {
@@ -69,6 +75,9 @@ export interface NotificationRepository {
   getLastSmsNotificationByFilter: (
     filters: SmsNotificationFilters,
   ) => Promise<SmsNotification | undefined>;
+  getLastEmailNotificationByFilter: (
+    filters: EmailNotificationForReminderFilters,
+  ) => Promise<EmailNotification | undefined>;
   filterUserDeletionWarningNotifications(
     params: FilterUserDeletionWarningNotificationsParams,
   ): Promise<UserId[]>;

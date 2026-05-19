@@ -1,8 +1,9 @@
 import {
   type AssessmentDto,
-  assessmentInputDtoSchema,
+  assessmentDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
+  calculateTotalImmersionHoursBetweenDateComplex,
   errors,
   ForbiddenError,
 } from "shared";
@@ -22,13 +23,13 @@ type WithCreateNewEvent = { createNewEvent: CreateNewEvent };
 
 export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
 export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
-  .withInput(assessmentInputDtoSchema)
+  .withInput<AssessmentDto>(assessmentDtoSchema)
   .withOutput<void>()
   .withCurrentUser<ConventionRelatedJwtPayload | undefined>()
   .withDeps<WithCreateNewEvent>()
   .build(
     async ({
-      inputParams: { conventionStartDate, ...assessment },
+      inputParams: assessment,
       uow,
       deps,
       currentUser: conventionJwtPayload,
@@ -40,9 +41,6 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         uow,
         assessment.conventionId,
       );
-
-      if (conventionStartDate !== convention.dateStart)
-        throw errors.assessment.conventionDateStartMismatch(convention.id);
 
       await throwForbiddenIfNotAllowedForAssessments({
         mode: "CreateAssessment",
@@ -61,6 +59,29 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
       ) {
         throw errors.assessment.lastDayOfPresenceNotInConventionRange();
       }
+
+      if (
+        assessment.endedWithAJob === true &&
+        convention.dateStart > assessment.contractStartDate
+      )
+        throw errors.assessment.contractStartDateBeforeImmersionStart({
+          immersionDateStart: convention.dateStart,
+        });
+
+      const scheduledHours = calculateTotalImmersionHoursBetweenDateComplex({
+        complexSchedule: convention.schedule.complexSchedule,
+        dateStart: convention.dateStart,
+        dateEnd:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? (assessment.lastDayOfPresence ?? convention.dateEnd)
+            : convention.dateEnd,
+      });
+
+      if (
+        assessment.status === "PARTIALLY_COMPLETED" &&
+        assessment.numberOfMissedHours > scheduledHours
+      )
+        throw errors.assessment.numberOfMissedHoursExceedsScheduled();
 
       const assessmentEntity = await createAssessmentEntityIfNotExist(
         uow,

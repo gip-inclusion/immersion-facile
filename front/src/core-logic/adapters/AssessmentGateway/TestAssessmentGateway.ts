@@ -1,13 +1,11 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   AssessmentDto,
-  AssessmentInputDto,
   ConventionId,
-  ConventionJwt,
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
+  SendAssessmentLinkRequestDto,
   SignAssessmentRequestDto,
-  WithConventionId,
 } from "shared";
 import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 
@@ -20,8 +18,8 @@ export class TestAssessmentGateway implements AssessmentGateway {
   public sendAssessmentLinkResponse$ = new Subject<void>();
 
   public createAssessment$(
-    _params: AssessmentInputDto,
-    _jwt: ConventionJwt,
+    _params: AssessmentDto,
+    _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.creationResponse$;
   }
@@ -48,7 +46,7 @@ export class TestAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentLink$(
-    _params: WithConventionId,
+    _params: SendAssessmentLinkRequestDto,
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.sendAssessmentLinkResponse$;

@@ -1,6 +1,8 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import { useState } from "react";
 import {
   type ConventionSummaryField,
   ConventionWeeklySchedule,
@@ -14,23 +16,26 @@ import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
-  allDefaultPhoneNumbers,
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
   type DateString,
   domElementIds,
+  type Email,
   getFormattedFirstnameAndLastname,
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
+  type NotificationKind,
   type PhoneNumber,
   remoteWorkModeLabels,
   removeEmptyValue,
   type ScheduleDto,
+  type Signatory,
   type SignatoryRole,
-  titleByRole,
   toDisplayedDate,
 } from "shared";
+import mushroomIllustration from "src/assets/img/mushroom.webp";
+import shurikenIllustration from "src/assets/img/shuriken.webp";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
 const makeSignatoriesSubsections = (
@@ -38,6 +43,7 @@ const makeSignatoriesSubsections = (
   signatoriesSubsectionButtonProps?: (
     signatoryRole: SignatoryRole,
     signatoryPhone: PhoneNumber,
+    signatoryEmail: Email,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
 ): ConventionSummarySubSection[] => {
@@ -97,6 +103,7 @@ const makeSignatoriesSubsections = (
             ? (signatoriesSubsectionButtonProps(
                 "beneficiary",
                 convention.signatories.beneficiary.phone,
+                convention.signatories.beneficiary.email,
                 !!convention.signatories.beneficiary.signedAt,
               ) ?? undefined)
             : undefined,
@@ -170,6 +177,7 @@ const makeSignatoriesSubsections = (
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
                     convention.signatories.beneficiaryRepresentative.phone,
+                    convention.signatories.beneficiaryRepresentative.email,
                     !!convention.signatories.beneficiaryRepresentative.signedAt,
                   ) ?? undefined)
                 : undefined,
@@ -244,6 +252,7 @@ const makeSignatoriesSubsections = (
             ? (signatoriesSubsectionButtonProps(
                 "establishment-representative",
                 convention.signatories.establishmentRepresentative.phone,
+                convention.signatories.establishmentRepresentative.email,
                 !!convention.signatories.establishmentRepresentative.signedAt,
               ) ?? undefined)
             : undefined,
@@ -335,6 +344,7 @@ const makeSignatoriesSubsections = (
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-current-employer",
                     convention.signatories.beneficiaryCurrentEmployer.phone,
+                    convention.signatories.beneficiaryCurrentEmployer.email,
                     !!convention.signatories.beneficiaryCurrentEmployer
                       .signedAt,
                   ) ?? undefined)
@@ -827,6 +837,7 @@ export const makeConventionSections = (
   signatoriesSubsectionButtonProps?: (
     signatoryRole: SignatoryRole,
     signatoryPhone: PhoneNumber,
+    signatoryEmail: Email,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
   assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
@@ -912,18 +923,25 @@ export const sendSignatureLinkModal = createModal({
 
 export const SendSignatureLinkModalWrapper = ({
   signatory,
-  signatoryPhone,
   onConfirm,
 }: {
-  signatory?: SignatoryRole;
-  signatoryPhone?: string;
-  onConfirm: () => void;
+  signatory?: Signatory;
+  onConfirm: (params: {
+    notificationKind: NotificationKind;
+    signatoryRole: SignatoryRole;
+  }) => void;
 }) => {
   const dispatch = useDispatch();
+  const [notificationKind, setNotificationKind] = useState<
+    NotificationKind | undefined
+  >();
+  const hasMobilePhone =
+    !!signatory?.phone && isValidMobilePhone(signatory.phone);
+  const selectedNotificationKind = hasMobilePhone ? notificationKind : "email";
 
   return createPortal(
     <sendSignatureLinkModal.Component
-      title="Envoyer le lien de signature par SMS"
+      title="Relancer pour finaliser l'action"
       buttons={[
         {
           priority: "secondary",
@@ -936,15 +954,78 @@ export const SendSignatureLinkModalWrapper = ({
         {
           id: domElementIds.manageConvention.submitSendSignatureLinkModalButton,
           priority: "primary",
-          children: "Envoyer",
-          onClick: () => onConfirm(),
+          children: "Envoyer la relance",
+          disabled: !selectedNotificationKind || !signatory,
+          onClick: () =>
+            selectedNotificationKind &&
+            signatory &&
+            onConfirm({
+              notificationKind: selectedNotificationKind,
+              signatoryRole: signatory.role,
+            }),
         },
       ]}
     >
       <p>
-        Le {signatory && titleByRole[signatory]} recevra un lien de signature au{" "}
-        {signatoryPhone}
+        {signatory
+          ? `${signatory.firstName} ${signatory.lastName} n'a pas encore signé la convention.`
+          : "Le signataire n'a pas encore signé la convention."}
       </p>
+      {hasMobilePhone ? (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendSignatureLinkModalReminderKindOptions
+          }
+          legend="Choisissez le canal par lequel vous souhaitez lui envoyer un rappel."
+          name="send-signature-link-reminder-kind"
+          options={[
+            {
+              illustration: <img src={shurikenIllustration} alt="" />,
+              label: `SMS: ${signatory?.phone}`,
+              hintText:
+                "Le SMS est généralement plus rapide et évite les problèmes de réception d’email (spam, filtres type Mailinblack, …).",
+              nativeInputProps: {
+                value: "sms",
+                checked: notificationKind === "sms",
+                onChange: () => setNotificationKind("sms"),
+              },
+            },
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: `Email: ${signatory?.email}`,
+              hintText:
+                "Par défaut, nos communications et rappels sont envoyés par email.",
+              nativeInputProps: {
+                value: "email",
+                checked: notificationKind === "email",
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      ) : (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendSignatureLinkModalReminderKindOptions
+          }
+          name="send-signature-link-reminder-kind"
+          options={[
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: `Un rappel sera envoyé par email à l’adresse : ${signatory?.email ?? ""}`,
+              hintText:
+                "Aucun numéro de mobile n'a été renseigné pour cette personne.",
+              nativeInputProps: {
+                value: "email",
+                checked: true,
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      )}
     </sendSignatureLinkModal.Component>,
     document.body,
   );
@@ -957,14 +1038,21 @@ export const sendAssessmentLinkModal = createModal({
 
 export const SendAssessmentLinkModalWrapper = ({
   phone,
+  email,
   onConfirm,
 }: {
   phone: PhoneNumber;
-  onConfirm: () => void;
-}) =>
-  createPortal(
+  email: string;
+  onConfirm: (notificationKind: NotificationKind) => void;
+}) => {
+  const [notificationKind, setNotificationKind] = useState<
+    NotificationKind | undefined
+  >();
+  const hasMobilePhone = isValidMobilePhone(phone);
+  const selectedReminderKind = hasMobilePhone ? notificationKind : "email";
+  return createPortal(
     <sendAssessmentLinkModal.Component
-      title="Renvoyer le bilan par SMS"
+      title="Relancer pour finaliser l'action"
       buttons={[
         {
           priority: "secondary",
@@ -975,18 +1063,72 @@ export const SendAssessmentLinkModalWrapper = ({
         },
         {
           priority: "primary",
-          children: "Envoyer",
-          onClick: () => onConfirm(),
+          children: "Envoyer la relance",
+          disabled: !selectedReminderKind,
+          onClick: () =>
+            selectedReminderKind && onConfirm(selectedReminderKind),
         },
       ]}
     >
-      <p>
-        Le tuteur recevra un lien lui permettant de compléter le bilan au{" "}
-        {phone}
-      </p>
+      <p>Le tuteur n'a pas encore complété le bilan.</p>
+      {hasMobilePhone ? (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendAssessmentLinkModalReminderKindOptions
+          }
+          legend="Choisissez le canal par lequel vous souhaitez lui envoyer un rappel."
+          name="send-assessment-link-reminder-kind"
+          options={[
+            {
+              illustration: <img src={shurikenIllustration} alt="" />,
+              label: "SMS",
+              hintText: phone,
+              nativeInputProps: {
+                value: "sms",
+                checked: notificationKind === "sms",
+                onChange: () => setNotificationKind("sms"),
+              },
+            },
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: "Email",
+              hintText: email,
+              nativeInputProps: {
+                value: "email",
+                checked: notificationKind === "email",
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      ) : (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendAssessmentLinkModalReminderKindOptions
+          }
+          legend="Le canal disponible pour envoyer une relance."
+          name="send-assessment-link-reminder-kind"
+          options={[
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: `Email : ${email}`,
+              hintText:
+                "Aucun numéro de mobile n'a été renseigné pour cette personne.",
+              nativeInputProps: {
+                value: "email",
+                checked: true,
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      )}
     </sendAssessmentLinkModal.Component>,
     document.body,
   );
+};
 
 export type SignatureLinkState = Record<SignatoryRole, boolean>;
 export const sendSignatureLinkButtonProps =
@@ -1000,25 +1142,23 @@ export const sendSignatureLinkButtonProps =
     onClick: (params: {
       signatoryRole: SignatoryRole;
       signatoryPhone: PhoneNumber;
+      signatoryEmail: Email;
     }) => void;
   }) =>
   (
     signatoryRole: SignatoryRole,
     signatoryPhone: PhoneNumber,
+    signatoryEmail: Email,
     signatoryAlreadySign: boolean,
   ): ButtonProps | null =>
     triggeredByRole && triggeredByRole === signatoryRole
       ? null
       : {
           priority: "tertiary",
-          children: "Faire signer par SMS",
-          disabled:
-            !isValidMobilePhone(signatoryPhone) ||
-            signatoryAlreadySign ||
-            signatureLinksSent[signatoryRole] ||
-            allDefaultPhoneNumbers.includes(signatoryPhone),
+          children: "Relancer pour signature",
+          disabled: signatoryAlreadySign || signatureLinksSent[signatoryRole],
           onClick: () => {
-            onClick({ signatoryRole, signatoryPhone });
+            onClick({ signatoryRole, signatoryPhone, signatoryEmail });
           },
           type: "button",
           id: domElementIds.manageConvention.openSendSignatureLinkModal,
@@ -1034,11 +1174,8 @@ export const sendAssessmentLinkButtonProps =
   }) =>
   (phone: PhoneNumber): ButtonProps => ({
     priority: "tertiary",
-    children: "Renvoyer le bilan par SMS",
-    disabled:
-      !isValidMobilePhone(phone) ||
-      isAssessmentLinkSent ||
-      allDefaultPhoneNumbers.includes(phone),
+    children: "Relancer pour bilan",
+    disabled: isAssessmentLinkSent,
     onClick: () => {
       onClick({ phone });
     },

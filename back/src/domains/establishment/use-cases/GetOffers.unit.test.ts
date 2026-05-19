@@ -1,5 +1,6 @@
 import {
   BadRequestError,
+  type BanEstablishmentPayload,
   type DataWithPagination,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -562,33 +563,113 @@ describe("GetOffers", () => {
   });
 
   it("should not include offers from banned establishment", async () => {
+    const banEstablishmentPayload: BanEstablishmentPayload = {
+      siret: establishment1.establishment.siret,
+      establishmentBannishmentJustification:
+        "Des crêpes à la poêle ? Sérieusement ??",
+    };
+    const bannedEstablishment1 = new EstablishmentAggregateBuilder(
+      establishment1,
+    )
+      .withBannishmentInformations({
+        isEstablishmentBanned: true,
+        establishmentBannishmentJustification:
+          banEstablishmentPayload.establishmentBannishmentJustification,
+      })
+      .build();
+
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      bannedEstablishment1,
+      establishment2,
+      establishment3,
+    ];
     uow.bannedEstablishmentRepository.bannedEstablishments = [
       {
-        siret: establishment1.establishment.siret,
+        siret: bannedEstablishment1.establishment.siret,
         establishmentBannishmentJustification:
-          "Des crêpes à la poêle ? Sérieusement ??",
+          banEstablishmentPayload.establishmentBannishmentJustification,
       },
     ];
-
     const result: DataWithPagination<InternalOfferDto> =
       await getOffers.execute(
-        { sortBy: "score", sortOrder: "desc" },
+        { sortBy: "score", sortOrder: "desc", perPage: 2 },
         undefined,
       );
 
-    expect(result.data).toHaveLength(2);
-    expect(
-      result.data.every(
-        (offer) => offer.siret !== establishment1.establishment.siret,
-      ),
-    ).toBe(true);
-    expect(result.data.map((offer) => offer.siret)).toEqual(
-      expect.arrayContaining([
-        establishment2.establishment.siret,
-        establishment3.establishment.siret,
-      ]),
-    );
-    expect(result.pagination.totalRecords).toBe(2);
+    expectToEqual(result, {
+      data: [
+        {
+          siret: establishment2.establishment.siret,
+          appellations: [
+            {
+              appellationCode: secretariatOffer.appellationCode,
+              appellationLabel: secretariatOffer.appellationLabel,
+            },
+          ],
+          establishmentScore: establishment2.establishment.score,
+          naf: establishment2.establishment.nafDto.code,
+          nafLabel: "FAKE",
+          name: establishment2.establishment.name,
+          customizedName: establishment2.establishment.customizedName,
+          numberOfEmployeeRange:
+            establishment2.establishment.numberEmployeesRange,
+          voluntaryToImmersion:
+            establishment2.establishment.voluntaryToImmersion,
+          additionalInformation:
+            establishment2.establishment.additionalInformation,
+          remoteWorkMode: "ON_SITE",
+          fitForDisabledWorkers: "no",
+          position: establishment2.establishment.locations[0].position,
+          address: establishment2.establishment.locations[0].address,
+          locationId: establishment2.establishment.locations[0].id,
+          contactMode: establishment2.establishment.contactMode,
+          romeLabel: "test_rome_label",
+          rome: secretariatOffer.romeCode,
+          website: establishment2.establishment.website,
+          updatedAt: establishment2.establishment.updatedAt.toISOString(),
+          createdAt: establishment2.establishment.createdAt.toISOString(),
+          isAvailable: true,
+        },
+        {
+          siret: establishment3.establishment.siret,
+          appellations: [
+            {
+              appellationCode: boulangerOffer.appellationCode,
+              appellationLabel: boulangerOffer.appellationLabel,
+            },
+          ],
+          establishmentScore: establishment3.establishment.score,
+          naf: establishment3.establishment.nafDto.code,
+          nafLabel: "FAKE",
+          name: establishment3.establishment.name,
+          customizedName: establishment3.establishment.customizedName,
+          numberOfEmployeeRange:
+            establishment3.establishment.numberEmployeesRange,
+          voluntaryToImmersion:
+            establishment3.establishment.voluntaryToImmersion,
+          additionalInformation:
+            establishment3.establishment.additionalInformation,
+          remoteWorkMode: "ON_SITE",
+          fitForDisabledWorkers: "no",
+          position: establishment3.establishment.locations[0].position,
+          address: establishment3.establishment.locations[0].address,
+          locationId: establishment3.establishment.locations[0].id,
+          contactMode: establishment3.establishment.contactMode,
+          romeLabel: "test_rome_label",
+          rome: boulangerOffer.romeCode,
+          website: establishment3.establishment.website,
+          updatedAt: establishment3.establishment.updatedAt.toISOString(),
+          createdAt: establishment3.establishment.createdAt.toISOString(),
+          isAvailable: true,
+        },
+      ],
+      pagination: {
+        currentPage: 1,
+        numberPerPage: 2,
+        totalPages: 1,
+        totalRecords: 2,
+      },
+    });
   });
 
   describe("wrong path", () => {

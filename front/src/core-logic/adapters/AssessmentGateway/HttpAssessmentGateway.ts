@@ -1,16 +1,14 @@
 import { from, type Observable } from "rxjs";
 import {
   type AssessmentDto,
-  type AssessmentInputDto,
   type ConventionId,
-  type ConventionJwt,
   type ConventionMagicLinkRoutes,
   type ConventionSupportedJwt,
   type DeleteAssessmentRequestDto,
   errors,
   type LegacyAssessmentDto,
+  type SendAssessmentLinkRequestDto,
   type SignAssessmentRequestDto,
-  type WithConventionId,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -48,8 +46,8 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   }
 
   public createAssessment$(
-    assessment: AssessmentInputDto,
-    jwt: ConventionJwt,
+    assessment: AssessmentDto,
+    jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -113,7 +111,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentLink$(
-    params: WithConventionId,
+    params: SendAssessmentLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(

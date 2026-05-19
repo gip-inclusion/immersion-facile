@@ -44,7 +44,7 @@ import type { Route } from "type-route";
 export type RouteByMode = {
   create: Route<typeof routes.formEstablishment>;
   edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
-  admin: Route<typeof routes.manageEstablishmentAdmin>;
+  admin: Route<typeof routes.adminEstablishments>;
 };
 
 export type Mode = keyof RouteByMode;
@@ -89,7 +89,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const route = useRoute() as RouteByMode[Mode];
 
   const isEstablishmentCreation = route.name === "formEstablishment";
-  const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
+  const isEstablishmentAdmin = route.name === "adminEstablishments";
   const isEstablishmentDashboard =
     route.name === "establishmentDashboardFormEstablishment";
 
@@ -222,7 +222,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishments" },
           connectedUserJwt: P.nullish,
         },
         () => {
@@ -231,7 +231,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishments", params: { siret: P.string } },
           connectedUserJwt: P.not(P.nullish),
         },
         ({ route, connectedUserJwt }) =>
@@ -247,19 +247,39 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "establishmentDashboardFormEstablishment" },
+          route: { name: "adminEstablishments", params: { siret: P.nullish } },
+          connectedUserJwt: P.not(P.nullish),
+        },
+        () => undefined,
+      )
+      .with(
+        {
+          route: {
+            name: "establishmentDashboardFormEstablishment",
+            params: { siret: P.string },
+          },
           connectedUserJwt: P.not(P.nullish),
         },
         ({ route, connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.fetchEstablishmentRequested({
               establishmentRequested: {
-                siret: route.params.siret ?? "",
+                siret: route.params.siret,
                 jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
             }),
           ),
+      )
+      .with(
+        {
+          route: {
+            name: "establishmentDashboardFormEstablishment",
+            params: { siret: P.nullish },
+          },
+          connectedUserJwt: P.not(P.nullish),
+        },
+        () => undefined,
       )
       .with(
         {
@@ -324,7 +344,16 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "manageEstablishmentAdmin" },
+          route: { name: "adminEstablishments" },
+          connectedUserJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
+      )
+      .with(
+        {
+          route: { name: "adminEstablishments" },
           connectedUserJwt: P.not(P.nullish),
         },
         ({ connectedUserJwt }) =>
@@ -365,15 +394,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           throw frontErrors.generic.unauthorized();
         },
       )
-      .with(
-        {
-          route: { name: "manageEstablishmentAdmin" },
-          connectedUserJwt: P.nullish,
-        },
-        () => {
-          throw frontErrors.generic.unauthorized();
-        },
-      )
+
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },

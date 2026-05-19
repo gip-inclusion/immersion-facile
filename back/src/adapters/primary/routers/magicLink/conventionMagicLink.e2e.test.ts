@@ -645,6 +645,7 @@ describe("Magic link router", () => {
         body: {
           conventionId: convention.id,
           signatoryRole: "establishment-representative",
+          notificationKind: "sms",
         },
         headers: {
           authorization: generateConnectedUserJwt({

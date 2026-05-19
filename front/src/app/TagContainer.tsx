@@ -1,15 +1,24 @@
 import { useEffect } from "react";
+import type { AbsoluteUrl, Environment } from "shared";
+
+type SupportedEnvironment = Extract<Environment, "staging" | "production">;
 
 type TagContainerProps = {
-  containerUrl: string;
+  environment: Environment;
 };
 
 const SCRIPT_ID = "tc-container-script";
 
-export const TagContainer = ({ containerUrl }: TagContainerProps) => {
-  useEffect(() => {
-    if (!containerUrl) return;
+const containerUrlForEnvironment: Record<SupportedEnvironment, AbsoluteUrl> = {
+  staging: "https://cdn.tagcommander.com/7774/uat/tc_ImmersionFacile_31.js",
+  production: "https://cdn.tagcommander.com/7774/tc_ImmersionFacile_31.js",
+};
 
+export const TagContainer = ({ environment }: TagContainerProps) => {
+  useEffect(() => {
+    if (environment !== "staging" && environment !== "production") return;
+
+    const containerUrl = containerUrlForEnvironment[environment];
     const existingScript = document.getElementById(SCRIPT_ID);
     if (existingScript) return;
 
@@ -26,7 +35,7 @@ export const TagContainer = ({ containerUrl }: TagContainerProps) => {
         script.parentNode.removeChild(script);
       }
     };
-  }, [containerUrl]);
+  }, [environment]);
 
   return null;
 };

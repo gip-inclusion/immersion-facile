@@ -55,6 +55,9 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       distanceKm: sortAndPositionParams.distanceKm,
     });
 
+    const excludedSirets =
+      bannedSirets.size > 0 ? Array.from(bannedSirets) : undefined;
+
     const result = await uow.establishmentAggregateRepository.getOffers({
       pagination: apiConsumer
         ? getPaginationParamsForApiConsumer({
@@ -76,6 +79,7 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
         sirets,
         showOnlyAvailableOffers: showOnlyAvailableOffers ?? true,
         geoParams,
+        excludedSirets,
       },
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });

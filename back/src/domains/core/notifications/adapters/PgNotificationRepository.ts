@@ -25,6 +25,7 @@ import {
 import type {
   DeleteNotificationsParams,
   EmailNotificationFilters,
+  EmailNotificationForReminderFilters,
   FilterUserDeletionWarningNotificationsParams,
   NotificationRepository,
   SmsNotificationFilters,
@@ -136,6 +137,19 @@ export class PgNotificationRepository implements NotificationRepository {
       .where("convention_id", "=", filters.conventionId)
       .where("sms_kind", "=", filters.smsKind)
       .orderBy("created_at", "desc")
+      .executeTakeFirst();
+
+    return result ? stripNullsFromNotification(result.notif) : undefined;
+  }
+
+  public async getLastEmailNotificationByFilter(
+    filters: EmailNotificationForReminderFilters,
+  ): Promise<EmailNotification | undefined> {
+    const result = await getEmailsNotificationBuilder(this.transaction)
+      .where("r.email", "=", filters.recipientEmail)
+      .where("e.convention_id", "=", filters.conventionId)
+      .where("e.email_kind", "=", filters.emailKind)
+      .orderBy("e.created_at", "desc")
       .executeTakeFirst();
 
     return result ? stripNullsFromNotification(result.notif) : undefined;

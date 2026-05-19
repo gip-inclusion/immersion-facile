@@ -10,10 +10,28 @@ const absolutizeRelativeUrls = (html: string, origin: string): string =>
     .replace(relativeLinkHrefRegex, `$1${origin}/`)
     .replace(relativeImgSrcRegex, `$1${origin}/`);
 
+const removeUnwantedElements = (
+  html: string,
+  querySelectors: string[],
+): string => {
+  if (querySelectors.length === 0) return html;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.querySelectorAll(querySelectors.join(",")).forEach((element) => {
+    element.remove();
+  });
+  return doc.documentElement.outerHTML;
+};
+
 const prepareContentForPdfGenerator = (rawHtml: string): string => {
   const origin = window.location.origin;
-  const withAbsoluteUrls = absolutizeRelativeUrls(rawHtml, origin);
-  return sanitizeHtmlForPdf(withAbsoluteUrls, window.location.hostname);
+  const htmlWithoutUnwantedElements = removeUnwantedElements(rawHtml, [
+    ".crisp-client",
+  ]);
+  const htmlWithAbsoluteUrls = absolutizeRelativeUrls(
+    htmlWithoutUnwantedElements,
+    origin,
+  );
+  return sanitizeHtmlForPdf(htmlWithAbsoluteUrls, window.location.hostname);
 };
 
 export const usePdfGenerator = () => {

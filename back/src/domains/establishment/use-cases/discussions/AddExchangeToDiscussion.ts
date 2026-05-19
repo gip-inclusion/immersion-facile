@@ -175,6 +175,16 @@ const processSendMessage = async ({
       discussion.siret,
     );
 
+  if (establishment?.establishment.isEstablishmentBanned)
+    return notifyForbidden({
+      uow,
+      discussion,
+      source,
+      messageInput,
+      reason: "establishment_banned",
+      deps,
+    });
+
   return !establishment || discussion.status === "REJECTED"
     ? notifyForbidden({
         uow,

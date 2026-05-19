@@ -43,5 +43,5 @@ export const goToManageEtablishmentBySiretInAdmin = async (
 
   await waitForVisibleLoaderHidden(page, ".im-loader");
 
-  await expect(page.url()).toContain("pilotage-etablissement-admin");
+  await expect(page.url()).toContain(`establishments/${siret}`);
 };

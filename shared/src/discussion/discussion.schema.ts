@@ -187,7 +187,7 @@ export const discussionRejectionSchema: ZodSchemaWithInputMatchingOutput<WithDis
       rejectionReason: zStringMinLength1Max1024,
     }),
     z.object({
-      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"], {
+      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME", "DEPRECATED"], {
         error: localization.invalidEnum,
       }),
     }),

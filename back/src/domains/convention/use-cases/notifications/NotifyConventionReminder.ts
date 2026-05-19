@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import { uniq } from "ramda";
 import {
   type AgencyDto,
-  allDefaultPhoneNumbers,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
@@ -20,9 +19,9 @@ import {
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
+  isValidMobilePhone,
   makeUrlWithQueryParams,
   type ReminderKind,
-  smsRecipientPhoneSchema,
   type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
@@ -154,10 +153,7 @@ const onSignatoriesReminder = async ({
   const signatories = Object.values(conventionRead.signatories);
 
   const smsSignatories = signatories.filter(
-    (signatory) =>
-      !signatory.signedAt &&
-      smsRecipientPhoneSchema.safeParse(signatory.phone).success &&
-      !allDefaultPhoneNumbers.includes(signatory.phone),
+    (signatory) => !signatory.signedAt && isValidMobilePhone(signatory.phone),
   );
 
   const emailActors = [

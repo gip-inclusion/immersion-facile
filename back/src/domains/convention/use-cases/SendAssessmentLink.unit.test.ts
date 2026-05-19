@@ -161,6 +161,7 @@ describe("SendAssessmentLink", () => {
         usecase.execute(
           {
             conventionId: convention.id,
+            notificationKind: "sms",
           },
           { ...validatorJwtPayload, applicationId: wrongConventionId },
         ),
@@ -179,6 +180,7 @@ describe("SendAssessmentLink", () => {
         usecase.execute(
           {
             conventionId: convention.id,
+            notificationKind: "sms",
           },
           validatorJwtPayload,
         ),
@@ -207,6 +209,7 @@ describe("SendAssessmentLink", () => {
         usecase.execute(
           {
             conventionId: conventionWithWrongStatus.id,
+            notificationKind: "sms",
           },
           validatorJwtPayload,
         ),
@@ -240,6 +243,7 @@ describe("SendAssessmentLink", () => {
         usecase.execute(
           {
             conventionId: conventionWithDateEndInMoreThan1Days.id,
+            notificationKind: "sms",
           },
           validatorJwtPayload,
         ),
@@ -275,6 +279,7 @@ describe("SendAssessmentLink", () => {
         usecase.execute(
           {
             conventionId: convention.id,
+            notificationKind: "sms",
           },
           validatorJwtPayload,
         ),
@@ -293,6 +298,7 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             unexistingUserPayload,
           ),
@@ -315,6 +321,7 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             { userId: connectedUser.id },
           ),
@@ -347,6 +354,7 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             { userId: connectedUser.id },
           ),
@@ -381,6 +389,7 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             notConnectedUserJwtPayload,
           ),
@@ -400,6 +409,7 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             {
               applicationId: convention.id,
@@ -445,10 +455,70 @@ describe("SendAssessmentLink", () => {
           usecase.execute(
             {
               conventionId: convention.id,
+              notificationKind: "sms",
             },
             validatorJwtPayload,
           ),
-          errors.assessment.smsAssessmentLinkAlreadySent({
+          errors.assessment.assessmentLinkAlreadySent({
+            notificationKind: "sms",
+            minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+            timeRemaining: "22h00",
+          }),
+        );
+      });
+
+      it(`throws too many requests if there was already an assessment email sent less than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours before`, async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
+        uow.notificationRepository.notifications = [
+          {
+            id: "past-email-notification-id",
+            createdAt: subHours(timeGateway.now(), 2).toISOString(),
+            kind: "email",
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+              userId: undefined,
+            },
+            templatedContent: {
+              kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+              recipients: [convention.establishmentTutor.email],
+              sender: {
+                name: "Immersion Facilitée",
+                email: "contact@immersion-facile.beta.gouv.fr",
+              },
+              params: {
+                agencyLogoUrl: undefined,
+                beneficiaryFirstName:
+                  convention.signatories.beneficiary.firstName,
+                beneficiaryLastName:
+                  convention.signatories.beneficiary.lastName,
+                conventionId: convention.id,
+                establishmentTutorName: convention.establishmentTutor.lastName,
+                assessmentCreationLink: makeShortLinkUrl(config, "shortLink"),
+                internshipKind: convention.internshipKind,
+              },
+            },
+          },
+        ];
+
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId: convention.id,
+              notificationKind: "email",
+            },
+            validatorJwtPayload,
+          ),
+          errors.assessment.assessmentLinkAlreadySent({
+            notificationKind: "email",
             minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
             timeRemaining: "22h00",
           }),
@@ -474,6 +544,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: convention.id,
+          notificationKind: "sms",
         },
         { userId: connectedUser.id },
       );
@@ -534,6 +605,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: convention.id,
+          notificationKind: "sms",
         },
         { userId: backofficeAdmin.id },
       );
@@ -581,6 +653,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: convention.id,
+          notificationKind: "sms",
         },
         role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
       );
@@ -638,6 +711,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: convention.id,
+          notificationKind: "sms",
         },
         signatoryJwtPayload,
       );
@@ -677,8 +751,8 @@ describe("SendAssessmentLink", () => {
     });
 
     it.each([
-      "+33600000000", // metropole
-      "+33785689727", // metropole
+      "+33611111111", // métropole
+      "+33785689727", // métropole
       "+262639000001", // Mayotte
       "+590690000001", // Guadeloupe
       "+590691282545", // Guadeloupe
@@ -710,6 +784,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: conventionWithCustomPhoneNumer.id,
+          notificationKind: "sms",
         },
         validatorJwtPayload,
       );
@@ -772,6 +847,7 @@ describe("SendAssessmentLink", () => {
       await usecase.execute(
         {
           conventionId: convention.id,
+          notificationKind: "sms",
         },
         { userId: connectedUser.id },
       );
@@ -801,7 +877,7 @@ describe("SendAssessmentLink", () => {
       ]);
     });
 
-    it("does not send sms when recipient phone is default phone number", async () => {
+    it("throws bad request when tutor phone is default phone number", async () => {
       const conventionWithDefaultTutorPhone = new ConventionDtoBuilder(
         convention,
       )
@@ -823,16 +899,78 @@ describe("SendAssessmentLink", () => {
         }),
       ];
 
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: conventionWithDefaultTutorPhone.id,
+            notificationKind: "sms",
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.invalidMobilePhoneNumber({
+          conventionId: conventionWithDefaultTutorPhone.id,
+          role: "establishment-tutor",
+        }),
+      );
+    });
+
+    it("sends assessment link by email", async () => {
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [connectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+
       await usecase.execute(
         {
-          conventionId: conventionWithDefaultTutorPhone.id,
+          conventionId: convention.id,
+          notificationKind: "email",
         },
-        validatorJwtPayload,
+        { userId: connectedUser.id },
       );
 
-      expectToEqual(uow.shortLinkQuery.getShortLinks(), []);
-      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
-      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        {
+          topic: "AssessmentReminderManuallySent",
+          payload: {
+            convention,
+            transport: "email",
+            triggeredBy: {
+              kind: "connected-user",
+              userId: connectedUser.id,
+            },
+          },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "email",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+          },
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+            recipients: [convention.establishmentTutor.email],
+            params: {
+              agencyLogoUrl: undefined,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: "OCON",
+              conventionId: convention.id,
+              establishmentTutorName: "Robert THÉNARDIER",
+              assessmentCreationLink: makeShortLinkUrl(config, shortLinkId),
+              internshipKind: convention.internshipKind,
+            },
+          },
+        },
+      ]);
+      expectToEqual(uow.shortLinkQuery.getShortLinks().length, 1);
     });
   });
 });

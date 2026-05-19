@@ -48,7 +48,6 @@ import { connectedUserSlice } from "src/core-logic/domain/connected-user/connect
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
 import { StandardLayoutPage } from "../components/layout/StandardLayoutPage";
-import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
 import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
@@ -359,7 +358,6 @@ const getPageByRouteName: {
     return <OpenApiDocV2Page />;
   },
   magicLinkInterstitial: () => <MagicLinkInterstitialPage />,
-  manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   search: (route) => (
     <SearchPage
       route={route}
