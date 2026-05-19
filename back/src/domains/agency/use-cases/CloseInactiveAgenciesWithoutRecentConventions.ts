@@ -74,6 +74,7 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     let page = 1;
     let totalPages = 1;
     let numberOfAgenciesClosed = 0;
+    let agenciesToClose: AgencyWithUsersRights[] = [];
 
     do {
       await uowPerformer.perform(async (uow) => {
@@ -85,35 +86,35 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
 
         totalPages = pagination.totalPages;
 
-        const agenciesToClose = await getAgenciesToClose(
-          activeAgencies,
-          uow,
-          noConventionSince,
+        agenciesToClose = agenciesToClose.concat(
+          await getAgenciesToClose(activeAgencies, uow, noConventionSince),
         );
-
-        if (agenciesToClose.length > 0) {
-          const notifications = await getNotificationsForClosedAgencies(
-            agenciesToClose,
-            uow,
-            numberOfMonthsWithoutConvention,
-          );
-
-          await executeInSequence(agenciesToClose, (agency) =>
-            uow.agencyRepository.update({
-              id: agency.id,
-              status: "closed",
-              statusJustification:
-                "Agence fermée automatiquement pour inactivité",
-            }),
-          );
-
-          await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
-          numberOfAgenciesClosed += agenciesToClose.length;
-        }
       });
 
       page += 1;
     } while (page <= totalPages);
+
+    if (agenciesToClose.length > 0) {
+      await uowPerformer.perform(async (uow) => {
+        const notifications = await getNotificationsForClosedAgencies(
+          agenciesToClose,
+          uow,
+          numberOfMonthsWithoutConvention,
+        );
+
+        await executeInSequence(agenciesToClose, (agency) =>
+          uow.agencyRepository.update({
+            id: agency.id,
+            status: "closed",
+            statusJustification:
+              "Agence fermée automatiquement pour inactivité",
+          }),
+        );
+
+        await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
+        numberOfAgenciesClosed += agenciesToClose.length;
+      });
+    }
 
     return { numberOfAgenciesClosed };
   });
