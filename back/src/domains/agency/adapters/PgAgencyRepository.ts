@@ -284,10 +284,18 @@ export class PgAgencyRepository implements AgencyRepository {
               `["${departmentCode}"]`,
             )
           : b,
-      (b) =>
-        nameIncludes
-          ? b.where("agencies.name", "ilike", `%${nameIncludes}%`)
-          : b,
+      (b) => {
+        if (!nameIncludes) return b;
+        const words = nameIncludes.split(/[^\p{L}\p{N}]+/u).filter(isTruthy);
+
+        return words.reduce(
+          (acc, word) =>
+            acc.where(
+              sql<boolean>`unaccent(${sql.ref("agencies.name")}) ilike unaccent(${`%${word}%`})`,
+            ),
+          b,
+        );
+      },
       (b) => (kinds ? b.where("agencies.kind", "in", kinds) : b),
       (b) => (status ? b.where("agencies.status", "in", status) : b),
       (b) =>

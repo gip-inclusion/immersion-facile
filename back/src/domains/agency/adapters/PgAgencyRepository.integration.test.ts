@@ -965,6 +965,26 @@ describe("PgAgencyRepository", () => {
         ).toEqual([agency1PEVitrySurSeine, agency2PEVitryLeFrancois]);
       });
 
+      it("considers each word separetly with and 'AND' close", async () => {
+        expect(
+          await agencyRepository.getAgencies({
+            filters: { nameIncludes: "Vi fran" },
+          }),
+        ).toEqual([agency2PEVitryLeFrancois]);
+      });
+
+      it("is accent-insensitive", async () => {
+        expect(
+          await agencyRepository.getAgencies({
+            filters: { nameIncludes: "Pole" },
+          }),
+        ).toEqual([
+          agency1PEVitrySurSeine,
+          agency2PEVitryLeFrancois,
+          agency3PEVitrolles,
+        ]);
+      });
+
       it("returns nothing on no match in names", async () => {
         expect(
           (

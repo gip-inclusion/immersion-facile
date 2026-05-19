@@ -5,6 +5,7 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   listAgencyOptionsRequestSchema,
+  maxAgencyOptionsPerRequest,
   miniStageAgencyKinds,
   orderedAgencyKindList,
 } from "shared";
@@ -19,7 +20,7 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
 )
   .withInput(listAgencyOptionsRequestSchema)
   .build(async ({ uow, inputParams }) => {
-    const { departmentCode, nameIncludes, filterKind, siret, status } =
+    const { departmentCode, nameIncludes, filterKind, siret, status, limit } =
       inputParams;
 
     const extraFilters = getFiltersFromFilterKind(filterKind);
@@ -31,6 +32,7 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
         sirets: siret ? [siret] : undefined,
         ...extraFilters,
       },
+      limit: limit ?? maxAgencyOptionsPerRequest,
     });
 
     return agencies.map(toAgencyOption);

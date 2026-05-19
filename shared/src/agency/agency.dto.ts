@@ -212,7 +212,14 @@ export type GetAgenciesFilter = {
   siret?: SiretDto;
 };
 
-export type ListAgencyOptionsRequestDto = Omit<GetAgenciesFilter, "position">;
+export const maxAgencyOptionsPerRequest = 20;
+
+export type ListAgencyOptionsRequestDto = Omit<
+  GetAgenciesFilter,
+  "position"
+> & {
+  limit?: number;
+};
 
 export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;
