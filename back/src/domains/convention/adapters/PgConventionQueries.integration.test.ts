@@ -1876,8 +1876,23 @@ describe("Pg implementation of ConventionQueries", () => {
             .withUpdatedAt(anyConventionUpdatedAt)
             .build();
 
+          const conventionWithAssessmentToComplete = new ConventionDtoBuilder()
+            .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5")
+            .withSiret("12345678901238")
+            .withAgencyId(agencyId)
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .withDateStart(subDays(now, 5).toISOString())
+            .withDateEnd(subDays(now, 1).toISOString())
+            .withSchedule(reasonableSchedule)
+            .withUpdatedAt(anyConventionUpdatedAt)
+            .build();
+
           await conventionRepository.save(
             conventionEndingInMoreThanOneDay,
+            anyConventionUpdatedAt,
+          );
+          await conventionRepository.save(
+            conventionWithAssessmentToComplete,
             anyConventionUpdatedAt,
           );
 
@@ -1892,7 +1907,14 @@ describe("Pg implementation of ConventionQueries", () => {
               },
             });
 
-          expectToEqual(result.data, []);
+          expectToEqual(result.data, [
+            {
+              ...conventionWithAssessmentToComplete,
+              ...agencyFields,
+              assessment: null,
+              isEstablishmentBanned: false,
+            },
+          ]);
         });
 
         it("should return convention without assessment when dateEnd is within one day", async () => {
@@ -1902,7 +1924,7 @@ describe("Pg implementation of ConventionQueries", () => {
             .withSiret("12345678901237")
             .withAgencyId(agencyId)
             .withStatus("ACCEPTED_BY_VALIDATOR")
-            .withDateStart(subDays(now, 10).toISOString())
+            .withDateStart(subDays(now, 5).toISOString())
             .withDateEnd(addDays(now, 1).toISOString())
             .withSchedule(reasonableSchedule)
             .withUpdatedAt(anyConventionUpdatedAt)
