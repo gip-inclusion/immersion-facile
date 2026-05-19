@@ -23,6 +23,7 @@ import {
   type WithGeoPosition,
   type WithUserFilters,
 } from "shared";
+import { z } from "zod";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import type {
   AgencyRepository,
@@ -33,6 +34,12 @@ import type {
 } from "../ports/AgencyRepository";
 
 type AgencyById = Partial<Record<AgencyId, AgencyWithUsersRights>>;
+
+// PostgreSQL uuid accepts GUID-shaped values without RFC version/variant bits,
+// so use z.guid() here instead of stricter z.uuid().
+const guidSchema = z.guid();
+
+const isUuid = (value: string) => guidSchema.safeParse(value.trim()).success;
 
 export class InMemoryAgencyRepository implements AgencyRepository {
   #agencies: AgencyById = {};
@@ -311,6 +318,11 @@ const agencyHasName = (
   name?: string,
 ): boolean => {
   if (!name) return true;
+
+  const trimmedName = name.trim();
+  if (isUuid(trimmedName))
+    return agency.id.toLowerCase() === trimmedName.toLowerCase();
+
   return agency.name.toLowerCase().includes(name.toLowerCase());
 };
 

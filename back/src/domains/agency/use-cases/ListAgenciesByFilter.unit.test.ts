@@ -141,10 +141,11 @@ describe("Query: List agencies by filter", () => {
     inReviewAgency,
   ];
 
+  let uow: ReturnType<typeof createInMemoryUow>;
   let listAgencyOptionsByFilter: ListAgencyOptionsByFilter;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
+    uow = createInMemoryUow();
     listAgencyOptionsByFilter = makeListAgencyOptionsByFilter({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
@@ -332,6 +333,25 @@ describe("Query: List agencies by filter", () => {
               activeAgencyStatuses.includes(agency.status),
           )
           .map(toAgencyOption),
+      );
+    });
+
+    it("List agencies by pasted agency uuid", async () => {
+      const agencyUuid = "00000000-0000-0000-0000-000000000003";
+      const agencyWithUuid = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId(agencyUuid)
+          .withName("Name not matching UUID")
+          .build(),
+      );
+      uow.agencyRepository.agencies = [agencyWithUuid];
+
+      expectToEqual(
+        await listAgencyOptionsByFilter.execute(
+          { nameIncludes: agencyUuid },
+          undefined,
+        ),
+        [agencyWithUuid].map(toAgencyOption),
       );
     });
 

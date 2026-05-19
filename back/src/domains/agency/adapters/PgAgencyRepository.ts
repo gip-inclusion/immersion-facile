@@ -27,6 +27,7 @@ import {
   type UserId,
   type WithUserFilters,
 } from "shared";
+import { z } from "zod";
 import {
   cast,
   jsonBuildObject,
@@ -46,6 +47,12 @@ import type {
 const logger = createLogger(__filename);
 
 const MAX_AGENCIES_RETURNED = 1500;
+
+// PostgreSQL uuid accepts GUID-shaped values without RFC version/variant bits,
+// so use z.guid() here instead of stricter z.uuid().
+const guidSchema = z.guid();
+
+const isUuid = (value: string) => guidSchema.safeParse(value.trim()).success;
 
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
@@ -286,6 +293,11 @@ export class PgAgencyRepository implements AgencyRepository {
           : b,
       (b) => {
         if (!nameIncludes) return b;
+
+        const trimmedNameIncludes = nameIncludes.trim();
+        if (isUuid(trimmedNameIncludes))
+          return b.where("agencies.id", "=", trimmedNameIncludes);
+
         const words = nameIncludes.split(/[^\p{L}\p{N}]+/u).filter(isTruthy);
 
         return words.reduce(
