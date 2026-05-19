@@ -1130,15 +1130,12 @@ export const SendAssessmentLinkModalWrapper = ({
   );
 };
 
-export type SignatureLinkState = Record<SignatoryRole, boolean>;
 export const sendSignatureLinkButtonProps =
   ({
     triggeredByRole,
-    signatureLinksSent,
     onClick,
   }: {
     triggeredByRole?: SignatoryRole;
-    signatureLinksSent: SignatureLinkState;
     onClick: (params: {
       signatoryRole: SignatoryRole;
       signatoryPhone: PhoneNumber;
@@ -1150,19 +1147,20 @@ export const sendSignatureLinkButtonProps =
     signatoryPhone: PhoneNumber,
     signatoryEmail: Email,
     signatoryAlreadySign: boolean,
-  ): ButtonProps | null =>
-    triggeredByRole && triggeredByRole === signatoryRole
-      ? null
-      : {
-          priority: "tertiary",
-          children: "Relancer pour signature",
-          disabled: signatoryAlreadySign || signatureLinksSent[signatoryRole],
-          onClick: () => {
-            onClick({ signatoryRole, signatoryPhone, signatoryEmail });
-          },
-          type: "button",
-          id: domElementIds.manageConvention.openSendSignatureLinkModal,
-        };
+  ): ButtonProps | null => {
+    if (signatoryAlreadySign) return null;
+    if (triggeredByRole && triggeredByRole === signatoryRole) return null;
+
+    return {
+      priority: "tertiary",
+      children: "Relancer pour signature",
+      onClick: () => {
+        onClick({ signatoryRole, signatoryPhone, signatoryEmail });
+      },
+      type: "button",
+      id: domElementIds.manageConvention.openSendSignatureLinkModal,
+    };
+  };
 
 export const sendAssessmentLinkButtonProps =
   ({
