@@ -105,6 +105,6 @@ export type CreateFormAssessmentInitialValues = {
     createdAt: DateTimeIsoString;
   };
 
-export type FormAssessmentDto =
+export type AssessmentFormDto =
   | AssessmentDto
   | CreateFormAssessmentInitialValues;

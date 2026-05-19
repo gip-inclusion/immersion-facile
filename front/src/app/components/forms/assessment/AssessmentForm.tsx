@@ -17,6 +17,7 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AssessmentDto,
+  type AssessmentFormDto,
   type AssessmentStatus,
   assessmentFormSchema,
   assessmentStatuses,
@@ -26,7 +27,6 @@ import {
   convertLocaleDateToUtcTimezoneDate,
   type DotNestedKeys,
   domElementIds,
-  type FormAssessmentDto,
   type InternshipKind,
   type Role,
   toDateUTCString,
@@ -79,7 +79,7 @@ export const AssessmentForm = ({
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
 
-  const initialValues: FormAssessmentDto = {
+  const initialValues: AssessmentFormDto = {
     conventionId: convention.id,
     establishmentFeedback: "",
     establishmentAdvices: "",
@@ -90,21 +90,21 @@ export const AssessmentForm = ({
     signedAt: null,
     createdAt: new Date().toISOString(),
   };
-  const methods = useForm<FormAssessmentDto>({
+  const methods = useForm<AssessmentFormDto>({
     resolver: zodResolver(assessmentFormSchema(convention)),
     mode: "onTouched",
     defaultValues: initialValues,
   });
   const { handleSubmit, trigger } = methods;
 
-  const onSubmit = (values: FormAssessmentDto) => {
+  const onSubmit = (values: AssessmentFormDto) => {
     if (values.status === null || values.endedWithAJob === null) {
       throw new Error(
         "Form validation failed: status or endedWithAJob is null",
       );
     }
 
-    const assessment = formAssessmentDtoToAssessmentDto(values);
+    const assessment = assessmentFormDtoToAssessmentDto(values);
 
     onAssessmentSubmitted?.(assessment);
 
@@ -236,7 +236,7 @@ const AssessmentStatusSection = ({
       );
     }
   }, [formValues]);
-  const assessmentDto = formAssessmentDtoToAssessmentDto(formValues);
+  const assessmentDto = assessmentFormDtoToAssessmentDto(formValues);
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
@@ -596,8 +596,8 @@ const AssessmentCommentsSection = ({
   );
 };
 
-export const formAssessmentDtoToAssessmentDto = (
-  formAssessmentDto: FormAssessmentDto,
+export const assessmentFormDtoToAssessmentDto = (
+  formAssessmentDto: AssessmentFormDto,
 ): AssessmentDto => {
   const commonFields = {
     conventionId: formAssessmentDto.conventionId,
