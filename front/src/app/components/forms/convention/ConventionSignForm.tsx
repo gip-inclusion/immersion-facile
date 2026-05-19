@@ -26,7 +26,6 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import {
   makeConventionSections,
   SendSignatureLinkModalWrapper,
-  type SignatureLinkState,
   sendSignatureLinkButtonProps,
   sendSignatureLinkModal,
 } from "src/app/contents/convention/conventionSummary.helpers";
@@ -70,14 +69,6 @@ export const ConventionSignForm = ({
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
     useState<Signatory | null>(null);
 
-  const [signatureLinksSent, setSignatureLinksSent] =
-    useState<SignatureLinkState>({
-      beneficiary: false,
-      "establishment-representative": false,
-      "beneficiary-representative": false,
-      "beneficiary-current-employer": false,
-    });
-
   const [isModalClosedWithoutSignature, setIsModalClosedWithoutSignature] =
     useState<boolean>(false);
 
@@ -103,11 +94,6 @@ export const ConventionSignForm = ({
         feedbackTopic: "send-signature-link",
       }),
     );
-
-    setSignatureLinksSent((prev) => ({
-      ...prev,
-      [signatoryRole]: true,
-    }));
   };
   const feedbacks = useFeedbackTopics([
     "send-signature-link",
@@ -177,7 +163,6 @@ export const ConventionSignForm = ({
               convention,
               sendSignatureLinkButtonProps({
                 triggeredByRole: currentSignatory.role,
-                signatureLinksSent,
                 onClick: ({
                   signatoryRole,
                   signatoryPhone,
@@ -229,7 +214,6 @@ export const ConventionSignForm = ({
                   convention,
                   sendSignatureLinkButtonProps({
                     triggeredByRole: currentSignatory.role,
-                    signatureLinksSent,
                     onClick: ({
                       signatoryRole,
                       signatoryPhone,

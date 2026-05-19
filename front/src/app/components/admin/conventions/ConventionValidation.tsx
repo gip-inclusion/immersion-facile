@@ -49,7 +49,6 @@ import {
   makeConventionSections,
   SendAssessmentLinkModalWrapper,
   SendSignatureLinkModalWrapper,
-  type SignatureLinkState,
   sendAssessmentLinkButtonProps,
   sendAssessmentLinkModal,
   sendSignatureLinkButtonProps,
@@ -91,14 +90,6 @@ export const ConventionValidation = ({
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
     useState<Signatory | null>(null);
-
-  const [signatureLinksSent, setSignatureLinksSent] =
-    useState<SignatureLinkState>({
-      beneficiary: false,
-      "establishment-representative": false,
-      "beneficiary-representative": false,
-      "beneficiary-current-employer": false,
-    });
 
   const isSignatureModalOpen = useIsModalOpen(sendSignatureLinkModal);
 
@@ -149,11 +140,6 @@ export const ConventionValidation = ({
         feedbackTopic: "send-signature-link",
       }),
     );
-
-    setSignatureLinksSent((prev) => ({
-      ...prev,
-      [signatoryRole]: true,
-    }));
   };
 
   const onSubmitSendAssessmentLink = (notificationKind: NotificationKind) => {
@@ -244,7 +230,6 @@ export const ConventionValidation = ({
         summary={makeConventionSections(
           convention,
           sendSignatureLinkButtonProps({
-            signatureLinksSent,
             onClick: ({ signatoryRole, signatoryPhone, signatoryEmail }) => {
               const signatoryKey =
                 conventionSignatoryRoleBySignatoryKey[signatoryRole];
