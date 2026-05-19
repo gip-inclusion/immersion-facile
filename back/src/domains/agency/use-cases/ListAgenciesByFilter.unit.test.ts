@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   activeAgencyStatuses,
   expectToEqual,
+  maxAgencyOptionsPerRequest,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
@@ -157,6 +158,45 @@ describe("Query: List agencies by filter", () => {
         result,
         allAgencies
           .filter((agency) => activeAgencyStatuses.includes(agency.status))
+          .map(toAgencyOption),
+      );
+    });
+
+    it("limits agency options by default", async () => {
+      const uow = createInMemoryUow();
+      listAgencyOptionsByFilter = makeListAgencyOptionsByFilter({
+        uowPerformer: new InMemoryUowPerformer(uow),
+      });
+      const agencies = Array.from(
+        { length: maxAgencyOptionsPerRequest + 1 },
+        (_, index) =>
+          toAgencyWithRights(
+            new AgencyDtoBuilder()
+              .withId(`agency-${index}`)
+              .withName(`Agence ${index}`)
+              .build(),
+          ),
+      );
+      uow.agencyRepository.agencies = agencies;
+
+      const result = await listAgencyOptionsByFilter.execute({}, undefined);
+
+      expectToEqual(
+        result,
+        agencies.slice(0, maxAgencyOptionsPerRequest).map(toAgencyOption),
+      );
+    });
+
+    it("uses requested limit when provided", async () => {
+      const result = await listAgencyOptionsByFilter.execute(
+        { limit: 2 },
+        undefined,
+      );
+      expectToEqual(
+        result,
+        allAgencies
+          .filter((agency) => activeAgencyStatuses.includes(agency.status))
+          .slice(0, 2)
           .map(toAgencyOption),
       );
     });

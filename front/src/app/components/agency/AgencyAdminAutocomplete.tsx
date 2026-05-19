@@ -1,8 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   RSAutocomplete,
   type RSAutocompleteComponentProps,
+  type RSAutocompleteProps,
 } from "react-design-system";
 
 import { useDispatch } from "react-redux";
@@ -54,6 +55,10 @@ export type AgencyAdminAutocompleteProps = RSAutocompleteComponentProps<
   initialValue?: AgencyOption;
 };
 
+type AgencyAdminSelectProps = NonNullable<
+  RSAutocompleteProps<AgencyOption, "agencyAdminAutocomplete">["selectProps"]
+>;
+
 export const AgencyAdminAutocomplete = ({
   label,
   className,
@@ -70,8 +75,15 @@ export const AgencyAdminAutocomplete = ({
   const noOptionText =
     isLoading || !inputValue ? "..." : "Aucune agence trouvée";
 
-  const sortedAgencyOptions: AgencyOption[] = [...agencyOptions].sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const options = useMemo<AgencyAdminSelectProps["options"]>(
+    () =>
+      [...agencyOptions]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((option) => ({
+          label: option.name,
+          value: option,
+        })),
+    [agencyOptions],
   );
   const { cx } = useStyles();
 
@@ -80,10 +92,7 @@ export const AgencyAdminAutocomplete = ({
       locator={locator}
       label={label}
       selectProps={{
-        options: sortedAgencyOptions.map((option) => ({
-          label: option.name,
-          value: option,
-        })),
+        options,
         inputId: domElementIds.admin.agencyTab.editAgencyAutocompleteInput,
         value: selectedAgency?.id
           ? {

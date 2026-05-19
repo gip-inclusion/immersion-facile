@@ -22,6 +22,7 @@ import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
   zEnumValidation,
+  zToNumber,
 } from "../zodUtils";
 import {
   type AgencyDto,
@@ -41,6 +42,7 @@ import {
   type DelegationAgencyKind,
   delegationAgencyKindList,
   type ListAgencyOptionsRequestDto,
+  maxAgencyOptionsPerRequest,
   orderedAgencyKindList,
   type PrivateListAgenciesRequestDto,
   type WithAgencyId,
@@ -97,6 +99,12 @@ export const agencyOptionsSchema: ZodSchemaWithInputMatchingOutput<
   AgencyOption[]
 > = z.array(agencyOptionSchema);
 
+const listAgencyOptionsLimitSchema: ZodSchemaWithInputMatchingOutput<number> =
+  zToNumber
+    .refine(Number.isInteger)
+    .refine((limit) => limit > 0)
+    .refine((limit) => limit <= maxAgencyOptionsPerRequest);
+
 export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<ListAgencyOptionsRequestDto> =
   z.object({
     departmentCode: departmentCodeSchema.optional(),
@@ -108,6 +116,7 @@ export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<Li
       .optional(),
     siret: siretSchema.optional(),
     status: z.array(agencyStatusSchema).optional(),
+    limit: listAgencyOptionsLimitSchema.optional(),
   });
 
 const delegationAgencyKindSchema: ZodSchemaWithInputMatchingOutput<DelegationAgencyKind> =
