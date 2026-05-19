@@ -119,9 +119,11 @@ export const AgencyAdminAutocomplete = ({
             onAgencySelected(searchResult.value);
           }
         },
-        onInputChange: (searchTerm) => {
-          setInputValue(searchTerm);
-          updateSearchTerm(searchTerm);
+        onInputChange: (searchTerm, actionMeta) => {
+          if (actionMeta.action === "input-change") {
+            setInputValue(searchTerm);
+            updateSearchTerm(searchTerm);
+          }
         },
         components: {
           Option: ({ innerRef, innerProps, data }) => (
