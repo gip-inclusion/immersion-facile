@@ -17,7 +17,7 @@ import {
   replaceAtIndex,
 } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
+import type { Mode } from "src/app/routes/routes.hooks";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { v4 as uuidV4 } from "uuid";
 import type { $ZodIssue } from "zod/v4/core";

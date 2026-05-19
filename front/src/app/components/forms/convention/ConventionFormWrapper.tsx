@@ -13,9 +13,11 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   agencyModifierRoles,
+  type ConventionDraftId,
   type ConventionId,
   type ConventionJwtPayload,
   conventionStatusesAllowedForModification,
+  type DiscussionId,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
@@ -41,7 +43,8 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes, useRoute } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { useConventionRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -51,7 +54,6 @@ import { conventionDraftSelectors } from "src/core-logic/domain/convention/conve
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
-import type { Route } from "type-route";
 
 const {
   Component: ConfirmDuplicateConventionModal,
@@ -90,12 +92,17 @@ export const ConventionFormWrapper = ({
   mode,
 }: ConventionFormWrapperProps) => {
   const showSummary = useAppSelector(conventionSelectors.showSummary);
-  const route = useRoute() as SupportedConventionRoutes;
+  const route = useConventionRoute([
+    routes.conventionImmersion.name,
+    routes.conventionTemplate.name,
+  ]);
   const routeJwt = "jwt" in route.params ? route.params.jwt : undefined;
   const routeConventionDraftId =
     "conventionDraftId" in route.params
       ? route.params.conventionDraftId
       : undefined;
+  const routeDiscussionId =
+    "discussionId" in route.params ? route.params.discussionId : undefined;
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
@@ -325,6 +332,9 @@ export const ConventionFormWrapper = ({
                 internshipKind={internshipKind}
                 userRolesOnConvention={userRolesOnConvention}
                 conventionId={fetchedConvention.id}
+                fromConventionDraftId={conventionDraftId}
+                discussionId={routeDiscussionId}
+                isEditingConvention={!!routeJwt}
               />
             ) : (
               <ConventionForm
@@ -379,11 +389,17 @@ const ConventionSummarySection = ({
   mode,
   internshipKind,
   conventionId,
+  fromConventionDraftId,
+  discussionId,
+  isEditingConvention,
 }: {
   mode: ConventionFormMode;
   internshipKind: InternshipKind;
   userRolesOnConvention: Role[];
   conventionId: ConventionId;
+  fromConventionDraftId?: ConventionDraftId;
+  discussionId?: DiscussionId;
+  isEditingConvention: boolean;
 }) => {
   const dispatch = useDispatch();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -408,9 +424,7 @@ const ConventionSummarySection = ({
   );
   const [isModalClosedWithoutSignature, setIsModalClosedWithoutSignature] =
     useState<boolean>(false);
-  const route = useRoute() as Route<typeof routes.conventionImmersion>;
 
-  const isEditingConvention = !!route.params.jwt;
   const shouldShowDuplicateWarning =
     !isEditingConvention && similarConventionIds.length > 0;
 
@@ -431,13 +445,13 @@ const ConventionSummarySection = ({
   const onConfirmSubmit = () => {
     dispatch(
       conventionSlice.actions.saveConventionRequested({
-        fromConventionDraftId: route.params.conventionDraftId,
+        fromConventionDraftId,
         convention: {
           ...convention,
           statusJustification: getValues("statusJustification"),
           status: "READY_TO_SIGN",
         },
-        discussionId: route.params.discussionId,
+        discussionId,
         feedbackTopic:
           mode === "edit-convention"
             ? "convention-action-edit"
