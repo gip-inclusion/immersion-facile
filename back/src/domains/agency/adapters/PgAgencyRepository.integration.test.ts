@@ -985,6 +985,14 @@ describe("PgAgencyRepository", () => {
         ]);
       });
 
+      it("also supports pasting the uuid of an agency", async () => {
+        expect(
+          await agencyRepository.getAgencies({
+            filters: { nameIncludes: agency2PEVitryLeFrancois.id },
+          }),
+        ).toEqual([agency2PEVitryLeFrancois]);
+      });
+
       it("returns nothing on no match in names", async () => {
         expect(
           (
