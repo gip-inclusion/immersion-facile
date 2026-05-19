@@ -1,13 +1,9 @@
 import { z } from "zod";
 import type { ConventionReadDto } from "../convention/convention.dto";
 import { conventionIdSchema } from "../convention/convention.schema";
+import { errors } from "../errors/errors";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
-import {
-  convertLocaleDateToUtcTimezoneDate,
-  dateTimeIsoStringSchema,
-  makeDateStringSchema,
-  toDisplayedDate,
-} from "../utils/date";
+import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
 import {
   zStringMinLength1Max1024,
   zStringMinLength1Max3000,
@@ -21,8 +17,8 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
+  type AssessmentFormDto,
   type DeleteAssessmentRequestDto,
-  type FormAssessmentDto,
   type LegacyAssessmentDto,
   type SignAssessmentRequestDto,
   typeOfContracts,
@@ -79,7 +75,7 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
+export const assessmentDtoSchema: z.ZodType<AssessmentDto, AssessmentFormDto> =
   z
     .object({
       conventionId: z.string(),
@@ -98,7 +94,7 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, FormAssessmentDto> =
 
 export const assessmentFormSchema = (
   convention: ConventionReadDto,
-): z.ZodType<AssessmentDto, FormAssessmentDto> =>
+): z.ZodType<AssessmentDto, AssessmentFormDto> =>
   assessmentDtoSchema
     .superRefine((formValues, ctx) => {
       if (
@@ -108,7 +104,9 @@ export const assessmentFormSchema = (
       ) {
         ctx.addIssue({
           code: "custom",
-          message: `La date début du contrat ne peut pas être antérieure à la date de début d'immersion: ${toDisplayedDate({ date: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)) })}.`,
+          message: errors.assessment.contractStartDateBeforeImmersionStart({
+            immersionDateStart: convention.dateStart,
+          }).message,
           path: ["contractStartDate"],
         });
       }
@@ -127,14 +125,14 @@ export const assessmentFormSchema = (
         ctx.addIssue({
           code: "custom",
           message:
-            "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
+            errors.assessment.numberOfMissedHoursExceedsScheduled().message,
           path: ["numberOfMissedHours"],
         });
     });
 
 export const withAssessmentSchema: z.ZodType<
   WithAssessmentDto,
-  { assessment: FormAssessmentDto }
+  { assessment: AssessmentFormDto }
 > = z.object({
   assessment: assessmentDtoSchema,
 });

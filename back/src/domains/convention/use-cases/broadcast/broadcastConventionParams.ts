@@ -1,13 +1,13 @@
 import {
   type AgencyId,
   type AssessmentDto,
+  type AssessmentFormDto,
   agencyIdSchema,
   assessmentDtoSchema,
   type ConventionId,
   type ConventionReadDto,
   conventionIdSchema,
   conventionReadSchema,
-  type FormAssessmentDto,
 } from "shared";
 import { z } from "zod";
 
@@ -43,7 +43,7 @@ export const broadcastConventionParamsSchema: z.ZodType<
   | {
       eventType: "ASSESSMENT_CREATED";
       convention: ConventionReadDto;
-      assessment: FormAssessmentDto;
+      assessment: AssessmentFormDto;
     }
 > = z.union([
   z.object({
