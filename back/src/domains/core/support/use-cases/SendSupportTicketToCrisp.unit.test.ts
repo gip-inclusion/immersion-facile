@@ -210,7 +210,7 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=$
 
 -----------
 Siret fourni : ${crispTicketSiret}
-Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${crispTicketSiret}
+Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/admin/establishments/${crispTicketSiret}
 
 -----------
 Logs Brevo:
@@ -262,7 +262,7 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=$
 
 -----------
 Siret fourni : ${crispTicketSiret}
-Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${crispTicketSiret}
+Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/admin/establishments/${crispTicketSiret}
 
 Pour quelle raison principale souhaitez-vous arrêter d'accueillir d'immersions professionnelles:
 Je reçois trop de demandes
