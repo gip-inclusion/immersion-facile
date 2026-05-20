@@ -492,6 +492,16 @@ export const domElementIds = {
       "im-convention-validation__open-send-assessment-link-modal",
     sendAssessmentLinkModalReminderKindOptions:
       "im-convention-validation__send-assessment-link-modal-reminder-kind-options",
+    openSendAssessmentSignatureReminderModal:
+      "im-convention-validation__open-send-assessment-signature-reminder-modal",
+    sendAssessmentSignatureReminderModal:
+      "im-convention-validation__send-assessment-signature-reminder-modal",
+    sendAssessmentSignatureReminderModalForm:
+      "im-convention-validation__send-assessment-signature-reminder-modal-form",
+    submitSendAssessmentSignatureReminderModalButton:
+      "im-convention-validation__send-assessment-signature-reminder-modal-button",
+    sendAssessmentSignatureReminderModalReminderKindOptions:
+      "im-convention-validation__send-assessment-signature-reminder-modal-reminder-kind-options",
     signModal: "im-convention-validation__sign-modal",
     signModalForm: "im-convention-validation__sign-modal-form",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
