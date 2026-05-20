@@ -2972,7 +2972,7 @@ export const discussionExchangeForbiddenContents = (
           url: string;
         }[];
       };
-      error_message_feedback: string;
+      errorMessageFeedback: string;
     }
   >
 > => ({
@@ -2997,7 +2997,7 @@ export const discussionExchangeForbiddenContents = (
               ]
             : undefined,
       },
-      error_message_feedback:
+      errorMessageFeedback:
         "Vous n'avez pas les droits nécessaires pour répondre à cette candidature.",
     },
     discussion_completed: {
@@ -3006,7 +3006,7 @@ export const discussionExchangeForbiddenContents = (
           La candidature à laquelle vous souhaitez répondre n'est plus en cours.
           Le candidat ne recevra pas votre message.`,
       },
-      error_message_feedback: "La candidature n'est plus en cours.",
+      errorMessageFeedback: "La candidature n'est plus en cours.",
     },
     establishment_missing: {
       emailContent: {
@@ -3016,7 +3016,7 @@ export const discussionExchangeForbiddenContents = (
 
           Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
       },
-      error_message_feedback:
+      errorMessageFeedback:
         "L'entreprise liée à cette candidature s'est récemment désinscrite.",
     },
     establishment_banned: {
@@ -3033,7 +3033,7 @@ export const discussionExchangeForbiddenContents = (
           Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
         `,
       },
-      error_message_feedback:
+      errorMessageFeedback:
         "Votre établissement est banni et n'a plus accès aux services d'Immersion Facilitée.",
     },
   },
@@ -3044,7 +3044,7 @@ export const discussionExchangeForbiddenContents = (
           Vous n'êtes pas le candidat associé à cette candidature.
         `,
       },
-      error_message_feedback:
+      errorMessageFeedback:
         "Vous n'êtes pas le candidat associé à cette candidature.",
     },
     discussion_completed: {
@@ -3055,7 +3055,7 @@ export const discussionExchangeForbiddenContents = (
 
           Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
       },
-      error_message_feedback: "La candidature n'est plus en cours.",
+      errorMessageFeedback: "La candidature n'est plus en cours.",
     },
     establishment_missing: {
       emailContent: {
@@ -3065,7 +3065,7 @@ export const discussionExchangeForbiddenContents = (
 
           Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche`,
       },
-      error_message_feedback:
+      errorMessageFeedback:
         "L'entreprise liée à cette candidature s'est récemment désinscrite.",
     },
     establishment_banned: {
@@ -3082,8 +3082,7 @@ export const discussionExchangeForbiddenContents = (
           Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
         `,
       },
-      error_message_feedback:
-        "L'entreprise liée à cette candidature est bannie.",
+      errorMessageFeedback: "L'entreprise liée à cette candidature est bannie.",
     },
   },
 });
