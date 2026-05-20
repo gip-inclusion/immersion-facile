@@ -8,6 +8,7 @@ import {
   errors,
   type LegacyAssessmentDto,
   type SendAssessmentLinkRequestDto,
+  type SendAssessmentSignatureReminderRequestDto,
   type SignAssessmentRequestDto,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -117,6 +118,27 @@ export class HttpAssessmentGateway implements AssessmentGateway {
     return from(
       this.httpClient
         .sendAssessmentLink({
+          headers: { authorization: jwt },
+          body: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 429 }, throwTooManyRequestWithExplicitMessage)
+            .with({ status: P.union(403, 401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public sendAssessmentSignatureReminder$(
+    params: SendAssessmentSignatureReminderRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .sendAssessmentSignatureReminder({
           headers: { authorization: jwt },
           body: params,
         })
