@@ -99,3 +99,18 @@ export const allAgencyRoles = [
   "to-review",
   "agency-viewer",
 ] as const;
+
+export const assessmentSignatureReminderAuthorizedRoles: Role[] = [
+  "establishment-representative",
+  "establishment-tutor",
+  "establishment-admin",
+  "establishment-contact",
+  "counsellor",
+  "validator",
+  "agency-admin",
+  "agency-viewer",
+  "back-office",
+] as const;
+
+export type AssessmentSignatureReminderAuthorizedRole =
+  (typeof assessmentSignatureReminderAuthorizedRoles)[number];
