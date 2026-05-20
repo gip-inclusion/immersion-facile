@@ -74,6 +74,7 @@ import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
+import { makeSendAssessmentSignatureReminder } from "../../domains/convention/use-cases/SendAssessmentSignatureReminder";
 import { makeSendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { makeSendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { makeSendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
@@ -1022,6 +1023,17 @@ export const createUseCases = ({
       },
     }),
     sendAssessmentLink: makeSendAssessmentLink({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        config,
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        createNewEvent,
+      },
+    }),
+    sendAssessmentSignatureReminder: makeSendAssessmentSignatureReminder({
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,
