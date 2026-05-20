@@ -73,27 +73,24 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
     const perPage = deps.batchSize;
     let page = 1;
     let totalPages = 1;
-    let numberOfAgenciesClosed = 0;
-    let agenciesToClose: AgencyWithUsersRights[] = [];
+    const agenciesToClose: AgencyWithUsersRights[] = [];
 
-    do {
+    while (page <= totalPages) {
       await uowPerformer.perform(async (uow) => {
         const { data: activeAgencies, pagination } =
           await uow.agencyRepository.getAgencies({
             filters,
             pagination: { page, perPage },
           });
-
         totalPages = pagination.totalPages;
-
-        agenciesToClose = agenciesToClose.concat(
-          await getAgenciesToClose(activeAgencies, uow, noConventionSince),
+        agenciesToClose.push(
+          ...(await getAgenciesToClose(activeAgencies, uow, noConventionSince)),
         );
       });
-
       page += 1;
-    } while (page <= totalPages);
+    }
 
+    let numberOfAgenciesClosed = 0;
     if (agenciesToClose.length > 0) {
       await uowPerformer.perform(async (uow) => {
         const notifications = await getNotificationsForClosedAgencies(
