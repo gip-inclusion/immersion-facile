@@ -1,8 +1,10 @@
 import {
   allowedLoginUris,
   expectToEqual,
+  type InitiateLoginByOAuthParams,
+  type OAuthProviderForLogin,
+  oAuthProvidersForLogin,
   queryParamsAsString,
-  type WithRedirectUri,
 } from "shared";
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -14,7 +16,9 @@ import {
 import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
 describe("InitiateLoginByOAuth usecase", () => {
-  describe("With OAuthGateway mode 'proConnect'", () => {
+  describe.each(
+    oAuthProvidersForLogin,
+  )("With OAuthGateway mode '%s'", (provider: OAuthProviderForLogin) => {
     it.each(
       allowedLoginUris,
     )("construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth", async (uri) => {
@@ -25,16 +29,20 @@ describe("InitiateLoginByOAuth usecase", () => {
       const useCase = new InitiateLoginByOAuth(
         new InMemoryUowPerformer(uow),
         uuidGenerator,
-        new InMemoryOAuthGateway(fakeProviderConfig),
+        {
+          proConnect: new InMemoryOAuthGateway(fakeProviderConfig),
+          peConnect: new InMemoryOAuthGateway(fakeProviderConfig),
+        },
       );
 
       uuidGenerator.setNextUuids([nonce, state]);
 
-      const sourcePage: WithRedirectUri = {
+      const sourcePage: InitiateLoginByOAuthParams = {
         redirectUri: `/${uri}?discussionId=discussion0`,
+        provider,
       };
       const redirectUrl = await useCase.execute(sourcePage);
-      const loginEndpoint = "login-pro-connect";
+      const loginEndpoint = "login";
 
       expectToEqual(
         redirectUrl,
@@ -53,7 +61,7 @@ describe("InitiateLoginByOAuth usecase", () => {
           fromUri: sourcePage.redirectUri,
           nonce,
           state,
-          provider: "proConnect",
+          provider,
           externalId: undefined,
           accessToken: undefined,
           usedAt: null,

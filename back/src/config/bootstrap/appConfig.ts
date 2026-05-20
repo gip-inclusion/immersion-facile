@@ -5,6 +5,7 @@ import {
   authRoutes,
   environments,
   filterNotFalsy,
+  ftConnect,
   loginByEmailLinkDurationInMinutes,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
@@ -13,6 +14,7 @@ import {
   makeThrowIfNotOpenCageGeosearchKey,
   type ProcessEnv,
 } from "shared";
+import { ftConnectNeededScopesForAllUsedApi } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 import type { MetabaseConfig } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import type { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import type { DomainTopic } from "../../domains/core/events/events";
@@ -327,6 +329,30 @@ export class AppConfig {
           : undefined,
       ),
       scope: "openid given_name usual_name email custom siret",
+    };
+  }
+
+  public get ftConnectConfig(): OAuthConfig {
+    const clientId =
+      this.ftConnectGateway === "HTTPS"
+        ? this.franceTravailClientId
+        : "fake id";
+
+    return {
+      clientId: clientId,
+      clientSecret:
+        this.ftConnectGateway === "HTTPS"
+          ? this.franceTravailClientSecret
+          : "fake secret",
+      immersionRedirectUri: {
+        afterLogin: `${this.immersionFacileBaseUrl}/api/${ftConnect}`,
+        afterLogout: this.immersionFacileBaseUrl,
+      },
+      providerBaseUri:
+        this.ftConnectGateway === "HTTPS"
+          ? this.ftAuthCandidatUrl
+          : "https://fake-ft-connect-url.com",
+      scope: ftConnectNeededScopesForAllUsedApi(clientId),
     };
   }
 

@@ -1,21 +1,18 @@
-import type { DateString, PhoneNumber } from "shared";
-import { type AbsoluteUrl, queryParamsAsString } from "shared";
+import type { AbsoluteUrl, DateString, PhoneNumber } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import type { AppConfig } from "../../../../../../config/bootstrap/appConfig";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import {
   type ExternalAccessToken,
   type ExternalFtConnectAdvisor,
-  type ExternalFtConnectOAuthGrantPayload,
   type ExternalFtConnectUser,
   ftConnectAccessTokenHeadersSchema,
 } from "./ftConnectApi.dto";
 import { ftConnectHeadersSchema } from "./ftConnectApi.schema";
 
-const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
+export const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
     `application_${clientId}`,
     "api_peconnect-individuv1",
@@ -90,23 +87,6 @@ export const makeFtConnectExternalRoutes = ({
       responses: { 200: z.any() },
     }),
   });
-
-export const makeFtConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
-  makeOauthGetAuthorizationCodeRedirectUrl(appConfig.ftAuthCandidatUrl, {
-    response_type: "code",
-    client_id: appConfig.franceTravailClientId,
-    realm: "/individu",
-    redirect_uri: `${appConfig.immersionFacileBaseUrl}/api/pe-connect`,
-    scope: ftConnectNeededScopesForAllUsedApi(appConfig.franceTravailClientId),
-  });
-
-const makeOauthGetAuthorizationCodeRedirectUrl = (
-  peAuthCandidatUrl: AbsoluteUrl,
-  authorizationCodePayload: ExternalFtConnectOAuthGrantPayload,
-): AbsoluteUrl =>
-  `${peAuthCandidatUrl}/connexion/oauth2/authorize?${queryParamsAsString<ExternalFtConnectOAuthGrantPayload>(
-    authorizationCodePayload,
-  )}`;
 
 export const toFtConnectAdvisorDto = (
   fromApi: ExternalFtConnectAdvisor,

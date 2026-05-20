@@ -34,7 +34,7 @@ export class InMemoryOAuthGateway implements OAuthGateway {
   public async getLoginUrl(params: GetLoginUrlParams): Promise<AbsoluteUrl> {
     return `${
       this.providerConfig.providerBaseUri
-    }/login-pro-connect?${queryParamsAsString(params)}`;
+    }/login?${queryParamsAsString(params)}`;
   }
 
   public async getAccessToken(

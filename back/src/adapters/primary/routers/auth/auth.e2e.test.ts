@@ -116,7 +116,7 @@ describe("auth router", () => {
       describe("handle all allowed user connection pages", () => {
         it.each(allowedLoginUris)(`${displayRouteName(
           authRoutes.initiateLoginByOAuth,
-        )} 302 > [ProConnect]/login-pro-connect - 302 > ${displayRouteName(
+        )} 302 > [ProConnect]/login - 302 > ${displayRouteName(
           authRoutes.afterOAuthLogin,
         )} 302 > page %s with required connected user params`, async (page) => {
           const generatedUserId = "my-user-id";
@@ -128,6 +128,7 @@ describe("auth router", () => {
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByOAuth({
               queryParams: {
+                provider: "proConnect",
                 redirectUri,
               },
             }),
@@ -138,7 +139,7 @@ describe("auth router", () => {
                 location: encodeURI(
                   `${
                     appConfig.proConnectConfig.providerBaseUri
-                  }/login-pro-connect?${queryParamsAsString({
+                  }/login?${queryParamsAsString({
                     nonce,
                     state,
                   })}`,
@@ -147,7 +148,7 @@ describe("auth router", () => {
             },
           );
 
-          gateways.oAuthGateway.setAccessTokenResponse({
+          gateways.proConnectOAuthGateway.setAccessTokenResponse({
             accessToken: proConnectToken,
             idToken,
             expire: 1,
@@ -197,6 +198,7 @@ describe("auth router", () => {
       it("throws an error if the redirect uri is not allowed", async () => {
         const response = await authRoutesClient.initiateLoginByOAuth({
           queryParams: {
+            provider: "proConnect",
             redirectUri: "@example.com",
           },
         });
@@ -220,6 +222,7 @@ describe("auth router", () => {
         expectHttpResponseToEqual(
           await authRoutesClient.initiateLoginByOAuth({
             queryParams: {
+              provider: "proConnect",
               redirectUri: "/tableau-de-bord-agence/agences/agencyId",
             },
           }),
@@ -230,7 +233,7 @@ describe("auth router", () => {
               location: encodeURI(
                 `${
                   appConfig.proConnectConfig.providerBaseUri
-                }/login-pro-connect?${queryParamsAsString({
+                }/login?${queryParamsAsString({
                   nonce,
                   state,
                 })}`,
@@ -244,7 +247,7 @@ describe("auth router", () => {
 
         inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
-        gateways.oAuthGateway.setAccessTokenResponse({
+        gateways.proConnectOAuthGateway.setAccessTokenResponse({
           accessToken: proConnectToken,
           expire: 1,
           idToken,

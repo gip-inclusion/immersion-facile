@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr/fr";
 import { useState } from "react";
 import { MainWrapper, NavCard, PageHeader } from "react-design-system";
-import { domElementIds, frontRoutes, loginFtConnect } from "shared";
+import { authRoutes, domElementIds, frontRoutes, legacyFrontRoutes, makeUrlWithQueryParams } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
@@ -122,7 +122,13 @@ export const InitiateConventionPage = () => {
                   total={1}
                   id={domElementIds.initiateConvention.ftConnectButton}
                   link={{
-                    href: `/api/${loginFtConnect}`,
+                    href: makeUrlWithQueryParams(
+                      `/api${authRoutes.initiateLoginByOAuth.url}`,
+                      {
+                        provider: "peConnect",
+                        redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+                      },
+                    ),
                   }}
                   alternateTitle="Je suis accompagné(e) par mon conseiller France Travail et je peux me connecter via FranceConnect"
                   withBorder

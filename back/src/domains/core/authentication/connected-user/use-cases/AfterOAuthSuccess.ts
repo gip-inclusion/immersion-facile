@@ -108,6 +108,11 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       };
     }
 
+    if (ongoingOAuth.provider === "peConnect") {
+      // TOTO : implement
+      throw errors.auth.missingOAuth({ state });
+    }
+
     const { newOrUpdatedUser, updatedOngoingOAuth, accessToken } =
       await (ongoingOAuth.provider === "email"
         ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)

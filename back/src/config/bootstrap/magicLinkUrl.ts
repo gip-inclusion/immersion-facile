@@ -3,6 +3,7 @@ import {
   type ConnectedUserQueryParams,
   decodeURIWithParams,
   type Email,
+  errors,
   type FrontRouteKeys,
   frontRoutes,
   makeRouteAbsoluteUrl,
@@ -98,6 +99,10 @@ export const makeGenerateConnectedUserLoginUrl =
     ongoingOAuth,
     now,
   }: GenerateConnectedUserLoginUrlParams): AbsoluteUrl => {
+    if (ongoingOAuth.provider === "peConnect")
+      // TODO : implement
+      throw errors.auth.missingOAuth({ state: ongoingOAuth.state });
+
     const { uriWithoutParams, params } = decodeURIWithParams(
       ongoingOAuth.fromUri,
     );

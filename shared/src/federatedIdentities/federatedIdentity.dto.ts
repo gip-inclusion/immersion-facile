@@ -9,6 +9,7 @@ export type FederatedIdentityProviderWithLogoutCallback =
   (typeof federatedIdentityProvidersWithLogoutCallback)[number];
 
 export const federatedIdentityProvidersWithLogoutCallback = [
+  //TODO : nettoyage
   "proConnect",
   "email",
   "peConnect",

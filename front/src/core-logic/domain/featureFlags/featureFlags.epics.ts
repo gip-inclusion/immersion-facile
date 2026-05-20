@@ -19,12 +19,14 @@ const fetchFeatureFlagsEpic: FeatureFlagEpic = (
     filter(featureFlagsSlice.actions.retrieveFeatureFlagsRequested.match),
     switchMap(technicalGateway.getAllFeatureFlags$),
     map(featureFlagsSlice.actions.retrieveFeatureFlagsSucceeded),
-    catchEpicError((error) =>
-      featureFlagsSlice.actions.retrieveFeatureFlagsFailed({
+    catchEpicError((error) => {
+      // biome-ignore lint/suspicious/noConsole: debug purpose
+      console.log("error", error);
+      return featureFlagsSlice.actions.retrieveFeatureFlagsFailed({
         feedbackTopic: "feature-flags-global",
         errorMessage: error.message,
-      }),
-    ),
+      });
+    }),
   );
 
 const setFeatureFlagEpic: FeatureFlagEpic = (

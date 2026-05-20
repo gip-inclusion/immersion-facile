@@ -1,5 +1,9 @@
 import { z } from "zod";
-import type { FederatedIdentityProvider, LogoutQueryParams } from "..";
+import type {
+  FederatedIdentityProvider,
+  LogoutQueryParams,
+  OAuthProviderForLogin,
+} from "..";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { emailSchema } from "../email/email.schema";
 import { legacyFrontRoutes } from "../routes/routes";
@@ -8,13 +12,24 @@ import {
   type AfterOAuthSuccessRedirectionResponse,
   allowedLoginSources,
   type InitiateLoginByEmailParams,
+  type InitiateLoginByOAuthParams,
   type OAuthSuccessLoginParams,
+  oAuthProvidersForLogin,
   type WithRedirectUri,
 } from "./auth.dto";
 
 export const allowedLoginUris = allowedLoginSources.map(
   (source) => legacyFrontRoutes[source],
 ) as [string, ...string[]];
+
+const additionalAllowedOAuthRedirectUris: string[] = [
+  legacyFrontRoutes.conventionImmersion,
+];
+
+export const allowedOAuthRedirectUris = [
+  ...allowedLoginUris,
+  ...additionalAllowedOAuthRedirectUris,
+] as [string, ...string[]];
 
 const isAllowedRedirectPath = (
   redirectPath: string,
@@ -43,6 +58,16 @@ export const withRedirectUriSchema: ZodSchemaWithInputMatchingOutput<WithRedirec
       }),
   });
 
+export const initiateLoginByOAuthParamsSchema: ZodSchemaWithInputMatchingOutput<InitiateLoginByOAuthParams> =
+  z.object({
+    redirectUri: z
+      .string()
+      .refine((uri) => isAllowedRedirectPath(uri, allowedOAuthRedirectUris), {
+        message: "redirectUri is not allowed",
+      }),
+    provider: z.enum(oAuthProvidersForLogin),
+  });
+
 export const initiateLoginByEmailParamsSchema: ZodSchemaWithInputMatchingOutput<InitiateLoginByEmailParams> =
   z
     .object({
@@ -56,13 +81,13 @@ export const oAuthSuccessLoginParamsSchema: ZodSchemaWithInputMatchingOutput<OAu
     state: z.string(),
   });
 
+const oauthProviderSchema: ZodSchemaWithInputMatchingOutput<OAuthProviderForLogin> =
+  z.enum(["proConnect", "peConnect"]);
+
 export const logoutQueryParamsSchema: ZodSchemaWithInputMatchingOutput<LogoutQueryParams> =
   z.object({
     idToken: z.string(),
-    provider: z.enum([
-      "proConnect",
-      "peConnect",
-    ] as FederatedIdentityProvider[]),
+    provider: oauthProviderSchema,
   });
 
 export const afterOAuthSuccessRedirectionResponseSchema: ZodSchemaWithInputMatchingOutput<AfterOAuthSuccessRedirectionResponse> =
@@ -70,3 +95,6 @@ export const afterOAuthSuccessRedirectionResponseSchema: ZodSchemaWithInputMatch
     provider: z.enum(["proConnect", "email"]),
     redirectUri: absoluteUrlSchema,
   });
+
+export const federatedIdentityProviderSchema: ZodSchemaWithInputMatchingOutput<FederatedIdentityProvider> =
+  z.enum(["proConnect", "email", "peConnect"]);
