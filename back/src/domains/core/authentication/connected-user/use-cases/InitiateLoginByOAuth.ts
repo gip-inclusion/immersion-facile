@@ -1,7 +1,8 @@
 import {
   type AbsoluteUrl,
-  type WithRedirectUri,
-  withRedirectUriSchema,
+  type InitiateLoginByOAuthParams,
+  initiateLoginByOAuthParamsSchema,
+  type OAuthProviderForLogin,
 } from "shared";
 import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
@@ -9,22 +10,27 @@ import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWork
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 import type { OAuthGateway } from "../port/OAuthGateway";
 
+export type OAuthGatewayByProvider = Record<
+  OAuthProviderForLogin,
+  OAuthGateway
+>;
+
 export class InitiateLoginByOAuth extends TransactionalUseCase<
-  WithRedirectUri,
+  InitiateLoginByOAuthParams,
   AbsoluteUrl
 > {
-  protected inputSchema = withRedirectUriSchema;
+  protected inputSchema = initiateLoginByOAuthParamsSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private uuidGenerator: UuidGenerator,
-    private oAuthGateway: OAuthGateway,
+    private oAuthGateways: OAuthGatewayByProvider,
   ) {
     super(uowPerformer);
   }
 
   protected async _execute(
-    params: WithRedirectUri,
+    params: InitiateLoginByOAuthParams,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
     const nonce = this.uuidGenerator.new();
@@ -34,11 +40,11 @@ export class InitiateLoginByOAuth extends TransactionalUseCase<
       fromUri: params.redirectUri,
       nonce,
       state,
-      provider: "proConnect",
+      provider: params.provider,
       usedAt: null,
     });
 
-    return this.oAuthGateway.getLoginUrl({
+    return this.oAuthGateways[params.provider].getLoginUrl({
       nonce,
       state,
     });

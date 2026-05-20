@@ -29,7 +29,7 @@ type OAuthLogoutQueryParams = {
 
 const logger = createLogger(__filename);
 
-export class HttpOAuthGateway implements OAuthGateway {
+export class ProConnectOAuthGateway implements OAuthGateway {
   #httpClient: HttpClient<ProConnectRoutes>;
   #proConnectConfig: OAuthConfig;
 

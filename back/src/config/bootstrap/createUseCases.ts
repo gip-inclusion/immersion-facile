@@ -285,12 +285,15 @@ export const createUseCases = ({
       initiateLoginByOAuth: new InitiateLoginByOAuth(
         uowPerformer,
         uuidGenerator,
-        gateways.oAuthGateway,
+        {
+          proConnect: gateways.proConnectOAuthGateway,
+          peConnect: gateways.ftConnectOAuthGateway,
+        },
       ),
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
-        oAuthGateway: gateways.oAuthGateway,
+        oAuthGateway: gateways.proConnectOAuthGateway,
         uuidGenerator,
         generateConnectedUserLoginUrl,
         verifyEmailAuthCodeJwt,
@@ -882,7 +885,7 @@ export const createUseCases = ({
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
       uowPerformer,
       deps: {
-        oAuthGateway: gateways.oAuthGateway,
+        oAuthGateway: gateways.proConnectOAuthGateway,
         ftConnectGateway: gateways.ftConnectGateway,
       },
     }),

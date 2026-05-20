@@ -1,5 +1,9 @@
 import { sql } from "kysely";
-import { type IdentityProvider, type OAuthState, optional } from "shared";
+import {
+  federatedIdentityProviderSchema,
+  type OAuthState,
+  optional,
+} from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
@@ -49,6 +53,14 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
     const { provider, nonce, state, userId, usedAt, fromUri, updatedAt } =
       ongoingOAuth;
+    const providerSpecificColumns =
+      ongoingOAuth.provider === "email"
+        ? { email: ongoingOAuth.email }
+        : {
+            external_id: ongoingOAuth.externalId,
+            access_token: ongoingOAuth.accessToken,
+          };
+
     if (await this.findByState(state)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
@@ -57,15 +69,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           user_id: userId,
           provider,
           used_at: usedAt,
-          ...(ongoingOAuth.provider === "proConnect"
-            ? {
-                external_id: ongoingOAuth.externalId,
-                access_token: ongoingOAuth.accessToken,
-              }
-            : {}),
-          ...(ongoingOAuth.provider === "email"
-            ? { email: ongoingOAuth.email }
-            : {}),
+          ...providerSpecificColumns,
           updated_at: updatedAt ? sql`${updatedAt}` : sql`now()`,
         })
         .where("state", "=", state)
@@ -79,15 +83,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           nonce,
           provider,
           user_id: userId,
-          ...(ongoingOAuth.provider === "proConnect"
-            ? {
-                external_id: ongoingOAuth.externalId,
-                access_token: ongoingOAuth.accessToken,
-              }
-            : {}),
-          ...(ongoingOAuth.provider === "email"
-            ? { email: ongoingOAuth.email }
-            : {}),
+          ...providerSpecificColumns,
           used_at: usedAt,
         })
         .execute();
@@ -96,10 +92,10 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
 
   #toOngoingOAuth(raw?: PersistenceOngoingOAuth): OngoingOAuth | undefined {
     if (!raw) return;
-    const provider = raw.provider as IdentityProvider;
+    const provider = federatedIdentityProviderSchema.parse(raw.provider);
     const usedAt = raw.used_at;
 
-    if (provider === "proConnect")
+    if (provider !== "email")
       return {
         fromUri: raw.from_uri,
         state: raw.state,

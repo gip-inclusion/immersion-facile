@@ -69,6 +69,8 @@ export type ExternalFtConnectOAuthGrantPayload = {
   realm: string;
   redirect_uri: string;
   scope: string;
+  state: string;
+  nonce: string;
 };
 
 export type FtConnectHeaders = {

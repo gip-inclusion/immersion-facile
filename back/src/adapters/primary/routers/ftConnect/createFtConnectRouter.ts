@@ -1,22 +1,10 @@
 import { Router } from "express";
-import { errors, ftConnect, loginFtConnect } from "shared";
+import { errors, ftConnect } from "shared";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendRedirectResponseWithManagedErrors } from "../../../../config/helpers/sendRedirectResponseWithManagedErrors";
-import { makeFtConnectLoginPageUrl } from "../../../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 
 export const createFtConnectRouter = (deps: AppDependencies) => {
   const ftConnectRouter = Router({ mergeParams: true });
-
-  ftConnectRouter.route(`/${loginFtConnect}`).get(async (req, res) =>
-    sendRedirectResponseWithManagedErrors(
-      req,
-      res,
-
-      async () => makeFtConnectLoginPageUrl(deps.config),
-      deps.errorHandlers.handleManagedRedirectResponseError,
-      deps.errorHandlers.handleRawRedirectResponseError,
-    ),
-  );
 
   ftConnectRouter.route(`/${ftConnect}`).get(async (req, res) =>
     sendRedirectResponseWithManagedErrors(

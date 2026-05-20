@@ -13,9 +13,9 @@ import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 import {
   afterOAuthSuccessRedirectionResponseSchema,
   initiateLoginByEmailParamsSchema,
+  initiateLoginByOAuthParamsSchema,
   logoutQueryParamsSchema,
   oAuthSuccessLoginParamsSchema,
-  withRedirectUriSchema,
 } from "./auth.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
@@ -26,7 +26,7 @@ export const authRoutes = defineRoutes({
   initiateLoginByOAuth: defineRoute({
     method: "get",
     url: "/login/oauth",
-    queryParamsSchema: withRedirectUriSchema,
+    queryParamsSchema: initiateLoginByOAuthParamsSchema,
     responses: {
       302: emptyObjectSchema,
       400: httpErrorSchema,

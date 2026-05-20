@@ -11,8 +11,9 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { HttpOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/HttpOAuthGateway";
+import { FtConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/FtConnectOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { ProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/ProConnectOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
 import type { OAuthGateway } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
 import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
@@ -195,9 +196,9 @@ export const createGateways = async (
         )
       : new InMemoryFtConnectGateway();
 
-  const oAuthGateway: OAuthGateway =
+  const proConnectOAuthGateway: OAuthGateway =
     config.proConnectGateway === "HTTPS"
-      ? new HttpOAuthGateway(
+      ? new ProConnectOAuthGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.proConnect,
             routes: makeProConnectRoutes(
@@ -208,6 +209,11 @@ export const createGateways = async (
           config.proConnectConfig,
         )
       : new InMemoryOAuthGateway(config.proConnectConfig);
+
+  const ftConnectOAuthGateway: OAuthGateway =
+    config.ftConnectGateway === "HTTPS"
+      ? new FtConnectOAuthGateway(config.ftConnectConfig)
+      : new InMemoryOAuthGateway(config.ftConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({
@@ -391,7 +397,8 @@ export const createGateways = async (
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
 
-    oAuthGateway,
+    proConnectOAuthGateway,
+    ftConnectOAuthGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(

@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, frontRoutes, loginFtConnect } from "shared";
+import { authRoutes, domElementIds, frontRoutes, legacyFrontRoutes, makeUrlWithQueryParams } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -234,7 +234,13 @@ const SharedConventionMessage = ({
       <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
         Vous êtes inscrits à France Travail en tant que bénéficiaire ?{" "}
         <a
-          href={`/api/${loginFtConnect}`}
+          href={makeUrlWithQueryParams(
+            `/api${authRoutes.initiateLoginByOAuth.url}`,
+            {
+              provider: "peConnect",
+              redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          )}
           onClick={() => {
             storeConventionRouteParamsOnDevice(route.params);
           }}

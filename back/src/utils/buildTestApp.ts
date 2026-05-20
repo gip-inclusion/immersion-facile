@@ -6,6 +6,7 @@ import type { InMemoryFranceTravailGateway } from "../domains/convention/adapter
 import type { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import type { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import type { InMemoryOAuthGateway } from "../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import type { OAuthGateway } from "../domains/core/authentication/connected-user/port/OAuthGateway";
 import type { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import type { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import type { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
@@ -39,7 +40,8 @@ export type InMemoryGateways = {
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
   franceTravailGateway: InMemoryFranceTravailGateway;
-  oAuthGateway: InMemoryOAuthGateway;
+  proConnectOAuthGateway: InMemoryOAuthGateway;
+  ftConnectOAuthGateway: OAuthGateway;
   documentGateway: InMemoryDocumentGateway;
   dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;

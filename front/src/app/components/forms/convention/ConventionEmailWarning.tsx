@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { loginFtConnect } from "shared";
+import { authRoutes, legacyFrontRoutes, makeUrlWithQueryParams } from "shared";
 
 export const ConventionEmailWarning = ({
   shouldShowFtSpecificMessage,
@@ -18,8 +18,19 @@ export const ConventionEmailWarning = ({
             L'adresse email indiquée doit être la même que celle du compte
             France Travail du candidat. Cela permet de transmettre correctement
             la convention à la structure d'accompagnement sélectionnée. Il est
-            possible de <a href={`/api/${loginFtConnect}`}>se connecter</a> à
-            l'espace France Travail pour pré-remplir cette adresse et d'autres
+            possible de{" "}
+            <a
+              href={makeUrlWithQueryParams(
+                `/api${authRoutes.initiateLoginByOAuth.url}`,
+                {
+                  provider: "peConnect",
+                  redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+                },
+              )}
+            >
+              se connecter
+            </a>{" "}
+            à l'espace France Travail pour pré-remplir cette adresse et d'autres
             informations.
           </>
         ) : (

@@ -74,7 +74,6 @@ export const legacyFrontRoutes = {
   unsubscribeEstablishmentLead: "desinscription-prospect",
 };
 
-export const loginFtConnect = "login-pe-connect";
 export const ftConnect = "pe-connect";
 
 export const uploadFileRoute = "upload-file";
