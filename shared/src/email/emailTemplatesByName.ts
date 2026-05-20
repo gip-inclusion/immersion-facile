@@ -2965,92 +2965,125 @@ export const discussionExchangeForbiddenContents = (
   Record<
     DiscussionExchangeForbiddenReason,
     {
-      content: string;
-      buttons?: {
-        label: string;
-        url: string;
-      }[];
+      emailContent: {
+        content: string;
+        buttons?: {
+          label: string;
+          url: string;
+        }[];
+      };
+      error_message_feedback: string;
     }
   >
 > => ({
   establishment: {
     user_unknown_or_missing_rights_on_establishment: {
-      content: `
-        Vous avez tenté de répondre à un candidat depuis un email de candidature Immersion Facilitée.
-        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> : vous ne disposez pas des droits nécessaires pour répondre au nom de l’entreprise concernée.
-        
-        Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits. 
-    `,
-      buttons:
-        isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl(
-          params,
-        )
-          ? [
-              {
-                label: "Demander le rattachement",
-                url: params.requestEstablishmentRegistrationUrl,
-              },
-            ]
-          : undefined,
+      emailContent: {
+        content: `
+          Vous avez tenté de répondre à un candidat depuis un email de candidature Immersion Facilitée.
+          Malheureusement, <strong>votre message n’a pas pu être transmis</strong> : vous ne disposez pas des droits nécessaires pour répondre au nom de l’entreprise concernée.
+          
+          Pour pouvoir répondre au candidat via Immersion Facilitée, vous devez être inscrit(e) dans l’espace entreprise avec les bons droits. 
+      `,
+        buttons:
+          isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl(
+            params,
+          )
+            ? [
+                {
+                  label: "Demander le rattachement",
+                  url: params.requestEstablishmentRegistrationUrl,
+                },
+              ]
+            : undefined,
+      },
+      error_message_feedback:
+        "Vous n'avez pas les droits nécessaires pour répondre à cette candidature.",
     },
     discussion_completed: {
-      content: `
-        La candidature à laquelle vous souhaitez répondre n'est plus en cours.
-        Le candidat ne recevra pas votre message.`,
+      emailContent: {
+        content: `
+          La candidature à laquelle vous souhaitez répondre n'est plus en cours.
+          Le candidat ne recevra pas votre message.`,
+      },
+      error_message_feedback: "La candidature n'est plus en cours.",
     },
     establishment_missing: {
-      content: `
-        L'entreprise liée à cette candidature s’est récemment désinscrite d’Immersion Facilitée.
+      emailContent: {
+        content: `
+          L'entreprise liée à cette candidature s’est récemment désinscrite d’Immersion Facilitée.
         Le candidat ne recevra pas votre message.
 
-        Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
+          Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
+      },
+      error_message_feedback:
+        "L'entreprise liée à cette candidature s'est récemment désinscrite.",
     },
     establishment_banned: {
-      content: `
-        Vous avez tenté de répondre à un candidat via Immersion Facilitée depuis un email de candidature Immersion Facilitée.
+      emailContent: {
+        content: `
+          Vous avez tenté de répondre à un candidat via Immersion Facilitée depuis un email de candidature Immersion Facilitée.
 
-        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
-        <ul>
-          <li>Votre établissement ${params.establishmentName} n'a plus accès aux services d'Immersion Facilitée.</li>
-          <li>Vous ne pouvez plus échanger avec les candidats via notre plateforme.</li>
-          <li>Toutes vos demandes en cours sont annulées.</li>
-        </ul>
-        Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
-      `,
+          Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
+          <ul>
+            <li>Votre établissement ${params.establishmentName} n'a plus accès aux services d'Immersion Facilitée.</li>
+            <li>Vous ne pouvez plus échanger avec les candidats via notre plateforme.</li>
+            <li>Toutes vos demandes en cours sont annulées.</li>
+          </ul>
+          Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
+        `,
+      },
+      error_message_feedback:
+        "Votre établissement est banni et n'a plus accès aux services d'Immersion Facilitée.",
     },
   },
   potentialBeneficiary: {
     user_unknown_or_missing_rights_on_establishment: {
-      content: `
-        Vous n'êtes pas le candidat associé à cette candidature.
-    `,
+      emailContent: {
+        content: `
+          Vous n'êtes pas le candidat associé à cette candidature.
+        `,
+      },
+      error_message_feedback:
+        "Vous n'êtes pas le candidat associé à cette candidature.",
     },
     discussion_completed: {
-      content: `
-        La candidature à laquelle vous souhaitez répondre n'est plus en cours.
-        L'entreprise ne recevra pas votre message.
+      emailContent: {
+        content: `
+          La candidature à laquelle vous souhaitez répondre n'est plus en cours.
+          L'entreprise ne recevra pas votre message.
 
-        Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+          Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+      },
+      error_message_feedback: "La candidature n'est plus en cours.",
     },
     establishment_missing: {
-      content: `
-        L’entreprise que vous souhaitez contacter s’est récemment désinscrite d’Immersion Facilitée.
-        Elle ne recevra pas votre message et ne propose plus d’immersion pour le moment.
+      emailContent: {
+        content: `
+          L’entreprise que vous souhaitez contacter s’est récemment désinscrite d’Immersion Facilitée.
+          Elle ne recevra pas votre message et ne propose plus d’immersion pour le moment.
 
-        Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+          Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche`,
+      },
+      error_message_feedback:
+        "L'entreprise liée à cette candidature s'est récemment désinscrite.",
     },
     establishment_banned: {
-      content: `
-        Vous avez tenté d'envoyer un message à l'entreprise ${params.establishmentName} concernant votre immersion.
+      emailContent: {
+        content: `
+          Vous avez tenté d'envoyer un message à l'entreprise ${params.establishmentName} concernant votre immersion.
 
-        Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
-        <ul>
-          <li>L'entreprise ${params.establishmentName} n'est plus disponible sur notre site.</li>
-          <li>Les échanges avec cet établissement sont désormais fermés.</li>
-          <li>Votre candidature auprès de cette entreprise est annulée.</li>
-        </ul>
-        Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
-      `,
+          Malheureusement, <strong>votre message n’a pas pu être transmis</strong> :
+          <ul>
+            <li>L'entreprise ${params.establishmentName} n'est plus disponible sur notre site.</li>
+            <li>Les échanges avec cet établissement sont désormais fermés.</li>
+            <li>Votre candidature auprès de cette entreprise est annulée.</li>
+          </ul>
+          Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="mailto:${immersionFacileContactEmail}">contacter notre support</a>.
+        `,
+      },
+      error_message_feedback:
+        "L'entreprise liée à cette candidature est bannie.",
     },
   },
 });
