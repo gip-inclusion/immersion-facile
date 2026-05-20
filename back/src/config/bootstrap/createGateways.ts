@@ -11,8 +11,8 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { HttpOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { ProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/ProConnectOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
 import type { OAuthGateway } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
 import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
@@ -197,7 +197,7 @@ export const createGateways = async (
 
   const oAuthGateway: OAuthGateway =
     config.proConnectGateway === "HTTPS"
-      ? new HttpOAuthGateway(
+      ? new ProConnectOAuthGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.proConnect,
             routes: makeProConnectRoutes(
