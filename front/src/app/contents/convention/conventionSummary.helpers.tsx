@@ -1163,17 +1163,10 @@ export const sendSignatureLinkButtonProps =
   };
 
 export const sendAssessmentLinkButtonProps =
-  ({
-    isAssessmentLinkSent,
-    onClick,
-  }: {
-    isAssessmentLinkSent: boolean;
-    onClick: (params: { phone: PhoneNumber }) => void;
-  }) =>
+  ({ onClick }: { onClick: (params: { phone: PhoneNumber }) => void }) =>
   (phone: PhoneNumber): ButtonProps => ({
     priority: "tertiary",
     children: "Relancer pour bilan",
-    disabled: isAssessmentLinkSent,
     onClick: () => {
       onClick({ phone });
     },
