@@ -138,7 +138,7 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25
         siret &&
           `-----------
 Siret fourni : ${siret}
-Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${removeSpaces(siret)}
+Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/admin/establishments/${removeSpaces(siret)}
 `,
         isEstablishment &&
           `-----------
