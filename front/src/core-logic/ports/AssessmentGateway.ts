@@ -6,6 +6,7 @@ import type {
   DeleteAssessmentRequestDto,
   LegacyAssessmentDto,
   SendAssessmentLinkRequestDto,
+  SendAssessmentSignatureReminderRequestDto,
   SignAssessmentRequestDto,
 } from "shared";
 
@@ -28,6 +29,10 @@ export interface AssessmentGateway {
   }): Observable<AssessmentDto | LegacyAssessmentDto>;
   sendAssessmentLink$(
     params: SendAssessmentLinkRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
+  sendAssessmentSignatureReminder$(
+    params: SendAssessmentSignatureReminderRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }
