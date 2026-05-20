@@ -46,6 +46,7 @@ const makeSignatoriesSubsections = (
     signatoryEmail: Email,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
+  assessmentSignatureReminderButtonProps?: () => ButtonProps | null,
 ): ConventionSummarySubSection[] => {
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
@@ -97,16 +98,25 @@ const makeSignatoriesSubsections = (
               severity: "success",
             } satisfies BadgeProps)
           : defaultSignatoryBadgeValue(),
-        action:
-          ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
-          signatoriesSubsectionButtonProps
-            ? (signatoriesSubsectionButtonProps(
+        action: (() => {
+          if (
+            ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
+            signatoriesSubsectionButtonProps
+          )
+            return (
+              signatoriesSubsectionButtonProps(
                 "beneficiary",
                 convention.signatories.beneficiary.phone,
                 convention.signatories.beneficiary.email,
                 !!convention.signatories.beneficiary.signedAt,
-              ) ?? undefined)
-            : undefined,
+              ) ?? undefined
+            );
+
+          if (assessmentSignatureReminderButtonProps)
+            return assessmentSignatureReminderButtonProps() ?? undefined;
+
+          return undefined;
+        })(),
       },
       fields: removeEmptyValue([
         {
@@ -841,6 +851,7 @@ export const makeConventionSections = (
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
   assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
+  assessmentSignatureReminderButtonProps?: () => ButtonProps | null,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -848,6 +859,7 @@ export const makeConventionSections = (
       subSections: makeSignatoriesSubsections(
         convention,
         signatoriesSubsectionButtonProps,
+        assessmentSignatureReminderButtonProps,
       ),
     },
     {
@@ -1172,4 +1184,126 @@ export const sendAssessmentLinkButtonProps =
     },
     type: "button",
     id: domElementIds.manageConvention.openSendAssessmentLinkModal,
+  });
+
+export const sendAssessmentSignatureReminderModal = createModal({
+  id: domElementIds.manageConvention.sendAssessmentSignatureReminderModal,
+  isOpenedByDefault: false,
+});
+
+export const SendAssessmentSignatureReminderModalWrapper = ({
+  phone,
+  email,
+  beneficiaryFirstName,
+  beneficiaryLastName,
+  onConfirm,
+}: {
+  phone: PhoneNumber;
+  email: Email;
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  onConfirm: (notificationKind: NotificationKind) => void;
+}) => {
+  const dispatch = useDispatch();
+  const [notificationKind, setNotificationKind] = useState<
+    NotificationKind | undefined
+  >();
+  const hasMobilePhone = isValidMobilePhone(phone);
+  const selectedNotificationKind = hasMobilePhone ? notificationKind : "email";
+
+  return createPortal(
+    <sendAssessmentSignatureReminderModal.Component
+      title="Relancer pour finaliser l'action"
+      buttons={[
+        {
+          priority: "secondary",
+          children: "Annuler",
+          onClick: () => {
+            dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+            sendAssessmentSignatureReminderModal.close();
+          },
+        },
+        {
+          id: domElementIds.manageConvention
+            .submitSendAssessmentSignatureReminderModalButton,
+          priority: "primary",
+          children: "Envoyer la relance",
+          disabled: !selectedNotificationKind,
+          onClick: () =>
+            selectedNotificationKind && onConfirm(selectedNotificationKind),
+        },
+      ]}
+    >
+      <p>
+        {beneficiaryFirstName} {beneficiaryLastName} n'a pas encore signé le
+        bilan.
+      </p>
+      {hasMobilePhone ? (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendAssessmentSignatureReminderModalReminderKindOptions
+          }
+          legend="Choisissez le canal par lequel vous souhaitez lui envoyer un rappel."
+          name="send-assessment-signature-reminder-kind"
+          options={[
+            {
+              illustration: <img src={shurikenIllustration} alt="" />,
+              label: `SMS: ${phone}`,
+              hintText:
+                "Le SMS est généralement plus rapide et évite les problèmes de réception d’email (spam, filtres type Mailinblack, …).",
+              nativeInputProps: {
+                value: "sms",
+                checked: notificationKind === "sms",
+                onChange: () => setNotificationKind("sms"),
+              },
+            },
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: `Email: ${email}`,
+              hintText:
+                "Par défaut, nos communications et rappels sont envoyés par email.",
+              nativeInputProps: {
+                value: "email",
+                checked: notificationKind === "email",
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      ) : (
+        <RadioButtons
+          id={
+            domElementIds.manageConvention
+              .sendAssessmentSignatureReminderModalReminderKindOptions
+          }
+          name="send-assessment-signature-reminder-kind"
+          options={[
+            {
+              illustration: <img src={mushroomIllustration} alt="" />,
+              label: `Un rappel sera envoyé par email à l’adresse : ${email}`,
+              hintText:
+                "Aucun numéro de mobile n'a été renseigné pour cette personne.",
+              nativeInputProps: {
+                value: "email",
+                checked: true,
+                onChange: () => setNotificationKind("email"),
+              },
+            },
+          ]}
+        />
+      )}
+    </sendAssessmentSignatureReminderModal.Component>,
+    document.body,
+  );
+};
+
+export const sendAssessmentSignatureReminderButtonProps =
+  ({ onClick }: { onClick: () => void }) =>
+  (): ButtonProps => ({
+    priority: "tertiary",
+    children: "Relance signature bilan",
+    onClick,
+    type: "button",
+    id: domElementIds.manageConvention.openSendAssessmentSignatureReminderModal,
   });
