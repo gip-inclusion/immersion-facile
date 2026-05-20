@@ -254,6 +254,7 @@ export class PgAgencyRepository implements AgencyRepository {
     pagination?: PaginationQueryParams;
   }): Promise<DataWithPagination<AgencyWithUsersRights>> {
     const {
+      agencyId,
       departmentCode,
       kinds,
       doesNotReferToOtherAgency,
@@ -283,6 +284,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
     const filteredBuilder = pipeWithValue(
       this.#getAgencyWithJsonBuiltQueryBuilder(),
+      (b) => (agencyId ? b.where("agencies.id", "=", agencyId) : b),
       (b) =>
         departmentCode
           ? b.where(

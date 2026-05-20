@@ -139,6 +139,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         (agency) =>
           ![
             agencyHasDepartmentCode(agency, filters?.departmentCode),
+            agencyHasId(agency, filters?.agencyId),
             agencyHasName(agency, filters?.nameIncludes),
             agencyIsOfKind(agency, filters?.kinds),
             agencyIsOfPosition(agency, filters?.position),
@@ -311,6 +312,14 @@ const agencyHasDepartmentCode = (
 ): boolean => {
   if (!departmentCode) return true;
   return departmentCode === agency.address.departmentCode;
+};
+
+const agencyHasId = (
+  agency: AgencyWithUsersRights,
+  agencyId?: AgencyId,
+): boolean => {
+  if (!agencyId) return true;
+  return agency.id === agencyId;
 };
 
 const agencyHasName = (

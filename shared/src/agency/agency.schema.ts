@@ -107,6 +107,7 @@ const listAgencyOptionsLimitSchema: ZodSchemaWithInputMatchingOutput<number> =
 
 export const listAgencyOptionsRequestSchema: ZodSchemaWithInputMatchingOutput<ListAgencyOptionsRequestDto> =
   z.object({
+    agencyId: agencyIdSchema.optional(),
     departmentCode: departmentCodeSchema.optional(),
     nameIncludes: searchTextAlphaNumericSchema.optional(),
     filterKind: z

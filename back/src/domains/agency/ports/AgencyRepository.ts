@@ -20,6 +20,7 @@ import { errors } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type GetAgenciesFilters = {
+  agencyId?: AgencyId;
   nameIncludes?: string;
   position?: AgencyPositionFilter;
   departmentCode?: DepartmentCode;

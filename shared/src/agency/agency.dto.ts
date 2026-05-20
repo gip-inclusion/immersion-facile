@@ -204,6 +204,7 @@ export type AgencyPositionFilter = {
 };
 
 export type GetAgenciesFilter = {
+  agencyId?: AgencyId;
   nameIncludes?: SearchTextAlphaNumeric;
   position?: AgencyPositionFilter;
   departmentCode?: DepartmentCode;

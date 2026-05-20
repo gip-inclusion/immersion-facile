@@ -20,12 +20,20 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
 )
   .withInput(listAgencyOptionsRequestSchema)
   .build(async ({ uow, inputParams }) => {
-    const { departmentCode, nameIncludes, filterKind, siret, status, limit } =
-      inputParams;
+    const {
+      agencyId,
+      departmentCode,
+      nameIncludes,
+      filterKind,
+      siret,
+      status,
+      limit,
+    } = inputParams;
 
     const extraFilters = getFiltersFromFilterKind(filterKind);
     const { data: agencies } = await uow.agencyRepository.getAgencies({
       filters: {
+        agencyId,
         nameIncludes,
         departmentCode,
         status: status ? status : activeAgencyStatuses,

@@ -1,5 +1,6 @@
 import { Parser } from "htmlparser2";
 import { values } from "ramda";
+import z from "zod";
 import { errors } from "../errors/errors";
 
 export const capitalize = (str: string): string =>
@@ -43,6 +44,10 @@ export const looksLikeSiret = (input: string) => {
   const cleanedInput = removeSpaces(input);
   const siretRegex = /^\d{14}$/;
   return siretRegex.test(cleanedInput);
+};
+
+export const looksLikeUuid = (input: string) => {
+  return z.uuid().safeParse(input).success;
 };
 
 export const removeSpaces = (str: string) => str.replace(/\s/g, "");

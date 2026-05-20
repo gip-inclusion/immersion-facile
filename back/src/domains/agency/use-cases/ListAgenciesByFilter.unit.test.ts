@@ -309,6 +309,18 @@ describe("Query: List agencies by filter", () => {
     });
   });
 
+  describe("With Agency id", () => {
+    it("List agencies with given agency id", async () => {
+      expectToEqual(
+        await listAgencyOptionsByFilter.execute(
+          { agencyId: peAgency1InParis.id },
+          undefined,
+        ),
+        [toAgencyOption(peAgency1InParis)],
+      );
+    });
+  });
+
   describe("With Agency name", () => {
     it("List agencies with name 'PE'", async () => {
       expectToEqual(

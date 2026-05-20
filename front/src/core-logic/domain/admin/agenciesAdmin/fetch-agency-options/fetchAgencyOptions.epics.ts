@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { allAgencyStatuses, looksLikeSiret } from "shared";
+import { allAgencyStatuses, looksLikeSiret, looksLikeUuid } from "shared";
 import type {
   ActionOfSlice,
   AppEpic,
@@ -21,13 +21,27 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     filter(agencyAdminSlice.actions.fetchAgencyOptionsRequested.match),
     debounceTime(400, scheduler),
     distinctUntilChanged(),
-    switchMap((action: PayloadAction<string>) =>
-      agencyGateway.listAgencyOptionsByFilter$({
+    switchMap((action: PayloadAction<string>) => {
+      const searchTerm = action.payload;
+      const isSiret = looksLikeSiret(searchTerm);
+      const isAgencyId = looksLikeUuid(searchTerm);
+
+      if (isSiret)
+        return agencyGateway.listAgencyOptionsByFilter$({
+          status: [...allAgencyStatuses],
+          siret: searchTerm,
+        });
+      if (isAgencyId)
+        return agencyGateway.listAgencyOptionsByFilter$({
+          status: [...allAgencyStatuses],
+          agencyId: searchTerm,
+        });
+
+      return agencyGateway.listAgencyOptionsByFilter$({
         status: [...allAgencyStatuses],
-        [looksLikeSiret(action.payload) ? "siret" : "nameIncludes"]:
-          action.payload,
-      }),
-    ),
+        nameIncludes: searchTerm,
+      });
+    }),
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
