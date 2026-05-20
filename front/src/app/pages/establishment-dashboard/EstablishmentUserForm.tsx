@@ -10,10 +10,10 @@ import {
   establishmentsRoles,
   type FormEstablishmentUserRight,
   formEstablishmentUserRightSchema,
-  localization,
   type OmitFromExistingKeys,
   type SiretDto,
 } from "shared";
+import { PhoneInput } from "src/app/components/forms/commons/PhoneInput";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { mergeUserRights } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
@@ -159,14 +159,21 @@ export const EstablishmentUserForm = ({
             }}
           />
         )}
-        <Input
+        <PhoneInput
           label="Téléphone *"
-          nativeInputProps={{
-            ...register("phone"),
+          inputProps={{
+            label: "Téléphone *",
+            nativeInputProps: {
+              ...register("phone"),
+              type: "phone",
+            },
+          }}
+          onPhoneNumberChange={(phoneNumber) => {
+            setValue("phone", phoneNumber);
           }}
           {...(errors.phone && {
             state: "error",
-            stateRelatedMessage: localization.required,
+            stateRelatedMessage: errors.phone.message,
           })}
         />
         <Input
@@ -176,7 +183,7 @@ export const EstablishmentUserForm = ({
           }}
           {...(errors.job && {
             state: "error",
-            stateRelatedMessage: localization.required,
+            stateRelatedMessage: errors.job.message,
           })}
         />
         <RadioButtons
