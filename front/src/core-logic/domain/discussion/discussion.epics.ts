@@ -74,7 +74,7 @@ const sendMessageEpic: DiscussionEpic = (
                 errorMessage:
                   discussionExchangeForbiddenContents(result)[result.sender][
                     result.reason
-                  ].error_message_feedback,
+                  ].errorMessageFeedback,
                 feedbackTopic: action.payload.feedbackTopic,
               })
             : discussionSlice.actions.sendExchangeSucceeded({
