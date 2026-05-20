@@ -90,6 +90,7 @@ const topics = [
   "search-result",
   "send-signature-link",
   "send-assessment-link",
+  "send-assessment-signature-reminder",
   "beneficiary-dashboard-discussion-list",
   "sign-assessment",
   "siret-input",
@@ -189,6 +190,30 @@ export const feedbacks: Record<
     },
     "create.error": {
       action: sendAssessmentLinkSlice.actions.sendAssessmentLinkFailed,
+      title: "Problème lors de l'envoi de la relance",
+      message: "Une erreur est survenue lors de l'envoi de la relance.",
+    },
+  },
+  "send-assessment-signature-reminder": {
+    "create.success": {
+      action:
+        sendAssessmentLinkSlice.actions
+          .sendAssessmentSignatureReminderSucceeded,
+      title: "La relance a bien été envoyée",
+      message:
+        "Le destinataire devrait la recevoir dans les prochaines minutes.",
+    },
+    "create.info": {
+      action:
+        sendAssessmentLinkSlice.actions
+          .sendAssessmentSignatureReminderRequested,
+      title: "La relance est en cours d'envoi",
+      message:
+        "La relance est en cours d'envoi. Cela peut prendre une quinzaine de secondes.",
+    },
+    "create.error": {
+      action:
+        sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderFailed,
       title: "Problème lors de l'envoi de la relance",
       message: "Une erreur est survenue lors de l'envoi de la relance.",
     },
