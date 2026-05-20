@@ -25,7 +25,12 @@ export const smsRecipientPhoneSchema: ZodSchemaWithInputMatchingOutput<PhoneNumb
   });
 
 const smsTemplateKindSchema: ZodSchemaWithInputMatchingOutput<SmsTemplateKind> =
-  z.literal(["ReminderForSignatories", "ReminderForAssessment", "HelloWorld"]);
+  z.literal([
+    "ReminderForSignatories",
+    "ReminderForAssessment",
+    "ReminderForAssessmentSignature",
+    "HelloWorld",
+  ]);
 
 export const templatedSmsSchema = z.object({
   kind: smsTemplateKindSchema,

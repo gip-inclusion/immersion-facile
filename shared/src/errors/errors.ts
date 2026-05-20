@@ -263,6 +263,22 @@ export const errors = {
       new ForbiddenError(
         "Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
+    sendAssessmentSignatureReminderNotAllowedForStatus: ({
+      status,
+    }: {
+      status: ConventionStatus;
+    }) =>
+      new BadRequestError(
+        `Impossible de relancer la signature du bilan pour les conventions ayant le statut "${status}".`,
+      ),
+    sendAssessmentSignatureReminderForbidden: () =>
+      new ForbiddenError(
+        "Vous n'êtes pas autorisé à relancer la signature du bilan pour cette convention.",
+      ),
+    sendAssessmentSignatureReminderAssessmentNotEligible: () =>
+      new BadRequestError(
+        "Impossible de relancer la signature du bilan de cette immersion car le candidat n'est jamais venu.",
+      ),
     alreadySigned: (conventionId: ConventionId) =>
       new ConflictError(
         `Le bilan pour la convention '${conventionId}' a déjà été signé par le bénéficiaire.`,
