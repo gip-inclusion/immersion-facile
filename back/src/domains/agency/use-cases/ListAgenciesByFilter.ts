@@ -32,7 +32,10 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
         sirets: siret ? [siret] : undefined,
         ...extraFilters,
       },
-      limit: limit ?? maxAgencyOptionsPerRequest,
+      pagination: {
+        page: 1,
+        perPage: limit ?? maxAgencyOptionsPerRequest,
+      },
     });
 
     return agencies.map(toAgencyOption);

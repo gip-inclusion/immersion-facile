@@ -967,17 +967,21 @@ describe("PgAgencyRepository", () => {
 
       it("considers each word separetly with and 'AND' close", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { nameIncludes: "Vi fran" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { nameIncludes: "Vi fran" },
+            })
+          ).data,
         ).toEqual([agency2PEVitryLeFrancois]);
       });
 
       it("is accent-insensitive", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { nameIncludes: "Pole" },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { nameIncludes: "Pole" },
+            })
+          ).data,
         ).toEqual([
           agency1PEVitrySurSeine,
           agency2PEVitryLeFrancois,
@@ -987,9 +991,11 @@ describe("PgAgencyRepository", () => {
 
       it("also supports pasting the uuid of an agency", async () => {
         expect(
-          await agencyRepository.getAgencies({
-            filters: { nameIncludes: agency2PEVitryLeFrancois.id },
-          }),
+          (
+            await agencyRepository.getAgencies({
+              filters: { nameIncludes: agency2PEVitryLeFrancois.id },
+            })
+          ).data,
         ).toEqual([agency2PEVitryLeFrancois]);
       });
 
