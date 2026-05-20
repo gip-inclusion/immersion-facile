@@ -8,13 +8,24 @@ import {
   type AfterOAuthSuccessRedirectionResponse,
   allowedLoginSources,
   type InitiateLoginByEmailParams,
+  type InitiateLoginByOAuthParams,
   type OAuthSuccessLoginParams,
+  oAuthProvidersForLogin,
   type WithRedirectUri,
 } from "./auth.dto";
 
 export const allowedLoginUris = allowedLoginSources.map(
   (source) => frontRoutes[source],
 ) as [string, ...string[]];
+
+const additionalAllowedOAuthRedirectUris: string[] = [
+  frontRoutes.conventionImmersionRoute,
+];
+
+const allowedOAuthRedirectUris = [
+  ...allowedLoginUris,
+  ...additionalAllowedOAuthRedirectUris,
+] as [string, ...string[]];
 
 const isAllowedRedirectPath = (
   redirectPath: string,
@@ -41,6 +52,16 @@ export const withRedirectUriSchema: ZodSchemaWithInputMatchingOutput<WithRedirec
       .refine((uri) => isAllowedRedirectPath(uri, allowedLoginUris), {
         message: "redirectUri is not allowed",
       }),
+  });
+
+export const initiateLoginByOAuthParamsSchema: ZodSchemaWithInputMatchingOutput<InitiateLoginByOAuthParams> =
+  z.object({
+    redirectUri: z
+      .string()
+      .refine((uri) => isAllowedRedirectPath(uri, allowedOAuthRedirectUris), {
+        message: "redirectUri is not allowed",
+      }),
+    provider: z.enum(oAuthProvidersForLogin),
   });
 
 export const initiateLoginByEmailParamsSchema: ZodSchemaWithInputMatchingOutput<InitiateLoginByEmailParams> =

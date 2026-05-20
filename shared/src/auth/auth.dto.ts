@@ -42,6 +42,13 @@ export type WithRedirectUri = {
   redirectUri: AllowedRedirectUri;
 };
 
+export const oAuthProvidersForLogin = ["proConnect", "peConnect"] as const;
+export type OAuthProviderForLogin = (typeof oAuthProvidersForLogin)[number];
+
+export type InitiateLoginByOAuthParams = WithRedirectUri & {
+  provider: OAuthProviderForLogin;
+};
+
 export type InitiateLoginByEmailParams = WithRedirectUri & {
   email: Email;
 };
@@ -55,7 +62,7 @@ export type WithIdToken = {
 };
 
 export type AfterOAuthSuccessRedirectionResponse = {
-  provider: IdentityProvider;
+  provider: FederatedIdentityProvider;
   redirectUri: AbsoluteUrl;
 };
 

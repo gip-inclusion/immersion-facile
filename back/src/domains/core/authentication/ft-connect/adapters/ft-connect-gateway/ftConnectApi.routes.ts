@@ -15,7 +15,7 @@ import {
 } from "./ftConnectApi.dto";
 import { ftConnectHeadersSchema } from "./ftConnectApi.schema";
 
-const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
+export const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
     `application_${clientId}`,
     "api_peconnect-individuv1",

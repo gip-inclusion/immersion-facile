@@ -730,6 +730,7 @@ const LoginWithProConnect = ({
           url={makeUrlWithQueryParams(
             `/api${authRoutes.initiateLoginByOAuth.url}`,
             {
+              provider: "proConnect",
               redirectUri,
             },
           )}

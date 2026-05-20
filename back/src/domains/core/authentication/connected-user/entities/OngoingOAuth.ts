@@ -2,6 +2,7 @@ import type {
   Email,
   ExternalId,
   ExtractFromExisting,
+  FederatedIdentityProvider,
   Flavor,
   IdentityProvider,
   OAuthState,
@@ -9,6 +10,8 @@ import type {
 
 export type OAuthJwt = Flavor<string, "OAuthJwt">;
 type OAuthNonce = Flavor<string, "OAuthNonce">;
+
+export type OngoingOAuthProvider = "proConnect" | "email" | "peConnect";
 
 type OngoingAuthCommon = {
   userId?: string;
@@ -28,5 +31,13 @@ export type ProConnectOngoingAuth = OngoingAuthCommon & {
   externalId?: ExternalId;
   accessToken?: OAuthJwt; //TODO Pourquoi on le stocke en DB (on ne fait que le save)
 };
+export type FTConnectOngoingAuth = OngoingAuthCommon & {
+  provider: ExtractFromExisting<FederatedIdentityProvider, "peConnect">;
+  externalId?: ExternalId;
+  accessToken?: OAuthJwt;
+};
 
-export type OngoingOAuth = ProConnectOngoingAuth | EmailOngoingAuth;
+export type OngoingOAuth =
+  | ProConnectOngoingAuth
+  | EmailOngoingAuth
+  | FTConnectOngoingAuth;

@@ -6,11 +6,7 @@ import type {
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
 import type { AssessmentMode } from "../assessment/assessment.dto";
-import {
-  authExpiredMessage,
-  type IdentityProvider,
-  type OAuthState,
-} from "../auth/auth.dto";
+import { authExpiredMessage, type OAuthState } from "../auth/auth.dto";
 import type {
   ConventionDto,
   ConventionId,
@@ -28,7 +24,10 @@ import type {
 } from "../discussion/discussion.dto";
 import type { EmailParamsByEmailType } from "../email/EmailParamsByEmailType";
 import type { Email } from "../email/email.dto";
-import type { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
+import type {
+  FederatedIdentityProvider,
+  FtExternalId,
+} from "../federatedIdentities/federatedIdentity.dto";
 import type { StoredFileId } from "../file/file.dto";
 import type { FileValidationError } from "../file/file.validators";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
@@ -295,7 +294,7 @@ export const errors = {
       ),
   },
   auth: {
-    otherRenewalNotSupported: (provider: IdentityProvider) =>
+    otherRenewalNotSupported: (provider: FederatedIdentityProvider) =>
       new ForbiddenError(
         `Le renouvellement d'une connexion du type ${provider} n'est pas supportée. Veuillez vous reconnecter manuellement.`,
       ),

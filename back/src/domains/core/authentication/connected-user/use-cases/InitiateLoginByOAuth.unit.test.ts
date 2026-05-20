@@ -1,8 +1,8 @@
 import {
   allowedLoginUris,
   expectToEqual,
+  type InitiateLoginByOAuthParams,
   queryParamsAsString,
-  type WithRedirectUri,
 } from "shared";
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -15,6 +15,7 @@ import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
 describe("InitiateLoginByOAuth usecase", () => {
   describe("With OAuthGateway mode 'proConnect'", () => {
+    // TODO : implement forEach with FTConnect
     it.each(
       allowedLoginUris,
     )("construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth", async (uri) => {
@@ -25,13 +26,17 @@ describe("InitiateLoginByOAuth usecase", () => {
       const useCase = new InitiateLoginByOAuth(
         new InMemoryUowPerformer(uow),
         uuidGenerator,
-        new InMemoryOAuthGateway(fakeProviderConfig),
+        {
+          proConnect: new InMemoryOAuthGateway(fakeProviderConfig),
+          peConnect: new InMemoryOAuthGateway(fakeProviderConfig),
+        },
       );
 
       uuidGenerator.setNextUuids([nonce, state]);
 
-      const sourcePage: WithRedirectUri = {
+      const sourcePage: InitiateLoginByOAuthParams = {
         redirectUri: `/${uri}?discussionId=discussion0`,
+        provider: "proConnect",
       };
       const redirectUrl = await useCase.execute(sourcePage);
       const loginEndpoint = "login-pro-connect";

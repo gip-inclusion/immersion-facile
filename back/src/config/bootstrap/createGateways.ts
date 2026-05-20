@@ -11,6 +11,7 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import { FtConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/FtConnectOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { ProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/ProConnectOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
@@ -195,7 +196,7 @@ export const createGateways = async (
         )
       : new InMemoryFtConnectGateway();
 
-  const oAuthGateway: OAuthGateway =
+  const proConnectOAuthGateway: OAuthGateway =
     config.proConnectGateway === "HTTPS"
       ? new ProConnectOAuthGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
@@ -208,6 +209,11 @@ export const createGateways = async (
           config.proConnectConfig,
         )
       : new InMemoryOAuthGateway(config.proConnectConfig);
+
+  const ftConnectOAuthGateway: OAuthGateway =
+    config.ftConnectGateway === "HTTPS"
+      ? new FtConnectOAuthGateway(config)
+      : new InMemoryOAuthGateway(config.proConnectConfig); //TODO
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({
@@ -391,7 +397,8 @@ export const createGateways = async (
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
 
-    oAuthGateway,
+    proConnectOAuthGateway,
+    ftConnectOAuthGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
