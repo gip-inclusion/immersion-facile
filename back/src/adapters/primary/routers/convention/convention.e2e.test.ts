@@ -1,7 +1,8 @@
-import { addDays } from "date-fns";
+import { addDays, subHours } from "date-fns";
 import {
   type AddConventionInput,
   AgencyDtoBuilder,
+  AssessmentDtoBuilder,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
   type ConventionDraftId,
@@ -31,6 +32,8 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
 import { v4 as uuid } from "uuid";
+import { createAssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
+import { MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER } from "../../../../domains/convention/use-cases/SendAssessmentSignatureReminder";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type {
   GenerateConnectedUserJwt,
@@ -966,6 +969,280 @@ describe("convention e2e", () => {
           status: 404,
           message: errors.convention.notFound({ conventionId: unknownId })
             .message,
+        },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.sendAssessmentSignatureReminder,
+  )} sends assessment signature reminder`, () => {
+    const conventionWithAssessment = new ConventionDtoBuilder(convention)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+
+    const assessmentDto = new AssessmentDtoBuilder()
+      .withConventionId(conventionWithAssessment.id)
+      .withCreatedAt("2026-04-01T00:00:00.000Z")
+      .build();
+
+    beforeEach(() => {
+      inMemoryUow.conventionRepository.setConventions([
+        conventionWithAssessment,
+      ]);
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ];
+      inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
+      inMemoryUow.assessmentRepository.assessments = [
+        createAssessmentEntity(assessmentDto, conventionWithAssessment),
+      ];
+    });
+
+    it("200 - Successfully sends assessment signature reminder by email", async () => {
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithAssessment.id,
+          role: "establishment-representative",
+          email:
+            conventionWithAssessment.signatories.establishmentRepresentative
+              .email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      gateways.shortLinkGenerator.addMoreShortLinkIds([
+        "shortLinkAssessmentSign",
+      ]);
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: conventionWithAssessment.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      await processEventsForEmailToBeSent(eventCrawler);
+
+      const sentEmails = gateways.notification.getSentEmails();
+      expectToEqual(sentEmails.length, 1);
+      expectEmailOfType(
+        sentEmails[0],
+        "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+      );
+    });
+
+    it("400 - Cannot send reminder when convention is not validated", async () => {
+      const conventionReadyToSign = new ConventionDtoBuilder(
+        conventionWithAssessment,
+      )
+        .withStatus("READY_TO_SIGN")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([conventionReadyToSign]);
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionReadyToSign.id,
+          role: "establishment-representative",
+          email:
+            conventionReadyToSign.signatories.establishmentRepresentative.email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: conventionReadyToSign.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          status: 400,
+          message:
+            errors.assessment.sendAssessmentSignatureReminderNotAllowedForStatus(
+              { status: "READY_TO_SIGN" },
+            ).message,
+        },
+      });
+    });
+
+    it("403 - Forbidden for beneficiary role", async () => {
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithAssessment.id,
+          role: "beneficiary",
+          email: conventionWithAssessment.signatories.beneficiary.email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: conventionWithAssessment.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message:
+            errors.assessment.sendAssessmentSignatureReminderForbidden()
+              .message,
+        },
+      });
+    });
+
+    it("401 - Invalid JWT", async () => {
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: "invalid-token" },
+        body: {
+          conventionId: conventionWithAssessment.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "Provided token is invalid",
+        },
+      });
+    });
+
+    it("404 - Convention not found", async () => {
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: unknownId,
+          role: "establishment-representative",
+          email:
+            conventionWithAssessment.signatories.establishmentRepresentative
+              .email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: unknownId,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message: errors.convention.notFound({ conventionId: unknownId })
+            .message,
+        },
+      });
+    });
+
+    it("404 - Assessment not found", async () => {
+      inMemoryUow.assessmentRepository.assessments = [];
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithAssessment.id,
+          role: "establishment-representative",
+          email:
+            conventionWithAssessment.signatories.establishmentRepresentative
+              .email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: conventionWithAssessment.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message: errors.assessment.notFound(conventionWithAssessment.id)
+            .message,
+        },
+      });
+    });
+
+    it("429 - Too many requests when reminder was sent less than 24h ago", async () => {
+      inMemoryUow.notificationRepository.notifications = [
+        {
+          id: "past-assessment-signature-reminder-email",
+          createdAt: subHours(gateways.timeGateway.now(), 2).toISOString(),
+          kind: "email",
+          followedIds: {
+            conventionId: conventionWithAssessment.id,
+            agencyId: conventionWithAssessment.agencyId,
+            establishmentSiret: conventionWithAssessment.siret,
+          },
+          templatedContent: {
+            kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+            recipients: [
+              conventionWithAssessment.signatories.beneficiary.email,
+            ],
+            params: {
+              beneficiaryFirstName: "Jean",
+              beneficiaryLastName: "Dupont",
+              businessName: conventionWithAssessment.businessName,
+              internshipKind: conventionWithAssessment.internshipKind,
+              assessmentSignatureLink: "https://example.com",
+            },
+          },
+        },
+      ];
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithAssessment.id,
+          role: "establishment-representative",
+          email:
+            conventionWithAssessment.signatories.establishmentRepresentative
+              .email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentSignatureReminder({
+        headers: { authorization: jwt },
+        body: {
+          conventionId: conventionWithAssessment.id,
+          notificationKind: "email",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 429,
+        body: {
+          status: 429,
+          message: errors.assessment.assessmentLinkAlreadySent({
+            notificationKind: "email",
+            minHoursBetweenReminder:
+              MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+            timeRemaining: "22h00",
+          }).message,
         },
       });
     });
