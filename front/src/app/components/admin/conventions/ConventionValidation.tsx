@@ -77,8 +77,6 @@ export const ConventionValidation = ({
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   );
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
-    useState<boolean>(false);
 
   useScrollTo(
     useFeedbackTopics([
@@ -143,8 +141,6 @@ export const ConventionValidation = ({
   };
 
   const onSubmitSendAssessmentLink = (notificationKind: NotificationKind) => {
-    setIsAssessmentLinkSent(true);
-
     dispatch(
       sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
         conventionId: convention.id,
@@ -247,7 +243,6 @@ export const ConventionValidation = ({
           }),
           shouldShowAssessmentReminderButton
             ? sendAssessmentLinkButtonProps({
-                isAssessmentLinkSent,
                 onClick: () => {
                   sendAssessmentLinkModal.open();
                 },
