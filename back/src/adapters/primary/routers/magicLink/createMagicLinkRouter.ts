@@ -178,6 +178,17 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.sendAssessmentSignatureReminder(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.sendAssessmentSignatureReminder.execute(
+          req.body,
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
+  );
+
   return expressRouter;
 };
 

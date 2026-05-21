@@ -1,6 +1,9 @@
 import { addDays, isBefore } from "date-fns";
 import { match } from "ts-pattern";
-import type { ConventionDto } from "../convention/convention.dto";
+import type {
+  ConventionAssessmentFields,
+  ConventionDto,
+} from "../convention/convention.dto";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
 import {
   type DateString,
@@ -63,3 +66,16 @@ export const isAssessmentDto = (
   assessment &&
   assessment.status !== "FINISHED" &&
   assessment.status !== "ABANDONED";
+
+export const isAssessmentToSign = (
+  assessment: ConventionAssessmentFields["assessment"],
+): boolean => {
+  if (assessment == null) return false;
+  if (!("signedAt" in assessment)) return false;
+  if (assessment.status === "DID_NOT_SHOW") return false;
+  if (assessment.signedAt !== null) return false;
+  if (isBeforeAssessmentSignatureReleaseDate(assessment.createdAt))
+    return false;
+
+  return true;
+};

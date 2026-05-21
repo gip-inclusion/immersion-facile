@@ -131,6 +131,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionWithFinalStatusEdited", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: NotificationKind } & WithTriggeredBy>
   | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: NotificationKind } & WithTriggeredBy>
+  | GenericEvent<"AssessmentSignatureReminderManuallySent", WithConventionDto & { transport: NotificationKind } & WithTriggeredBy>
   // UNHAPPY PATHS
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>

@@ -99,4 +99,84 @@ describe("sendAssessmentLink slice", () => {
   const feedGatewayWithSendAssessmentLinkFailure = (error: Error) => {
     dependencies.assessmentGateway.sendAssessmentLinkResponse$.error(error);
   };
+
+  it("sends assessment signature reminder", () => {
+    store.dispatch(
+      sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderRequested({
+        conventionId: "fake-covention-id",
+        notificationKind: "email",
+        jwt: "fake-jwt",
+        feedbackTopic: "send-assessment-signature-reminder",
+      }),
+    );
+    expectSendAssessmentLinkState({
+      isSending: true,
+    });
+    feedGatewaySendAssessmentSignatureReminderSuccess();
+
+    expectSendAssessmentLinkState({
+      isSending: false,
+    });
+
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "send-assessment-signature-reminder"
+      ],
+      {
+        level: "success",
+        message:
+          "Le destinataire devrait la recevoir dans les prochaines minutes.",
+        on: "create",
+        title: "La relance a bien été envoyée",
+      },
+    );
+  });
+
+  it("gets error message when sending assessment signature reminder fails", () => {
+    store.dispatch(
+      sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderRequested({
+        conventionId: "fake-covention-id",
+        notificationKind: "email",
+        jwt: "fake-jwt",
+        feedbackTopic: "send-assessment-signature-reminder",
+      }),
+    );
+    expectSendAssessmentLinkState({
+      isSending: true,
+    });
+    const errorMessage =
+      "Une erreur est survenue lors de l'envoi de la relance.";
+    feedGatewayWithSendAssessmentSignatureReminderFailure(
+      new Error(errorMessage),
+    );
+    expectSendAssessmentLinkState({
+      isSending: false,
+    });
+
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "send-assessment-signature-reminder"
+      ],
+      {
+        level: "error",
+        message: errorMessage,
+        on: "create",
+        title: "Problème lors de l'envoi de la relance",
+      },
+    );
+  });
+
+  const feedGatewaySendAssessmentSignatureReminderSuccess = () => {
+    dependencies.assessmentGateway.sendAssessmentSignatureReminderResponse$.next(
+      undefined,
+    );
+  };
+
+  const feedGatewayWithSendAssessmentSignatureReminderFailure = (
+    error: Error,
+  ) => {
+    dependencies.assessmentGateway.sendAssessmentSignatureReminderResponse$.error(
+      error,
+    );
+  };
 });

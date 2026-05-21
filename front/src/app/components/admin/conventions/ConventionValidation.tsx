@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import {
   agencyModifierRoles,
   allSignatoryRoles,
+  assessmentSignatureReminderAuthorizedRoles,
   type ConventionReadDto,
   conventionSignatoryRoleBySignatoryKey,
   getDaysBetween,
@@ -46,9 +47,12 @@ import { partnersErroredConventionSelectors } from "src/core-logic/domain/partne
 import {
   makeConventionSections,
   SendAssessmentLinkModalWrapper,
+  SendAssessmentSignatureReminderModalWrapper,
   SendSignatureLinkModalWrapper,
   sendAssessmentLinkButtonProps,
   sendAssessmentLinkModal,
+  sendAssessmentSignatureReminderButtonProps,
+  sendAssessmentSignatureReminderModal,
   sendSignatureLinkButtonProps,
   sendSignatureLinkModal,
 } from "../../../contents/convention/conventionSummary.helpers";
@@ -80,6 +84,7 @@ export const ConventionValidation = ({
     useFeedbackTopics([
       "send-signature-link",
       "send-assessment-link",
+      "send-assessment-signature-reminder",
       "convention-action-sign",
     ]).length > 0,
   );
@@ -109,6 +114,11 @@ export const ConventionValidation = ({
       ...allSignatoryRoles,
       "back-office",
     ]).length > 0;
+
+  const shouldShowAssessmentSignatureReminderButton =
+    getAssessmentCompletionStatus(convention.assessment) === "to-sign" &&
+    intersection(roles, [...assessmentSignatureReminderAuthorizedRoles])
+      .length > 0;
 
   const shouldShowConventionLastBroadcastFeedbackErrorInfo =
     conventionLastBroadcastFeedback?.subscriberErrorFeedback &&
@@ -147,6 +157,19 @@ export const ConventionValidation = ({
         notificationKind,
         jwt: jwtParams.jwt,
         feedbackTopic: "send-assessment-link",
+      }),
+    );
+  };
+
+  const onSubmitSendAssessmentSignatureReminder = (
+    notificationKind: NotificationKind,
+  ) => {
+    dispatch(
+      sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderRequested({
+        conventionId: convention.id,
+        notificationKind,
+        jwt: jwtParams.jwt,
+        feedbackTopic: "send-assessment-signature-reminder",
       }),
     );
   };
@@ -200,6 +223,7 @@ export const ConventionValidation = ({
         topics={[
           "send-signature-link",
           "send-assessment-link",
+          "send-assessment-signature-reminder",
           "convention-action-sign",
         ]}
         closable
@@ -248,6 +272,13 @@ export const ConventionValidation = ({
                 },
               })
             : undefined,
+          shouldShowAssessmentSignatureReminderButton
+            ? sendAssessmentSignatureReminderButtonProps({
+                onClick: () => {
+                  sendAssessmentSignatureReminderModal.open();
+                },
+              })
+            : undefined,
         )}
         conventionId={convention.id}
       />
@@ -260,6 +291,13 @@ export const ConventionValidation = ({
         phone={convention.establishmentTutor.phone}
         email={convention.establishmentTutor.email}
         onConfirm={onSubmitSendAssessmentLink}
+      />
+      <SendAssessmentSignatureReminderModalWrapper
+        phone={convention.signatories.beneficiary.phone}
+        email={convention.signatories.beneficiary.email}
+        beneficiaryFirstName={convention.signatories.beneficiary.firstName}
+        beneficiaryLastName={convention.signatories.beneficiary.lastName}
+        onConfirm={onSubmitSendAssessmentSignatureReminder}
       />
     </>
   );

@@ -41,4 +41,38 @@ const sendAssessmentLinkEpic: SendAssessmentLinkEpic = (
     ),
   );
 
-export const sendAssessmentLinkEpics = [sendAssessmentLinkEpic];
+const sendAssessmentSignatureReminderEpic: SendAssessmentLinkEpic = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(
+      sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderRequested
+        .match,
+    ),
+    switchMap((action) =>
+      assessmentGateway
+        .sendAssessmentSignatureReminder$(action.payload, action.payload.jwt)
+        .pipe(
+          map(() =>
+            sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderSucceeded(
+              action.payload,
+            ),
+          ),
+          catchEpicError((error) =>
+            sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderFailed(
+              {
+                errorMessage: error.message,
+                feedbackTopic: action.payload.feedbackTopic,
+              },
+            ),
+          ),
+        ),
+    ),
+  );
+
+export const sendAssessmentLinkEpics = [
+  sendAssessmentLinkEpic,
+  sendAssessmentSignatureReminderEpic,
+];
