@@ -3,7 +3,7 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type EstablishmentRole,
@@ -135,7 +135,7 @@ export const EstablishmentUserForm = ({
 
   const values = watch();
 
-  return (
+  const formJsx = (
     <>
       {values.email && isEstablishmentDashboardFormEstablishment && (
         <p>
@@ -212,4 +212,8 @@ export const EstablishmentUserForm = ({
       </form>
     </>
   );
+  if (isMyProfileEstablishmentRegistration) {
+    return <FormProvider {...methods}>{formJsx}</FormProvider>;
+  }
+  return formJsx;
 };
