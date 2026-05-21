@@ -1,0 +1,24 @@
+{
+  "name": "load-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bundle": "tsc",
+    "typecheck": "tsc --noEmit",
+    "k6-example": "pnpm bundle && k6 run dist/k6-example.js",
+    "k6:local-ramp": "pnpm bundle && k6 run --summary-mode=full --summary-trend-stats='avg,min,med,p(90),p(95),p(99),max' dist/k6-local-ramp.js",
+    "k6:local-ramp:dashboard": "pnpm bundle && K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_OPEN=true K6_WEB_DASHBOARD_EXPORT=dist/k6-local-ramp-report.html k6 run dist/k6-local-ramp.js",
+    "k6:ci-smoke": "pnpm bundle && TARGET_RPS=1000 PRE_ALLOCATED_VUS=200 MAX_VUS=1000 k6 run --summary-mode=full --summary-trend-stats='avg,min,med,p(90),p(95),p(99),max' dist/k6-local-ramp.js",
+    "gatling-example": "gatling run --simulation gatling-example",
+    "k6-cloud": "k6 cloud src/k6-example.ts"
+  },
+  "dependencies": {
+    "@gatling.io/core": "3.15.1",
+    "@gatling.io/http": "3.15.1"
+  },
+  "devDependencies": {
+    "@gatling.io/cli": "3.15.1",
+    "@types/k6": "^1.6.0",
+    "typescript": "^5.8.3"
+  }
+}
