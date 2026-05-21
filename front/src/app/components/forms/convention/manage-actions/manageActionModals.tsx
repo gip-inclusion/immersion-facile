@@ -155,6 +155,9 @@ const createEditCounsellorNameModalParams = {
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.editCounsellorNameModalForm,
   doSubmitClosesModal: false,
+  submitButton: {
+    id: domElementIds.manageConvention.editCounsellorNameModalSubmitButton,
+  },
 };
 const {
   Component: EditCounsellorNameModal,

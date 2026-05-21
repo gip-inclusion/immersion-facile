@@ -46,6 +46,11 @@ export const feedbackSlice = createSlice({
     clearFeedbacksTriggered: () => {
       return initialFeedbacks;
     },
+    clearFeedbackTopics: (state, { payload }: PayloadAction<FeedbackTopic[]>) =>
+      keys(state).reduce<Feedbacks>((acc, topic) => {
+        if (!payload.includes(topic)) acc[topic] = state[topic];
+        return acc;
+      }, {}),
   },
   extraReducers: (builder) => {
     keys(feedbacks).map((topic) => {

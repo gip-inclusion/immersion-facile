@@ -4,6 +4,7 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   type ActionKindAndLevel,
+  feedbackSlice,
   getLevelAndActionKindFromActionKindAndLevel,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
@@ -68,6 +69,35 @@ describe("Feedbacks", () => {
         topic: "dashboard-discussion-status-updated",
         kindAndLevel: "update.success",
       });
+    });
+    it("clearFeedbackTopics removes the given topics", () => {
+      store.dispatch(
+        apiConsumerSlice.actions.saveApiConsumerSucceeded({
+          apiConsumerJwt: "jwt",
+          feedbackTopic: "api-consumer-global",
+        }),
+      );
+      store.dispatch(
+        discussionSlice.actions.updateDiscussionStatusSucceeded({
+          feedbackTopic: "dashboard-discussion-status-updated",
+        }),
+      );
+      expect(keys(feedbacksSelectors.feedbacks(store.getState()))).toHaveLength(
+        2,
+      );
+
+      store.dispatch(
+        feedbackSlice.actions.clearFeedbackTopics(["api-consumer-global"]),
+      );
+
+      expect(
+        feedbacksSelectors.feedbacks(store.getState())["api-consumer-global"],
+      ).toBeUndefined();
+      expect(
+        feedbacksSelectors.feedbacks(store.getState())[
+          "dashboard-discussion-status-updated"
+        ],
+      ).toBeDefined();
     });
   });
   const expectFeedbackStoreByTopicToEqual = ({
