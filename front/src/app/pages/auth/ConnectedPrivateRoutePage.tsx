@@ -60,7 +60,6 @@ export type FrontAdminRoute =
 
 export const agencyDashboardTabsList = [
   "agencyDashboardMain",
-  "agencyDashboardSynchronisedConventions",
   "agencyDashboardAgencies",
   "agencyManagement",
   "establishmentManagement",
@@ -71,7 +70,6 @@ export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
 
 export const agencyDashboardRoutes = [
   "agencyDashboardMain",
-  "agencyDashboardSynchronisedConventions",
   "agencyDashboardAgencies",
   "agencyDashboardAgencyDetails",
   "agencyDashboardOnboarding",
@@ -108,7 +106,6 @@ export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
 export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardMain>
   | Route<typeof routes.agencyDashboardOnboarding>
-  | Route<typeof routes.agencyDashboardSynchronisedConventions>
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>
   | Route<typeof routes.agencyManagement>

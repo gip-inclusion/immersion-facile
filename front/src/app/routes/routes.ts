@@ -221,9 +221,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboard,
   agencyDashboardMain: agencyDashboard.extend("/dashboard"),
   agencyDashboardOnboarding: agencyDashboard.extend("/onboarding"),
-  agencyDashboardSynchronisedConventions: agencyDashboard.extend(
-    "/conventions-synchronisees",
-  ),
   statsEstablishmentDetails: agencyDashboard.extend(
     "/stats-activites-par-entreprise",
   ),
