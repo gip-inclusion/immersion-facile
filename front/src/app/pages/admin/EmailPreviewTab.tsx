@@ -476,6 +476,16 @@ export const defaultEmailValueByEmailKind: {
     domain: "immersion-facile.beta.gouv.fr",
     mode: "3days",
   },
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS: {
+    businessName: "Machin CORP",
+    siret: "12345678901234",
+  },
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY: {
+    businessName: "Machin CORP",
+    beneficiaryFirstName: "Gwenola",
+    beneficiaryLastName: "Kornac'h",
+    immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
+  },
   ESTABLISHMENT_DELETED: {
     businessAddresses: [
       addressDtoToString({

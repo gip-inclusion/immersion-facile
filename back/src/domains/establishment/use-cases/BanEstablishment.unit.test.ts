@@ -81,14 +81,9 @@ describe("BanEstablishment", () => {
   });
 
   it("throws if establishment is already banned", async () => {
-    await banEstablishment.execute(
-      {
-        siret: bannedEstablishment.siret,
-        establishmentBannishmentJustification:
-          bannedEstablishment.establishmentBannishmentJustification,
-      },
-      connectedAdminUser,
-    );
+    uow.bannedEstablishmentRepository.bannedEstablishments = [
+      bannedEstablishment,
+    ];
 
     await expect(
       banEstablishment.execute(
@@ -102,6 +97,8 @@ describe("BanEstablishment", () => {
     ).rejects.toThrow(
       `L'établissement avec le siret '${bannedEstablishment.siret}' est déjà banni.`,
     );
+
+    expectArraysToMatch(uow.outboxRepository.events, []);
   });
 
   it("throws if the user is not a back office admin", async () => {
@@ -117,5 +114,7 @@ describe("BanEstablishment", () => {
     ).rejects.toThrow(
       `L'utilisateur qui a l'identifiant "${connectedNonAdminUser.id}" n'a pas le droit d'accéder à cette ressource.`,
     );
+
+    expectArraysToMatch(uow.outboxRepository.events, []);
   });
 });
