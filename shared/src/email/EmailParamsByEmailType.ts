@@ -331,6 +331,16 @@ export type EmailParamsByEmailType = {
     domain: string;
     mode: "3days" | "7days";
   };
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS: {
+    businessName: string;
+    siret: SiretDto;
+  };
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY: {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    immersionBaseUrl: AbsoluteUrl;
+  };
   ESTABLISHMENT_DELETED: {
     businessName: string;
     siret: SiretDto;

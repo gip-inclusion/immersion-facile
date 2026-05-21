@@ -166,7 +166,9 @@ import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/estab
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
+import { makeNotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned";
 import { makeNotifyEstablishmentAdminsThatUserRightIsPending } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentAdminsThatUserRightIsPending";
+import { makeNotifyEstablishmentUsersThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentUsersThatEstablishmentIsBanned";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { makeRegisterUserOnEstablishment } from "../../domains/establishment/use-cases/RegisterUserOnEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
@@ -539,6 +541,19 @@ export const createUseCases = ({
         deps: {
           saveNotificationAndRelatedEvent,
           config,
+        },
+      }),
+    notifyEstablishmentUsersThatEstablishmentIsBanned:
+      makeNotifyEstablishmentUsersThatEstablishmentIsBanned({
+        uowPerformer,
+        deps: { saveNotificationAndRelatedEvent },
+      }),
+    notifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned:
+      makeNotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          immersionBaseUrl: config.immersionFacileBaseUrl,
         },
       }),
     addExchangeToDiscussion: makeAddExchangeToDiscussion({
@@ -992,7 +1007,10 @@ export const createUseCases = ({
         uowPerformer,
       }),
 
-    banEstablishment: makeBanEstablishment({ uowPerformer }),
+    banEstablishment: makeBanEstablishment({
+      uowPerformer,
+      deps: { createNewEvent },
+    }),
     getUsers: makeGetUsers({
       uowPerformer,
     }),
