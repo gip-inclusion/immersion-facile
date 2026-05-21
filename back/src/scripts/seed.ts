@@ -72,6 +72,7 @@ const seed = async () => {
   });
 
   await resetDb(db);
+
   await executeSeedTasks(db, deps);
 
   await pool.end();
