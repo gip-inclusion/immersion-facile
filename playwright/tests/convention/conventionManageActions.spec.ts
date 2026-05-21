@@ -20,6 +20,7 @@ import {
   navigateToAgencyDashboardMain,
   openManageConventionPageFromDashboard,
 } from "../../utils/convention";
+import { acceptCookiesIfBannerVisible } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -32,6 +33,7 @@ test.describe("Convention manage actions from prescriber dashboard", () => {
     });
     agencyDashboardPage = await context.newPage();
     await agencyDashboardPage.goto("/");
+    await acceptCookiesIfBannerVisible(agencyDashboardPage);
   });
 
   test.afterAll(async () => {

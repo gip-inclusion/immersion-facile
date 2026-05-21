@@ -119,6 +119,13 @@ export const expectLocatorToBeReadOnly = async (
   await expect(locator).not.toBeEditable();
 };
 
+export const acceptCookiesIfBannerVisible = async (page: Page) => {
+  const acceptAllButton = page
+    .getByRole("region", { name: "Gestion des cookies" })
+    .getByRole("button", { name: "Tout accepter" });
+  if (await acceptAllButton.isVisible()) await acceptAllButton.click();
+};
+
 export const expectNoErrorVisible = async (page: Page) => {
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
 };
