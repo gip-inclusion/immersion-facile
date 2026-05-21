@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from "axios";
 import type { Pool } from "pg";
 import {
+  type AgencyId,
   type BroadcastFeedback,
   type BroadcastFeedbackResponse,
   broadcastFeedbackSchema,
@@ -22,8 +23,10 @@ import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { broadcastToFtServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
-const someConventionId = "a07af28e-9c7b-4845-91ee-71020860faa8";
-const anotherConventionId = "b07af28e-9c7b-4845-91ee-71020860faa8";
+const someConventionId: ConventionId = "a07af28e-9c7b-4845-91ee-71020860faa8";
+const anotherConventionId: ConventionId =
+  "b07af28e-9c7b-4845-91ee-71020860faa8";
+const someAgencyId: AgencyId = "11111111-1111-4111-8111-111111111111";
 
 describe("PgBroadcastFeedbacksRepository", () => {
   let pool: Pool;
@@ -105,6 +108,8 @@ describe("PgBroadcastFeedbacksRepository", () => {
         handled_by_agency: broadcastFeedback.handledByAgency,
         occurred_at: new Date(broadcastFeedback.occurredAt),
         request_params: broadcastFeedback.requestParams,
+        convention_id: broadcastFeedback.conventionId,
+        agency_id: broadcastFeedback.agencyId,
         ...(broadcastFeedback.response
           ? {
               response: {
@@ -118,6 +123,25 @@ describe("PgBroadcastFeedbacksRepository", () => {
         service_name: broadcastFeedback.serviceName,
       },
     ]);
+  });
+
+  it("writes convention_id and agency_id columns on save", async () => {
+    const conventionId = someConventionId;
+    const agencyId: AgencyId = "22222222-2222-4222-8222-222222222222";
+    const broadcastFeedback = await makeBroadcastFeedback({
+      conventionId,
+      agencyId,
+      serviceName: "osef",
+      kind: "success",
+    });
+    await pgBroadcastFeedbacksRepository.save(broadcastFeedback);
+
+    const rows = await kyselyDb
+      .selectFrom("broadcast_feedbacks")
+      .select(["convention_id", "agency_id"])
+      .execute();
+
+    expectToEqual(rows, [{ convention_id: conventionId, agency_id: agencyId }]);
   });
 
   it("saves an axios timeout error in the repository", async () => {
@@ -260,6 +284,8 @@ describe("PgBroadcastFeedbacksRepository", () => {
             handledByAgency: qb.ref("bf.handled_by_agency"),
             consumerName: qb.ref("bf.consumer_name"),
             consumerId: qb.ref("bf.consumer_id"),
+            conventionId: cast<ConventionId>(qb.ref("bf.convention_id")),
+            agencyId: cast<AgencyId>(qb.ref("bf.agency_id")),
           }).as("broacastFeedback"),
         )
         .orderBy("id")
@@ -269,6 +295,8 @@ describe("PgBroadcastFeedbacksRepository", () => {
         pgbroadcastFeedbacks.map(
           (pgBroadcastFeedback): BroadcastFeedback => ({
             serviceName: pgBroadcastFeedback.broacastFeedback.serviceName,
+            conventionId: pgBroadcastFeedback.broacastFeedback.conventionId,
+            agencyId: pgBroadcastFeedback.broacastFeedback.agencyId,
             subscriberErrorFeedback:
               pgBroadcastFeedback.broacastFeedback.subscriberErrorFeedback,
             requestParams: pgBroadcastFeedback.broacastFeedback.requestParams,
@@ -345,6 +373,34 @@ describe("PgBroadcastFeedbacksRepository", () => {
       expect(result).toBeNull();
     });
 
+    it("falls back to request_params.conventionId when convention_id column is null (legacy rows pre-backfill)", async () => {
+      const conventionId = someConventionId;
+
+      await kyselyDb
+        .insertInto("broadcast_feedbacks")
+        .values({
+          service_name: broadcastToFtServiceName,
+          consumer_name: "my-consumer",
+          consumer_id: null,
+          request_params: JSON.stringify({ conventionId }),
+          response: JSON.stringify({ httpStatus: 500 }),
+          occurred_at: new Date("2024-07-31").toISOString(),
+          handled_by_agency: false,
+          convention_id: null,
+          agency_id: null,
+        })
+        .execute();
+
+      const result =
+        await pgBroadcastFeedbacksRepository.getLastBroadcastFeedback(
+          conventionId,
+        );
+
+      expect(result).not.toBeNull();
+      expectToEqual(result?.conventionId, conventionId);
+      expectToEqual(result?.agencyId, null);
+    });
+
     it("retrieve a broadcast feedback", async () => {
       const conventionId = someConventionId;
 
@@ -390,10 +446,12 @@ const makeBroadcastFeedback = async (params: {
   kind: "error" | "success";
   serviceName: string;
   conventionId: ConventionId;
+  agencyId?: AgencyId;
   occurredAt?: Date;
   errorMode?: "timeout" | "response-error" | "not-axios-error";
   handledByAgency?: boolean;
 }): Promise<BroadcastFeedback> => {
+  const agencyId = params.agencyId ?? someAgencyId;
   if (params.kind === "error") {
     const error = await axios
       .get(
@@ -412,6 +470,8 @@ const makeBroadcastFeedback = async (params: {
     return {
       consumerId: null,
       consumerName: "my-consumer",
+      conventionId: params.conventionId,
+      agencyId,
       serviceName: params.serviceName,
       subscriberErrorFeedback: {
         message: "Some message",
@@ -432,6 +492,8 @@ const makeBroadcastFeedback = async (params: {
   return {
     consumerId: null,
     consumerName: "my-consumer",
+    conventionId: params.conventionId,
+    agencyId,
     serviceName: params.serviceName,
     requestParams: { conventionId: params.conventionId },
     response: { httpStatus: 200, body: { status: 200, title: "blabla" } },

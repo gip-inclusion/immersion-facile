@@ -54,6 +54,8 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
     serviceName: "test-service",
     consumerId: "consumer-id-1",
     consumerName: "Test Consumer",
+    conventionId: convention1.id,
+    agencyId: agencyId1,
     subscriberErrorFeedback: {
       message: "Aucun dossier trouvé pour les critères d'identité transmis",
     },
@@ -68,6 +70,8 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
     serviceName: "test-service",
     consumerId: "consumer-id-2",
     consumerName: "Test Consumer",
+    conventionId: convention2.id,
+    agencyId: agencyId1,
     subscriberErrorFeedback: {
       message: "Some unmanaged error message",
     },
@@ -218,6 +222,8 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
       serviceName: "test-service",
       consumerId: "consumer-id-3",
       consumerName: "Test Consumer",
+      conventionId: convention3.id,
+      agencyId: agencyId2,
       subscriberErrorFeedback: {
         message: "Some error message",
       },
@@ -365,6 +371,8 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
     const errorBroadcast: BroadcastFeedback = {
       consumerId: null,
       consumerName: "any-consumer-name",
+      conventionId: cancelledConventionId,
+      agencyId: agencyId1,
       serviceName:
         "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
       occurredAt: "2024-07-01T14:00:00.000Z",
@@ -386,6 +394,8 @@ describe("GetConventionsWithErroredBroadcastFeedback", () => {
     const priorSuccessBroadcast: BroadcastFeedback = {
       consumerId: null,
       consumerName: "any-consumer-name",
+      conventionId: cancelledConventionId,
+      agencyId: agencyId1,
       serviceName:
         "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated",
       occurredAt: "2024-07-01T08:00:00.000Z",

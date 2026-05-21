@@ -94,6 +94,8 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
     await uow.broadcastFeedbacksRepository.save({
       consumerId: null,
       consumerName: "France Travail",
+      conventionId: inputParams.convention.id,
+      agencyId: inputParams.convention.agencyId,
       serviceName: broadcastToFtServiceName,
       requestParams: {
         conventionId: inputParams.convention.id,
