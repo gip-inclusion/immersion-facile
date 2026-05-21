@@ -14,6 +14,7 @@ import {
 import { getMagicLinkFromEmail, goToAdminTab } from "./admin";
 import { getRandomizedData } from "./data";
 import {
+  acceptCookiesIfBannerVisible,
   expectElementToBeVisible,
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
@@ -539,6 +540,7 @@ export const openManageConventionPageFromDashboard = async (
   await manageConventionPage.waitForURL(
     `**/${frontRoutes.manageConventionUserConnected}?conventionId=${conventionId}`,
   );
+  await acceptCookiesIfBannerVisible(manageConventionPage);
   return manageConventionPage;
 };
 
@@ -547,6 +549,8 @@ export const clickbuttonInSubMenu = async (
   subMenuButtonId: string,
   buttonId: string,
 ) => {
+  await acceptCookiesIfBannerVisible(page);
+
   const subMenuButton = page.locator(`#${subMenuButtonId}`);
   await expect(subMenuButton).toBeVisible();
   const subMenu = page.locator(`#${subMenuButtonId}-submenu`);
@@ -558,6 +562,7 @@ export const clickbuttonInSubMenu = async (
 
   const button = page.locator(`#${buttonId}`);
   await expect(button).toBeVisible();
+  await button.scrollIntoViewIfNeeded();
   await button.click();
 };
 
