@@ -5,6 +5,9 @@ import { defineConfig } from "vite";
 import type { ManifestOptions } from "vite-plugin-pwa";
 import { VitePWA } from "vite-plugin-pwa";
 
+const backendPort = Number.parseInt(process.env.BACKEND_PORT || "1234", 10);
+const frontPort = Number.parseInt(process.env.PORT || "3000", 10);
+
 const manifest: Partial<ManifestOptions> = {
   name: "Immersion Facilitée",
   short_name: "IF",
@@ -94,12 +97,13 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:1234/",
+        target: `http://127.0.0.1:${backendPort}/`,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-    port: 3000,
+    port: frontPort,
+    strictPort: process.env.PORT !== undefined,
   },
   preview: {
     port: 5000,

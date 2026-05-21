@@ -203,10 +203,12 @@ test.describe("Agency dashboard workflow", () => {
         .first()
         .click();
 
-      await page.fill(
+      const nameInput = page.locator(
         `#${domElementIds.conventionTemplate.form.nameInput}`,
-        newConventionTemplateName,
       );
+      await expect(nameInput).toHaveValue("Mon premier modèle de convention");
+      await nameInput.fill(newConventionTemplateName);
+      await expect(nameInput).toHaveValue(newConventionTemplateName);
 
       await page.click(
         `#${domElementIds.conventionTemplate.form.submitFormButton}`,
