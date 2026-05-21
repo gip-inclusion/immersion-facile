@@ -72,8 +72,8 @@ export const EstablishmentUserForm = ({
   const dispatch = useDispatch();
   const emptyValues = {
     email: "",
-    phone: "",
-    job: "",
+    phone: undefined,
+    job: undefined,
     role: undefined,
     shouldReceiveDiscussionNotifications: false,
     isMainContactByPhone: false,
@@ -173,7 +173,9 @@ export const EstablishmentUserForm = ({
           inputProps={{
             label: "Téléphone *",
             nativeInputProps: {
-              ...register("phone"),
+              ...register("phone", {
+                setValueAs: (value) => value || undefined,
+              }),
               type: "phone",
             },
           }}
@@ -188,7 +190,9 @@ export const EstablishmentUserForm = ({
         <Input
           label="Fonction *"
           nativeInputProps={{
-            ...register("job"),
+            ...register("job", {
+              setValueAs: (value) => value || undefined,
+            }),
           }}
           {...(errors.job && {
             state: "error",
