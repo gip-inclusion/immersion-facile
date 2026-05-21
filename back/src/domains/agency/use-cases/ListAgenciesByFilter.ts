@@ -5,7 +5,6 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   listAgencyOptionsRequestSchema,
-  maxAgencyOptionsPerRequest,
   miniStageAgencyKinds,
   orderedAgencyKindList,
 } from "shared";
@@ -32,10 +31,14 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
         sirets: siret ? [siret] : undefined,
         ...extraFilters,
       },
-      pagination: {
-        page: 1,
-        perPage: limit ?? maxAgencyOptionsPerRequest,
-      },
+      ...(limit
+        ? {
+            pagination: {
+              page: 1,
+              perPage: limit,
+            },
+          }
+        : {}),
     });
 
     return agencies.map(toAgencyOption);
