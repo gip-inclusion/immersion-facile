@@ -200,11 +200,6 @@ const getPageByRouteName: {
       <AgencyDashboardMainTab route={route} />
     </DashboardPrivateRoutePage>
   ),
-  agencyDashboardSynchronisedConventions: (route) => (
-    <DashboardPrivateRoutePage route={route}>
-      <AgencyDashboardMainTab route={route} />
-    </DashboardPrivateRoutePage>
-  ),
   agencyDashboardAgencies: (route) => (
     <DashboardPrivateRoutePage route={route}>
       <AgencyDashboardMainTab route={route} />
