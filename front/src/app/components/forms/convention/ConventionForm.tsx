@@ -57,6 +57,7 @@ import {
   toConventionTemplate,
   type UserWithRights,
   undefinedIfEmptyString,
+  type WithFirstnameAndLastname,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -157,10 +158,7 @@ const getInitialAgencyReferentName = ({
 }: {
   federatedIdentity: FederatedIdentityWithUser | null | undefined;
   currentUser: ConnectedUser | null;
-}): {
-  firstname: string;
-  lastname: string;
-} => {
+}): WithFirstnameAndLastname => {
   const advisor = federatedIdentity?.payload?.advisor;
   if (advisor)
     return {
@@ -356,7 +354,6 @@ export const ConventionForm = ({
     fetchedConvention,
     conventionPresentationFromDraft,
     conventionPresentationFromConventionTemplate,
-    initialValues.agencyReferent,
     route,
   ]);
 
