@@ -1682,6 +1682,61 @@ Tél : ${beneficiaryPhone}`,
         l'équipe d'Immersion Facilitée`,
       }),
     },
+    ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS: {
+      niceName: "Espace entreprise - Entreprise - Entreprise bannie",
+      tags: ["template:etablissement banni", "acteur:entreprise"],
+      createEmailVariables: ({ businessName, siret }) => ({
+        subject: `Information concernant l'accès de ${businessName} à Immersion Facilitée`,
+        greetings: "Bonjour,",
+        content: `
+        Nous vous informons que votre établissement ${businessName} (SIRET : ${siret}) n'a plus accès aux services d'Immersion Facilitée.
+        
+        <strong>Ce qu'il faut savoir :</strong>
+        • Votre référencement sur notre site est supprimé.
+        • Vos candidatures et conventions en cours sont annulées.
+        • Vous ne pouvez plus créer de nouvelles conventions d’immersions.
+
+        <strong>Pourquoi cette décision ?</strong>
+        Cette mesure fait suite à des signalements concernant le non-respect des règles de l'immersion.
+
+        Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="https://aide.immersion-facile.beta.gouv.fr/fr/" >contacter notre support</a>.
+        `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
+    ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY: {
+      niceName: "Établissement - MER - Candidat - Entreprise bannie",
+      tags: ["template:etablissement banni", "acteur:candidat"],
+      createEmailVariables: ({
+        businessName,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        immersionBaseUrl,
+      }) => ({
+        subject: `Information concernant votre demande auprès de ${businessName}`,
+        greetings: `Bonjour${beneficiaryFirstName ? ` ${beneficiaryFirstName}` : ""}${beneficiaryLastName ? ` ${beneficiaryLastName}` : ""},`,
+        content: `
+        Vous avez une candidature ou une convention en cours avec l'entreprise ${businessName}.
+
+        Nous vous informons que cette demande ne peut pas continuer.
+
+        <strong>Ce qu'il faut savoir :</strong>
+          • L'entreprise ${businessName} n'est plus disponible sur notre site.
+          • Votre candidature ou votre convention est donc annulée.
+
+        <strong>Si vous voulez toujours faire une immersion, vous pouvez :</strong>
+          • Rechercher d'autres immersions sur notre site.
+          • Contacter votre conseiller pour vous aider dans vos recherches.
+        `,
+        buttons: [
+          {
+            label: "Voir les offres d'immersion",
+            url: `${immersionBaseUrl}/${frontRoutes.search}`,
+          },
+        ],
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     ESTABLISHMENT_LEAD_REMINDER: {
       niceName: "Establishment Lead - Premier rappel d'inscription",
       tags: [

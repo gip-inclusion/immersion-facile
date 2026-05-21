@@ -789,6 +789,10 @@ export const errors = {
       ),
     bannedEstablishment: ({ siret }: { siret: SiretDto }) =>
       new ForbiddenError(`L'entreprise avec le siret '${siret}' est bannie`),
+    establishmentNotBanned: ({ siret }: { siret: SiretDto }) =>
+      new BadRequestError(
+        `L'entreprise avec le siret '${siret}' n'est pas bannie`,
+      ),
   },
   establishmentLead: {
     notFound: ({ siret }: { siret: SiretDto }) =>
