@@ -163,7 +163,7 @@ describe("Query: List agencies by filter", () => {
       );
     });
 
-    it("limits agency options by default", async () => {
+    it("returns all agencies when no limit is provided", async () => {
       const uow = createInMemoryUow();
       listAgencyOptionsByFilter = makeListAgencyOptionsByFilter({
         uowPerformer: new InMemoryUowPerformer(uow),
@@ -182,10 +182,7 @@ describe("Query: List agencies by filter", () => {
 
       const result = await listAgencyOptionsByFilter.execute({}, undefined);
 
-      expectToEqual(
-        result,
-        agencies.slice(0, maxAgencyOptionsPerRequest).map(toAgencyOption),
-      );
+      expectToEqual(result, agencies.map(toAgencyOption));
     });
 
     it("uses requested limit when provided", async () => {
