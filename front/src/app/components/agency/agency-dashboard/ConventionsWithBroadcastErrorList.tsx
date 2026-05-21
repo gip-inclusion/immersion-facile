@@ -26,6 +26,7 @@ import {
   isFunctionalBroadcastFeedbackError,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
 } from "shared";
+import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import {
   broadcastFeedbackErrorMessageMap,
   franceTravailTemporaryNetworkErrorBroadcastFeedback,
@@ -250,6 +251,9 @@ export const ConventionsWithBroadcastErrorList = ({
       activeAgencyStatuses.includes(agencyRight.agency.status),
   );
 
+  const erroredConventionsDashboardUrl =
+    currentUser?.dashboards.agencies.erroredConventionsDashboardUrl;
+
   return (
     <HeadingSection
       title={title}
@@ -302,71 +306,87 @@ export const ConventionsWithBroadcastErrorList = ({
           event.preventDefault();
           onSubmit();
         }}
-        className={fr.cx("fr-grid-row", "fr-mb-4w")}
+        className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-4w")}
       >
-        <RichDropdown
-          id="broadcast-error-kind"
-          iconId="fr-icon-error-warning-line"
-          defaultValue="Tous les types d'erreurs"
-          className={fr.cx("fr-mr-2w")}
-          values={[
-            tempFilters.broadcastErrorKind === "functional"
-              ? "Type : Erreurs fonctionnelles"
-              : tempFilters.broadcastErrorKind === "technical"
-                ? "Type : Erreurs techniques"
-                : "Tous les types d'erreurs",
-          ]}
-          submenu={{
-            title: "Filtrer par type d'erreur",
-            content: <RadioButtons options={broadcastErrorKindOptions} />,
-          }}
-          onReset={() => {
-            const newFilters = {
-              ...tempFilters,
-              broadcastErrorKind: undefined,
-            };
-            setTempFilters(newFilters);
-            onSubmit(newFilters, searchValue || undefined);
-          }}
-          as="Tag"
-        />
-        <RichDropdown
-          id="convention-status"
-          iconId="fr-icon-equalizer-line"
-          className={fr.cx("fr-mr-2w")}
-          defaultValue="Tous les statuts"
-          values={
-            filters.conventionStatus?.length &&
-            filters.conventionStatus.length !== conventionStatuses.length
-              ? [
-                  `${
-                    filters.conventionStatus.length > 1 ? "Statuts" : "Statut :"
-                  }  ${
-                    filters.conventionStatus.length > 1
-                      ? `(${filters.conventionStatus.length})`
-                      : filters.conventionStatus
-                          .map(
-                            (status) => labelAndSeverityByStatus[status].label,
-                          )
-                          .join(", ")
-                  }`,
-                ]
-              : ["Tous les statuts"]
-          }
-          submenu={{
-            title: "Filtrer par statut",
-            content: <Checkbox options={statusOptions} />,
-          }}
-          onReset={() => {
-            const newFilters = {
-              ...tempFilters,
-              conventionStatus: undefined,
-            };
-            setTempFilters(newFilters);
-            onSubmit(newFilters, searchValue || undefined);
-          }}
-          as="Tag"
-        />
+        <div className={fr.cx("fr-col")}>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
+            <RichDropdown
+              id="broadcast-error-kind"
+              iconId="fr-icon-error-warning-line"
+              defaultValue="Tous les types d'erreurs"
+              className={fr.cx("fr-mr-2w")}
+              values={[
+                tempFilters.broadcastErrorKind === "functional"
+                  ? "Type : Erreurs fonctionnelles"
+                  : tempFilters.broadcastErrorKind === "technical"
+                    ? "Type : Erreurs techniques"
+                    : "Tous les types d'erreurs",
+              ]}
+              submenu={{
+                title: "Filtrer par type d'erreur",
+                content: <RadioButtons options={broadcastErrorKindOptions} />,
+              }}
+              onReset={() => {
+                const newFilters = {
+                  ...tempFilters,
+                  broadcastErrorKind: undefined,
+                };
+                setTempFilters(newFilters);
+                onSubmit(newFilters, searchValue || undefined);
+              }}
+              as="Tag"
+            />
+            <RichDropdown
+              id="convention-status"
+              iconId="fr-icon-equalizer-line"
+              className={fr.cx("fr-mr-2w")}
+              defaultValue="Tous les statuts"
+              values={
+                filters.conventionStatus?.length &&
+                filters.conventionStatus.length !== conventionStatuses.length
+                  ? [
+                      `${
+                        filters.conventionStatus.length > 1
+                          ? "Statuts"
+                          : "Statut :"
+                      }  ${
+                        filters.conventionStatus.length > 1
+                          ? `(${filters.conventionStatus.length})`
+                          : filters.conventionStatus
+                              .map(
+                                (status) =>
+                                  labelAndSeverityByStatus[status].label,
+                              )
+                              .join(", ")
+                      }`,
+                    ]
+                  : ["Tous les statuts"]
+              }
+              submenu={{
+                title: "Filtrer par statut",
+                content: <Checkbox options={statusOptions} />,
+              }}
+              onReset={() => {
+                const newFilters = {
+                  ...tempFilters,
+                  conventionStatus: undefined,
+                };
+                setTempFilters(newFilters);
+                onSubmit(newFilters, searchValue || undefined);
+              }}
+              as="Tag"
+            />
+          </div>
+        </div>
+        {erroredConventionsDashboardUrl && (
+          <div className={fr.cx("fr-ml-auto", "fr-col--middle")}>
+            <MetabaseFullScreenButton
+              url={erroredConventionsDashboardUrl}
+              label="Télécharger les données (Excel/CSV)"
+              tooltipText="L'export se fait depuis l'ancien tableau Metabase."
+            />
+          </div>
+        )}
       </form>
       {conventionsWithBroadcastFeedback.length === 0 && (
         <p>
