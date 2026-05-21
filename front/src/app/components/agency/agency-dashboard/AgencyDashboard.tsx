@@ -6,7 +6,6 @@ import {
   type AgencyRight,
   activeAgencyStatuses,
   type ConnectedUser,
-  type ConnectedUserJwt,
   domElementIds,
   type WithDashboards,
 } from "shared";
@@ -25,16 +24,13 @@ import { connectedUserSelectors } from "src/core-logic/domain/connected-user/con
 import { MetabaseView } from "../../MetabaseView";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";
 import { ConventionTabContent } from "./tabs/ConventionTabContent";
-import { ErroredConventionTabContent } from "./tabs/ErroredConventionTabContent";
 
 export const AgencyDashboard = ({
   route,
-  connectedUserJwt,
   activeAgencyRights,
   dashboards,
 }: {
   route: FrontAgencyDashboardRoute;
-  connectedUserJwt: ConnectedUserJwt | undefined;
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): JSX.Element => {
   const currentTab = route.name;
@@ -49,7 +45,6 @@ export const AgencyDashboard = ({
   const agencyTabs = rawAgencyDashboardTabs({
     activeAgencyRights,
     dashboards,
-    connectedUserJwt,
     currentUser,
   });
 
@@ -102,10 +97,8 @@ export const AgencyDashboard = ({
 const rawAgencyDashboardTabs = ({
   dashboards,
   activeAgencyRights,
-  connectedUserJwt,
   currentUser,
 }: {
-  connectedUserJwt?: ConnectedUserJwt;
   activeAgencyRights: AgencyRight[];
   currentUser: ConnectedUser;
 } & WithDashboards): DashboardTab[] => {
@@ -121,22 +114,6 @@ const rawAgencyDashboardTabs = ({
             label: "Tableau de bord",
             content: (
               <ConventionTabContent activeAgencies={agenciesWithActiveStatus} />
-            ),
-          },
-        ]
-      : []),
-    ...(dashboards.agencies.erroredConventionsDashboardUrl
-      ? [
-          {
-            tabId:
-              "agencyDashboardSynchronisedConventions" satisfies AgencyDashboardRouteName,
-            label: "Conventions synchronisées",
-            content: (
-              <ErroredConventionTabContent
-                activeAgencyRights={activeAgencyRights}
-                connectedUserJwt={connectedUserJwt}
-                dashboards={dashboards}
-              />
             ),
           },
         ]

@@ -11,7 +11,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { match, P } from "ts-pattern";
@@ -26,7 +25,6 @@ export const AgencyDashboardMainTab = ({
   const dispatch = useDispatch();
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const isLoading = useAppSelector(connectedUserSelectors.isLoading);
-  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const feedbackTopic: FeedbackTopic = "dashboard-agency-register-user";
 
@@ -112,7 +110,6 @@ export const AgencyDashboardMainTab = ({
                 route={route}
                 activeAgencyRights={activeAgencyRights}
                 dashboards={currentUser.dashboards}
-                connectedUserJwt={connectedUserJwt}
               />
             ) : (
               <NoActiveAgencyRights
