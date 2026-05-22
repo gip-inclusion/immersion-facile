@@ -235,7 +235,10 @@ const getPostcodeFromAliases = (
 const getStreetNumberFromAliases = (
   components: OpenCageDataAddressComponents,
 ): string | undefined =>
-  components.house_number ?? components.housenumber ?? components.street_number;
+  components.house_number ??
+  components.housenumber ??
+  components.street_number ??
+  components.farmyard;
 
 const getStreetNameFromAliases = (
   components: OpenCageDataAddressComponents,
