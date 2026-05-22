@@ -84,10 +84,6 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       sort: { by: inputParams.sortBy, direction: inputParams.sortOrder },
     });
 
-    const filteredResults = result.data.filter(
-      (offer) => !bannedSirets.has(offer.siret),
-    );
-
     const searchMadeCommon: SearchMadeCommon = {
       appellationCodes,
       departmentCodes,
@@ -110,17 +106,11 @@ export const makeGetOffers = useCaseBuilder("GetOffers")
       ...searchMade,
       id: deps.uuidGenerator.new(),
       needsToBeSearched: true, // this is useless (legacy TODO : remove this column)
-      numberOfResults: filteredResults.length,
+      numberOfResults: result.data.length,
       apiConsumerName: apiConsumer?.name,
     });
 
-    return {
-      data: filteredResults,
-      pagination: {
-        ...result.pagination,
-        totalRecords: filteredResults.length,
-      },
-    };
+    return result;
   });
 
 const getValidatedGeoParams = (
