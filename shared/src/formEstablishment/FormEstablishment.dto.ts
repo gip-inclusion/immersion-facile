@@ -17,6 +17,7 @@ import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndApp
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
+import type { Firstname, Lastname } from "../user/user.dto";
 import type { OmitFromExistingKeys } from "../utils";
 import type { DateTimeIsoString } from "../utils/date";
 
@@ -37,6 +38,8 @@ export type EstablishmentUserRightStatus =
   (typeof establishmentUserRightStatuses)[number];
 
 type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
+  firstName?: Firstname;
+  lastName?: Lastname;
   email: Email;
   role: Role;
   status: EstablishmentUserRightStatus;

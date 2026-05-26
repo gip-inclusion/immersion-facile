@@ -373,6 +373,8 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
             role: "establishment-admin",
             status: "ACCEPTED",
             email: "admin@mail.com",
+            firstName: adminUser.firstName,
+            lastName: adminUser.lastName,
             job: adminUserRight.job,
             phone: adminUserRight.phone,
             shouldReceiveDiscussionNotifications:
@@ -381,6 +383,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           },
           {
             email: "contact@email.com",
+            firstName:
+              establishmentContactWithPhoneButMainContactBuPhoneUndefined.firstName,
+            lastName:
+              establishmentContactWithPhoneButMainContactBuPhoneUndefined.lastName,
             job: establishmentContactWithPhoneRight.job,
             role: "establishment-contact",
             status: "ACCEPTED",
@@ -429,6 +435,92 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         }),
       );
     });
+
+    it("populates firstName and lastName from user when they exist", async () => {
+      const adminWithNames = new UserBuilder()
+        .withId("admin-id")
+        .withEmail("admin@mail.com")
+        .withFirstName("Jean")
+        .withLastName("Dupont")
+        .build();
+      const contactWithNames = new UserBuilder()
+        .withId("contact-id")
+        .withEmail("contact@email.com")
+        .withFirstName("Marie")
+        .withLastName("Martin")
+        .build();
+
+      uow.userRepository.users = [adminWithNames, contactWithNames, adminUser];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: adminWithNames.id,
+      });
+
+      expectToEqual(establishmentForm.userRights, [
+        {
+          role: "establishment-admin",
+          status: "ACCEPTED",
+          email: "admin@mail.com",
+          firstName: "Jean",
+          lastName: "Dupont",
+          job,
+          phone,
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          status: "ACCEPTED",
+          email: "contact@email.com",
+          firstName: "Marie",
+          lastName: "Martin",
+          shouldReceiveDiscussionNotifications: true,
+        },
+      ]);
+    });
+
+    it("does not populate firstName and lastName when user has empty names", async () => {
+      const adminWithoutNames = new UserBuilder()
+        .withId("admin-id")
+        .withEmail("admin@mail.com")
+        .withFirstName("")
+        .withLastName("")
+        .build();
+      const contactWithoutNames = new UserBuilder()
+        .withId("contact-id")
+        .withEmail("contact@email.com")
+        .withFirstName("")
+        .withLastName("")
+        .build();
+
+      uow.userRepository.users = [
+        adminWithoutNames,
+        contactWithoutNames,
+        adminUser,
+      ];
+
+      const establishmentForm = await useCase.execute(siret, {
+        userId: adminWithoutNames.id,
+      });
+
+      expectToEqual(establishmentForm.userRights, [
+        {
+          role: "establishment-admin",
+          status: "ACCEPTED",
+          email: "admin@mail.com",
+          job,
+          phone,
+          shouldReceiveDiscussionNotifications: true,
+          isMainContactByPhone: false,
+        },
+        {
+          role: "establishment-contact",
+          status: "ACCEPTED",
+          email: "contact@email.com",
+          shouldReceiveDiscussionNotifications: true,
+        },
+      ]);
+    });
   });
 });
 
@@ -471,6 +563,12 @@ const makeExpectedFormEstablishment = ({
       role: "establishment-admin",
       status: "ACCEPTED",
       email: establishmentAdmin.email,
+      ...(establishmentAdmin.firstName
+        ? { firstName: establishmentAdmin.firstName }
+        : {}),
+      ...(establishmentAdmin.lastName
+        ? { lastName: establishmentAdmin.lastName }
+        : {}),
       job,
       phone,
       shouldReceiveDiscussionNotifications: true,
@@ -480,6 +578,12 @@ const makeExpectedFormEstablishment = ({
       role: "establishment-contact",
       status: "ACCEPTED",
       email: establishmentContact.email,
+      ...(establishmentContact.firstName
+        ? { firstName: establishmentContact.firstName }
+        : {}),
+      ...(establishmentContact.lastName
+        ? { lastName: establishmentContact.lastName }
+        : {}),
       shouldReceiveDiscussionNotifications: true,
     },
   ],
