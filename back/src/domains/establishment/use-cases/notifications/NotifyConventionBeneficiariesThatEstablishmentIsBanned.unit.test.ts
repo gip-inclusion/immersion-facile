@@ -110,7 +110,7 @@ describe("NotifyConventionBeneficiariesThatEstablishmentIsBanned", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           saveNotificationAndRelatedEvent,
-          immersionBaseUrl: "https://immersion-facile.beta.gouv.fr/recherche",
+          immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
         },
       });
     uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -196,8 +196,7 @@ describe("NotifyConventionBeneficiariesThatEstablishmentIsBanned", () => {
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              immersionBaseUrl:
-                "https://immersion-facile.beta.gouv.fr/recherche",
+              immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
             },
           },
         ],
@@ -207,6 +206,7 @@ describe("NotifyConventionBeneficiariesThatEstablishmentIsBanned", () => {
     it("notifies only beneficiaries with conventions in affected statuses", async () => {
       uow.conventionRepository.setConventions([
         readyToSignConvention,
+        partiallySignedConvention,
         validatedConvention,
       ]);
 
@@ -225,8 +225,21 @@ describe("NotifyConventionBeneficiariesThatEstablishmentIsBanned", () => {
                 readyToSignConvention.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 readyToSignConvention.signatories.beneficiary.lastName,
-              immersionBaseUrl:
-                "https://immersion-facile.beta.gouv.fr/recherche",
+              immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
+            },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY",
+            recipients: [
+              partiallySignedConvention.signatories.beneficiary.email,
+            ],
+            params: {
+              businessName: bannedEstablishmentAggregate.establishment.name,
+              beneficiaryFirstName:
+                partiallySignedConvention.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                partiallySignedConvention.signatories.beneficiary.lastName,
+              immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
             },
           },
         ],

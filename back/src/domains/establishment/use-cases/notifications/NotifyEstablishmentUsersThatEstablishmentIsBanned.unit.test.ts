@@ -36,6 +36,11 @@ describe("NotifyEstablishmentUsersThatEstablishmentIsBanned", () => {
     .withEmail("contact@company.com")
     .build();
 
+  const anotherContactUser = new UserBuilder()
+    .withId("another-contact-id")
+    .withEmail("another.contact@company.com")
+    .build();
+
   const bannedEstablishmentAggregate = new EstablishmentAggregateBuilder()
     .withUserRights([
       {
@@ -55,6 +60,35 @@ describe("NotifyEstablishmentUsersThatEstablishmentIsBanned", () => {
         isMainContactByPhone: false,
         job: "HR",
         phone: "0600000001",
+      },
+      {
+        role: "establishment-contact",
+        userId: anotherContactUser.id,
+        status: "PENDING",
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
+        job: "Manager",
+        phone: "0600000002",
+      },
+    ])
+    .withBannishmentInformations({
+      isEstablishmentBanned: true,
+      establishmentBannishmentJustification:
+        "Ils font de la pêche à pied intensive",
+    })
+    .build();
+
+  const bannedEstablishmentAggregate2 = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("22222222222222")
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        userId: adminUser.id,
+        status: "ACCEPTED",
+        shouldReceiveDiscussionNotifications: true,
+        isMainContactByPhone: false,
+        job: "CEO",
+        phone: "0600000000",
       },
     ])
     .withBannishmentInformations({
@@ -80,7 +114,7 @@ describe("NotifyEstablishmentUsersThatEstablishmentIsBanned", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: { saveNotificationAndRelatedEvent },
       });
-    uow.userRepository.users = [adminUser, contactUser];
+    uow.userRepository.users = [adminUser, contactUser, anotherContactUser];
   });
 
   describe("Wrong path", () => {
@@ -121,10 +155,11 @@ describe("NotifyEstablishmentUsersThatEstablishmentIsBanned", () => {
     beforeEach(() => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         bannedEstablishmentAggregate,
+        bannedEstablishmentAggregate2,
       ];
     });
 
-    it("sends emails to admin and contact users", async () => {
+    it("sends emails to accepted admin and contact users of the correct banned establishment", async () => {
       await notifyEstablishmentUsersThatEstablishmentIsBanned.execute({
         siret: bannedEstablishmentAggregate.establishment.siret,
       });
@@ -142,42 +177,6 @@ describe("NotifyEstablishmentUsersThatEstablishmentIsBanned", () => {
           {
             kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
             recipients: [contactUser.email],
-            params: {
-              businessName: bannedEstablishmentAggregate.establishment.name,
-              siret: bannedEstablishmentAggregate.establishment.siret,
-            },
-          },
-        ],
-      });
-    });
-
-    it("sends only admin emails when establishment has no contacts", async () => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        {
-          ...bannedEstablishmentAggregate,
-          userRights: [
-            {
-              role: "establishment-admin" as const,
-              userId: adminUser.id,
-              status: "ACCEPTED" as const,
-              shouldReceiveDiscussionNotifications: true,
-              isMainContactByPhone: false,
-              job: "CEO",
-              phone: "0600000000",
-            },
-          ],
-        },
-      ];
-
-      await notifyEstablishmentUsersThatEstablishmentIsBanned.execute({
-        siret: bannedEstablishmentAggregate.establishment.siret,
-      });
-
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
-            recipients: [adminUser.email],
             params: {
               businessName: bannedEstablishmentAggregate.establishment.name,
               siret: bannedEstablishmentAggregate.establishment.siret,
