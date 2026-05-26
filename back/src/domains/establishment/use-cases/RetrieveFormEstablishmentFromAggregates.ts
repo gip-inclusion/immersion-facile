@@ -5,6 +5,7 @@ import {
   errors,
   type FormEstablishmentDto,
   type FormEstablishmentUserRight,
+  populatePropIfDefined,
   type SiretDto,
   siretSchema,
 } from "shared";
@@ -129,11 +130,17 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         const user = users.find(({ id }) => id === userId);
         if (!user) throw errors.user.notFound({ userId });
 
+        const nameProps = {
+          ...populatePropIfDefined("firstName", user.firstName || undefined),
+          ...populatePropIfDefined("lastName", user.lastName || undefined),
+        };
+
         if (role === "establishment-admin") {
           return {
             role,
             status,
             email: user.email,
+            ...nameProps,
             job,
             phone,
             shouldReceiveDiscussionNotifications,
@@ -146,6 +153,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
           role,
           status,
           email: user.email,
+          ...nameProps,
           job,
           phone,
           shouldReceiveDiscussionNotifications,
