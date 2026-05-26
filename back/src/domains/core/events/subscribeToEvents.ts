@@ -218,6 +218,7 @@ const getUseCasesByTopics = (
   EstablishmentBanned: [
     useCases.notifyEstablishmentUsersThatEstablishmentIsBanned,
     useCases.notifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned,
+    useCases.notifyConventionPotentialBeneficiariesThatEstablishmentIsBanned,
   ],
   EstablishmentDeleted: [],
   PendingUserRightRegisteredOnEstablishment: [
