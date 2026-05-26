@@ -1692,11 +1692,13 @@ Tél : ${beneficiaryPhone}`,
         Nous vous informons que votre établissement ${businessName} (SIRET : ${siret}) n'a plus accès aux services d'Immersion Facilitée.
         
         <strong>Ce qu'il faut savoir :</strong>
+
         • Votre référencement sur notre site est supprimé.
         • Vos candidatures et conventions en cours sont annulées.
         • Vous ne pouvez plus créer de nouvelles conventions d’immersions.
 
         <strong>Pourquoi cette décision ?</strong>
+        
         Cette mesure fait suite à des signalements concernant le non-respect des règles de l'immersion.
 
         Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="https://aide.immersion-facile.beta.gouv.fr/fr/" >contacter notre support</a>.
@@ -1718,13 +1720,17 @@ Tél : ${beneficiaryPhone}`,
         content: `
         Vous avez une candidature ou une convention en cours avec l'entreprise ${businessName}.
 
-        Nous vous informons que cette demande ne peut pas continuer.
+        Nous vous informons que cette entreprise a été bannie de notre site car elle ne respectait pas la législation en matière d'immersion. Par conséquent, votre démarche ne peut pas continuer.
 
-        <strong>Ce qu'il faut savoir :</strong>
-          • L'entreprise ${businessName} n'est plus disponible sur notre site.
-          • Votre candidature ou votre convention est donc annulée.
+        <strong>Ce que cela implique pour vous :</strong>
 
-        <strong>Si vous voulez toujours faire une immersion, vous pouvez :</strong>
+          • <strong>Si vous aviez une candidature en cours :</strong> Celle-ci est désormais suspendue. Vous ne pouvez plus échanger avec cette entreprise..
+          • <strong>Si vous aviez une convention en cours :</strong> Veuillez contacter rapidement votre conseiller pour procéder à son annulation.
+
+        <strong>Comment rebondir ?</strong>
+        
+        Ne vous découragez pas ! De nombreuses autres entreprises sont prêtes à vous accueillir. Si vous souhaitez toujours réaliser une immersion, vous pouvez :
+
           • Rechercher d'autres immersions sur notre site.
           • Contacter votre conseiller pour vous aider dans vos recherches.
         `,
