@@ -1684,7 +1684,14 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS: {
       niceName: "Espace entreprise - Entreprise - Entreprise bannie",
-      tags: ["template:etablissement banni", "acteur:entreprise"],
+      tags: [
+        "template:etablissement banni",
+        "acteur:entreprise",
+        "theme:espaceEntreprise",
+        "role:admin",
+        "role:contact",
+        "theme:entrepriseBannie",
+      ],
       createEmailVariables: ({ businessName, siret }) => ({
         subject: `Information concernant l'accès de ${businessName} à Immersion Facilitée`,
         greetings: "Bonjour,",
@@ -1698,7 +1705,7 @@ Tél : ${beneficiaryPhone}`,
         • Vous ne pouvez plus créer de nouvelles conventions d’immersions.
 
         <strong>Pourquoi cette décision ?</strong>
-        
+
         Cette mesure fait suite à des signalements concernant le non-respect des règles de l'immersion.
 
         Si vous estimez qu'il s'agit d'une erreur, vous pouvez <a href="https://aide.immersion-facile.beta.gouv.fr/fr/" >contacter notre support</a>.
@@ -1708,7 +1715,13 @@ Tél : ${beneficiaryPhone}`,
     },
     ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY: {
       niceName: "Établissement - MER - Candidat - Entreprise bannie",
-      tags: ["template:etablissement banni", "acteur:candidat"],
+      tags: [
+        "template:etablissement banni",
+        "theme:MER",
+        "acteur:candidat",
+        "role:beneficiaire",
+        "theme:entrepriseBannie",
+      ],
       createEmailVariables: ({
         businessName,
         beneficiaryFirstName,

@@ -23,7 +23,8 @@ type Theme =
   | "acquisitionEntreprise"
   | "MER"
   | "bilan"
-  | "convention";
+  | "convention"
+  | "entrepriseBannie";
 type ThemeTag = `theme:${Theme}`;
 
 type Actor = "candidat" | "prescripteur" | "entreprise";
