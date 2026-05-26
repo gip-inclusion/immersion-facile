@@ -13,6 +13,7 @@
     "db:redo": "pnpm db:migrate redo",
     "db:seed": "ts-node src/scripts/seed.ts",
     "db:seed:bun": "bun src/scripts/seed.ts",
+    "backfill-broadcast-feedback-ids": "ts-node src/scripts/backfillBroadcastFeedbackIds.ts",
     "db:up": "pnpm db:migrate up",
     "deadcode": "ts-prune --ignore 'src/config/pg/migrations'",
     "dev": "NODE_ENV=local ts-node-dev src/scripts/startServer.ts",

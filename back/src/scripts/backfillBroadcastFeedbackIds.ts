@@ -9,23 +9,39 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-const batchSize = 10_000;
+const defaultBatchSize = 10_000;
+const uuidRegexp =
+  "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
 
-const parseMaxBatchesPerPhase = (raw: string | undefined): number => {
-  if (!raw) return Number.POSITIVE_INFINITY;
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0)
-    throw new Error(
-      `Invalid BACKFILL_MAX_BATCHES_PER_PHASE=${raw} (expected a positive integer)`,
-    );
-  return parsed;
+type BackfillBroadcastFeedbackIdsOptions = {
+  batchSize?: number;
+  maxBatchesPerPhase?: number;
 };
 
-const maxBatchesPerPhase = parseMaxBatchesPerPhase(
-  process.env.BACKFILL_MAX_BATCHES_PER_PHASE,
-);
+type BackfillBroadcastFeedbackIdsResult = {
+  totalConventionIdUpdated: number;
+  totalAgencyIdUpdated: number;
+  remainingOrphanAgencyIds: number;
+  invalidLegacyConventionIds: number;
+  conventionIdStoppedByMaxBatches: boolean;
+  agencyIdStoppedByMaxBatches: boolean;
+};
 
-const fillConventionIdBatch = async (kysely: KyselyDb): Promise<number> => {
+type BackfillPhase = "convention_id" | "agency_id";
+
+type BackfillPhaseResult = {
+  totalUpdated: number;
+  stoppedByMaxBatches: boolean;
+};
+
+const defaultMaxBatchesPerPhase =
+  config.backfillBroadcastFeedbackMaxBatchesPerPhase ??
+  Number.POSITIVE_INFINITY;
+
+const fillConventionIdBatch = async (
+  kysely: KyselyDb,
+  batchSize: number,
+): Promise<number> => {
   const res = await kysely
     .updateTable("broadcast_feedbacks")
     .set({
@@ -36,6 +52,7 @@ const fillConventionIdBatch = async (kysely: KyselyDb): Promise<number> => {
         SELECT id
         FROM broadcast_feedbacks
         WHERE convention_id IS NULL
+          AND request_params ->> 'conventionId' ~* ${uuidRegexp}
         ORDER BY id
         LIMIT ${batchSize}
       ))`,
@@ -44,7 +61,10 @@ const fillConventionIdBatch = async (kysely: KyselyDb): Promise<number> => {
   return Number(res.numUpdatedRows);
 };
 
-const fillAgencyIdBatch = async (kysely: KyselyDb): Promise<number> => {
+const fillAgencyIdBatch = async (
+  kysely: KyselyDb,
+  batchSize: number,
+): Promise<number> => {
   const res = await kysely
     .updateTable("broadcast_feedbacks")
     .from("conventions")
@@ -52,16 +72,49 @@ const fillAgencyIdBatch = async (kysely: KyselyDb): Promise<number> => {
     .whereRef("broadcast_feedbacks.convention_id", "=", "conventions.id")
     .where(
       sql<SqlBool>`broadcast_feedbacks.id = ANY(ARRAY(
-        SELECT id
-        FROM broadcast_feedbacks
-        WHERE agency_id IS NULL
-          AND convention_id IS NOT NULL
-        ORDER BY id
+        SELECT bf.id
+        FROM broadcast_feedbacks AS bf
+        INNER JOIN conventions AS c ON c.id = bf.convention_id
+        WHERE bf.agency_id IS NULL
+          AND bf.convention_id IS NOT NULL
+        ORDER BY bf.id
         LIMIT ${batchSize}
       ))`,
     )
     .executeTakeFirst();
   return Number(res.numUpdatedRows);
+};
+
+const runBackfillPhase = async ({
+  phase,
+  maxBatchesPerPhase,
+  updateNextBatch,
+}: {
+  phase: BackfillPhase;
+  maxBatchesPerPhase: number;
+  updateNextBatch: () => Promise<number>;
+}): Promise<BackfillPhaseResult> => {
+  let totalUpdated = 0;
+  let batchesRun = 0;
+  let lastBatchUpdatedRows = 1;
+
+  while (lastBatchUpdatedRows > 0 && batchesRun < maxBatchesPerPhase) {
+    lastBatchUpdatedRows = await updateNextBatch();
+    totalUpdated += lastBatchUpdatedRows;
+    batchesRun += 1;
+    logger.info({
+      message: JSON.stringify({
+        phase,
+        batchRows: lastBatchUpdatedRows,
+        totalSoFar: totalUpdated,
+      }),
+    });
+  }
+
+  return {
+    totalUpdated,
+    stoppedByMaxBatches: lastBatchUpdatedRows > 0,
+  };
 };
 
 const countRemainingOrphanAgencyIds = async (
@@ -72,58 +125,60 @@ const countRemainingOrphanAgencyIds = async (
     .select((eb) => eb.fn.countAll<string>().as("count"))
     .where("agency_id", "is", null)
     .where("convention_id", "is not", null)
+    .where(
+      sql<SqlBool>`NOT EXISTS (
+        SELECT 1
+        FROM conventions
+        WHERE conventions.id = broadcast_feedbacks.convention_id
+      )`,
+    )
     .executeTakeFirstOrThrow();
   return Number(row.count);
 };
 
-export const backfillBroadcastFeedbackIds = async (kysely: KyselyDb) => {
-  let totalConventionIdUpdated = 0;
-  let conventionIdBatches = 0;
-  for (;;) {
-    const n = await fillConventionIdBatch(kysely);
-    totalConventionIdUpdated += n;
-    conventionIdBatches += 1;
-    logger.info({
-      message: JSON.stringify({
-        phase: "convention_id",
-        batchRows: n,
-        totalSoFar: totalConventionIdUpdated,
-      }),
-    });
-    if (n === 0) break;
-    if (conventionIdBatches >= maxBatchesPerPhase) break;
-  }
+const countInvalidLegacyConventionIds = async (
+  kysely: KyselyDb,
+): Promise<number> => {
+  const row = await kysely
+    .selectFrom("broadcast_feedbacks")
+    .select((eb) => eb.fn.countAll<string>().as("count"))
+    .where("convention_id", "is", null)
+    .where(
+      sql<SqlBool>`COALESCE(request_params ->> 'conventionId', '') !~* ${uuidRegexp}`,
+    )
+    .executeTakeFirstOrThrow();
+  return Number(row.count);
+};
 
-  let totalAgencyIdUpdated = 0;
-  let agencyIdBatches = 0;
-  for (;;) {
-    const n = await fillAgencyIdBatch(kysely);
-    totalAgencyIdUpdated += n;
-    agencyIdBatches += 1;
-    logger.info({
-      message: JSON.stringify({
-        phase: "agency_id",
-        batchRows: n,
-        totalSoFar: totalAgencyIdUpdated,
-      }),
-    });
-    if (n === 0) break;
-    if (agencyIdBatches >= maxBatchesPerPhase) break;
-  }
-
-  const remainingOrphanAgencyIds = await countRemainingOrphanAgencyIds(kysely);
-  logger.info({
-    message: JSON.stringify({
-      phase: "summary",
-      remainingOrphanAgencyIds,
-    }),
+export const backfillBroadcastFeedbackIds = async (
+  kysely: KyselyDb,
+  {
+    batchSize = defaultBatchSize,
+    maxBatchesPerPhase = defaultMaxBatchesPerPhase,
+  }: BackfillBroadcastFeedbackIdsOptions = {},
+): Promise<BackfillBroadcastFeedbackIdsResult> => {
+  const conventionIdPhase = await runBackfillPhase({
+    phase: "convention_id",
+    maxBatchesPerPhase,
+    updateNextBatch: () => fillConventionIdBatch(kysely, batchSize),
   });
 
-  return {
-    totalConventionIdUpdated,
-    totalAgencyIdUpdated,
-    remainingOrphanAgencyIds,
+  const agencyIdPhase = await runBackfillPhase({
+    phase: "agency_id",
+    maxBatchesPerPhase,
+    updateNextBatch: () => fillAgencyIdBatch(kysely, batchSize),
+  });
+
+  const summary = {
+    totalConventionIdUpdated: conventionIdPhase.totalUpdated,
+    totalAgencyIdUpdated: agencyIdPhase.totalUpdated,
+    remainingOrphanAgencyIds: await countRemainingOrphanAgencyIds(kysely),
+    invalidLegacyConventionIds: await countInvalidLegacyConventionIds(kysely),
+    conventionIdStoppedByMaxBatches: conventionIdPhase.stoppedByMaxBatches,
+    agencyIdStoppedByMaxBatches: agencyIdPhase.stoppedByMaxBatches,
   };
+
+  return summary;
 };
 
 const runScript = async () => {
@@ -145,11 +200,17 @@ if (require.main === module) {
       totalConventionIdUpdated,
       totalAgencyIdUpdated,
       remainingOrphanAgencyIds,
+      invalidLegacyConventionIds,
+      conventionIdStoppedByMaxBatches,
+      agencyIdStoppedByMaxBatches,
     }) =>
       [
         `convention_id filled: ${totalConventionIdUpdated}`,
         `agency_id filled: ${totalAgencyIdUpdated}`,
         `remaining orphan agency_id (rows with convention_id but no matching convention): ${remainingOrphanAgencyIds}`,
+        `invalid legacy convention_id rows skipped: ${invalidLegacyConventionIds}`,
+        `convention_id phase stopped by max batches: ${conventionIdStoppedByMaxBatches}`,
+        `agency_id phase stopped by max batches: ${agencyIdStoppedByMaxBatches}`,
       ].join("\n"),
     logger,
   });

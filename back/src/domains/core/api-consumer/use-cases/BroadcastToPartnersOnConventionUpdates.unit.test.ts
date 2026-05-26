@@ -332,8 +332,6 @@ describe("Broadcast to partners on updated convention", () => {
     const errorResponse: SubscriberResponse = {
       title: "Partner subscription errored",
       callbackUrl: "http://fake.com",
-      conventionStatus: "ACCEPTED_BY_VALIDATOR",
-      conventionId: "lala",
       status: 200,
       subscriberErrorFeedback: { message: "ca va très mal" },
       body: { success: true },
@@ -353,8 +351,8 @@ describe("Broadcast to partners on updated convention", () => {
       occurredAt: now.toISOString(),
       requestParams: {
         callbackUrl: errorResponse.callbackUrl,
-        conventionId: errorResponse.conventionId,
-        conventionStatus: errorResponse.conventionStatus,
+        conventionId: convention1.id,
+        conventionStatus: convention1.status,
       },
       ...(errorResponse.status
         ? {
@@ -382,8 +380,6 @@ describe("Broadcast to partners on updated convention", () => {
     const successResponse: SubscriberResponse = {
       title: "Partner subscription notified successfully",
       callbackUrl: "http://fake.com",
-      conventionStatus: "ACCEPTED_BY_VALIDATOR",
-      conventionId: "lala",
       status: 200,
       body: { success: true },
     };
@@ -401,8 +397,8 @@ describe("Broadcast to partners on updated convention", () => {
       occurredAt: now.toISOString(),
       requestParams: {
         callbackUrl: successResponse.callbackUrl,
-        conventionId: successResponse.conventionId,
-        conventionStatus: successResponse.conventionStatus,
+        conventionId: convention1.id,
+        conventionStatus: convention1.status,
       },
       ...(successResponse.status
         ? {

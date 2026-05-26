@@ -37,18 +37,27 @@ const conventionBroadcastRequestParamsSchema: ZodSchemaWithInputMatchingOutput<C
     conventionStatus: z.enum(conventionStatuses).optional(),
   });
 
+const nonNullableBroadcastFeedbackSchema = z
+  .object({
+    serviceName: z.string(),
+    consumerId: apiConsumerIdSchema.nullable(),
+    consumerName: apiConsumerNameSchema,
+    conventionId: conventionIdSchema,
+    agencyId: agencyIdSchema,
+    subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
+    requestParams: conventionBroadcastRequestParamsSchema,
+    response: broadcastFeedbackResponseSchema.optional(),
+    occurredAt: dateTimeIsoStringSchema,
+    handledByAgency: z.boolean(),
+  })
+  .refine(
+    ({ conventionId, requestParams }) =>
+      conventionId === requestParams.conventionId,
+    {
+      message: "conventionId must match requestParams.conventionId",
+      path: ["requestParams", "conventionId"],
+    },
+  );
+
 export const broadcastFeedbackSchema: ZodSchemaWithInputMatchingOutput<ConventionLastBroadcastFeedbackResponse> =
-  z
-    .object({
-      serviceName: z.string(),
-      consumerId: apiConsumerIdSchema.nullable(),
-      consumerName: apiConsumerNameSchema,
-      conventionId: conventionIdSchema,
-      agencyId: agencyIdSchema.nullable(),
-      subscriberErrorFeedback: subscriberErrorFeedbackSchema.optional(),
-      requestParams: conventionBroadcastRequestParamsSchema,
-      response: broadcastFeedbackResponseSchema.optional(),
-      occurredAt: dateTimeIsoStringSchema,
-      handledByAgency: z.boolean(),
-    })
-    .nullable();
+  nonNullableBroadcastFeedbackSchema.nullable();

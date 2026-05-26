@@ -52,12 +52,17 @@ export class PgBroadcastFeedbacksRepository
 
     if (!result) return null;
 
+    const conventionId = (result.conventionId ??
+      result.requestParams.conventionId) as ConventionId;
+    const agencyId = result.agencyId ?? (await this.#getAgencyId(conventionId));
+
+    if (!agencyId) return null;
+
     return {
       consumerId: result.consumerId,
       consumerName: result.consumerName,
-      conventionId: (result.conventionId ??
-        result.requestParams.conventionId) as ConventionId,
-      agencyId: result.agencyId as AgencyId | null,
+      conventionId,
+      agencyId,
       handledByAgency: result.handledByAgency,
       occurredAt: result.occurredAt,
       requestParams: result.requestParams,
@@ -67,6 +72,16 @@ export class PgBroadcastFeedbacksRepository
         ? result.subscriberErrorFeedback
         : undefined,
     };
+  }
+
+  async #getAgencyId(conventionId: ConventionId): Promise<AgencyId | null> {
+    const convention = await this.transaction
+      .selectFrom("conventions")
+      .select("agency_id")
+      .where("id", "=", conventionId)
+      .executeTakeFirst();
+
+    return (convention?.agency_id ?? null) as AgencyId | null;
   }
 
   public async markPartnersErroredConventionAsHandled(
@@ -98,6 +113,9 @@ export class PgBroadcastFeedbacksRepository
       conventionId,
       agencyId,
     } = broadcastFeedback;
+
+    if (conventionId !== requestParams.conventionId)
+      throw new Error("Broadcast feedback convention ids must match");
 
     await this.transaction
       .insertInto("broadcast_feedbacks")
