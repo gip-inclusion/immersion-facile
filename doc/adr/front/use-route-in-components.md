@@ -22,7 +22,7 @@ Certains composants accèdent directement aux paramètres de route, créant un c
 Dans certains cas, les routes peuvent toujours être utilisées dans les composants :
 
 - Code legacy
-- Eviter le prop drilling (profondeur de 3 composants maxiumum)
+- Éviter le prop drilling (profondeur de 3 composants maximum)
 
 Dans ces cas, il est nécessaire d'utiliser l'utilitaire dédié (`useTypedRoute`) pour récupérer la route de manière typée, afin d'éviter les `as`.
 
