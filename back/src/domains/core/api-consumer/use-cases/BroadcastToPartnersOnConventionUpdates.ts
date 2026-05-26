@@ -250,8 +250,8 @@ const notifySubscriber = ({
         occurredAt: deps.timeGateway.now().toISOString(),
         requestParams: {
           callbackUrl: response.callbackUrl,
-          conventionId: response.conventionId,
-          conventionStatus: response.conventionStatus,
+          conventionId: convention.id,
+          conventionStatus: convention.status,
         },
         serviceName: broadcastToPartnersServiceName,
         ...(response.status
@@ -271,8 +271,8 @@ const notifySubscriber = ({
       occurredAt: deps.timeGateway.now().toISOString(),
       requestParams: {
         callbackUrl: response.callbackUrl,
-        conventionId: response.conventionId,
-        conventionStatus: response.conventionStatus,
+        conventionId: convention.id,
+        conventionStatus: convention.status,
       },
       ...(response.status
         ? { response: { httpStatus: response.status, body: response.body } }

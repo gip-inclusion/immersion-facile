@@ -16,8 +16,6 @@ export class InMemorySubscribersGateway implements SubscribersGateway {
   #simulatedResponse: SubscriberResponse = {
     title: "Partner subscription notified successfully",
     callbackUrl: "http://fake.com",
-    conventionStatus: "ACCEPTED_BY_VALIDATOR",
-    conventionId: "lala",
     status: 200,
     body: { success: true },
   };
@@ -31,6 +29,7 @@ export class InMemorySubscribersGateway implements SubscribersGateway {
     subscriptionParams: SubscriptionParams,
   ): Promise<SubscriberResponse> {
     this.#calls.push({ body, subscriptionParams });
+
     return this.#simulatedResponse;
   }
 

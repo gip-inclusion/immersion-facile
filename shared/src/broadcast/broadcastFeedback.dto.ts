@@ -28,7 +28,7 @@ export type BroadcastFeedback = {
   consumerId: ApiConsumerId | null;
   consumerName: ApiConsumerName;
   conventionId: ConventionId;
-  agencyId: AgencyId | null;
+  agencyId: AgencyId;
   subscriberErrorFeedback?: SubscriberErrorFeedback;
   requestParams: ConventionBroadcastRequestParams;
   response?: BroadcastFeedbackResponse;

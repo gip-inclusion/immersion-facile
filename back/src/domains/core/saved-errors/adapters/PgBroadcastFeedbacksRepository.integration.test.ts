@@ -1,11 +1,13 @@
 import axios, { isAxiosError } from "axios";
 import type { Pool } from "pg";
 import {
+  AgencyDtoBuilder,
   type AgencyId,
   type BroadcastFeedback,
   type BroadcastFeedbackResponse,
   broadcastFeedbackSchema,
   type ConventionBroadcastRequestParams,
+  ConventionDtoBuilder,
   type ConventionId,
   errors,
   expectObjectInArrayToMatch,
@@ -13,6 +15,7 @@ import {
   expectToEqual,
   type SubscriberErrorFeedback,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   cast,
   jsonBuildObject,
@@ -20,6 +23,11 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
+import { toAgencyWithRights } from "../../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../../utils/user";
+import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
+import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
+import { PgUserRepository } from "../../../core/authentication/connected-user/adapters/PgUserRepository";
 import { broadcastToFtServiceName } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
@@ -43,6 +51,10 @@ describe("PgBroadcastFeedbacksRepository", () => {
       kyselyDb,
     );
     await kyselyDb.deleteFrom("broadcast_feedbacks").execute();
+    await kyselyDb.deleteFrom("conventions").execute();
+    await kyselyDb.deleteFrom("actors").execute();
+    await kyselyDb.deleteFrom("users__agencies").execute();
+    await kyselyDb.deleteFrom("agencies").execute();
   });
 
   afterAll(async () => {
@@ -373,8 +385,22 @@ describe("PgBroadcastFeedbacksRepository", () => {
       expect(result).toBeNull();
     });
 
-    it("falls back to request_params.conventionId when convention_id column is null (legacy rows pre-backfill)", async () => {
+    it("falls back to legacy fields when columns are null (legacy rows pre-backfill)", async () => {
       const conventionId = someConventionId;
+      const agencyId = someAgencyId;
+      const validator = makeUniqueUserForTest(uuid());
+      await new PgUserRepository(kyselyDb).save(validator);
+      await new PgAgencyRepository(kyselyDb).insert(
+        toAgencyWithRights(new AgencyDtoBuilder().withId(agencyId).build(), {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await new PgConventionRepository(kyselyDb).save(
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(agencyId)
+          .build(),
+      );
 
       await kyselyDb
         .insertInto("broadcast_feedbacks")
@@ -398,7 +424,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
       expect(result).not.toBeNull();
       expectToEqual(result?.conventionId, conventionId);
-      expectToEqual(result?.agencyId, null);
+      expectToEqual(result?.agencyId, agencyId);
     });
 
     it("retrieve a broadcast feedback", async () => {

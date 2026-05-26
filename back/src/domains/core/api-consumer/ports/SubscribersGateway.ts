@@ -1,8 +1,6 @@
 import type {
   AbsoluteUrl,
-  ConventionId,
   ConventionReadDto,
-  ConventionStatus,
   SubscriberErrorFeedback,
   SubscriptionParams,
 } from "shared";
@@ -16,8 +14,6 @@ export type ConventionUpdatedSubscriptionCallbackBody = {
 
 type NotifyResponseCommon = {
   callbackUrl: AbsoluteUrl;
-  conventionId: ConventionId;
-  conventionStatus: ConventionStatus;
   status: number | undefined;
   body: unknown;
 };

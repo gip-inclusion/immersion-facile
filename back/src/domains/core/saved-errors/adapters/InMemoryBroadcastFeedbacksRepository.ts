@@ -45,6 +45,12 @@ export class InMemoryBroadcastFeedbacksRepository
   }
 
   public async save(broadcastFeedback: BroadcastFeedback): Promise<void> {
+    if (
+      broadcastFeedback.conventionId !==
+      broadcastFeedback.requestParams.conventionId
+    )
+      throw new Error("Broadcast feedback convention ids must match");
+
     this.#broadcastFeedbacks.push(broadcastFeedback);
   }
 

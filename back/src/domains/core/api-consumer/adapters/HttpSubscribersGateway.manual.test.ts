@@ -64,8 +64,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: conventionReadDto.id,
-      conventionStatus: conventionReadDto.status,
       callbackUrl,
       status: 201,
       title: "Partner subscription notified successfully",
@@ -84,8 +82,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: conventionReadDto.id,
-      conventionStatus: conventionReadDto.status,
       callbackUrl,
       status: undefined,
       title: "Partner subscription errored",
@@ -108,8 +104,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: conventionReadDto.id,
-      conventionStatus: conventionReadDto.status,
       callbackUrl,
       status: 500,
       title: "Partner subscription errored",
@@ -132,8 +126,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: conventionReadDto.id,
-      conventionStatus: conventionReadDto.status,
       callbackUrl,
       status: 500,
       title: "Partner subscription errored",
@@ -156,8 +148,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: subscriptionBody.payload.convention.id,
-      conventionStatus: subscriptionBody.payload.convention.status,
       callbackUrl,
       status: 500,
       title: "Partner subscription errored",
@@ -180,8 +170,6 @@ describe("HttpSubscribersGateway", () => {
     );
 
     expectToEqual(response, {
-      conventionId: subscriptionBody.payload.convention.id,
-      conventionStatus: subscriptionBody.payload.convention.status,
       callbackUrl,
       status: 500,
       title: "Partner subscription errored",

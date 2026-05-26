@@ -84,6 +84,18 @@ describe("GetLastBroadcastFeedback", () => {
       expectToEqual(result, sampleBroadcastFeedback);
     });
 
+    it("rejects broadcast feedbacks with inconsistent convention ids", () => {
+      const parseResult = broadcastFeedbackSchema.safeParse({
+        ...sampleBroadcastFeedback,
+        requestParams: {
+          ...sampleBroadcastFeedback.requestParams,
+          conventionId: "11111111-1111-4111-8111-111111111111",
+        },
+      });
+
+      expect(parseResult.success).toBe(false);
+    });
+
     it("should return null when no broadcast feedback exists", async () => {
       const result = await getLastBroadcastFeedback.execute(
         convention.id,
