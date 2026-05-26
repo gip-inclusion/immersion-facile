@@ -15,11 +15,16 @@ Certains composants accèdent directement aux paramètres de route, créant un c
 ### 2026/05/05 - Consommation de la route dans les composants de page
 
 - Les composants de **page** sont responsables de consommer tout ce qui se rapporte à la route (params, query string, etc.) et de le transmettre aux composants enfants via les props.
-- Les composants réutilisables ne doivent **pas** dépendre de la route directement.
+- Si les composants réutilisables ne doivent idéalement pas dépendre de la route directement.
 
 ### Cas legacy ou contraignant
 
-Lorsque la migration est trop contraignante ou dans le code legacy, utiliser un utilitaire dédié (e.g.: `useTypedRoute`) pour récupérer la route de manière typée, afin d'éviter les `as`.
+Dans certains cas, les routes peuvent toujours être utilisées dans les composants :
+
+- Code legacy
+- Eviter le prop drilling (profondeur de 3 composants maxiumum)
+
+Dans ces cas, il est nécessaire d'utiliser l'utilitaire dédié (`useTypedRoute`) pour récupérer la route de manière typée, afin d'éviter les `as`.
 
 ## Consequences
 
