@@ -57,7 +57,15 @@ models:
         description: User's last name
       - name: user_full_name
         description: User's full name (first + last)
-      - name: roles
-        description: User roles at this agency (JSON)
+      - name: agency_admin
+        description: Whether user has the agency-admin role at this agency
+      - name: validator
+        description: Whether user has the validator role at this agency
+      - name: counsellor
+        description: Whether user has the counsellor role at this agency
+      - name: agency_viewer
+        description: Whether user has the agency-viewer role at this agency
+      - name: to_review
+        description: Whether user has the to-review role at this agency
       - name: is_notified_by_email
         description: Whether user receives email notifications
