@@ -319,7 +319,7 @@ export class AppConfig {
         this.proConnectGateway !== "HTTPS" ? "fake secret" : undefined,
       ),
       immersionRedirectUri: {
-        afterLogin: `${this.immersionFacileBaseUrl}/api${authRoutes.afterOAuthLogin.url}`,
+        afterLogin: `${this.immersionFacileBaseUrl}/api${authRoutes.afterProConnectOAuthLogin.url}`,
         afterLogout: this.immersionFacileBaseUrl,
       },
       providerBaseUri: this.#throwIfNotAbsoluteUrl(
