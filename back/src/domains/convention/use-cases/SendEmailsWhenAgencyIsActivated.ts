@@ -20,13 +20,13 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
   .withInput(withAgencyIdSchema)
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-    config: AppConfig;
+    immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
   }>()
   .build(
     async ({
       inputParams: { agencyId },
       uow,
-      deps: { saveNotificationAndRelatedEvent, config },
+      deps: { saveNotificationAndRelatedEvent, immersionFacileBaseUrl },
     }) => {
       const agency = await uow.agencyRepository.getById(agencyId);
       if (!agency) throw errors.agency.notFound({ agencyId });
@@ -54,7 +54,7 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
             agencyLogoUrl: agency.logoUrl ?? undefined,
             agencyReferdToName: agency.refersToAgencyName ?? undefined,
             refersToOtherAgency: !!agency.refersToAgencyId,
-            agencyDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.agencyDashboard}/dashboard`,
+            agencyDashboardUrl: `${immersionFacileBaseUrl}/${frontRoutes.agencyDashboard}/dashboard`,
           },
         },
         followedIds: {
