@@ -26,6 +26,7 @@ export type BroadcastConventionParams =
       eventType: "CONVENTION_UPDATED";
       convention: ConventionReadDto;
       previousAgencyId?: AgencyId;
+      assessment?: AssessmentDto;
     }
   | {
       eventType: "ASSESSMENT_CREATED";
@@ -39,6 +40,7 @@ export const broadcastConventionParamsSchema: z.ZodType<
       eventType: "CONVENTION_UPDATED";
       convention: ConventionReadDto;
       previousAgencyId?: AgencyId;
+      assessment?: AssessmentFormDto;
     }
   | {
       eventType: "ASSESSMENT_CREATED";
@@ -50,6 +52,7 @@ export const broadcastConventionParamsSchema: z.ZodType<
     eventType: z.literal("CONVENTION_UPDATED"),
     convention: conventionReadSchema,
     previousAgencyId: agencyIdSchema.optional(),
+    assessment: assessmentDtoSchema.optional(),
   }),
   z.object({
     eventType: z.literal("ASSESSMENT_CREATED"),

@@ -120,6 +120,7 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
         eventType: "CONVENTION_UPDATED",
         convention: conventionRead,
         previousAgencyId: params.previousAgencyId,
+        ...(assessmentDto ? { assessment: assessmentDto } : {}),
       });
     },
   };
