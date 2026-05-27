@@ -12,6 +12,7 @@ import {
   type PotentialBeneficiaryExchange,
 } from "shared";
 import { v4 as uuid } from "uuid";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -155,6 +156,7 @@ describe("SendExchangeToRecipient", () => {
           new UuidV4Generator(),
           timeGateway,
         ),
+        config: new AppConfigBuilder().build(),
       },
       uowPerformer: new InMemoryUowPerformer(uow),
     });
@@ -195,16 +197,19 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "establishment",
                 htmlContent: `
-                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
-                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. 
+                  Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
-                  </ul><br /></div>
+                  </ul><br />
+                  
+  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  
+                  </div>
             ${lastEstablishmentExchange.message}`,
                 subject: lastEstablishmentExchange.subject,
               },
@@ -282,16 +287,19 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "potentialBeneficiary",
                 htmlContent: `
-                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
-                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. 
+                  Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
-                  </ul><br /></div>
+                  </ul><br />
+                  
+  <a href="http://localhost/tableau-de-bord-etablissement?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  
+                  </div>
             ${lastBeneficiaryExchange.message}`,
                 subject: lastBeneficiaryExchange.subject,
               },
@@ -353,16 +361,19 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "establishment",
                 htmlContent: `
-                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
-                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. 
+                  Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
-                  </ul><br /></div>
+                  </ul><br />
+                  
+  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  
+                  </div>
             ${"--- pas de message ---"}`,
                 subject: lastEstablishmentExchange.subject,
               },
@@ -408,16 +419,19 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "establishment",
                 htmlContent: `
-                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
-                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. 
+                  Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ali baba</li>
                   <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
-                  </ul><br /></div>
+                  </ul><br />
+                  
+  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  
+                  </div>
             ${lastExchange.message}`,
                 subject: lastExchange.subject,
               },
@@ -459,7 +473,6 @@ describe("SendExchangeToRecipient", () => {
             {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "potentialBeneficiary",
                 htmlContent: expect.any(String),
                 subject: lastBeneficiaryExchange.subject,
               },

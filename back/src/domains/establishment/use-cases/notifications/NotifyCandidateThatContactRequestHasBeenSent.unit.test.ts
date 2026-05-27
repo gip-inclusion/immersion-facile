@@ -4,6 +4,8 @@ import {
   expectPromiseToFailWithError,
   getFormattedFirstnameAndLastname,
 } from "shared";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -25,9 +27,10 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
   let notifyCandidateThatContactRequestHasBeenSent: NotifyCandidateThatContactRequestHasBeenSent;
   let uow: InMemoryUnitOfWork;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
-
+  let config: AppConfig;
   beforeEach(() => {
     uow = createInMemoryUow();
+    config = new AppConfigBuilder().build();
     const uowPerformer = new InMemoryUowPerformer(uow);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -42,7 +45,7 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
     notifyCandidateThatContactRequestHasBeenSent =
       makeNotifyCandidateThatContactRequestHasBeenSent({
         uowPerformer,
-        deps: { saveNotificationAndRelatedEvent },
+        deps: { saveNotificationAndRelatedEvent, config },
       });
   });
 
@@ -80,6 +83,8 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
               lastname: discussion.potentialBeneficiary.lastName,
             }),
             kind: discussion.kind,
+            beneficiaryDashboardUrl:
+              "http://localhost/tableau-de-bord-beneficiaire",
           },
         },
       ],

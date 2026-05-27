@@ -2,8 +2,10 @@ import {
   type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   errors,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
 } from "shared";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
@@ -20,9 +22,14 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent = useCaseBuilder(
   .withCurrentUser<void>()
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    config: AppConfig;
   }>()
   .build(
-    async ({ inputParams, uow, deps: { saveNotificationAndRelatedEvent } }) => {
+    async ({
+      inputParams,
+      uow,
+      deps: { saveNotificationAndRelatedEvent, config },
+    }) => {
       const discussion = await uow.discussionRepository.getById(
         inputParams.discussionId,
       );
@@ -48,6 +55,7 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent = useCaseBuilder(
             beneficiaryLastName: getFormattedFirstnameAndLastname({
               lastname: discussion.potentialBeneficiary.lastName,
             }),
+            beneficiaryDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.beneficiaryDashboard}`,
           },
         },
         followedIds: {

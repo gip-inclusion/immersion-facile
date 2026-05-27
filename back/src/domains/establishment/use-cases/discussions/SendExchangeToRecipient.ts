@@ -5,11 +5,14 @@ import {
   type EmailAttachment,
   type Exchange,
   errors,
+  frontRoutes,
+  renderCTAInEmailContent,
   type SiretDto,
   type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
 import { z } from "zod";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
   triggeredBySchema,
   type WithTriggeredBy,
@@ -29,12 +32,6 @@ export type SendExchangeToRecipient = ReturnType<
   typeof makeSendExchangeToRecipient
 >;
 
-type Deps = {
-  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  domain: string;
-  notificationGateway: NotificationGateway;
-};
-
 export const makeSendExchangeToRecipient = useCaseBuilder(
   "SendExchangeToRecipient",
 )
@@ -46,7 +43,12 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
       }),
     ),
   )
-  .withDeps<Deps>()
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    domain: string;
+    notificationGateway: NotificationGateway;
+    config: AppConfig;
+  }>()
   .build(async ({ deps, inputParams, uow }) => {
     if (inputParams.skipSendingEmail) return;
     const discussion = await uow.discussionRepository.getById(
@@ -92,11 +94,10 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
         kind: "DISCUSSION_EXCHANGE",
         sender: discussionEmailSender,
         params: {
-          sender: lastExchange.sender,
           subject: lastExchange.subject,
           htmlContent: `
-                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée.
-                  Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.
+                  ⚠️ Important : Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. 
+                  Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.
                   <div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
                   <br /><ul>
                   <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${
@@ -106,7 +107,12 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   <li>Entreprise : ${discussion.businessName} - ${
                     discussion.address.streetNumberAndAddress
                   } ${discussion.address.postcode} ${discussion.address.city}</li>
-                  </ul><br /></div>
+                  </ul><br />
+                  ${renderCTAInEmailContent({
+                    url: `${deps.config.immersionFacileBaseUrl}/${lastExchange.sender === "establishment" ? frontRoutes.beneficiaryDashboard : frontRoutes.establishmentDashboard}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord`,
+                    label: "Répondre depuis mon espace",
+                  })}
+                  </div>
             ${
               lastExchange.message.length
                 ? lastExchange.message

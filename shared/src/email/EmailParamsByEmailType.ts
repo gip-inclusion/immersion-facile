@@ -13,7 +13,6 @@ import type {
   ContactLevelOfEducation,
   DiscussionExchangeForbiddenParams,
   DiscussionKind,
-  ExchangeRole,
 } from "../discussion/discussion.dto";
 import type { EstablishmentUserRightStatus } from "../formEstablishment/FormEstablishment.dto";
 import type { AgencyRole, EstablishmentRole } from "../role/role.dto";
@@ -208,6 +207,7 @@ export type EmailParamsByEmailType = {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
+    beneficiaryDashboardUrl: AbsoluteUrl;
   };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;
@@ -320,7 +320,6 @@ export type EmailParamsByEmailType = {
   DISCUSSION_EXCHANGE: {
     subject: string;
     htmlContent: string;
-    sender: ExchangeRole;
   };
   DISCUSSION_EXCHANGE_FORBIDDEN: DiscussionExchangeForbiddenParams;
   ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
