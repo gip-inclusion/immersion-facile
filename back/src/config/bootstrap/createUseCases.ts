@@ -143,7 +143,7 @@ import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-c
 import { makeBanEstablishment } from "../../domains/establishment/use-cases/BanEstablishment";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
-import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
+import { makeDeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { makeGetDiscussionById } from "../../domains/establishment/use-cases/discussions/GetDiscussionById";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
@@ -349,12 +349,6 @@ export const createUseCases = ({
           uowPerformer,
           gateways.timeGateway,
         ),
-      deleteEstablishment: new DeleteEstablishment(
-        uowPerformer,
-        gateways.timeGateway,
-        saveNotificationAndRelatedEvent,
-        createNewEvent,
-      ),
       contactEstablishment: new ContactEstablishment(
         uowPerformer,
         createNewEvent,
@@ -558,6 +552,15 @@ export const createUseCases = ({
         immersionFacileBaseUrl: config.immersionFacileBaseUrl,
       },
       uowPerformer,
+    }),
+
+    deleteEstablishment: makeDeleteEstablishment({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        saveNotificationAndRelatedEvent,
+        createNewEvent,
+      },
     }),
 
     getEstablishmentPublicOptionsByFilters:
