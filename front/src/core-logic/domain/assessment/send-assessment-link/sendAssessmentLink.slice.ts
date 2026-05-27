@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import type {
   ConventionSupportedJwt,
   SendAssessmentLinkRequestDto,
-  SendAssessmentSignatureReminderRequestDto,
 } from "shared";
 
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
@@ -47,7 +46,7 @@ export const sendAssessmentLinkSlice = createSlice({
     sendAssessmentSignatureReminderRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        SendAssessmentSignatureReminderRequestDto & {
+        SendAssessmentLinkRequestDto & {
           jwt: ConventionSupportedJwt;
         }
       >,
@@ -58,7 +57,7 @@ export const sendAssessmentLinkSlice = createSlice({
     sendAssessmentSignatureReminderSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        SendAssessmentSignatureReminderRequestDto & {
+        SendAssessmentLinkRequestDto & {
           jwt: ConventionSupportedJwt;
         }
       >,

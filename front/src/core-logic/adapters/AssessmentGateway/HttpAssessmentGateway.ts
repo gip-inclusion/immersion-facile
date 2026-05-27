@@ -8,7 +8,6 @@ import {
   errors,
   type LegacyAssessmentDto,
   type SendAssessmentLinkRequestDto,
-  type SendAssessmentSignatureReminderRequestDto,
   type SignAssessmentRequestDto,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -133,7 +132,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentSignatureReminder$(
-    params: SendAssessmentSignatureReminderRequestDto,
+    params: SendAssessmentLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(

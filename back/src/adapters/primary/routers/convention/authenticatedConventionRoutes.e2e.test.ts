@@ -41,6 +41,7 @@ describe("authenticatedConventionRoutes", () => {
     .buildUser();
 
   let httpClient: HttpClient<AuthenticatedConventionRoutes>;
+
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;

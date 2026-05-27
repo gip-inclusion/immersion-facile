@@ -79,7 +79,3 @@ export type SendSignatureLinkRequestDto = WithConventionId & {
 export type SendAssessmentLinkRequestDto = WithConventionId & {
   notificationKind: NotificationKind;
 };
-
-export type SendAssessmentSignatureReminderRequestDto = WithConventionId & {
-  notificationKind: NotificationKind;
-};

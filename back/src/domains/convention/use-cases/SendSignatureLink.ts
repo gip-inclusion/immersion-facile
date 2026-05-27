@@ -1,4 +1,3 @@
-import { subHours } from "date-fns";
 import {
   agencyModifierRoles,
   allSignatoryRoles,
@@ -7,8 +6,10 @@ import {
   type ConventionRelatedJwtPayload,
   conventionSignatoryRoleBySignatoryKey,
   errors,
+  formatHoursCooldownTimeRemaining,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  isWithinHoursCooldown,
   type NotificationKind,
   type SendSignatureLinkRequestDto,
   type SignatoryRole,
@@ -337,28 +338,25 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
           recipientEmail: signatoryEmail,
         });
 
-  if (
-    lastNotification &&
-    new Date(lastNotification.createdAt) >
-      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_SIGNATURE_REMINDER)
-  ) {
-    const nextAllowedTime = new Date(lastNotification.createdAt);
-    nextAllowedTime.setHours(
-      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
-    );
-    const timeRemainingMs =
-      nextAllowedTime.getTime() - timeGateway.now().getTime();
-    const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
-    const minutesRemaining = Math.ceil(
-      (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
-    );
-    const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
+  const lastNotificationCreatedAt =
+    lastNotification && new Date(lastNotification.createdAt);
 
+  if (
+    lastNotificationCreatedAt &&
+    isWithinHoursCooldown({
+      lastActionAt: lastNotificationCreatedAt,
+      minHours: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
+      now: timeGateway.now(),
+    })
+  )
     throw errors.convention.signatureLinkAlreadySent({
       signatoryRole,
       notificationKind,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
-      timeRemaining: formattedTimeRemaining,
+      timeRemaining: formatHoursCooldownTimeRemaining({
+        lastActionAt: lastNotificationCreatedAt,
+        minHours: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
+        now: timeGateway.now(),
+      }),
     });
-  }
 };

@@ -5,7 +5,6 @@ import type {
   ConventionSupportedJwt,
   DeleteAssessmentRequestDto,
   SendAssessmentLinkRequestDto,
-  SendAssessmentSignatureReminderRequestDto,
   SignAssessmentRequestDto,
 } from "shared";
 import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
@@ -55,7 +54,7 @@ export class TestAssessmentGateway implements AssessmentGateway {
   }
 
   public sendAssessmentSignatureReminder$(
-    _params: SendAssessmentSignatureReminderRequestDto,
+    _params: SendAssessmentLinkRequestDto,
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.sendAssessmentSignatureReminderResponse$;

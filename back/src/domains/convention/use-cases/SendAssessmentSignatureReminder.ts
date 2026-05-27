@@ -1,4 +1,3 @@
-import { subHours } from "date-fns";
 import {
   assessmentSignatureReminderAuthorizedRoles,
   type ConventionDto,
@@ -6,12 +5,14 @@ import {
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
+  formatHoursCooldownTimeRemaining,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   isBeforeAssessmentSignatureReleaseDate,
+  isWithinHoursCooldown,
   type NotificationKind,
-  type SendAssessmentSignatureReminderRequestDto,
-  sendAssessmentSignatureReminderRequestSchema,
+  type SendAssessmentLinkRequestDto,
+  sendAssessmentLinkRequestSchema,
   type UserId,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -45,9 +46,7 @@ export type SendAssessmentSignatureReminder = ReturnType<
 export const makeSendAssessmentSignatureReminder = useCaseBuilder(
   "SendAssessmentSignatureReminder",
 )
-  .withInput<SendAssessmentSignatureReminderRequestDto>(
-    sendAssessmentSignatureReminderRequestSchema,
-  )
+  .withInput<SendAssessmentLinkRequestDto>(sendAssessmentLinkRequestSchema)
   .withOutput<void>()
   .withCurrentUser<ConventionRelatedJwtPayload>()
   .withDeps<{
@@ -320,29 +319,19 @@ const throwErrorIfAssessmentSignatureReminderAlreadySent = async ({
 
   if (
     lastNotificationCreatedAt &&
-    lastNotificationCreatedAt >
-      subHours(
-        timeGateway.now(),
-        MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
-      )
-  ) {
-    const nextAllowedTime = new Date(lastNotificationCreatedAt);
-    nextAllowedTime.setHours(
-      nextAllowedTime.getHours() +
-        MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
-    );
-    const timeRemainingMs =
-      nextAllowedTime.getTime() - timeGateway.now().getTime();
-    const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
-    const minutesRemaining = Math.ceil(
-      (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
-    );
-    const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
-
+    isWithinHoursCooldown({
+      lastActionAt: lastNotificationCreatedAt,
+      minHours: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+      now: timeGateway.now(),
+    })
+  )
     throw errors.assessment.assessmentLinkAlreadySent({
       notificationKind,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
-      timeRemaining: formattedTimeRemaining,
+      timeRemaining: formatHoursCooldownTimeRemaining({
+        lastActionAt: lastNotificationCreatedAt,
+        minHours: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+        now: timeGateway.now(),
+      }),
     });
-  }
 };
