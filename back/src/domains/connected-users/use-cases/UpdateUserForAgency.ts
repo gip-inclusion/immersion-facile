@@ -89,6 +89,7 @@ export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
 
     await uow.agencyRepository.update({
       id: agency.id,
+      status: agency.status,
       usersRights: updatedRights,
     });
     await updateIfUserEmailChanged(

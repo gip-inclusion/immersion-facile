@@ -1,3 +1,4 @@
+import { values } from "ramda";
 import type {
   AddressDto,
   AgencyDto,
@@ -38,6 +39,7 @@ export type AgencyWithoutRights = Omit<
 
 export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
   id: AgencyId;
+  status: AgencyStatus;
 };
 export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
   agencyId: AgencyId;
@@ -46,6 +48,15 @@ export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
 export type AgencyWithNumberOfUsersToReview = {
   agency: AgencyWithUsersRights;
   numberOfUsersToReview: number;
+};
+
+export const throwIfAgencyHasNoUsersWhileNotClosed = ({
+  id,
+  status,
+  usersRights,
+}: Pick<AgencyWithUsersRights, "id" | "status" | "usersRights">): void => {
+  if (!values(usersRights).length && status !== "closed")
+    throw errors.agency.noUsers(id);
 };
 
 export interface AgencyRepository {
@@ -89,6 +100,7 @@ export const updateAgencyRightsForUser = async (
   if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   return uow.agencyRepository.update({
     id: agencyId,
+    status: agencyWithRights.status,
     usersRights: {
       ...agencyWithRights.usersRights,
       [userId]: { isNotifiedByEmail, roles },
@@ -106,6 +118,7 @@ export const removeAgencyRightsForUser = async (
   const { [userId]: _, ...rightsToKeep } = agencyWithRights.usersRights;
   return uow.agencyRepository.update({
     id: agencyId,
+    status: agencyWithRights.status,
     usersRights: rightsToKeep,
   });
 };

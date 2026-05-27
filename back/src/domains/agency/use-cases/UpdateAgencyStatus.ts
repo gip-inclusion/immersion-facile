@@ -1,7 +1,6 @@
 import {
   type ConnectedUser,
   errors,
-  type PartialAgencyDto,
   updateAgencyStatusParamsSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
@@ -21,15 +20,14 @@ export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
         agencyId: inputParams.id,
       });
 
-    const updatedAgencyParams: PartialAgencyDto = {
+    await uow.agencyRepository.update({
       id: inputParams.id,
       status: inputParams.status,
       statusJustification:
         inputParams.status === "rejected"
           ? inputParams.statusJustification
           : null,
-    };
-    await uow.agencyRepository.update(updatedAgencyParams);
+    });
 
     if (inputParams.status === "active" || inputParams.status === "rejected") {
       await uow.outboxRepository.save(

@@ -28,23 +28,27 @@ export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
     const relatedAgencies =
       await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
 
-    await executeInSequence(relatedAgencies, async ({ usersRights, id }) => {
-      await uow.agencyRepository.update({
-        id,
-        usersRights: updateRights(usersRights, updatedAgency),
-      });
-      await uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "AgencyUpdated",
-          payload: {
-            agencyId: id,
-            triggeredBy: {
-              kind: "crawler",
+    await executeInSequence(
+      relatedAgencies,
+      async ({ usersRights, status, id }) => {
+        await uow.agencyRepository.update({
+          id,
+          status,
+          usersRights: updateRights(usersRights, updatedAgency),
+        });
+        await uow.outboxRepository.save(
+          deps.createNewEvent({
+            topic: "AgencyUpdated",
+            payload: {
+              agencyId: id,
+              triggeredBy: {
+                kind: "crawler",
+              },
             },
-          },
-        }),
-      );
-    });
+          }),
+        );
+      },
+    );
   });
 
 const updateRights = (

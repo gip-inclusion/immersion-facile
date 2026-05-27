@@ -36,12 +36,13 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
-import type {
-  AgencyRepository,
-  AgencyRightOfUser,
-  AgencyWithNumberOfUsersToReview,
-  GetAgenciesFilters,
-  PartialAgencyWithUsersRights,
+import {
+  type AgencyRepository,
+  type AgencyRightOfUser,
+  type AgencyWithNumberOfUsersToReview,
+  type GetAgenciesFilters,
+  type PartialAgencyWithUsersRights,
+  throwIfAgencyHasNoUsersWhileNotClosed,
 } from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
@@ -62,7 +63,7 @@ export class PgAgencyRepository implements AgencyRepository {
     updatedAt?: DateString,
   ): Promise<void> {
     await this.insertAgency(agency, updatedAt);
-    await this.#saveAgencyRights(agency.id, agency.usersRights);
+    await this.#saveAgencyRights(agency);
   }
 
   private async insertAgency(
@@ -160,7 +161,11 @@ export class PgAgencyRepository implements AgencyRepository {
       .execute();
 
     if (agency.usersRights)
-      await this.#saveAgencyRights(agency.id, agency.usersRights);
+      await this.#saveAgencyRights({
+        id: agency.id,
+        status: agency.status,
+        usersRights: agency.usersRights,
+      });
   }
 
   public async getAllAgenciesWithUsersToReview(): Promise<
@@ -577,19 +582,13 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   async #saveAgencyRights(
-    agencyId: AgencyId,
-    agencyUserRights: AgencyUsersRights,
+    agency: Pick<AgencyWithUsersRights, "id" | "status" | "usersRights">,
   ): Promise<void> {
-    await this.transaction
-      .deleteFrom("users__agencies")
-      .where("users__agencies.agency_id", "=", agencyId)
-      .execute();
-
-    const newRights = toPairs(agencyUserRights)
+    const newRights = toPairs(agency.usersRights)
       .map(([userId, userRights]) =>
         userRights
           ? {
-              agency_id: agencyId,
+              agency_id: agency.id,
               user_id: userId,
               is_notified_by_email: userRights.isNotifiedByEmail,
               roles: JSON.stringify(userRights.roles),
@@ -598,11 +597,21 @@ export class PgAgencyRepository implements AgencyRepository {
       )
       .filter(isTruthy);
 
-    if (!newRights.length) throw errors.agency.noUsers(agencyId);
+    if (!newRights.length) throwIfAgencyHasNoUsersWhileNotClosed(agency);
 
+    await this.#deleteAgencyRights(agency.id);
+
+    if (newRights.length)
+      await this.transaction
+        .insertInto("users__agencies")
+        .values(newRights)
+        .execute();
+  }
+
+  async #deleteAgencyRights(agencyId: AgencyId): Promise<void> {
     await this.transaction
-      .insertInto("users__agencies")
-      .values(newRights)
+      .deleteFrom("users__agencies")
+      .where("users__agencies.agency_id", "=", agencyId)
       .execute();
   }
 

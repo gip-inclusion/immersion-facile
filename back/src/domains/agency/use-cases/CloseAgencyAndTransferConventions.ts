@@ -84,21 +84,18 @@ export const makeCloseAgencyAndTransferConventions = useCaseBuilder(
       );
     });
 
-    const agenciesReferringToAgencyToClose =
+    await executeInSequence(
       await uow.agencyRepository.getAgenciesRelatedToAgency(
         inputParams.agencyToCloseId,
-      );
-    await executeInSequence(
-      agenciesReferringToAgencyToClose,
-      async (referringAgency) => {
-        const updatedReferringAgency = {
-          ...referringAgency,
+      ),
+      (referringAgency) =>
+        uow.agencyRepository.update({
+          id: referringAgency.id,
+          status: referringAgency.status,
           refersToAgencyId: inputParams.agencyToTransferConventionsToId,
           refersToAgencyName: agencyToTransferTo.name,
           refersToAgencyContactEmail: agencyToTransferTo.contactEmail,
-        };
-        await uow.agencyRepository.update(updatedReferringAgency);
-      },
+        }),
     );
 
     await uow.agencyRepository.update({

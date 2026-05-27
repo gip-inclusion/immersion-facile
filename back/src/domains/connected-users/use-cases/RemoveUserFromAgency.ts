@@ -45,6 +45,7 @@ export const makeRemoveUserFromAgency = useCaseBuilder("RemoveUserFromAgency")
 
       await uow.agencyRepository.update({
         id: agency.id,
+        status: agency.status,
         usersRights,
       });
 
