@@ -1,99 +1,133 @@
 import {
   addressDtoToString,
   type ConnectedUser,
+  type Email,
+  type EstablishmentRole,
   errors,
   executeInSequence,
+  type WithSiretDto,
   withSiretSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
+import {
+  type WithTriggeredBy,
+  withTriggeredBySchema,
+} from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 
 export type DeleteEstablishment = ReturnType<typeof makeDeleteEstablishment>;
+type Deps = {
+  timeGateway: TimeGateway;
+  createNewEvent: CreateNewEvent;
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+};
+
 export const makeDeleteEstablishment = useCaseBuilder("DeleteEstablishment")
-  .withInput(withSiretSchema)
+  .withInput(withSiretSchema.and(withTriggeredBySchema))
   .withCurrentUser<ConnectedUser | void>()
-  .withDeps<{
-    timeGateway: TimeGateway;
-    createNewEvent: CreateNewEvent;
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  }>()
+  .withDeps<Deps>()
   .build(async ({ currentUser, deps, inputParams, uow }) => {
-    if (!currentUser) throw errors.user.unauthorized();
-    throwIfNotAdmin(currentUser);
-
-    const groupsWithSiret = await uow.groupRepository.groupsWithSiret(
-      inputParams.siret,
-    );
-
-    const groupsUpdatedWithoutSiret = groupsWithSiret.map((group) => ({
-      ...group,
-      sirets: group.sirets.filter(
-        (groupSiret) => groupSiret !== inputParams.siret,
-      ),
-    }));
-
-    const establishmentAggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        inputParams.siret,
-      );
-
-    if (!establishmentAggregate)
-      throw errors.establishment.notFound({ siret: inputParams.siret });
-
-    await uow.establishmentAggregateRepository.delete(
-      establishmentAggregate.establishment.siret,
-    );
-
-    await executeInSequence(groupsUpdatedWithoutSiret, (group) =>
-      uow.groupRepository.save(group),
-    );
-
-    await uow.deletedEstablishmentRepository.save({
-      siret: establishmentAggregate.establishment.siret,
-      createdAt: establishmentAggregate.establishment.createdAt,
-      deletedAt: deps.timeGateway.now(),
-    });
-
-    const adminIds = establishmentAggregate.userRights
-      .filter(({ role }) => role === "establishment-admin")
-      .map(({ userId }) => userId);
-    const contactIds = establishmentAggregate.userRights
-      .filter(({ role }) => role === "establishment-contact")
-      .map(({ userId }) => userId);
-
-    const deletedEstablishmentEvent = deps.createNewEvent({
-      topic: "EstablishmentDeleted",
-      payload: {
-        siret: establishmentAggregate.establishment.siret,
-        triggeredBy: { kind: "connected-user", userId: currentUser.id },
-      },
-    });
-
-    await uow.outboxRepository.save(deletedEstablishmentEvent);
-    await deps.saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "ESTABLISHMENT_DELETED",
-        recipients: (await uow.userRepository.getByIds(adminIds)).map(
-          ({ email }) => email,
-        ),
-        cc: (await uow.userRepository.getByIds(contactIds)).map(
-          ({ email }) => email,
-        ),
-        params: {
-          businessAddresses: establishmentAggregate.establishment.locations.map(
-            (addressAndPosition) =>
-              addressDtoToString(addressAndPosition.address),
-          ),
-          businessName: establishmentAggregate.establishment.name,
-          siret: establishmentAggregate.establishment.siret,
-        },
-      },
-      followedIds: {
-        establishmentSiret: establishmentAggregate.establishment.siret,
-      },
-    });
+    if (inputParams.triggeredBy?.kind === "connected-user" && currentUser) {
+      throwIfNotAdmin(currentUser);
+      return onValidRights(uow, deps, inputParams);
+    }
+    if (inputParams.triggeredBy?.kind === "crawler") {
+      return onValidRights(uow, deps, inputParams);
+    }
+    throw errors.user.unauthorized();
   });
+
+const onValidRights = async (
+  uow: UnitOfWork,
+  deps: Deps,
+  { siret, triggeredBy }: WithSiretDto & WithTriggeredBy,
+) =>
+  uow.establishmentAggregateRepository
+    .getEstablishmentAggregateBySiret(siret)
+    .then((establishment) => {
+      if (!establishment) throw errors.establishment.notFound({ siret });
+      return onEstablishment(uow, deps, { siret, triggeredBy }, establishment);
+    });
+
+const onEstablishment = (
+  uow: UnitOfWork,
+  deps: Deps,
+  params: WithSiretDto & WithTriggeredBy,
+  establishment: EstablishmentAggregate,
+) =>
+  uow.establishmentAggregateRepository
+    .delete(params.siret)
+    .then(() => uow.groupRepository.groupsWithSiret(params.siret))
+    .then((groups) =>
+      executeInSequence(
+        groups.map((group) => ({
+          ...group,
+          sirets: group.sirets.filter(
+            (groupSiret) => groupSiret !== params.siret,
+          ),
+        })),
+        (group) => uow.groupRepository.save(group),
+      ),
+    )
+    .then(() =>
+      uow.deletedEstablishmentRepository.save({
+        siret: params.siret,
+        createdAt: establishment.establishment.createdAt,
+        deletedAt: deps.timeGateway.now(),
+      }),
+    )
+    .then(() =>
+      uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "EstablishmentDeleted",
+          payload: params,
+        }),
+      ),
+    )
+    .then(async () => {
+      await deps.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ESTABLISHMENT_DELETED",
+          recipients: await getUserEmailsByEstablishmentUserRole(
+            uow,
+            establishment,
+            "establishment-admin",
+          ),
+          cc: await getUserEmailsByEstablishmentUserRole(
+            uow,
+            establishment,
+            "establishment-contact",
+          ),
+          params: {
+            businessAddresses: establishment.establishment.locations.map(
+              (addressAndPosition) =>
+                addressDtoToString(addressAndPosition.address),
+            ),
+            businessName: establishment.establishment.name,
+            siret: establishment.establishment.siret,
+          },
+        },
+        followedIds: {
+          establishmentSiret: establishment.establishment.siret,
+        },
+      });
+    });
+
+const getUserEmailsByEstablishmentUserRole = (
+  uow: UnitOfWork,
+  establishmentAggregate: EstablishmentAggregate,
+  role: EstablishmentRole,
+): Promise<Email[]> =>
+  uow.userRepository
+    .getByIds(
+      establishmentAggregate.userRights
+        .filter((userRight) => userRight.role === role)
+        .map(({ userId }) => userId),
+    )
+    .then((users) => users.map(({ email }) => email));

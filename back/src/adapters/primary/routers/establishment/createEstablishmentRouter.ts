@@ -76,12 +76,19 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentSharedRouter.deleteEstablishment(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(204), () =>
-        deps.useCases.deleteEstablishment.execute(
-          req.params,
-          req.payloads?.currentUser,
-        ),
-      ),
+      sendHttpResponse(req, res.status(204), () => {
+        const currentUser = getGenericAuthOrThrow(req.payloads?.currentUser);
+        return deps.useCases.deleteEstablishment.execute(
+          {
+            siret: req.params.siret,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: currentUser.id,
+            },
+          },
+          currentUser,
+        );
+      }),
   );
 
   establishmentSharedRouter.getDiscussionById(
