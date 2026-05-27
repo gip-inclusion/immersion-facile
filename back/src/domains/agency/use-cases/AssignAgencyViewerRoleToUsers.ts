@@ -78,6 +78,7 @@ export const makeAssignAgencyViewerRole = useCaseBuilder(
         return uow.agencyRepository
           .update({
             id: agency.id,
+            status: agency.status,
             usersRights: updatedUsersRights,
           })
           .then(() => {

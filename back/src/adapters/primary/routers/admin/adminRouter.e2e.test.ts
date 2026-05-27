@@ -655,7 +655,7 @@ describe("Admin router", () => {
       });
 
       expectObjectsToMatch(inMemoryUow.agencyRepository.agencies, [
-        toAgencyWithRights(agency, {}),
+        toAgencyWithRights({ ...agency, status: "closed" }, {}),
       ]);
 
       await processEventsForEmailToBeSent(eventCrawler);

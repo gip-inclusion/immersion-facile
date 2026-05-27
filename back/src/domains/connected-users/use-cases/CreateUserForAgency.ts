@@ -75,6 +75,7 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
 
     await uow.agencyRepository.update({
       id: agency.id,
+      status: agency.status,
       usersRights: updatedAgencyRights,
     });
     await uow.outboxRepository.save(

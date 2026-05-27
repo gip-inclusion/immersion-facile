@@ -31,9 +31,10 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
-    await executeInSequence(agencies, ({ id, usersRights }) =>
+    await executeInSequence(agencies, ({ id, status, usersRights }) =>
       uow.agencyRepository.update({
         id,
+        status,
         usersRights: {
           ...usersRights,
           [currentUser.id]: {

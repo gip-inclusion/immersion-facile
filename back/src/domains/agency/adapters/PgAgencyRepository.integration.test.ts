@@ -358,6 +358,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agency1.id,
+        status: agency1.status,
         ...updatedFields,
       });
 
@@ -366,6 +367,35 @@ describe("PgAgencyRepository", () => {
       ]);
 
       expect(await phoneNumberExist(db, agency1.phoneNumber)).toBe(true);
+    });
+
+    it("allows closed agencies to have no users", async () => {
+      await agencyRepository.insert(agency1);
+
+      await agencyRepository.update({
+        id: agency1.id,
+        status: "closed",
+        usersRights: {},
+      });
+
+      expectToEqual((await agencyRepository.getAgencies({})).data, [
+        { ...agency1, status: "closed", usersRights: {} },
+      ]);
+    });
+
+    it("does not allow agencies not closed to have no users", async () => {
+      await agencyRepository.insert(agency1);
+
+      await expectPromiseToFailWithError(
+        agencyRepository.update({
+          id: agency1.id,
+          status: "active",
+          usersRights: {},
+        }),
+        errors.agency.noUsers(agency1.id),
+      );
+
+      expectToEqual((await agencyRepository.getAgencies({})).data, [agency1]);
     });
 
     it("switch the counsellor to validator", async () => {
@@ -396,6 +426,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agencyWithTwoStepValidation.id,
+        status: agencyWithTwoStepValidation.status,
         ...updatedAgencyRights,
       });
       expectToEqual((await agencyRepository.getAgencies({})).data, [
@@ -421,6 +452,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agencyWithoutDelegationInfo.id,
+        status: agencyWithoutDelegationInfo.status,
         delegationAgencyInfo: delegationInfo,
       });
 
@@ -459,6 +491,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agencyWithDelegation.id,
+        status: agencyWithDelegation.status,
         delegationAgencyInfo: updatedDelegationInfo,
       });
 
@@ -485,6 +518,7 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.update({
         id: agency.id,
+        status: agency.status,
         contactEmail: newContactEmail,
       });
 

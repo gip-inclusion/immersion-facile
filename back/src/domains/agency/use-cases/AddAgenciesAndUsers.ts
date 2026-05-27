@@ -227,6 +227,7 @@ const linkUsersToExistingAgency = async ({
 
       await agencyRepository.update({
         id: agencyIF.id,
+        status: agencyIF.status,
         usersRights: {
           ...agencyIF.usersRights,
           ...agencyUsersRights.reduce((acc, curr) => {

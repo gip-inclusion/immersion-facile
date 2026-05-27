@@ -25,12 +25,13 @@ import {
 } from "shared";
 import { z } from "zod";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import type {
-  AgencyRepository,
-  AgencyRightOfUser,
-  AgencyWithNumberOfUsersToReview,
-  GetAgenciesFilters,
-  PartialAgencyWithUsersRights,
+import {
+  type AgencyRepository,
+  type AgencyRightOfUser,
+  type AgencyWithNumberOfUsersToReview,
+  type GetAgenciesFilters,
+  type PartialAgencyWithUsersRights,
+  throwIfAgencyHasNoUsersWhileNotClosed,
 } from "../ports/AgencyRepository";
 
 type AgencyById = Partial<Record<AgencyId, AgencyWithUsersRights>>;
@@ -70,8 +71,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     _updatedAt?: DateString,
   ): Promise<void> {
     if (this.#agencies[agency.id]) throw errors.agency.alreadyExist(agency.id);
-    if (!values(agency.usersRights).length)
-      throw errors.agency.noUsers(agency.id);
+    throwIfAgencyHasNoUsersWhileNotClosed(agency);
     this.#agencies[agency.id] = agency;
   }
 
@@ -80,7 +80,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     if (!agencyToUdpate) {
       throw errors.agency.notFound({ agencyId: agency.id });
     }
-    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
+
+    const updatedAgency = { ...agencyToUdpate, ...agency };
+    if (agency.usersRights !== undefined)
+      throwIfAgencyHasNoUsersWhileNotClosed(updatedAgency);
+    this.#agencies[agency.id] = updatedAgency;
   }
 
   public async getById(

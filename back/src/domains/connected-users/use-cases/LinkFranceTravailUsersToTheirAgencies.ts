@@ -84,6 +84,7 @@ const updateActiveAgencyWithSafir = async (
 ): Promise<void> => {
   await uow.agencyRepository.update({
     id: agencyWithSafir.id,
+    status: agencyWithSafir.status,
     usersRights: {
       ...agencyWithSafir.usersRights,
       [userId]: { roles: ["validator"], isNotifiedByEmail: false },
@@ -151,9 +152,9 @@ const updateAgenciesOfGroup = async (
     ...otherAgencyRights,
   ];
 
-  return updateRightsOnMultipleAgenciesForUser(
+  return updateRightsOnMultipleAgenciesForUser({
     uow,
-    user.id,
-    agencyRightsForUser,
-  );
+    userId: user.id,
+    agenciesRightForUser: agencyRightsForUser,
+  });
 };
