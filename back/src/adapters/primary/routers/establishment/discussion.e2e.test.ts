@@ -429,7 +429,6 @@ describe("discussion e2e", () => {
             templatedContent: {
               kind: "DISCUSSION_EXCHANGE",
               params: {
-                sender: "establishment",
                 htmlContent: expect.any(String),
                 subject: emailSubject,
               },

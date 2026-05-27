@@ -582,6 +582,7 @@ export const createUseCases = ({
         domain: config.immersionFacileDomain,
         notificationGateway: gateways.notification,
         saveNotificationAndRelatedEvent,
+        config,
       },
       uowPerformer,
     }),
@@ -1022,7 +1023,7 @@ export const createUseCases = ({
     notifyCandidateThatContactRequestHasBeenSent:
       makeNotifyCandidateThatContactRequestHasBeenSent({
         uowPerformer,
-        deps: { saveNotificationAndRelatedEvent },
+        deps: { saveNotificationAndRelatedEvent, config },
       }),
     sendSignatureLink: makeSendSignatureLink({
       uowPerformer,

@@ -1,5 +1,8 @@
 import { createTemplatesByName } from "html-templates";
-import { immersionFacileHelpdeskRootUrl } from "../AbsoluteUrl";
+import {
+  type AbsoluteUrl,
+  immersionFacileHelpdeskRootUrl,
+} from "../AbsoluteUrl";
 import {
   type ConventionId,
   type InternshipKind,
@@ -1099,14 +1102,21 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
+        beneficiaryDashboardUrl,
       }) => ({
         subject: ` Immersion Facilitée - Confirmation de l’envoi de votre candidature auprès de ${businessName}`,
         greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
         content: `<strong>Nous vous confirmons que votre candidature pour ${kind === "IF" ? "une immersion professionnelle" : "un stage"} a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
 
           Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre ${kind === "IF" ? "immersion" : "stage"}.
-          
-          <strong>Comment maximiser vos chances ?</strong>
+        `,
+        buttons: [
+          {
+            label: "Accéder à mon espace",
+            url: beneficiaryDashboardUrl,
+          },
+        ],
+        subContent: `<strong>Comment maximiser vos chances ?</strong>
           • Si l'entreprise ne répond pas sous <strong>15 jours</strong>, appelez-la directement.
           • Postulez à au moins <strong>3 entreprises</strong> pour multiplier vos opportunités.
           
@@ -1115,7 +1125,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           Si vous avez besoin d'aide pour préparer votre relance, n'hésitez pas à contacter votre conseiller.
           
           Bonne chance pour la suite de vos démarches ! Nous restons à votre disposition.
-        `,
+          ${defaultSignature("immersion")}`,
       }),
     },
     CONTACT_BY_EMAIL_REQUEST: {
@@ -1174,7 +1184,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
+          - répondre directement à cet email, il lui sera transmis. ${transferReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${params.potentialBeneficiaryPhone}`,
           },
@@ -1239,7 +1249,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis. ${establishmentReplyWarning}
+          - répondre directement à cet email, il lui sera transmis. ${transferReplyWarning}
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
@@ -1585,14 +1595,11 @@ Tél : ${beneficiaryPhone}`,
         "theme:MER",
         "role:utilisateurDestinataire",
       ],
-      createEmailVariables: ({ subject, htmlContent, sender }) => ({
+      createEmailVariables: ({ subject, htmlContent }) => ({
         bypassLayout: true,
         subject,
-        content:
-          sender === "establishment"
-            ? htmlContent
-            : `
-          ⚠️ Important : ${establishmentReplyWarning}
+        content: `
+          ⚠️ Important : ${transferReplyWarning}
           ${htmlContent}
         `,
       }),
@@ -3155,5 +3162,15 @@ export const discussionExchangeForbiddenContents = (
   },
 });
 
-const establishmentReplyWarning =
-  "Seule la personne destinataire de cet email est autorisée à répondre au candidat via Immersion Facilitée. Merci de ne pas transférer ce message en interne : toute réponse envoyée depuis un autre compte ne pourra pas être transmise au candidat.";
+const transferReplyWarning =
+  "Seule la personne destinataire de cet email est autorisée à répondre via Immersion Facilitée. Merci de ne pas transférer ce message : toute réponse envoyée depuis un autre compte ne pourra pas être transmise.";
+
+export const renderCTAInEmailContent = ({
+  url,
+  label,
+}: {
+  url: AbsoluteUrl;
+  label: string;
+}) => `
+  <a href="${url}" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">${label}</a><br />
+  `;
