@@ -452,7 +452,7 @@ export const createUseCases = ({
     sendEmailsWhenAgencyIsActivated: makeSendEmailsWhenAgencyIsActivated({
       uowPerformer,
       deps: {
-        config,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
         saveNotificationAndRelatedEvent,
       },
     }),

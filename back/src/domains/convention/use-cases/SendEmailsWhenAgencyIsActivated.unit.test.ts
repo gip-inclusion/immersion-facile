@@ -101,7 +101,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     sendEmailsWhenAgencyActivated = makeSendEmailsWhenAgencyIsActivated({
       uowPerformer,
       deps: {
-        config,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
         saveNotificationAndRelatedEvent,
       },
     });
