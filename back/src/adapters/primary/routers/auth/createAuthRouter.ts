@@ -18,7 +18,7 @@ export const createAuthRouter = (deps: AppDependencies) => {
     ),
   );
 
-  authSharedRouter.afterOAuthLogin(async (req, res) => {
+  authSharedRouter.afterProConnectOAuthLogin(async (req, res) => {
     return sendHttpResponse(req, res, async () => {
       const useCaseResult =
         await deps.useCases.afterOAuthSuccessRedirection.execute(req.query);
