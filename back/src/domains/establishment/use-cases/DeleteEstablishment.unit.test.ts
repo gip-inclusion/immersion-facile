@@ -125,6 +125,10 @@ describe("Delete Establishment", () => {
       await expectPromiseToFailWithError(
         deleteEstablishment.execute({
           siret: establishmentAggregate.establishment.siret,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: connectedBackofficeAdminUser.id,
+          },
         }),
         errors.user.unauthorized(),
       );
@@ -135,6 +139,10 @@ describe("Delete Establishment", () => {
         deleteEstablishment.execute(
           {
             siret: establishmentAggregate.establishment.siret,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: connectedBackofficeAdminUser.id,
+            },
           },
           connectedBackofficeAdminUser,
         ),
@@ -146,7 +154,7 @@ describe("Delete Establishment", () => {
   });
 
   describe("Right paths", () => {
-    it("Establishment aggregate are deleted, establishment group with siret have siret removed, and event is created", async () => {
+    it("With triggeredBy connected user and connectedUser, Establishment aggregate are deleted, establishment group with siret have siret removed, and event is created", async () => {
       uuidGenerator.setNextUuids(["uuid1", "uuid2"]);
       uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
@@ -164,6 +172,10 @@ describe("Delete Establishment", () => {
       await deleteEstablishment.execute(
         {
           siret: establishmentAggregate.establishment.siret,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: connectedBackofficeAdminUser.id,
+          },
         },
         connectedBackofficeAdminUser,
       );
@@ -201,6 +213,84 @@ describe("Delete Establishment", () => {
           triggeredBy: {
             kind: "connected-user",
             userId: backofficeAdminUser.id,
+          },
+        },
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_DELETED",
+            recipients: [establishmentAdmin.email],
+            params: {
+              businessName: establishmentAggregate.establishment.name,
+              siret: establishmentAggregate.establishment.siret,
+              businessAddresses:
+                establishmentAggregate.establishment.locations.map(
+                  (addressAndPosition) =>
+                    addressDtoToString(addressAndPosition.address),
+                ),
+            },
+            cc: [establishmentContact1.email, establishmentContact2.email],
+          },
+        ],
+      });
+    });
+
+    it("With triggeredBy crawler, Establishment aggregate are deleted, establishment group with siret have siret removed, and event is created", async () => {
+      uuidGenerator.setNextUuids(["uuid1", "uuid2"]);
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      uow.groupRepository.groupEntities = [
+        {
+          name: "group",
+          sirets: [establishmentAggregate.establishment.siret, "siret2"],
+          slug: "group",
+          options: groupOptions,
+        },
+      ];
+
+      await deleteEstablishment.execute({
+        siret: establishmentAggregate.establishment.siret,
+        triggeredBy: {
+          kind: "crawler",
+        },
+      });
+
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [],
+      );
+
+      expectToEqual(uow.groupRepository.groupEntities, [
+        {
+          name: "group",
+          sirets: ["siret2"],
+          slug: "group",
+          options: groupOptions,
+        },
+      ]);
+      expectToEqual(uow.deletedEstablishmentRepository.deletedEstablishments, [
+        {
+          siret: establishmentAggregate.establishment.siret,
+          createdAt: establishmentAggregate.establishment.createdAt,
+          deletedAt: timeGateway.now(),
+        },
+      ]);
+
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const deletedEstablishmentEvent = uow.outboxRepository.events.find(
+        (event) => event.topic === "EstablishmentDeleted",
+      )!;
+
+      expectObjectsToMatch(deletedEstablishmentEvent, {
+        topic: "EstablishmentDeleted",
+        payload: {
+          siret: establishmentAggregate.establishment.siret,
+          triggeredBy: {
+            kind: "crawler",
           },
         },
       });
