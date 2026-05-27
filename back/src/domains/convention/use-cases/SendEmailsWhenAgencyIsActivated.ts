@@ -1,11 +1,12 @@
 import { toPairs } from "ramda";
 import {
   errors,
+  frontRoutes,
   getCounsellorsAndValidatorsEmailsDeduplicated,
   type UserId,
-  type UserParamsForMail,
   withAgencyIdSchema,
 } from "shared";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -13,19 +14,19 @@ import { useCaseBuilder } from "../../core/useCaseBuilder";
 export type SendEmailsWhenAgencyIsActivated = ReturnType<
   typeof makeSendEmailsWhenAgencyIsActivated
 >;
-
 export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
   "SendEmailsWhenAgencyIsActivated",
 )
   .withInput(withAgencyIdSchema)
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    config: AppConfig;
   }>()
   .build(
     async ({
       inputParams: { agencyId },
       uow,
-      deps: { saveNotificationAndRelatedEvent },
+      deps: { saveNotificationAndRelatedEvent, config },
     }) => {
       const agency = await uow.agencyRepository.getById(agencyId);
       if (!agency) throw errors.agency.notFound({ agencyId });
@@ -41,30 +42,6 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
       if (users.length === 0)
         throw errors.agency.usersNotFound({ agencyId: agency.id });
 
-      const usersInfo: UserParamsForMail[] = users
-        .filter(
-          (user) =>
-            !agency.refersToAgencyId ||
-            agency.usersRights[user.id]?.roles.includes("counsellor"),
-        )
-        .map(({ firstName, lastName, email, id }) => {
-          const agencyRight = agency.usersRights[id];
-
-          if (!agencyRight)
-            throw errors.user.noRightsOnAgency({
-              agencyId: agency.id,
-              userId: id,
-            });
-          return {
-            firstName,
-            lastName,
-            email,
-            agencyName: agency.name,
-            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-            roles: agencyRight.roles,
-          };
-        });
-
       await saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
@@ -75,9 +52,9 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
           params: {
             agencyName: agency.name,
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            users: usersInfo,
             agencyReferdToName: agency.refersToAgencyName ?? undefined,
             refersToOtherAgency: !!agency.refersToAgencyId,
+            agencyDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.agencyDashboard}/dashboard`,
           },
         },
         followedIds: {

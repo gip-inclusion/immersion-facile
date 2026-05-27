@@ -325,8 +325,8 @@ export const emailTemplatesByName =
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
+        agencyDashboardUrl,
         refersToOtherAgency,
-        users,
         agencyReferdToName,
       }) => ({
         subject: "Immersion Facilitée - Votre structure a été activée",
@@ -337,41 +337,13 @@ export const emailTemplatesByName =
             : "organisme prescripteur"
         } ${agencyName} est activée sur Immersion facilitée !</strong> 
 
-        Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
+        Vous pouvez dès à présent ${refersToOtherAgency ? "pré-valider" : "valider"} les conventions dématérialisées sur Immersion Facilitée.
 
-        <strong>Voici les différents utilisateurs rattachés à la structure et leur rôles :</strong>
-
-        Chaque utilisateur peut se créer un espace personnel afin de voir${
-          refersToOtherAgency
-            ? " ou pré-valider"
-            : ", pré-valider ou valider et piloter"
-        } ses conventions, en fonction de ses droits.
         ${
           refersToOtherAgency &&
-          `Les conventions devront ensuite être validées par l’un des validateurs de votre organisme prescripteur lié : ${agencyReferdToName}.`
+          `Elles seront ensuite validée par ${agencyReferdToName}.`
         }
-        ${users
-          .map(
-            ({
-              firstName,
-              lastName,
-              email,
-              agencyName,
-              isNotifiedByEmail,
-              roles,
-            }) =>
-              generateUserInfo(
-                firstName,
-                lastName,
-                email,
-                roles,
-                isNotifiedByEmail,
-                agencyName,
-              ),
-          )
-          .join("")}
  
-
         Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
 
         Au programme :
@@ -381,12 +353,34 @@ export const emailTemplatesByName =
         `,
         buttons: [
           {
-            label: "Je m'inscris au webinaire",
-            url: "https://pages.immersion-facile.beta.gouv.fr/prescripteurs-nos-prochains-webinaires/",
+            label: "Accèder à mon espace",
+            url: agencyDashboardUrl,
+            target: "_blank",
           },
         ],
         agencyLogoUrl,
-        subContent: defaultSignature("immersion"),
+        subContent: `
+        <strong>Maîtrisez rapidement l’utilisation du site en 2 temps :</strong>
+        
+        • <strong>Pour les responsables de votre structure</strong> :
+        <a href="https://app.livestorm.co/immersion-facilitee/immersion-facilitee-parametrer-les-acces-au-tableau-de-bord?s=6a2504e1-6eaf-4174-afc9-f9a4b48369ec" target="_blank">Un point pour bien paramétrer votre compte</a>
+        (30 minutes)
+
+        • <strong>Pour l'ensemble de vos collaborateurs</strong> :
+        <a href="https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee" target="_blank">Un temps de présentation de toutes les fonctionnalités du site</a>
+        (30 minutes de présentation et 30 minutes pour poser les questions)
+
+        N'hésitez pas à leur partager ce lien :
+        <a href="https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee" target="_blank">https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee</a>
+
+        Si aucune date ne vous convient, inscrivez-vous et nous vous enverrons le replay.
+
+        Pour toute question n'hésitez pas à nous contacter via le
+        <a href=${immersionFacileHelpdeskRootUrl} target="_blank">
+          support d’Immersion Facilitée
+        </a>.
+
+        ${defaultSignature("immersion")}`,
         attachmentUrls: [emailAttachements.memoAgencyRolesAndRisks],
       }),
     },
