@@ -43,10 +43,9 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { type routes, useRoute } from "src/app/routes/routes";
+import { useCreateDiscussionRoute } from "src/app/routes/routes.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { match } from "ts-pattern";
-import type { Route } from "type-route";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type CreateDiscussionFormProps = {
@@ -61,9 +60,10 @@ export const CreateDiscussionForm = ({
   contactMode,
 }: CreateDiscussionFormProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<
-    typeof routes.searchResult | typeof routes.searchResultForStudent
-  >;
+  const route = useCreateDiscussionRoute([
+    "searchResult",
+    "searchResultForStudent",
+  ]);
 
   const inputsLabelsByKey = makeContactInputsLabelsByKey(
     route.name === "searchResult" ? "IF" : "1_ELEVE_1_STAGE",

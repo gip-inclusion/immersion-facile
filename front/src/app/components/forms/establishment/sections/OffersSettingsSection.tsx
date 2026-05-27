@@ -41,7 +41,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useRoute } from "src/app/routes/routes";
+import { type Mode, useEstablishmentRoute } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
@@ -55,12 +55,7 @@ import mailSvg from "../../../../../assets/img/mail.svg";
 import phoneSvg from "../../../../../assets/img/phone.svg";
 import studentSvg from "../../../../../assets/img/student.svg";
 import userSvg from "../../../../../assets/img/user.svg";
-import type {
-  Mode,
-  OnStepChange,
-  RouteByMode,
-  Step,
-} from "../EstablishmentForm";
+import type { OnStepChange, Step } from "../EstablishmentForm";
 
 const searchableByValues: Record<
   "all" | keyof EstablishmentSearchableBy,
@@ -98,7 +93,11 @@ export const OffersSettingsSection = ({
   const { setValue, watch, clearErrors, getValues, register, formState } =
     useFormContext<FormEstablishmentDto>();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const route = useRoute() as RouteByMode[Mode];
+  const route = useEstablishmentRoute([
+    "adminEstablishments",
+    "establishmentDashboardFormEstablishment",
+    "formEstablishment",
+  ]);
   const isEstablishmentAdmin = route.name === "adminEstablishments";
 
   const dispatch = useDispatch();

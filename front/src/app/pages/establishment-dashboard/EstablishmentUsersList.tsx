@@ -9,6 +9,7 @@ import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import { domElementIds, type FormEstablishmentUserRight } from "shared";
+import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
@@ -245,7 +246,13 @@ const getEstablishmentUserRow = ({
   setEditingUserRight: (userRight: FormEstablishmentUserRight) => void;
   onValidateUserRight: (userRight: FormEstablishmentUserRight) => void;
 }) => [
-  userRight.email,
+  <Fragment key={`${userRight.email}`}>
+    <NameAndEmailInTable
+      firstName={userRight.firstName}
+      lastName={userRight.lastName}
+      email={userRight.email}
+    />
+  </Fragment>,
   <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
     <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
     <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>

@@ -2,6 +2,7 @@ import {
   BadRequestError,
   type BanEstablishmentPayload,
   type DataWithPagination,
+  executeInSequence,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -21,6 +22,7 @@ import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate"
 import {
   boulangerOffer,
   EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
   OfferEntityBuilder,
   secretariatOffer,
 } from "../helpers/EstablishmentBuilders";
@@ -669,6 +671,55 @@ describe("GetOffers", () => {
         totalPages: 1,
         totalRecords: 2,
       },
+    });
+  });
+  it("should calculate totalRecords and pagination properly", async () => {
+    await executeInSequence(Array.from({ length: 100 }), async (index) => {
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(`1111222233334${index}`)
+            .build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withRomeCode("B1805")
+            .withAppellationCode("19540")
+            .withAppellationLabel("Styliste")
+            .build(),
+        ])
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            status: "ACCEPTED",
+            userId: "osef",
+            job: "",
+            phone: "",
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+        ])
+        .build();
+      return uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+    });
+
+    const response = await getOffers.execute(
+      {
+        sortBy: "score",
+        sortOrder: "asc",
+        page: 1,
+        perPage: 10,
+      },
+      undefined,
+    );
+
+    expectToEqual(response.pagination, {
+      totalRecords: 104,
+      totalPages: 11,
+      currentPage: 1,
+      numberPerPage: 10,
     });
   });
 

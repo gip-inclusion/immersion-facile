@@ -1,7 +1,11 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { allAgencyStatuses, looksLikeSiret } from "shared";
+import {
+  allAgencyStatuses,
+  looksLikeSiret,
+  maxAgencyOptionsPerRequest,
+} from "shared";
 import type {
   ActionOfSlice,
   AppEpic,
@@ -24,6 +28,7 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     switchMap((action: PayloadAction<string>) =>
       agencyGateway.listAgencyOptionsByFilter$({
         status: [...allAgencyStatuses],
+        limit: maxAgencyOptionsPerRequest,
         [looksLikeSiret(action.payload) ? "siret" : "nameIncludes"]:
           action.payload,
       }),

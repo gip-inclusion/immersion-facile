@@ -17,10 +17,11 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUsersList } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
+import type { Mode } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { match, P } from "ts-pattern";
-import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
+import type { OnStepChange, Step } from "../EstablishmentForm";
 
 export const BusinessAndAdminSection = ({
   mode,

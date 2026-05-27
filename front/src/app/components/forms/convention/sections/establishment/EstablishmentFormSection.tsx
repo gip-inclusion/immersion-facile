@@ -110,6 +110,7 @@ export const EstablishmentFormSection = ({
         isConventionTemplate={isConventionTemplate}
       />
       <RadioButtons
+        id={formContents.isEstablishmentTutorIsEstablishmentRepresentative.id}
         legend={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
         }

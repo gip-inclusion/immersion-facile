@@ -111,12 +111,107 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     ];
   });
 
-  it("triggers standard broadcast on convention update", async () => {
+  it("triggers standard broadcast on convention update with assessment when present", async () => {
     await broadcastToFranceTravailOrchestrator.execute({
       conventionId: convention.id,
     });
     expectStandardBroadcastCallsToEqual([
-      { eventType: "CONVENTION_UPDATED", convention: conventionReadDto },
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDto,
+        assessment,
+      },
+    ]);
+  });
+
+  it("does not include assessment key when convention has no assessment", async () => {
+    const conventionReadDtoWithoutAssessment: ConventionReadDto = {
+      ...conventionWithoutAssessment,
+      agencyName: agency.name,
+      agencySiret: agency.agencySiret,
+      agencyKind: agency.kind,
+      agencyContactEmail: agency.contactEmail,
+      agencyRefersTo: {
+        id: referredAgency.id,
+        name: referredAgency.name,
+        contactEmail: referredAgency.contactEmail,
+        kind: referredAgency.kind,
+        siret: referredAgency.agencySiret,
+      },
+      agencyDepartment: agency.address.departmentCode,
+      agencyValidatorEmails: [validator.email],
+      agencyCounsellorEmails: [],
+      assessment: null,
+      isEstablishmentBanned: false,
+    };
+
+    await broadcastToFranceTravailOrchestrator.execute({
+      conventionId: conventionWithoutAssessment.id,
+    });
+
+    expectStandardBroadcastCallsToEqual([
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: conventionReadDtoWithoutAssessment,
+      },
+    ]);
+  });
+
+  it("does not include assessment key when assessment is legacy", async () => {
+    const conventionWithLegacyAssessment = new ConventionDtoBuilder()
+      .withId("convention-with-legacy-assessment-id")
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agency.id)
+      .build();
+
+    uow.conventionRepository.setConventions([
+      convention,
+      conventionWithoutAssessment,
+      conventionWithLegacyAssessment,
+    ]);
+    uow.assessmentRepository.assessments = [
+      createAssessmentEntity(assessment, convention),
+      {
+        _entityName: "Assessment",
+        status: "FINISHED",
+        conventionId: conventionWithLegacyAssessment.id,
+        establishmentFeedback: "commentaire",
+        numberOfHoursActuallyMade: null,
+        createdAt: new Date("2023-03-11").toISOString(),
+      },
+    ];
+
+    await broadcastToFranceTravailOrchestrator.execute({
+      conventionId: conventionWithLegacyAssessment.id,
+    });
+
+    expectStandardBroadcastCallsToEqual([
+      {
+        eventType: "CONVENTION_UPDATED",
+        previousAgencyId: undefined,
+        convention: {
+          ...conventionWithLegacyAssessment,
+          agencyName: agency.name,
+          agencySiret: agency.agencySiret,
+          agencyKind: agency.kind,
+          agencyContactEmail: agency.contactEmail,
+          agencyRefersTo: {
+            id: referredAgency.id,
+            name: referredAgency.name,
+            contactEmail: referredAgency.contactEmail,
+            kind: referredAgency.kind,
+            siret: referredAgency.agencySiret,
+          },
+          agencyDepartment: agency.address.departmentCode,
+          agencyValidatorEmails: [validator.email],
+          agencyCounsellorEmails: [],
+          assessment: {
+            status: "FINISHED",
+            createdAt: new Date("2023-03-11").toISOString(),
+          },
+          isEstablishmentBanned: false,
+        },
+      },
     ]);
   });
 
@@ -131,6 +226,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         eventType: "CONVENTION_UPDATED",
         convention: conventionReadDto,
         previousAgencyId,
+        assessment,
       },
     ]);
   });

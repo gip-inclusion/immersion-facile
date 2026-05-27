@@ -165,9 +165,10 @@ const conventionTemplateFromRouteValues = [
   "agencyDashboard",
 ] as const;
 
-const isConventionTemplateFromRoute = (
-  value: string,
-): value is "agencyDashboard" | "establishmentDashboard" =>
+export const isConventionTemplateFromRoute = (
+  value: unknown,
+): value is ConventionTemplateFromRoute =>
+  typeof value === "string" &&
   conventionTemplateFromRouteValues.some((v) => v === value);
 
 export const conventionTemplateFromRouteSerializer: ValueSerializer<
@@ -221,9 +222,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboard,
   agencyDashboardMain: agencyDashboard.extend("/dashboard"),
   agencyDashboardOnboarding: agencyDashboard.extend("/onboarding"),
-  agencyDashboardSynchronisedConventions: agencyDashboard.extend(
-    "/conventions-synchronisees",
-  ),
   statsEstablishmentDetails: agencyDashboard.extend(
     "/stats-activites-par-entreprise",
   ),
