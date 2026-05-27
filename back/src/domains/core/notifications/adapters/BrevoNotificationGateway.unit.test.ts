@@ -208,26 +208,7 @@ describe("BrevoNotificationGateway unit", () => {
       <br/>
       <br/>Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
       <br/>
-      <br/><strong>Voici les différents utilisateurs rattachés à la structure et leur rôles :</strong>
-      <br/>
-      <br/>Chaque utilisateur peut se créer un espace personnel afin de voir, pré-valider ou valider et piloter ses conventions, en fonction de ses droits.
       <br/>false
-      <br/>
-      <br/><ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>Jean Dupont - jean-dupont@gmail.com</strong></li>
-      <br/><li><strong>Valideur</strong> (peut valider des conventions de l’agence et modifier leur statut)</li>
-      <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
-      <br/><li><a 
-      href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" 
-      target="_blank">Espace personnel</a></li></ul>
-      <br/>
-      <br/><ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>Jeanne Dupont - jeanne-dupont@gmail.com</strong></li>
-      <br/><li><strong>Pré-Valideur</strong> (peut pré-valider les conventions de l’agence et modifier leur statut)</li>
-      <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
-      <br/><li><a 
-      href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" 
-      target="_blank">Espace personnel</a></li></ul>
-      <br/>
-      <br/>
       <br/>
       <br/>Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
       <br/>
@@ -251,9 +232,10 @@ describe("BrevoNotificationGateway unit", () => {
       >
       <a
       style="text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;"
-      href="https://pages.immersion-facile.beta.gouv.fr/prescripteurs-nos-prochains-webinaires/"
+      href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence/dashboard"
+      target="_blank"
       >
-      Je m'inscris au webinaire
+      Accèder à mon espace
       </a>
       </td>
       </tr>
@@ -266,7 +248,36 @@ describe("BrevoNotificationGateway unit", () => {
       width="600">
       <tr>
       <td>
-      <p>Bonne journée,
+      <p><strong>Maîtrisez rapidement l’utilisation du site en 2 temps :</strong>
+      <br/>
+      <br/>• <strong>Pour les responsables de votre structure</strong> :
+      <br/><a 
+      href="https://app.livestorm.co/immersion-facilitee/immersion-facilitee-parametrer-les-acces-au-tableau-de-bord?s=6a2504e1-6eaf-4174-afc9-f9a4b48369ec" 
+      target="_blank">Un point pour bien paramétrer votre compte</a>
+      <br/>(30 minutes)
+      <br/>
+      <br/>• <strong>Pour l'ensemble de vos collaborateurs</strong> :
+      <br/><a 
+      href="https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee" 
+      target="_blank">Un temps de présentation de toutes les fonctionnalités du site</a>
+      <br/>(30 minutes de présentation et 30 minutes pour poser les questions)
+      <br/>
+      <br/>N'hésitez pas à leur partager ce lien :
+      <br/><a 
+      href="https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee" 
+      target="_blank">https://app.livestorm.co/immersion-facilitee/prescripteurs-et-structures-daccompagnement-decouvrir-immersion-facilitee</a>
+      <br/>
+      <br/>Si aucune date ne vous convient, inscrivez-vous et nous vous enverrons le replay.
+      <br/>
+      <br/>Pour toute question n'hésitez pas à nous contacter via le
+      <br/><a 
+      href=https://aide.immersion-facile.beta.gouv.fr/fr 
+      target="_blank">
+      <br/>support d’Immersion Facilitée
+      <br/></a>.
+      <br/>
+      <br/>
+      <br/>Bonne journée,
       <br/>L'équipe Immersion Facilitée</p>
       </td>
       </tr>
