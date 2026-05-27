@@ -166,10 +166,8 @@ import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/estab
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
-import { makeNotifyConventionBeneficiariesThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyConventionBeneficiariesThatEstablishmentIsBanned";
-import { makeNotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned";
 import { makeNotifyEstablishmentAdminsThatUserRightIsPending } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentAdminsThatUserRightIsPending";
-import { makeNotifyEstablishmentUsersThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentUsersThatEstablishmentIsBanned";
+import { makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { makeRegisterUserOnEstablishment } from "../../domains/establishment/use-cases/RegisterUserOnEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
@@ -544,21 +542,8 @@ export const createUseCases = ({
           config,
         },
       }),
-    notifyEstablishmentUsersThatEstablishmentIsBanned:
-      makeNotifyEstablishmentUsersThatEstablishmentIsBanned({
-        uowPerformer,
-        deps: { saveNotificationAndRelatedEvent },
-      }),
-    notifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned:
-      makeNotifyDiscussionPotentialBeneficiariesThatEstablishmentIsBanned({
-        uowPerformer,
-        deps: {
-          saveNotificationAndRelatedEvent,
-          immersionBaseUrl: config.immersionFacileBaseUrl,
-        },
-      }),
-    notifyConventionPotentialBeneficiariesThatEstablishmentIsBanned:
-      makeNotifyConventionBeneficiariesThatEstablishmentIsBanned({
+    notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned:
+      makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned({
         uowPerformer,
         deps: {
           saveNotificationAndRelatedEvent,
