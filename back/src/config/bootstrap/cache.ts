@@ -49,12 +49,21 @@ export const makeConnectedRedisClient = async (config: AppConfig) => {
     logger.info({ message: "Redis client ready for commands" });
   });
 
-  redisClient.on("error", (err) =>
+  redisClient.on("error", (err) => {
+    if (err.message === "Socket closed unexpectedly") {
+      logger.info({
+        message:
+          "Redis connection closed after inactivity, attempting to reconnect...",
+        error: err,
+      });
+      return;
+    }
+
     logger.error({
       message: `Redis Client Error : ${err.message}`,
       error: err,
-    }),
-  );
+    });
+  });
 
   logger.info({ message: "Redis client connected successfully" });
 
