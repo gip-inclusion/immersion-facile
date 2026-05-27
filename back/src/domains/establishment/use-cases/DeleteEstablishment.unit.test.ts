@@ -23,7 +23,10 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { DeleteEstablishment } from "./DeleteEstablishment";
+import {
+  type DeleteEstablishment,
+  makeDeleteEstablishment,
+} from "./DeleteEstablishment";
 
 describe("Delete Establishment", () => {
   const backofficeAdminBuilder = new ConnectedUserBuilder().withIsAdmin(true);
@@ -89,16 +92,22 @@ describe("Delete Establishment", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
+
+    deleteEstablishment = makeDeleteEstablishment({
+      deps: {
+        timeGateway,
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          uuidGenerator,
+          timeGateway,
+        ),
+      },
+      uowPerformer: new InMemoryUowPerformer(uow),
     });
-    deleteEstablishment = new DeleteEstablishment(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-      makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
-      createNewEvent,
-    );
+
     uow.userRepository.users = [
       backofficeAdminUser,
       establishmentAdmin,

@@ -3,62 +3,58 @@ import {
   type ConnectedUser,
   errors,
   executeInSequence,
-  type WithSiretDto,
   withSiretSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class DeleteEstablishment extends TransactionalUseCase<
-  WithSiretDto,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = withSiretSchema;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private timeGateway: TimeGateway,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    private readonly createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-  }
-
-  public async _execute(
-    { siret }: WithSiretDto,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type DeleteEstablishment = ReturnType<typeof makeDeleteEstablishment>;
+export const makeDeleteEstablishment = useCaseBuilder("DeleteEstablishment")
+  .withInput(withSiretSchema)
+  .withCurrentUser<ConnectedUser | void>()
+  .withDeps<{
+    timeGateway: TimeGateway;
+    createNewEvent: CreateNewEvent;
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  }>()
+  .build(async ({ currentUser, deps, inputParams, uow }) => {
+    if (!currentUser) throw errors.user.unauthorized();
     throwIfNotAdmin(currentUser);
 
-    const groupsWithSiret = await uow.groupRepository.groupsWithSiret(siret);
+    const groupsWithSiret = await uow.groupRepository.groupsWithSiret(
+      inputParams.siret,
+    );
 
     const groupsUpdatedWithoutSiret = groupsWithSiret.map((group) => ({
       ...group,
-      sirets: group.sirets.filter((groupSiret) => groupSiret !== siret),
+      sirets: group.sirets.filter(
+        (groupSiret) => groupSiret !== inputParams.siret,
+      ),
     }));
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+        inputParams.siret,
       );
 
-    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
+    if (!establishmentAggregate)
+      throw errors.establishment.notFound({ siret: inputParams.siret });
 
-    await uow.establishmentAggregateRepository.delete(siret);
+    await uow.establishmentAggregateRepository.delete(
+      establishmentAggregate.establishment.siret,
+    );
+
     await executeInSequence(groupsUpdatedWithoutSiret, (group) =>
       uow.groupRepository.save(group),
     );
+
     await uow.deletedEstablishmentRepository.save({
-      siret,
+      siret: establishmentAggregate.establishment.siret,
       createdAt: establishmentAggregate.establishment.createdAt,
-      deletedAt: this.timeGateway.now(),
+      deletedAt: deps.timeGateway.now(),
     });
 
     const adminIds = establishmentAggregate.userRights
@@ -68,16 +64,16 @@ export class DeleteEstablishment extends TransactionalUseCase<
       .filter(({ role }) => role === "establishment-contact")
       .map(({ userId }) => userId);
 
-    const deletedEstablishmentEvent = this.createNewEvent({
+    const deletedEstablishmentEvent = deps.createNewEvent({
       topic: "EstablishmentDeleted",
       payload: {
-        siret,
+        siret: establishmentAggregate.establishment.siret,
         triggeredBy: { kind: "connected-user", userId: currentUser.id },
       },
     });
 
     await uow.outboxRepository.save(deletedEstablishmentEvent);
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "ESTABLISHMENT_DELETED",
@@ -100,5 +96,4 @@ export class DeleteEstablishment extends TransactionalUseCase<
         establishmentSiret: establishmentAggregate.establishment.siret,
       },
     });
-  }
-}
+  });
