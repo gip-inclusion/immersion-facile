@@ -158,7 +158,9 @@ const initiateConventionFromEstablishmentInformations = async ({
   const appellationSelectLocator = page.locator(
     `#${domElementIds.establishmentDashboard.initiateConvention.appellationSelect}`,
   );
-  await appellationSelectLocator.selectOption({ index: 1 });
+  await appellationSelectLocator.selectOption({
+    label: "Boucher-charcutier / Bouchère-charcutière",
+  });
   const selectedAppellation =
     (
       await appellationSelectLocator.locator("option:checked").textContent()
@@ -167,7 +169,14 @@ const initiateConventionFromEstablishmentInformations = async ({
   const addressSelectLocator = page.locator(
     `#${domElementIds.establishmentDashboard.initiateConvention.addressSelect}`,
   );
-  await addressSelectLocator.selectOption({ index: 1 });
+  await expect(addressSelectLocator).toBeVisible();
+
+  const addressOptionCount = await addressSelectLocator
+    .locator("option")
+    .count();
+  if (addressOptionCount > 1)
+    await addressSelectLocator.selectOption({ index: 1 });
+
   const selectedAddress = await addressSelectLocator.inputValue();
 
   await page.click(
