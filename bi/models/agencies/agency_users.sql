@@ -4,7 +4,8 @@
     schema='analytics',
     post_hook=[
       "CREATE INDEX IF NOT EXISTS idx_agency_users_agency_id ON {{ this }} (agency_id)",
-      "CREATE INDEX IF NOT EXISTS idx_agency_users_user_id ON {{ this }} (user_id)"
+      "CREATE INDEX IF NOT EXISTS idx_agency_users_user_id ON {{ this }} (user_id)",
+      "CREATE INDEX IF NOT EXISTS idx_agency_users_agency_admin_true ON {{ this }} (agency_id, user_id) WHERE agency_admin = true"
     ]
   )
 }}
@@ -16,7 +17,11 @@ select
     u.first_name as user_first_name,
     u.last_name as user_last_name,
     concat(u.first_name, ' ', u.last_name) as user_full_name,
-    au.roles,
+    coalesce(au.roles ? 'agency-admin', false) as agency_admin,
+    coalesce(au.roles ? 'validator', false) as validator,
+    coalesce(au.roles ? 'counsellor', false) as counsellor,
+    coalesce(au.roles ? 'agency-viewer', false) as agency_viewer,
+    coalesce(au.roles ? 'to-review', false) as to_review,
     au.is_notified_by_email,
     u.created_at as user_created_at,
     u.updated_at as user_updated_at,
