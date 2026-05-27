@@ -1,4 +1,4 @@
-import { addDays, subHours } from "date-fns";
+import { addDays } from "date-fns";
 import {
   agencyModifierRoles,
   allSignatoryRoles,
@@ -7,8 +7,10 @@ import {
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
+  formatHoursCooldownTimeRemaining,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  isWithinHoursCooldown,
   type NotificationKind,
   type SendAssessmentLinkRequestDto,
   sendAssessmentLinkRequestSchema,
@@ -329,25 +331,19 @@ const throwErrorIfAssessmentLinkAlreadySent = async ({
 
   if (
     lastNotificationCreatedAt &&
-    lastNotificationCreatedAt >
-      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER)
-  ) {
-    const nextAllowedTime = lastNotificationCreatedAt;
-    nextAllowedTime.setHours(
-      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
-    );
-    const timeRemainingMs =
-      nextAllowedTime.getTime() - timeGateway.now().getTime();
-    const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
-    const minutesRemaining = Math.ceil(
-      (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
-    );
-    const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
-
+    isWithinHoursCooldown({
+      lastActionAt: lastNotificationCreatedAt,
+      minHours: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+      now: timeGateway.now(),
+    })
+  )
     throw errors.assessment.assessmentLinkAlreadySent({
       notificationKind,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
-      timeRemaining: formattedTimeRemaining,
+      timeRemaining: formatHoursCooldownTimeRemaining({
+        lastActionAt: lastNotificationCreatedAt,
+        minHours: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+        now: timeGateway.now(),
+      }),
     });
-  }
 };

@@ -22,7 +22,6 @@ import {
   type NotificationsByKind,
   notificationKinds,
   type SendAssessmentLinkRequestDto,
-  type SendAssessmentSignatureReminderRequestDto,
   type SendSignatureLinkRequestDto,
   type SmsNotification,
 } from "./notifications.dto";
@@ -101,12 +100,6 @@ export const sendSignatureLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Se
     notificationKind: notificationKindSchema,
   });
 export const sendAssessmentLinkRequestSchema: ZodSchemaWithInputMatchingOutput<SendAssessmentLinkRequestDto> =
-  z.object({
-    conventionId: conventionIdSchema,
-    notificationKind: notificationKindSchema,
-  });
-
-export const sendAssessmentSignatureReminderRequestSchema: ZodSchemaWithInputMatchingOutput<SendAssessmentSignatureReminderRequestDto> =
   z.object({
     conventionId: conventionIdSchema,
     notificationKind: notificationKindSchema,

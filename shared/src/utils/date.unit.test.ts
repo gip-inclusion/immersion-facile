@@ -1,9 +1,11 @@
-import { addSeconds, addYears, parseISO, subYears } from "date-fns";
+import { addSeconds, addYears, parseISO, subHours, subYears } from "date-fns";
 import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
 import {
+  formatHoursCooldownTimeRemaining,
   hoursValueToHoursDisplayed,
+  isWithinHoursCooldown,
   makeDateStringSchema,
   toDateUTCString,
   toDisplayedDate,
@@ -49,6 +51,31 @@ describe("Date utils tests - hoursValueToHoursDisplayed", () => {
     { expected: "67h45", input: 67.75 },
   ])("convert $input to $expected", ({ input, expected }) => {
     expect(hoursValueToHoursDisplayed({ hoursValue: input })).toBe(expected);
+  });
+});
+
+describe("Date utils tests - hours cooldown", () => {
+  const now = new Date("2024-06-15T12:00:00.000Z");
+  const minHours = 24;
+
+  it("detects when last action is within cooldown period", () => {
+    const lastActionAt = subHours(now, 2);
+
+    expect(isWithinHoursCooldown({ lastActionAt, minHours, now })).toBeTruthy();
+  });
+
+  it("detects when last action is outside cooldown period", () => {
+    const lastActionAt = subHours(now, 25);
+
+    expect(isWithinHoursCooldown({ lastActionAt, minHours, now })).toBeFalsy();
+  });
+
+  it("formats remaining time until cooldown ends", () => {
+    const lastActionAt = subHours(now, 2);
+
+    expect(
+      formatHoursCooldownTimeRemaining({ lastActionAt, minHours, now }),
+    ).toBe("22h00");
   });
 });
 

@@ -40,7 +40,6 @@ import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
   sendAssessmentLinkRequestSchema,
-  sendAssessmentSignatureReminderRequestSchema,
   sendSignatureLinkRequestSchema,
 } from "../notifications/notifications.schema";
 import { paginationRequiredQueryParamsSchema } from "../pagination/pagination.schema";
@@ -203,7 +202,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
   sendAssessmentSignatureReminder: defineRoute({
     url: "/auth/assessment/send-assessment-signature-reminder",
     method: "post",
-    requestBodySchema: sendAssessmentSignatureReminderRequestSchema,
+    requestBodySchema: sendAssessmentLinkRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

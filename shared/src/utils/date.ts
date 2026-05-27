@@ -4,6 +4,7 @@ import {
   addYears,
   differenceInCalendarDays,
   isValid,
+  subHours,
   subYears,
 } from "date-fns";
 import { z } from "zod";
@@ -160,3 +161,31 @@ export const getDaysBetween = (from: Date, to: Date) =>
     convertLocaleDateToUtcTimezoneDate(to),
     convertLocaleDateToUtcTimezoneDate(from),
   );
+
+export const isWithinHoursCooldown = ({
+  lastActionAt,
+  minHours,
+  now,
+}: {
+  lastActionAt: Date;
+  minHours: number;
+  now: Date;
+}): boolean => lastActionAt > subHours(now, minHours);
+
+export const formatHoursCooldownTimeRemaining = ({
+  lastActionAt,
+  minHours,
+  now,
+}: {
+  lastActionAt: Date;
+  minHours: number;
+  now: Date;
+}): string => {
+  const nextAllowedTime = addHours(lastActionAt, minHours);
+  const timeRemainingMs = nextAllowedTime.getTime() - now.getTime();
+  const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
+  const minutesRemaining = Math.ceil(
+    (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
+  );
+  return `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
+};
