@@ -207,7 +207,7 @@ describe("SendExchangeToRecipient", () => {
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
                   </ul><br />
                   
-  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  <a href="http://localhost/tableau-de-bord-beneficiaire/discussions/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
   
                   </div>
             ${lastEstablishmentExchange.message}`,
@@ -297,7 +297,7 @@ describe("SendExchangeToRecipient", () => {
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
                   </ul><br />
                   
-  <a href="http://localhost/tableau-de-bord-etablissement?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  <a href="http://localhost/tableau-de-bord-etablissement/discussions/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
   
                   </div>
             ${lastBeneficiaryExchange.message}`,
@@ -371,7 +371,7 @@ describe("SendExchangeToRecipient", () => {
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
                   </ul><br />
                   
-  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  <a href="http://localhost/tableau-de-bord-beneficiaire/discussions/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
   
                   </div>
             ${"--- pas de message ---"}`,
@@ -429,7 +429,7 @@ describe("SendExchangeToRecipient", () => {
                   <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
                   </ul><br />
                   
-  <a href="http://localhost/tableau-de-bord-beneficiaire?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
+  <a href="http://localhost/tableau-de-bord-beneficiaire/discussions/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">Répondre depuis mon espace</a><br />
   
                   </div>
             ${lastExchange.message}`,

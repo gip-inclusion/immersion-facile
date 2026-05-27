@@ -109,7 +109,7 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   } ${discussion.address.postcode} ${discussion.address.city}</li>
                   </ul><br />
                   ${renderCTAInEmailContent({
-                    url: `${deps.config.immersionFacileBaseUrl}/${lastExchange.sender === "establishment" ? frontRoutes.beneficiaryDashboard : frontRoutes.establishmentDashboard}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord`,
+                    url: `${deps.config.immersionFacileBaseUrl}/${lastExchange.sender === "establishment" ? frontRoutes.beneficiaryDashboardDiscussions : frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord`,
                     label: "Répondre depuis mon espace",
                   })}
                   </div>
