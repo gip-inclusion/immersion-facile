@@ -439,6 +439,22 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 Site web de l'entreprise
               </a>
             )}
+          {discussion.kind === "IF" && viewer === "potentialBeneficiary" && (
+            <a
+              title="Offre d'immersion"
+              target="_blank"
+              rel="noreferrer"
+              href={
+                routes.searchResult({
+                  appellationCode: [discussion.appellation.appellationCode],
+                  siret: discussion.siret,
+                  location: discussion.locationId,
+                }).href
+              }
+            >
+              Voir l'offre
+            </a>
+          )}
         </DiscussionMeta>
       </header>
 
