@@ -258,25 +258,8 @@ describe("SendNotification UseCase", () => {
         agencyLogoUrl: undefined,
         refersToOtherAgency: false,
         agencyReferdToName: undefined,
-        users: [
-          {
-            firstName: "Jean",
-            lastName: "Dupont",
-            email: "jean-dupont@gmail.com",
-            agencyName: "Agence du Grand Est",
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
-
-          {
-            firstName: "Jeanne",
-            lastName: "Dupont",
-            email: "jeanne-dupont@gmail.com",
-            agencyName: "Agence du Grand Est",
-            isNotifiedByEmail: true,
-            roles: ["counsellor"],
-          },
-        ],
+        agencyDashboardUrl:
+          "https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence/dashboard",
       },
       recipients: ["bob@mail.com"],
       cc: [],
