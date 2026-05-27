@@ -43,6 +43,7 @@ import {
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
+  establishmentFormOfferSchema,
   type InternshipKind,
   isBeneficiaryMinor,
   isCreateConventionPresentationInitialValues,
@@ -316,6 +317,13 @@ export const ConventionForm = ({
       return convention.signatories?.beneficiary?.[key];
     };
 
+    const immersionAppellationFromRoute = pickConventionValueFromRouteParams(
+      "immersionAppellation",
+    );
+    const parsedEstablishmentOffer = establishmentFormOfferSchema.safeParse(
+      immersionAppellationFromRoute,
+    );
+
     const conventionDefaultValues: CreateConventionPresentationInitialValues = {
       ...convention,
       status: "READY_TO_SIGN",
@@ -337,9 +345,10 @@ export const ConventionForm = ({
       agencyKind: pickConventionValueFromRouteParams("agencyKind"),
       siret: pickConventionValueFromRouteParams("siret"),
       immersionAddress: pickConventionValueFromRouteParams("immersionAddress"),
-      immersionAppellation: pickConventionValueFromRouteParams(
-        "immersionAppellation",
-      ),
+      immersionAppellation: immersionAppellationFromRoute,
+      remoteWorkMode: parsedEstablishmentOffer.success
+        ? parsedEstablishmentOffer.data.remoteWorkMode
+        : convention.remoteWorkMode,
       signatories: {
         ...convention.signatories,
         beneficiary: {
