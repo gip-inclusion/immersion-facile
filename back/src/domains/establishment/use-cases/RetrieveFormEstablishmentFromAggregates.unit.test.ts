@@ -315,7 +315,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .withId("admin-id")
         .withEmail("admin@mail.com")
         .buildUser();
-      const establishmentContactWithPhoneButMainContactBuPhoneUndefined =
+      const establishmentContactWithPhoneButMainContactButPhoneUndefined =
         new ConnectedUserBuilder()
           .withId("contact-id")
           .withEmail("contact@email.com")
@@ -332,7 +332,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       const establishmentContactWithPhoneRight: EstablishmentUserRight = {
         role: "establishment-contact",
         status: "ACCEPTED",
-        userId: establishmentContactWithPhoneButMainContactBuPhoneUndefined.id,
+        userId: establishmentContactWithPhoneButMainContactButPhoneUndefined.id,
         shouldReceiveDiscussionNotifications: true,
         phone: "+33611111111",
       };
@@ -359,7 +359,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       uow.userRepository.users = [
         connectedAdmin,
         adminUser,
-        establishmentContactWithPhoneButMainContactBuPhoneUndefined,
+        establishmentContactWithPhoneButMainContactButPhoneUndefined,
       ];
 
       const establishmentForm = await useCase.execute(siret, {
@@ -384,9 +384,9 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           {
             email: "contact@email.com",
             firstName:
-              establishmentContactWithPhoneButMainContactBuPhoneUndefined.firstName,
+              establishmentContactWithPhoneButMainContactButPhoneUndefined.firstName,
             lastName:
-              establishmentContactWithPhoneButMainContactBuPhoneUndefined.lastName,
+              establishmentContactWithPhoneButMainContactButPhoneUndefined.lastName,
             job: establishmentContactWithPhoneRight.job,
             role: "establishment-contact",
             status: "ACCEPTED",
