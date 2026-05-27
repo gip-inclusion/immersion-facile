@@ -134,6 +134,20 @@ export const InitiateConventionButton = () => {
         >)
       : null;
 
+  const selectedOffer =
+    !isEstablishmentDefault && establishmentValues?.appellation
+      ? establishment.offers.find(
+          (offer) => offer.appellationCode === establishmentValues.appellation,
+        )
+      : undefined;
+
+  const isFullRemoteOffer = selectedOffer?.remoteWorkMode === "FULL_REMOTE";
+  const defaultEstablishmentAddress =
+    establishment.businessAddresses[0]?.rawAddress;
+
+  const shouldShowAddressSelect =
+    !!establishmentValues?.appellation && !isFullRemoteOffer;
+
   const onInitiateConventionFormSubmit = () => {
     if (initiateConventionSource === "establishment" && establishmentValues) {
       const appellation = establishment?.offers.find(
@@ -250,10 +264,14 @@ export const InitiateConventionButton = () => {
   if (
     initiateConventionSource === "establishment" &&
     !isEstablishmentDefault &&
-    establishment.businessAddresses.length === 1 &&
-    establishmentValues?.location === ""
+    defaultEstablishmentAddress &&
+    establishmentValues?.appellation &&
+    (isFullRemoteOffer ||
+      (shouldShowAddressSelect &&
+        establishment.businessAddresses.length === 1)) &&
+    establishmentValues.location !== defaultEstablishmentAddress
   )
-    setValue("location", establishment.businessAddresses[0].rawAddress);
+    setValue("location", defaultEstablishmentAddress);
 
   if (!currentUser || !connectedUserJwt) return null;
 
@@ -387,32 +405,34 @@ export const InitiateConventionButton = () => {
                       formErrors.appellation?.message
                     }
                   />
-                  <Select
-                    label={"Lieu d'immersion *"}
-                    placeholder="Sélectionnez un lieu d'immersion"
-                    className={fr.cx("fr-mt-2w")}
-                    disabled={
-                      isEstablishmentDefault ||
-                      establishment.businessAddresses.length === 1
-                    }
-                    options={
-                      establishment?.businessAddresses.map((location) => ({
-                        value: location.rawAddress,
-                        label: location.rawAddress,
-                      })) ?? []
-                    }
-                    nativeSelectProps={{
-                      id: domElementIds.establishmentDashboard
-                        .initiateConvention.addressSelect,
-                      value: establishmentValues?.location ?? "",
-                      onChange: (event) =>
-                        setValue("location", event.currentTarget.value),
-                    }}
-                    state={"location" in formErrors ? "error" : "default"}
-                    stateRelatedMessage={
-                      "location" in formErrors && formErrors.location?.message
-                    }
-                  />
+                  {shouldShowAddressSelect && (
+                    <Select
+                      label={"Lieu d'immersion *"}
+                      placeholder="Sélectionnez un lieu d'immersion"
+                      className={fr.cx("fr-mt-2w")}
+                      disabled={
+                        isEstablishmentDefault ||
+                        establishment.businessAddresses.length === 1
+                      }
+                      options={
+                        establishment?.businessAddresses.map((location) => ({
+                          value: location.rawAddress,
+                          label: location.rawAddress,
+                        })) ?? []
+                      }
+                      nativeSelectProps={{
+                        id: domElementIds.establishmentDashboard
+                          .initiateConvention.addressSelect,
+                        value: establishmentValues?.location ?? "",
+                        onChange: (event) =>
+                          setValue("location", event.currentTarget.value),
+                      }}
+                      state={"location" in formErrors ? "error" : "default"}
+                      stateRelatedMessage={
+                        "location" in formErrors && formErrors.location?.message
+                      }
+                    />
+                  )}
                 </>
               )}
             </SectionHighlight>
