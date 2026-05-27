@@ -452,6 +452,7 @@ export const createUseCases = ({
     sendEmailsWhenAgencyIsActivated: makeSendEmailsWhenAgencyIsActivated({
       uowPerformer,
       deps: {
+        config,
         saveNotificationAndRelatedEvent,
       },
     }),

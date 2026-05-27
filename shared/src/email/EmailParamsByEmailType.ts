@@ -77,8 +77,8 @@ export type EmailParamsByEmailType = {
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
-    users: UserParamsForMail[];
     agencyReferdToName: string | undefined;
+    agencyDashboardUrl: AbsoluteUrl;
     refersToOtherAgency: boolean;
   };
   AGENCY_WAS_REJECTED: {

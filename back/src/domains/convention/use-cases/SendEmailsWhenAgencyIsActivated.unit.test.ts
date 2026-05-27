@@ -1,9 +1,12 @@
 import {
+  type AbsoluteUrl,
   AgencyDtoBuilder,
   ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  frontRoutes,
 } from "shared";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -75,6 +78,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   let sendEmailsWhenAgencyActivated: SendEmailsWhenAgencyIsActivated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: TimeGateway;
+  const config = new AppConfigBuilder().build();
+
+  const agencyDashboardUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.agencyDashboard}/dashboard`;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -91,9 +97,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       uuidGenerator,
       timeGateway,
     );
+
     sendEmailsWhenAgencyActivated = makeSendEmailsWhenAgencyIsActivated({
       uowPerformer,
       deps: {
+        config,
         saveNotificationAndRelatedEvent,
       },
     });
@@ -115,24 +123,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
             agencyLogoUrl: "https://agency-logo.com",
             refersToOtherAgency: false,
             agencyReferdToName: undefined,
-            users: [
-              {
-                firstName: connectedUser1.firstName,
-                lastName: connectedUser1.lastName,
-                email: connectedUser1.email,
-                agencyName: agency.name,
-                isNotifiedByEmail: true,
-                roles: ["validator"],
-              },
-              {
-                firstName: connectedUser2.firstName,
-                lastName: connectedUser2.lastName,
-                email: connectedUser2.email,
-                agencyName: agency.name,
-                isNotifiedByEmail: true,
-                roles: ["counsellor"],
-              },
-            ],
+            agencyDashboardUrl,
           },
         },
       ],
@@ -169,16 +160,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
             agencyLogoUrl: "https://agency-refering-logo.com",
             refersToOtherAgency: true,
             agencyReferdToName: agency.name,
-            users: [
-              {
-                firstName: connectedUser3.firstName,
-                lastName: connectedUser3.lastName,
-                email: connectedUser3.email,
-                agencyName: agencyWithRefersTo.name,
-                isNotifiedByEmail: true,
-                roles: ["counsellor"],
-              },
-            ],
+            agencyDashboardUrl,
           },
         },
         {

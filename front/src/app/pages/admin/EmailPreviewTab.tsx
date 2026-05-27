@@ -242,24 +242,8 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
     refersToOtherAgency: true,
-    users: [
-      {
-        agencyName: "AGENCY_NAME",
-        roles: ["counsellor"],
-        isNotifiedByEmail: true,
-        email: "USER_EMAIL",
-        firstName: "USER_FIRST_NAME",
-        lastName: "USER_LAST_NAME",
-      },
-      {
-        agencyName: "AGENCY_NAME",
-        roles: ["validator"],
-        isNotifiedByEmail: true,
-        email: "USER_EMAIL",
-        firstName: "USER_FIRST_NAME",
-        lastName: "USER_LAST_NAME",
-      },
-    ],
+    agencyDashboardUrl:
+      "https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence/dashboard",
     agencyReferdToName: "AGENCY_REFERS_TO_NAME",
   },
   AGENCY_OF_TYPE_OTHER_ADDED: {
