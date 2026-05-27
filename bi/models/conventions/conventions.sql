@@ -81,6 +81,7 @@ a.id as agency_id,
 a.name as agency_name,
 a.status as agency_status,
 a.agency_siret::text as agency_siret,
+nullif(trim(concat(c.agency_referent_first_name, ' ', c.agency_referent_last_name)), '') as agency_referent_name,
 refer_a.name as referring_agency_name,
 case
     when a.kind = 'pole-emploi' then 'france-travail'

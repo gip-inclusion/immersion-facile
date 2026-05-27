@@ -98,6 +98,8 @@ models:
         description: Status of the agency (active, from-api-PE, etc.)
       - name: agency_siret
         description: SIRET of the agency
+      - name: agency_referent_name
+        description: Full name of the agency referent declared on the convention
       - name: referring_agency_name
         description: Name of referring agency if applicable
       - name: agency_kind
