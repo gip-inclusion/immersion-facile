@@ -8,7 +8,7 @@ import {
   type CreateConventionTemplatePresentationInitialValues,
   undefinedIfEmptyString,
 } from "./conventionPresentation.dto";
-import type { ConventionDraftDto } from "./shareConventionDraftByEmail.dto";
+import type { ConventionDraftDto } from "./saveConventionDraft.dto";
 
 export type ConventionTemplateId = Flavor<string, "ConventionTemplateId">;
 

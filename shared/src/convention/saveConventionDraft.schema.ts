@@ -14,10 +14,10 @@ import {
 import type {
   ConventionDraftDto,
   ConventionDraftId,
-  ShareConventionDraftByEmailDto,
-  ShareConventionDraftByEmailFromConventionDto,
-  ShareConventionDraftByEmailFromConventionTemplateDto,
-} from "./shareConventionDraftByEmail.dto";
+  SaveConventionDraftDto,
+  SaveConventionDraftFromConventionDto,
+  SaveConventionDraftFromConventionTemplateDto,
+} from "./saveConventionDraft.dto";
 
 export const makeConventionDeepPartialSchema = (
   schema: z.ZodTypeAny,
@@ -128,7 +128,7 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
     return input;
   }, baseConventionDraftSchema) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>;
 
-export const shareConventionDraftByEmailFromConventionSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailFromConventionDto> =
+export const saveConventionDraftFromConventionSchema: ZodSchemaWithInputMatchingOutput<SaveConventionDraftFromConventionDto> =
   z.object({
     senderEmail: emailSchema,
     recipientEmail: emailSchema.optional(),
@@ -136,16 +136,16 @@ export const shareConventionDraftByEmailFromConventionSchema: ZodSchemaWithInput
     conventionDraft: conventionDraftSchema,
   });
 
-export const shareConventionDraftByEmailFromConventionTemplateSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailFromConventionTemplateDto> =
+export const saveConventionDraftFromConventionTemplateSchema: ZodSchemaWithInputMatchingOutput<SaveConventionDraftFromConventionTemplateDto> =
   z.object({
     recipientEmail: emailSchema,
     details: zStringMinLength1Max1024.optional(),
     conventionDraft: conventionDraftSchema,
   });
 
-export const shareConventionDraftByEmailSchema: ZodSchemaWithInputMatchingOutput<ShareConventionDraftByEmailDto> =
-  shareConventionDraftByEmailFromConventionSchema
-    .or(shareConventionDraftByEmailFromConventionTemplateSchema)
+export const saveConventionDraftSchema: ZodSchemaWithInputMatchingOutput<SaveConventionDraftDto> =
+  saveConventionDraftFromConventionSchema
+    .or(saveConventionDraftFromConventionTemplateSchema)
     .or(
       z
         .object({

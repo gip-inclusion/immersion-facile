@@ -36,7 +36,7 @@ const fetchConventionDraftEpic: ConventionDraftEpic = (
     ),
   );
 
-const shareConventionDraftByEmailEpic: ConventionDraftEpic = (
+const saveConventionDraftEpic: ConventionDraftEpic = (
   action$,
   _state$,
   { conventionGateway, navigationGateway },
@@ -48,7 +48,7 @@ const shareConventionDraftByEmailEpic: ConventionDraftEpic = (
     ),
     switchMap((action) => {
       const { feedbackTopic, redirectUrl, ...shareDraftDto } = action.payload;
-      return conventionGateway.shareConventionDraftByEmail(shareDraftDto).pipe(
+      return conventionGateway.saveConventionDraft(shareDraftDto).pipe(
         tap(() => {
           if (redirectUrl) navigationGateway.goToUrl(redirectUrl);
         }),
@@ -69,5 +69,5 @@ const shareConventionDraftByEmailEpic: ConventionDraftEpic = (
 
 export const conventionDraftEpics = [
   fetchConventionDraftEpic,
-  shareConventionDraftByEmailEpic,
+  saveConventionDraftEpic,
 ];

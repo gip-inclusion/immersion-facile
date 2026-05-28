@@ -2,21 +2,21 @@ import z from "zod";
 import { expectToEqual } from "../test.helpers";
 import type {
   ConventionDraftDto,
-  ShareConventionDraftByEmailFromConventionDto,
-  ShareConventionDraftByEmailFromConventionTemplateDto,
-} from "./shareConventionDraftByEmail.dto";
+  SaveConventionDraftFromConventionDto,
+  SaveConventionDraftFromConventionTemplateDto,
+} from "./saveConventionDraft.dto";
 import {
   conventionDraftSchema,
   makeConventionDeepPartialSchema,
-  shareConventionDraftByEmailFromConventionSchema,
-  shareConventionDraftByEmailFromConventionTemplateSchema,
-  shareConventionDraftByEmailSchema,
-} from "./shareConventionDraftByEmail.schema";
+  saveConventionDraftFromConventionSchema,
+  saveConventionDraftFromConventionTemplateSchema,
+  saveConventionDraftSchema,
+} from "./saveConventionDraft.schema";
 
-describe("shareConventionDraftByEmailSchema schema validation", () => {
+describe("saveConventionDraftSchema schema validation", () => {
   it("can have no senderEmail nor recipientEmail", () => {
     expectToEqual(
-      shareConventionDraftByEmailSchema.safeParse({
+      saveConventionDraftSchema.safeParse({
         conventionDraft: {
           id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
           internshipKind: "immersion",
@@ -26,8 +26,9 @@ describe("shareConventionDraftByEmailSchema schema validation", () => {
     );
   });
 });
-describe("shareConventionDraftByEmailFromConventionSchema schema validation", () => {
-  it.each<ShareConventionDraftByEmailFromConventionDto>([
+
+describe("saveConventionDraftFromConventionSchema schema validation", () => {
+  it.each<SaveConventionDraftFromConventionDto>([
     {
       senderEmail: "test@test.com",
       conventionDraft: {
@@ -45,16 +46,13 @@ describe("shareConventionDraftByEmailFromConventionSchema schema validation", ()
       },
     },
   ])("accepts valid data", (data) => {
-    expectToEqual(
-      shareConventionDraftByEmailFromConventionSchema.parse(data),
-      data,
-    );
+    expectToEqual(saveConventionDraftFromConventionSchema.parse(data), data);
   });
 
   it.each([
     {
       senderEmail: "not-an-email",
-    } as ShareConventionDraftByEmailFromConventionDto,
+    } as SaveConventionDraftFromConventionDto,
     {
       senderEmail: "not-an-email",
       conventionDraft: {
@@ -68,16 +66,14 @@ describe("shareConventionDraftByEmailFromConventionSchema schema validation", ()
         id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
         internshipKind: "immersion",
       },
-    } as ShareConventionDraftByEmailFromConventionDto,
+    } as SaveConventionDraftFromConventionDto,
   ])("fails on invalid data", (data) => {
-    expect(() =>
-      shareConventionDraftByEmailFromConventionSchema.parse(data),
-    ).toThrow();
+    expect(() => saveConventionDraftFromConventionSchema.parse(data)).toThrow();
   });
 });
 
-describe("shareConventionDraftByEmailFromConventionTemplateSchema schema validation", () => {
-  it.each<ShareConventionDraftByEmailFromConventionTemplateDto>([
+describe("saveConventionDraftFromConventionTemplateSchema schema validation", () => {
+  it.each<SaveConventionDraftFromConventionTemplateDto>([
     {
       recipientEmail: "test@test.com",
       conventionDraft: {
@@ -95,7 +91,7 @@ describe("shareConventionDraftByEmailFromConventionTemplateSchema schema validat
     },
   ])("accepts valid data", (data) => {
     expectToEqual(
-      shareConventionDraftByEmailFromConventionTemplateSchema.parse(data),
+      saveConventionDraftFromConventionTemplateSchema.parse(data),
       data,
     );
   });
@@ -103,7 +99,7 @@ describe("shareConventionDraftByEmailFromConventionTemplateSchema schema validat
   it.each([
     {
       recipientEmail: "not-an-email",
-    } as ShareConventionDraftByEmailFromConventionTemplateDto,
+    } as SaveConventionDraftFromConventionTemplateDto,
     {
       recipientEmail: "not-an-email",
       conventionDraft: {
@@ -113,7 +109,7 @@ describe("shareConventionDraftByEmailFromConventionTemplateSchema schema validat
     },
   ])("fails on invalid data", (data) => {
     expect(() =>
-      shareConventionDraftByEmailFromConventionTemplateSchema.parse(data),
+      saveConventionDraftFromConventionTemplateSchema.parse(data),
     ).toThrow();
   });
 });

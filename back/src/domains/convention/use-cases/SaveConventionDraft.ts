@@ -3,7 +3,7 @@ import {
   type ConventionDraftDto,
   errors,
   frontRoutes,
-  shareConventionDraftByEmailSchema,
+  saveConventionDraftSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -36,14 +36,10 @@ const throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave =
     }
   };
 
-export type ShareConventionDraftByEmail = ReturnType<
-  typeof makeShareConventionDraftByEmail
->;
+export type SaveConventionDraft = ReturnType<typeof makeSaveConventionDraft>;
 
-export const makeShareConventionDraftByEmail = useCaseBuilder(
-  "ShareConventionDraftByEmail",
-)
-  .withInput(shareConventionDraftByEmailSchema)
+export const makeSaveConventionDraft = useCaseBuilder("SaveConventionDraft")
+  .withInput(saveConventionDraftSchema)
   .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;

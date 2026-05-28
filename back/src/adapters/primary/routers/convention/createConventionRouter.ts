@@ -23,9 +23,9 @@ export const createConventionRouter = (deps: AppDependencies) => {
     expressRouter,
   );
 
-  unauthenticatedConventionSharedRouter.shareConvention((req, res) =>
+  unauthenticatedConventionSharedRouter.saveConventionDraft((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.shareConventionByEmail.execute(req.body),
+      deps.useCases.saveConventionDraft.execute(req.body),
     ),
   );
 

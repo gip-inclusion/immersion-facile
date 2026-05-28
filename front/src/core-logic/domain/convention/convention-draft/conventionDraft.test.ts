@@ -99,7 +99,7 @@ describe("ConventionDraft slice", () => {
     });
   });
 
-  describe("Share convention draft by email", () => {
+  describe("save convention draft", () => {
     it("fetches convention draft successfully before sharing", () => {
       expectConventionDraftState({
         isLoading: false,
@@ -120,7 +120,7 @@ describe("ConventionDraft slice", () => {
         conventionDraft: null,
       });
 
-      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+      dependencies.conventionGateway.saveConventionDraftResult$.next();
 
       expectConventionDraftState({
         isLoading: false,
@@ -159,7 +159,7 @@ describe("ConventionDraft slice", () => {
         conventionDraft: null,
       });
 
-      dependencies.conventionGateway.shareConventionDraftByEmailResult$.error(
+      dependencies.conventionGateway.saveConventionDraftResult$.error(
         new Error(errorMessage),
       );
 
@@ -192,7 +192,7 @@ describe("ConventionDraft slice", () => {
         }),
       );
 
-      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+      dependencies.conventionGateway.saveConventionDraftResult$.next();
 
       expectToEqual(
         (dependencies.navigationGateway as InMemoryNavigationGateway)
@@ -211,7 +211,7 @@ describe("ConventionDraft slice", () => {
         }),
       );
 
-      dependencies.conventionGateway.shareConventionDraftByEmailResult$.next();
+      dependencies.conventionGateway.saveConventionDraftResult$.next();
 
       expectToEqual(
         (dependencies.navigationGateway as InMemoryNavigationGateway)
@@ -233,7 +233,7 @@ describe("ConventionDraft slice", () => {
         }),
       );
 
-      dependencies.conventionGateway.shareConventionDraftByEmailResult$.error(
+      dependencies.conventionGateway.saveConventionDraftResult$.error(
         new Error("some error"),
       );
 
