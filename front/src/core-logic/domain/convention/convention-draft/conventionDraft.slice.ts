@@ -3,7 +3,7 @@ import type {
   AbsoluteUrl,
   ConventionDraftDto,
   ConventionDraftId,
-  ShareConventionDraftByEmailDto,
+  SaveConventionDraftDto,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -50,7 +50,7 @@ export const conventionDraftSlice = createSlice({
     saveConventionDraftThenRedirectRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        ShareConventionDraftByEmailDto & { redirectUrl?: AbsoluteUrl }
+        SaveConventionDraftDto & { redirectUrl?: AbsoluteUrl }
       >,
     ) => {
       state.isLoading = true;
@@ -58,7 +58,7 @@ export const conventionDraftSlice = createSlice({
     saveConventionDraftThenRedirectSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        ShareConventionDraftByEmailDto & { redirectUrl?: AbsoluteUrl }
+        SaveConventionDraftDto & { redirectUrl?: AbsoluteUrl }
       >,
     ) => {
       state.isLoading = false;

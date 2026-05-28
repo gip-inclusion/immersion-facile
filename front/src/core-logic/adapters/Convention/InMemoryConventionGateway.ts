@@ -25,8 +25,8 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   type PaginationQueryParams,
   type RenewConventionParams,
+  type SaveConventionDraftDto,
   type SendSignatureLinkRequestDto,
-  type ShareConventionDraftByEmailDto,
   sleep,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
@@ -78,7 +78,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
-  public shareConventionDraftByEmailResult$ = new Subject<void>();
+  public saveConventionDraftResult$ = new Subject<void>();
 
   public createOrUpdateConventionTemplateResult$ = new Subject<void>();
 
@@ -183,10 +183,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  public shareConventionDraftByEmail(
-    _shareLinkByEmailDTO: ShareConventionDraftByEmailDto,
+  public saveConventionDraft(
+    _saveConventionDraftDto: SaveConventionDraftDto,
   ): Observable<void> {
-    return this.shareConventionDraftByEmailResult$;
+    return this.saveConventionDraftResult$;
   }
 
   public getConventionDraftById$(

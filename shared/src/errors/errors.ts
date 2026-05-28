@@ -19,7 +19,7 @@ import type {
   ReminderKind,
 } from "../convention/convention.dto";
 import type { ConventionTemplateId } from "../convention/conventionTemplate.dto";
-import type { ConventionDraftId } from "../convention/shareConventionDraftByEmail.dto";
+import type { ConventionDraftId } from "../convention/saveConventionDraft.dto";
 import type {
   DiscussionId,
   DiscussionKind,

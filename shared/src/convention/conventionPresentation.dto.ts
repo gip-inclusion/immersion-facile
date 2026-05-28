@@ -9,7 +9,7 @@ import type { ConventionTemplateId } from "./conventionTemplate.dto";
 import type {
   ConventionDraftDto,
   ConventionDraftId,
-} from "./shareConventionDraftByEmail.dto";
+} from "./saveConventionDraft.dto";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;

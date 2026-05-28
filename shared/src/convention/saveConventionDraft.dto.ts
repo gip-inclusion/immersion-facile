@@ -37,23 +37,22 @@ export type WithConventionDraftId = {
   conventionDraftId: ConventionDraftId;
 };
 
-export type ShareConventionDraftByEmailFromConventionDto = {
+export type SaveConventionDraftFromConventionDto = {
   senderEmail: Email;
   recipientEmail?: Email;
   details?: string;
   conventionDraft: ConventionDraftDto;
 };
 
-export type ShareConventionDraftByEmailFromConventionTemplateDto = {
+export type SaveConventionDraftFromConventionTemplateDto = {
   recipientEmail: Email;
   details?: string;
   conventionDraft: ConventionDraftDto;
 };
 
-//TODO: Rename this type + usecase because an email is not always sent
-export type ShareConventionDraftByEmailDto =
-  | ShareConventionDraftByEmailFromConventionDto
-  | ShareConventionDraftByEmailFromConventionTemplateDto
+export type SaveConventionDraftDto =
+  | SaveConventionDraftFromConventionDto
+  | SaveConventionDraftFromConventionTemplateDto
   | { conventionDraft: ConventionDraftDto };
 
 export const toConventionDraftDto = ({

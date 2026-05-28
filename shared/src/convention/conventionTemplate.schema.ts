@@ -9,7 +9,7 @@ import type {
   ConventionTemplate,
   ConventionTemplateId,
 } from "./conventionTemplate.dto";
-import { conventionDraftSchema } from "./shareConventionDraftByEmail.schema";
+import { conventionDraftSchema } from "./saveConventionDraft.schema";
 
 export const conventionTemplateIdSchema: ZodSchemaWithInputMatchingOutput<ConventionTemplateId> =
   z.uuid(localization.invalidUuid);

@@ -180,7 +180,7 @@ describe("convention e2e", () => {
   });
 
   describe(`${displayRouteName(
-    unauthenticatedConventionRoutes.shareConvention,
+    unauthenticatedConventionRoutes.saveConventionDraft,
   )} shares a conventions with a short link`, () => {
     describe("200 - Share convention without auth", () => {
       it("should successfully ask for a short link", async () => {
@@ -191,7 +191,7 @@ describe("convention e2e", () => {
         const conventionDraftLink = `http://localhost/demande-immersion?conventionDraftId=${conventionDraftId}`;
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
-        const response = await unauthenticatedRequest.shareConvention({
+        const response = await unauthenticatedRequest.saveConventionDraft({
           body: {
             senderEmail: "any@email.fr",
             conventionDraft: {
@@ -228,7 +228,7 @@ describe("convention e2e", () => {
     describe("400 - Invalid body", () => {
       it("should return error message when missing mandatory fields", async () => {
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
-        const response = await unauthenticatedRequest.shareConvention({
+        const response = await unauthenticatedRequest.saveConventionDraft({
           body: {
             details: "any@email.fr",
             senderEmail: "invalid-email",

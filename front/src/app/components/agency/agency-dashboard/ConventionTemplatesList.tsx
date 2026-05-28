@@ -18,8 +18,8 @@ import {
   type ConventionTemplateId,
   domElementIds,
   errors,
-  type ShareConventionDraftByEmailFromConventionTemplateDto,
-  shareConventionDraftByEmailFromConventionTemplateSchema,
+  type SaveConventionDraftFromConventionTemplateDto,
+  saveConventionDraftFromConventionTemplateSchema,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -92,14 +92,11 @@ export const ConventionTemplatesList = ({
     setConventionTemplateIdToDelete(null);
   };
 
-  const shareForm =
-    useForm<ShareConventionDraftByEmailFromConventionTemplateDto>({
-      mode: "onTouched",
-      defaultValues: { recipientEmail: "" },
-      resolver: zodResolver(
-        shareConventionDraftByEmailFromConventionTemplateSchema,
-      ),
-    });
+  const shareForm = useForm<SaveConventionDraftFromConventionTemplateDto>({
+    mode: "onTouched",
+    defaultValues: { recipientEmail: "" },
+    resolver: zodResolver(saveConventionDraftFromConventionTemplateSchema),
+  });
   const { register, handleSubmit, formState, reset } = shareForm;
 
   const openShareModal = (conventionTemplateId: ConventionTemplateId) => {
@@ -119,7 +116,7 @@ export const ConventionTemplatesList = ({
   };
 
   const onShareFormSubmit = (
-    values: ShareConventionDraftByEmailFromConventionTemplateDto,
+    values: SaveConventionDraftFromConventionTemplateDto,
   ) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(

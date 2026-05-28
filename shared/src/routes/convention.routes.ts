@@ -33,8 +33,8 @@ import {
 import { paginatedConventionWithUnfinalizedAssessmentSchema } from "../convention/conventionWithUnfinalizedAssessment.schema";
 import {
   conventionDraftSchema,
-  shareConventionDraftByEmailSchema,
-} from "../convention/shareConventionDraftByEmail.schema";
+  saveConventionDraftSchema,
+} from "../convention/saveConventionDraft.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -256,10 +256,10 @@ export const unauthenticatedConventionRoutes = defineRoutes({
       503: httpErrorSchema,
     },
   }),
-  shareConvention: defineRoute({
+  saveConventionDraft: defineRoute({
     url: "/convention-drafts",
     method: "post",
-    requestBodySchema: shareConventionDraftByEmailSchema,
+    requestBodySchema: saveConventionDraftSchema,
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,

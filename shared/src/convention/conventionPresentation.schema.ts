@@ -20,7 +20,7 @@ import { conventionTemplateIdSchema } from "./conventionTemplate.schema";
 import {
   conventionDraftIdSchema,
   conventionDraftSchema,
-} from "./shareConventionDraftByEmail.schema";
+} from "./saveConventionDraft.schema";
 
 const makeConventionPresentationSchema = (
   isTemplateForm: boolean,

@@ -73,13 +73,13 @@ import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
+import { makeSaveConventionDraft } from "../../domains/convention/use-cases/SaveConventionDraft";
 import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { makeSendAssessmentSignatureReminder } from "../../domains/convention/use-cases/SendAssessmentSignatureReminder";
 import { makeSendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { makeSendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { makeSendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
-import { makeShareConventionDraftByEmail } from "../../domains/convention/use-cases/ShareConventionDraftByEmail";
 import { makeSignAssessment } from "../../domains/convention/use-cases/SignAssessment";
 import { makeSignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
@@ -403,7 +403,7 @@ export const createUseCases = ({
     addConvention,
     getConvention: makeGetConvention({ uowPerformer }),
 
-    shareConventionByEmail: makeShareConventionDraftByEmail({
+    saveConventionDraft: makeSaveConventionDraft({
       uowPerformer,
       deps: {
         saveNotificationAndRelatedEvent,
