@@ -492,7 +492,7 @@ export type EmailParamsByEmailType = {
     additionalDetails: string | undefined;
     conventionFormUrl: string;
   };
-  SHARE_CONVENTION_DRAFT_SELF: {
+  SHARE_CONVENTION_DRAFT_SENDER: {
     internshipKind: InternshipKind;
     conventionFormUrl: string;
   };

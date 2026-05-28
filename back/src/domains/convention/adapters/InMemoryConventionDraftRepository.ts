@@ -16,6 +16,10 @@ export class InMemoryConventionDraftRepository
     );
   }
 
+  public get conventionDrafts(): ConventionDraftDto[] {
+    return Object.values(this.#conventionDrafts);
+  }
+
   public async getById(
     id: ConventionDraftId,
   ): Promise<ConventionDraftDto | undefined> {

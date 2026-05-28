@@ -31,7 +31,7 @@ test.describe("Convention can be created from shared draft", () => {
     await goToAdminTab(page, "adminNotifications");
     const href = await getMagicLinkFromEmail({
       page,
-      emailType: "SHARE_CONVENTION_DRAFT_SELF",
+      emailType: "SHARE_CONVENTION_DRAFT_SENDER",
       label: "conventionFormUrl",
     });
     expect(href).not.toBe(null);
