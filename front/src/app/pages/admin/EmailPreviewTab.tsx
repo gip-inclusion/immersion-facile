@@ -659,7 +659,7 @@ export const defaultEmailValueByEmailKind: {
     additionalDetails: "ADDITIONAL_DETAILS",
     conventionFormUrl: "CONVENTION_FORM_URL",
   },
-  SHARE_CONVENTION_DRAFT_SELF: {
+  SHARE_CONVENTION_DRAFT_SENDER: {
     internshipKind: "immersion",
     conventionFormUrl: "CONVENTION_FORM_URL",
   },

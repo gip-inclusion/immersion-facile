@@ -128,18 +128,20 @@ export const conventionDraftSchema: ZodSchemaWithInputMatchingOutput<ConventionD
     return input;
   }, baseConventionDraftSchema) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDraftDto>;
 
+export const conventionDraftDetailSchema = zStringMinLength1Max1024;
+
 export const saveConventionDraftFromConventionSchema: ZodSchemaWithInputMatchingOutput<SaveConventionDraftFromConventionDto> =
   z.object({
     senderEmail: emailSchema,
     recipientEmail: emailSchema.optional(),
-    details: zStringMinLength1Max1024.optional(),
+    details: conventionDraftDetailSchema.optional(),
     conventionDraft: conventionDraftSchema,
   });
 
 export const saveConventionDraftFromConventionTemplateSchema: ZodSchemaWithInputMatchingOutput<SaveConventionDraftFromConventionTemplateDto> =
   z.object({
     recipientEmail: emailSchema,
-    details: zStringMinLength1Max1024.optional(),
+    details: conventionDraftDetailSchema.optional(),
     conventionDraft: conventionDraftSchema,
   });
 

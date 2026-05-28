@@ -32,6 +32,7 @@ import {
 import { z } from "zod";
 import type { DeleteUserInputSchema } from "../../connected-users/use-cases/DeleteUser";
 import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
+import type { NotifyConventionDraftSavedInputParams } from "../../convention/use-cases/notifications/NotifyConventionDraftSaved";
 import type {
   EstablishmentUserRight,
   WithEstablishmentAggregate,
@@ -136,7 +137,8 @@ export type DomainEvent =
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionDrafToDelete", WithConventionDraftId & WithTriggeredBy>
+  | GenericEvent<"ConventionDrafToDelete", WithConventionDraftId & WithTriggeredBy> // TODO: typo nom event
+  | GenericEvent<"ConventionDraftSaved",NotifyConventionDraftSavedInputParams>
 
   // ESTABLISHMENT RELATED
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>

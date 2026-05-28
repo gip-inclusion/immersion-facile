@@ -2567,7 +2567,7 @@ Tél : ${beneficiaryPhone}`,
         subContent: defaultSignature(internshipKind),
       }),
     },
-    SHARE_CONVENTION_DRAFT_SELF: {
+    SHARE_CONVENTION_DRAFT_SENDER: {
       niceName: "Convention - Brouillon de convention",
       tags: [
         "template:convention_brouillonConvention",

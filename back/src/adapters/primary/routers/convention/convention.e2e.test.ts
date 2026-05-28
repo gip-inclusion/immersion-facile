@@ -212,7 +212,7 @@ describe("convention e2e", () => {
         expectToEqual(sentEmails.length, 1);
         const conventionShortLinkEmail = expectEmailOfType(
           sentEmails[0],
-          "SHARE_CONVENTION_DRAFT_SELF",
+          "SHARE_CONVENTION_DRAFT_SENDER",
         );
 
         const sharedConventionLink =
