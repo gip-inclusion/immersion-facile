@@ -235,7 +235,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         crawlerInfo,
         durationInSeconds,
         sqlQuery,
-        error,
+        error: error instanceof Error ? error.message : error,
         events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
