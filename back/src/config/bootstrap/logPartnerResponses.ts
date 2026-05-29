@@ -49,7 +49,13 @@ export const logPartnerResponses: LogPartnerResponses =
             status: response.status,
             input,
             headers: response.headers,
-            body: response.body,
+            body:
+              typeof response.body === "string"
+                ? // Limit body log in case of HTML content instead of JSON content
+                  // Scaling truncate the json log if too long without having valid json
+                  // Datadog does not have the log
+                  response.body.slice(0, 2000)
+                : response.body,
           },
         },
       });
