@@ -67,7 +67,7 @@ export const createFranceTravailRoutes = ({
         200: z.any(),
         201: z.any(),
         204: z.any(),
-        400: ftBusinessError,
+        400: ftBusinessError.or(z.string()),
         404: ftBusinessError,
       },
     }),
