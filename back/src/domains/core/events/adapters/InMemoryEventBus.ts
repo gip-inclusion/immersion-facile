@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { type DateString, errors, errorToString } from "shared";
+import { castError, type DateString, errors, errorToString } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -165,7 +165,7 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
         message: `Sending an event for ${subscriptionId}`,
       });
       await subscriptionsForTopic[subscriptionId](event);
-    } catch (error: any) {
+    } catch (error: unknown) {
       return onSubscriptionError(
         error,
         event,
@@ -197,12 +197,12 @@ const monitorAbsenceOfCallback = (event: DomainEvent) => {
   });
 };
 
-const monitorErrorInCallback = (error: any, event: DomainEvent) => {
+const monitorErrorInCallback = (error: unknown, event: DomainEvent) => {
   Sentry.captureException(error);
   logger.error({
     topic: event.topic,
     events: [event],
-    error: error.message || JSON.stringify(error),
+    error: castError(error),
     message: "publishedEventsError",
   });
 };
@@ -219,7 +219,7 @@ export const getLastPublication = (
     .at(-1);
 
 function onSubscriptionError(
-  error: any,
+  error: unknown,
   event: DomainEvent,
   throwOnPublishFailure: boolean,
   subscriptionId: SubscriptionId,
