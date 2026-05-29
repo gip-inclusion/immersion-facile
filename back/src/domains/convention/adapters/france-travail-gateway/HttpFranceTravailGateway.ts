@@ -203,7 +203,7 @@ const handleFtResponse =
   ): FranceTravailBroadcastResponse => {
     if (response.status === 400 || response.status === 404) {
       logger.error({
-        message: "FtBroadcast - handled error",
+        message: `FtBroadcast - handled error - status ${response.status}`,
         franceTravailGatewayStatus: "error",
         error: new Error(JSON.stringify(response.body, null, 2)),
         ftConnect: {
@@ -212,7 +212,12 @@ const handleFtResponse =
       });
       return {
         status: response.status,
-        subscriberErrorFeedback: { message: response.body.message },
+        subscriberErrorFeedback: {
+          message:
+            typeof response.body === "string"
+              ? response.body
+              : response.body.message,
+        },
         body: response.body,
       };
     }
