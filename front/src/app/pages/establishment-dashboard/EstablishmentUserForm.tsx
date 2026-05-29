@@ -162,10 +162,14 @@ export const EstablishmentUserForm = ({
       >
         {!alreadyExistingUserRight?.email && (
           <Input
-            label="Email"
+            label="Email *"
             nativeInputProps={{
               ...register("email"),
             }}
+            {...(errors.email && {
+              state: "error",
+              stateRelatedMessage: errors.email.message,
+            })}
           />
         )}
         <PhoneInput
