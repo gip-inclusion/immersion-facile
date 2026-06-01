@@ -93,7 +93,7 @@ export interface ConventionGateway {
   ): Observable<void>;
   editConventionWithFinalStatus$(
     params: EditConventionWithFinalStatusRequestDto,
-    jwt: ConnectedUserJwt,
+    jwt: ConventionSupportedJwt,
   ): Observable<void>;
   markPartnersErroredConventionAsHandled$(
     params: MarkPartnersErroredConventionAsHandledRequest,

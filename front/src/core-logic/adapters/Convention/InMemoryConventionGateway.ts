@@ -131,7 +131,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public editConventionWithFinalStatus$(
     _params: EditConventionWithFinalStatusRequestDto,
-    _jwt: ConnectedUserJwt,
+    _jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return this.editConventionWithFinalStatusResult$;
   }
