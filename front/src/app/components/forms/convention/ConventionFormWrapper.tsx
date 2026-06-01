@@ -92,10 +92,7 @@ export const ConventionFormWrapper = ({
   mode,
 }: ConventionFormWrapperProps) => {
   const showSummary = useAppSelector(conventionSelectors.showSummary);
-  const route = useConventionRoute([
-    routes.conventionImmersion.name,
-    routes.conventionTemplate.name,
-  ]);
+  const route = useConventionRoute();
   const routeJwt = "jwt" in route.params ? route.params.jwt : undefined;
   const routeConventionDraftId =
     "conventionDraftId" in route.params
