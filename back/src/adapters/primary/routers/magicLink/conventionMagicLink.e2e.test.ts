@@ -10,7 +10,9 @@ import {
   conventionMagicLinkRoutes,
   currentJwtVersions,
   defaultProConnectInfos,
+  displayRouteName,
   errors,
+  expectArraysToMatch,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
@@ -21,6 +23,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type {
   GenerateConnectedUserJwt,
   GenerateConventionJwt,
@@ -32,6 +35,7 @@ import {
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { makeHashByRolesForTest } from "../../../../utils/emailHash";
+import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 
 describe("Magic link router", () => {
   const payloadMeta = {
@@ -606,6 +610,285 @@ describe("Magic link router", () => {
           message: `User '${notEstablishmentRepresentative.id}' is not the establishment representative for convention '${convention.id}'`,
         },
       });
+    });
+  });
+
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.editConventionWithFinalStatus,
+  )}`, () => {
+    const agency = new AgencyDtoBuilder().build();
+    const validator = new ConnectedUserBuilder()
+      .withId("validator")
+      .withEmail("validator@mail.com")
+      .buildUser();
+    const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
+    const newBirthdate = "1995-03-15";
+    const oldBeneficiaryBirthdate = "2002-10-05";
+    const newFirstName = "Jean";
+    const newLastName = "Martin";
+    const newTutorEmail = "new-tutor@mail.com";
+    const convention = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withAgencyId(agency.id)
+      .withBeneficiaryBirthdate(oldBeneficiaryBirthdate)
+      .build();
+
+    const establishmentTutorBody = {
+      firstname: "Marie",
+      lastname: "Curie",
+      job: convention.establishmentTutor.job,
+      email: newTutorEmail,
+      phone: convention.establishmentTutor.phone,
+    };
+
+    const beneficiaryBody = {
+      updatedBeneficiaryBirthDate: newBirthdate,
+      firstname: newFirstName,
+      lastname: newLastName,
+    };
+
+    const adminUser = new ConnectedUserBuilder()
+      .withId("admin-user-id")
+      .withEmail("admin@mail.com")
+      .withIsAdmin(true)
+      .buildUser();
+
+    const validatorToken = () =>
+      generateConnectedUserJwt({
+        userId: validator.id,
+        version: currentJwtVersions.connectedUser,
+      });
+
+    it("401 with bad token", async () => {
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: { authorization: "wrong-token" },
+        body: {
+          conventionId,
+          establishmentTutor: establishmentTutorBody,
+          beneficiary: beneficiaryBody,
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        body: { message: invalidTokenMessage, status: 401 },
+        status: 401,
+      });
+    });
+
+    it("403 when non-admin sends beneficiary update", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.userRepository.users = [validator];
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: { authorization: validatorToken() },
+        body: {
+          conventionId,
+          establishmentTutor: establishmentTutorBody,
+          beneficiary: beneficiaryBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 403,
+          message:
+            errors.convention.editConventionWithFinalStatusBeneficiaryEditForbidden()
+              .message,
+        },
+        status: 403,
+      });
+    });
+
+    it("404 when convention is not found", async () => {
+      const unknownId = "00000000-0000-4000-8000-000000000001";
+      inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.conventionRepository.setConventions([]);
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: adminUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        body: {
+          conventionId: unknownId,
+          establishmentTutor: establishmentTutorBody,
+          beneficiary: beneficiaryBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 404,
+          message: errors.convention.notFound({ conventionId: unknownId })
+            .message,
+        },
+        status: 404,
+      });
+    });
+
+    it("400 when convention status is not allowed", async () => {
+      const conventionInReview = new ConventionDtoBuilder(convention)
+        .withStatus("IN_REVIEW")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([conventionInReview]);
+      inMemoryUow.userRepository.users = [adminUser];
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: adminUser.id,
+            version: currentJwtVersions.connectedUser,
+          }),
+        },
+        body: {
+          conventionId: conventionInReview.id,
+          establishmentTutor: establishmentTutorBody,
+          beneficiary: beneficiaryBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          status: 400,
+          message:
+            errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
+              status: "IN_REVIEW",
+              conventionId: conventionInReview.id,
+            }).message,
+        },
+        status: 400,
+      });
+    });
+
+    it("200 - establishment representative can update establishment tutor", async () => {
+      const repEmail = convention.signatories.establishmentRepresentative.email;
+      const emailHash = createConventionMagicLinkPayload({
+        id: convention.id,
+        role: "establishment-representative",
+        email: repEmail,
+        now: new Date(),
+      }).emailHash;
+
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: {
+          authorization: generateConventionJwt({
+            ...payloadMeta,
+            applicationId: convention.id,
+            role: "establishment-representative",
+            emailHash,
+          }),
+        },
+        body: {
+          conventionId: convention.id,
+          establishmentTutor: establishmentTutorBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+      expectToEqual(
+        inMemoryUow.conventionRepository.conventions[0]?.establishmentTutor
+          .email,
+        newTutorEmail,
+      );
+    });
+
+    it("200 updates establishment tutor when validator has agency rights", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.userRepository.users = [validator];
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: { authorization: validatorToken() },
+        body: {
+          conventionId,
+          establishmentTutor: establishmentTutorBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      expectToEqual(
+        inMemoryUow.conventionRepository.conventions[0]?.establishmentTutor
+          .email,
+        newTutorEmail,
+      );
+    });
+
+    it("200 updates beneficiary and saves ConventionWithFinalStatusEdited event", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [adminUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+      const adminToken = generateConnectedUserJwt({
+        userId: adminUser.id,
+        version: currentJwtVersions.connectedUser,
+      });
+
+      const response = await httpClient.editConventionWithFinalStatus({
+        headers: { authorization: adminToken },
+        body: {
+          conventionId,
+          establishmentTutor: establishmentTutorBody,
+          beneficiary: beneficiaryBody,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      const updatedConvention = inMemoryUow.conventionRepository.conventions[0];
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.birthdate,
+        newBirthdate,
+      );
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.firstName,
+        newFirstName,
+      );
+      expectToEqual(
+        updatedConvention?.signatories.beneficiary.lastName,
+        newLastName,
+      );
+      expectToEqual(updatedConvention?.establishmentTutor.email, newTutorEmail);
+
+      expectArraysToMatch(inMemoryUow.outboxRepository.events, [
+        {
+          topic: "ConventionWithFinalStatusEdited",
+          payload: {
+            convention: updatedConvention,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: adminUser.id,
+            },
+          },
+        },
+      ]);
     });
   });
 
