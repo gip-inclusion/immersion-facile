@@ -19,42 +19,42 @@ export const updateEstablishmentThroughEstablishmentDashboard =
   (
     makeUpdatedFormEstablishment: MakeFormEstablishmentFromRetryNumber,
   ): PlaywrightTestCallback =>
-    async ({ page }, { retry }) => {
-      const updatedFormEstablishment = makeUpdatedFormEstablishment(retry);
-      await page.goto("/");
-      await goToDashboard(page, "establishment");
-      await expect(page.locator(".fr-tabs__list")).toBeVisible();
+  async ({ page }, { retry }) => {
+    const updatedFormEstablishment = makeUpdatedFormEstablishment(retry);
+    await page.goto("/");
+    await goToDashboard(page, "establishment");
+    await expect(page.locator(".fr-tabs__list")).toBeVisible();
 
-      await goToEstablishmentDashboardTab(page, "fiche-entreprise");
+    await goToEstablishmentDashboardTab(page, "fiche-entreprise");
 
-      await page.waitForURL(
-        `/tableau-de-bord-etablissement/fiche-entreprise?siret=${updatedFormEstablishment.siret}`,
-      );
+    await page.waitForURL(
+      `/tableau-de-bord-etablissement/fiche-entreprise?siret=${updatedFormEstablishment.siret}`,
+    );
 
-      await editEstablishmentInEstablishmentDashboard(
-        page,
-        updatedFormEstablishment,
-      );
-    };
+    await editEstablishmentInEstablishmentDashboard(
+      page,
+      updatedFormEstablishment,
+    );
+  };
 
 export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
   (
     makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
   ): PlaywrightTestCallback =>
-    async ({ page }, { retry }) => {
-      const updatedEstablishment = makeUpdatedEstablishment(retry);
-      await goToManageEtablishmentBySiretInAdmin(
-        page,
-        updatedEstablishment.siret,
-      );
+  async ({ page }, { retry }) => {
+    const updatedEstablishment = makeUpdatedEstablishment(retry);
+    await goToManageEtablishmentBySiretInAdmin(
+      page,
+      updatedEstablishment.siret,
+    );
 
-      await page
-        .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
-        .getByText("Oui")
-        .click();
-      await page.click(`#${domElementIds.establishment.admin.submitFormButton}`);
-      await expect(page.locator(".fr-alert--success")).toBeVisible();
-    };
+    await page
+      .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
+      .getByText("Oui")
+      .click();
+    await page.click(`#${domElementIds.establishment.admin.submitFormButton}`);
+    await expect(page.locator(".fr-alert--success")).toBeVisible();
+  };
 
 const editEstablishmentInEstablishmentDashboard = async (
   page: Page,
@@ -180,12 +180,14 @@ const step3 = async (
     .click();
 
   await page.click(
-    `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${updatedEstablishment.isEngagedEnterprise ? "1" : "0"
+    `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
+      updatedEstablishment.isEngagedEnterprise ? "1" : "0"
     }]`,
   );
 
   await page.click(
-    `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
+    `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
+      updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
     }]`,
   );
 };
