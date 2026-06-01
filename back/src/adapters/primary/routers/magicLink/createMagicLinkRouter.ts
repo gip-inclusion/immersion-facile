@@ -152,6 +152,17 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.editConventionWithFinalStatus(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.editConventionWithFinalStatus.execute(
+          req.body,
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
+  );
+
   sharedRouter.sendSignatureLink(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
