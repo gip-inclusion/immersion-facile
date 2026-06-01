@@ -1,5 +1,5 @@
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { type routes, useRoute } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
 type CurrentRoute = ReturnType<typeof useRoute>;
@@ -42,10 +42,23 @@ export const makeUseTypedRoute =
   ) =>
     useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
-export const useConventionRoute = makeUseTypedRoute<
+type ConventionRouteName =
   | (typeof routes.conventionImmersion)["name"]
-  | (typeof routes.conventionTemplate)["name"]
->();
+  | (typeof routes.conventionMiniStage)["name"]
+  | (typeof routes.conventionImmersionForExternals)["name"]
+  | (typeof routes.conventionTemplate)["name"];
+
+const conventionRouteNames = [
+  routes.conventionImmersion.name,
+  routes.conventionMiniStage.name,
+  routes.conventionImmersionForExternals.name,
+  routes.conventionTemplate.name,
+] as const;
+
+export const useConventionRoute = () =>
+  useTypedRoute<ConventionRouteName, typeof conventionRouteNames>(
+    conventionRouteNames,
+  );
 
 export type RouteByMode = {
   create: Route<typeof routes.formEstablishment>;
