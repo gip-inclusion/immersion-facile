@@ -1461,26 +1461,51 @@ describe("conventionDtoSchema", () => {
 describe("editConventionWithFinalStatusRequestSchema", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
-  it("accepts request with only convention id", () => {
+  const establishmentTutor = {
+    firstname: "Marie",
+    lastname: "Tutor",
+    job: "Responsable RH",
+    email: "tutor@mail.com",
+    phone: "+33601020304",
+  };
+
+  it("accepts request with establishment tutor only", () => {
     expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
       conventionId,
+      establishmentTutor,
     });
   });
 
-  it("accepts request with optional beneficiary updates", () => {
+  it("accepts request with establishment tutor and beneficiary updates", () => {
     expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
       conventionId,
-      updatedBeneficiaryBirthDate: "2008-06-01",
-      firstname: "Jean",
-      lastname: "Dupont",
+      establishmentTutor,
+      beneficiary: {
+        updatedBeneficiaryBirthDate: "2008-06-01",
+        firstname: "Jean",
+        lastname: "Dupont",
+      },
     });
   });
 
-  it("rejects empty string for updatedBeneficiaryBirthDate", () => {
+  it("rejects request without establishment tutor", () => {
     expect(() =>
       editConventionWithFinalStatusRequestSchema.parse({
         conventionId,
-        updatedBeneficiaryBirthDate: "",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects empty string for beneficiary birthdate", () => {
+    expect(() =>
+      editConventionWithFinalStatusRequestSchema.parse({
+        conventionId,
+        establishmentTutor,
+        beneficiary: {
+          updatedBeneficiaryBirthDate: "",
+          firstname: "Jean",
+          lastname: "Dupont",
+        },
       }),
     ).toThrow();
   });
