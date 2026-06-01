@@ -255,9 +255,20 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
 export const editConventionWithFinalStatusRequestSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusRequestDto> =
   z.object({
     conventionId: conventionIdSchema,
-    updatedBeneficiaryBirthDate: makeDateStringSchema().optional(),
-    firstname: firstnameSchema.optional(),
-    lastname: lastnameSchema.optional(),
+    establishmentTutor: z.object({
+      firstname: firstnameSchema,
+      lastname: lastnameSchema,
+      job: stringWithMaxLength255,
+      email: emailSchema,
+      phone: phoneNumberSchema,
+    }),
+    beneficiary: z
+      .object({
+        updatedBeneficiaryBirthDate: makeDateStringSchema(),
+        firstname: firstnameSchema,
+        lastname: lastnameSchema,
+      })
+      .optional(),
   });
 
 export const renewedSchema = z.object({

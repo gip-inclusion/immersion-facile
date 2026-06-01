@@ -240,6 +240,20 @@ export const conventionMagicLinkRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
+
+  editConventionWithFinalStatus: defineRoute({
+    url: "/auth/convention/edit-convention-with-final-status",
+    method: "post",
+    requestBodySchema: editConventionWithFinalStatusRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 });
 
 export type UnauthenticatedConventionRoutes =
@@ -376,20 +390,6 @@ export const authenticatedConventionRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: broadcastFeedbackSchema,
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-    },
-  }),
-
-  editConventionWithFinalStatus: defineRoute({
-    url: "/inclusion-connected/edit-convention-with-final-status",
-    method: "post",
-    requestBodySchema: editConventionWithFinalStatusRequestSchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

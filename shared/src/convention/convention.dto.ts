@@ -58,6 +58,7 @@ import {
   isInRange,
   type OptionalDateRange,
 } from "../utils/date";
+import type { WithFirstnameAndLastname } from "./convention.schema";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
@@ -516,10 +517,16 @@ export type TransferConventionToAgencyRequestDto = WithConventionId & {
 export type EditConventionCounsellorNameRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname;
 
-export type EditConventionWithFinalStatusRequestDto = WithConventionId &
-  WithOptionalFirstnameAndLastname & {
-    updatedBeneficiaryBirthDate?: DateString;
+export type EditConventionWithFinalStatusRequestDto = WithConventionId & {
+  establishmentTutor: WithFirstnameAndLastname & {
+    job: string;
+    email: Email;
+    phone: PhoneNumber;
   };
+  beneficiary?: WithFirstnameAndLastname & {
+    updatedBeneficiaryBirthDate: DateString;
+  };
+};
 
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
