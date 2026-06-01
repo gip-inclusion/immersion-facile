@@ -371,7 +371,9 @@ export const InitiateConventionButton = () => {
                     }}
                     state={"siret" in formErrors ? "error" : "default"}
                     stateRelatedMessage={
-                      "siret" in formErrors && formErrors.siret?.message
+                      "siret" in formErrors &&
+                      formErrors.siret &&
+                      formErrors.siret.message
                     }
                   />
                   <Select
@@ -402,7 +404,8 @@ export const InitiateConventionButton = () => {
                     state={"appellation" in formErrors ? "error" : "default"}
                     stateRelatedMessage={
                       "appellation" in formErrors &&
-                      formErrors.appellation?.message
+                      formErrors.appellation &&
+                      formErrors.appellation.message
                     }
                   />
                   {shouldShowAddressSelect && (
@@ -429,7 +432,9 @@ export const InitiateConventionButton = () => {
                       }}
                       state={"location" in formErrors ? "error" : "default"}
                       stateRelatedMessage={
-                        "location" in formErrors && formErrors.location?.message
+                        "location" in formErrors &&
+                        formErrors.location &&
+                        formErrors.location.message
                       }
                     />
                   )}
