@@ -171,7 +171,7 @@ export const test = base.extend({
 export { expect } from "@playwright/test";
 
 export const remoteModeIndexMap: Record<RemoteWorkMode, number> = {
-  HYBRID: 0,
-  FULL_REMOTE: 1,
-  ON_SITE: 2,
+  ON_SITE: 0,
+  HYBRID: 1,
+  FULL_REMOTE: 2,
 };

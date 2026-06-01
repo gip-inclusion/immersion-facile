@@ -1,8 +1,8 @@
-export const physicalWorkModes = ["HYBRID", "ON_SITE"] as const;
+export const physicalWorkModes = ["ON_SITE", "HYBRID"] as const;
 
 export type PhysicalWorkMode = (typeof physicalWorkModes)[number];
 
-export const remoteWorkModes = ["FULL_REMOTE", ...physicalWorkModes] as const;
+export const remoteWorkModes = [...physicalWorkModes, "FULL_REMOTE"] as const;
 
 export type RemoteWorkMode = (typeof remoteWorkModes)[number];
 
