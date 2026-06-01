@@ -90,7 +90,7 @@ jobs:
 
             const body = releaseNotes.data.body ?? "";
             const lines = body.split("\n");
-            const issueRefRegex = /^\*\s+#(\d+)\b/;
+            const issueRefRegex = /^\*\s+#?(\d+)\b/;
 
             const whatsChangedIdx = lines.findIndex((l) => l.startsWith("## What's Changed"));
             const sectionEndIdx = whatsChangedIdx >= 0
@@ -155,8 +155,16 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prerelease = await github.request(`GET /repos/${{ github.repository }}/releases/tags/${{ inputs.release_tag }}-rc`);
-            if (prerelease.data && prerelease.data.id) {
-              await github.request(`DELETE /repos/${{ github.repository }}/releases/${prerelease.data.id}`);
-              await github.request(`DELETE /repos/${{ github.repository }}/git/refs/tags/${prerelease.data.tag_name}`);
+            try {
+              const prerelease = await github.request(`GET /repos/${{ github.repository }}/releases/tags/${{ inputs.release_tag }}-rc`);
+              if (prerelease.data && prerelease.data.id) {
+                await github.request(`DELETE /repos/${{ github.repository }}/releases/${prerelease.data.id}`);
+                await github.request(`DELETE /repos/${{ github.repository }}/git/refs/tags/${prerelease.data.tag_name}`);
+              }
+            } catch (error) {
+              if (error.status === 404) {
+                console.info(`No corresponding prerelease found for ${{ inputs.release_tag }}-rc, skipping deletion.`);
+              } else {
+                throw error;
+              }
             }
