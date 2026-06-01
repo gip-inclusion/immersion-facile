@@ -148,10 +148,10 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public editConventionWithFinalStatus$(
     params: EditConventionWithFinalStatusRequestDto,
-    jwt: ConnectedUserJwt,
+    jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(
-      this.authenticatedHttpClient
+      this.magicLinkHttpClient
         .editConventionWithFinalStatus({
           body: params,
           headers: { authorization: jwt },
