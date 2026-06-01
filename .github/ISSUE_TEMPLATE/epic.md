@@ -13,4 +13,4 @@ type: epic
 
 ### :tada: Résultat de recherche et proposition de solutions
 
-<!-- Quelle est la solution envisagée pour répondre à cette problématique et comment sera-t-elle séquencée-->
+<!-- Quelle est la solution envisagée pour répondre à cette problématique et comment sera-t-elle séquencée - test commit 2-->

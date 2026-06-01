@@ -15,4 +15,4 @@ type: feature
 
 ### :camera: Maquettes
 
-<!-- Si possible, un lien vers les maquettes -->
+<!-- Si possible, un lien vers les maquettes test commit -->
