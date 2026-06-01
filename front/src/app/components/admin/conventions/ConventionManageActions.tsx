@@ -125,7 +125,7 @@ export const ConventionManageActions = ({
     if (isConventionActionLoading) return;
 
     if (verificationAction === "EDIT_CONVENTION_WITH_FINAL_STATUS") {
-      if (jwtParams.kind === "convention") return;
+      if ("beneficiary" in params && jwtParams.kind === "convention") return;
       dispatch(
         editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusRequested(
           {

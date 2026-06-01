@@ -445,6 +445,16 @@ export const domElementIds = {
       "im-edit-convention-with-final-status-modal__new-first-name-input",
     editConventionWithFinalStatusModalNewLastNameInput:
       "im-edit-convention-with-final-status-modal__new-last-name-input",
+    editConventionWithFinalStatusModalTutorFirstNameInput:
+      "im-edit-convention-with-final-status-modal__tutor-first-name-input",
+    editConventionWithFinalStatusModalTutorLastNameInput:
+      "im-edit-convention-with-final-status-modal__tutor-last-name-input",
+    editConventionWithFinalStatusModalTutorJobInput:
+      "im-edit-convention-with-final-status-modal__tutor-job-input",
+    editConventionWithFinalStatusModalTutorEmailInput:
+      "im-edit-convention-with-final-status-modal__tutor-email-input",
+    editConventionWithFinalStatusModalTutorPhoneInput:
+      "im-edit-convention-with-final-status-modal__tutor-phone-input",
     editConventionWithFinalStatusModalSubmitButton:
       "im-edit-convention-with-final-status-modal__submit-button",
     editConventionWithFinalStatusModalCancelButton:
