@@ -21,9 +21,18 @@ describe("editConventionWithFinalStatus slice", () => {
 
   const basePayload: EditConventionWithFinalStatusRequestDto = {
     conventionId: "fake-convention-id",
-    updatedBeneficiaryBirthDate: "1995-03-15",
-    firstname: "Jean",
-    lastname: "Martin",
+    establishmentTutor: {
+      firstname: "Marie",
+      lastname: "Curie",
+      job: "Tuteur",
+      email: "tutor@mail.com",
+      phone: "+33601020304",
+    },
+    beneficiary: {
+      updatedBeneficiaryBirthDate: "1995-03-15",
+      firstname: "Jean",
+      lastname: "Martin",
+    },
   };
 
   beforeEach(() => {

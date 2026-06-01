@@ -30,10 +30,8 @@ const editConventionWithFinalStatusEpic: EditConventionWithFinalStatusEpic = (
         .editConventionWithFinalStatus$(
           {
             conventionId: action.payload.conventionId,
-            updatedBeneficiaryBirthDate:
-              action.payload.updatedBeneficiaryBirthDate,
-            firstname: action.payload.firstname,
-            lastname: action.payload.lastname,
+            establishmentTutor: action.payload.establishmentTutor,
+            beneficiary: action.payload.beneficiary,
           },
           action.payload.jwt,
         )

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type {
-  ConnectedUserJwt,
+  ConventionSupportedJwt,
   EditConventionWithFinalStatusRequestDto,
 } from "shared";
 
@@ -25,7 +25,9 @@ export const editConventionWithFinalStatusSlice = createSlice({
     editConventionWithFinalStatusRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        EditConventionWithFinalStatusRequestDto & { jwt: ConnectedUserJwt }
+        EditConventionWithFinalStatusRequestDto & {
+          jwt: ConventionSupportedJwt;
+        }
       >,
     ) => {
       state.isLoading = true;
@@ -34,7 +36,9 @@ export const editConventionWithFinalStatusSlice = createSlice({
     editConventionWithFinalStatusSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        EditConventionWithFinalStatusRequestDto & { jwt: ConnectedUserJwt }
+        EditConventionWithFinalStatusRequestDto & {
+          jwt: ConventionSupportedJwt;
+        }
       >,
     ) => {
       state.isLoading = false;
