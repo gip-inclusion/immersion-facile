@@ -1,11 +1,12 @@
 import { useDispatch } from "react-redux";
-import { type GetOffersFlatQueryParams, keys } from "shared";
 import {
   type AcquisitionParams,
   acquisitionParams,
+  type GetOffersFlatQueryParams,
+  keys,
   routes,
   searchParams,
-} from "src/app/routes/routes";
+} from "shared";
 import {
   filterParamsForRoute,
   getUrlParameters,

@@ -5,6 +5,7 @@ import {
   domElementIds,
   type Email,
   expiredJwtErrorTitle,
+  routes,
   type SiretDto,
 } from "shared";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
@@ -13,7 +14,6 @@ import type {
   ErrorButton,
   FrontErrorProps,
 } from "src/app/contents/error/types";
-import { routes } from "src/app/routes/routes";
 
 export class FrontSpecificError extends Error {
   public props: FrontErrorProps;

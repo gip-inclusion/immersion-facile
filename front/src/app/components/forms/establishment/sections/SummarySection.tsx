@@ -7,6 +7,7 @@ import {
   addressDtoToString,
   type ContactMode,
   domElementIds,
+  type FederatedIdentityWithUser,
   type FormEstablishmentDto,
   getFormattedFirstnameAndLastname,
   remoteWorkModeLabels,
@@ -20,7 +21,6 @@ import { SearchResultPreview } from "src/app/components/forms/establishment/Sear
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { Mode } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
 export const SummarySection = ({
   mode,

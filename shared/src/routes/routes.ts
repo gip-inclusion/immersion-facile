@@ -1,18 +1,20 @@
 import {
-  type AdminTabRouteName,
-  type AlreadyAuthenticatedUserQueryParams,
-  adminTabRouteNames,
-  adminTabs,
-  type ConnectedUserQueryParams,
-  frontRoutes,
-  type ValueOf,
-} from "shared";
-import {
   createRouter,
   defineRoute,
   param,
   type ValueSerializer,
 } from "type-route";
+import type {
+  AllowedLoginSource,
+  AlreadyAuthenticatedUserQueryParams,
+  ConnectedUserQueryParams,
+} from "..";
+import {
+  type AdminTabRouteName,
+  adminTabRouteNames,
+  adminTabs,
+} from "../admin/adminTabs";
+import type { ValueOf } from "../utils";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 import {
   appellationAndRomeDtoArraySerializer,
@@ -21,6 +23,60 @@ import {
   nafCodeSerializer,
   remoteWorkModeSerializer,
 } from "./valueSerializer";
+
+const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
+  admin: "admin",
+  establishment: "establishment",
+  establishmentDashboard: "tableau-de-bord-etablissement",
+  establishmentDashboardDiscussions:
+    "tableau-de-bord-etablissement/discussions",
+  agencyDashboard: "tableau-de-bord-agence",
+  addAgency: "ajouter-prescripteur",
+  manageConventionUserConnected: "pilotage-convention-inclusion-connect",
+  conventionTemplate: "modele-convention",
+  myProfile: "mon-profil",
+  beneficiaryDashboard: "tableau-de-bord-beneficiaire",
+  beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
+};
+
+export const frontRoutes = {
+  ...allowedLoginSourcesRoutes,
+  assessmentDocument: "bilan-document",
+  beneficiaryDashboard: "tableau-de-bord-beneficiaire",
+  initiateConvention: "initier-convention",
+  conventionImmersionRoute: "demande-immersion",
+  conventionDocument: "convention-immersion",
+  conventionMiniStageRoute: "demande-mini-stage",
+  conventionStatusDashboard: "statut-convention",
+  conventionToSign: "verifier-et-signer",
+  error: "error",
+  group: "groupe",
+  homeAgencies: "accueil-prescripteurs",
+  homeCandidates: "accueil-beneficiaires",
+  homeEstablishments: "accueil-entreprises",
+  assessment: "bilan-immersion",
+  searchResult: "offre",
+  searchResultForStudent: "offre-scolaire",
+  searchResultExternal: "tentez-votre-chance",
+  landingEstablishment: "accueil-etablissement",
+  magicLinkRenewal: "refraichir-lien",
+  magicLinkInterstitial: "connexion-interstitiel",
+  manageConvention: "pilotage-convention",
+  manageEstablishmentAdmin: "pilotage-etablissement-admin",
+  myProfileEstablishmentRegistration: "rattachement-entreprise",
+  profile: "mon-profil",
+  search: "recherche",
+  externalSearch: "recherche-partenaires",
+  searchForStudent: "recherche-scolaire",
+  searchDiagoriente: "recherche-diagoriente",
+  standard: "pages",
+  unsubscribeEstablishmentLead: "desinscription-prospect",
+};
+
+export const loginFtConnect = "login-pe-connect";
+export const ftConnect = "pe-connect";
+
+export const uploadFileRoute = "upload-file";
 
 export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<

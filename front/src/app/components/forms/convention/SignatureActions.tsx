@@ -2,17 +2,16 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 import type { Dispatch, SetStateAction } from "react";
-
 import {
   type ConventionDto,
   domElementIds,
   type InternshipKind,
   isConventionRenewed,
+  routes,
   type Signatory,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 type SignatureActionsProperties = {

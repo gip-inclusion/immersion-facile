@@ -1,5 +1,5 @@
+import { routes, useRoute } from "shared";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes, useRoute } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
 type CurrentRoute = ReturnType<typeof useRoute>;
@@ -37,10 +37,10 @@ const useTypedRoute = <
 
 export const makeUseTypedRoute =
   <TRouteName extends CurrentRouteName>() =>
-  <const TRouteNames extends readonly TRouteName[]>(
-    routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
-  ) =>
-    useTypedRoute<TRouteName, TRouteNames>(routeNames);
+    <const TRouteNames extends readonly TRouteName[]>(
+      routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
+    ) =>
+      useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
 type ConventionRouteName =
   | (typeof routes.conventionImmersion)["name"]

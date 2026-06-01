@@ -7,10 +7,10 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
   decodeJwtWithoutSignatureCheck,
+  routes,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { establishmentLeadStatus } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";

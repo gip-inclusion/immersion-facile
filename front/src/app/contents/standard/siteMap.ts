@@ -1,6 +1,5 @@
 import type { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
-import { domElementIds } from "shared";
-import { routes } from "src/app/routes/routes";
+import { domElementIds, routes } from "shared";
 import type { VersionnedStandardContent } from "./textSetup";
 
 const { siteMap: siteMapIds } = domElementIds.standard;

@@ -8,9 +8,9 @@ import {
   domElementIds,
   type ManageConventionAdminForm,
   manageConventionAdminFormSchema,
+  routes,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 
 type SelectConventionFromIdFormProps = {

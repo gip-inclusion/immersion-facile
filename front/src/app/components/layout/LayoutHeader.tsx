@@ -9,7 +9,7 @@ import {
   useLayout,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds } from "shared";
+import { domElementIds, routes, useRoute } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -18,7 +18,6 @@ import {
   type AgencyDashboardRouteName,
   agencyDashboardRoutes,
 } from "src/app/pages/auth/ConnectedPrivateRoutePage";
-import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";

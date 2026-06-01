@@ -2,12 +2,12 @@ import { MainWrapper } from "react-design-system";
 import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  type routes,
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { match } from "ts-pattern";
 import type { Route } from "type-route";

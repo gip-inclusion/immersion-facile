@@ -15,6 +15,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
   isSignatory,
+  type routes,
   type SignatoryRole,
 } from "shared";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
@@ -28,7 +29,6 @@ import { conventionSlice } from "../../../core-logic/domain/convention/conventio
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
-import type { routes } from "../../routes/routes";
 import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowConventionErrorOrRenewExpiredJwt";
 
 interface ConventionSignPageProperties {

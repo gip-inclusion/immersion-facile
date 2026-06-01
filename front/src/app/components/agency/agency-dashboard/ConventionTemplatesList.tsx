@@ -18,13 +18,13 @@ import {
   type ConventionTemplateId,
   domElementIds,
   errors,
+  routes,
   type SaveConventionDraftFromConventionTemplateDto,
   saveConventionDraftFromConventionTemplateSchema,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";

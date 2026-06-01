@@ -10,12 +10,12 @@ import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
+import { RouteProvider } from "shared";
 import { App } from "src/app/App";
 import { MinimalErrorPage } from "src/app/pages/error/MinimalErrorPage";
 import { store } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { DefaultMetaContent } from "./components/layout/DefaultMetaContent";
-import { RouteProvider } from "./routes/routes";
 
 startReactDsfr({ defaultColorScheme: "light" });
 

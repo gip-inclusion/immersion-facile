@@ -18,10 +18,10 @@ import {
   type ConnectedUser,
   domElementIds,
   looksLikeSiret,
+  routes,
   type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";

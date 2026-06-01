@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { keys } from "shared";
+import { keys, type routes } from "shared";
 import {
   type ConventionFormMode,
   ConventionFormWrapper,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { Route } from "type-route";

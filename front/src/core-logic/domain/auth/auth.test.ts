@@ -7,6 +7,7 @@ import {
   errors,
   expectToEqual,
   type FederatedIdentity,
+  type FederatedIdentityWithUser,
   noAgencyDashboards,
   noEstablishmentDashboard,
 } from "shared";
@@ -14,7 +15,6 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
   type AuthState,
   authSlice,
-  type FederatedIdentityWithUser,
   initialAuthState,
   type RenewJwtPayload,
 } from "src/core-logic/domain/auth/auth.slice";

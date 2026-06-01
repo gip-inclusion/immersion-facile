@@ -19,6 +19,7 @@ import {
   domElementIds,
   type ExchangeRole,
   getFormattedFirstnameAndLastname,
+  routes,
   toDisplayedDate,
   toDisplayedPhoneNumber,
 } from "shared";
@@ -26,7 +27,6 @@ import { DiscussionStatusBadge } from "src/app/components/establishment/establis
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";

@@ -4,9 +4,12 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, type UserEstablishmentRightDetails } from "shared";
+import {
+  domElementIds,
+  routes,
+  type UserEstablishmentRightDetails,
+} from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { routes } from "src/app/routes/routes";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";

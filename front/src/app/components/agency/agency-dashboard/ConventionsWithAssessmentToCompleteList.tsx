@@ -9,10 +9,10 @@ import {
   type ConventionWithUnfinalizedAssessment,
   domElementIds,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
+  routes,
   toDisplayedDate,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import {
   getAssessmentCompletionStatus,
   getAssessmentLabelsAndSeverityByStatus,

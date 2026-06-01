@@ -1,10 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr/fr";
 import { useState } from "react";
 import { MainWrapper, NavCard, PageHeader } from "react-design-system";
-import { domElementIds, loginFtConnect } from "shared";
+import { domElementIds, loginFtConnect, routes } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 
 const useInitiateConventionRoute =

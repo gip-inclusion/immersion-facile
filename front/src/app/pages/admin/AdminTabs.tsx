@@ -1,13 +1,13 @@
 import { Tabs, type TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
 import { useDispatch } from "react-redux";
-
 import {
   type AdminTabRouteName,
   adminTabs,
   keys,
   type OmitFromExistingKeys,
   type Prettify,
+  routes,
 } from "shared";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
@@ -17,7 +17,6 @@ import { EventsTab } from "src/app/pages/admin/EventsTabs";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { UsersTab } from "src/app/pages/admin/UsersTab";
-import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";

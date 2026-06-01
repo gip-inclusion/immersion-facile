@@ -8,6 +8,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredJwtErrorMessage,
   type Role,
+  useRoute,
   userHasEnoughRightsOnConvention,
   type WithConventionId,
 } from "shared";
@@ -16,7 +17,6 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { useRoute } from "src/app/routes/routes";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionManageFeedbackTopicsToClearOnUnmount } from "src/core-logic/domain/feedback/feedback.content";

@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type { AgencyDto } from "shared";
+import type { AgencyDto, routes } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
@@ -9,7 +9,6 @@ import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { routes } from "src/app/routes/routes";
 import type { ConnectedUsersWithNormalizedAgencyRightsById } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";

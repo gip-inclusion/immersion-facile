@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   domElementIds,
+  routes,
   type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { routes } from "src/app/routes/routes";
 
 export const ManageDiscussionFormSection = (): JSX.Element => {
   const { register, handleSubmit, formState, setValue } =

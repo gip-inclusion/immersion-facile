@@ -7,6 +7,7 @@ import {
   activeAgencyStatuses,
   type ConnectedUser,
   domElementIds,
+  routes,
   type WithDashboards,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -18,7 +19,6 @@ import {
   agencyDashboardTabsList,
   type FrontAgencyDashboardRoute,
 } from "src/app/pages/auth/ConnectedPrivateRoutePage";
-import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { MetabaseView } from "../../MetabaseView";

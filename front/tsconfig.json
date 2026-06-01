@@ -21,5 +21,10 @@
       "shared": ["../../shared/src/index.ts"]
     }
   },
-  "include": ["./src"]
+  "include": [
+    "./src",
+    "../shared/src/routes/routeParams",
+    "../shared/src/routes/front/routes.hooks.ts",
+    "../shared/src/routes/valueSerializer.ts"
+  ]
 }

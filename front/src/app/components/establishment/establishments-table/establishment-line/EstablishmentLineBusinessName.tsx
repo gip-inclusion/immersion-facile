@@ -4,10 +4,10 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Tag } from "react-design-system";
 import {
   domElementIds,
+  routes,
   type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
-import { routes } from "src/app/routes/routes";
 
 export const EstablishmentLineBusinessName = ({
   data,

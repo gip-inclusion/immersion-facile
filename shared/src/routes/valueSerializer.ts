@@ -1,12 +1,12 @@
-import {
-  type AppellationAndRomeDto,
-  type AppellationCode,
-  type NafCode,
-  parseStringToJsonOrThrow,
-  type RemoteWorkMode,
-  type ScheduleDto,
-} from "shared";
 import type { ValueSerializer } from "type-route";
+import type { NafCode } from "../naf/naf.dto";
+import type { RemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
+import type {
+  AppellationAndRomeDto,
+  AppellationCode,
+} from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { ScheduleDto } from "../schedule/Schedule.dto";
+import { parseStringToJsonOrThrow } from "../utils/string";
 
 const makeValueSerializer = <T>(paramName: string): ValueSerializer<T> => ({
   parse: (raw) => parseStringToJsonOrThrow<T>(raw, paramName),
@@ -31,3 +31,4 @@ export const nafCodeSerializer: ValueSerializer<NafCode[]> =
 
 export const remoteWorkModeSerializer: ValueSerializer<RemoteWorkMode[]> =
   makeValueSerializer<RemoteWorkMode[]>("remoteWorkModes");
+makeValueSerializer<RemoteWorkMode[]>("remoteWorkModes");
