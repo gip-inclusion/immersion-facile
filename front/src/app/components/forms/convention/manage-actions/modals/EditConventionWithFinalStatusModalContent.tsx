@@ -10,6 +10,8 @@ import {
   toDateUTCString,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 
 export const EditConventionWithFinalStatusModalContent = ({
   convention,
@@ -21,6 +23,10 @@ export const EditConventionWithFinalStatusModalContent = ({
   closeModal: () => void;
 }) => {
   const beneficiary = convention.signatories.beneficiary;
+  const establishmentTutor = convention.establishmentTutor;
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+
+  const canEditBeneficiary = currentUser?.isBackofficeAdmin ?? false;
 
   const { register, handleSubmit, formState } =
     useForm<EditConventionWithFinalStatusRequestDto>({
@@ -28,16 +34,33 @@ export const EditConventionWithFinalStatusModalContent = ({
       mode: "onTouched",
       defaultValues: {
         conventionId: convention.id,
-        updatedBeneficiaryBirthDate: beneficiary.birthdate,
-        firstname: beneficiary.firstName,
-        lastname: beneficiary.lastName,
+        establishmentTutor: {
+          firstname: establishmentTutor.firstName,
+          lastname: establishmentTutor.lastName,
+          job: establishmentTutor.job,
+          email: establishmentTutor.email,
+          phone: establishmentTutor.phone,
+        },
+        ...(canEditBeneficiary && {
+          beneficiary: {
+            updatedBeneficiaryBirthDate: beneficiary.birthdate,
+            firstname: beneficiary.firstName,
+            lastname: beneficiary.lastName,
+          },
+        }),
       },
     });
 
   const onFormSubmit: SubmitHandler<EditConventionWithFinalStatusRequestDto> = (
     values,
   ) => {
-    onSubmit(values);
+    onSubmit({
+      conventionId: values.conventionId,
+      establishmentTutor: values.establishmentTutor,
+      ...(canEditBeneficiary && values.beneficiary
+        ? { beneficiary: values.beneficiary }
+        : {}),
+    });
     closeModal();
   };
 
@@ -51,44 +74,89 @@ export const EditConventionWithFinalStatusModalContent = ({
         <strong>ID :</strong> {convention.id}
       </p>
 
-      <div className={fr.cx("fr-card", "fr-p-2w", "fr-mb-3w")}>
-        <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Personne en immersion</h3>
-        <Input
-          label="Date de naissance"
-          nativeInputProps={{
-            ...register("updatedBeneficiaryBirthDate", {
-              setValueAs: (value) => (value ? value : undefined),
-            }),
-            id: domElementIds.manageConvention
-              .editConventionWithFinalStatusModalNewDateInput,
-            type: "date",
-            max: toDateUTCString(new Date()),
-          }}
-          {...getFieldError("updatedBeneficiaryBirthDate")}
-        />
+      {canEditBeneficiary && (
+        <div className={fr.cx("fr-card", "fr-p-2w", "fr-mb-3w")}>
+          <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Personne en immersion</h3>
+          <Input
+            label="Date de naissance"
+            nativeInputProps={{
+              ...register("beneficiary.updatedBeneficiaryBirthDate"),
+              id: domElementIds.manageConvention
+                .editConventionWithFinalStatusModalNewDateInput,
+              type: "date",
+              max: toDateUTCString(new Date()),
+            }}
+            {...getFieldError("beneficiary.updatedBeneficiaryBirthDate")}
+          />
 
+          <Input
+            label="Prénom"
+            nativeInputProps={{
+              ...register("beneficiary.firstname"),
+              id: domElementIds.manageConvention
+                .editConventionWithFinalStatusModalNewFirstNameInput,
+            }}
+            {...getFieldError("beneficiary.firstname")}
+          />
+          <Input
+            label="Nom de famille"
+            nativeInputProps={{
+              ...register("beneficiary.lastname"),
+              id: domElementIds.manageConvention
+                .editConventionWithFinalStatusModalNewLastNameInput,
+            }}
+            {...getFieldError("beneficiary.lastname")}
+          />
+        </div>
+      )}
+
+      <div className={fr.cx("fr-card", "fr-p-2w")}>
+        <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Tuteur de l'immersion</h3>
         <Input
           label="Prénom"
           nativeInputProps={{
-            ...register("firstname"),
+            ...register("establishmentTutor.firstname"),
             id: domElementIds.manageConvention
-              .editConventionWithFinalStatusModalNewFirstNameInput,
+              .editConventionWithFinalStatusModalTutorFirstNameInput,
           }}
-          {...getFieldError("firstname")}
+          {...getFieldError("establishmentTutor.firstname")}
         />
         <Input
           label="Nom de famille"
           nativeInputProps={{
-            ...register("lastname"),
+            ...register("establishmentTutor.lastname"),
             id: domElementIds.manageConvention
-              .editConventionWithFinalStatusModalNewLastNameInput,
+              .editConventionWithFinalStatusModalTutorLastNameInput,
           }}
-          {...getFieldError("lastname")}
+          {...getFieldError("establishmentTutor.lastname")}
         />
-      </div>
-
-      <div className={fr.cx("fr-card", "fr-p-2w")}>
-        <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Tuteur de l'immersion</h3>
+        <Input
+          label="Fonction"
+          nativeInputProps={{
+            ...register("establishmentTutor.job"),
+            id: domElementIds.manageConvention
+              .editConventionWithFinalStatusModalTutorJobInput,
+          }}
+          {...getFieldError("establishmentTutor.job")}
+        />
+        <Input
+          label="Email"
+          nativeInputProps={{
+            ...register("establishmentTutor.email"),
+            id: domElementIds.manageConvention
+              .editConventionWithFinalStatusModalTutorEmailInput,
+          }}
+          {...getFieldError("establishmentTutor.email")}
+        />
+        <Input
+          label="Téléphone"
+          nativeInputProps={{
+            ...register("establishmentTutor.phone"),
+            id: domElementIds.manageConvention
+              .editConventionWithFinalStatusModalTutorPhoneInput,
+          }}
+          {...getFieldError("establishmentTutor.phone")}
+        />
       </div>
     </form>
   );

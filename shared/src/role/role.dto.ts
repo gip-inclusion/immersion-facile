@@ -60,6 +60,12 @@ export const conventionEstablishmentsRoles = [
 
 export const agencyModifierRoles = ["counsellor", "validator"] as const;
 
+export const allowedRolesToEditConventionWithFinalStatus = [
+  ...agencyModifierRoles,
+  "establishment-representative",
+  "back-office",
+] as const;
+
 export const allModifierRoles = [
   ...allSignatoryRoles,
   ...agencyModifierRoles,

@@ -4,7 +4,9 @@ import { intersection } from "ramda";
 import type { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
 import {
+  agencyModifierRoles,
   allowedRolesToCreateAssessment,
+  allowedRolesToEditConventionWithFinalStatus,
   type ConnectedUser,
   type ConventionReadDto,
   type ConventionStatus,
@@ -386,9 +388,18 @@ const createButtonPropsByVerificationAction = (
   const shouldShowMarkAsHandledButton =
     shouldShowBroadcastAgainButton && !!broadcastErrorFeedback;
 
+  const canEditConventionWithFinalStatus =
+    intersection(requesterRoles, [
+      ...allowedRolesToEditConventionWithFinalStatus,
+    ]).length > 0 ||
+    (!!currentUser &&
+      userHasEnoughRightsOnConvention(currentUser, convention, [
+        ...agencyModifierRoles,
+      ]));
+
   const shouldShowEditConventionWithFinalStatusButton =
-    currentUser?.isBackofficeAdmin === true &&
-    !conventionStatusesAllowedForModification.includes(convention.status);
+    !conventionStatusesAllowedForModification.includes(convention.status) &&
+    canEditConventionWithFinalStatus;
 
   const shouldShowCancelButton =
     isAllowedConventionTransition(convention, "CANCELLED", requesterRoles) &&
