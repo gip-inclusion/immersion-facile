@@ -26,14 +26,15 @@ import {
   immersionFacileNoReplyEmail,
   isFederatedIdentityProvider,
   makeUrlWithQueryParams,
+  routes,
   toLowerCaseWithoutDiacritics,
+  useRoute,
   withRedirectUriSchema,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
-import { routes, useRoute } from "src/app/routes/routes";
 import {
   commonIllustrations,
   loginIllustration,

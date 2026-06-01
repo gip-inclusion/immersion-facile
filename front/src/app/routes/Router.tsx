@@ -12,6 +12,8 @@ import {
   type AppellationAndRomeDto,
   adminTabRouteNames,
   parseStringToJsonOrThrow,
+  routes,
+  useRoute,
 } from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
@@ -47,6 +49,10 @@ import { store } from "src/config/dependencies";
 import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import type { Route } from "type-route";
+import {
+  type StandardPageSlugs,
+  standardPageSlugs,
+} from "../../../../shared/src/routes/routeParams/standardPage";
 import { StandardLayoutPage } from "../components/layout/StandardLayoutPage";
 import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
@@ -58,11 +64,6 @@ import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { AssessmentPage } from "../pages/immersion-assessment/AssessmentPage";
 import { SearchResultPage } from "../pages/search/SearchResultPage";
-import {
-  type StandardPageSlugs,
-  standardPageSlugs,
-} from "./routeParams/standardPage";
-import { routes, useRoute } from "./routes";
 
 const OpenApiDocV2Page = lazy(
   () => import("src/app/pages/open-api-doc/OpenApiDocV2Page"),

@@ -15,6 +15,7 @@ import {
   domElementIds,
   type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
+  routes,
   type User,
   type UserId,
   type UserParamsForAgency,
@@ -22,7 +23,6 @@ import {
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";

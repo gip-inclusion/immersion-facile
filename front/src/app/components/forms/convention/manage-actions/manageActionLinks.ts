@@ -1,6 +1,6 @@
 import type { ConventionReadDto } from "shared";
+import { routes } from "shared";
 import type { VerificationActionWithLink } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
-import { routes } from "src/app/routes/routes";
 import type { Link } from "type-route";
 
 export type LinkParams = {

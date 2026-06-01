@@ -3,11 +3,15 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { HeadingSection, useScrollTo } from "react-design-system";
 import { useDispatch } from "react-redux";
 import type { UserParamsForAgency } from "shared";
-import { type AgencyRight, type ConnectedUser, domElementIds } from "shared";
+import {
+  type AgencyRight,
+  type ConnectedUser,
+  domElementIds,
+  routes,
+} from "shared";
 import { AgencyRightsTable } from "src/app/components/agency/agencies-table/AgencyRightsTable";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
-import { routes } from "src/app/routes/routes";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 

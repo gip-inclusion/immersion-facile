@@ -4,9 +4,8 @@ import type {
   HeroHeaderNavCard,
   Stat,
 } from "react-design-system";
-import { domElementIds } from "shared";
+import { domElementIds, routes } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
-import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
 import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";

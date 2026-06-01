@@ -17,11 +17,11 @@ import {
   type ConnectedUser,
   domElementIds,
   looksLikeSiret,
+  routes,
   type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUserForm } from "src/app/pages/establishment-dashboard/EstablishmentUserForm";
-import { routes } from "src/app/routes/routes";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";

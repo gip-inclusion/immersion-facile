@@ -16,7 +16,7 @@ import type {
 import { isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl } from "../discussion/discussion.schema";
 import type { AgencyRole } from "../role/role.dto";
 import { titleByRole } from "../role/role.utils";
-import { frontRoutes } from "../routes/route.utils";
+import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { displayDuration, oneMinuteInSeconds } from "../utils/durations";
 import { advices } from "./advices";

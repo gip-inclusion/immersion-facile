@@ -11,6 +11,7 @@ import {
   type AgencyRight,
   addressDtoToString,
   agencyKindToLabelIncludingIFAndPrepa,
+  routes,
   type User,
   type UserParamsForAgency,
 } from "shared";
@@ -20,7 +21,6 @@ import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUser
 import { AgencyLineRightsCTAs } from "src/app/components/agency/agencies-table/agency-line/AgencyLineRightsCTAs";
 import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";

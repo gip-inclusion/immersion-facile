@@ -10,6 +10,7 @@ import {
   type EstablishmentAdminPrivateData,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  type FederatedIdentityWithUser,
   FormEstablishmentDtoBuilder,
   type FormEstablishmentUserRight,
   noAgencyDashboards,
@@ -36,7 +37,7 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { authSelectors } from "../auth/auth.selectors";
-import { authSlice, type FederatedIdentityWithUser } from "../auth/auth.slice";
+import { authSlice } from "../auth/auth.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 

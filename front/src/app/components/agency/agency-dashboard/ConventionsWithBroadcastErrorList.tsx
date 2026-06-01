@@ -25,6 +25,7 @@ import {
   isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
+  routes,
 } from "shared";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import {
@@ -33,7 +34,6 @@ import {
 } from "src/app/contents/broadcast-feedback/broadcastFeedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionsWithBroadcastFeedbackSelectors } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.selectors";

@@ -2,9 +2,9 @@ import {
   type ConventionJwtPayload,
   type ConventionSupportedJwt,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  type routes,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 

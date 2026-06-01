@@ -8,10 +8,9 @@ import {
   useCopyButton,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, errors, zUuidLike } from "shared";
+import { domElementIds, errors, type routes, zUuidLike } from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import type { routes } from "src/app/routes/routes";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 import {

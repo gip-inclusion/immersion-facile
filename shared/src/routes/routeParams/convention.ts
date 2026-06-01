@@ -1,29 +1,43 @@
 import { addDays, startOfToday } from "date-fns";
-import {
-  type AgencyKind,
-  type AppellationAndRomeDto,
-  type BeneficiaryCurrentEmployer,
-  type BeneficiaryRepresentative,
-  type ConventionDraftDto,
-  type ConventionDto,
-  type ConventionTemplate,
-  type CreateConventionPresentationInitialValues,
-  type CreateConventionTemplatePresentationInitialValues,
-  type DateString,
-  type FtConnectIdentity,
-  type ImmersionObjective,
-  type InternshipKind,
-  isFtConnectIdentity,
-  type LevelOfEducation,
-  reasonableSchedule,
-  type ScheduleDto,
-  type Signatories,
-  type SiretDto,
-  toDateUTCString,
-} from "shared";
-import { ENV } from "src/config/environmentVariables";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
+
 import { v4 as uuidV4 } from "uuid";
+import {
+  type FederatedIdentity,
+  type FtConnectIdentity,
+  type IdToken,
+  isFtConnectIdentity,
+  type PhoneNumber,
+} from "../..";
+import type { AgencyKind } from "../../agency/agency.dto";
+import type {
+  BeneficiaryCurrentEmployer,
+  BeneficiaryRepresentative,
+  ConventionDto,
+  ImmersionObjective,
+  InternshipKind,
+  LevelOfEducation,
+  Signatories,
+} from "../../convention/convention.dto";
+import type {
+  CreateConventionPresentationInitialValues,
+  CreateConventionTemplatePresentationInitialValues,
+} from "../../convention/conventionPresentation.dto";
+import type { ConventionTemplate } from "../../convention/conventionTemplate.dto";
+import type { ConventionDraftDto } from "../../convention/shareConventionDraftByEmail.dto";
+import type { AppellationAndRomeDto } from "../../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { ScheduleDto } from "../../schedule/Schedule.dto";
+import { reasonableSchedule } from "../../schedule/ScheduleUtils";
+import type { SiretDto } from "../../siret/siret";
+import { type DateString, toDateUTCString } from "../../utils/date";
+
+export type FederatedIdentityWithUser = FederatedIdentity & {
+  email: string;
+  firstName: string;
+  lastName: string;
+  birthdate?: DateString;
+  phone?: PhoneNumber;
+  idToken: IdToken;
+};
 
 export const makeEmptyConventionInitialValues = ({
   internshipKind,
@@ -126,91 +140,7 @@ export const makeEmptyConventionInitialValues = ({
     internshipKind,
   };
 
-  return ENV.prefilledForms ? withDevPrefilledValues(initialForm) : initialForm;
-};
-
-const withDevPrefilledValues = (
-  emptyForm: CreateConventionPresentationInitialValues,
-): CreateConventionPresentationInitialValues => {
-  const signatories = emptyForm.signatories;
-
-  const defaultTutor = {
-    firstName: "Joe",
-    lastName: "Le tuteur",
-    phone: "0101100110",
-    email: "establishmentRepresentative@superbusiness.fr",
-    job: "Le job du tuteur",
-  };
-
-  const tutor = emptyForm.establishmentTutor;
-
-  return {
-    ...emptyForm,
-    signatories: {
-      ...emptyForm.signatories,
-      beneficiary: {
-        role: "beneficiary",
-        firstName: signatories?.beneficiary.firstName || "Sylvanie",
-        lastName: signatories?.beneficiary.lastName || "Durand",
-        email: signatories?.beneficiary.email || "sylvanie@monemail.fr",
-        phone: signatories?.beneficiary.phone || "0612345678",
-        birthdate:
-          signatories?.beneficiary.birthdate || "1990-02-21T00:00:00.000Z",
-        emergencyContact:
-          signatories?.beneficiary.emergencyContact || "Éric Durand",
-        emergencyContactPhone:
-          signatories?.beneficiary.emergencyContactPhone || "0662552607",
-        emergencyContactEmail:
-          signatories?.beneficiary.emergencyContactEmail ||
-          "eric.durand@emergencycontact.com",
-        federatedIdentity: signatories?.beneficiary.federatedIdentity,
-        isRqth: false,
-      },
-      beneficiaryRepresentative: signatories?.beneficiaryRepresentative,
-      establishmentRepresentative: {
-        role: "establishment-representative",
-        firstName:
-          signatories?.establishmentRepresentative.firstName ||
-          defaultTutor.firstName,
-        lastName:
-          signatories?.establishmentRepresentative.lastName ||
-          defaultTutor.lastName,
-        phone:
-          signatories?.establishmentRepresentative.phone || defaultTutor.phone,
-        email:
-          signatories?.establishmentRepresentative.email || defaultTutor.email,
-      },
-    },
-    establishmentTutor: {
-      role: "establishment-tutor",
-      firstName: tutor?.firstName || defaultTutor.firstName,
-      lastName: tutor?.lastName || defaultTutor.lastName,
-      phone: tutor?.phone || defaultTutor.phone,
-      email: tutor?.email || defaultTutor.email,
-      job: tutor?.job || defaultTutor.job,
-    },
-    siret: emptyForm.siret || "1234567890123",
-    businessName: emptyForm.businessName || "Futuroscope",
-    immersionAddress:
-      emptyForm.immersionAddress ||
-      "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
-    agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-    individualProtection: emptyForm.individualProtection ?? true,
-    individualProtectionDescription:
-      emptyForm.individualProtectionDescription || "Aucunes",
-    sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
-    sanitaryPreventionDescription:
-      emptyForm.sanitaryPreventionDescription || "Aucunes",
-    immersionObjective: emptyForm.immersionObjective,
-    immersionAppellation: emptyForm.immersionAppellation || {
-      romeLabel: "Boulanger / Boulangère",
-      appellationLabel: "Boulangerie",
-      romeCode: "D1502",
-      appellationCode: "12278",
-    },
-    immersionActivities: emptyForm.immersionActivities || "Superviser",
-    immersionSkills: emptyForm.immersionSkills || "Attention au détail",
-  };
+  return initialForm;
 };
 
 export const beneficiaryRepresentativeFromParams = ({

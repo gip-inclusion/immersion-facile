@@ -14,10 +14,9 @@ import {
   OverFooter,
   type OverFooterCols,
 } from "react-design-system";
-import { type AbsoluteUrl, domElementIds } from "shared";
+import { type AbsoluteUrl, domElementIds, routes } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
-import { routes } from "src/app/routes/routes";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
 import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";

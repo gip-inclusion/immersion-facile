@@ -2,9 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { format } from "date-fns";
 import { renderContent } from "html-templates/src/components/email";
 import { MainWrapper } from "react-design-system";
+import { routes, type StandardPageSlugs } from "shared";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
-import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
-import { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 import { HeaderFooterLayout } from "./HeaderFooterLayout";
 

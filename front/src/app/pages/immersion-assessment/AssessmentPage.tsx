@@ -12,6 +12,7 @@ import {
   getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
   type Role,
+  routes,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -22,7 +23,6 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
-import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";

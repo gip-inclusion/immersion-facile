@@ -17,11 +17,11 @@ import {
   isPhysicalWorkMode,
   isSuperEstablishment,
   type OfferDto,
+  routes,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { type SearchRoute, useSearch } from "src/app/hooks/search.hooks";
-import { routes } from "src/app/routes/routes";
 import { filterParamsForRoute } from "src/app/utils/url.utils";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-on-left.png";

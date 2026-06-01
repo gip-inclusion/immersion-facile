@@ -1,8 +1,8 @@
 import { MainWrapper } from "react-design-system";
+import type { routes } from "shared";
 import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import type { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 import { ErrorPage } from "../error/ErrorPage";
 

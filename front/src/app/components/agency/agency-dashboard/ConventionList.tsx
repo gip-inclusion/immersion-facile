@@ -23,13 +23,13 @@ import {
   isConventionEndingInOneDayOrMore,
   isConventionValidated,
   isNotEmptyArray,
+  routes,
   toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import {
   getAssessmentCompletionStatus,
   getAssessmentLabelsAndSeverityByStatus,

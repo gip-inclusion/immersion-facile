@@ -7,9 +7,8 @@ import {
   SearchResultIllustration,
   useScrollTo,
 } from "react-design-system";
-import { domElementIds, type InternalOfferDto } from "shared";
+import { domElementIds, type InternalOfferDto, routes } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
-import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
 
 type GroupListResultsProps = {

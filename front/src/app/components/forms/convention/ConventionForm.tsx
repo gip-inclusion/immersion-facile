@@ -36,6 +36,7 @@ import {
   type ConventionTemplate,
   type ConventionTemplateId,
   type CreateConventionPresentationInitialValues,
+  conventionPresentationFromConventionDraft,
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
@@ -44,17 +45,24 @@ import {
   type ExcludeFromExisting,
   errors as errorMessage,
   establishmentFormOfferSchema,
+  type FederatedIdentityWithUser,
+  type ftConnectParams,
   type InternshipKind,
   isBeneficiaryMinor,
+  isConventionTemplateFromRoute,
   isCreateConventionPresentationInitialValues,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isRemotableWorkMode,
   keys,
+  makeConventionPresentationFromConventionTemplate,
   makeConventionPresentationSchemaWithNormalizedInput,
+  makeConventionTemplatePresentationFromConventionTemplate,
+  makeEmptyConventionInitialValues,
   makeListAgencyOptionsKindFilter,
   remoteWorkModeLabels,
   remoteWorkModes,
   replaceEmptyValuesByUndefinedFromObject,
+  routes,
   toConventionTemplate,
   type UserWithRights,
   undefinedIfEmptyString,
@@ -89,24 +97,12 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  conventionPresentationFromConventionDraft,
-  makeConventionPresentationFromConventionTemplate,
-  makeConventionTemplatePresentationFromConventionTemplate,
-  makeEmptyConventionInitialValues,
-} from "src/app/routes/routeParams/convention";
-import {
-  type ftConnectParams,
-  isConventionTemplateFromRoute,
-  routes,
-} from "src/app/routes/routes";
 import { useConventionRoute } from "src/app/routes/routes.hooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {

@@ -2,13 +2,13 @@ import { useDispatch } from "react-redux";
 import {
   getJwtExpiredSinceInSeconds,
   handleJWTStringPossiblyContainingJsonError,
+  type routes,
 } from "shared";
 import { RenewExpiredJwtButton } from "src/app/components/auth/RenewExpiredJwtButton";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import type { routes } from "src/app/routes/routes";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";

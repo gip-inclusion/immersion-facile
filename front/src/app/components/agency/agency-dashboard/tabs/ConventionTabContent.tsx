@@ -22,6 +22,7 @@ import {
   conventionTemplateIdSchema,
   domElementIds,
   miniStageAgencyKinds,
+  routes,
   toDisplayedDate,
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
@@ -32,7 +33,6 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
 import { match, P } from "ts-pattern";

@@ -2,9 +2,9 @@ import type {
   AbsoluteUrl,
   ConventionDraftId,
   ExternalOfferDto,
+  FederatedIdentityWithUser,
   WithAcquisition,
 } from "shared";
-import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
 export type GenericPair<K extends string, Payload> = {
   key: K;

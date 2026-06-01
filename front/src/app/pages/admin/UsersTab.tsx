@@ -2,12 +2,11 @@ import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { type ElementRef, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { domElementIds } from "shared";
+import { domElementIds, routes } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 

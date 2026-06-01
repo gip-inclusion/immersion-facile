@@ -16,9 +16,8 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import type { Group, GroupWithResults, InternalOfferDto } from "shared";
+import type { Group, GroupWithResults, InternalOfferDto, routes } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import type { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { makeStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";

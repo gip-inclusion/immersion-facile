@@ -1,5 +1,5 @@
 import { errors } from "../errors/errors";
-import { frontRoutes } from "../routes/route.utils";
+import { frontRoutes } from "../routes/routes";
 import type { User } from "../user/user.dto";
 import type {
   DiscussionDto,

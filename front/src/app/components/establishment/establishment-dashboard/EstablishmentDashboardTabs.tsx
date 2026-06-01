@@ -12,6 +12,7 @@ import {
   establishmentDashboardTabsList,
   immersionFacileHelpdeskRootUrl,
   onlyAdminUserRightsWithStatusAccepted,
+  routes,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
@@ -23,7 +24,6 @@ import type {
 } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
-import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";

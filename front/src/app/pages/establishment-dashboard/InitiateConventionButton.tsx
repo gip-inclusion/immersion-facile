@@ -16,6 +16,7 @@ import {
   appellationCodeSchema,
   conventionTemplateIdSchema,
   domElementIds,
+  routes,
   type SiretDto,
   siretSchema,
   toDisplayedDate,
@@ -28,7 +29,6 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";

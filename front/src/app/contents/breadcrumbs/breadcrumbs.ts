@@ -1,12 +1,12 @@
 import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
-import { makeBreadcrumbsSegments } from "src/app/utils/breadcrumbs";
-import type { Route } from "type-route";
 import {
   type FrontRouteKeys,
   type FrontRouteUnion,
   routes,
   useRoute,
-} from "../../routes/routes";
+} from "shared";
+import { makeBreadcrumbsSegments } from "src/app/utils/breadcrumbs";
+import type { Route } from "type-route";
 
 export type BreadcrumbsItem = {
   label: string;

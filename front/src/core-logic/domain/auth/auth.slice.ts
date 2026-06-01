@@ -4,13 +4,10 @@ import type {
   AfterOAuthSuccessRedirectionResponse,
   ConnectedUserJwt,
   ConventionJwt,
-  DateString,
   Email,
   EmailAuthCodeJwt,
-  FederatedIdentity,
-  IdToken,
+  FederatedIdentityWithUser,
   OAuthState,
-  PhoneNumber,
   ShortLinkId,
   WithRedirectUri,
 } from "shared";
@@ -18,15 +15,6 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-
-export type FederatedIdentityWithUser = FederatedIdentity & {
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthdate?: DateString;
-  phone?: PhoneNumber;
-  idToken: IdToken;
-};
 
 type WithUrl = {
   url: AbsoluteUrl;

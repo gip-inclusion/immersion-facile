@@ -33,6 +33,8 @@ import {
   escapeHtml,
   exchangeMessageFromDashboardSchema,
   getFormattedFirstnameAndLastname,
+  makeEmptyConventionInitialValues,
+  routes,
   splitTextOnFirstSeparator,
   toConventionDraftDto,
   toDisplayedDate,
@@ -51,8 +53,6 @@ import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { makeEmptyConventionInitialValues } from "src/app/routes/routeParams/convention";
-import { routes } from "src/app/routes/routes";
 import {
   addLineBreakOnNewLines,
   convertHtmlToText,

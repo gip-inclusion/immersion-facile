@@ -3,10 +3,10 @@ import {
   absoluteUrlSchema,
   type ConventionDraftDto,
   type ConventionReadDto,
+  routes,
   toConventionDraftDto,
 } from "shared";
 import type { VerificationActionWithOnClick } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
-import { routes } from "src/app/routes/routes";
 
 export type OnClickWithoutModalParams = {
   convention: ConventionReadDto;

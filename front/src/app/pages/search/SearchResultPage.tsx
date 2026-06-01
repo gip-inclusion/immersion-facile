@@ -23,6 +23,7 @@ import {
   makeSiretDescriptionLink,
   type OfferDto,
   remoteWorkModeLabels,
+  routes,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -35,7 +36,6 @@ import { SearchResultContactSection } from "src/app/components/search/SearchResu
 import { SearchResultLabels } from "src/app/components/search/SearchResultLabels";
 import { defaultPageMetaContents } from "src/app/contents/meta/metaContents";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { useSearchResultRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";

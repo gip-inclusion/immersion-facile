@@ -1,12 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { routes, useRoute } from "shared";
 import { AddEstablishmentsByBatch } from "src/app/components/admin/establishments/AddEstablishmentsByBatch";
 import { ManageEstablishment } from "src/app/components/admin/establishments/ManageEstablishment";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { routes, useRoute } from "src/app/routes/routes";
 import { makeStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";
 import { useAdminDashboard } from "./useAdminDashboard";

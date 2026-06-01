@@ -1,4 +1,4 @@
-import type { frontRoutes } from "./routes/route.utils";
+import type { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
 

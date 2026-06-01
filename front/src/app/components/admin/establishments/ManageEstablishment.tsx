@@ -13,10 +13,10 @@ import {
   errors,
   type ManageEstablishmentAdminForm,
   manageEstablishmentAdminFormSchema,
+  routes,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { BackofficeDashboardTabContent } from "../../layout/BackofficeDashboardTabContent";

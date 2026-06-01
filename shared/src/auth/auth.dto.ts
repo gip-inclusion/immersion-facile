@@ -1,7 +1,7 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
-import type { frontRoutes } from "../routes/route.utils";
+import type { frontRoutes } from "../routes/routes";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 

@@ -19,6 +19,7 @@ import {
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
+  routes,
   toDateUTCString,
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
@@ -37,7 +38,6 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";

@@ -23,6 +23,7 @@ import {
   makeSiretDescriptionLink,
   npsFormIds,
   prettyPrintSchedule,
+  type routes,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -33,7 +34,6 @@ import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import type { routes } from "src/app/routes/routes";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import type { Route } from "type-route";

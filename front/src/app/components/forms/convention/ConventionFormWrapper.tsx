@@ -25,6 +25,7 @@ import {
   type InternshipKind,
   isSignatory,
   type Role,
+  routes,
   toDisplayedDate,
   type WithStatusJustification,
   withStatusJustificationSchema,
@@ -43,7 +44,6 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import type { ConventionTemplateFormRoute } from "src/app/pages/convention/ConventionTemplateForm";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes } from "src/app/routes/routes";
 import { useConventionRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
