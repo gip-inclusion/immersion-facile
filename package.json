@@ -45,7 +45,7 @@
     "@biomejs/biome": "2.3.8",
     "husky": "^8.0.1",
     "lint-staged": "^16.1.2",
-    "turbo": "1.4.6",
+    "turbo": "^2.9.16",
     "typescript": "^5.8.3"
   },
   "pnpm": {
