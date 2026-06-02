@@ -1,4 +1,3 @@
-import { values } from "ramda";
 import {
   type ConnectedUser,
   errors,
@@ -32,7 +31,7 @@ export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
 
     await uow.agencyRepository.update({
       id: agency.id,
-      status: !values(updatedUserRights).length ? "closed" : agency.status,
+      status: agency.status,
       usersRights: updatedUserRights,
     });
     await uow.outboxRepository.save(

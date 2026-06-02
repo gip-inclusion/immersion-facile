@@ -636,6 +636,7 @@ describe("Admin router", () => {
       inMemoryUow.userRepository.users = [user, backOfficeAdminUser];
       inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
+          validator: { roles: ["validator"], isNotifiedByEmail: true },
           [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
       ];
@@ -655,7 +656,9 @@ describe("Admin router", () => {
       });
 
       expectObjectsToMatch(inMemoryUow.agencyRepository.agencies, [
-        toAgencyWithRights({ ...agency, status: "closed" }, {}),
+        toAgencyWithRights(agency, {
+          validator: { roles: ["validator"], isNotifiedByEmail: true },
+        }),
       ]);
 
       await processEventsForEmailToBeSent(eventCrawler);
