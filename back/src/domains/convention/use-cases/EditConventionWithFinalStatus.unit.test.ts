@@ -8,8 +8,10 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  UserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -31,19 +33,37 @@ describe("EditConventionWithFinalStatus", () => {
   const oldBeneficiaryBirthdate = "2002-10-05";
   const newFirstName = "Jean";
   const newLastName = "Martin";
+  const newTutorEmail = "new-tutor@mail.com";
 
   const convention = new ConventionDtoBuilder()
     .withId(conventionId)
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withAgencyId(agency.id)
     .withBeneficiaryBirthdate(oldBeneficiaryBirthdate)
+    .withEstablishmentTutorEmail("tutor@mail.com")
     .build();
+
+  const establishmentTutorRequest = {
+    firstname: "Marie",
+    lastname: "Curie",
+    job: "Tuteur",
+    email: newTutorEmail,
+    phone: "+33601020304",
+  };
 
   const baseRequest: EditConventionWithFinalStatusRequestDto = {
     conventionId,
-    updatedBeneficiaryBirthDate: newBirthdate,
-    firstname: newFirstName,
-    lastname: newLastName,
+    establishmentTutor: establishmentTutorRequest,
+    beneficiary: {
+      updatedBeneficiaryBirthDate: newBirthdate,
+      firstname: newFirstName,
+      lastname: newLastName,
+    },
+  };
+
+  const tutorOnlyRequest: EditConventionWithFinalStatusRequestDto = {
+    conventionId,
+    establishmentTutor: establishmentTutorRequest,
   };
 
   const backOfficeAdmin = new ConnectedUserBuilder()
@@ -51,10 +71,13 @@ describe("EditConventionWithFinalStatus", () => {
     .withIsAdmin(true)
     .build();
 
-  const nonAdminUser = new ConnectedUserBuilder()
-    .withId("bcc5c20e-6dd2-45cf-affe-927358005263")
-    .withIsAdmin(false)
+  const counsellorUser = new ConnectedUserBuilder()
+    .withId("bcc5c20e-6dd2-45cf-affe-927358005264")
+    .withEmail("counsellor@mail.com")
     .build();
+
+  const adminJwtPayload = { userId: backOfficeAdmin.id };
+  const counsellorJwtPayload = { userId: counsellorUser.id };
 
   let uow: InMemoryUnitOfWork;
   let usecase: EditConventionWithFinalStatus;
@@ -85,7 +108,7 @@ describe("EditConventionWithFinalStatus", () => {
             ...baseRequest,
             conventionId: nonExistentConventionId,
           },
-          backOfficeAdmin,
+          adminJwtPayload,
         ),
         errors.convention.notFound({
           conventionId: nonExistentConventionId,
@@ -108,7 +131,7 @@ describe("EditConventionWithFinalStatus", () => {
             ...baseRequest,
             conventionId: conventionWithStatus.id,
           },
-          backOfficeAdmin,
+          adminJwtPayload,
         ),
         errors.convention.editConventionWithFinalStatusNotAllowedForStatus({
           status,
@@ -117,13 +140,35 @@ describe("EditConventionWithFinalStatus", () => {
       );
     });
 
-    it("throws when user is not back-office admin", async () => {
+    it("throws when user is not authorized", async () => {
+      const unauthorizedUser = new ConnectedUserBuilder()
+        .withId("bcc5c20e-6dd2-45cf-affe-927358005265")
+        .build();
       uow.conventionRepository.setConventions([convention]);
-      uow.userRepository.users = [nonAdminUser];
+      uow.userRepository.users = [unauthorizedUser];
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
 
       await expectPromiseToFailWithError(
-        usecase.execute(baseRequest, nonAdminUser),
-        errors.user.forbidden({ userId: nonAdminUser.id }),
+        usecase.execute(tutorOnlyRequest, { userId: unauthorizedUser.id }),
+        errors.convention.editConventionWithFinalStatusNotAuthorizedForRole(),
+      );
+    });
+
+    it("throws when non-admin sends beneficiary update", async () => {
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [counsellorUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [counsellorUser.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(baseRequest, counsellorJwtPayload),
+        errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole(),
       );
     });
 
@@ -143,9 +188,13 @@ describe("EditConventionWithFinalStatus", () => {
         usecase.execute(
           {
             ...baseRequest,
-            updatedBeneficiaryBirthDate: minorAbove16YearsOldBirthdate,
+            beneficiary: {
+              updatedBeneficiaryBirthDate: minorAbove16YearsOldBirthdate,
+              firstname: newFirstName,
+              lastname: newLastName,
+            },
           },
-          backOfficeAdmin,
+          adminJwtPayload,
         ),
         errors.convention.invalidConventionAfterFinalStatusEdit({
           message:
@@ -171,10 +220,14 @@ describe("EditConventionWithFinalStatus", () => {
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            conventionId,
-            updatedBeneficiaryBirthDate: "2009-06-01",
+            ...tutorOnlyRequest,
+            beneficiary: {
+              updatedBeneficiaryBirthDate: "2009-06-01",
+              firstname: newFirstName,
+              lastname: newLastName,
+            },
           },
-          backOfficeAdmin,
+          adminJwtPayload,
         ),
         errors.convention.invalidConventionAfterFinalStatusEdit({
           message:
@@ -186,16 +239,21 @@ describe("EditConventionWithFinalStatus", () => {
   });
 
   describe("Right path", () => {
-    it("updates beneficiary birthdate and names and saves ConventionWithFinalStatusEdited event", async () => {
+    it("updates beneficiary and establishment tutor and saves ConventionWithFinalStatusEdited event", async () => {
       uow.conventionRepository.setConventions([convention]);
       uow.userRepository.users = [backOfficeAdmin];
 
-      await usecase.execute(baseRequest, backOfficeAdmin);
+      await usecase.execute(baseRequest, adminJwtPayload);
 
       const expectedConvention = new ConventionDtoBuilder(convention)
         .withBeneficiaryBirthdate(newBirthdate)
         .withBeneficiaryFirstName(newFirstName)
         .withBeneficiaryLastName(newLastName)
+        .withEstablishmentTutorEmail(newTutorEmail)
+        .withEstablishmentTutorFirstName(establishmentTutorRequest.firstname)
+        .withEstablishmentTutorLastName(establishmentTutorRequest.lastname)
+        .withEstablishmentTutorJob(establishmentTutorRequest.job)
+        .withEstablishmentTutorPhone(establishmentTutorRequest.phone)
         .build();
       expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
@@ -212,27 +270,62 @@ describe("EditConventionWithFinalStatus", () => {
       ]);
     });
 
-    it("updates only beneficiary birthdate when only birthdate is provided", async () => {
+    it("updates only establishment tutor when counsellor edits without beneficiary", async () => {
       uow.conventionRepository.setConventions([convention]);
-      uow.userRepository.users = [backOfficeAdmin];
+      uow.userRepository.users = [counsellorUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [counsellorUser.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
 
-      await usecase.execute(
-        {
-          conventionId,
-          updatedBeneficiaryBirthDate: newBirthdate,
-        },
-        backOfficeAdmin,
-      );
+      await usecase.execute(tutorOnlyRequest, counsellorJwtPayload);
 
-      const updatedConvention = new ConventionDtoBuilder(convention)
-        .withBeneficiaryBirthdate(newBirthdate)
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withEstablishmentTutorEmail(newTutorEmail)
+        .withEstablishmentTutorFirstName(establishmentTutorRequest.firstname)
+        .withEstablishmentTutorLastName(establishmentTutorRequest.lastname)
+        .withEstablishmentTutorJob(establishmentTutorRequest.job)
+        .withEstablishmentTutorPhone(establishmentTutorRequest.phone)
         .build();
-      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionWithFinalStatusEdited",
           payload: {
-            convention: updatedConvention,
+            convention: expectedConvention,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: counsellorUser.id,
+            },
+          },
+        },
+      ]);
+    });
+
+    it("does not update establishment representative signatory when only tutor is edited", async () => {
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [backOfficeAdmin];
+
+      await usecase.execute(tutorOnlyRequest, adminJwtPayload);
+
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withEstablishmentTutorEmail(newTutorEmail)
+        .withEstablishmentTutorFirstName(establishmentTutorRequest.firstname)
+        .withEstablishmentTutorLastName(establishmentTutorRequest.lastname)
+        .withEstablishmentTutorJob(establishmentTutorRequest.job)
+        .withEstablishmentTutorPhone(establishmentTutorRequest.phone)
+        .build();
+
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "ConventionWithFinalStatusEdited",
+          payload: {
+            convention: expectedConvention,
             triggeredBy: {
               kind: "connected-user",
               userId: backOfficeAdmin.id,
@@ -242,30 +335,38 @@ describe("EditConventionWithFinalStatus", () => {
       ]);
     });
 
-    it("updates only beneficiary first name when only first name is provided", async () => {
+    it("allows establishment representative via magic link jwt", async () => {
+      const repEmail = convention.signatories.establishmentRepresentative.email;
+      const repUser = new UserBuilder().withEmail(repEmail).build();
+      const repJwtPayload = createConventionMagicLinkPayload({
+        id: conventionId,
+        role: "establishment-representative",
+        email: repEmail,
+        now: new Date(),
+      });
+
       uow.conventionRepository.setConventions([convention]);
-      uow.userRepository.users = [backOfficeAdmin];
+      uow.userRepository.users = [repUser];
 
-      await usecase.execute(
-        {
-          conventionId,
-          firstname: newFirstName,
-        },
-        backOfficeAdmin,
-      );
+      await usecase.execute(tutorOnlyRequest, repJwtPayload);
 
-      const updatedConvention = new ConventionDtoBuilder(convention)
-        .withBeneficiaryFirstName(newFirstName)
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withEstablishmentTutorEmail(newTutorEmail)
+        .withEstablishmentTutorFirstName(establishmentTutorRequest.firstname)
+        .withEstablishmentTutorLastName(establishmentTutorRequest.lastname)
+        .withEstablishmentTutorJob(establishmentTutorRequest.job)
+        .withEstablishmentTutorPhone(establishmentTutorRequest.phone)
         .build();
-      expectToEqual(uow.conventionRepository.conventions, [updatedConvention]);
+
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "ConventionWithFinalStatusEdited",
           payload: {
-            convention: updatedConvention,
+            convention: expectedConvention,
             triggeredBy: {
-              kind: "connected-user",
-              userId: backOfficeAdmin.id,
+              kind: "convention-magic-link",
+              role: "establishment-representative",
             },
           },
         },
