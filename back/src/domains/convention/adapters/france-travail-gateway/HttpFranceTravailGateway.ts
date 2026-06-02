@@ -215,7 +215,7 @@ const handleFtResponse =
         subscriberErrorFeedback: {
           message:
             typeof response.body === "string"
-              ? response.body
+              ? "wrong format response : HTML content instead of JSON"
               : response.body.message,
         },
         body: response.body,
