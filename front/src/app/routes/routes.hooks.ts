@@ -55,10 +55,10 @@ const conventionRouteNames = [
   routes.conventionTemplate.name,
 ] as const;
 
+const useConventionTypedRoute = makeUseTypedRoute<ConventionRouteName>();
+
 export const useConventionRoute = () =>
-  useTypedRoute<ConventionRouteName, typeof conventionRouteNames>(
-    conventionRouteNames,
-  );
+  useConventionTypedRoute(conventionRouteNames);
 
 export type RouteByMode = {
   create: Route<typeof routes.formEstablishment>;
@@ -68,8 +68,18 @@ export type RouteByMode = {
 
 export type Mode = keyof RouteByMode;
 
-export const useEstablishmentRoute =
-  makeUseTypedRoute<RouteByMode[Mode]["name"]>();
+type EstablishmentRouteName = RouteByMode[Mode]["name"];
+
+const establishmentRouteNames = [
+  routes.formEstablishment.name,
+  routes.establishmentDashboardFormEstablishment.name,
+  routes.adminEstablishments.name,
+] as const;
+
+const useEstablishmentTypedRoute = makeUseTypedRoute<EstablishmentRouteName>();
+
+export const useEstablishmentRoute = () =>
+  useEstablishmentTypedRoute(establishmentRouteNames);
 
 export const useSearchResultRoute =
   makeUseTypedRoute<
@@ -80,7 +90,18 @@ export const useSearchResultRoute =
     )["name"]
   >();
 
-export const useCreateDiscussionRoute =
-  makeUseTypedRoute<
-    (typeof routes.searchResult | typeof routes.searchResultForStudent)["name"]
-  >();
+type CreateDiscussionRouteName = (
+  | typeof routes.searchResult
+  | typeof routes.searchResultForStudent
+)["name"];
+
+const createDiscussionRouteNames = [
+  routes.searchResult.name,
+  routes.searchResultForStudent.name,
+] as const;
+
+const useCreateDiscussionTypedRoute =
+  makeUseTypedRoute<CreateDiscussionRouteName>();
+
+export const useCreateDiscussionRoute = () =>
+  useCreateDiscussionTypedRoute(createDiscussionRouteNames);

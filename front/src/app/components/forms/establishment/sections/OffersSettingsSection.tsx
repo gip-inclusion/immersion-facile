@@ -93,11 +93,7 @@ export const OffersSettingsSection = ({
   const { setValue, watch, clearErrors, getValues, register, formState } =
     useFormContext<FormEstablishmentDto>();
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const route = useEstablishmentRoute([
-    "adminEstablishments",
-    "establishmentDashboardFormEstablishment",
-    "formEstablishment",
-  ]);
+  const route = useEstablishmentRoute();
   const isEstablishmentAdmin = route.name === "adminEstablishments";
 
   const dispatch = useDispatch();

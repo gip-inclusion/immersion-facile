@@ -60,10 +60,7 @@ export const CreateDiscussionForm = ({
   contactMode,
 }: CreateDiscussionFormProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useCreateDiscussionRoute([
-    "searchResult",
-    "searchResultForStudent",
-  ]);
+  const route = useCreateDiscussionRoute();
 
   const inputsLabelsByKey = makeContactInputsLabelsByKey(
     route.name === "searchResult" ? "IF" : "1_ELEVE_1_STAGE",
