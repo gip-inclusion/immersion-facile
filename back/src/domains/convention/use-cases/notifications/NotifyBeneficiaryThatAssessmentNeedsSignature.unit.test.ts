@@ -4,7 +4,6 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type ShortLinkId,
 } from "shared";
@@ -138,7 +137,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
       role: convention.signatories.beneficiary.role,
       email: convention.signatories.beneficiary.email,
       now: timeGateway.now(),
-      targetRoute: frontRoutes.assessmentDocument,
+      targetRoute: "assessmentDocument",
       lifetime: "2Days",
     });
 

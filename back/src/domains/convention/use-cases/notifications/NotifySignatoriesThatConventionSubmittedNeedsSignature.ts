@@ -4,7 +4,6 @@ import {
   type ConventionDto,
   errors,
   filterNotFalsy,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type Signatory,
   type TemplatedEmail,
@@ -150,10 +149,10 @@ const makeEmail = async (
           firstname: beneficiaryCurrentEmployer.firstName,
         }),
       conventionSignShortlink: await makeMagicShortLink({
-        targetRoute: frontRoutes.conventionToSign,
+        targetRoute: "conventionToSign",
         lifetime: "2Days",
         extraQueryParams: {
-          mtm_source: "email-signature-link",
+          mtm_campaign: "email-signature-link",
         },
       }),
       businessName,

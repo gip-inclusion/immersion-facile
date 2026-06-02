@@ -141,12 +141,12 @@ When adding new error cases, add them to the centralized `errors` object.
 import { domElementIds } from "shared";
 
 // In React components
-<Button id={domElementIds.conventionImmersionRoute.submitFormButton}>
+<Button id={domElementIds.conventionImmersion.submitFormButton}>
   Submit
 </Button>
 
 // In Playwright tests
-await page.click(`#${domElementIds.conventionImmersionRoute.submitFormButton}`);
+await page.click(`#${domElementIds.conventionImmersion.submitFormButton}`);
 ```
 
 Every button, link, and interactive element needs an ID for analytics.

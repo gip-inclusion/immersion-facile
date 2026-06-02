@@ -1,7 +1,7 @@
 import {
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
@@ -70,12 +70,12 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             immersionAddress: convention.immersionAddress,
-            manageConventionLink: `${this.#config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              {
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
                 conventionId: convention.id,
-              },
-            )}`,
+              }),
+              this.#config.immersionFacileBaseUrl,
+            ),
           },
         },
         followedIds: {

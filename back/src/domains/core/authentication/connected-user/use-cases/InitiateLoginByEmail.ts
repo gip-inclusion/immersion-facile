@@ -1,5 +1,4 @@
 import {
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type InitiateLoginByEmailParams,
   immersionFacileNoReplyEmailSender,
@@ -52,7 +51,7 @@ export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
             loginLink: deps.generateEmailAuthCodeUrl({
               state,
               now: deps.timeGateway.now(),
-              uri: frontRoutes.magicLinkInterstitial,
+              targetRoute: "magicLinkInterstitial",
               email,
             }),
             fullname: getFormattedFirstnameAndLastname({

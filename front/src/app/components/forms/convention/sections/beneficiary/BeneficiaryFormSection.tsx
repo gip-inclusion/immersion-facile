@@ -286,9 +286,7 @@ export const BeneficiaryFormSection = ({
             onAddressClear={() => {
               setValue("signatories.beneficiary.address", undefined);
             }}
-            id={
-              domElementIds.conventionImmersionRoute.beneficiarySection.address
-            }
+            id={domElementIds.conventionImmersion.beneficiarySection.address}
             {...getFieldError("signatories.beneficiary.address")}
           />
           <Select

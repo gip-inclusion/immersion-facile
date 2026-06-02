@@ -37,10 +37,10 @@ const useTypedRoute = <
 
 export const makeUseTypedRoute =
   <TRouteName extends CurrentRouteName>() =>
-    <const TRouteNames extends readonly TRouteName[]>(
-      routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
-    ) =>
-      useTypedRoute<TRouteName, TRouteNames>(routeNames);
+  <const TRouteNames extends readonly TRouteName[]>(
+    routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
+  ) =>
+    useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
 type ConventionRouteName =
   | (typeof routes.conventionImmersion)["name"]

@@ -5,9 +5,9 @@ import {
   type ConventionRole,
   type Email,
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -158,12 +158,12 @@ const sendAgencyEmails = async ({
           beneficiaryPhone: convention.signatories.beneficiary.phone,
           previousAgencyName,
           justification,
-          manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-            `/${frontRoutes.manageConventionUserConnected}`,
-            {
+          manageConventionLink: makeRouteAbsoluteUrl(
+            routes.manageConventionConnectedUser({
               conventionId: convention.id,
-            },
-          )}`,
+            }),
+            config.immersionFacileBaseUrl,
+          ),
           conventionId: convention.id,
         },
       },
@@ -206,7 +206,7 @@ const sendSignatoriesEmail = async (
     });
 
     const shortLink = await makeShortMagicLink({
-      targetRoute: frontRoutes.manageConvention,
+      targetRoute: "manageConvention",
       lifetime: "1Month",
     });
 

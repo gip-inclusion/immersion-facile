@@ -1,7 +1,6 @@
 import {
   type ConventionEstablishmentRole,
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type WithAssessmentDto,
   withAssessmentSchema,
@@ -76,7 +75,7 @@ export const makeNotifyEstablishmentThatAssessmentWasCreated = useCaseBuilder(
                     ? convention.signatories.establishmentRepresentative.email
                     : convention.establishmentTutor.email,
                 role,
-                targetRoute: `${frontRoutes.assessmentDocument}`,
+                targetRoute: "assessmentDocument",
                 now: timeGateway.now(),
                 lifetime: "1Month",
               }),

@@ -1,15 +1,16 @@
 import {
-  type AbsoluteUrl,
   type ConnectedUserJwt,
   type ConnectedUserQueryParams,
   decodeURIWithParams,
   filterNotFalsy,
+  makeRouteAbsoluteUrl,
   queryParamsAsString,
+  routes,
 } from "shared";
 import type {
   ConventionMagicLinkLifetime,
-  EmailAuthCodeUrlQueryParams,
   GenerateConnectedUserLoginUrl,
+  GenerateConventionMagicLinkRouteName,
   GenerateConventionMagicLinkUrl,
   GenerateEmailAuthCodeUrl,
 } from "../config/bootstrap/magicLinkUrl";
@@ -32,22 +33,20 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   extraQueryParams = {},
 }: CreateConventionMagicLinkPayloadProperties & {
   extraQueryParams?: Record<string, string>;
-  targetRoute: string;
+  targetRoute: GenerateConventionMagicLinkRouteName;
   lifetime?: ConventionMagicLinkLifetime;
 }) => {
   const fakeJwt = [id, role, now.toISOString(), email, lifetime]
     .filter(filterNotFalsy)
     .join("/");
 
-  const queryParams = Object.entries(extraQueryParams).map(
-    ([key, value]) => `${key}=${value}`,
-  );
-  return [
+  return makeRouteAbsoluteUrl(
+    routes[targetRoute]({
+      ...extraQueryParams,
+      jwt: fakeJwt,
+    }),
     "http://fake-magic-link",
-    targetRoute,
-    fakeJwt,
-    ...(queryParams.length ? [queryParams.join("&")] : []),
-  ].join("/") as AbsoluteUrl;
+  );
 };
 
 export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
@@ -75,12 +74,13 @@ export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
 export const fakeGenerateEmailAuthCodeUrlFn: GenerateEmailAuthCodeUrl = ({
   email,
   state,
-  uri,
+  targetRoute,
 }) =>
-  `http://fake-connected-user/${uri}?${queryParamsAsString<EmailAuthCodeUrlQueryParams>(
-    {
+  makeRouteAbsoluteUrl(
+    routes[targetRoute]({
       code: "EmailAuthCodeJwt",
       email,
       state,
-    },
-  )}`;
+    }),
+    "http://fake-connected-user",
+  );

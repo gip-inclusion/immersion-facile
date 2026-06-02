@@ -2,10 +2,10 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   ConventionDtoBuilder,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
   reasonableSchedule,
+  routes,
 } from "shared";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
@@ -147,10 +147,12 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
             dateStart: conventionDtoFromEvent.dateStart,
             dateEnd: conventionDtoFromEvent.dateEnd,
             businessName: conventionDtoFromEvent.businessName,
-            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              { conventionId: conventionDtoFromEvent.id },
-            )}`,
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
+                conventionId: conventionDtoFromEvent.id,
+              }),
+              config.immersionFacileBaseUrl,
+            ),
             agencyLogoUrl: agency.logoUrl ?? undefined,
           },
         },

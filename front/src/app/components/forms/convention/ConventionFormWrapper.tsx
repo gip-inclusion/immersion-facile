@@ -507,8 +507,7 @@ const ConventionSummarySection = ({
               hintText="Votre message sera envoyé aux autres signataires"
               nativeTextAreaProps={{
                 ...register("statusJustification"),
-                id: domElementIds.conventionImmersionRoute
-                  .statusJustificationInput,
+                id: domElementIds.conventionImmersion.statusJustificationInput,
               }}
               {...getFieldError("statusJustification")}
             />
@@ -523,7 +522,7 @@ const ConventionSummarySection = ({
               <Button
                 disabled={isLoading}
                 iconId="fr-icon-arrow-go-back-line"
-                id={domElementIds.conventionImmersionRoute.summaryEditButton}
+                id={domElementIds.conventionImmersion.summaryEditButton}
                 priority="secondary"
                 onClick={() => {
                   dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
@@ -554,7 +553,7 @@ const ConventionSummarySection = ({
                   priority="primary"
                   onClick={handleSubmit(onConfirmSubmit)}
                   nativeButtonProps={{
-                    id: domElementIds.conventionImmersionRoute
+                    id: domElementIds.conventionImmersion
                       .confirmSubmitFormButton,
                     disabled: isLoading,
                   }}
@@ -582,7 +581,7 @@ const ConventionSummarySection = ({
                     }),
                   );
                 },
-                id: domElementIds.conventionImmersionRoute.summaryEditButton,
+                id: domElementIds.conventionImmersion.summaryEditButton,
                 priority: "secondary",
               },
               {
@@ -592,8 +591,7 @@ const ConventionSummarySection = ({
                     ? openConfirmDuplicateConventionModal()
                     : onConfirmSubmit(),
                 nativeButtonProps: {
-                  id: domElementIds.conventionImmersionRoute
-                    .confirmSubmitFormButton,
+                  id: domElementIds.conventionImmersion.confirmSubmitFormButton,
                   disabled: isLoading,
                 },
               },

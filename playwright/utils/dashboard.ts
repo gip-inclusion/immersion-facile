@@ -4,7 +4,7 @@ import {
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
-  frontRoutes,
+  routes,
 } from "shared";
 import { getTabIndexByTabName } from "./admin";
 import { fillConventionForm } from "./convention";
@@ -44,7 +44,9 @@ export const createConventionTemplate = async (
   await page.click(
     `#${domElementIds.conventionTemplate.createConventionTemplateButton}`,
   );
-  await page.waitForURL(`${frontRoutes.conventionTemplate}**`);
+  await page.waitForURL(
+    `**/${routes.conventionTemplate({ fromRoute: dashboardKind === "agency" ? "agencyDashboard" : "establishmentDashboard" }).href}**`,
+  );
 
   const templateName = "Mon premier modèle de convention";
   await page.fill(
@@ -127,10 +129,10 @@ const initiateConventionFromConventionTemplate = async ({
 
   await page.click(`#${domIds.initiateConvention.modalButton}`);
   await expect(
-    page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),
+    page.locator(`#${domElementIds.conventionImmersion.submitFormButton}`),
   ).toBeVisible();
   await page
-    .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
+    .locator(`#${domElementIds.conventionImmersion.submitFormButton}`)
     .click();
   await page.locator(".im-convention-summary__section").first().isVisible();
 };
@@ -185,12 +187,12 @@ const initiateConventionFromEstablishmentInformations = async ({
 
   expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
+      `#${domElementIds.conventionImmersion.conventionSection.immersionAddress}`,
     ),
   ).toHaveValue(selectedAddress);
   expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}-wrapper .im-select__single-value`,
+      `#${domElementIds.conventionImmersion.conventionSection.immersionAppellation}-wrapper .im-select__single-value`,
     ),
   ).toHaveText(selectedAppellation);
 };
@@ -216,16 +218,16 @@ const initiateConventionFromAgencyInformations = async ({
   }
 
   await expect(
-    page.locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`),
+    page.locator(`#${domElementIds.conventionImmersion.submitFormButton}`),
   ).toBeVisible();
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyReferentFirstName}`,
+      `#${domElementIds.conventionImmersion.conventionSection.agencyReferentFirstName}`,
     ),
   ).toHaveValue("Jean");
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyReferentLastName}`,
+      `#${domElementIds.conventionImmersion.conventionSection.agencyReferentLastName}`,
     ),
   ).toHaveValue("Immersion");
 };

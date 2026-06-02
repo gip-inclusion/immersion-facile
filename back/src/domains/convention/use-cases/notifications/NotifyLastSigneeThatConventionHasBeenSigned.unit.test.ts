@@ -4,7 +4,6 @@ import {
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -76,7 +75,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     await notifyLastSignee.execute({ convention: signedConvention });
 
     const magicLink = fakeGenerateMagicLinkUrlFn({
-      targetRoute: frontRoutes.manageConvention,
+      targetRoute: "manageConvention",
       id: signedConvention.id,
       role: "beneficiary",
       email: signedConvention.signatories.beneficiary.email,
@@ -125,7 +124,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
                 .signedAt!,
             conventionId: signedConvention.id,
             magicLink: fakeGenerateMagicLinkUrlFn({
-              targetRoute: frontRoutes.manageConvention,
+              targetRoute: "manageConvention",
               id: signedConvention.id,
               role: "establishment-representative",
               email:

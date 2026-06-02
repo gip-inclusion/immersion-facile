@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { domElementIds, routes } from "shared";
 
 test.describe("Home user flow", () => {
   const userTypes = ["candidate", "establishment", "agency"] as const;
@@ -15,7 +15,7 @@ test.describe("Home user flow", () => {
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.candidate}`);
     await page.click(`#${domElementIds.homeCandidates.heroHeader.search}`);
-    await expect(page).toHaveURL(`/${frontRoutes.search}`);
+    await expect(page).toHaveURL(`/${routes.search().href}`);
   });
 
   test("User flow: Candidate -> convention form", async ({ page }) => {
@@ -25,7 +25,7 @@ test.describe("Home user flow", () => {
       `#${domElementIds.homeCandidates.heroHeader.formConvention}`,
     );
     await expect(page.url()).toContain(
-      `/${frontRoutes.initiateConvention}?skipFirstStep=true`,
+      `/${routes.initiateConvention({ skipFirstStep: true }).href}`,
     );
   });
 
@@ -35,16 +35,14 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeEstablishments.heroHeader.formConvention}`,
     );
-    await expect(page.url()).toContain(
-      `/${frontRoutes.conventionImmersionRoute}`,
-    );
+    await expect(page.url()).toContain(`/${routes.conventionImmersion().href}`);
   });
 
   test("User flow: Agency -> register form", async ({ page }) => {
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.agency}`);
     await page.click(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`);
-    await expect(page.url()).toContain(`/${frontRoutes.agencyDashboard}`);
+    await expect(page.url()).toContain(`/${routes.agencyDashboard().href}`);
   });
 
   test("User flow: Agency -> convention form", async ({ page }) => {
@@ -53,8 +51,6 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeAgencies.heroHeader.formConvention}`,
     );
-    await expect(page.url()).toContain(
-      `/${frontRoutes.conventionImmersionRoute}`,
-    );
+    await expect(page.url()).toContain(`/${routes.conventionImmersion().href}`);
   });
 });

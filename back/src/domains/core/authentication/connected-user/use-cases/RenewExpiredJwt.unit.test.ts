@@ -11,8 +11,8 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
   type RenewExpiredJwtRequestDto,
+  routes,
   type ShortLinkId,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -170,7 +170,7 @@ describe("RenewExpiredJwt use case", () => {
 
         await useCase.execute({
           kind: "convention",
-          originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+          originalUrl: "http://immersionfacile.fr/verifier-et-signer?jwt=toto",
           expiredJwt: generateConventionJwt(expiredPayload),
         });
 
@@ -196,7 +196,7 @@ describe("RenewExpiredJwt use case", () => {
               role: expectedRole,
               email: expectedEmail,
               now: timeGateway.now(),
-              targetRoute: frontRoutes.conventionToSign,
+              targetRoute: "conventionToSign",
             }),
             lastUsedAt: null,
           },
@@ -218,7 +218,7 @@ describe("RenewExpiredJwt use case", () => {
         await useCase.execute({
           kind: "convention",
           originalUrl: encodeURIComponent(
-            "http://immersionfacile.fr/verifier-et-signer",
+            "http://immersionfacile.fr/verifier-et-signer?jwt=toto",
           ),
           expiredJwt: generateConventionJwt(expiredPayload),
         });
@@ -281,7 +281,8 @@ describe("RenewExpiredJwt use case", () => {
         await expectPromiseToFailWithError(
           useCase.execute({
             kind: "convention",
-            originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+            originalUrl:
+              "http://immersionfacile.fr/verifier-et-signer?jwt=toto",
             expiredJwt: generateConventionJwt(
               createConventionMagicLinkPayload({
                 id: validConvention.id,
@@ -314,11 +315,13 @@ describe("RenewExpiredJwt use case", () => {
           errors.convention.unsupportedRenewRoute({
             originalUrl: request.originalUrl,
             supportedRenewRoutes: [
-              "demande-immersion",
-              "verifier-et-signer",
-              "pilotage-convention",
-              "bilan-immersion",
-              "bilan-document",
+              routes.conventionToSign({ jwt: "" }).href,
+              routes.manageConvention({ jwt: "" }).href,
+              routes.assessment({ jwt: "" }).href,
+              routes.assessmentDocument({ jwt: "" }).href,
+              routes.conventionImmersion({ jwt: "" }).href,
+              routes.unregisterEstablishmentLead({ jwt: "" }).href,
+              routes.conventionDocument({ jwt: "" }).href,
             ],
           }),
         );
@@ -353,7 +356,7 @@ describe("RenewExpiredJwt use case", () => {
     );
 
     const existingShortLinkId = "already-used-short-link";
-    const originalUrl = "http://immersionfacile.fr/verifier-et-signer";
+    const originalUrl = "http://immersionfacile.fr/verifier-et-signer?jwt=toto";
 
     beforeEach(() => {
       uow.shortLinkQuery.setShortLinks([
@@ -429,7 +432,7 @@ describe("RenewExpiredJwt use case", () => {
               role: expectedRole,
               email: expectedEmail,
               now: timeGateway.now(),
-              targetRoute: frontRoutes.conventionToSign,
+              targetRoute: "conventionToSign",
             }),
             lastUsedAt: null,
           },
@@ -734,7 +737,7 @@ describe("RenewExpiredJwt use case", () => {
           url: fakeGenerateEmailAuthCodeUrlFn({
             email: user.email,
             state: emailUnusedOnGoingOAuth.state,
-            uri: frontRoutes.magicLinkInterstitial,
+            targetRoute: "magicLinkInterstitial",
             now: timeGateway.now(),
           }),
           lastUsedAt: null,

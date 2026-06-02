@@ -8,7 +8,6 @@ import {
   type ConventionRelatedJwtPayload,
   errors,
   formatHoursCooldownTimeRemaining,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   isWithinHoursCooldown,
   type NotificationKind,
@@ -216,9 +215,9 @@ const sendSms = async ({
   });
 
   const shortLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.assessment,
+    targetRoute: "assessment",
     lifetime: "2Days",
-    extraQueryParams: { mtm_source: "sms-assessment-link" },
+    extraQueryParams: { mtm_campaign: "sms-assessment-link" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {
@@ -262,9 +261,9 @@ const sendEmail = async ({
     uow,
   });
   const assessmentCreationLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.assessment,
+    targetRoute: "assessment",
     lifetime: "2Days",
-    extraQueryParams: { mtm_source: "email-assessment-link" },
+    extraQueryParams: { mtm_campaign: "email-assessment-link" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {

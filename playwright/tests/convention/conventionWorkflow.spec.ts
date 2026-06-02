@@ -38,7 +38,7 @@ test.describe("Convention can be created from shared draft", () => {
     if (!href) throw new Error("Convention draft magic link not found");
     await page.goto(href);
     await page.click(
-      `#${domElementIds.conventionImmersionRoute.fromSharedConventionContinueButton}`,
+      `#${domElementIds.conventionImmersion.fromSharedConventionContinueButton}`,
     );
     await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
   });
@@ -122,7 +122,7 @@ test.describe("Convention creation and modification workflow", () => {
 
         await expect(
           page.locator(
-            `#${domElementIds.conventionImmersionRoute.form({
+            `#${domElementIds.conventionImmersion.form({
               internshipKind: "immersion",
               mode: "edit-convention",
             })}`,
@@ -152,7 +152,7 @@ test.describe("Convention creation and modification workflow", () => {
           .click();
         await expect(
           page.locator(
-            `#${domElementIds.conventionImmersionRoute.form({
+            `#${domElementIds.conventionImmersion.form({
               internshipKind: "immersion",
               mode: "edit-convention",
             })}`,
@@ -160,13 +160,11 @@ test.describe("Convention creation and modification workflow", () => {
         ).toBeVisible();
 
         await page
-          .locator(
-            `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
-          )
+          .locator(`#${domElementIds.conventionImmersion.submitFormButton}`)
           .click();
 
         await page.fill(
-          `#${domElementIds.conventionImmersionRoute.statusJustificationInput}`,
+          `#${domElementIds.conventionImmersion.statusJustificationInput}`,
           "justification de la modification",
         );
 

@@ -2,7 +2,6 @@ import {
   type DeleteAssessmentRequestDto,
   deleteAssessmentRequestDtoSchema,
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
 } from "shared";
 import { z } from "zod";
@@ -65,7 +64,7 @@ export const makeNotifyActorsThatAssessmentDeleted = useCaseBuilder(
     });
 
     const assessmentCreationLink = await makeShortMagicLink({
-      targetRoute: frontRoutes.assessment,
+      targetRoute: "assessment",
       lifetime: "2Days",
     });
 

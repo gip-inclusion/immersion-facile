@@ -9,11 +9,11 @@ import {
   ConventionDtoBuilder,
   type DateString,
   expectObjectInArrayToMatch,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
   type Notification,
   reasonableSchedule,
+  routes,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -235,10 +235,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: convention.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: convention.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -314,10 +316,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: convention.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: convention.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -409,10 +413,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: convention.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: convention.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),

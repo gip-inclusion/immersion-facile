@@ -10,7 +10,6 @@ import {
   type DateRange,
   errors,
   executeInSequence,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   validatedConventionStatuses,
@@ -222,7 +221,7 @@ const sendAssessmentNotifications = async (
               shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
               uow,
             })({
-              targetRoute: frontRoutes.assessment,
+              targetRoute: "assessment",
               lifetime: "2Days",
             }),
           ),

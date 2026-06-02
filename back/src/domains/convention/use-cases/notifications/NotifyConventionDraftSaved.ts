@@ -6,7 +6,8 @@ import {
   type Email,
   emailSchema,
   errors,
-  frontRoutes,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import z from "zod";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -63,7 +64,12 @@ export const makeNotifyConventionDraftSaved = useCaseBuilder(
           conventionDraftId: inputParams.draftId,
         });
 
-      const longLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${draft.internshipKind === "immersion" ? frontRoutes.conventionImmersionRoute : frontRoutes.conventionMiniStageRoute}?conventionDraftId=${inputParams.draftId}`;
+      const longLink: AbsoluteUrl = makeRouteAbsoluteUrl(
+        draft.internshipKind === "immersion"
+          ? routes.conventionImmersion()
+          : routes.conventionMiniStage(),
+        config.immersionFacileBaseUrl,
+      );
       const conventionFormUrl = await makeShortLink({
         uow,
         longLink,

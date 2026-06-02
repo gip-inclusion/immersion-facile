@@ -16,11 +16,12 @@ import {
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
-  frontRoutes,
+  makeRouteAbsoluteUrl,
   noAgencyDashboards,
   noEstablishmentDashboard,
   queryParamsAsString,
   type Role,
+  routes,
   type TechnicalRoutes,
   technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -733,7 +734,10 @@ describe("auth router", () => {
           const shortLinkIds = ["shortLink1", "shortLinkg2"];
           gateways.shortLinkGenerator.addMoreShortLinkIds(shortLinkIds);
 
-          const originalUrl = `${appConfig.immersionFacileBaseUrl}/${frontRoutes.conventionToSign}`;
+          const originalUrl = makeRouteAbsoluteUrl(
+            routes.conventionToSign({ jwt: "" }),
+            appConfig.immersionFacileBaseUrl,
+          );
 
           const expiredJwt = generateConventionJwt(
             createConventionMagicLinkPayload({
@@ -770,10 +774,8 @@ describe("auth router", () => {
             technicalRoutesClient,
           );
 
-          const newUrlStart = `${originalUrl}?jwt=`;
-
-          expect(magicLink.startsWith(newUrlStart)).toBeTruthy();
-          const renewedJwt = magicLink.replace(newUrlStart, "");
+          expect(magicLink.startsWith(originalUrl)).toBeTruthy();
+          const renewedJwt = magicLink.replace(originalUrl, "");
           expect(renewedJwt !== expiredJwt).toBeTruthy();
           expect(
             makeVerifyJwtES256(appConfig.jwtPublicKey)(renewedJwt),
@@ -813,8 +815,9 @@ describe("auth router", () => {
                   now: gateways.timeGateway.now(),
                 }),
               ),
-              originalUrl: encodeURIComponent(
-                `https://${appConfig.immersionFacileBaseUrl}/${frontRoutes.assessment}`,
+              originalUrl: makeRouteAbsoluteUrl(
+                routes.assessment({ jwt: "fake-jwt" }),
+                appConfig.immersionFacileBaseUrl,
               ),
             },
           });

@@ -391,7 +391,7 @@ describe("SendAssessmentNeededNotifications", () => {
           assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
             email: conventionEndedYesterday.establishmentTutor.email,
             id: conventionEndedYesterday.id,
-            targetRoute: "bilan-immersion",
+            targetRoute: "assessment",
             role: "establishment-tutor",
             now,
           }),

@@ -5,7 +5,6 @@ import {
   type ExtractFromExisting,
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -110,7 +109,7 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
                 id: convention.id,
                 email: convention.signatories.beneficiary.email,
                 role: "beneficiary",
-                targetRoute: frontRoutes.assessmentDocument,
+                targetRoute: "assessmentDocument",
                 now: today,
                 lifetime: "1Month",
               }),
@@ -165,7 +164,7 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
                 email:
                   cciConventionWithRepresentative.signatories.beneficiary.email,
                 role: "beneficiary",
-                targetRoute: frontRoutes.assessmentDocument,
+                targetRoute: "assessmentDocument",
                 now: today,
                 lifetime: "1Month",
               }),
@@ -196,7 +195,7 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
                   cciConventionWithRepresentative.signatories
                     .beneficiaryRepresentative!.email,
                 role: "beneficiary-representative",
-                targetRoute: frontRoutes.assessmentDocument,
+                targetRoute: "assessmentDocument",
                 now: today,
                 lifetime: "1Month",
               }),

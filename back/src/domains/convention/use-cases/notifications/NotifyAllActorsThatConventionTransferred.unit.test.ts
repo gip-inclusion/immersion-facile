@@ -5,9 +5,9 @@ import {
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -187,12 +187,12 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
             beneficiaryPhone: convention.signatories.beneficiary.phone,
             previousAgencyName: previousAgency.name,
             justification: "agency change",
-            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              {
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
                 conventionId: convention.id,
-              },
-            )}`,
+              }),
+              config.immersionFacileBaseUrl,
+            ),
             conventionId: convention.id,
           },
         },

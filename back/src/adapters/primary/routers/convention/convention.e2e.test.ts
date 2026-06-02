@@ -1,5 +1,6 @@
 import { addDays, subHours } from "date-fns";
 import {
+  type AbsoluteUrl,
   type AddConventionInput,
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
@@ -21,6 +22,8 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
   expiredJwtErrorMessage,
+  makeRouteAbsoluteUrl,
+  routes,
   type TechnicalRoutes,
   technicalRoutes,
   type UnauthenticatedConventionRoutes,
@@ -188,7 +191,11 @@ describe("convention e2e", () => {
         gateways.shortLinkGenerator.addMoreShortLinkIds([shortLinkId]);
         const conventionDraftId: ConventionDraftId =
           "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-        const conventionDraftLink = `http://localhost/demande-immersion?conventionDraftId=${conventionDraftId}`;
+        const localBaseUrl: AbsoluteUrl = "http://localhost";
+        const conventionDraftLink = makeRouteAbsoluteUrl(
+          routes.conventionImmersion({ conventionDraftId }),
+          localBaseUrl,
+        );
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
         const response = await unauthenticatedRequest.saveConventionDraft({

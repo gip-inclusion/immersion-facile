@@ -12,11 +12,11 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
   type ReminderKind,
+  routes,
   splitCasesBetweenPassingAndFailing,
   type TemplatedEmail,
 } from "shared";
@@ -198,10 +198,10 @@ describe("NotifyConventionReminder use case", () => {
 
         //Assert
 
-        const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-          `/${frontRoutes.manageConventionUserConnected}`,
-          { conventionId: convention.id },
-        )}`;
+        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
+          routes.manageConventionConnectedUser({ conventionId: convention.id }),
+          config.immersionFacileBaseUrl,
+        );
 
         expectSavedNotificationsBatchAndEvent({
           emails: [
@@ -278,10 +278,10 @@ describe("NotifyConventionReminder use case", () => {
 
         //Assert
 
-        const manageConventionLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-          `/${frontRoutes.manageConventionUserConnected}`,
-          { conventionId: convention.id },
-        )}`;
+        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
+          routes.manageConventionConnectedUser({ conventionId: convention.id }),
+          config.immersionFacileBaseUrl,
+        );
 
         expectSavedNotificationsBatchAndEvent({
           emails: [
@@ -386,7 +386,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
@@ -397,7 +397,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
@@ -461,7 +461,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
@@ -473,7 +473,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
@@ -485,7 +485,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
@@ -670,7 +670,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
@@ -681,7 +681,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),
@@ -692,7 +692,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
@@ -757,7 +757,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.beneficiary.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
           }),
@@ -769,7 +769,7 @@ describe("NotifyConventionReminder use case", () => {
           url: fakeGenerateMagicLinkUrlFn({
             id: convention.id,
             role: convention.signatories.establishmentRepresentative.role,
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
           }),

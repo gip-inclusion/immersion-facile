@@ -1,7 +1,7 @@
+import type { frontRoutes } from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
-import type { frontRoutes } from "../routes/routes";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 
@@ -10,12 +10,12 @@ export type AllowedRedirectUri = (typeof frontRoutes)[AllowedLoginSource];
 
 export const allowedLoginSources = [
   "admin",
-  "establishment",
+  "formEstablishment",
   "establishmentDashboard",
   "establishmentDashboardDiscussions",
   "agencyDashboard",
   "addAgency",
-  "manageConventionUserConnected",
+  "manageConventionConnectedUser",
   "conventionTemplate",
   "myProfile",
   "beneficiaryDashboard",

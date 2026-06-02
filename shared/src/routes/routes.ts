@@ -2,9 +2,11 @@ import {
   createRouter,
   defineRoute,
   param,
+  type Route,
   type ValueSerializer,
 } from "type-route";
 import type {
+  AbsoluteUrl,
   AllowedLoginSource,
   AlreadyAuthenticatedUserQueryParams,
   ConnectedUserQueryParams,
@@ -26,13 +28,13 @@ import {
 
 const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   admin: "admin",
-  establishment: "establishment",
+  formEstablishment: "establishment",
   establishmentDashboard: "tableau-de-bord-etablissement",
   establishmentDashboardDiscussions:
     "tableau-de-bord-etablissement/discussions",
   agencyDashboard: "tableau-de-bord-agence",
   addAgency: "ajouter-prescripteur",
-  manageConventionUserConnected: "pilotage-convention-inclusion-connect",
+  manageConventionConnectedUser: "pilotage-convention-inclusion-connect",
   conventionTemplate: "modele-convention",
   myProfile: "mon-profil",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
@@ -44,7 +46,7 @@ export const frontRoutes = {
   assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   initiateConvention: "initier-convention",
-  conventionImmersionRoute: "demande-immersion",
+  conventionImmersion: "demande-immersion",
   conventionDocument: "convention-immersion",
   conventionMiniStageRoute: "demande-mini-stage",
   conventionStatusDashboard: "statut-convention",
@@ -59,7 +61,6 @@ export const frontRoutes = {
   searchResultForStudent: "offre-scolaire",
   searchResultExternal: "tentez-votre-chance",
   landingEstablishment: "accueil-etablissement",
-  magicLinkRenewal: "refraichir-lien",
   magicLinkInterstitial: "connexion-interstitiel",
   manageConvention: "pilotage-convention",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
@@ -191,7 +192,10 @@ const agencyDashboard = defineRoute(
 );
 
 const establishmentDashboard = defineRoute(
-  connectedUserParams,
+  {
+    ...connectedUserParams,
+    ...acquisitionParams,
+  },
   () => `/${frontRoutes.establishmentDashboard}`,
 );
 
@@ -309,12 +313,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.path.string,
     },
     ({ conventionId }) =>
-      `/${frontRoutes.conventionImmersionRoute}/confirmation/${conventionId}`,
+      `/${frontRoutes.conventionImmersion}/confirmation/${conventionId}`,
   ),
   assessmentDocument: defineRoute(
     {
       jwt: param.query.optional.string,
       conventionId: param.query.optional.string,
+      ...acquisitionParams,
     },
     () => `/${frontRoutes.assessmentDocument}`,
   ),
@@ -345,7 +350,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...ftConnectParams,
       ...acquisitionParams,
     },
-    () => `/${frontRoutes.conventionImmersionRoute}`,
+    () => `/${frontRoutes.conventionImmersion}`,
   ),
   conventionImmersionForExternals: defineRoute(
     {
@@ -356,7 +361,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...acquisitionParams,
       ...conventionForExternalParams,
     },
-    (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
+    (params) => `/${frontRoutes.conventionImmersion}/${params.consumer}`,
   ),
   conventionMiniStage: defineRoute(
     {
@@ -382,7 +387,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => "/modele-convention",
   ),
   conventionToSign: defineRoute(
-    { jwt: param.query.string },
+    {
+      jwt: param.query.string,
+      ...acquisitionParams,
+    },
     () => `/${frontRoutes.conventionToSign}`,
   ),
   establishmentDashboard,
@@ -406,7 +414,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...connectedUserParams,
       ...establishmentParams,
     },
-    () => `/${frontRoutes.establishment}`,
+    () => `/${frontRoutes.formEstablishment}`,
   ),
   unregisterEstablishmentLead: defineRoute(
     {
@@ -429,6 +437,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.string,
       conventionId: param.query.optional.string,
+      ...acquisitionParams,
     },
     () => `/${frontRoutes.assessment}`,
   ),
@@ -479,7 +488,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   manageConventionConnectedUser: defineRoute(
     { ...connectedUserParams, conventionId: param.query.string },
-    () => `/${frontRoutes.manageConventionUserConnected}`,
+    () => `/${frontRoutes.manageConventionConnectedUser}`,
   ),
   openApiDoc: defineRoute(
     { version: param.query.optional.string },
@@ -502,4 +511,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
   ),
   stats: defineRoute("/stats"),
+  temporaryError: defineRoute("/error"),
 });
+
+export const makeRouteAbsoluteUrl = (
+  route: Route<typeof routes>,
+  immersionFacileBaseUrl: AbsoluteUrl,
+): AbsoluteUrl => {
+  return `${immersionFacileBaseUrl}${route.href}`;
+};

@@ -2,7 +2,6 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   errors,
-  frontRoutes,
   type Signatory,
   type TemplatedEmail,
   withConventionSchema,
@@ -87,7 +86,7 @@ const makeEmail = (
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
         magicLink: deps.generateConventionMagicLinkUrl({
-          targetRoute: frontRoutes.manageConvention,
+          targetRoute: "manageConvention",
           id: convention.id,
           role: lastSignee.role,
           email: lastSignee.email,

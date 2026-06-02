@@ -58,33 +58,33 @@ const step1 = async (
   establishment: FormEstablishmentDto,
 ) => {
   const siretInput = await page.locator(
-    `#${domElementIds.establishment.create.siret}`,
+    `#${domElementIds.formEstablishment.create.siret}`,
   );
 
   await siretInput.fill(establishment.siret);
 
   await expect(
     page.locator(
-      `#${domElementIds.establishment.create.businessContact.firstName}`,
+      `#${domElementIds.formEstablishment.create.businessContact.firstName}`,
     ),
   ).toHaveValue("Jean");
   await expect(
     page.locator(
-      `#${domElementIds.establishment.create.businessContact.lastName}`,
+      `#${domElementIds.formEstablishment.create.businessContact.lastName}`,
     ),
   ).toHaveValue("Immersion");
   await expect(
     page.locator(
-      `#${domElementIds.establishment.create.businessContact.email}`,
+      `#${domElementIds.formEstablishment.create.businessContact.email}`,
     ),
   ).toHaveValue(adminRight.email);
 
   await page.fill(
-    `#${domElementIds.establishment.create.businessContact.job}`,
+    `#${domElementIds.formEstablishment.create.businessContact.job}`,
     adminRight.job,
   );
   await page.fill(
-    `#${domElementIds.establishment.create.businessContact.phone}`,
+    `#${domElementIds.formEstablishment.create.businessContact.phone}`,
     adminRight.phone,
   );
 
@@ -109,10 +109,10 @@ const step3 = async (page: Page) => {
   await expectNoErrorVisible(page);
 
   const availableRadioLocator = page.locator(
-    `[for='${domElementIds.establishment.create.availabilityButton}-1']`,
+    `[for='${domElementIds.formEstablishment.create.availabilityButton}-1']`,
   );
   const unavailableRadioLocator = page.locator(
-    `[for='${domElementIds.establishment.create.availabilityButton}-0']`,
+    `[for='${domElementIds.formEstablishment.create.availabilityButton}-0']`,
   );
   await expect(availableRadioLocator).not.toBeChecked();
   await expect(unavailableRadioLocator).not.toBeChecked();
@@ -120,12 +120,12 @@ const step3 = async (page: Page) => {
   await availableRadioLocator.click();
 
   await page
-    .locator(`[for='${domElementIds.establishment.create.contactMode}-0']`)
+    .locator(`[for='${domElementIds.formEstablishment.create.contactMode}-0']`)
     .click();
 
   await page
     .locator(
-      `[for='${domElementIds.establishment.create.businessContact.isMainContactByPhone}-0']`,
+      `[for='${domElementIds.formEstablishment.create.businessContact.isMainContactByPhone}-0']`,
     )
     .click();
 
@@ -134,26 +134,28 @@ const step3 = async (page: Page) => {
 
 const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
   const summarySiretValue = await page.locator(
-    `#${domElementIds.establishment.create.summarySiretValue}`,
+    `#${domElementIds.formEstablishment.create.summarySiretValue}`,
   );
   await expect(summarySiretValue).toHaveText(establishment.siret);
 
   const summaryAdminName = await page.locator(
-    `#${domElementIds.establishment.create.summaryAdminName}`,
+    `#${domElementIds.formEstablishment.create.summaryAdminName}`,
   );
   await expect(summaryAdminName).toContainText("Jean IMMERSION");
 
   const summaryBusinessAddresses = await page.locator(
-    `#${domElementIds.establishment.create.summaryBusinessAddresses} li`,
+    `#${domElementIds.formEstablishment.create.summaryBusinessAddresses} li`,
   );
   await expect(summaryBusinessAddresses).toHaveCount(2);
 
   const summaryAppellations = await page.locator(
-    `#${domElementIds.establishment.create.summaryAppellations} li`,
+    `#${domElementIds.formEstablishment.create.summaryAppellations} li`,
   );
   await expect(summaryAppellations).toHaveCount(2);
 
-  await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
+  await page.click(
+    `#${domElementIds.formEstablishment.create.submitFormButton}`,
+  );
   await expect(page.locator(".fr-alert--success")).toBeVisible({
     timeout: 20_000,
   });
@@ -164,20 +166,22 @@ const addOffer = async (
   appelationValue: string,
   remoteMode: RemoteWorkMode,
 ) => {
-  await page.click(`#${domElementIds.establishment.create.addOfferButton}`);
+  await page.click(`#${domElementIds.formEstablishment.create.addOfferButton}`);
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.create.appellations}`,
+    locator: `#${domElementIds.formEstablishment.create.appellations}`,
     value: appelationValue,
     endpoint: formCompletionRoutes.appellation.url,
   });
 
   await page.click(
-    `[for='${domElementIds.establishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
+    `[for='${domElementIds.formEstablishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
   );
 
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+  await page.click(
+    `#${domElementIds.formEstablishment.offerModalSubmitButton}`,
+  );
 };
 
 const editOffer = async (
@@ -186,23 +190,25 @@ const editOffer = async (
   remoteMode: RemoteWorkMode,
 ) => {
   await page.click(
-    `#${domElementIds.establishment.create.editOfferButton}-${offerIndex}`,
+    `#${domElementIds.formEstablishment.create.editOfferButton}-${offerIndex}`,
   );
   await page.click(
-    `[for='${domElementIds.establishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
+    `[for='${domElementIds.formEstablishment.create.remoteWorkMode}-${remoteModeIndexMap[remoteMode]}']`,
   );
 
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+  await page.click(
+    `#${domElementIds.formEstablishment.offerModalSubmitButton}`,
+  );
 };
 
 const addLocation = async (page: Page) => {
   await page.click(
-    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+    `#${domElementIds.formEstablishment.create.businessAddresses}-add-option-button`,
   );
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
+    locator: `#${domElementIds.formEstablishment.create.businessAddresses}-1`,
     value: "28 rue des mimosas",
     endpoint: addressRoutes.lookupStreetAddress.url,
   });

@@ -7,7 +7,7 @@ import {
   type ConventionId,
   domElementIds,
   executeInSequence,
-  frontRoutes,
+  routes,
   SEED_FT_AGENCY_ID,
   technicalRoutes,
 } from "shared";
@@ -58,119 +58,117 @@ export const updatedEndDateDisplayed = format(
 
 export const fillConventionForm = async (page: Page) => {
   await page.selectOption(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
+    `#${domElementIds.conventionImmersion.conventionSection.agencyDepartment}`,
     "75",
   );
 
   await page.selectOption(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+    `#${domElementIds.conventionImmersion.conventionSection.agencyId}`,
     SEED_FT_AGENCY_ID,
   );
   await openConventionAccordionSection(page, 1); // Open Beneficiary section
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.beneficiarySection.firstName}`,
+    `#${domElementIds.conventionImmersion.beneficiarySection.firstName}`,
     faker.person.firstName(),
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.beneficiarySection.lastName}`,
+    `#${domElementIds.conventionImmersion.beneficiarySection.lastName}`,
     faker.person.lastName(),
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.beneficiarySection.email}`,
+    `#${domElementIds.conventionImmersion.beneficiarySection.email}`,
     "recette+beneficiary@immersion-facile.beta.gouv.fr",
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.beneficiarySection.phone}`,
+    `#${domElementIds.conventionImmersion.beneficiarySection.phone}`,
     validPhonesData.beneficiary,
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.beneficiarySection.birthdate}`,
+    `#${domElementIds.conventionImmersion.beneficiarySection.birthdate}`,
     beneficiaryBirthdate,
   );
   await openConventionAccordionSection(page, 2); // Open Establishment section
 
   await page
-    .locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.siret}`,
-    )
+    .locator(`#${domElementIds.conventionImmersion.conventionSection.siret}`)
     .pressSequentially(getRandomSiret());
 
   const establishmentFirstName = page.locator(
-    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.firstName}`,
+    `#${domElementIds.conventionImmersion.establishmentRepresentativeSection.firstName}`,
   );
   await expect(establishmentFirstName).toBeEnabled({ timeout: 15_000 });
   await establishmentFirstName.fill(faker.person.firstName());
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.lastName}`,
+    `#${domElementIds.conventionImmersion.establishmentRepresentativeSection.lastName}`,
     faker.person.lastName(),
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.phone}`,
+    `#${domElementIds.conventionImmersion.establishmentRepresentativeSection.phone}`,
     validPhonesData.establishmentRepresentative,
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.email}`,
+    `#${domElementIds.conventionImmersion.establishmentRepresentativeSection.email}`,
     "recette+establishment-tutor@immersion-facile.beta.gouv.fr",
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
+    `#${domElementIds.conventionImmersion.establishmentTutorSection.job}`,
     faker.person.jobType(),
   );
   await openConventionAccordionSection(page, 3); // Open place / hour section
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
+    `#${domElementIds.conventionImmersion.conventionSection.dateStart}`,
     currentDate,
   );
   await page.focus(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+    `#${domElementIds.conventionImmersion.conventionSection.dateEnd}`,
   );
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
+      `#${domElementIds.conventionImmersion.conventionSection.dateStart}`,
     ),
   ).toHaveValue(currentDate);
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+    `#${domElementIds.conventionImmersion.conventionSection.dateEnd}`,
     tomorrowDate,
   );
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
+    `#${domElementIds.conventionImmersion.conventionSection.addHoursButton}`,
   );
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
+    locator: `#${domElementIds.conventionImmersion.conventionSection.immersionAddress}`,
     value: getRandomizedData("addressQueries"),
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
 
   await page.click(
-    `[for='${domElementIds.conventionImmersionRoute.conventionSection.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
+    `[for='${domElementIds.conventionImmersion.conventionSection.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
   );
 
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+      `#${domElementIds.conventionImmersion.conventionSection.dateEnd}`,
     ),
   ).toHaveValue(tomorrowDate);
   await openConventionAccordionSection(page, 4); // Open immersion details section
 
   await page.click(
-    `[for="${domElementIds.conventionImmersionRoute.conventionSection.individualProtection}-0"]`,
+    `[for="${domElementIds.conventionImmersion.conventionSection.individualProtection}-0"]`,
   );
   await page.click(
-    `[for="${domElementIds.conventionImmersionRoute.conventionSection.sanitaryPrevention}-0"]`,
+    `[for="${domElementIds.conventionImmersion.conventionSection.sanitaryPrevention}-0"]`,
   );
   await page.click(
-    `[for="${domElementIds.conventionImmersionRoute.conventionSection.immersionObjective}-1"]`,
+    `[for="${domElementIds.conventionImmersion.conventionSection.immersionObjective}-1"]`,
   );
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
+    locator: `#${domElementIds.conventionImmersion.conventionSection.immersionAppellation}`,
     value: getRandomizedData("jobs"),
   });
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
+    `#${domElementIds.conventionImmersion.conventionSection.immersionActivities}`,
     faker.word.words(8),
   );
 };
@@ -178,7 +176,7 @@ export const fillConventionForm = async (page: Page) => {
 export const goToFormPageAndFillConventionForm = async (
   page: Page,
 ): Promise<AgencyId | undefined> => {
-  await page.goto(frontRoutes.initiateConvention);
+  await page.goto(routes.initiateConvention().href);
   await expect(
     await page.request.get(technicalRoutes.featureFlags.url),
   ).toBeOK();
@@ -190,7 +188,7 @@ export const goToFormPageAndFillConventionForm = async (
   await page
     .locator(`#${domElementIds.initiateConvention.otherStructureButton}`)
     .click();
-  await page.waitForURL(`${frontRoutes.conventionImmersionRoute}**`);
+  await page.waitForURL(`${routes.conventionImmersion().href}**`);
 
   await fillConventionForm(page);
 
@@ -272,7 +270,7 @@ export const submitEditConventionForm = async (
   conventionSubmitted: ConventionSubmitted | void,
 ) => {
   const agencyIdSelect = page.locator(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+    `#${domElementIds.conventionImmersion.conventionSection.agencyId}`,
   );
   await agencyIdSelect.locator("option").locator("nth=1").waitFor({
     state: "hidden",
@@ -281,108 +279,106 @@ export const submitEditConventionForm = async (
   if (conventionSubmitted?.agencyId) {
     await expect(
       page.locator(
-        `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+        `#${domElementIds.conventionImmersion.conventionSection.agencyId}`,
       ),
     ).toHaveValue(conventionSubmitted.agencyId);
   }
   await openConventionAccordionSection(page, 1);
   await page
     .locator(
-      `[for='${domElementIds.conventionImmersionRoute.conventionSection.isMinor}-0']`,
+      `[for='${domElementIds.conventionImmersion.conventionSection.isMinor}-0']`,
     )
     .click();
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.firstName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryRepresentativeSection.firstName}`,
     ),
   ).toBeVisible();
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.firstName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryRepresentativeSection.firstName}`,
     )
     .fill(faker.person.firstName());
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.lastName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryRepresentativeSection.lastName}`,
     )
     .fill(faker.person.lastName());
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.email}`,
+      `#${domElementIds.conventionImmersion.beneficiaryRepresentativeSection.email}`,
     )
     .fill("recette+beneficiary-rep@immersion-facile.beta.gouv.fr");
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.phone}`,
+      `#${domElementIds.conventionImmersion.beneficiaryRepresentativeSection.phone}`,
     )
     .fill(validPhonesData.beneficiaryRepresentative);
   await page
     .locator(
-      `[for='${domElementIds.conventionImmersionRoute.conventionSection.isCurrentEmployer}-0']`,
+      `[for='${domElementIds.conventionImmersion.conventionSection.isCurrentEmployer}-0']`,
     )
     .click();
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessSiret}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.businessSiret}`,
     ),
   ).toBeVisible();
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessSiret}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.businessSiret}`,
     )
     .fill(faker.string.numeric("XXXXXXXXXXXXXX"));
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.businessName}`,
     )
     .fill(faker.company.name());
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessAddress}`,
+    locator: `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.businessAddress}`,
     value: getRandomizedData("addressQueries"),
   });
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.firstName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.firstName}`,
     )
     .fill(faker.person.firstName());
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.lastName}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.lastName}`,
     )
     .fill(faker.person.lastName());
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.job}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.job}`,
     )
     .fill(faker.person.jobType());
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.phone}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.phone}`,
     )
     .fill(validPhonesData.beneficiaryCurrentEmployer);
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.email}`,
+      `#${domElementIds.conventionImmersion.beneficiaryCurrentEmployerSection.email}`,
     )
     .fill("recette+current-employer@immersion-facile.beta.gouv.fr");
 
   await openConventionAccordionSection(page, 2);
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
+      `#${domElementIds.conventionImmersion.establishmentTutorSection.job}`,
     )
     .fill("Edited job");
   await openConventionAccordionSection(page, 3);
   await page
-    .locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
-    )
+    .locator(`#${domElementIds.conventionImmersion.conventionSection.dateEnd}`)
     .fill(updatedEndDate);
 
   await expect(
     page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+      `#${domElementIds.conventionImmersion.conventionSection.dateEnd}`,
     ),
   ).toHaveValue(updatedEndDate);
 
@@ -394,11 +390,11 @@ export const submitEditConventionForm = async (
 
   await page
     .locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
+      `#${domElementIds.conventionImmersion.conventionSection.addHoursButton}`,
     )
     .click();
   await page
-    .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
+    .locator(`#${domElementIds.conventionImmersion.submitFormButton}`)
     .click();
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
   await expectElementToBeVisible(page, ".im-convention-summary__section");
@@ -418,12 +414,12 @@ export const submitEditConventionForm = async (
   ).toBeVisible();
 
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.statusJustificationInput}`,
+    `#${domElementIds.conventionImmersion.statusJustificationInput}`,
     "justification de la modification",
   );
 
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
+    `#${domElementIds.conventionImmersion.confirmSubmitFormButton}`,
   );
 
   await expect(page.locator(".fr-alert--error").first()).not.toBeVisible();
@@ -480,17 +476,15 @@ export const confirmCreateConventionFormSubmit = async (
   page: Page,
   dateEndDisplayed: string,
 ) => {
-  await page.click(
-    `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
-  );
+  await page.click(`#${domElementIds.conventionImmersion.submitFormButton}`);
   await checkConventionSummary(page, dateEndDisplayed);
 
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
+    `#${domElementIds.conventionImmersion.confirmSubmitFormButton}`,
   );
   await expectElementToBeVisible(
     page,
-    `#${domElementIds.conventionImmersionRoute.conventionConfirmation.copyConventionIdButton}`,
+    `#${domElementIds.conventionImmersion.conventionConfirmation.copyConventionIdButton}`,
   );
 };
 
@@ -501,18 +495,18 @@ const getRandomSiret = () =>
 
 export const shareConventionDraftByEmail = async (page: Page) => {
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareButton}`,
+    `#${domElementIds.conventionImmersion.shareConventionDraft.shareButton}`,
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormEmailInput}`,
+    `#${domElementIds.conventionImmersion.shareConventionDraft.shareFormEmailInput}`,
     "test@immersion-facile.beta.gouv.fr",
   );
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormSubmitButton}`,
+    `#${domElementIds.conventionImmersion.shareConventionDraft.shareFormSubmitButton}`,
   );
   await expectElementToBeVisible(page, ".fr-alert--success");
   await page.click(
-    `#${domElementIds.conventionImmersionRoute.shareConventionDraft.shareFormCancelButton}`,
+    `#${domElementIds.conventionImmersion.shareConventionDraft.shareFormCancelButton}`,
   );
 };
 
@@ -538,7 +532,7 @@ export const openManageConventionPageFromDashboard = async (
   ]);
   await manageConventionPage.waitForLoadState("domcontentloaded");
   await manageConventionPage.waitForURL(
-    `**/${frontRoutes.manageConventionUserConnected}?conventionId=${conventionId}`,
+    `**/${routes.manageConventionConnectedUser({ conventionId }).href}**`,
   );
   await acceptCookiesIfBannerVisible(manageConventionPage);
   return manageConventionPage;

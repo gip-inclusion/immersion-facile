@@ -2,6 +2,7 @@ import { addDays, startOfToday } from "date-fns";
 
 import { v4 as uuidV4 } from "uuid";
 import {
+  type ConventionDraftDto,
   type FederatedIdentity,
   type FtConnectIdentity,
   type IdToken,
@@ -23,7 +24,6 @@ import type {
   CreateConventionTemplatePresentationInitialValues,
 } from "../../convention/conventionPresentation.dto";
 import type { ConventionTemplate } from "../../convention/conventionTemplate.dto";
-import type { ConventionDraftDto } from "../../convention/shareConventionDraftByEmail.dto";
 import type { AppellationAndRomeDto } from "../../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { ScheduleDto } from "../../schedule/Schedule.dto";
 import { reasonableSchedule } from "../../schedule/ScheduleUtils";

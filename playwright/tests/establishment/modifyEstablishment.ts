@@ -50,10 +50,12 @@ export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
     );
 
     await page
-      .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
+      .locator(`#${domElementIds.formEstablishment.admin.availabilityButton}`)
       .getByText("Oui")
       .click();
-    await page.click(`#${domElementIds.establishment.admin.submitFormButton}`);
+    await page.click(
+      `#${domElementIds.formEstablishment.admin.submitFormButton}`,
+    );
     await expect(page.locator(".fr-alert--success")).toBeVisible();
   };
 
@@ -92,24 +94,24 @@ const step1 = async (
     throw new Error("Missing website for updatedEstablishmentInfos");
 
   await expect(
-    page.locator(`#${domElementIds.establishment.edit.siret} input`),
+    page.locator(`#${domElementIds.formEstablishment.edit.siret} input`),
   ).toBeDisabled();
   await expect(
-    page.locator(`#${domElementIds.establishment.edit.siret} input`),
+    page.locator(`#${domElementIds.formEstablishment.edit.siret} input`),
   ).toHaveValue(updatedEstablishment.siret);
 
   await page.fill(
-    `#${domElementIds.establishment.edit.businessNameCustomized}`,
+    `#${domElementIds.formEstablishment.edit.businessNameCustomized}`,
     updatedEstablishment.businessNameCustomized,
   );
 
   await page.fill(
-    `#${domElementIds.establishment.edit.additionalInformation}`,
+    `#${domElementIds.formEstablishment.edit.additionalInformation}`,
     updatedEstablishment.additionalInformation,
   );
 
   await page.fill(
-    `#${domElementIds.establishment.edit.website}`,
+    `#${domElementIds.formEstablishment.edit.website}`,
     updatedEstablishment.website,
   );
 };
@@ -126,25 +128,31 @@ const step2 = async (
     );
 
   await page.click(
-    `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
+    `#${domElementIds.formEstablishment.edit.businessAddresses}-delete-option-button-0`,
   );
   await page.click(
-    `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
+    `#${domElementIds.formEstablishment.edit.businessAddresses}-delete-option-button-0`,
   ); // twice, to remove the second address
 
-  await page.click(`#${domElementIds.establishment.edit.deleteOfferButton}-0`);
-
-  await page.click(`#${domElementIds.establishment.edit.editOfferButton}-0`);
-
   await page.click(
-    `[for='${domElementIds.establishment.edit.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
+    `#${domElementIds.formEstablishment.edit.deleteOfferButton}-0`,
   );
 
-  await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
+  await page.click(
+    `#${domElementIds.formEstablishment.edit.editOfferButton}-0`,
+  );
+
+  await page.click(
+    `[for='${domElementIds.formEstablishment.edit.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
+  );
+
+  await page.click(
+    `#${domElementIds.formEstablishment.offerModalSubmitButton}`,
+  );
 
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.edit.businessAddresses}-0`,
+    locator: `#${domElementIds.formEstablishment.edit.businessAddresses}-0`,
     value: businessAddress.rawAddress,
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
@@ -160,34 +168,36 @@ const step3 = async (
     );
 
   const unavailableRadioLocator = page.locator(
-    `[for="${domElementIds.establishment.edit.availabilityButton}-0"]`,
+    `[for="${domElementIds.formEstablishment.edit.availabilityButton}-0"]`,
   );
   await unavailableRadioLocator.click();
 
   await page
-    .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
+    .locator(
+      `#${domElementIds.formEstablishment.edit.nextAvailabilityDateInput}`,
+    )
     .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
 
   await page.fill(
-    `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
+    `#${domElementIds.formEstablishment.edit.maxContactsPerMonth}`,
     updatedEstablishment.maxContactsPerMonth.toString(),
   );
 
   await page
-    .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
+    .locator(`[for="${domElementIds.formEstablishment.edit.searchableBy}-1"]`)
     .click();
   await page
-    .locator(`[for='${domElementIds.establishment.edit.contactMode}-1']`)
+    .locator(`[for='${domElementIds.formEstablishment.edit.contactMode}-1']`)
     .click();
 
   await page.click(
-    `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
+    `[for=${domElementIds.formEstablishment.edit.isEngagedEnterprise}-${
       updatedEstablishment.isEngagedEnterprise ? "1" : "0"
     }]`,
   );
 
   await page.click(
-    `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
+    `[for=${domElementIds.formEstablishment.edit.fitForDisabledWorkers}-${
       updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
     }]`,
   );
@@ -197,7 +207,7 @@ const step4 = async (
   page: Page,
   updatedEstablishment: FormEstablishmentDto,
 ) => {
-  await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
+  await page.click(`#${domElementIds.formEstablishment.edit.submitFormButton}`);
   await expect(page.url()).toContain(`siret=${updatedEstablishment.siret}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };

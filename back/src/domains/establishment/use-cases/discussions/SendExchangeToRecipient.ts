@@ -5,8 +5,9 @@ import {
   type EmailAttachment,
   type Exchange,
   errors,
-  frontRoutes,
+  makeRouteAbsoluteUrl,
   renderCTAInEmailContent,
+  routes,
   type SiretDto,
   type WithDiscussionId,
   withDiscussionIdSchema,
@@ -109,7 +110,12 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   } ${discussion.address.postcode} ${discussion.address.city}</li>
                   </ul><br />
                   ${renderCTAInEmailContent({
-                    url: `${deps.config.immersionFacileBaseUrl}/${lastExchange.sender === "establishment" ? frontRoutes.beneficiaryDashboardDiscussions : frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-tableau-de-bord`,
+                    url: makeRouteAbsoluteUrl(
+                      lastExchange.sender === "establishment"
+                        ? routes.beneficiaryDashboardDiscussions()
+                        : routes.establishmentDashboardDiscussions(),
+                      deps.config.immersionFacileBaseUrl,
+                    ),
                     label: "Répondre depuis mon espace",
                   })}
                   </div>

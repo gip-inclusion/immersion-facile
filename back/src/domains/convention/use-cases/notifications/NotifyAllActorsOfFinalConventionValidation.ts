@@ -9,10 +9,10 @@ import {
   displayEmergencyContactInfos,
   type Email,
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
   type TemplatedEmail,
   withConventionSchema,
 } from "shared";
@@ -178,17 +178,19 @@ const prepareEmail = async ({
       }),
       agencyLogoUrl: agency.logoUrl ?? undefined,
       magicLink: agencyModifierRoles.includes(role as AgencyModifierRole)
-        ? `${deps.config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-            `/${frontRoutes.manageConventionUserConnected}`,
-            { conventionId: convention.id },
-          )}`
+        ? makeRouteAbsoluteUrl(
+            routes.manageConventionConnectedUser({
+              conventionId: convention.id,
+            }),
+            deps.config.immersionFacileBaseUrl,
+          )
         : await makeShortMagicLink({
-            targetRoute: frontRoutes.conventionDocument,
+            targetRoute: "conventionDocument",
             lifetime: "1Month",
           }),
       assessmentMagicLink: shouldHaveAssessmentMagicLink
         ? await makeShortMagicLink({
-            targetRoute: frontRoutes.assessment,
+            targetRoute: "assessment",
             lifetime: "2Days",
           })
         : undefined,

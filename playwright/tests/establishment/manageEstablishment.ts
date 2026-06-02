@@ -115,14 +115,16 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.maxContactsPerMonthValue}`)
+      .locator(
+        `#${domElementIds.formEstablishment.admin.maxContactsPerMonthValue}`,
+      )
       .textContent(),
   ).toBe(maxContactsPerMonth.toString());
 
   await expect(
     await page
       .locator(
-        `#${domElementIds.establishment.admin.nextAvailabilityDateValue}`,
+        `#${domElementIds.formEstablishment.admin.nextAvailabilityDateValue}`,
       )
       .textContent(),
   ).toBe(
@@ -133,30 +135,36 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.businessNameCustomized}`)
+      .locator(
+        `#${domElementIds.formEstablishment.admin.businessNameCustomized}`,
+      )
       .inputValue(),
   ).toBe(businessNameCustomized);
 
   await expect(
-    await page.locator(`#${domElementIds.establishment.admin.searchableBy}-1`),
+    await page.locator(
+      `#${domElementIds.formEstablishment.admin.searchableBy}-1`,
+    ),
   ).toBeChecked();
 
   await expect(
-    await page.locator(`#${domElementIds.establishment.admin.contactMode}-1`),
+    await page.locator(
+      `#${domElementIds.formEstablishment.admin.contactMode}-1`,
+    ),
   ).toBeChecked();
 
   await expect(
     (
       await page
         .locator(
-          `#${domElementIds.establishment.admin.businessAddresses}-0-wrapper .im-select__single-value`,
+          `#${domElementIds.formEstablishment.admin.businessAddresses}-0-wrapper .im-select__single-value`,
         )
         .innerText()
     ).toLowerCase(),
   ).toContain(businessAddress.rawAddress.toLowerCase());
 
   const firstOfferCardContent = await page
-    .locator(`#${domElementIds.establishment.admin.offerCard}-0`)
+    .locator(`#${domElementIds.formEstablishment.admin.offerCard}-0`)
     .innerText();
 
   await expect(firstOfferCardContent).toContain("routage");
@@ -167,7 +175,7 @@ const checkEstablishment = async (
 
   await expect(
     await page.locator(
-      `#${domElementIds.establishment.admin.fitForDisabledWorkers}-${
+      `#${domElementIds.formEstablishment.admin.fitForDisabledWorkers}-${
         updatedEstablishmentInfos.fitForDisabledWorkers ? "1" : "0"
       }`,
     ),
@@ -175,7 +183,7 @@ const checkEstablishment = async (
 
   await expect(
     await page.locator(
-      `#${domElementIds.establishment.admin.isEngagedEnterprise}-${
+      `#${domElementIds.formEstablishment.admin.isEngagedEnterprise}-${
         updatedEstablishmentInfos.isEngagedEnterprise ? "1" : "0"
       }`,
     ),
@@ -183,13 +191,15 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.website}`)
+      .locator(`#${domElementIds.formEstablishment.admin.website}`)
       .inputValue(),
   ).toBe(website);
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.additionalInformation}`)
+      .locator(
+        `#${domElementIds.formEstablishment.admin.additionalInformation}`,
+      )
       .inputValue(),
   ).toBe(additionalInformation);
 };
