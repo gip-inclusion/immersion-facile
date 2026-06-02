@@ -12,7 +12,7 @@ export const checkAvailabilityButtons = async (
   expectedAvailability: "Oui" | "Non",
 ) => {
   const availibilityRadioButton = page.locator(
-    `#${domElementIds.establishment[mode].availabilityButton}-${expectedAvailability === "Oui" ? "1" : "0"}`,
+    `#${domElementIds.formEstablishment[mode].availabilityButton}-${expectedAvailability === "Oui" ? "1" : "0"}`,
   );
   await expect(availibilityRadioButton).toBeChecked();
 };
@@ -25,7 +25,7 @@ export const goToNextStep = async (
   await waitForVisibleLoaderHidden(page, ".im-loader__overlay");
 
   const nextButton = page.locator(
-    `#${domElementIds.establishment[mode].nextButtonFromStepAndMode({
+    `#${domElementIds.formEstablishment[mode].nextButtonFromStepAndMode({
       currentStep,
       mode,
     })}`,

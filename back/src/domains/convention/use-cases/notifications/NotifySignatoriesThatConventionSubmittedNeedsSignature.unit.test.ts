@@ -6,7 +6,6 @@ import {
   ConventionDtoBuilder,
   type EmailNotification,
   expectToEqual,
-  frontRoutes,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -102,9 +101,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           role: validConvention.signatories.beneficiary.role,
           email: validConvention.signatories.beneficiary.email,
           now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
+          targetRoute: "conventionToSign",
           lifetime: "2Days",
-          extraQueryParams: { mtm_source: "email-signature-link" },
+          extraQueryParams: { mtm_campaign: "email-signature-link" },
         }),
         lastUsedAt: null,
       },
@@ -117,9 +116,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           // biome-ignore lint/style/noNonNullAssertion: testing purpose
           email: validConvention.signatories.establishmentRepresentative!.email,
           now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
+          targetRoute: "conventionToSign",
           lifetime: "2Days",
-          extraQueryParams: { mtm_source: "email-signature-link" },
+          extraQueryParams: { mtm_campaign: "email-signature-link" },
         }),
         lastUsedAt: null,
       },
@@ -132,9 +131,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
           // biome-ignore lint/style/noNonNullAssertion: testing purpose
           email: validConvention.signatories.beneficiaryRepresentative!.email,
           now: timeGateway.now(),
-          targetRoute: frontRoutes.conventionToSign,
+          targetRoute: "conventionToSign",
           lifetime: "2Days",
-          extraQueryParams: { mtm_source: "email-signature-link" },
+          extraQueryParams: { mtm_campaign: "email-signature-link" },
         }),
         lastUsedAt: null,
       },

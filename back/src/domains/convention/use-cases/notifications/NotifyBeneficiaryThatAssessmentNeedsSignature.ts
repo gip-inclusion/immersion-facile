@@ -1,6 +1,5 @@
 import {
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type WithAssessmentDto,
   type WithConventionDto,
@@ -74,7 +73,7 @@ export const makeNotifyBeneficiaryThatAssessmentNeedsSignature = useCaseBuilder(
     });
 
     const assessmentSignatureLink = await makeMagicShortLink({
-      targetRoute: frontRoutes.assessmentDocument,
+      targetRoute: "assessmentDocument",
       lifetime: "2Days",
     });
 

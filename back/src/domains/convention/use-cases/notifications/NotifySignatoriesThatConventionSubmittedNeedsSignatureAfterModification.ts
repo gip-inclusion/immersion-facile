@@ -4,7 +4,6 @@ import {
   type ConventionDto,
   executeInSequence,
   filterNotFalsy,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   type Signatory,
   type TemplatedEmail,
@@ -103,10 +102,10 @@ const makeEmail = async (
       generateConventionMagicLinkUrl,
       shortLinkIdGeneratorGateway,
     })({
-      targetRoute: frontRoutes.conventionToSign,
+      targetRoute: "conventionToSign",
       lifetime: "2Days",
       extraQueryParams: {
-        mtm_source: "email-signature-link-after-modification",
+        mtm_campaign: "email-signature-link-after-modification",
       },
     }),
     justification: convention.statusJustification ?? NO_JUSTIFICATION,

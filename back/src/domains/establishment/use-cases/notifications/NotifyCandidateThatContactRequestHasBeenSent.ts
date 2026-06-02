@@ -2,8 +2,9 @@ import {
   type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   errors,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -55,7 +56,10 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent = useCaseBuilder(
             beneficiaryLastName: getFormattedFirstnameAndLastname({
               lastname: discussion.potentialBeneficiary.lastName,
             }),
-            beneficiaryDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.beneficiaryDashboard}`,
+            beneficiaryDashboardUrl: makeRouteAbsoluteUrl(
+              routes.beneficiaryDashboard(),
+              config.immersionFacileBaseUrl,
+            ),
           },
         },
         followedIds: {

@@ -4,7 +4,6 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -96,10 +95,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             role: convention.signatories.beneficiary.role,
             email: convention.signatories.beneficiary.email,
             now: timeGateway.now(),
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             lifetime: "2Days",
             extraQueryParams: {
-              mtm_source: "email-signature-link-after-modification",
+              mtm_campaign: "email-signature-link-after-modification",
             },
           }),
           lastUsedAt: null,
@@ -111,10 +110,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             role: convention.signatories.establishmentRepresentative.role,
             email: convention.signatories.establishmentRepresentative.email,
             now: timeGateway.now(),
-            targetRoute: frontRoutes.conventionToSign,
+            targetRoute: "conventionToSign",
             lifetime: "2Days",
             extraQueryParams: {
-              mtm_source: "email-signature-link-after-modification",
+              mtm_campaign: "email-signature-link-after-modification",
             },
           }),
           lastUsedAt: null,

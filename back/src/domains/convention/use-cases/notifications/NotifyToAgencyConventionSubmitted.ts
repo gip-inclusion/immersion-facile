@@ -4,9 +4,9 @@ import {
   type Email,
   errors,
   executeInSequence,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -105,10 +105,12 @@ const sendEmailToRecipients = async ({
           lastName: getFormattedFirstnameAndLastname({
             lastname: convention.signatories.beneficiary.lastName,
           }),
-          manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-            `/${frontRoutes.manageConventionUserConnected}`,
-            { conventionId: convention.id },
-          )}`,
+          manageConventionLink: makeRouteAbsoluteUrl(
+            routes.manageConventionConnectedUser({
+              conventionId: convention.id,
+            }),
+            config.immersionFacileBaseUrl,
+          ),
           agencyLogoUrl: agency.logoUrl ?? undefined,
           warning,
         },

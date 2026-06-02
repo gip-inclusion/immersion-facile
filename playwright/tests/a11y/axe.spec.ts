@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { frontRoutes } from "shared";
+import { routes } from "shared";
 
 test.describe("Axe detect accessibility issues on main pages", () => {
   test("Home", async ({ page }, testInfo) => {
@@ -13,13 +13,13 @@ test.describe("Axe detect accessibility issues on main pages", () => {
     expect(accessibilityScanResults.violations).toEqual([]);
   });
   test("Search", async ({ page }) => {
-    await page.goto(frontRoutes.search);
+    await page.goto(routes.search().href);
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
   test("Convention form", async ({ page }) => {
-    await page.goto(frontRoutes.conventionImmersionRoute);
+    await page.goto(routes.conventionImmersion().href);
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(
       accessibilityScanResults.violations.filter(
@@ -34,13 +34,13 @@ test.describe("Axe detect accessibility issues on main pages", () => {
   });
 
   test("Add agency form", async ({ page }) => {
-    await page.goto(frontRoutes.addAgency);
+    await page.goto(routes.addAgency().href);
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
   test("Form establishment", async ({ page }) => {
-    await page.goto(frontRoutes.establishment);
+    await page.goto(routes.formEstablishment().href);
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });

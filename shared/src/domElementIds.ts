@@ -1,6 +1,6 @@
-import type { frontRoutes } from "./routes/routes";
+import type { routes } from "./routes/routes";
 
-type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
+type FrontRoutesKeys = keyof typeof routes | "home" | "header" | "footer";
 
 type FrontRouteParametrizedKeys =
   | "mode"
@@ -271,7 +271,7 @@ export const domElementIds = {
     addressAutocomplete: "im-form-add-agency__address-autocomplete-input",
   },
 
-  conventionImmersionRoute: {
+  conventionImmersion: {
     form: (params) =>
       `im-convention-${params.internshipKind}-form--${params.mode}`,
     fromSharedConventionContinueButton:
@@ -545,9 +545,9 @@ export const domElementIds = {
     broadcastAgainModalForm: "im-broadcast-modal__form",
   },
 
-  unsubscribeEstablishmentLead: {},
+  unregisterEstablishmentLead: {},
 
-  establishment: {
+  formEstablishment: {
     offerModal: "im-offer-modal",
     offerModalSubmitButton: "im-offer-modal__submit-button",
     login: {
@@ -777,11 +777,6 @@ export const domElementIds = {
       `im-assessment-form__next-button--step-${currentStep}`,
     successMessage: "im-assessment-form__success-message",
   },
-
-  magicLinkRenewal: {
-    renewalButton: "im-renew-page__renew-link-button",
-  },
-
   standard: {
     siteMap: {
       home: buildSitemapNavLinkId("home"),
@@ -927,7 +922,7 @@ export const domElementIds = {
       formLoginSubmitButton: "im-login__submit-button",
     },
   },
-  profile: {
+  myProfile: {
     firstName: "im-profile__first-name",
     lastName: "im-profile__last-name",
     email: "im-profile__email",
@@ -945,8 +940,6 @@ export const domElementIds = {
       "im-profile-form-edit-agency__users-submit-button",
     registerAgenciesSearchLink: "im-profile__register-agencies-search-link",
     registerAgencyButton: "im-profile__register-agency-button",
-  },
-  myProfile: {
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--my-profile-establishment-registration",
@@ -979,21 +972,14 @@ export const domElementIds = {
     signAssessmentModal: "im-assessment-document__sign-assessment-modal",
     signAssessmentForm: "im-assessment-document__sign-assessment-form",
   },
-  landingEstablishment: {},
   conventionToSign: {
     form: "im-convention-to-sign-form",
     submitButton: "im-convention-to-sign__submit-button",
     openSignModalButton: "im-convention-to-sign__open-sign-modal-button",
     modificationButton: "im-convention-to-sign__modification-button",
   },
-  error: {
-    establishmentDashboardButton:
-      "im-error-page__establishment-dashboard-button",
-    homeButton: "im-error-page__home-button",
-    contactUsButton: "im-error-contact-us-button",
-    initiateConventionButton: "im-error-initiate-convention-button",
-  },
-  conventionMiniStageRoute: {},
+
+  conventionMiniStage: {},
 
   agencyDashboard: {
     login: {
@@ -1050,7 +1036,7 @@ export const domElementIds = {
         "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
   },
-  manageConventionUserConnected: {
+  manageConventionConnectedUser: {
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--manage-convention-user-connected",
@@ -1086,7 +1072,7 @@ export const domElementIds = {
   magicLinkInterstitial: {
     confirmLoginButton: "im-magic-link-interstitial__confirm-login-button",
   },
-  manageEstablishmentAdmin: {},
+  adminEstablishments: {},
   establishmentDashboard: {
     tabContainer: "im-establishment-dashboard__tab-container",
     initiateConvention: {
@@ -1176,7 +1162,6 @@ export const domElementIds = {
         "im-manage-establishment__reject-user-right-button",
     },
   },
-  searchDiagoriente: {},
   initiateConvention: {
     navCards: {
       candidate: "im-initiate-convention-page__nav-card-candidate",
@@ -1269,4 +1254,33 @@ export const domElementIds = {
         "im-manage-convention-template__share-as-convention-draft-submit-button",
     },
   },
+  adminAgencies: {},
+  adminConventions: {},
+  adminEvents: {},
+  adminUsers: {},
+  adminNotifications: {},
+  adminEmailPreview: {},
+  adminTechnicalOptions: {},
+  adminConventionDetail: {},
+  adminUserDetail: {},
+  adminUserDetailAgencies: {},
+  adminUserDetailEstablishments: {},
+  adminAgencyDetail: {},
+  agencyDashboardMain: {},
+  agencyDashboardOnboarding: {},
+  statsEstablishmentDetails: {},
+  agencyManagement: {},
+  establishmentManagement: {},
+  myProfileAgencies: {},
+  myProfileEstablishments: {},
+  myProfileAgencyRegistration: {},
+  agencyDashboardAgencies: {},
+  agencyDashboardAgencyDetails: {},
+  conventionConfirmation: {},
+  conventionImmersionForExternals: {},
+  establishmentDashboardConventions: {},
+  establishmentDashboardFormEstablishment: {},
+  openApiDoc: {},
+  stats: {},
+  temporaryError: {},
 } satisfies DomElementIds;

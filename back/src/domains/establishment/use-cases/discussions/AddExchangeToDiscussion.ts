@@ -19,9 +19,10 @@ import {
   errors,
   exchangeRoleSchema,
   executeInSequence,
-  frontRoutes,
   localization,
+  makeRouteAbsoluteUrl,
   messageSchema,
+  routes,
   type UserId,
 } from "shared";
 import { z } from "zod";
@@ -370,7 +371,12 @@ const notifyForbidden = async ({
               ? "potentialBeneficiary"
               : "establishment",
           reason,
-          requestEstablishmentRegistrationUrl: `${deps.immersionFacileBaseUrl}/${frontRoutes.profile}/${frontRoutes.myProfileEstablishmentRegistration}?siret=${discussion.siret}`,
+          requestEstablishmentRegistrationUrl: makeRouteAbsoluteUrl(
+            routes.myProfileEstablishmentRegistration({
+              siret: discussion.siret,
+            }),
+            deps.immersionFacileBaseUrl,
+          ),
         }
       : {
           sender:

@@ -122,7 +122,7 @@ export const ConventionConfirmationPage = ({
             </>
           }
           buttonProps={{
-            id: domElementIds.conventionImmersionRoute.conventionConfirmation
+            id: domElementIds.conventionImmersion.conventionConfirmation
               .copyConventionIdButton,
             children: copyButtonLabel,
             disabled: copyButtonIsDisabled,

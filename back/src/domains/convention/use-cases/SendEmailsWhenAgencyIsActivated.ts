@@ -1,7 +1,8 @@
 import {
   errors,
-  frontRoutes,
   getCounsellorsAndValidatorsEmailsDeduplicated,
+  makeRouteAbsoluteUrl,
+  routes,
   withAgencyIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -43,7 +44,10 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
             agencyLogoUrl: agency.logoUrl ?? undefined,
             agencyReferdToName: agency.refersToAgencyName ?? undefined,
             refersToOtherAgency: !!agency.refersToAgencyId,
-            agencyDashboardUrl: `${immersionFacileBaseUrl}/${frontRoutes.agencyDashboard}/dashboard`,
+            agencyDashboardUrl: makeRouteAbsoluteUrl(
+              routes.agencyDashboardMain(),
+              immersionFacileBaseUrl,
+            ),
           },
         },
         followedIds: {

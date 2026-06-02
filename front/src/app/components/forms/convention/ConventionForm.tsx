@@ -806,7 +806,7 @@ const ConventionFormContent = ({
             )}
 
             <form
-              id={domElementIds.conventionImmersionRoute.form({
+              id={domElementIds.conventionImmersion.form({
                 mode,
                 internshipKind,
               })}
@@ -962,7 +962,7 @@ const ConventionFormContent = ({
                     countryCode={establishmentAddressCountryCode ?? undefined}
                     selectProps={{
                       inputId:
-                        domElementIds.conventionImmersionRoute.conventionSection
+                        domElementIds.conventionImmersion.conventionSection
                           .immersionAddress,
                     }}
                     locator="convention-immersion-address"
@@ -1042,7 +1042,7 @@ const ConventionFormContent = ({
                   nativeButtonProps={{
                     id: isTemplateForm
                       ? domElementIds.conventionTemplate.form.submitFormButton
-                      : domElementIds.conventionImmersionRoute.submitFormButton,
+                      : domElementIds.conventionImmersion.submitFormButton,
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
@@ -1083,7 +1083,7 @@ const ConventionFormContent = ({
                     isTemplateForm
                       ? domElementIds.conventionTemplate.form
                           .submitFormButtonMobile
-                      : domElementIds.conventionImmersionRoute
+                      : domElementIds.conventionImmersion.submitFormButtonMobile
                           .submitFormButtonMobile
                   }
                   onClick={handleSubmit(onSubmit, (errors) => {

@@ -5,9 +5,10 @@ import {
   type ConventionId,
   castError,
   executeInSequence,
-  frontRoutes,
   immersionFacileNoReplyEmailSender,
   localization,
+  makeRouteAbsoluteUrl,
+  routes,
   type SiretDto,
 } from "shared";
 import { z } from "zod";
@@ -138,7 +139,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
         id: convention.id,
         email: convention.signatories.establishmentRepresentative.email,
         role: "establishment-representative",
-        targetRoute: frontRoutes.unsubscribeEstablishmentLead,
+        targetRoute: "unregisterEstablishmentLead",
         now,
       }),
     });
@@ -197,4 +198,10 @@ const generateAddEstablishmentFormLink = ({
   convention: ConventionDto;
   acquisitionCampaign: string;
 }): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?fromConventionId=${convention.id}&mtm_campaign=${acquisitionCampaign}`;
+  makeRouteAbsoluteUrl(
+    routes.formEstablishment({
+      fromConventionId: convention.id,
+      mtm_campaign: acquisitionCampaign,
+    }),
+    config.immersionFacileBaseUrl,
+  );

@@ -12,7 +12,7 @@ import { ShareForm, type ShareFormProps } from "./ShareForm";
 const shareConventionDraftModalProps = {
   isOpenedByDefault: false,
   id: "shareLink",
-  formId: domElementIds.conventionImmersionRoute.shareConventionDraft.shareForm,
+  formId: domElementIds.conventionImmersion.shareConventionDraft.shareForm,
 };
 const shareConventionDraftModal = createFormModal(
   shareConventionDraftModalProps,
@@ -31,14 +31,14 @@ export const ShareConventionDraft = ({
     type: "button",
     priority: "secondary",
     onClick: shareConventionDraftModal.close,
-    id: domElementIds.conventionImmersionRoute.shareConventionDraft
+    id: domElementIds.conventionImmersion.shareConventionDraft
       .shareFormCancelButton,
   };
 
   const submitConventionDraftButton: ButtonProps = {
     children: "Envoyer le brouillon",
     type: "submit",
-    id: domElementIds.conventionImmersionRoute.shareConventionDraft
+    id: domElementIds.conventionImmersion.shareConventionDraft
       .shareFormSubmitButton,
   };
 
@@ -57,7 +57,7 @@ export const ShareConventionDraft = ({
           shareConventionDraftModal.open();
         }}
         nativeButtonProps={{
-          id: domElementIds.conventionImmersionRoute.shareConventionDraft
+          id: domElementIds.conventionImmersion.shareConventionDraft
             .shareButton,
         }}
         priority="secondary"

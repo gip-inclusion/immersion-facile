@@ -6,10 +6,11 @@ import {
   discussionEmailSender,
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  makeRouteAbsoluteUrl,
   type PhoneNumber,
+  routes,
   UserBuilder,
 } from "shared";
 import {
@@ -262,7 +263,16 @@ describe("NotifyContactRequest", () => {
                       appellationLabel: TEST_APPELLATION_LABEL,
                       businessAddress: addressDtoToString(discussion.address),
                       businessName: discussion.businessName,
-                      discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                      discussionUrl: makeRouteAbsoluteUrl(
+                        routes.establishmentDashboardDiscussions({
+                          discussionId: discussion.id,
+                          mtm_campaign:
+                            "inbound-parsing-reponse-via-espace-entreprise",
+                          mtm_kwd:
+                            "inbound-parsing-reponse-via-espace-entreprise",
+                        }),
+                        immersionFacileBaseUrl,
+                      ),
                       kind: discussion.kind,
                       immersionObjective:
                         discussion.potentialBeneficiary.immersionObjective ??
@@ -290,7 +300,16 @@ describe("NotifyContactRequest", () => {
                       appellationLabel: TEST_APPELLATION_LABEL,
                       businessAddress: addressDtoToString(discussion.address),
                       businessName: discussion.businessName,
-                      discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                      discussionUrl: makeRouteAbsoluteUrl(
+                        routes.establishmentDashboardDiscussions({
+                          discussionId: discussion.id,
+                          mtm_campaign:
+                            "inbound-parsing-reponse-via-espace-entreprise",
+                          mtm_kwd:
+                            "inbound-parsing-reponse-via-espace-entreprise",
+                        }),
+                        immersionFacileBaseUrl,
+                      ),
                       kind: discussion.kind,
                       immersionObjective:
                         discussion.potentialBeneficiary.immersionObjective,

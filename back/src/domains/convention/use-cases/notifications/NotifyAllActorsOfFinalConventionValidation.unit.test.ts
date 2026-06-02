@@ -10,7 +10,6 @@ import {
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   expectToEqual,
-  frontRoutes,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -727,7 +726,7 @@ const makeExpectedShortLinks = (
           email: actor.email,
           now: timeGateway.now(),
           expOverride: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-          targetRoute: frontRoutes.conventionDocument,
+          targetRoute: "conventionDocument",
           lifetime: "1Month",
         }),
         lastUsedAt: null,
@@ -743,7 +742,7 @@ const makeExpectedShortLinks = (
                 now: timeGateway.now(),
                 expOverride:
                   timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
-                targetRoute: frontRoutes.assessment,
+                targetRoute: "assessment",
                 lifetime: "2Days",
               }),
               lastUsedAt: null,

@@ -1,7 +1,8 @@
 import {
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
+  makeRouteAbsoluteUrl,
+  routes,
   UserBuilder,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -189,7 +190,10 @@ describe("NotifyEstablishmentAdminsThatUserRightIsPending", () => {
             kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
             recipients: [adminUser.email],
             params: {
-              establishmentDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+              establishmentDashboardUrl: makeRouteAbsoluteUrl(
+                routes.establishmentDashboard(),
+                config.immersionFacileBaseUrl,
+              ),
               adminFirstName: adminUser.firstName,
               adminLastName: adminUser.lastName,
               pendingUserFirstName: pendingUser.firstName,
@@ -285,7 +289,10 @@ describe("NotifyEstablishmentAdminsThatUserRightIsPending", () => {
             kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
             recipients: [admin.email],
             params: {
-              establishmentDashboardUrl: `${config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+              establishmentDashboardUrl: makeRouteAbsoluteUrl(
+                routes.establishmentDashboard(),
+                config.immersionFacileBaseUrl,
+              ),
               adminFirstName: admin.firstName,
               adminLastName: admin.lastName,
               pendingUserFirstName: pendingUser.firstName,

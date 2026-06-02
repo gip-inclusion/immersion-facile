@@ -6,7 +6,6 @@ import {
   type ConventionRelatedJwtPayload,
   errors,
   formatHoursCooldownTimeRemaining,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   isBeforeAssessmentSignatureReleaseDate,
   isWithinHoursCooldown,
@@ -206,7 +205,7 @@ const sendAssessmentSignatureReminderEmail = async ({
   });
 
   const assessmentSignatureLink = await makeMagicShortLink({
-    targetRoute: frontRoutes.assessmentDocument,
+    targetRoute: "assessmentDocument",
     lifetime: "2Days",
   });
 
@@ -266,9 +265,9 @@ const sendAssessmentSignatureReminderSms = async ({
   });
 
   const shortLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.assessmentDocument,
+    targetRoute: "assessmentDocument",
     lifetime: "2Days",
-    extraQueryParams: { mtm_source: "sms-assessment-signature-reminder" },
+    extraQueryParams: { mtm_campaign: "sms-assessment-signature-reminder" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {

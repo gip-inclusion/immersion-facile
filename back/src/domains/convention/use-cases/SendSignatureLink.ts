@@ -7,7 +7,6 @@ import {
   conventionSignatoryRoleBySignatoryKey,
   errors,
   formatHoursCooldownTimeRemaining,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   isWithinHoursCooldown,
   type NotificationKind,
@@ -199,9 +198,9 @@ const sendSms = async ({
   });
 
   const shortLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.conventionToSign,
+    targetRoute: "conventionToSign",
     lifetime: "2Days",
-    extraQueryParams: { mtm_source: "sms-signature-link" },
+    extraQueryParams: { mtm_campaign: "sms-signature-link" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {
@@ -297,9 +296,9 @@ const sendEmail = async ({
               convention.signatories.beneficiaryCurrentEmployer.lastName,
           }),
         conventionSignShortlink: await makeShortMagicLink({
-          targetRoute: frontRoutes.conventionToSign,
+          targetRoute: "conventionToSign",
           lifetime: "2Days",
-          extraQueryParams: { mtm_source: "email-signature-link" },
+          extraQueryParams: { mtm_campaign: "email-signature-link" },
         }),
         businessName: convention.businessName,
         agencyLogoUrl: undefined,

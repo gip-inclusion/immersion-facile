@@ -3,7 +3,6 @@ import {
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -107,7 +106,7 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
             linkToAssessment: fakeGenerateMagicLinkUrlFn({
               email: convention.signatories.establishmentRepresentative.email,
               role: "establishment-representative",
-              targetRoute: frontRoutes.assessmentDocument,
+              targetRoute: "assessmentDocument",
               now,
               id: convention.id,
               lifetime: "1Month",
@@ -131,7 +130,7 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
             linkToAssessment: fakeGenerateMagicLinkUrlFn({
               email: convention.establishmentTutor.email,
               role: "establishment-tutor",
-              targetRoute: frontRoutes.assessmentDocument,
+              targetRoute: "assessmentDocument",
               now,
               id: convention.id,
               lifetime: "1Month",
@@ -181,7 +180,7 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
             linkToAssessment: fakeGenerateMagicLinkUrlFn({
               email: convention.signatories.establishmentRepresentative.email,
               role: "establishment-representative",
-              targetRoute: frontRoutes.assessmentDocument,
+              targetRoute: "assessmentDocument",
               now,
               id: convention.id,
               lifetime: "1Month",

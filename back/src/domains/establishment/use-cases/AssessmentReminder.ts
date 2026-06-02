@@ -7,11 +7,11 @@ import {
   type Email,
   errors,
   executeInSequence,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   localization,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -241,9 +241,9 @@ const sendTutorAssessmentReminder = async ({
     uow,
   });
   const assessmentCreationLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.assessment,
+    targetRoute: "assessment",
     lifetime: "2Days",
-    extraQueryParams: { mtm_source: "assessment-reminder" },
+    extraQueryParams: { mtm_campaign: "assessment-reminder" },
   });
 
   const notification = createTutorNotification({
@@ -301,10 +301,12 @@ const sendAgencyAssessmentReminder = async ({
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              { conventionId: convention.id },
-            )}`,
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
+                conventionId: convention.id,
+              }),
+              config.immersionFacileBaseUrl,
+            ),
             tutorEmail: convention.establishmentTutor.email,
           },
         },

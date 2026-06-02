@@ -4,6 +4,7 @@ import type {
   ConventionMagicLinkLifetime,
   GenerateConnectedUserLoginUrl,
   GenerateConnectedUserLoginUrlParams,
+  GenerateConventionMagicLinkRouteName,
   GenerateConventionMagicLinkUrl,
   GenerateEmailAuthCodeUrl,
   GenerateEmailAuthCodeUrlParams,
@@ -46,7 +47,7 @@ export const prepareConventionMagicShortLinkMaker =
     extraQueryParams,
   }: {
     extraQueryParams?: Record<string, string>;
-    targetRoute: string;
+    targetRoute: GenerateConventionMagicLinkRouteName;
     lifetime: ConventionMagicLinkLifetime;
   }): Promise<AbsoluteUrl> =>
     makeShortLink({

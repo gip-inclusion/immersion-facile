@@ -225,7 +225,7 @@ const SharedConventionMessage = ({
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
         id={
-          domElementIds.conventionImmersionRoute
+          domElementIds.conventionImmersion.fromSharedConventionContinueButton
             .fromSharedConventionContinueButton
         }
       >

@@ -72,9 +72,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   return (
     <WithFeedbackReplacer topic="convention-draft">
       <form
-        id={
-          domElementIds.conventionImmersionRoute.shareConventionDraft.shareForm
-        }
+        id={domElementIds.conventionImmersion.shareConventionDraft.shareForm}
         onSubmit={handleSubmit(onSubmit)}
       >
         <p className={fr.cx("fr-text--xs")}>
@@ -84,7 +82,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           label="Votre adresse email *"
           nativeInputProps={{
             ...register("senderEmail"),
-            id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            id: domElementIds.conventionImmersion.shareConventionDraft
               .shareFormEmailInput,
             type: "email",
             placeholder: "nom@exemple.com",
@@ -110,7 +108,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
             }),
             type: "email",
             placeholder: "nom@exemple.com",
-            id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            id: domElementIds.conventionImmersion.shareConventionDraft
               .shareFormRecipientEmailInput,
           }}
           state={formState.errors.recipientEmail ? "error" : "default"}
@@ -123,7 +121,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
             ...register("details", {
               setValueAs: (v) => (v === "" ? undefined : v),
             }),
-            id: domElementIds.conventionImmersionRoute.shareConventionDraft
+            id: domElementIds.conventionImmersion.shareConventionDraft
               .shareFormDetailsInput,
           }}
           textArea

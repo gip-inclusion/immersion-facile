@@ -4,9 +4,9 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type FtConnectIdentity,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -140,10 +140,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: conventionInReview.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: conventionInReview.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -180,10 +182,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: conventionInReview.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: conventionInReview.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -207,10 +211,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                 lastname: conventionInReview.signatories.beneficiary.lastName,
               }),
               businessName: conventionInReview.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: conventionInReview.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: conventionInReview.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -281,10 +287,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: conventionInReviewWithFtAdvisor.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: conventionInReviewWithFtAdvisor.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithCounsellorsAndValidators.logoUrl ?? undefined,
@@ -348,10 +356,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: conventionInReviewWithFtAdvisor.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: conventionInReviewWithFtAdvisor.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -405,10 +415,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: acceptedByCounsellorConvention.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: acceptedByCounsellorConvention.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -435,10 +447,12 @@ describe("NotifyNewConventionNeedsReview", () => {
                     .lastName,
               }),
               businessName: acceptedByCounsellorConvention.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                { conventionId: acceptedByCounsellorConvention.id },
-              )}`,
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
+                  conventionId: acceptedByCounsellorConvention.id,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -510,12 +524,12 @@ describe("NotifyNewConventionNeedsReview", () => {
               }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
-              manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-                `/${frontRoutes.manageConventionUserConnected}`,
-                {
+              manageConventionLink: makeRouteAbsoluteUrl(
+                routes.manageConventionConnectedUser({
                   conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
-                },
-              )}`,
+                }),
+                config.immersionFacileBaseUrl,
+              ),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",

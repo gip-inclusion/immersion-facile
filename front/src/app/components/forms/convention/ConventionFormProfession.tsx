@@ -50,7 +50,7 @@ export const ConventionFormProfession = ({
         label={label}
         selectProps={{
           inputId:
-            domElementIds.conventionImmersionRoute.conventionSection
+            domElementIds.conventionImmersion.conventionSection
               .immersionAppellation,
         }}
         onAppellationSelected={(appellationMatch) => {

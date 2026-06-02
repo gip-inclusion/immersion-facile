@@ -3,9 +3,10 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  makeRouteAbsoluteUrl,
+  routes,
   type UserWithAdminRights,
 } from "shared";
 import { AppConfigBuilder } from "../../../../../utils/AppConfigBuilder";
@@ -126,7 +127,14 @@ describe("RequestLoginByEmail usecase", () => {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
             validMinutes: config.emailAuthCodeJwtDurationInMinutes,
-            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
+            loginLink: makeRouteAbsoluteUrl(
+              routes.magicLinkInterstitial({
+                code: "EmailAuthCodeJwt",
+                state,
+                email: user.email,
+              }),
+              "http://fake-connected-user",
+            ),
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,
@@ -171,7 +179,14 @@ describe("RequestLoginByEmail usecase", () => {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
             validMinutes: config.emailAuthCodeJwtDurationInMinutes,
-            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
+            loginLink: makeRouteAbsoluteUrl(
+              routes.magicLinkInterstitial({
+                code: "EmailAuthCodeJwt",
+                state,
+                email: user.email,
+              }),
+              "http://fake-connected-user",
+            ),
             fullname: "",
           },
           recipients: [user.email],
@@ -197,7 +212,14 @@ describe("RequestLoginByEmail usecase", () => {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
             validMinutes: config.emailAuthCodeJwtDurationInMinutes,
-            loginLink: `http://fake-connected-user/${frontRoutes.magicLinkInterstitial}?code=EmailAuthCodeJwt&email=${user.email}&state=${state}`,
+            loginLink: makeRouteAbsoluteUrl(
+              routes.magicLinkInterstitial({
+                code: "EmailAuthCodeJwt",
+                state,
+                email: user.email,
+              }),
+              "http://fake-connected-user",
+            ),
             fullname: getFormattedFirstnameAndLastname({
               firstname: user.firstName,
               lastname: user.lastName,

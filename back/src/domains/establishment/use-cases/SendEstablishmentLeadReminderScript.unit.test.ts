@@ -186,16 +186,19 @@ describe("SendEstablishmentLeadReminder", () => {
         errors: {},
       });
 
+      const expectedFakeJwtPayload =
+        "11111111-ee70-4c90-b3f4-668d492f7395%2Festablishment-representative%2F2021-05-15T08%3A00%3A00.000Z%2FnewestConvention.establishment%40email.fr%2F1Month";
+
       expectToEqual(uow.shortLinkRepository.getShortLinks(), [
         {
           id: "addEstablishmentFormShortLink",
           lastUsedAt: null,
-          url: `http://localhost/establishment?fromConventionId=${newestConvention.id}&mtm_campaign=transactionnel-etablissement-rappel-inscription`,
+          url: `http://localhost/establishment?mtm_campaign=transactionnel-etablissement-rappel-inscription&fromConventionId=${newestConvention.id}`,
         },
         {
           id: "addUnsubscribeToEmailShortLink",
           lastUsedAt: null,
-          url: "http://fake-magic-link/desinscription-prospect/11111111-ee70-4c90-b3f4-668d492f7395/establishment-representative/2021-05-15T08:00:00.000Z/newestConvention.establishment@email.fr/1Month",
+          url: `http://fake-magic-link/desinscription-prospect?jwt=${expectedFakeJwtPayload}`,
         },
       ]);
 
@@ -298,16 +301,19 @@ describe("SendEstablishmentLeadReminder", () => {
         errors: {},
       });
 
+      const expectedFakeJwtPayload =
+        "45664444-1234-4000-4444-123456789012%2Festablishment-representative%2F2021-05-15T08%3A00%3A00.000Z%2Festablishment%40example.com%2F1Month";
+
       expectToEqual(uow.shortLinkRepository.getShortLinks(), [
         {
           id: "addEstablishmentFormShortLink",
           lastUsedAt: null,
-          url: `http://localhost/establishment?fromConventionId=${convention1.id}&mtm_campaign=transactionnel-etablissement-rappel-inscription`,
+          url: `http://localhost/establishment?mtm_campaign=transactionnel-etablissement-rappel-inscription&fromConventionId=${convention1.id}`,
         },
         {
           id: "addUnsubscribeToEmailShortLink",
           lastUsedAt: null,
-          url: "http://fake-magic-link/desinscription-prospect/45664444-1234-4000-4444-123456789012/establishment-representative/2021-05-15T08:00:00.000Z/establishment@example.com/1Month",
+          url: `http://fake-magic-link/desinscription-prospect?jwt=${expectedFakeJwtPayload}`,
         },
       ]);
 

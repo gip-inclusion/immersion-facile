@@ -3,9 +3,12 @@ import {
   type ConnectedUserQueryParams,
   decodeURIWithParams,
   type Email,
+  type FrontRouteKeys,
+  makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
   type OmitFromExistingKeys,
   queryParamsAsString,
+  routes,
   type User,
 } from "shared";
 import type { OngoingOAuth } from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
@@ -29,6 +32,17 @@ export type GenerateConventionMagicLinkUrl = ReturnType<
 
 export type ConventionMagicLinkLifetime = "1Month" | "2Days";
 
+export type GenerateConventionMagicLinkRouteName = Extract<
+  FrontRouteKeys,
+  | "conventionImmersion"
+  | "conventionToSign"
+  | "unregisterEstablishmentLead"
+  | "assessment"
+  | "assessmentDocument"
+  | "conventionDocument"
+  | "manageConvention"
+>;
+
 export const makeGenerateConventionMagicLinkUrl =
   (config: AppConfig, generateConventionJwt: GenerateConventionJwt) =>
   ({
@@ -41,7 +55,7 @@ export const makeGenerateConventionMagicLinkUrl =
     "durationDays"
   > & {
     extraQueryParams?: Record<string, string>;
-    targetRoute: string;
+    targetRoute: GenerateConventionMagicLinkRouteName;
     lifetime?: ConventionMagicLinkLifetime;
   }): AbsoluteUrl => {
     const durationDaysByLifetime = {
@@ -56,12 +70,13 @@ export const makeGenerateConventionMagicLinkUrl =
       }),
     );
 
-    const queryParams = new URLSearchParams({
-      ...extraQueryParams,
-      jwt,
-    });
-
-    return `${config.immersionFacileBaseUrl}/${targetRoute}?${queryParams}`;
+    return makeRouteAbsoluteUrl(
+      routes[targetRoute]({
+        ...extraQueryParams,
+        jwt,
+      }),
+      config.immersionFacileBaseUrl,
+    );
   };
 
 export type GenerateConnectedUserLoginUrl = ReturnType<
@@ -113,7 +128,7 @@ export type GenerateEmailAuthCodeUrl = ReturnType<
 >;
 
 export type GenerateEmailAuthCodeUrlParams = {
-  uri: string;
+  targetRoute: Extract<FrontRouteKeys, "magicLinkInterstitial">;
   state: string;
   email: Email;
   now: Date;
@@ -125,7 +140,12 @@ export type EmailAuthCodeUrlQueryParams = OAuthSuccessLoginParams & {
 
 export const makeGenerateEmailAuthCodeUrl =
   (config: AppConfig, generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt) =>
-  ({ email, state, uri, now }: GenerateEmailAuthCodeUrlParams): AbsoluteUrl => {
+  ({
+    email,
+    state,
+    targetRoute,
+    now,
+  }: GenerateEmailAuthCodeUrlParams): AbsoluteUrl => {
     const jwt = generateEmailAuthCodeJwt(
       createEmailAuthCodeJwtPayload({
         now,
@@ -134,11 +154,12 @@ export const makeGenerateEmailAuthCodeUrl =
       }),
     );
 
-    const queryParams = queryParamsAsString<EmailAuthCodeUrlQueryParams>({
-      code: jwt,
-      state,
-      email,
-    });
-
-    return `${config.immersionFacileBaseUrl}/${uri}?${queryParams}`;
+    return makeRouteAbsoluteUrl(
+      routes[targetRoute]({
+        code: jwt,
+        email,
+        state,
+      }),
+      config.immersionFacileBaseUrl,
+    );
   };

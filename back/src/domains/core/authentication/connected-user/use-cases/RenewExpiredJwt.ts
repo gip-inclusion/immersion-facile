@@ -1,4 +1,5 @@
 import { decode, TokenExpiredError } from "jsonwebtoken";
+import { keys, values } from "ramda";
 import {
   type AppSupportedDomainJwtPayload,
   type AppSupportedJwt,
@@ -6,17 +7,18 @@ import {
   type ConventionDomainJwtPayload,
   errors,
   ForbiddenError,
-  frontRoutes,
   type MagicLinkRenewalParams,
   type OAuthState,
   type RenewExpiredJwtRequestDto,
   renewExpiredJwtRequestSchema,
+  routes,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../../../config/bootstrap/authMiddleware";
 import type {
   GenerateConnectedUserLoginUrl,
+  GenerateConventionMagicLinkRouteName,
   GenerateConventionMagicLinkUrl,
   GenerateEmailAuthCodeUrl,
 } from "../../../../../config/bootstrap/magicLinkUrl";
@@ -170,7 +172,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
             email: ongoingOAuth.email,
             now: this.#timeGateway.now(),
             state: ongoingOAuth.state,
-            uri: frontRoutes.magicLinkInterstitial,
+            targetRoute: "magicLinkInterstitial",
           }),
         });
   }
@@ -242,10 +244,13 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       },
     });
 
+    const routeToRenew: GenerateConventionMagicLinkRouteName =
+      this.#findRouteToRenew(originalUrl);
+
     await this.#sendTokenRenewal(uow, emailMatchingEmailHash, {
       internshipKind: convention.internshipKind,
       magicLink: await makeConventionMagicShortLink({
-        targetRoute: this.#findRouteToRenew(originalUrl),
+        targetRoute: routeToRenew,
         lifetime: "1Month",
       }),
       conventionId: convention.id,
@@ -274,22 +279,32 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     );
   }
 
-  #findRouteToRenew(originalUrl: string) {
-    const supportedRenewRoutes: string[] = [
-      frontRoutes.conventionImmersionRoute,
-      frontRoutes.conventionToSign,
-      frontRoutes.manageConvention,
-      frontRoutes.assessment,
-      frontRoutes.assessmentDocument,
-    ];
+  #findRouteToRenew(originalUrl: string): GenerateConventionMagicLinkRouteName {
+    const supportedRenewRoutesByRouteName: Record<
+      GenerateConventionMagicLinkRouteName,
+      string
+    > = {
+      conventionToSign: routes.conventionToSign({ jwt: "" }).href,
+      manageConvention: routes.manageConvention({ jwt: "" }).href,
+      assessment: routes.assessment({ jwt: "" }).href,
+      assessmentDocument: routes.assessmentDocument({ jwt: "" }).href,
+      conventionImmersion: routes.conventionImmersion({ jwt: "" }).href,
+      unregisterEstablishmentLead: routes.unregisterEstablishmentLead({
+        jwt: "",
+      }).href,
+      conventionDocument: routes.conventionDocument({ jwt: "" }).href,
+    };
 
-    const supportedRouteToRenew = supportedRenewRoutes.find((supportedRoute) =>
-      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
+    const supportedRouteToRenew = keys(supportedRenewRoutesByRouteName).find(
+      (routeName) =>
+        decodeURIComponent(originalUrl).includes(
+          supportedRenewRoutesByRouteName[routeName],
+        ),
     );
 
     if (!supportedRouteToRenew)
       throw errors.convention.unsupportedRenewRoute({
-        supportedRenewRoutes,
+        supportedRenewRoutes: values(supportedRenewRoutesByRouteName),
         originalUrl,
       });
     return supportedRouteToRenew;

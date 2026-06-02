@@ -33,7 +33,7 @@ const {
   beneficiaryRepresentativeSection: beneficiaryRepresentativeSectionIds,
   beneficiaryCurrentEmployerSection: beneficiaryCurrentEmployerSectionIds,
   establishmentRepresentativeSection: establishmentRepresentativeSectionIds,
-} = domElementIds.conventionImmersionRoute;
+} = domElementIds.conventionImmersion;
 
 export const formConventionFieldsLabels: (params: {
   internshipKind: InternshipKind;

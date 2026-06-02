@@ -65,7 +65,7 @@ export const HourPicker = ({
           priority="secondary"
           onClick={() => add()}
           nativeButtonProps={{
-            id: domElementIds.conventionImmersionRoute.conventionSection
+            id: domElementIds.conventionImmersion.conventionSection
               .addHoursButton,
           }}
         >
@@ -167,7 +167,7 @@ const TimePeriod = ({
             iconId="fr-icon-delete-bin-line"
             title="Supprimer la tranche horaire"
             nativeButtonProps={{
-              id: domElementIds.conventionImmersionRoute.deleteHoursButton,
+              id: domElementIds.conventionImmersion.deleteHoursButton,
             }}
             onClick={() => remove(index)}
           />

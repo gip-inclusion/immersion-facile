@@ -14,14 +14,14 @@ import {
   errors,
   executeInSequence,
   filterNotFalsy,
-  frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
   isValidMobilePhone,
-  makeUrlWithQueryParams,
+  makeRouteAbsoluteUrl,
   type ReminderKind,
+  routes,
   type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
@@ -248,7 +248,7 @@ const makeSignatoryReminderEmail = async ({
           shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
           uow,
         })({
-          targetRoute: frontRoutes.conventionToSign,
+          targetRoute: "conventionToSign",
           lifetime: "1Month",
         })
       : undefined,
@@ -282,7 +282,7 @@ const prepareSmsReminderParams = async ({
   });
 
   const shortLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.conventionToSign,
+    targetRoute: "conventionToSign",
     lifetime: "1Month",
   });
 
@@ -326,12 +326,12 @@ const createAgencyReminderEmail = async ({
             businessName: conventionRead.businessName,
             dateStart: conventionRead.dateStart,
             dateEnd: conventionRead.dateEnd,
-            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              {
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
                 conventionId: conventionRead.id,
-              },
-            )}`,
+              }),
+              config.immersionFacileBaseUrl,
+            ),
           },
         }
       : {
@@ -349,12 +349,12 @@ const createAgencyReminderEmail = async ({
               lastname: conventionRead.signatories.beneficiary.lastName,
             }),
             businessName: conventionRead.businessName,
-            manageConventionLink: `${config.immersionFacileBaseUrl}${makeUrlWithQueryParams(
-              `/${frontRoutes.manageConventionUserConnected}`,
-              {
+            manageConventionLink: makeRouteAbsoluteUrl(
+              routes.manageConventionConnectedUser({
                 conventionId: conventionRead.id,
-              },
-            )}`,
+              }),
+              config.immersionFacileBaseUrl,
+            ),
           },
         };
 

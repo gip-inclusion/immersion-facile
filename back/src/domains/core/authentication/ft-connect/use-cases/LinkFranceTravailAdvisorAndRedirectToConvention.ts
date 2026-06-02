@@ -1,8 +1,8 @@
 import {
   type AbsoluteUrl,
   authFailed,
-  frontRoutes,
-  queryParamsAsString,
+  makeRouteAbsoluteUrl,
+  routes,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../../UseCase";
@@ -53,9 +53,10 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
   }
 
   #makeRedirectUrl(fields: Partial<ConventionFtConnectFields>): AbsoluteUrl {
-    return `${this.#baseUrlForRedirect}/${
-      frontRoutes.conventionImmersionRoute
-    }?${queryParamsAsString<Partial<ConventionFtConnectFields>>(fields)}`;
+    return makeRouteAbsoluteUrl(
+      routes.conventionImmersion(fields),
+      this.#baseUrlForRedirect,
+    );
   }
 
   async #onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
