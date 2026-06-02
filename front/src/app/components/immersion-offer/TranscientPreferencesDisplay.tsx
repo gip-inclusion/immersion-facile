@@ -47,10 +47,7 @@ type TranscientPreferencesDisplayProps = TranscientPreferencesDisplayBaseProps &
 export const TranscientPreferencesDisplay = (
   props: TranscientPreferencesDisplayProps,
 ) => {
-  const route = useCreateDiscussionRoute([
-    "searchResult",
-    "searchResultForStudent",
-  ]);
+  const route = useCreateDiscussionRoute();
   const { scope, onPreferencesChange, mode } = props;
   const {
     getTranscientDataForScope,

@@ -77,11 +77,7 @@ export type OnStepChange = (
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
-  const route = useEstablishmentRoute([
-    "formEstablishment",
-    "adminEstablishments",
-    "establishmentDashboardFormEstablishment",
-  ]);
+  const route = useEstablishmentRoute();
 
   const isEstablishmentCreation = route.name === "formEstablishment";
   const isEstablishmentAdmin = route.name === "adminEstablishments";
