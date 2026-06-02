@@ -1,6 +1,7 @@
 import {
-  type ConnectedUser,
+  allowedRolesToEditConventionWithFinalStatus,
   type ConventionDto,
+  type ConventionRelatedJwtPayload,
   conventionSchema,
   conventionStatuses,
   conventionStatusesAllowedForModification,
@@ -8,10 +9,17 @@ import {
   editConventionWithFinalStatusRequestSchema,
   errors,
 } from "shared";
-import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
-import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
+import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
+import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type EditConventionWithFinalStatus = ReturnType<
   typeof makeEditConventionWithFinalStatus
@@ -24,12 +32,16 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
     editConventionWithFinalStatusRequestSchema,
   )
   .withOutput<void>()
-  .withCurrentUser<ConnectedUser>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
   .withDeps<{
     createNewEvent: CreateNewEvent;
   }>()
-  .build(async ({ inputParams, uow, deps, currentUser }) => {
-    throwIfNotAdmin(currentUser);
+  .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+    throwErrorOnConventionIdMismatch({
+      requestedConventionId: inputParams.conventionId,
+      jwtPayload,
+    });
+
     const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
@@ -50,28 +62,59 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       }),
     );
 
-    const updatedConventionCandidate = {
-      ...convention,
-      signatories: {
-        ...convention.signatories,
-        beneficiary: {
-          ...convention.signatories.beneficiary,
-          ...(inputParams.updatedBeneficiaryBirthDate && {
-            birthdate: inputParams.updatedBeneficiaryBirthDate,
-          }),
-          ...(inputParams.firstname && {
-            firstName: inputParams.firstname,
-          }),
-          ...(inputParams.lastname && {
-            lastName: inputParams.lastname,
-          }),
-        },
-      },
+    const conventionRead = await conventionDtoToConventionReadDto(
+      convention,
+      uow,
+    );
+
+    if (inputParams.beneficiary) {
+      await throwIfNotAllowedToEditBeneficiary({
+        uow,
+        jwtPayload,
+        hasBeneficiaryUpdate: !!inputParams.beneficiary,
+      });
+    }
+
+    await throwIfNotAuthorizedForRole({
+      uow,
+      jwtPayload,
+      convention: conventionRead,
+      authorizedRoles: [...allowedRolesToEditConventionWithFinalStatus],
+      errorToThrow:
+        errors.convention.editConventionWithFinalStatusNotAuthorizedForRole(),
+      isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: true,
+    });
+
+    const updatedEstablishmentTutor = {
+      ...convention.establishmentTutor,
+      firstName: inputParams.establishmentTutor.firstname,
+      lastName: inputParams.establishmentTutor.lastname,
+      job: inputParams.establishmentTutor.job,
+      email: inputParams.establishmentTutor.email,
+      phone: inputParams.establishmentTutor.phone,
     };
 
-    const conventionValidation = conventionSchema.safeParse(
-      updatedConventionCandidate,
-    );
+    const updatedConvention = inputParams.beneficiary
+      ? {
+          ...convention,
+          establishmentTutor: updatedEstablishmentTutor,
+          signatories: {
+            ...convention.signatories,
+            beneficiary: {
+              ...convention.signatories.beneficiary,
+              birthdate: inputParams.beneficiary.updatedBeneficiaryBirthDate,
+              firstName: inputParams.beneficiary.firstname,
+              lastName: inputParams.beneficiary.lastname,
+            },
+          },
+        }
+      : {
+          ...convention,
+          establishmentTutor: updatedEstablishmentTutor,
+        };
+
+    const conventionValidation = conventionSchema.safeParse(updatedConvention);
     if (!conventionValidation.success)
       throw errors.convention.invalidConventionAfterFinalStatusEdit({
         message: conventionValidation.error.issues
@@ -80,19 +123,47 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
         conventionId: convention.id,
       });
 
-    const updatedConvention: ConventionDto = conventionValidation.data;
+    const parsedUpdatedConvention: ConventionDto = conventionValidation.data;
 
-    await uow.conventionRepository.update(updatedConvention);
+    const triggeredBy: TriggeredBy =
+      "userId" in jwtPayload
+        ? {
+            kind: "connected-user",
+            userId: jwtPayload.userId,
+          }
+        : {
+            kind: "convention-magic-link",
+            role: jwtPayload.role,
+          };
+
+    await uow.conventionRepository.update(parsedUpdatedConvention);
     await uow.outboxRepository.save(
       deps.createNewEvent({
         topic: "ConventionWithFinalStatusEdited",
         payload: {
-          convention: updatedConvention,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: currentUser.id,
-          },
+          convention: parsedUpdatedConvention,
+          triggeredBy,
         },
       }),
     );
   });
+
+const throwIfNotAllowedToEditBeneficiary = async ({
+  uow,
+  jwtPayload,
+  hasBeneficiaryUpdate,
+}: {
+  uow: UnitOfWork;
+  jwtPayload: ConventionRelatedJwtPayload;
+  hasBeneficiaryUpdate: boolean;
+}) => {
+  if (!hasBeneficiaryUpdate) return;
+
+  if (!("userId" in jwtPayload))
+    throw errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole();
+
+  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+  if (!userWithRights.isBackofficeAdmin)
+    throw errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole();
+};

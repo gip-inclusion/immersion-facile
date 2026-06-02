@@ -350,6 +350,10 @@ export const errors = {
         `Impossible de modifier le nom du conseiller pour les conventions ayant le statut "${status}".`,
       ),
 
+    editConventionWithFinalStatusNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        "Seuls les conseillers, les validateurs et le représentant légal de l'entreprise sont autorisés à modifier la convention lorsqu'elle est finalisée.",
+      ),
     editConventionWithFinalStatusNotAllowedForStatus: ({
       status,
       conventionId,
@@ -359,6 +363,10 @@ export const errors = {
     }) =>
       new BadRequestError(
         `Impossible de modifier la convention : ${conventionId} en tant qu'admin : le statut "${status}" ne permet pas cette action.`,
+      ),
+    editConventionWithFinalStatusBeneficiaryForbiddenForRole: () =>
+      new ForbiddenError(
+        "Seuls les administrateurs backoffice sont autorisés à modifier les informations du candidat lorsque la convention est finalisée.",
       ),
     invalidConventionAfterFinalStatusEdit: ({
       message,

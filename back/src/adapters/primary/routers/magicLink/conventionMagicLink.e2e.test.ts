@@ -697,7 +697,7 @@ describe("Magic link router", () => {
         body: {
           status: 403,
           message:
-            errors.convention.editConventionWithFinalStatusBeneficiaryEditForbidden()
+            errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole()
               .message,
         },
         status: 403,
