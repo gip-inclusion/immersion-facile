@@ -2,6 +2,7 @@ import {
   addressDtoToString,
   ConnectedUserBuilder,
   errors,
+  expectObjectInArrayToMatch,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -312,6 +313,68 @@ describe("Delete Establishment", () => {
             cc: [establishmentContact1.email, establishmentContact2.email],
           },
         ],
+      });
+    });
+
+    it("With triggeredBy crawler and no remaining establishment rights, Establishment aggregate are deleted, establishment group with siret have siret removed, event is created and no notification sent", async () => {
+      uuidGenerator.setNextUuids(["uuid1", "uuid2"]);
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        new EstablishmentAggregateBuilder(establishmentAggregate)
+          .withUserRights([])
+          .build(),
+      ];
+
+      uow.groupRepository.groupEntities = [
+        {
+          name: "group",
+          sirets: [establishmentAggregate.establishment.siret, "siret2"],
+          slug: "group",
+          options: groupOptions,
+        },
+      ];
+
+      await deleteEstablishment.execute({
+        siret: establishmentAggregate.establishment.siret,
+        triggeredBy: {
+          kind: "crawler",
+        },
+      });
+
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [],
+      );
+
+      expectToEqual(uow.groupRepository.groupEntities, [
+        {
+          name: "group",
+          sirets: ["siret2"],
+          slug: "group",
+          options: groupOptions,
+        },
+      ]);
+      expectToEqual(uow.deletedEstablishmentRepository.deletedEstablishments, [
+        {
+          siret: establishmentAggregate.establishment.siret,
+          createdAt: establishmentAggregate.establishment.createdAt,
+          deletedAt: timeGateway.now(),
+        },
+      ]);
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "EstablishmentDeleted",
+          payload: {
+            siret: establishmentAggregate.establishment.siret,
+            triggeredBy: {
+              kind: "crawler",
+            },
+          },
+        },
+      ]);
+
+      expectSavedNotificationsAndEvents({
+        emails: [],
       });
     });
   });
