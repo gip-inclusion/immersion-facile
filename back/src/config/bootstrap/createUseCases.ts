@@ -102,7 +102,6 @@ import { makeInitiateLoginByEmail } from "../../domains/core/authentication/conn
 import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
 import { RenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
-import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
 import { makeNotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
@@ -287,13 +286,14 @@ export const createUseCases = ({
         uuidGenerator,
         {
           proConnect: gateways.proConnectOAuthGateway,
-          peConnect: gateways.ftConnectOAuthGateway,
+          peConnect: gateways.ftConnectGateway,
         },
       ),
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
         oAuthGateway: gateways.proConnectOAuthGateway,
+        ftConnectGateway: gateways.ftConnectGateway,
         uuidGenerator,
         generateConnectedUserLoginUrl,
         verifyEmailAuthCodeJwt,
@@ -304,15 +304,6 @@ export const createUseCases = ({
         uowPerformer,
         createNewEvent,
       ),
-
-      // Conventions
-
-      linkFranceTravailAdvisorAndRedirectToConvention:
-        new LinkFranceTravailAdvisorAndRedirectToConvention(
-          uowPerformer,
-          gateways.ftConnectGateway,
-          config.immersionFacileBaseUrl,
-        ),
 
       renewExpiredJwt: new RenewExpiredJwt({
         uowPerformer,

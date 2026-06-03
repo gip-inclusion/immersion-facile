@@ -4,6 +4,7 @@ import type {
   ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
+import type { OAuthNonce } from "../../../connected-user/entities/OngoingOAuth";
 import type { BearerToken } from "../../dto/BearerToken";
 import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
 
@@ -11,6 +12,7 @@ export type ExternalAccessToken = {
   access_token: string;
   expires_in: number;
   id_token: string;
+  nonce: OAuthNonce;
 };
 
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect

@@ -22,13 +22,13 @@ export const allowedLoginUris = allowedLoginSources.map(
   (source) => legacyFrontRoutes[source],
 ) as [string, ...string[]];
 
-const additionalAllowedOAuthRedirectUris: string[] = [
+const ftConnectAllowedOAuthRedirectUris: string[] = [
   legacyFrontRoutes.conventionImmersion,
 ];
 
 export const allowedOAuthRedirectUris = [
   ...allowedLoginUris,
-  ...additionalAllowedOAuthRedirectUris,
+  ...ftConnectAllowedOAuthRedirectUris,
 ] as [string, ...string[]];
 
 const isAllowedRedirectPath = (

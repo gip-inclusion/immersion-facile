@@ -291,20 +291,25 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     const advisorEmail = "john.doe@mail.fr";
 
     beforeEach(() => {
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [
-          {
-            _entityName: "ConventionFranceTravailAdvisor",
-            peExternalId: "pe-external-id",
-            conventionId: convention.id,
-            advisor: {
-              firstName: "John",
-              lastName: "Doe",
-              type: "PLACEMENT",
-              email: advisorEmail,
-            },
-          },
-        ],
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        user: {
+          peExternalId: "pe-external-id",
+          email: advisorEmail,
+          firstName: "Elsa",
+          isJobseeker: true,
+          lastName: "Oldenburg",
+          birthdate: "1990-01-01",
+        },
+        advisor: {
+          firstName: "John",
+          lastName: "Doe",
+          type: "PLACEMENT",
+          email: advisorEmail,
+        },
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        convention.id,
+        "pe-external-id",
       );
     });
 

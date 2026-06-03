@@ -17,7 +17,6 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -274,15 +273,20 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       baseUrl: config.immersionFacileBaseUrl,
     });
 
-    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-      [
-        {
-          conventionId: validConvention.id,
-          peExternalId: ftIdentity.token,
-          _entityName: "ConventionFranceTravailAdvisor",
-          advisor: undefined,
-        },
-      ],
+    uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+      advisor: undefined,
+      user: {
+        email: "john.doe@gmail.com",
+        firstName: "John",
+        isJobseeker: true,
+        lastName: "Doe",
+        peExternalId: ftIdentity.token,
+        birthdate: "2000-01-01",
+      },
+    });
+    uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+      validConvention.id,
+      ftIdentity.token,
     );
 
     await notifyToAgencyConventionSubmitted.execute({
@@ -352,20 +356,25 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       baseUrl: config.immersionFacileBaseUrl,
     });
 
-    const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-      _entityName: "ConventionFranceTravailAdvisor",
+    uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
       advisor: {
         email: ftAdvisorEmail,
         firstName: "Elsa",
         lastName: "Oldenburg",
         type: "CAPEMPLOI",
       },
-      peExternalId: ftIdentity.token,
-      conventionId: validConvention.id,
-    };
-
-    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-      [userConventionAdvisor],
+      user: {
+        email: "john.doe@gmail.com",
+        firstName: "John",
+        isJobseeker: true,
+        lastName: "Doe",
+        peExternalId: ftIdentity.token,
+        birthdate: "2000-01-01",
+      },
+    });
+    uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+      validConvention.id,
+      ftIdentity.token,
     );
 
     await notifyToAgencyConventionSubmitted.execute({

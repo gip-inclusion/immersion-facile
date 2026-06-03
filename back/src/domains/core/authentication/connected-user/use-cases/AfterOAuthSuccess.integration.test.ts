@@ -14,18 +14,19 @@ import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryFtConnectGateway } from "../../ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import {
   fakeProConnectSiret,
   fakeProviderConfig,
   InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
-import type { GetAccessTokenPayload } from "../port/OAuthGateway";
+import type { ProConnectGetAccessTokenPayload } from "../port/OAuthGateway";
 import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccess use case", () => {
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
-  const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
+  const defaultExpectedIcIdTokenPayload: ProConnectGetAccessTokenPayload = {
     nonce: "nounce",
     sub: "my-user-external-id",
     firstName: "John",
@@ -38,6 +39,7 @@ describe("AfterOAuthSuccess use case", () => {
   let db: KyselyDb;
   let uow: UnitOfWork;
   let oAuthGateway: InMemoryOAuthGateway;
+  let ftConnectGateway: InMemoryFtConnectGateway;
   let afterOAuthSuccessRedirection: AfterOAuthSuccess;
   let timeGateway: CustomTimeGateway;
 
@@ -47,6 +49,7 @@ describe("AfterOAuthSuccess use case", () => {
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
     oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    ftConnectGateway = new InMemoryFtConnectGateway();
     timeGateway = new CustomTimeGateway();
     afterOAuthSuccessRedirection = new AfterOAuthSuccess({
       uowPerformer: new PgUowPerformer(db, createPgUow),
@@ -55,6 +58,7 @@ describe("AfterOAuthSuccess use case", () => {
         uuidGenerator,
       }),
       oAuthGateway,
+      ftConnectGateway,
       uuidGenerator,
       generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
       verifyEmailAuthCodeJwt: makeVerifyJwtES256<"emailAuthCode">(
@@ -182,6 +186,7 @@ describe("AfterOAuthSuccess use case", () => {
     const accessToken = "access-token";
     const idToken = "fake-id-token";
     oAuthGateway.setAccessTokenResponse({
+      type: "proConnect",
       payload: expectedIcIdTokenPayload,
       accessToken,
       idToken,

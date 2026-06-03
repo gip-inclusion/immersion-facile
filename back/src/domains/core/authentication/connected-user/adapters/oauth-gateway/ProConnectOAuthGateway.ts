@@ -14,10 +14,10 @@ import {
 } from "../../entities/OAuthIdTokenPayload";
 import type {
   GetAccessTokenParams,
-  GetAccessTokenResult,
   GetLoginUrlParams,
   GetLogoutUrlParams,
   OAuthGateway,
+  ProConnectAccessTokenResult,
 } from "../../port/OAuthGateway";
 import type { ProConnectRoutes } from "./proConnect.routes";
 
@@ -66,7 +66,7 @@ export class ProConnectOAuthGateway implements OAuthGateway {
 
   async getAccessToken({
     code,
-  }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
+  }: GetAccessTokenParams): Promise<ProConnectAccessTokenResult> {
     const queryParams = {
       body: queryParamsAsString({
         code,
@@ -113,6 +113,7 @@ export class ProConnectOAuthGateway implements OAuthGateway {
     });
 
     return {
+      type: "proConnect",
       accessToken: proConnectAccessTokenBody.access_token,
       idToken: proConnectAccessTokenBody.id_token,
       expire: proConnectAccessTokenBody.expires_in,

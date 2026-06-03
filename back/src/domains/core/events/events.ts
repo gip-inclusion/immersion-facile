@@ -1,11 +1,13 @@
 import {
   type AgencyId,
   type ContactEstablishmentEventPayload,
+  type ConventionDraftId,
   type ConventionId,
   type ConventionTemplateId,
   type DateString,
   type DeleteAssessmentRequestDto,
   type Flavor,
+  type FtExternalId,
   type InitiateLoginByEmailParams,
   type NotificationKind,
   type RangeOfPosition,
@@ -108,6 +110,11 @@ export const withTriggeredBySchema: ZodSchemaWithInputMatchingOutput<WithTrigger
     triggeredBy: triggeredBySchema,
   });
 
+type WithFTConnectEvent = {
+  ftConnectUserId: FtExternalId;
+  conventionDraftId: ConventionDraftId;
+};
+
 export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | null;
 };
@@ -184,6 +191,7 @@ export type DomainEvent =
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
   // PECONNECT related
+  | GenericEvent<"FTConnectedSuccessfully", WithFTConnectEvent>
   | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
   // USER CONNECTED related.

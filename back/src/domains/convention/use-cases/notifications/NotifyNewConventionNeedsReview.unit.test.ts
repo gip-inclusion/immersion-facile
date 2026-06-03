@@ -16,7 +16,7 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
+import type { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -245,20 +245,27 @@ describe("NotifyNewConventionNeedsReview", () => {
         .withFederatedIdentity(ftIdentity)
         .build();
 
-      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-        _entityName: "ConventionFranceTravailAdvisor",
-        advisor: {
-          email: ftAdvisorEmail,
-          firstName: "Elsa",
-          lastName: "Oldenburg",
-          type: "CAPEMPLOI",
-        },
-        peExternalId: ftIdentity.token,
-        conventionId: conventionInReviewWithFtAdvisor.id,
+      const advisor: FtConnectImmersionAdvisorDto = {
+        email: ftAdvisorEmail,
+        firstName: "Elsa",
+        lastName: "Oldenburg",
+        type: "CAPEMPLOI",
       };
 
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [userConventionAdvisor],
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        advisor,
+        user: {
+          email: "john.doe@gmail.com",
+          firstName: "John",
+          isJobseeker: true,
+          lastName: "Doe",
+          peExternalId: ftIdentity.token,
+          birthdate: "2000-01-01",
+        },
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionInReviewWithFtAdvisor.id,
+        ftIdentity.token,
       );
 
       await notifyNewConventionNeedsReview.execute({
@@ -314,20 +321,27 @@ describe("NotifyNewConventionNeedsReview", () => {
         .withFederatedIdentity(ftIdentity)
         .build();
 
-      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-        _entityName: "ConventionFranceTravailAdvisor",
-        advisor: {
-          email: ftAdvisorEmail,
-          firstName: "Elsa",
-          lastName: "Oldenburg",
-          type: "CAPEMPLOI",
-        },
-        peExternalId: ftIdentity.token,
-        conventionId: conventionInReviewWithFtAdvisor.id,
+      const advisor: FtConnectImmersionAdvisorDto = {
+        email: ftAdvisorEmail,
+        firstName: "Elsa",
+        lastName: "Oldenburg",
+        type: "CAPEMPLOI",
       };
 
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [userConventionAdvisor],
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        advisor,
+        user: {
+          email: "john.doe@gmail.com",
+          firstName: "John",
+          isJobseeker: true,
+          lastName: "Doe",
+          peExternalId: ftIdentity.token,
+          birthdate: "2000-01-01",
+        },
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionInReviewWithFtAdvisor.id,
+        ftIdentity.token,
       );
 
       await notifyNewConventionNeedsReview.execute({
@@ -367,8 +381,7 @@ describe("NotifyNewConventionNeedsReview", () => {
               validatorName: "",
               peAdvisor: {
                 recipientIsPeAdvisor: true,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
+                ...advisor,
               },
             },
           },
@@ -479,20 +492,27 @@ describe("NotifyNewConventionNeedsReview", () => {
           .withFederatedIdentity(ftIdentity)
           .build();
 
-      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-        _entityName: "ConventionFranceTravailAdvisor",
-        advisor: {
-          email: ftAdvisorEmail,
-          firstName: "Elsa",
-          lastName: "Oldenburg",
-          type: "CAPEMPLOI",
-        },
-        peExternalId: ftIdentity.token,
-        conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
+      const advisor: FtConnectImmersionAdvisorDto = {
+        email: ftAdvisorEmail,
+        firstName: "Elsa",
+        lastName: "Oldenburg",
+        type: "CAPEMPLOI",
       };
 
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [userConventionAdvisor],
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        advisor,
+        user: {
+          email: "john.doe@gmail.com",
+          firstName: "John",
+          isJobseeker: true,
+          lastName: "Doe",
+          peExternalId: ftIdentity.token,
+          birthdate: "2000-01-01",
+        },
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionAcceptedByCounsellorWithFtAdvisor.id,
+        ftIdentity.token,
       );
 
       await notifyNewConventionNeedsReview.execute({
@@ -535,8 +555,7 @@ describe("NotifyNewConventionNeedsReview", () => {
               validatorName: "",
               peAdvisor: {
                 recipientIsPeAdvisor: true,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                ...userConventionAdvisor.advisor!,
+                ...advisor,
               },
             },
           },

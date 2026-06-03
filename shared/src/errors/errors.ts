@@ -310,6 +310,16 @@ export const errors = {
       ),
   },
   auth: {
+    accessTokenErrorType: ({
+      actualType,
+      expectedType,
+    }: {
+      actualType: FederatedIdentityProvider;
+      expectedType: FederatedIdentityProvider;
+    }) =>
+      new BadRequestError(
+        `Erreur sur le type d'access token qui est ${actualType} alors qu'elle devrait être ${expectedType}.`,
+      ),
     otherRenewalNotSupported: (provider: FederatedIdentityProvider) =>
       new ForbiddenError(
         `Le renouvellement d'une connexion du type ${provider} n'est pas supportée. Veuillez vous reconnecter manuellement.`,
@@ -324,6 +334,10 @@ export const errors = {
       ),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
+    couldNotGetAccessToken: ({ message }: { message: string }) =>
+      new BadRequestError(
+        `Impossible de récupérer l'access token FT : ${message}`,
+      ),
     couldNotGetUserInfo: ({ message }: { message: string }) =>
       new BadRequestError(
         `Impossible de récupérer les infos ProConnect : ${message}`,

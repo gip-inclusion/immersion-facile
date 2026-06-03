@@ -16,7 +16,9 @@ import {
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
+  FTConnectError,
   frontRoutes,
+  ManagedFTConnectError,
   makeRouteAbsoluteUrl,
   noAgencyDashboards,
   noEstablishmentDashboard,
@@ -27,6 +29,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
   UserBuilder,
+  legacyFrontRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -63,6 +66,7 @@ import { processEventsForEmailToBeSent } from "../../../../utils/processEventsFo
 
 describe("auth router", () => {
   const immersionDomain = "immersion.fr";
+  const now = new Date();
 
   let authRoutesClient: HttpClient<AuthRoutes>;
   let technicalRoutesClient: HttpClient<TechnicalRoutes>;
@@ -100,7 +104,7 @@ describe("auth router", () => {
       technicalRoutes,
       request,
     );
-    gateways.timeGateway.setNextDate(new Date());
+    gateways.timeGateway.setNextDate(now);
   });
 
   describe("user connexion flow", () => {
@@ -149,6 +153,7 @@ describe("auth router", () => {
           );
 
           gateways.proConnectOAuthGateway.setAccessTokenResponse({
+            type: "proConnect",
             accessToken: proConnectToken,
             idToken,
             expire: 1,
@@ -248,6 +253,7 @@ describe("auth router", () => {
         inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
         gateways.proConnectOAuthGateway.setAccessTokenResponse({
+          type: "proConnect",
           accessToken: proConnectToken,
           expire: 1,
           idToken,
@@ -401,6 +407,205 @@ describe("auth router", () => {
               fromUri: `/${uri}`,
             },
           ]);
+        });
+      });
+    });
+
+    describe("Right path with FT Connect", () => {
+      const ftConnectAuthCode = "ft-connect-auth-code";
+      const ftConnectAccessToken = "ft-connect-token";
+      const ftConnectIdToken = "ft-connect-id-token";
+      const ftConnectExternalId = "ft-connect-external-id";
+      const conventionDraftId = "ft-connect-convention-draft-id";
+
+      describe(displayRouteName(authRoutes.initiateLoginByOAuth), () => {
+        it("redirects to FT Connect login and stores ongoing OAuth", async () => {
+          const uuids = [nonce, state];
+          uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
+
+          expectHttpResponseToEqual(
+            await authRoutesClient.initiateLoginByOAuth({
+              queryParams: {
+                provider: "peConnect",
+                redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              },
+            }),
+            {
+              body: {},
+              status: 302,
+              headers: {
+                location: encodeURI(
+                  `https://fake-ft-connect-login-url?${queryParamsAsString({
+                    nonce,
+                    state,
+                  })}`,
+                ),
+              },
+            },
+          );
+
+          expectToEqual(inMemoryUow.ongoingOAuthRepository.ongoingOAuths, [
+            {
+              provider: "peConnect",
+              nonce,
+              state,
+              usedAt: null,
+              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          ]);
+        });
+      });
+
+      describe(displayRouteName(authRoutes.afterFTConnectOAuthLogin), () => {
+        it("redirects to convention immersion page with convention draft id", async () => {
+          uuidGenerator.new = () => conventionDraftId;
+          inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
+            {
+              provider: "peConnect",
+              nonce,
+              state,
+              usedAt: null,
+              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          ];
+          gateways.ftConnectGateway.setAccessTokenResult({
+            type: "ftConnect",
+            accessToken: ftConnectAccessToken,
+            expire: 1,
+            idToken: ftConnectIdToken,
+            payload: { nonce },
+          });
+          gateways.ftConnectGateway.setUser({
+            isJobseeker: true,
+            firstName: "Jean",
+            lastName: "Dupont",
+            birthdate: "1990-01-01",
+            peExternalId: ftConnectExternalId,
+          });
+          gateways.ftConnectGateway.setAdvisors([
+            {
+              type: "PLACEMENT",
+              firstName: "Alice",
+              lastName: "Martin",
+              email: "conseiller@francetravail.fr",
+            },
+          ]);
+
+          const response = await authRoutesClient.afterFTConnectOAuthLogin({
+            queryParams: {
+              code: ftConnectAuthCode,
+              state,
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            body: {},
+            status: 302,
+            headers: {
+              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.conventionImmersion}?conventionDraftId=${conventionDraftId}`,
+            },
+          });
+
+          expectToEqual(inMemoryUow.ongoingOAuthRepository.ongoingOAuths, [
+            {
+              provider: "peConnect",
+              nonce,
+              state,
+              usedAt: now,
+              accessToken: ftConnectAccessToken,
+              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          ]);
+          expectToEqual(
+            inMemoryUow.conventionDraftRepository.conventionDrafts,
+            [
+              {
+                id: conventionDraftId,
+                internshipKind: "immersion",
+                fromPeConnectedUser: true,
+                updatedAt: gateways.timeGateway.now().toISOString(),
+                signatories: {
+                  beneficiary: {
+                    firstName: "Jean",
+                    lastName: "Dupont",
+                    birthdate: "1990-01-01",
+                    federatedIdentity: {
+                      provider: "peConnect",
+                      token: ftConnectExternalId,
+                    },
+                  },
+                },
+                validators: {
+                  agencyCounsellor: {
+                    firstname: "Alice",
+                    lastname: "Martin",
+                  },
+                },
+              },
+            ],
+          );
+        });
+
+        it("redirects to managed FT Connect error page when FT Connect throws a managed error", async () => {
+          inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
+            {
+              provider: "peConnect",
+              nonce,
+              state,
+              usedAt: null,
+              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          ];
+          gateways.ftConnectGateway.getAccessToken = async () => {
+            throw new ManagedFTConnectError("peConnectNoAuthorisation");
+          };
+
+          const response = await authRoutesClient.afterFTConnectOAuthLogin({
+            queryParams: {
+              code: ftConnectAuthCode,
+              state,
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            body: {},
+            status: 302,
+            headers: {
+              location: `${appConfig.immersionFacileBaseUrl}/${frontRoutes.temporaryError}?kind=peConnectNoAuthorisation`,
+            },
+          });
+        });
+
+        it("redirects to raw FT Connect error page when FT Connect throws a raw error", async () => {
+          const rawErrorTitle = "Erreur France Travail";
+          const rawErrorMessage = "Le service France Travail est indisponible";
+          inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
+            {
+              provider: "peConnect",
+              nonce,
+              state,
+              usedAt: null,
+              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+            },
+          ];
+          gateways.ftConnectGateway.getAccessToken = async () => {
+            throw new FTConnectError(rawErrorTitle, rawErrorMessage);
+          };
+
+          const response = await authRoutesClient.afterFTConnectOAuthLogin({
+            queryParams: {
+              code: ftConnectAuthCode,
+              state,
+            },
+          });
+
+          expectHttpResponseToEqual(response, {
+            body: {},
+            status: 302,
+            headers: {
+              location: `${appConfig.immersionFacileBaseUrl}/${frontRoutes.temporaryError}?title=${encodeURIComponent(rawErrorTitle)}&message=${encodeURIComponent(rawErrorMessage)}`,
+            },
+          });
         });
       });
     });

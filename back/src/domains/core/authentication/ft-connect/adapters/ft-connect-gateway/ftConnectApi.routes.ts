@@ -1,7 +1,7 @@
 import type { AbsoluteUrl, DateString, PhoneNumber } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import type { AccessTokenDto } from "../../dto/AccessToken.dto";
+import type { FTConnectAccessTokenResult } from "../../../connected-user/port/OAuthGateway";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import {
@@ -117,8 +117,15 @@ export const toFtConnectUserDto = (
 
 export const toAccessToken = (
   externalAccessToken: ExternalAccessToken,
-): AccessTokenDto => ({
-  value: externalAccessToken.access_token,
-  expiresIn: externalAccessToken.expires_in,
-  idToken: externalAccessToken.id_token,
-});
+): FTConnectAccessTokenResult => {
+  const { access_token, expires_in, id_token, ...payload } =
+    externalAccessToken;
+
+  return {
+    type: "ftConnect",
+    payload,
+    accessToken: access_token,
+    expire: expires_in,
+    idToken: id_token,
+  };
+};

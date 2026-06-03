@@ -1,15 +1,21 @@
 import {
   type AbsoluteUrl,
   type AfterOAuthSuccessRedirectionResponse,
-  type EmailAuthCodeJwt,
+  absoluteUrlSchema,
+  authFailed,
+  type ConventionDraftDto,
+  type ExtractFromExisting,
   errors,
   executeInSequence,
-  type OAuthCode,
+  type FederatedIdentityProvider,
+  frontRoutes,
   type OAuthSuccessLoginParams,
   oAuthSuccessLoginParamsSchema,
   type UserId,
   type UserWithAdminRights,
+  makeRouteAbsoluteUrl,
 } from "shared";
+import { match } from "ts-pattern";
 import type { GenerateConnectedUserLoginUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
 import {
@@ -24,15 +30,17 @@ import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
+import { chooseValidAdvisor } from "../../ft-connect/entities/ConventionFranceTravailAdvisorEntity";
+import type { FtConnectGateway } from "../../ft-connect/port/FtConnectGateway";
 import type {
   EmailOngoingAuth,
-  OngoingOAuth,
+  FTConnectOngoingAuth,
   ProConnectOngoingAuth,
 } from "../entities/OngoingOAuth";
 import type {
-  GetAccessTokenPayload,
   GetAccessTokenResult,
   OAuthGateway,
+  ProConnectGetAccessTokenPayload,
 } from "../port/OAuthGateway";
 
 export class AfterOAuthSuccess extends TransactionalUseCase<
@@ -49,6 +57,8 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
 
   readonly #generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
 
+  readonly #ftConnectGateway: FtConnectGateway;
+
   readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
   readonly #timeGateway: TimeGateway;
@@ -60,6 +70,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     createNewEvent,
     oAuthGateway,
     uuidGenerator,
+    ftConnectGateway,
     generateConnectedUserLoginUrl,
     verifyEmailAuthCodeJwt,
     immersionFacileBaseUrl,
@@ -68,6 +79,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer;
     createNewEvent: CreateNewEvent;
     oAuthGateway: OAuthGateway;
+    ftConnectGateway: FtConnectGateway;
     uuidGenerator: UuidGenerator;
     generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;
     verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode">;
@@ -77,6 +89,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
     this.#oAuthGateway = oAuthGateway;
+    this.#ftConnectGateway = ftConnectGateway;
     this.#uuidGenerator = uuidGenerator;
     this.#generateConnectedUserLoginUrl = generateConnectedUserLoginUrl;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
@@ -92,74 +105,238 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<AfterOAuthSuccessRedirectionResponse> {
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByState(state);
+    if (!ongoingOAuth) throw errors.auth.missingOAuth({ state });
 
-    if (!ongoingOAuth)
-      throw errors.auth.missingOAuth({
-        state,
-      });
-
-    if (ongoingOAuth.usedAt) {
-      if (ongoingOAuth.provider === "email") {
-        throw errors.auth.alreadyUsedAuthentication();
-      }
-      return {
-        provider: ongoingOAuth.provider,
-        redirectUri: `${this.#immersionFacileBaseUrl}${ongoingOAuth.fromUri}?alreadyUsedAuthentication=true`,
-      };
-    }
-
-    if (ongoingOAuth.provider === "peConnect") {
-      // TOTO : implement
-      throw errors.auth.missingOAuth({ state });
-    }
-
-    const { newOrUpdatedUser, updatedOngoingOAuth, accessToken } =
-      await (ongoingOAuth.provider === "email"
-        ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
-        : this.#onProConnectProvider(uow, ongoingOAuth, code as OAuthCode));
-
-    await uow.userRepository.save({
-      ...newOrUpdatedUser,
-      lastLoginAt: this.#timeGateway.now().toISOString(),
-    });
-    await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "UserAuthenticatedSuccessfully",
-        payload: {
-          userId: newOrUpdatedUser.id,
-          codeSafir: accessToken?.payload.structure_pe ?? null,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: newOrUpdatedUser.id,
-          },
+    return match(ongoingOAuth)
+      .with({ provider: "email" }, async (emailOauth: EmailOngoingAuth) => {
+        if (emailOauth.usedAt) throw errors.auth.alreadyUsedAuthentication();
+        return this.#saveAuthenticationDataAndReturnRedirectURI({
+          uow,
+          provider: emailOauth.provider,
+          ...(await this.#onEmailProvider(uow, emailOauth, code)),
+        });
+      })
+      .with(
+        { provider: "proConnect" },
+        async (proConnectOngoingOAuth: ProConnectOngoingAuth) => {
+          if (ongoingOAuth.usedAt) {
+            return {
+              provider: ongoingOAuth.provider,
+              redirectUri: absoluteUrlSchema.parse(
+                `${this.#immersionFacileBaseUrl}${ongoingOAuth.fromUri}?alreadyUsedAuthentication=true`,
+              ),
+            };
+          }
+          return this.#saveAuthenticationDataAndReturnRedirectURI({
+            uow,
+            provider: proConnectOngoingOAuth.provider,
+            ...(await this.#onProConnectProvider(
+              uow,
+              proConnectOngoingOAuth,
+              code,
+            )),
+          });
         },
-      }),
-    );
+      )
+      .with(
+        { provider: "peConnect" },
+        async (ftConnectOngoinOAuth: FTConnectOngoingAuth) => {
+          return this.#saveAuthenticationDataAndReturnRedirectURI({
+            uow,
+            provider: ftConnectOngoinOAuth.provider,
+            ...(await this.#onFTConnectProvider(ftConnectOngoinOAuth, code)),
+          });
+        },
+      )
+      .exhaustive();
+  }
 
-    return {
-      provider: ongoingOAuth.provider,
-      redirectUri: this.#generateConnectedUserLoginUrl({
-        user: newOrUpdatedUser,
-        accessToken,
-        ongoingOAuth,
-        now: this.#timeGateway.now(),
-      }),
-    };
+  async #saveAuthenticationDataAndReturnRedirectURI(
+    params:
+      | {
+          uow: UnitOfWork;
+          provider: ExtractFromExisting<FederatedIdentityProvider, "email">;
+          newOrUpdatedUser: UserWithAdminRights;
+          updatedOngoingOAuth: EmailOngoingAuth;
+        }
+      | {
+          uow: UnitOfWork;
+          provider: ExtractFromExisting<
+            FederatedIdentityProvider,
+            "proConnect"
+          >;
+          newOrUpdatedUser: UserWithAdminRights;
+          updatedOngoingOAuth: ProConnectOngoingAuth;
+          accessToken: GetAccessTokenResult;
+        }
+      | {
+          uow: UnitOfWork;
+          provider: ExtractFromExisting<FederatedIdentityProvider, "peConnect">;
+          updatedOngoingOAuth: FTConnectOngoingAuth;
+          accessToken: GetAccessTokenResult;
+        },
+  ): Promise<AfterOAuthSuccessRedirectionResponse> {
+    return match(params)
+      .with(
+        { provider: "email" },
+        async ({ uow, newOrUpdatedUser, updatedOngoingOAuth }) => {
+          await uow.userRepository.save({
+            ...newOrUpdatedUser,
+            lastLoginAt: this.#timeGateway.now().toISOString(),
+          });
+          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+
+          return {
+            provider: updatedOngoingOAuth.provider,
+            redirectUri: this.#generateConnectedUserLoginUrl({
+              user: newOrUpdatedUser,
+              ongoingOAuth: updatedOngoingOAuth,
+              now: this.#timeGateway.now(),
+              accessToken: undefined,
+            }),
+          };
+        },
+      )
+      .with(
+        { provider: "proConnect" },
+        async ({ uow, newOrUpdatedUser, updatedOngoingOAuth, accessToken }) => {
+          await uow.userRepository.save({
+            ...newOrUpdatedUser,
+            lastLoginAt: this.#timeGateway.now().toISOString(),
+          });
+          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+          await uow.outboxRepository.save(
+            this.#createNewEvent({
+              topic: "UserAuthenticatedSuccessfully",
+              payload: {
+                userId: newOrUpdatedUser.id,
+                codeSafir:
+                  accessToken &&
+                  "structure_pe" in accessToken.payload &&
+                  accessToken.payload.structure_pe
+                    ? accessToken.payload.structure_pe
+                    : null,
+                triggeredBy: {
+                  kind: "connected-user",
+                  userId: newOrUpdatedUser.id,
+                },
+              },
+            }),
+          );
+          return {
+            provider: updatedOngoingOAuth.provider,
+            redirectUri: this.#generateConnectedUserLoginUrl({
+              user: newOrUpdatedUser,
+              accessToken,
+              ongoingOAuth: updatedOngoingOAuth,
+              now: this.#timeGateway.now(),
+            }),
+          };
+        },
+      )
+      .with(
+        { provider: "peConnect" },
+        async ({ uow, updatedOngoingOAuth, accessToken }) => {
+          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+          const userAndAdvisors =
+            await this.#ftConnectGateway.getUserAndAdvisors({
+              value: accessToken.accessToken,
+              expiresIn: accessToken.expire,
+              idToken: accessToken.idToken,
+            });
+          if (!userAndAdvisors) {
+            return {
+              provider: updatedOngoingOAuth.provider,
+              redirectUri: makeRouteAbsoluteUrl({
+                route: frontRoutes.conventionImmersion({
+                  fedId: authFailed,
+                  fedIdToken: accessToken.idToken,
+                  fedIdProvider: "peConnect",
+                }),
+                baseUrl: this.#immersionFacileBaseUrl,
+              }),
+            };
+          }
+          const validAdvisor = userAndAdvisors.user.isJobseeker
+            ? chooseValidAdvisor(userAndAdvisors.user, userAndAdvisors.advisors)
+            : undefined;
+
+          await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
+            {
+              advisor: validAdvisor,
+              user: userAndAdvisors.user,
+            },
+          );
+
+          const conventionDraft: ConventionDraftDto = {
+            id: this.#uuidGenerator.new(),
+            internshipKind: "immersion",
+            fromPeConnectedUser: true,
+            signatories: {
+              beneficiary: {
+                birthdate: userAndAdvisors.user.birthdate,
+                email: userAndAdvisors.user.email,
+                firstName: userAndAdvisors.user.firstName,
+                lastName: userAndAdvisors.user.lastName,
+                phone: userAndAdvisors.user.phone,
+                federatedIdentity: {
+                  provider: "peConnect",
+                  token: userAndAdvisors.user.peExternalId,
+                },
+              },
+            },
+            validators: validAdvisor
+              ? {
+                  agencyCounsellor: {
+                    firstname: validAdvisor.firstName,
+                    lastname: validAdvisor.lastName,
+                  },
+                }
+              : undefined,
+          };
+          await uow.conventionDraftRepository.save(
+            conventionDraft,
+            this.#timeGateway.now().toISOString(),
+          );
+
+          await uow.outboxRepository.save(
+            this.#createNewEvent({
+              topic: "FTConnectedSuccessfully",
+              payload: {
+                ftConnectUserId: userAndAdvisors.user.peExternalId,
+                conventionDraftId: conventionDraft.id,
+              },
+            }),
+          );
+          return {
+            provider: updatedOngoingOAuth.provider,
+            redirectUri: absoluteUrlSchema.parse(
+              `${this.#immersionFacileBaseUrl}${updatedOngoingOAuth.fromUri}?conventionDraftId=${conventionDraft.id}`,
+            ),
+          };
+        },
+      )
+      .exhaustive();
   }
 
   async #onProConnectProvider(
     uow: UnitOfWork,
     ongoingOAuth: ProConnectOngoingAuth,
-    code: OAuthCode,
+    code: string,
   ): Promise<{
     newOrUpdatedUser: UserWithAdminRights;
-    updatedOngoingOAuth: OngoingOAuth;
-    accessToken?: GetAccessTokenResult;
+    updatedOngoingOAuth: ProConnectOngoingAuth;
+    accessToken: GetAccessTokenResult;
   }> {
     const accessToken = await this.#oAuthGateway.getAccessToken({
       code,
     });
+
+    if (accessToken.type !== "proConnect")
+      throw errors.auth.accessTokenErrorType({
+        actualType: "peConnect",
+        expectedType: "proConnect",
+      });
 
     if (accessToken.payload.nonce !== ongoingOAuth.nonce)
       throw errors.auth.nonceMismatch();
@@ -182,14 +359,37 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     };
   }
 
+  async #onFTConnectProvider(
+    ongoingOAuth: FTConnectOngoingAuth,
+    code: string,
+  ): Promise<{
+    updatedOngoingOAuth: FTConnectOngoingAuth;
+    accessToken: GetAccessTokenResult;
+  }> {
+    const accessToken = await this.#ftConnectGateway.getAccessToken({
+      code,
+    });
+
+    if (accessToken.payload.nonce !== ongoingOAuth.nonce)
+      throw errors.auth.nonceMismatch();
+
+    return {
+      updatedOngoingOAuth: {
+        ...ongoingOAuth,
+        usedAt: this.#timeGateway.now(),
+        accessToken: accessToken.accessToken,
+      },
+      accessToken,
+    };
+  }
+
   async #onEmailProvider(
     uow: UnitOfWork,
     ongoingOAuth: EmailOngoingAuth,
-    code: EmailAuthCodeJwt,
+    code: string,
   ): Promise<{
     newOrUpdatedUser: UserWithAdminRights;
-    updatedOngoingOAuth: OngoingOAuth;
-    accessToken?: GetAccessTokenResult;
+    updatedOngoingOAuth: EmailOngoingAuth;
   }> {
     this.#throwIfIncorrectJwt(code);
 
@@ -218,7 +418,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
 
   async #makeNewOrUpdatedProConnectedUser(
     uow: UnitOfWork,
-    payload: GetAccessTokenPayload,
+    payload: ProConnectGetAccessTokenPayload,
   ): Promise<UserWithAdminRights> {
     const existingUserByExternalId =
       "sub" in payload

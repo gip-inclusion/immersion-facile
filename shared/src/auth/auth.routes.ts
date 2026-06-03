@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import z from "zod";
+import { ftConnect } from "..";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withUserFiltersSchema } from "../admin/admin.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -46,6 +47,16 @@ export const authRoutes = defineRoutes({
     queryParamsSchema: oAuthSuccessLoginParamsSchema,
     responses: {
       200: afterOAuthSuccessRedirectionResponseSchema,
+      302: emptyObjectSchema,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+    },
+  }),
+  afterFTConnectOAuthLogin: defineRoute({
+    method: "get",
+    url: `/${ftConnect}`, // URI déclarée chez FT Connect ?
+    queryParamsSchema: oAuthSuccessLoginParamsSchema,
+    responses: {
       302: emptyObjectSchema,
       400: httpErrorSchema,
       403: httpErrorSchema,

@@ -12,7 +12,7 @@ export type GetAccessTokenParams = {
   code: string;
 };
 
-export type GetAccessTokenPayload = {
+export type ProConnectGetAccessTokenPayload = {
   nonce: string;
   sub: ExternalId;
   firstName: string;
@@ -22,12 +22,29 @@ export type GetAccessTokenPayload = {
   siret: SiretDto;
 };
 
-export type GetAccessTokenResult = {
-  payload: GetAccessTokenPayload;
+export type FTConnectGetAccessTokenPayload = {
+  nonce: string;
+};
+
+type AccessTokenResultCommon = {
   expire: number;
   accessToken: OAuthJwt;
   idToken: IdToken;
 };
+
+export type FTConnectAccessTokenResult = AccessTokenResultCommon & {
+  payload: FTConnectGetAccessTokenPayload;
+  type: "ftConnect";
+};
+
+export type ProConnectAccessTokenResult = AccessTokenResultCommon & {
+  payload: ProConnectGetAccessTokenPayload;
+  type: "proConnect";
+};
+
+export type GetAccessTokenResult =
+  | FTConnectAccessTokenResult
+  | ProConnectAccessTokenResult;
 
 export type GetLoginUrlParams = {
   nonce: string;

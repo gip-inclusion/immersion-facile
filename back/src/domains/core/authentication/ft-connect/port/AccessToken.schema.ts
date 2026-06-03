@@ -13,4 +13,5 @@ export const externalAccessTokenSchema: ZodSchemaWithInputMatchingOutput<Externa
     ),
     expires_in: z.number().min(1, "Ce token est déja expiré"),
     id_token: zStringMinLength1Max3000,
+    nonce: zStringMinLength1Max3000,
   });
