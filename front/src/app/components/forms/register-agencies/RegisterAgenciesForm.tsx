@@ -156,7 +156,6 @@ const AgencyTable = ({
   currentUser: ConnectedUser;
 }) => {
   const isFetching = useAppSelector(agenciesSelectors.isLoading);
-  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const userAgencyIds = currentUser.agencyRights.map(
     (agencyRight) => agencyRight.agency.id,
   );
@@ -170,27 +169,7 @@ const AgencyTable = ({
     <Table
       fixed
       id={domElementIds.agencyDashboard.registerAgencies.table}
-      headers={[
-        <Checkbox
-          key={`${isAllChecked}-checkbox`}
-          options={[
-            {
-              label: "Sélectionner tous les organismes",
-              nativeInputProps: {
-                checked: isAllChecked,
-                onChange: (event) => {
-                  const checked = event.currentTarget.checked;
-                  setIsAllChecked(checked);
-                  setCheckedAgencies(
-                    checked ? agencies.map(({ id }) => id) : [],
-                  );
-                },
-              },
-            },
-          ]}
-        />,
-        "Organismes",
-      ]}
+      headers={["", "Organismes"]}
       data={agencies.map((agency) => [
         <Checkbox
           key={`${agency.id}-checkbox`}
