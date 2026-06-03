@@ -194,6 +194,13 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   public async save(notification: Notification): Promise<void> {
+    if (
+      notification.kind === "email" &&
+      !notification.templatedContent.recipients.length &&
+      !notification.templatedContent.cc?.length
+    )
+      throw new Error("Email notification without recipients not allowed.");
+
     this.notifications.push(notification);
   }
 

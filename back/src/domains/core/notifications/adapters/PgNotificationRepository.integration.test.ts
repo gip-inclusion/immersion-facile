@@ -12,12 +12,12 @@ import {
   type EmailNotification,
   expectArraysToEqual,
   expectArraysToEqualIgnoringOrder,
+  expectPromiseToFail,
   expectToEqual,
   type Notification,
   type NotificationErrored,
   type NotificationState,
   type SmsNotification,
-  type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -29,6 +29,10 @@ import { makeTestPgPool } from "../../../../config/pg/pgPool";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 describe("PgNotificationRepository", () => {
+  const sender = {
+    email: "recette@immersion-facile.beta.gouv.fr",
+    name: "Recette Immersion Facile",
+  };
   const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
   const now = new Date();
   const emailNotifications: EmailNotification[] = [
@@ -340,19 +344,16 @@ describe("PgNotificationRepository", () => {
     });
 
     it("saves Email notification in a dedicated table, then gets it", async () => {
-      const { id, emailNotification } = createTemplatedEmailAndNotification({
+      const emailNotification = createTemplatedEmailNotification({
         recipients: ["bob@mail.com", "jane@mail.com"],
         cc: ["copy@mail.com"],
-        sender: {
-          email: "recette@immersion-facile.beta.gouv.fr",
-          name: "Recette Immersion Facile",
-        },
+        sender,
       });
 
       await pgNotificationRepository.save(emailNotification);
 
       const response = await pgNotificationRepository.getByIdAndKind(
-        id,
+        emailNotification.id,
         "email",
       );
       expectToEqual(response, { ...emailNotification, ...withToBeSendState });
@@ -361,19 +362,16 @@ describe("PgNotificationRepository", () => {
     it("save and eliminates duplicates when they exit", async () => {
       const recipients = ["bob@mail.com", "jane@mail.com", "bob@mail.com"];
       const cc = ["copy@mail.com", "jane@mail.com"];
-      const { id, emailNotification } = createTemplatedEmailAndNotification({
+      const emailNotification = createTemplatedEmailNotification({
         recipients,
         cc,
-        sender: {
-          email: "recette@immersion-facile.beta.gouv.fr",
-          name: "Recette Immersion Facile",
-        },
+        sender,
       });
 
       await pgNotificationRepository.save(emailNotification);
 
       const response = await pgNotificationRepository.getByIdAndKind(
-        id,
+        emailNotification.id,
         "email",
       );
       expectToEqual(response, {
@@ -390,14 +388,10 @@ describe("PgNotificationRepository", () => {
     it("round-trips followedIds.userId on email and sms notifications", async () => {
       const userId = "dddddddd-1111-4111-1111-dddddddddddd";
 
-      const { id: emailId, emailNotification } =
-        createTemplatedEmailAndNotification({
-          recipients: ["user@mail.com"],
-          sender: {
-            email: "recette@immersion-facile.beta.gouv.fr",
-            name: "Recette Immersion Facile",
-          },
-        });
+      const emailNotification = createTemplatedEmailNotification({
+        recipients: ["user@mail.com"],
+        sender,
+      });
       const emailWithUserId: EmailNotification = {
         ...emailNotification,
         followedIds: { ...emailNotification.followedIds, userId },
@@ -412,7 +406,10 @@ describe("PgNotificationRepository", () => {
       await pgNotificationRepository.save(smsWithUserId);
 
       expectToEqual(
-        await pgNotificationRepository.getByIdAndKind(emailId, "email"),
+        await pgNotificationRepository.getByIdAndKind(
+          emailNotification.id,
+          "email",
+        ),
         {
           ...emailWithUserId,
           templatedContent: {
@@ -429,19 +426,16 @@ describe("PgNotificationRepository", () => {
     });
 
     it("save and eliminates duplicates when cc ends up empty after de-duplication", async () => {
-      const { id, emailNotification } = createTemplatedEmailAndNotification({
+      const emailNotification = createTemplatedEmailNotification({
         recipients: ["bob@mail.com"],
         cc: ["bob@mail.com"],
-        sender: {
-          email: "recette@immersion-facile.beta.gouv.fr",
-          name: "Recette Immersion Facile",
-        },
+        sender,
       });
 
       await pgNotificationRepository.save(emailNotification);
 
       const response = await pgNotificationRepository.getByIdAndKind(
-        id,
+        emailNotification.id,
         "email",
       );
       expectToEqual(response, {
@@ -453,6 +447,18 @@ describe("PgNotificationRepository", () => {
         },
         ...withToBeSendState,
       });
+    });
+
+    it("throws when email notification has no recipients & cc", async () => {
+      const emailNotification = createTemplatedEmailNotification({
+        recipients: [],
+        cc: [],
+        sender,
+      });
+
+      await expectPromiseToFail(
+        pgNotificationRepository.save(emailNotification),
+      );
     });
   });
 
@@ -841,12 +847,9 @@ describe("PgNotificationRepository", () => {
 
   describe("deleteAllAttachements", () => {
     it("remove all the attachment content, but keeps the metadata (attachement exited, name of file)", async () => {
-      const { emailNotification } = createTemplatedEmailAndNotification({
+      const emailNotification = createTemplatedEmailNotification({
         recipients: ["bob@mail.com"],
-        sender: {
-          email: "recette@immersion-facile.beta.gouv.fr",
-          name: "Recette Immersion Facile",
-        },
+        sender,
         cc: [],
         attachments: [
           { name: "myFile.pdf", content: "myFile content as base64" },
@@ -855,14 +858,11 @@ describe("PgNotificationRepository", () => {
 
       await pgNotificationRepository.save(emailNotification);
 
-      const { emailNotification: emailNotificationWithUrlAttachment } =
-        createTemplatedEmailAndNotification({
+      const emailNotificationWithUrlAttachment =
+        createTemplatedEmailNotification({
           id: "33333333-3333-4444-3333-333333333333",
           recipients: ["bob@mail.com"],
-          sender: {
-            email: "recette@immersion-facile.beta.gouv.fr",
-            name: "Recette Immersion Facile",
-          },
+          sender,
           cc: [],
           attachments: [{ url: "www.truc.com" }],
         });
@@ -1089,7 +1089,7 @@ describe("PgNotificationRepository", () => {
   });
 });
 
-const createTemplatedEmailAndNotification = ({
+const createTemplatedEmailNotification = ({
   recipients,
   cc,
   sender,
@@ -1104,29 +1104,24 @@ const createTemplatedEmailAndNotification = ({
   };
   attachments?: EmailAttachment[];
   id?: string;
-}) => {
-  const email: TemplatedEmail = {
-    kind: "AGENCY_WAS_REJECTED",
-    recipients,
-    sender,
-    cc,
-    params: {
-      agencyName: "My agency",
-      statusJustification: "Justification",
-    },
-    ...(attachments ? { attachments } : {}),
-  };
-
+}): EmailNotification => {
   const emailNotification: Notification = {
     id: id ?? "22222222-2222-4444-2222-222222222222",
     kind: "email",
     createdAt: subHours(new Date(), 1).toISOString(),
     followedIds: { agencyId: "cccccccc-1111-4111-1111-cccccccccccc" },
-    templatedContent: email,
+    templatedContent: {
+      kind: "AGENCY_WAS_REJECTED",
+      recipients,
+      sender,
+      cc,
+      params: {
+        agencyName: "My agency",
+        statusJustification: "Justification",
+      },
+      ...(attachments ? { attachments } : {}),
+    },
   };
 
-  return {
-    id: emailNotification.id,
-    emailNotification,
-  };
+  return emailNotification;
 };
