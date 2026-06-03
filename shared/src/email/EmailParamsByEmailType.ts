@@ -119,6 +119,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     internshipKind: InternshipKind;
     assessmentSignatureLink: string;
+    conventionId: ConventionId;
   };
   ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: {
     internshipKind: InternshipKind;

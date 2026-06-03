@@ -155,6 +155,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
         {
           kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
           params: {
+            conventionId: convention.id,
             beneficiaryFirstName: getFormattedFirstnameAndLastname({
               firstname: convention.signatories.beneficiary.firstName,
             }),
