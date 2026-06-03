@@ -20,7 +20,10 @@ import {
   navigateToAgencyDashboardMain,
   openManageConventionPageFromDashboard,
 } from "../../utils/convention";
-import { acceptCookiesIfBannerVisible } from "../../utils/utils";
+import {
+  acceptCookiesIfBannerVisible,
+  remoteModeIndexMap,
+} from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -154,7 +157,9 @@ test.describe("Convention manage actions from prescriber dashboard", () => {
       ),
     ).toHaveText("Pilote de machines d'abattage");
     await expect(
-      managePage.locator(`#${conventionSection.remoteWorkMode}-2`),
+      managePage.locator(
+        `#${conventionSection.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}`,
+      ),
     ).toBeChecked();
     await expect(
       managePage.locator(`#${conventionSection.immersionAddress}`),
