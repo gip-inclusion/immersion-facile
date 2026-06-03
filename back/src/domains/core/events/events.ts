@@ -137,7 +137,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionDrafToDelete", WithConventionDraftId & WithTriggeredBy> // TODO: typo nom event
+  | GenericEvent<"ConventionDrafToDelete", WithConventionDraftId & WithTriggeredBy>
   | GenericEvent<"ConventionDraftSaved",NotifyConventionDraftSavedInputParams>
 
   // ESTABLISHMENT RELATED
