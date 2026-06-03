@@ -83,7 +83,8 @@ export class PgNotificationRepository implements NotificationRepository {
               ])
               .where("notifications_sms.created_at", "<=", createdAt.to),
           )
-          .orderBy(["created_at asc", "type desc"]) // type desc for delete sms by priority if some date email === date sms
+          .orderBy("created_at", "asc")
+          .orderBy("type", "desc") // type desc for delete sms by priority if some date email === date sms
           .limit(limit),
       )
       .with("deleted_email_recipients", (qb) =>
@@ -266,17 +267,7 @@ export class PgNotificationRepository implements NotificationRepository {
       case "sms":
         return this.#saveSmsNotification(notification);
       case "email": {
-        const recipients = uniq(notification.templatedContent.recipients);
-        return this.#saveEmailNotification({
-          ...notification,
-          templatedContent: {
-            ...notification.templatedContent,
-            recipients,
-            cc: uniq(notification.templatedContent.cc ?? []).filter(
-              (ccEmail) => !recipients.includes(ccEmail),
-            ),
-          },
-        });
+        return this.#saveEmailNotifications([notification]);
       }
       default:
         return exhaustiveCheck(notification, {
@@ -348,32 +339,16 @@ export class PgNotificationRepository implements NotificationRepository {
     return templatedSms[0];
   }
 
-  async #saveEmailNotification(notification: EmailNotification) {
-    await this.#saveEmailNotifications([notification]);
-  }
-
-  async #saveEmailNotifications(notifications: EmailNotification[]) {
-    const notificationsWithDeduplicatedRecipients = notifications.map(
-      (notification) => {
-        const recipients = uniq(notification.templatedContent.recipients);
-        return {
-          ...notification,
-          templatedContent: {
-            ...notification.templatedContent,
-            recipients,
-            cc: uniq(notification.templatedContent.cc ?? []).filter(
-              (ccEmail) => !recipients.includes(ccEmail),
-            ),
-          },
-        };
-      },
+  async #saveEmailNotifications(
+    notifications: EmailNotification[],
+  ): Promise<void> {
+    const emailNotification = notifications.map((notification) =>
+      dedupRecipientsAndCc(notification),
     );
 
-    await this.#insertEmailNotifications(
-      notificationsWithDeduplicatedRecipients,
-    );
-    await this.#insertEmailsRecipients(notificationsWithDeduplicatedRecipients);
-    await this.#insertEmailAttachments(notificationsWithDeduplicatedRecipients);
+    await this.#insertEmailNotifications(emailNotification);
+    await this.#insertEmailsRecipients(emailNotification);
+    await this.#insertEmailAttachments(emailNotification);
   }
 
   async #saveSmsNotification(notification: SmsNotification): Promise<void> {
@@ -381,69 +356,67 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   async #saveSmsNotifications(notifications: SmsNotification[]): Promise<void> {
-    if (notifications.length === 0) return;
-
-    await this.transaction
-      .insertInto("notifications_sms")
-      .values(
-        notifications.map((notification) => ({
-          id: notification.id,
-          created_at: notification.createdAt,
-          sms_kind: notification.templatedContent.kind,
-          recipient_phone: notification.templatedContent.recipientPhone,
-          convention_id: notification.followedIds.conventionId,
-          user_id: notification.followedIds.userId,
-          establishment_siret: notification.followedIds.establishmentSiret,
-          agency_id: notification.followedIds.agencyId,
-          params: JSON.stringify(notification.templatedContent.params),
-          state: JSON.stringify(
-            notification.state ?? getDefaultNotificationState(),
-          ),
-        })),
-      )
-      .execute();
+    if (notifications.length)
+      await this.transaction
+        .insertInto("notifications_sms")
+        .values(
+          notifications.map((notification) => ({
+            id: notification.id,
+            created_at: notification.createdAt,
+            sms_kind: notification.templatedContent.kind,
+            recipient_phone: notification.templatedContent.recipientPhone,
+            convention_id: notification.followedIds.conventionId,
+            user_id: notification.followedIds.userId,
+            establishment_siret: notification.followedIds.establishmentSiret,
+            agency_id: notification.followedIds.agencyId,
+            params: JSON.stringify(notification.templatedContent.params),
+            state: JSON.stringify(
+              notification.state ?? getDefaultNotificationState(),
+            ),
+          })),
+        )
+        .execute();
   }
 
-  async #insertEmailAttachments(notifications: EmailNotification[]) {
-    const notificationsWithAttachments = notifications.filter(
-      (notification) =>
-        notification.templatedContent.attachments &&
-        notification.templatedContent.attachments.length > 0,
+  async #insertEmailAttachments(
+    notifications: EmailNotification[],
+  ): Promise<void> {
+    const attachments: {
+      notifications_email_id: NotificationId;
+      attachment: string;
+    }[] = notifications.flatMap((notification) =>
+      (notification.templatedContent.attachments ?? []).map((attachment) => ({
+        notifications_email_id: notification.id,
+        attachment: JSON.stringify(attachment),
+      })),
     );
-    if (!notificationsWithAttachments.length) return;
 
-    await this.transaction
-      .insertInto("notifications_email_attachments")
-      .values(
-        notificationsWithAttachments.flatMap((notification) =>
-          (notification.templatedContent.attachments ?? []).map(
-            (attachment) => ({
-              notifications_email_id: notification.id,
-              attachment: JSON.stringify(attachment),
-            }),
-          ),
-        ),
-      )
-      .execute();
+    if (attachments.length)
+      await this.transaction
+        .insertInto("notifications_email_attachments")
+        .values(attachments)
+        .execute();
   }
 
-  async #insertEmailsRecipients(notifications: EmailNotification[]) {
+  async #insertEmailsRecipients(
+    notifications: EmailNotification[],
+  ): Promise<void> {
+    const recipients = notifications.flatMap((notification) => [
+      ...notification.templatedContent.recipients.map((recipient) => ({
+        notifications_email_id: notification.id,
+        email: recipient,
+        recipient_type: "to" as const,
+      })),
+      ...(notification.templatedContent.cc ?? []).map((ccRecipient) => ({
+        notifications_email_id: notification.id,
+        email: ccRecipient,
+        recipient_type: "cc" as const,
+      })),
+    ]);
+
     await this.transaction
       .insertInto("notifications_email_recipients")
-      .values(
-        notifications.flatMap((notification) => [
-          ...notification.templatedContent.recipients.map((recipient) => ({
-            notifications_email_id: notification.id,
-            email: recipient,
-            recipient_type: "to" as const,
-          })),
-          ...(notification.templatedContent.cc ?? []).map((ccRecipient) => ({
-            notifications_email_id: notification.id,
-            email: ccRecipient,
-            recipient_type: "cc" as const,
-          })),
-        ]),
-      )
+      .values(recipients)
       .execute();
   }
 
@@ -610,3 +583,19 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
         "notif",
       ),
     );
+
+const dedupRecipientsAndCc = (
+  emailNotification: EmailNotification,
+): EmailNotification => {
+  const recipients = uniq(emailNotification.templatedContent.recipients);
+  return {
+    ...emailNotification,
+    templatedContent: {
+      ...emailNotification.templatedContent,
+      recipients,
+      cc: uniq(emailNotification.templatedContent.cc ?? []).filter(
+        (ccEmail) => !recipients.includes(ccEmail),
+      ),
+    },
+  };
+};
