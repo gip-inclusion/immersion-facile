@@ -11,6 +11,7 @@ import {
 import {
   fillAutocomplete,
   type PlaywrightTestCallback,
+  remoteModeIndexMap,
 } from "../../utils/utils";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";
@@ -136,7 +137,7 @@ const step2 = async (
   await page.click(`#${domElementIds.establishment.edit.editOfferButton}-0`);
 
   await page.click(
-    `[for='${domElementIds.establishment.edit.remoteWorkMode}-2']`, // ON_SITE
+    `[for='${domElementIds.establishment.edit.remoteWorkMode}-${remoteModeIndexMap.ON_SITE}']`,
   );
 
   await page.click(`#${domElementIds.establishment.offerModalSubmitButton}`);
