@@ -1,9 +1,7 @@
-import { toPairs } from "ramda";
 import {
   errors,
   frontRoutes,
   getCounsellorsAndValidatorsEmailsDeduplicated,
-  type UserId,
   withAgencyIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -32,15 +30,6 @@ export const makeSendEmailsWhenAgencyIsActivated = useCaseBuilder(
       if (!agency) throw errors.agency.notFound({ agencyId });
 
       const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
-
-      const userIds: UserId[] = toPairs(agency.usersRights).map(
-        (userIdAndRights) => userIdAndRights[0],
-      );
-
-      const users = await uow.userRepository.getByIds(userIds);
-
-      if (users.length === 0)
-        throw errors.agency.usersNotFound({ agencyId: agency.id });
 
       await saveNotificationAndRelatedEvent(uow, {
         kind: "email",

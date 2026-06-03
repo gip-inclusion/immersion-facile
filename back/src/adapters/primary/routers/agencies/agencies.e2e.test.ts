@@ -493,7 +493,7 @@ describe("Agency routes", () => {
         // Prepare
         inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency4NeedsReview, {
-            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
           }),
         ];
         inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
