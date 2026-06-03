@@ -59,7 +59,7 @@ const onEstablishment = (
   deps: Deps,
   params: WithSiretDto & WithTriggeredBy,
   establishment: EstablishmentAggregate,
-) =>
+): Promise<void> =>
   uow.establishmentAggregateRepository
     .delete(params.siret)
     .then(() => uow.groupRepository.groupsWithSiret(params.siret))
@@ -90,33 +90,34 @@ const onEstablishment = (
       ),
     )
     .then(async () => {
-      await deps.saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_DELETED",
-          recipients: await getUserEmailsByEstablishmentUserRole(
-            uow,
-            establishment,
-            "establishment-admin",
-          ),
-          cc: await getUserEmailsByEstablishmentUserRole(
-            uow,
-            establishment,
-            "establishment-contact",
-          ),
-          params: {
-            businessAddresses: establishment.establishment.locations.map(
-              (addressAndPosition) =>
-                addressDtoToString(addressAndPosition.address),
+      if (establishment.userRights.length)
+        await deps.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            kind: "ESTABLISHMENT_DELETED",
+            recipients: await getUserEmailsByEstablishmentUserRole(
+              uow,
+              establishment,
+              "establishment-admin",
             ),
-            businessName: establishment.establishment.name,
-            siret: establishment.establishment.siret,
+            cc: await getUserEmailsByEstablishmentUserRole(
+              uow,
+              establishment,
+              "establishment-contact",
+            ),
+            params: {
+              businessAddresses: establishment.establishment.locations.map(
+                (addressAndPosition) =>
+                  addressDtoToString(addressAndPosition.address),
+              ),
+              businessName: establishment.establishment.name,
+              siret: establishment.establishment.siret,
+            },
           },
-        },
-        followedIds: {
-          establishmentSiret: establishment.establishment.siret,
-        },
-      });
+          followedIds: {
+            establishmentSiret: establishment.establishment.siret,
+          },
+        });
     });
 
 const getUserEmailsByEstablishmentUserRole = (

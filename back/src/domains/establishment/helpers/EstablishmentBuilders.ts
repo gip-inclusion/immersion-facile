@@ -5,7 +5,6 @@ import {
   type ContactMode,
   defaultMaxContactsPerMonth,
   type EstablishmentSearchableBy,
-  errors,
   type FitForDisableWorkerOption,
   type FormEstablishmentSource,
   type Location,
@@ -258,10 +257,6 @@ export class EstablishmentAggregateBuilder
   }
 
   public build() {
-    if (!this.aggregate.userRights.length)
-      throw errors.establishment.noUserRights({
-        siret: this.aggregate.establishment.siret,
-      });
     return this.aggregate;
   }
 
