@@ -585,9 +585,13 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         businessName,
         internshipKind,
         assessmentSignatureLink,
+        conventionId,
       }) => ({
         subject: `Votre bilan d'immersion est prêt à être signé`,
-        greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${beneficiaryFirstName} ${beneficiaryLastName}`,
+        ),
 
         content: `
         <strong>Nous espérons que votre ${

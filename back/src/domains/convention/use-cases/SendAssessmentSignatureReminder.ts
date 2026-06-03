@@ -216,6 +216,7 @@ const sendAssessmentSignatureReminderEmail = async ({
       kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
       recipients: [beneficiary.email],
       params: {
+        conventionId: convention.id,
         beneficiaryFirstName: getFormattedFirstnameAndLastname({
           firstname: beneficiary.firstName,
         }),

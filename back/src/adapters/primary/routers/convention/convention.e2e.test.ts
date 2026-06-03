@@ -1204,6 +1204,7 @@ describe("convention e2e", () => {
               conventionWithAssessment.signatories.beneficiary.email,
             ],
             params: {
+              conventionId: conventionWithAssessment.id,
               beneficiaryFirstName: "Jean",
               beneficiaryLastName: "Dupont",
               businessName: conventionWithAssessment.businessName,

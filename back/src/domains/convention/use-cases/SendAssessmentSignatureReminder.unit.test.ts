@@ -142,6 +142,7 @@ describe("SendAssessmentSignatureReminder", () => {
           kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
           recipients: [convention.signatories.beneficiary.email],
           params: {
+            conventionId: convention.id,
             beneficiaryFirstName: getFormattedFirstnameAndLastname({
               firstname: convention.signatories.beneficiary.firstName,
             }),
@@ -281,6 +282,7 @@ describe("SendAssessmentSignatureReminder", () => {
           kind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
           recipients: [convention.signatories.beneficiary.email],
           params: {
+            conventionId: convention.id,
             beneficiaryFirstName: "Jean",
             beneficiaryLastName: "Dupont",
             businessName: convention.businessName,
