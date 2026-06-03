@@ -11,7 +11,6 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { FtConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/FtConnectOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { ProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/ProConnectOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
@@ -186,12 +185,7 @@ export const createGateways = async (
             }),
             axiosInstance: axiosWithoutValidateStatus,
           }),
-          {
-            immersionFacileBaseUrl: config.immersionFacileBaseUrl,
-            franceTravailClientId: config.franceTravailClientId,
-            franceTravailClientSecret: config.franceTravailClientSecret,
-            ftAuthCandidatUrl: config.ftAuthCandidatUrl,
-          },
+          config.ftConnectConfig,
           config.ftConnectMaxRequestsPerInterval,
         )
       : new InMemoryFtConnectGateway();
@@ -209,11 +203,6 @@ export const createGateways = async (
           config.proConnectConfig,
         )
       : new InMemoryOAuthGateway(config.proConnectConfig);
-
-  const ftConnectOAuthGateway: OAuthGateway =
-    config.ftConnectGateway === "HTTPS"
-      ? new FtConnectOAuthGateway(config.ftConnectConfig)
-      : new InMemoryOAuthGateway(config.ftConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({
@@ -398,7 +387,6 @@ export const createGateways = async (
     emailValidationGateway: createEmailValidationGateway(config),
 
     proConnectOAuthGateway,
-    ftConnectOAuthGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(

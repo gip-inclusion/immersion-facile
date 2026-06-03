@@ -11,18 +11,21 @@ import type {
 export class InMemoryConventionFranceTravailAdvisorRepository
   implements ConventionFranceTravailAdvisorRepository
 {
-  #conventionFranceTravailUsersAdvisors: ConventionFtUserAdvisorEntity[] = [];
+  #ftConnectedUsers: Record<FtExternalId, FtUserAndAdvisor> = {};
+  #conventionFranceTravailUsers: Record<ConventionId, FtExternalId> = {};
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
     userFtExternalId: FtExternalId,
   ): Promise<ConventionAndFtExternalIds> {
-    const entity: ConventionFtUserAdvisorEntity =
-      await this.#getAlreadyOpenIfExist(userFtExternalId);
-    this.#upsertWithClosedConvention(entity, {
-      ...entity,
-      conventionId,
-    });
+    if (!this.#ftConnectedUsers[userFtExternalId]) {
+      throw errors.ftConnect.associationFailed({
+        rowCount: 0,
+        conventionId,
+        ftExternalId: userFtExternalId,
+      });
+    }
+    this.#conventionFranceTravailUsers[conventionId] = userFtExternalId;
 
     return {
       conventionId,
@@ -30,79 +33,35 @@ export class InMemoryConventionFranceTravailAdvisorRepository
     };
   }
 
-  //test purposes only
-  public get conventionFranceTravailUsersAdvisors() {
-    return this.#conventionFranceTravailUsersAdvisors;
-  }
-
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionFtUserAdvisorEntity | undefined> {
-    return this.#conventionFranceTravailUsersAdvisors.find(
-      matchConventionId(conventionId),
-    );
+    const userFtExternalId = this.#conventionFranceTravailUsers[conventionId];
+    const userAndAdvisor = this.#ftConnectedUsers[userFtExternalId];
+
+    return {
+      peExternalId: userFtExternalId,
+      conventionId,
+      advisor: userAndAdvisor?.advisor,
+      _entityName: "ConventionFranceTravailAdvisor",
+    };
   }
 
   public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
-    this.#conventionFranceTravailUsersAdvisors =
-      this.#conventionFranceTravailUsersAdvisors.filter(
-        (conventionFranceTravailUserAdvisor) =>
-          conventionFranceTravailUserAdvisor.conventionId !== conventionId,
-      );
+    const { [conventionId]: _deleted, ...conventionFranceTravailUsers } =
+      this.#conventionFranceTravailUsers;
+
+    this.#conventionFranceTravailUsers = conventionFranceTravailUsers;
   }
 
   public async saveFtUserAndAdvisor(
     peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
-    this.#conventionFranceTravailUsersAdvisors.push({
-      advisor: peUserAndAdvisor.advisor,
-      conventionId: CONVENTION_ID_DEFAULT_UUID,
-      peExternalId: peUserAndAdvisor.user.peExternalId,
-      _entityName: "ConventionFranceTravailAdvisor",
-    });
+    this.#ftConnectedUsers[peUserAndAdvisor.user.peExternalId] =
+      peUserAndAdvisor;
   }
 
-  //test purposes only
-  public setConventionFranceTravailUsersAdvisor(
-    conventionFranceTravailUserAdvisorEntities: ConventionFtUserAdvisorEntity[],
-  ) {
-    this.#conventionFranceTravailUsersAdvisors =
-      conventionFranceTravailUserAdvisorEntities;
+  public get conventionFranceTravailUsers() {
+    return this.#conventionFranceTravailUsers;
   }
-
-  async #getAlreadyOpenIfExist(
-    peExternalId: FtExternalId,
-  ): Promise<ConventionFtUserAdvisorEntity> {
-    const entity: ConventionFtUserAdvisorEntity | undefined =
-      this.#conventionFranceTravailUsersAdvisors
-        .filter(matchFtExternalId(peExternalId))
-        .find(isOpenEntity);
-    if (entity) return entity;
-    throw errors.convention.missingFTAdvisor({ ftExternalId: peExternalId });
-  }
-
-  #upsertWithClosedConvention = (
-    oldEntity: ConventionFtUserAdvisorEntity,
-    newEntity: ConventionFtUserAdvisorEntity,
-  ): void => {
-    this.#conventionFranceTravailUsersAdvisors[
-      this.#conventionFranceTravailUsersAdvisors.indexOf(oldEntity)
-    ] = newEntity;
-  };
 }
-
-export const CONVENTION_ID_DEFAULT_UUID =
-  "00000000-0000-0000-0000-000000000000";
-
-const matchFtExternalId =
-  (ftExternalId: string) =>
-  (conventionFranceTravailUserAdvisor: ConventionFtUserAdvisorEntity) =>
-    conventionFranceTravailUserAdvisor.peExternalId === ftExternalId;
-
-const matchConventionId =
-  (conventionId: string) =>
-  (conventionFranceTravailUserAdvisor: ConventionFtUserAdvisorEntity) =>
-    conventionFranceTravailUserAdvisor.conventionId === conventionId;
-
-const isOpenEntity = (entity: ConventionFtUserAdvisorEntity) =>
-  entity.conventionId === CONVENTION_ID_DEFAULT_UUID;

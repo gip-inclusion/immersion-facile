@@ -344,21 +344,26 @@ describe("AssessmentReminder", () => {
     });
 
     it("when there is an advisor, send assessment reminder to tutor and advisor", async () => {
-      const advisorEmail = "john.doe@mail.fr";
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [
-          {
-            _entityName: "ConventionFranceTravailAdvisor",
-            peExternalId: "pe-external-id",
-            conventionId: convention.id,
-            advisor: {
-              firstName: "John",
-              lastName: "Doe",
-              type: "PLACEMENT",
-              email: advisorEmail,
-            },
-          },
-        ],
+      const advisorEmail = "johnny.joey@mail.fr";
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        user: {
+          email: "john.doe@mail.fr",
+          firstName: "John",
+          lastName: "Doe",
+          isJobseeker: true,
+          peExternalId: "pe-external-id",
+          birthdate: "1990-01-01",
+        },
+        advisor: {
+          firstName: "Johnny",
+          lastName: "Joey",
+          type: "PLACEMENT",
+          email: advisorEmail,
+        },
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        convention.id,
+        "pe-external-id",
       );
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({

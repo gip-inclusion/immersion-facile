@@ -10,6 +10,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
+import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import { validateAndParseZodSchema } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { isAxiosError } from "../../../../../../utils/axiosUtils";
@@ -20,6 +21,11 @@ import {
 } from "../../../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
 import { scheduleWithBackpressure } from "../../../../../../utils/scheduleWithBackpressure";
+import type {
+  FTConnectAccessTokenResult,
+  GetAccessTokenParams,
+  GetLoginUrlParams,
+} from "../../../connected-user/port/OAuthGateway";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate } from "../../dto/FtConnect.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
@@ -28,9 +34,9 @@ import { externalAccessTokenSchema } from "../../port/AccessToken.schema";
 import type { FtConnectGateway } from "../../port/FtConnectGateway";
 import type {
   ExternalFtConnectAdvisor,
+  ExternalFtConnectOAuthGrantPayload,
   ExternalFtConnectUser,
   FtConnectHeaders,
-  FtConnectOauthConfig,
 } from "./ftConnectApi.dto";
 import { ftConnectErrorStrategy } from "./ftConnectApi.error";
 import {
@@ -112,7 +118,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
 
   constructor(
     private httpClient: HttpClient<FtConnectExternalRoutes>,
-    private configs: FtConnectOauthConfig,
+    private ftConnectConfig: OAuthConfig,
     private ftConnectMaxRequestsPerInterval: number,
     highWater = ftConnectHighWater,
   ) {
@@ -127,9 +133,28 @@ export class HttpFtConnectGateway implements FtConnectGateway {
     });
   }
 
+  public async getLoginUrl({
+    nonce,
+    state,
+  }: GetLoginUrlParams): Promise<AbsoluteUrl> {
+    const queryParams = queryParamsAsString<ExternalFtConnectOAuthGrantPayload>(
+      {
+        response_type: "code",
+        client_id: this.ftConnectConfig.clientId,
+        realm: "/individu",
+        redirect_uri: this.ftConnectConfig.immersionRedirectUri.afterLogin,
+        scope: this.ftConnectConfig.scope,
+        state,
+        nonce,
+      },
+    );
+
+    return `${this.ftConnectConfig.providerBaseUri}/connexion/oauth2/authorize?${queryParams}`;
+  }
+
   public async getAccessToken(
-    authorizationCode: string,
-  ): Promise<AccessTokenDto | undefined> {
+    params: GetAccessTokenParams,
+  ): Promise<FTConnectAccessTokenResult> {
     const log = exchangeCodeForAccessTokenLogger;
     try {
       log.total({});
@@ -139,11 +164,12 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         () =>
           this.httpClient.exchangeCodeForAccessToken({
             body: queryParamsAsString({
-              client_id: this.configs.franceTravailClientId,
-              client_secret: this.configs.franceTravailClientSecret,
-              code: authorizationCode,
+              client_id: this.ftConnectConfig.clientId,
+              client_secret: this.ftConnectConfig.clientSecret,
+              code: params.code,
               grant_type: "authorization_code",
-              redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
+              redirect_uri:
+                this.ftConnectConfig.immersionRedirectUri.afterLogin,
             }),
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
@@ -155,7 +181,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
           sharedRouteResponse: response,
           message: `exchangeCodeForAccessToken - Response status is ${response.status}`,
         });
-        return undefined;
+        throw errors.auth.couldNotGetAccessToken({
+          message: `exchangeCodeForAccessToken - Response status is ${response.status}`,
+        });
       }
       const externalAccessToken = validateAndParseZodSchema({
         schemaName: "externalAccessTokenSchema",
@@ -174,7 +202,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (payload) => notifyTeamOnNotError(payload),
       );
       return manageFtConnectError(error, "exchangeCodeForAccessToken", {
-        authorization: authorizationCode,
+        authorization: params.code,
       });
     }
   }
@@ -217,8 +245,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
   }
 
   public async getLogoutUrl({ idToken }: WithIdToken): Promise<AbsoluteUrl> {
-    const uri: AbsoluteUrl = `${this.configs.ftAuthCandidatUrl}/compte/deconnexion`;
-    const postLogoutRedirectUri = this.configs.immersionFacileBaseUrl;
+    const uri: AbsoluteUrl = `${this.ftConnectConfig.providerBaseUri}/compte/deconnexion`;
+    const postLogoutRedirectUri =
+      this.ftConnectConfig.immersionRedirectUri.afterLogout;
 
     return `${uri}?${queryParamsAsString({
       id_token_hint: idToken,

@@ -2,6 +2,7 @@ import { subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   allowedLoginSources,
+  authFailed,
   type ExternalId,
   errors,
   expectObjectInArrayToMatch,
@@ -25,12 +26,21 @@ import {
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryFtConnectGateway } from "../../ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
+import type {
+  FtConnectAdvisorDto,
+  FtConnectImmersionAdvisorDto,
+} from "../../ft-connect/dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../ft-connect/dto/FtConnectUserDto";
 import {
   fakeProviderConfig,
   InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
-import type { GetAccessTokenPayload } from "../port/OAuthGateway";
+import type {
+  FTConnectGetAccessTokenPayload,
+  ProConnectGetAccessTokenPayload,
+} from "../port/OAuthGateway";
 import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccessRedirection use case", () => {
@@ -42,17 +52,24 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     60 * 60, // 1 hour expiration
   );
 
-  const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
-    nonce: "nounce",
-    sub: "my-user-external-id",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@mail.com",
-    siret: "12345678901234",
-  };
+  const defaultExpectedProConnectIcIdTokenPayload: ProConnectGetAccessTokenPayload =
+    {
+      nonce: "nounce",
+      sub: "my-user-external-id",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@mail.com",
+      siret: "12345678901234",
+    };
+
+  const defaultExpectedIftConnectcIdTokenPayload: FTConnectGetAccessTokenPayload =
+    {
+      nonce: "nounce",
+    };
 
   let uow: InMemoryUnitOfWork;
   let oAuthGateway: InMemoryOAuthGateway;
+  let ftConnectGateway: InMemoryFtConnectGateway;
   let uuidGenerator: TestUuidGenerator;
   let afterOAuthSuccessRedirection: AfterOAuthSuccess;
   let timeGateway: CustomTimeGateway;
@@ -61,6 +78,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
     oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    ftConnectGateway = new InMemoryFtConnectGateway();
     timeGateway = new CustomTimeGateway();
     const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
 
@@ -71,6 +89,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         uuidGenerator,
       }),
       oAuthGateway,
+      ftConnectGateway,
       uuidGenerator,
       generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
       verifyEmailAuthCodeJwt: verifyEmailAuthCode,
@@ -94,12 +113,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           expectToEqual(uow.userRepository.users, [
             {
               id: userId,
-              firstName: defaultExpectedIcIdTokenPayload.firstName,
-              lastName: defaultExpectedIcIdTokenPayload.lastName,
-              email: defaultExpectedIcIdTokenPayload.email,
+              firstName: defaultExpectedProConnectIcIdTokenPayload.firstName,
+              lastName: defaultExpectedProConnectIcIdTokenPayload.lastName,
+              email: defaultExpectedProConnectIcIdTokenPayload.email,
               proConnect: {
-                externalId: defaultExpectedIcIdTokenPayload.sub,
-                siret: defaultExpectedIcIdTokenPayload.siret,
+                externalId: defaultExpectedProConnectIcIdTokenPayload.sub,
+                siret: defaultExpectedProConnectIcIdTokenPayload.siret,
               },
               createdAt: timeGateway.now().toISOString(),
               lastLoginAt: timeGateway.now().toISOString(),
@@ -122,7 +141,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               usedAt: timeGateway.now(),
               accessToken,
               userId,
-              externalId: defaultExpectedIcIdTokenPayload.sub,
+              externalId: defaultExpectedProConnectIcIdTokenPayload.sub,
             },
           ]);
         });
@@ -169,9 +188,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           expectToEqual(uow.userRepository.users, [
             {
               ...alreadyExistingUser,
-              email: defaultExpectedIcIdTokenPayload.email,
-              firstName: defaultExpectedIcIdTokenPayload.firstName,
-              lastName: defaultExpectedIcIdTokenPayload.lastName,
+              email: defaultExpectedProConnectIcIdTokenPayload.email,
+              firstName: defaultExpectedProConnectIcIdTokenPayload.firstName,
+              lastName: defaultExpectedProConnectIcIdTokenPayload.lastName,
               lastLoginAt: timeGateway.now().toISOString(),
             },
           ]);
@@ -202,11 +221,11 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             {
               id: alreadyExistingUser.id,
               email: alreadyExistingUser.email,
-              firstName: defaultExpectedIcIdTokenPayload.firstName,
-              lastName: defaultExpectedIcIdTokenPayload.lastName,
+              firstName: defaultExpectedProConnectIcIdTokenPayload.firstName,
+              lastName: defaultExpectedProConnectIcIdTokenPayload.lastName,
               proConnect: {
-                externalId: defaultExpectedIcIdTokenPayload.sub,
-                siret: defaultExpectedIcIdTokenPayload.siret,
+                externalId: defaultExpectedProConnectIcIdTokenPayload.sub,
+                siret: defaultExpectedProConnectIcIdTokenPayload.siret,
               },
               createdAt: alreadyExistingUser.createdAt,
               lastLoginAt: timeGateway.now().toISOString(),
@@ -275,7 +294,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             lastName: "Duflot",
             proConnect: {
               externalId,
-              siret: defaultExpectedIcIdTokenPayload.siret,
+              siret: defaultExpectedProConnectIcIdTokenPayload.siret,
             },
             createdAt: initialUser.createdAt,
             lastLoginAt: timeGateway.now().toISOString(),
@@ -384,8 +403,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       it("rejects the connection if no state match the provided one in DB", async () => {
         oAuthGateway.setAccessTokenResponse({
+          type: "proConnect",
           expire: 60,
-          payload: defaultExpectedIcIdTokenPayload,
+          payload: defaultExpectedProConnectIcIdTokenPayload,
           accessToken,
           idToken,
         });
@@ -415,8 +435,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
         oAuthGateway.setAccessTokenResponse({
+          type: "proConnect",
           expire: 60,
-          payload: defaultExpectedIcIdTokenPayload,
+          payload: defaultExpectedProConnectIcIdTokenPayload,
           accessToken,
           idToken,
         });
@@ -428,6 +449,313 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           }),
           errors.auth.nonceMismatch(),
         );
+      });
+    });
+  });
+
+  describe("With OAuthGateway provider 'ftConnect'", () => {
+    const code = "my-code";
+    const state = "my-state";
+    const accessToken = "access-token";
+    const idToken: IdToken = "id-token";
+
+    const ftPlacementAdvisor: FtConnectImmersionAdvisorDto = {
+      type: "PLACEMENT",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@mail.com",
+    };
+    const ftIndemnisationAdvisor: FtConnectAdvisorDto = {
+      email: "017jean.dupont@france-travail.net",
+      firstName: "Jean",
+      lastName: "Dupont",
+      type: "INDEMNISATION",
+    };
+    const ftCapEmploiAdvisor: FtConnectImmersionAdvisorDto = {
+      email: "elsa.oldenburg@france-travail.net",
+      lastName: "Oldenburg",
+      firstName: "Elsa",
+      type: "CAPEMPLOI",
+    };
+    const ftJobseekerUser: FtConnectUserDto = {
+      isJobseeker: true,
+      firstName: "John",
+      lastName: "Doe",
+      birthdate: "1990-01-01",
+      peExternalId: "123",
+    };
+    const ftNotJobseekerUser: FtConnectUserDto = {
+      isJobseeker: false,
+      firstName: "Jane",
+      lastName: "Joe",
+      birthdate: "1990-01-01",
+      peExternalId: "456",
+    };
+    const defaultFtOngoingOAuth: OngoingOAuth = {
+      fromUri: "/demande-immersion",
+      provider: "peConnect",
+      state,
+      nonce: "nounce",
+      usedAt: null,
+    };
+
+    describe("right paths", () => {
+      const conventionDraftId = "my-id";
+
+      beforeEach(() => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [defaultFtOngoingOAuth];
+        uow.conventionDraftRepository.conventionDrafts = [];
+        ftConnectGateway.setAccessTokenResult({
+          type: "ftConnect",
+          expire: 60,
+          payload: defaultExpectedIftConnectcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+        ftConnectGateway.setUser(ftJobseekerUser);
+        uuidGenerator.setNextUuid(conventionDraftId);
+      });
+
+      it("updates the authenticated user and create convention draft with advisor", async () => {
+        ftConnectGateway.setAdvisors([
+          ftPlacementAdvisor,
+          ftIndemnisationAdvisor,
+        ]);
+
+        const response = await afterOAuthSuccessRedirection.execute({
+          code,
+          state,
+        });
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+        ]);
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
+          {
+            id: conventionDraftId,
+            internshipKind: "immersion",
+            fromPeConnectedUser: true,
+            updatedAt: timeGateway.now().toISOString(),
+            signatories: {
+              beneficiary: {
+                firstName: ftJobseekerUser.firstName,
+                lastName: ftJobseekerUser.lastName,
+                email: ftJobseekerUser.email,
+                birthdate: ftJobseekerUser.birthdate,
+                phone: ftJobseekerUser.phone,
+                federatedIdentity: {
+                  provider: "peConnect",
+                  token: ftJobseekerUser.peExternalId,
+                },
+              },
+            },
+            validators: {
+              agencyCounsellor: {
+                firstname: ftPlacementAdvisor.firstName,
+                lastname: ftPlacementAdvisor.lastName,
+              },
+            },
+          },
+        ]);
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "FTConnectedSuccessfully",
+            payload: {
+              ftConnectUserId: ftJobseekerUser.peExternalId,
+              conventionDraftId,
+            },
+          },
+        ]);
+        expectToEqual(
+          uow.conventionFranceTravailAdvisorRepository
+            .conventionFranceTravailUsers,
+          {},
+        );
+        expectToEqual(response, {
+          provider: "peConnect",
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+        });
+      });
+
+      it("updates the authenticated user and use preferred capemploi advisor among other advisor types", async () => {
+        ftConnectGateway.setAdvisors([
+          ftPlacementAdvisor,
+          ftCapEmploiAdvisor,
+          ftIndemnisationAdvisor,
+        ]);
+
+        const response = await afterOAuthSuccessRedirection.execute({
+          code,
+          state,
+        });
+
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+        ]);
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
+          {
+            id: conventionDraftId,
+            internshipKind: "immersion",
+            fromPeConnectedUser: true,
+            updatedAt: timeGateway.now().toISOString(),
+            signatories: {
+              beneficiary: {
+                firstName: ftJobseekerUser.firstName,
+                lastName: ftJobseekerUser.lastName,
+                email: ftJobseekerUser.email,
+                birthdate: ftJobseekerUser.birthdate,
+                phone: ftJobseekerUser.phone,
+                federatedIdentity: {
+                  provider: "peConnect",
+                  token: ftJobseekerUser.peExternalId,
+                },
+              },
+            },
+            validators: {
+              agencyCounsellor: {
+                firstname: ftCapEmploiAdvisor.firstName,
+                lastname: ftCapEmploiAdvisor.lastName,
+              },
+            },
+          },
+        ]);
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "FTConnectedSuccessfully",
+            payload: {
+              ftConnectUserId: ftJobseekerUser.peExternalId,
+              conventionDraftId,
+            },
+          },
+        ]);
+        expectToEqual(response, {
+          provider: "peConnect",
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+        });
+      });
+
+      it("should still redirect correctly when FtConnected and is not jobseeker", async () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [defaultFtOngoingOAuth];
+        ftConnectGateway.setAccessTokenResult({
+          type: "ftConnect",
+          expire: 60,
+          payload: defaultExpectedIftConnectcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+        ftConnectGateway.setUser(ftNotJobseekerUser);
+        ftConnectGateway.setAdvisors([
+          ftPlacementAdvisor,
+          ftIndemnisationAdvisor,
+        ]);
+        uuidGenerator.setNextUuid(conventionDraftId);
+
+        const response = await afterOAuthSuccessRedirection.execute({
+          code,
+          state,
+        });
+
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+        ]);
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
+          {
+            id: conventionDraftId,
+            internshipKind: "immersion",
+            fromPeConnectedUser: true,
+            updatedAt: timeGateway.now().toISOString(),
+            signatories: {
+              beneficiary: {
+                firstName: ftNotJobseekerUser.firstName,
+                lastName: ftNotJobseekerUser.lastName,
+                email: ftNotJobseekerUser.email,
+                birthdate: ftNotJobseekerUser.birthdate,
+                phone: ftNotJobseekerUser.phone,
+                federatedIdentity: {
+                  provider: "peConnect",
+                  token: ftNotJobseekerUser.peExternalId,
+                },
+              },
+            },
+            validators: undefined,
+          },
+        ]);
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "FTConnectedSuccessfully",
+            payload: {
+              ftConnectUserId: ftNotJobseekerUser.peExternalId,
+              conventionDraftId,
+            },
+          },
+        ]);
+        expectToEqual(response, {
+          provider: "peConnect",
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+        });
+      });
+    });
+
+    describe("wrong paths", () => {
+      it("rejects the connection if no state match the provided one in DB", async () => {
+        oAuthGateway.setAccessTokenResponse({
+          type: "ftConnect",
+          expire: 60,
+          payload: defaultExpectedIftConnectcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+
+        await expectPromiseToFailWithError(
+          afterOAuthSuccessRedirection.execute({ code, state }),
+          errors.auth.missingOAuth({ state }),
+        );
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, []);
+      });
+
+      it("should raise a Forbidden error if the nonce does not match", async () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            ...defaultFtOngoingOAuth,
+            fromUri: "agencyDashboard",
+            nonce: "existing-nonce",
+          },
+        ];
+        ftConnectGateway.setAccessTokenResult({
+          type: "ftConnect",
+          expire: 60,
+          payload: defaultExpectedIftConnectcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+
+        await expectPromiseToFailWithError(
+          afterOAuthSuccessRedirection.execute({ code, state }),
+          errors.auth.nonceMismatch(),
+        );
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, []);
+      });
+
+      it("should redirect with authFailure id on FtConnect auth failure", async () => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [defaultFtOngoingOAuth];
+        ftConnectGateway.setAccessTokenResult({
+          type: "ftConnect",
+          expire: 60,
+          payload: defaultExpectedIftConnectcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+        ftConnectGateway.setUser(undefined);
+
+        const response = await afterOAuthSuccessRedirection.execute({
+          code,
+          state,
+        });
+
+        expectToEqual(uow.conventionDraftRepository.conventionDrafts, []);
+        expectToEqual(response, {
+          provider: "peConnect",
+          redirectUri: `http://baseUrl/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}&fedIdToken=id-token`,
+        });
       });
     });
   });
@@ -472,6 +800,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             uuidGenerator,
           }),
           oAuthGateway,
+          ftConnectGateway,
           uuidGenerator,
           generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
           verifyEmailAuthCodeJwt: verifyEmailAuthCode,
@@ -619,10 +948,10 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
   const makeSuccessfulAuthenticationConditions = (
     fromUri: string,
-    params?: Partial<GetAccessTokenPayload>,
+    params?: Partial<ProConnectGetAccessTokenPayload>,
   ) => {
     const expectedIcIdTokenPayload = {
-      ...defaultExpectedIcIdTokenPayload,
+      ...defaultExpectedProConnectIcIdTokenPayload,
       ...params,
     };
     const initialOngoingOAuth: OngoingOAuth = {
@@ -640,6 +969,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     const accessToken = "access-token";
     const idToken: IdToken = "id-token";
     oAuthGateway.setAccessTokenResponse({
+      type: "proConnect",
       payload: expectedIcIdTokenPayload,
       accessToken,
       expire: 60,
@@ -668,8 +998,8 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               externalId:
                 options.externalId !== undefined
                   ? options.externalId
-                  : defaultExpectedIcIdTokenPayload.sub,
-              siret: defaultExpectedIcIdTokenPayload.siret,
+                  : defaultExpectedProConnectIcIdTokenPayload.sub,
+              siret: defaultExpectedProConnectIcIdTokenPayload.siret,
             }
           : null,
       createdAt: new Date().toISOString(),

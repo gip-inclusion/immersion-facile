@@ -70,6 +70,7 @@ const getUseCasesByTopics = (
   ],
 
   // Convention Federated Identities
+  FTConnectedSuccessfully: [],
   FederatedIdentityBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,

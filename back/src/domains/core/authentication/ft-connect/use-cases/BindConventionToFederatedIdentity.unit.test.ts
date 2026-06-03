@@ -13,12 +13,8 @@ import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGate
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  CONVENTION_ID_DEFAULT_UUID,
-  type InMemoryConventionFranceTravailAdvisorRepository,
-} from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
+import type { InMemoryConventionFranceTravailAdvisorRepository } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
-import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 
 describe("AssociateFtConnectFederatedIdentity", () => {
@@ -59,9 +55,10 @@ describe("AssociateFtConnectFederatedIdentity", () => {
       convention: conventionDtoFromEvent,
     });
 
-    expect(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-    ).toHaveLength(0);
+    expectToEqual(
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {},
+    );
     expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
 
@@ -75,9 +72,9 @@ describe("AssociateFtConnectFederatedIdentity", () => {
       convention: conventionDtoFromEvent,
     });
 
-    expectObjectsToMatch(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-      [],
+    expectToEqual(
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {},
     );
 
     const expectedEvent = createNewEvent({
@@ -88,96 +85,10 @@ describe("AssociateFtConnectFederatedIdentity", () => {
   });
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
-    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
-      conventionFranceTravailUserAdvisorFromDto(
-        userAdvisorDto,
-        CONVENTION_ID_DEFAULT_UUID,
-      ),
-    ]);
-
-    const conventionDtoFromEvent = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
-      .build();
-
-    await associateFtConnectFederatedIdentity.execute({
-      convention: conventionDtoFromEvent,
-    });
-
-    expect(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-    ).toHaveLength(1);
-
-    expect(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors[0]
-        .conventionId,
-    ).toBe(conventionId);
-  });
-
-  it("should save event FtConnectFederatedIdentityAssociated", async () => {
-    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
-      conventionFranceTravailUserAdvisorFromDto(
-        userAdvisorDto,
-        CONVENTION_ID_DEFAULT_UUID,
-      ),
-    ]);
-
-    const conventionDtoFromEvent = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
-      .build();
-
-    await associateFtConnectFederatedIdentity.execute({
-      convention: conventionDtoFromEvent,
-    });
-
-    expect(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-    ).toHaveLength(1);
-
-    // outbox rep
-    expect(outboxRepo.events).toHaveLength(1);
-    expectObjectsToMatch(outboxRepo.events[0], {
-      topic: "FederatedIdentityBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
-    });
-  });
-
-  it("without advisor", async () => {
-    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
-      conventionFranceTravailUserAdvisorFromDto(
-        {
-          ...userAdvisorDto,
-          advisor: undefined,
-        },
-        CONVENTION_ID_DEFAULT_UUID,
-      ),
-    ]);
-
-    const conventionDtoFromEvent = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
-      .build();
-
-    await associateFtConnectFederatedIdentity.execute({
-      convention: conventionDtoFromEvent,
-    });
-
-    expect(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-    ).toHaveLength(1);
-
-    // outbox rep
-    expect(outboxRepo.events).toHaveLength(1);
-    expectObjectsToMatch(outboxRepo.events[0], {
-      topic: "FederatedIdentityBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
-    });
-  });
-
-  it("without open slot then no association and FederatedIdentityNotBoundToConvention event", async () => {
-    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor(
-      [],
+    conventionFranceTravailAdvisorRepo.saveFtUserAndAdvisor(userAdvisorDto);
+    expectToEqual(
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {},
     );
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
@@ -190,16 +101,42 @@ describe("AssociateFtConnectFederatedIdentity", () => {
     });
 
     expectToEqual(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
-      [],
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {
+        [conventionId]: userFtExternalId,
+      },
+    );
+  });
+
+  it("should save event FtConnectFederatedIdentityAssociated", async () => {
+    conventionFranceTravailAdvisorRepo.saveFtUserAndAdvisor(userAdvisorDto);
+    expectToEqual(
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {},
     );
 
-    expectToEqual(outboxRepo.events, [
-      createNewEvent({
-        topic: "FederatedIdentityNotBoundToConvention",
-        payload: { convention: conventionDtoFromEvent, triggeredBy: null },
-      }),
-    ]);
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
+      .build();
+
+    await associateFtConnectFederatedIdentity.execute({
+      convention: conventionDtoFromEvent,
+    });
+
+    expectToEqual(
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
+      {
+        [conventionId]: userFtExternalId,
+      },
+    );
+
+    // outbox rep
+    expect(outboxRepo.events).toHaveLength(1);
+    expectObjectsToMatch(outboxRepo.events[0], {
+      topic: "FederatedIdentityBoundToConvention",
+      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
+    });
   });
 });
 

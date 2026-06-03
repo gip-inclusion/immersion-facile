@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
-import { authRoutes } from "shared";
+import { authRoutes, FTConnectError, ManagedFTConnectError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { handleHttpJsonResponseError } from "../../../../config/helpers/handleHttpJsonResponseError";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
@@ -25,8 +26,31 @@ export const createAuthRouter = (deps: AppDependencies) => {
       if (useCaseResult.provider === "proConnect") {
         return res.status(302).redirect(useCaseResult.redirectUri);
       }
+      if (useCaseResult.provider === "peConnect") {
+        throw new Error("Incorrect provider for this route"); //TODO
+      }
       return useCaseResult;
     });
+  });
+
+  authSharedRouter.afterFTConnectOAuthLogin(async (req, res) => {
+    try {
+      const useCaseResult =
+        await deps.useCases.afterOAuthSuccessRedirection.execute(req.query);
+      if (useCaseResult.provider !== "peConnect") {
+        throw new Error("Incorrect provider for this route"); //TODO
+      }
+      return res.status(302).redirect(useCaseResult.redirectUri);
+    } catch (error) {
+      if (error instanceof ManagedFTConnectError)
+        return deps.errorHandlers.handleManagedRedirectResponseError(
+          error,
+          res,
+        );
+      if (error instanceof FTConnectError)
+        return deps.errorHandlers.handleRawRedirectResponseError(error, res);
+      return handleHttpJsonResponseError(req, res, error);
+    }
   });
 
   authSharedRouter.initiateLoginByEmail((req, res) =>

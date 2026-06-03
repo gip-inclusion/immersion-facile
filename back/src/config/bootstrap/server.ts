@@ -13,7 +13,6 @@ import { createConventionRouter } from "../../adapters/primary/routers/conventio
 import { createEstablishmentRouter } from "../../adapters/primary/routers/establishment/createEstablishmentRouter";
 import { createEstablishmentLeadRouter } from "../../adapters/primary/routers/establishmentLead/createEstablishmentLeadRouter";
 import { createFormCompletionRouter } from "../../adapters/primary/routers/formCompletion/createFormCompletionRouter";
-import { createFtConnectRouter } from "../../adapters/primary/routers/ftConnect/createFtConnectRouter";
 import { createMagicLinkRouter } from "../../adapters/primary/routers/magicLink/createMagicLinkRouter";
 import { createNafRouter } from "../../adapters/primary/routers/naf/createNafRouter";
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";
@@ -103,7 +102,6 @@ export const createApp = async (
   app.use(corsPolicy, createAddressRouter(deps));
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
-  app.use(createFtConnectRouter(deps));
   app.use(createAuthRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));

@@ -111,15 +111,12 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
       .build();
 
     uow.conventionRepository.setConventions([conventionDtoFromEvent]);
-    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-      [
-        {
-          peExternalId: userAdvisorDto.user.peExternalId,
-          advisor: userAdvisorDto.advisor,
-          _entityName: "ConventionFranceTravailAdvisor",
-          conventionId,
-        },
-      ],
+    uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
+      userAdvisorDto,
+    );
+    uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+      conventionId,
+      userAdvisorDto.user.peExternalId,
     );
 
     await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({
@@ -183,15 +180,13 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
       .build();
 
     uow.conventionRepository.setConventions([conventionDtoFromEvent]);
-    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-      [
-        {
-          advisor: undefined,
-          peExternalId: userAdvisorDto.user.peExternalId,
-          _entityName: "ConventionFranceTravailAdvisor",
-          conventionId,
-        },
-      ],
+    uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+      user: userAdvisorDto.user,
+      advisor: undefined,
+    });
+    uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+      conventionId,
+      userAdvisorDto.user.peExternalId,
     );
 
     await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({

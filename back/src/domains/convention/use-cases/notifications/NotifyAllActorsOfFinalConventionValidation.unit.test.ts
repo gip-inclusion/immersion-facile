@@ -16,7 +16,6 @@ import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
-import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { expectEmailFinalValidationConfirmationParamsMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   makeSaveNotificationAndRelatedEvent,
@@ -544,20 +543,26 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         },
       ];
       const userFtExternalId = "i-am-an-external-id";
-      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-        _entityName: "ConventionFranceTravailAdvisor",
+
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        user: {
+          peExternalId: userFtExternalId,
+          email: "john.doe@plop.fr",
+          firstName: "John",
+          isJobseeker: true,
+          lastName: "Doe",
+          birthdate: "1990-01-01",
+        },
         advisor: {
           email: peAdvisorEmail,
           firstName: "Elsa",
           lastName: "Oldenburg",
           type: "CAPEMPLOI",
         },
-        peExternalId: userFtExternalId,
-        conventionId: validConventionWithSameTutorAndRepresentative.id,
-      };
-
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [userConventionAdvisor],
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        validConventionWithSameTutorAndRepresentative.id,
+        userFtExternalId,
       );
 
       const actorsWithShortlinks = actors.filter(
@@ -641,15 +646,21 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
         },
       ];
       const userFtExternalId = "i-am-an-external-id";
-      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
-        _entityName: "ConventionFranceTravailAdvisor",
-        advisor: undefined,
-        peExternalId: userFtExternalId,
-        conventionId: validConventionWithSameTutorAndRepresentative.id,
-      };
 
-      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
-        [userConventionAdvisor],
+      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+        user: {
+          peExternalId: userFtExternalId,
+          email: "john.doe@plop.fr",
+          firstName: "John",
+          isJobseeker: true,
+          lastName: "Doe",
+          birthdate: "1990-01-01",
+        },
+        advisor: undefined,
+      });
+      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        validConventionWithSameTutorAndRepresentative.id,
+        userFtExternalId,
       );
 
       const actorsWithShortlinks = actors.filter(

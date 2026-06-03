@@ -44,10 +44,14 @@ describe("HttpFtConnectGateway", () => {
       skipResponseValidation: true,
     }),
     {
-      immersionFacileBaseUrl: "https://fake-immersion.fr",
-      franceTravailClientId: "pe-client-id",
-      franceTravailClientSecret: "pe-client-secret",
-      ftAuthCandidatUrl: "https://fake-ft-candidat.fr",
+      immersionRedirectUri: {
+        afterLogin: "https://fake-immersion.fr/login",
+        afterLogout: "https://fake-immersion.fr",
+      },
+      clientId: "pe-client-id",
+      clientSecret: "pe-client-secret",
+      providerBaseUri: "https://fake-ft-candidat.fr",
+      scope: "openid email",
     },
     2,
   );
@@ -117,14 +121,18 @@ describe("HttpFtConnectGateway", () => {
           access_token: "5656sdfsdfsdfsdf654",
           expires_in: 50,
           id_token: "my-id-token",
+          nonce: "some-nonce",
         };
         mock
           .onPost(routes.exchangeCodeForAccessToken.url)
           .reply(200, expectedResponse);
-        expectObjectsToMatch(await ftConnectGateway.getAccessToken(""), {
-          expiresIn: expectedResponse.expires_in,
-          value: expectedResponse.access_token,
-        });
+        expectObjectsToMatch(
+          await ftConnectGateway.getAccessToken({ code: "" }),
+          {
+            expire: expectedResponse.expires_in,
+            accessToken: expectedResponse.access_token,
+          },
+        );
       });
     });
 
@@ -136,7 +144,7 @@ describe("HttpFtConnectGateway", () => {
           error: "invalid_grant",
         });
         await expectPromiseToFailWithError(
-          ftConnectGateway.getAccessToken(""),
+          ftConnectGateway.getAccessToken({ code: "" }),
           new ManagedFTConnectError(
             "peConnectInvalidGrant",
             errors.generic.testError("Request failed with status code 400"),
@@ -147,7 +155,7 @@ describe("HttpFtConnectGateway", () => {
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedFTConnectError(
-          () => ftConnectGateway.getAccessToken(""),
+          () => ftConnectGateway.getAccessToken({ code: "" }),
           new ManagedFTConnectError(
             "peConnectConnectionAborted",
             errors.generic.testError(""),
@@ -871,6 +879,7 @@ describe("HttpFtConnectGateway", () => {
         access_token: "some-token",
         expires_in: 50,
         id_token: "some-id-token",
+        nonce: "some-nonce",
       };
       mock
         .onPost(routes.exchangeCodeForAccessToken.url)
@@ -881,10 +890,14 @@ describe("HttpFtConnectGateway", () => {
           skipResponseValidation: true,
         }),
         {
-          immersionFacileBaseUrl: "https://fake-immersion.fr",
-          franceTravailClientId: "pe-client-id",
-          franceTravailClientSecret: "pe-client-secret",
-          ftAuthCandidatUrl: "https://fake-ft-candidat.fr",
+          immersionRedirectUri: {
+            afterLogin: "https://fake-immersion.fr/login",
+            afterLogout: "https://fake-immersion.fr",
+          },
+          clientId: "pe-client-id",
+          clientSecret: "pe-client-secret",
+          providerBaseUri: "https://fake-ft-candidat.fr",
+          scope: "openid email",
         },
         1,
         highWater,
@@ -893,7 +906,7 @@ describe("HttpFtConnectGateway", () => {
       const totalCalls = highWater + 5;
       const results = await Promise.allSettled(
         Array.from({ length: totalCalls }, () =>
-          ftConnectGateway.getAccessToken("some-code"),
+          ftConnectGateway.getAccessToken({ code: "some-code" }),
         ),
       );
 
