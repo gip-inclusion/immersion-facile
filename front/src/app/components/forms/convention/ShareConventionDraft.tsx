@@ -2,15 +2,12 @@ import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import {
-  type CreateConventionPresentationInitialValues,
-  domElementIds,
-} from "shared";
+import { domElementIds } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { ShareForm } from "./ShareForm";
+import { ShareForm, type ShareFormProps } from "./ShareForm";
 
 const shareConventionDraftModalProps = {
   isOpenedByDefault: false,
@@ -23,9 +20,9 @@ const shareConventionDraftModal = createFormModal(
 
 export const ShareConventionDraft = ({
   conventionFormData,
-}: {
-  conventionFormData: CreateConventionPresentationInitialValues;
-}) => {
+  firstName,
+  lastName,
+}: ShareFormProps) => {
   const dispatch = useDispatch();
   const t = useConventionTexts(conventionFormData.internshipKind);
   const shareLinkByEmail = t.shareConventionDraftByMail.share;
@@ -78,7 +75,11 @@ export const ShareConventionDraft = ({
             ...(!conventionDraftFeedback ? [submitConventionDraftButton] : []),
           ]}
         >
-          <ShareForm conventionFormData={conventionFormData} />
+          <ShareForm
+            conventionFormData={conventionFormData}
+            firstName={firstName}
+            lastName={lastName}
+          />
         </shareConventionDraftModal.Component>,
         document.body,
       )}

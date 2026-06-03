@@ -22,20 +22,33 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 
-type ShareFormProps = {
+export type ShareFormProps = {
   conventionFormData: CreateConventionPresentationInitialValues;
+  firstName: string;
+  lastName: string;
 };
 
 const makeInitialValues = ({
   conventionFormData,
+  firstName,
+  lastName,
 }: {
   conventionFormData: CreateConventionPresentationInitialValues;
+  firstName: string;
+  lastName: string;
 }): SaveConventionDraftFromConventionDto => ({
   senderEmail: "",
   conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
+  details: `${firstName || "Prénom"} ${
+    lastName || "Nom"
+  } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
 });
 
-export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
+export const ShareForm = ({
+  conventionFormData,
+  firstName,
+  lastName,
+}: ShareFormProps) => {
   const dispatch = useDispatch();
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
   const onSubmit = (values: SaveConventionDraftFromConventionDto) => {
@@ -48,7 +61,11 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   };
   const methods = useForm<SaveConventionDraftFromConventionDto>({
     mode: "onTouched",
-    defaultValues: makeInitialValues({ conventionFormData }),
+    defaultValues: makeInitialValues({
+      conventionFormData,
+      firstName,
+      lastName,
+    }),
     resolver: zodResolver(saveConventionDraftFromConventionSchema),
   });
   const { register, handleSubmit, formState, reset, setValue } = methods;
@@ -62,8 +79,8 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   );
 
   useEffect(() => {
-    reset(makeInitialValues({ conventionFormData }));
-  }, [conventionFormData, reset]);
+    reset(makeInitialValues({ conventionFormData, firstName, lastName }));
+  }, [conventionFormData, firstName, lastName, reset]);
 
   return (
     <WithFeedbackReplacer topic="convention-draft">
