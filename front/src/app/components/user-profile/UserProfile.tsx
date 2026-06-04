@@ -135,7 +135,7 @@ export const UserProfile = ({
             {showAddButtons && (
               <div className={fr.cx("fr-grid-row")}>
                 <Button
-                  id={domElementIds.profile.registerAgenciesSearchLink}
+                  id={domElementIds.myProfile.registerAgenciesSearchLink}
                   priority="primary"
                   linkProps={{
                     href: `${routes.myProfileAgencyRegistration().href}`,
@@ -259,7 +259,7 @@ const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
           guidé(e) vers le formulaire de création.
         </Highlight>
         <Button
-          id={domElementIds.profile.registerAgencyButton}
+          id={domElementIds.myProfile.registerAgencyButton}
           priority="primary"
           linkProps={routes.myProfileAgencyRegistration().link}
           className={fr.cx("fr-ml-auto")}

@@ -387,6 +387,9 @@ const getPageByRouteName: {
   unregisterEstablishmentLead: (route) => (
     <EstablishmentLeadRegistrationRejectedPage route={route} />
   ),
+  temporaryError: () => (
+    <ErrorPage error={frontErrors.generic.temporaryError()} />
+  ),
 };
 
 export const Router = (): ReactNode => {

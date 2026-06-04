@@ -138,7 +138,7 @@ const AssessmentToCompleteTaskItem = ({
       footer={footer}
       buttonsRows={[
         {
-          id: domElementIds.manageConventionUserConnected
+          id: domElementIds.manageConventionConnectedUser
             .pilotConventionWithAssessmentIssueButton,
           content: (
             <Button

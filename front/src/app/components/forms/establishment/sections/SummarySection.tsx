@@ -45,7 +45,7 @@ export const SummarySection = ({
       iconId: "fr-icon-arrow-left-line",
       priority: "secondary",
       type: "button",
-      id: domElementIds.establishment[mode].previousButtonFromStepAndMode({
+      id: domElementIds.formEstablishment[mode].previousButtonFromStepAndMode({
         currentStep: 3,
         mode,
       }),
@@ -59,7 +59,7 @@ export const SummarySection = ({
       iconPosition: "right",
       type: "submit",
       disabled: isSubmitting,
-      id: domElementIds.establishment[mode].submitFormButton,
+      id: domElementIds.formEstablishment[mode].submitFormButton,
     },
   ];
 
@@ -68,13 +68,13 @@ export const SummarySection = ({
       <p>
         Voici un récapitulatif des informations saisies pour l’établissement{" "}
         {formValues.businessName} (SIRET :{" "}
-        <strong id={domElementIds.establishment.create.summarySiretValue}>
+        <strong id={domElementIds.formEstablishment.create.summarySiretValue}>
           {formValues.siret}
         </strong>
         ). L’administrateur sera :{" "}
         <strong>
           {federatedIdentity?.provider === "proConnect" && (
-            <span id={domElementIds.establishment.create.summaryAdminName}>
+            <span id={domElementIds.formEstablishment.create.summaryAdminName}>
               {getFormattedFirstnameAndLastname({
                 firstname: federatedIdentity.firstName,
                 lastname: federatedIdentity.lastName,
@@ -98,7 +98,10 @@ export const SummarySection = ({
                 Adresses d'accueil :
               </p>
               <ul
-                id={domElementIds.establishment.create.summaryBusinessAddresses}
+                id={
+                  domElementIds.formEstablishment.create
+                    .summaryBusinessAddresses
+                }
               >
                 {formValues.businessAddresses.map((businessAddress) => (
                   <li key={businessAddress.id}>{businessAddress.rawAddress}</li>
@@ -109,7 +112,7 @@ export const SummarySection = ({
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Métiers proposés :
           </p>
-          <ul id={domElementIds.establishment.create.summaryAppellations}>
+          <ul id={domElementIds.formEstablishment.create.summaryAppellations}>
             {formValues.offers.map((offer) => (
               <li key={offer.appellationCode}>
                 {offer.appellationLabel} -{" "}

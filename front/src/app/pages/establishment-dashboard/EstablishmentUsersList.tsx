@@ -98,7 +98,7 @@ export const EstablishmentUsersList = () => {
 
   return (
     <div
-      id={domElementIds.establishment.edit.userRightsList}
+      id={domElementIds.formEstablishment.edit.userRightsList}
       className="fr-mt-4w"
     >
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>

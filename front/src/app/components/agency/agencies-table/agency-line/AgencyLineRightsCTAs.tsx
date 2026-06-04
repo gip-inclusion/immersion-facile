@@ -18,7 +18,7 @@ export const AgencyLineRightsCTAs = ({
       <Button
         size="small"
         priority="secondary"
-        id={`${domElementIds.profile.editRoleButton}-${agencyRight.agency.id}`}
+        id={`${domElementIds.myProfile.editRoleButton}-${agencyRight.agency.id}`}
         onClick={() => {
           onUpdateClicked(agencyRight);
         }}
@@ -29,7 +29,7 @@ export const AgencyLineRightsCTAs = ({
     {isBackofficeAdmin && (
       <Button
         priority="tertiary no outline"
-        id={`${domElementIds.profile.adminAgencyLink}-${agencyRight.agency.id}`}
+        id={`${domElementIds.myProfile.adminAgencyLink}-${agencyRight.agency.id}`}
         size="small"
         linkProps={
           routes.adminAgencyDetail({
@@ -43,7 +43,7 @@ export const AgencyLineRightsCTAs = ({
     {onRegistrationCancelledClicked && (
       <Button
         priority="secondary"
-        id={`${domElementIds.profile.cancelRegistrationButton}-${agencyRight.agency.id}`}
+        id={`${domElementIds.myProfile.cancelRegistrationButton}-${agencyRight.agency.id}`}
         size="small"
         onClick={() => {
           onRegistrationCancelledClicked(agencyRight);

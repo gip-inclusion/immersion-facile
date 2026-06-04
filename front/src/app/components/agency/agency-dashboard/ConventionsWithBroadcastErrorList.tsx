@@ -448,12 +448,12 @@ export const ConventionsWithBroadcastErrorList = ({
             )}
             buttonsRows={[
               {
-                id: domElementIds.manageConventionUserConnected
+                id: domElementIds.manageConventionConnectedUser
                   .pilotConventionWithBroadcastErrorButton,
                 content: (
                   <Button
                     key={
-                      domElementIds.manageConventionUserConnected
+                      domElementIds.manageConventionConnectedUser
                         .pilotConventionWithBroadcastErrorButton
                     }
                     priority="secondary"
