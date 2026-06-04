@@ -162,11 +162,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       establishmentSignJwt,
       initialConvention,
     );
+    const now = appAndDeps.gateways.timeGateway.now();
     const validatorReviewJwt = appAndDeps.generateConnectedUserJwt({
-      version: currentJwtVersions.connectedUser,
-      iat: Date.now(),
-      exp: addDays(new Date(), 30).getTime(),
       userId: validator.id,
+      version: currentJwtVersions.connectedUser,
+      iat: Math.round(now.getTime() / 1000),
+      exp: Math.round(addDays(now, 30).getTime() / 1000),
     });
 
     await validatorValidatesApplicationWhichTriggersConventionToBeSent(
@@ -174,8 +175,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       validatorReviewJwt,
       initialConvention,
     );
-
-    // REVIEW : RAJOUTER EXPECT A FAIRE !!!
   });
 
   const expectSentEmails = (
