@@ -320,10 +320,6 @@ export const errors = {
       new BadRequestError(
         `Erreur sur le type d'access token qui est ${actualType} alors qu'elle devrait être ${expectedType}.`,
       ),
-    incorrectProvider: (provider: FederatedIdentityProvider) =>
-      new BadRequestError(
-        `Le fournisseur d'authentification ${provider} n'est pas supporté pour cette route.`,
-      ),
     otherRenewalNotSupported: (provider: FederatedIdentityProvider) =>
       new ForbiddenError(
         `Le renouvellement d'une connexion du type ${provider} n'est pas supportée. Veuillez vous reconnecter manuellement.`,

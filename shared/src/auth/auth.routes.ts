@@ -41,7 +41,7 @@ export const authRoutes = defineRoutes({
       200: expressEmptyResponseBody,
     },
   }),
-  afterProConnectOAuthLogin: defineRoute({
+  afterEmailOrProConnectOAuthLogin: defineRoute({
     method: "get",
     url: "/inclusion-connect-after-login", // URI déclarée chez ProConnect, ne pas toucher sauf si on change la config chez ProConnect
     queryParamsSchema: oAuthSuccessLoginParamsSchema,
