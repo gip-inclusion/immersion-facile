@@ -183,7 +183,7 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
       footer={footer}
       buttonsRows={[
         {
-          id: domElementIds.manageConventionUserConnected
+          id: domElementIds.manageConventionConnectedUser
             .pilotConventionToManageButton,
           content: (
             <Button

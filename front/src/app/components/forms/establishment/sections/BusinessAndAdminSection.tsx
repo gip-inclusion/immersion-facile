@@ -69,7 +69,7 @@ export const BusinessAndAdminSection = ({
                 Un ou plusieurs utilisateurs ont demandé l'accès à votre
                 entreprise.{" "}
                 <a
-                  href={`#${domElementIds.establishment.edit.userRightsList}`}
+                  href={`#${domElementIds.formEstablishment.edit.userRightsList}`}
                   className={fr.cx("fr-skiplink")}
                 >
                   Veuillez examiner leur demande.
@@ -137,7 +137,7 @@ export const BusinessAndAdminSection = ({
                 iconId: "fr-icon-arrow-left-line",
                 priority: "secondary",
                 disabled: true,
-                id: domElementIds.establishment[
+                id: domElementIds.formEstablishment[
                   mode
                 ].previousButtonFromStepAndMode({
                   currentStep,
@@ -159,12 +159,12 @@ export const BusinessAndAdminSection = ({
                 type: "button",
                 iconId: "fr-icon-arrow-right-line",
                 iconPosition: "right",
-                id: domElementIds.establishment[mode].nextButtonFromStepAndMode(
-                  {
-                    currentStep,
-                    mode,
-                  },
-                ),
+                id: domElementIds.formEstablishment[
+                  mode
+                ].nextButtonFromStepAndMode({
+                  currentStep,
+                  mode,
+                }),
               },
             ]}
           />
@@ -206,7 +206,8 @@ const EstablishmentAdminInfos = () => {
             disabled
             nativeInputProps={{
               value: federatedIdentity?.firstName,
-              id: domElementIds.establishment.create.businessContact.firstName,
+              id: domElementIds.formEstablishment.create.businessContact
+                .firstName,
             }}
           />
           <Input
@@ -217,7 +218,8 @@ const EstablishmentAdminInfos = () => {
             disabled
             nativeInputProps={{
               value: federatedIdentity?.lastName,
-              id: domElementIds.establishment.create.businessContact.lastName,
+              id: domElementIds.formEstablishment.create.businessContact
+                .lastName,
             }}
           />
         </>
@@ -229,7 +231,7 @@ const EstablishmentAdminInfos = () => {
         disabled
         nativeInputProps={{
           value: federatedIdentity?.email,
-          id: domElementIds.establishment.create.businessContact.email,
+          id: domElementIds.formEstablishment.create.businessContact.email,
         }}
       />
       <Input

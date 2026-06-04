@@ -74,6 +74,12 @@ export const frontErrors = {
       }),
   },
   generic: {
+    temporaryError: () =>
+      new FrontSpecificError({
+        title: "Une erreur technique est survenue",
+        description: "Veuillez réessayer plus tard.",
+        buttons: [HomeButton],
+      }),
     backendUnreachable: () =>
       new FrontSpecificError({
         title: "Immersion Facilitée est momentanément indisponible",
@@ -276,7 +282,7 @@ export const frontErrors = {
             priority="primary"
             linkProps={{
               ...routes.initiateConvention().link,
-              id: domElementIds.error.initiateConventionButton,
+              id: domElementIds.temporaryError.initiateConventionButton,
             }}
           >
             Créer une demande de convention
@@ -308,7 +314,7 @@ const EstablishmentDashboardButton: ErrorButton = (
     priority="primary"
     linkProps={{
       ...routes.establishmentDashboard().link,
-      id: domElementIds.error.establishmentDashboardButton,
+      id: domElementIds.temporaryError.establishmentDashboardButton,
     }}
   >
     Accéder à mon espace entreprise
@@ -320,7 +326,7 @@ export const HomeButton: ErrorButton = (
     priority="primary"
     linkProps={{
       ...routes.home().link,
-      id: domElementIds.error.homeButton,
+      id: domElementIds.temporaryError.homeButton,
     }}
   >
     Page d'accueil
@@ -336,7 +342,7 @@ export const ContactUsButton = ({
       linkProps={{
         href: `${immersionFacileSupportUrl}`,
         target: "_blank",
-        id: domElementIds.error.contactUsButton,
+        id: domElementIds.temporaryError.contactUsButton,
       }}
     >
       Contactez-nous

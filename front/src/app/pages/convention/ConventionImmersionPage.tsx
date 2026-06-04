@@ -226,7 +226,6 @@ const SharedConventionMessage = ({
         iconPosition="right"
         id={
           domElementIds.conventionImmersion.fromSharedConventionContinueButton
-            .fromSharedConventionContinueButton
         }
       >
         Compléter la demande de convention

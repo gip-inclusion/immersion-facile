@@ -1084,7 +1084,6 @@ const ConventionFormContent = ({
                       ? domElementIds.conventionTemplate.form
                           .submitFormButtonMobile
                       : domElementIds.conventionImmersion.submitFormButtonMobile
-                          .submitFormButtonMobile
                   }
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");

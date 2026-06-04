@@ -72,7 +72,7 @@ export const OffersSection = ({
           type="button"
           iconId="fr-icon-add-line"
           title="Ajouter un métier"
-          id={domElementIds.establishment[mode].addOfferButton}
+          id={domElementIds.formEstablishment[mode].addOfferButton}
           priority="secondary"
           onClick={() => {
             setSelectedOfferIndex(null);
@@ -145,7 +145,7 @@ export const OffersSection = ({
                   : removeAtIndex(addresses, index);
               setValue("businessAddresses", newAddresses);
             }}
-            id={domElementIds.establishment[mode].businessAddresses}
+            id={domElementIds.formEstablishment[mode].businessAddresses}
           />
         </HeadingSection>
       )}
@@ -169,7 +169,7 @@ export const OffersSection = ({
                 children: "Étape précédente",
                 iconId: "fr-icon-arrow-left-line",
                 priority: "secondary",
-                id: domElementIds.establishment[
+                id: domElementIds.formEstablishment[
                   mode
                 ].previousButtonFromStepAndMode({
                   currentStep,
@@ -188,12 +188,12 @@ export const OffersSection = ({
                 type: "button",
                 iconId: "fr-icon-arrow-right-line",
                 iconPosition: "right",
-                id: domElementIds.establishment[mode].nextButtonFromStepAndMode(
-                  {
-                    currentStep,
-                    mode,
-                  },
-                ),
+                id: domElementIds.formEstablishment[
+                  mode
+                ].nextButtonFromStepAndMode({
+                  currentStep,
+                  mode,
+                }),
               },
             ]}
           />

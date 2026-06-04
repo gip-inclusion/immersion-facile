@@ -1071,6 +1071,7 @@ export const domElementIds = {
   },
   magicLinkInterstitial: {
     confirmLoginButton: "im-magic-link-interstitial__confirm-login-button",
+    renewalButton: "im-magic-link-interstitial__renewal-button",
   },
   adminEstablishments: {},
   establishmentDashboard: {
@@ -1282,5 +1283,10 @@ export const domElementIds = {
   establishmentDashboardFormEstablishment: {},
   openApiDoc: {},
   stats: {},
-  temporaryError: {},
+  temporaryError: {
+    initiateConventionButton: "im-error__initiate-convention-button",
+    establishmentDashboardButton: "im-error__establishment-dashboard-button",
+    homeButton: "im-error__home-button",
+    contactUsButton: "im-error__contact-us-button",
+  },
 } satisfies DomElementIds;

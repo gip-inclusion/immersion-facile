@@ -49,7 +49,7 @@ const emptyOffer: CurrentOffer = {
 
 export const offerModal = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.establishment.offerModal,
+  id: domElementIds.formEstablishment.offerModal,
 });
 
 export const OfferModal = ({
@@ -103,7 +103,7 @@ export const OfferModal = ({
             selectedOfferIndex !== null
               ? "Modifier ce métier"
               : "Ajouter ce métier",
-          id: domElementIds.establishment.offerModalSubmitButton,
+          id: domElementIds.formEstablishment.offerModalSubmitButton,
           onClick: async () => {
             const { offers } = formValues;
             const validCurrentOfferResult =
@@ -128,7 +128,7 @@ export const OfferModal = ({
           label={"Rechercher un métier"}
           locator={"form-establishment-offer-modal"}
           selectProps={{
-            inputId: domElementIds.establishment[mode].appellations,
+            inputId: domElementIds.formEstablishment[mode].appellations,
           }}
           initialInputValue={
             selectedOfferIndex
@@ -172,7 +172,7 @@ export const OfferModal = ({
         />
         <RadioButtons
           legend={"Proposez-vous du télétravail sur ce métier ?"}
-          id={domElementIds.establishment[mode].remoteWorkMode}
+          id={domElementIds.formEstablishment[mode].remoteWorkMode}
           options={remoteWorkModes.map((remoteWorkMode) => ({
             label: remoteWorkModeLabels[remoteWorkMode].answerLabel,
             nativeInputProps: {

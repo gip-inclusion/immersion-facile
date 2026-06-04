@@ -447,7 +447,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            id={domElementIds.establishment[mode].form}
+            id={domElementIds.formEstablishment[mode].form}
           >
             {match(currentStep)
               .with(null, () => (

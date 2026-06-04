@@ -25,7 +25,7 @@ export const OfferCard = ({
   return (
     <div
       className={fr.cx("fr-col-12", "fr-col-lg-6")}
-      id={`${domElementIds.establishment[mode].offerCard}-${index}`}
+      id={`${domElementIds.formEstablishment[mode].offerCard}-${index}`}
     >
       <article className={fr.cx("fr-card", "fr-p-2w", "fr-pt-1v")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
@@ -49,7 +49,7 @@ export const OfferCard = ({
               type: "button",
               className: fr.cx("fr-mb-0"),
               onClick: onEditOfferClick,
-              id: `${domElementIds.establishment[mode].editOfferButton}-${index}`,
+              id: `${domElementIds.formEstablishment[mode].editOfferButton}-${index}`,
             },
             {
               children: "Supprimer",
@@ -58,7 +58,7 @@ export const OfferCard = ({
               priority: "tertiary",
               type: "button",
               className: fr.cx("fr-mb-0"),
-              id: `${domElementIds.establishment[mode].deleteOfferButton}-${index}`,
+              id: `${domElementIds.formEstablishment[mode].deleteOfferButton}-${index}`,
               onClick: () => {
                 const offers = formValues.offers;
                 const newOffers = removeAtIndex(offers, index);

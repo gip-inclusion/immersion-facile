@@ -383,7 +383,7 @@ const getAllowedStartAuthPage = (
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
-    return "manageConventionUserConnected";
+    return "manageConventionConnectedUser";
   if (
     agencyDashboardRoutes.includes(routeName as AgencyDashboardRouteName) &&
     "isAgencyRegistration" in routeParams &&
@@ -398,7 +398,7 @@ const getAllowedStartAuthPage = (
     return "establishmentDashboard";
   if (agencyDashboardRoutes.includes(routeName as AgencyDashboardRouteName))
     return "agencyDashboard";
-  if (routeName === "formEstablishment") return "establishment";
+  if (routeName === "formEstablishment") return "formEstablishment";
   return "admin";
 };
 
@@ -544,7 +544,7 @@ const defaultPageContent: PageContent = {
 
 const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
   {
-    establishment: {
+    formEstablishment: {
       title: "Proposer une immersion",
       description: (
         <>
@@ -627,7 +627,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       ],
     },
     agencyDashboard: agencyDashboardContent,
-    manageConventionUserConnected: agencyDashboardContent,
+    manageConventionConnectedUser: agencyDashboardContent,
     admin: {
       title: "Mon espace administrateur",
       description: "Pour la super team IF 😉",

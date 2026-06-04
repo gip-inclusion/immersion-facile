@@ -168,7 +168,7 @@ export const OffersSettingsSection = ({
         description="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ? *"
       >
         <RadioButtons
-          id={domElementIds.establishment[mode].availabilityButton}
+          id={domElementIds.formEstablishment[mode].availabilityButton}
           name="availableForImmersion"
           options={richBooleanSelectOptions.map((option) => ({
             ...option,
@@ -248,7 +248,8 @@ export const OffersSettingsSection = ({
                 Mise en relation max/mois :{" "}
                 <span
                   id={
-                    domElementIds.establishment.admin.maxContactsPerMonthValue
+                    domElementIds.formEstablishment.admin
+                      .maxContactsPerMonthValue
                   }
                 >
                   {getValues().maxContactsPerMonth}
@@ -260,7 +261,7 @@ export const OffersSettingsSection = ({
                     à partir du{" "}
                     <span
                       id={
-                        domElementIds.establishment.admin
+                        domElementIds.formEstablishment.admin
                           .nextAvailabilityDateValue
                       }
                     >
@@ -299,7 +300,7 @@ export const OffersSettingsSection = ({
       >
         <RadioButtons
           name="searchableBy"
-          id={domElementIds.establishment[mode].searchableBy}
+          id={domElementIds.formEstablishment[mode].searchableBy}
           options={searchableByOptions.map((option) => ({
             ...option,
             nativeInputProps: {
@@ -380,7 +381,7 @@ export const OffersSettingsSection = ({
                 onClick: () => onStepChange(2, []),
                 iconId: "fr-icon-arrow-left-line",
                 priority: "secondary",
-                id: domElementIds.establishment[
+                id: domElementIds.formEstablishment[
                   mode
                 ].previousButtonFromStepAndMode({
                   currentStep,
@@ -404,12 +405,12 @@ export const OffersSettingsSection = ({
                 iconId: "fr-icon-arrow-right-line",
                 iconPosition: "right",
                 type: "button",
-                id: domElementIds.establishment[mode].nextButtonFromStepAndMode(
-                  {
-                    currentStep,
-                    mode,
-                  },
-                ),
+                id: domElementIds.formEstablishment[
+                  mode
+                ].nextButtonFromStepAndMode({
+                  currentStep,
+                  mode,
+                }),
               },
             ]}
           />
@@ -425,7 +426,7 @@ export const OffersSettingsSection = ({
                 iconId: "fr-icon-save-line",
                 priority: "primary",
                 type: "submit",
-                id: domElementIds.establishment[mode].submitFormButton,
+                id: domElementIds.formEstablishment[mode].submitFormButton,
               },
               ...(isEstablishmentAdmin
                 ? [
@@ -544,7 +545,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
   return (
     <>
       <RadioButtons
-        id={domElementIds.establishment[mode].contactMode}
+        id={domElementIds.formEstablishment[mode].contactMode}
         {...contactModeRegister}
         options={[
           {
@@ -635,7 +636,7 @@ const ContactModeSection = ({ mode }: { mode: Mode }) => {
             <RadioButtons
               legend="Si vous ne répondez pas dans les 15 jours, est-ce que vous consentez à ce que le candidat vous contacte par téléphone ? *"
               id={
-                domElementIds.establishment[mode].businessContact
+                domElementIds.formEstablishment[mode].businessContact
                   .isMainContactByPhone
               }
               options={[

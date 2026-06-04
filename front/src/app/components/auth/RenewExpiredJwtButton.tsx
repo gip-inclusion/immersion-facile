@@ -59,7 +59,7 @@ export const RenewExpiredJwtButton = ({
         }
         onClick={onClick}
         nativeButtonProps={{
-          id: domElementIds.magicLinkRenewal.renewalButton,
+          id: domElementIds.magicLinkInterstitial.renewalButton,
         }}
       >
         Demander un nouveau lien
