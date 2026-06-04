@@ -66,8 +66,12 @@ export const makeNotifyConventionDraftSaved = useCaseBuilder(
 
       const longLink: AbsoluteUrl = makeRouteAbsoluteUrl(
         draft.internshipKind === "immersion"
-          ? routes.conventionImmersion()
-          : routes.conventionMiniStage(),
+          ? routes.conventionImmersion({
+              conventionDraftId: draft.id,
+            })
+          : routes.conventionMiniStage({
+              conventionDraftId: draft.id,
+            }),
         config.immersionFacileBaseUrl,
       );
       const conventionFormUrl = await makeShortLink({
