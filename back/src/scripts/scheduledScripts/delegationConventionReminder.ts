@@ -1,0 +1,63 @@
+import { filterNotFalsy } from "shared";
+import { AppConfig } from "../../config/bootstrap/appConfig";
+import { createMakeProductionPgPool } from "../../config/pg/pgPool";
+import { makeDelegationConventionReminder } from "../../domains/agency/use-cases/DelegationConventionReminder";
+import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
+import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
+import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { createLogger } from "../../utils/logger";
+import { handleCRONScript } from "../handleCRONScript";
+
+const config = AppConfig.createFromEnv();
+
+const logger = createLogger(__filename);
+
+const executeDelegationConventionReminder = () => {
+  logger.info({
+    message: "Starting delegation convention reminder script",
+  });
+  const timeGateway = new RealTimeGateway();
+
+  return makeDelegationConventionReminder({
+    uowPerformer: createDbRelatedSystems(
+      config,
+      createMakeProductionPgPool(config),
+    ).uowPerformer,
+    deps: {
+      timeGateway,
+      createNewEvent: makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new UuidV4Generator(),
+      }),
+    },
+  }).execute();
+};
+
+export const triggerDelegationConventionReminder = ({
+  exitOnFinish,
+}: {
+  exitOnFinish: boolean;
+}) =>
+  handleCRONScript({
+    name: "delegationConventionReminderScript",
+    config,
+    script: executeDelegationConventionReminder,
+    handleResults: ({ success, failures }) => {
+      const reportLines = [
+        `Total of reminders : ${success + failures.length}`,
+        `Number of successfully reminders : ${success}`,
+        `Number of failures : ${failures.length}`,
+        ...(failures.length > 0
+          ? [
+              `Failures : \n${failures
+                .map(({ id, error }) => `  - For agency id ${id} : ${error}`)
+                .join("\n")}`,
+            ]
+          : []),
+      ];
+      return reportLines.filter(filterNotFalsy).join("\n");
+    },
+    logger,
+    exitOnFinish,
+  });
