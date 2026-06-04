@@ -1,3 +1,4 @@
+import { isSameDay, parseISO } from "date-fns";
 import { keys, toPairs, uniq, values } from "ramda";
 import {
   type AddressDto,
@@ -154,6 +155,10 @@ export class InMemoryAgencyRepository implements AgencyRepository {
             ),
             agencyCreatedAtBefore(agency, filters?.createdAtBefore),
             agencyHasUserIds(agency, filters?.userIds),
+            agencyDelegationConventionEndsOnDate(
+              agency,
+              filters?.delegationConventionEndDate,
+            ),
           ].includes(false),
       );
 
@@ -376,6 +381,22 @@ const agencyCreatedAtBefore = (
 ): boolean => {
   if (createdAtBefore === undefined) return true;
   return new Date(agency.createdAt) <= createdAtBefore;
+};
+
+const agencyDelegationConventionEndsOnDate = (
+  agency: AgencyWithUsersRights,
+  delegationConventionEndDate: DateString | undefined,
+): boolean => {
+  if (delegationConventionEndDate === undefined) return true;
+
+  const agencyDelegationEndDate =
+    agency.delegationAgencyInfo?.delegationEndDate;
+  if (!agencyDelegationEndDate) return false;
+
+  return isSameDay(
+    parseISO(agencyDelegationEndDate),
+    parseISO(delegationConventionEndDate),
+  );
 };
 
 const defaultCreatedAt = new Date("2025-02-02").toISOString();

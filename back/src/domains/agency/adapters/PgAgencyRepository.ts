@@ -1,3 +1,4 @@
+import { parseISO, startOfDay } from "date-fns";
 import { sql } from "kysely";
 import { map, partition, toPairs } from "ramda";
 import {
@@ -268,6 +269,7 @@ export class PgAgencyRepository implements AgencyRepository {
       status,
       createdAtBefore,
       userIds,
+      delegationConventionEndDate,
       ...rest
     } = filters;
 
@@ -351,6 +353,14 @@ export class PgAgencyRepository implements AgencyRepository {
                   .where("sub.user_id", "in", userIds),
               ),
             )
+          : b,
+      (b) =>
+        delegationConventionEndDate
+          ? b
+              .where("agencies.delegation_info", "is not", null)
+              .where(
+                sql<boolean>`(${sql.ref("agencies.delegation_info")} ->> 'delegationEndDate')::timestamptz::date = ${sql`${startOfDay(parseISO(delegationConventionEndDate))}::date`}`,
+              )
           : b,
     );
 

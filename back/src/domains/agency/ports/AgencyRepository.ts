@@ -30,6 +30,7 @@ export type GetAgenciesFilters = {
   doesNotReferToOtherAgency?: true;
   createdAtBefore?: Date;
   userIds?: UserId[];
+  delegationConventionEndDate?: DateString;
 };
 
 export type AgencyWithoutRights = Omit<
