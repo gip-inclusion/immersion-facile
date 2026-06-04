@@ -117,7 +117,7 @@ test.describe("Convention manage actions from prescriber dashboard", () => {
       domElementIds.manageConvention.otherActionsButton,
       domElementIds.manageConvention.duplicateConventionButton,
     );
-    await managePage.waitForURL(`**/${routes.conventionImmersion().href}**`, {
+    await managePage.waitForURL(`**${routes.conventionImmersion().href}**`, {
       timeout: 30_000,
     });
     const {
