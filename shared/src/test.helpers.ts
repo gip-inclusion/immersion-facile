@@ -44,11 +44,9 @@ export const expectArraysToEqual = <T>(actual: T[], expected: T[]) => {
 
 export const expectJwtInMagicLinkAndGetIt = (link: string | unknown) => {
   expect(typeof link).toBe("string");
-  expect((link as string).includes("jwt=")).toBeTruthy();
-  const split = (link as string).split("jwt=");
-  const last = split[split.length - 1];
-  expect(last).toBeTruthy();
-  return last;
+  const jwt = new URL(link as string).searchParams.get("jwt");
+  expect(jwt).toBeTruthy();
+  return jwt as string;
 };
 
 export const expectArraysToEqualIgnoringOrder = <T>(
