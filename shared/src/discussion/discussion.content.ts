@@ -20,7 +20,7 @@ Malheureusement, nous ne souhaitons pas donner suite à votre candidature à l�
 
 La raison du refus est : ${makeRejectionText(params)}
 
-N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/${routes.search()}">rechercher une immersion dans une autre entreprise</a> !
+N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr${routes.search().href}">rechercher une immersion dans une autre entreprise</a> !
 
 Bonne journée, 
 ${fromUser.firstName} ${fromUser.lastName}, représentant de l'entreprise ${discussion.businessName}`,

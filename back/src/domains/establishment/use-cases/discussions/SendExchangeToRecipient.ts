@@ -112,8 +112,16 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   ${renderCTAInEmailContent({
                     url: makeRouteAbsoluteUrl(
                       lastExchange.sender === "establishment"
-                        ? routes.beneficiaryDashboardDiscussions()
-                        : routes.establishmentDashboardDiscussions(),
+                        ? routes.beneficiaryDashboardDiscussions({
+                            discussionId: discussion.id,
+                            mtm_campaign:
+                              "inbound-parsing-reponse-via-tableau-de-bord",
+                          })
+                        : routes.establishmentDashboardDiscussions({
+                            discussionId: discussion.id,
+                            mtm_campaign:
+                              "inbound-parsing-reponse-via-tableau-de-bord",
+                          }),
                       deps.config.immersionFacileBaseUrl,
                     ),
                     label: "Répondre depuis mon espace",

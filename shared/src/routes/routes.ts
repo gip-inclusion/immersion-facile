@@ -176,7 +176,10 @@ export type ConventionTemplateFromRoute = Extract<
 const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
 const beneficiaryDashboard = defineRoute(
-  connectedUserParams,
+  {
+    ...connectedUserParams,
+    ...acquisitionParams,
+  },
   () => `/${frontRoutes.beneficiaryDashboard}`,
 );
 
