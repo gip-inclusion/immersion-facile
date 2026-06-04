@@ -37,8 +37,10 @@ export class InMemoryConventionFranceTravailAdvisorRepository
     conventionId: ConventionId,
   ): Promise<ConventionFtUserAdvisorEntity | undefined> {
     const userFtExternalId = this.#conventionFranceTravailUsers[conventionId];
-    const userAndAdvisor = this.#ftConnectedUsers[userFtExternalId];
 
+    if (!userFtExternalId) return undefined;
+
+    const userAndAdvisor = this.#ftConnectedUsers[userFtExternalId];
     return {
       peExternalId: userFtExternalId,
       conventionId,

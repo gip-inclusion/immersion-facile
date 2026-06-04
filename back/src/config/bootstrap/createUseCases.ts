@@ -292,7 +292,7 @@ export const createUseCases = ({
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
-        oAuthGateway: gateways.proConnectOAuthGateway,
+        proConnectOAuthGateway: gateways.proConnectOAuthGateway,
         ftConnectGateway: gateways.ftConnectGateway,
         uuidGenerator,
         generateConnectedUserLoginUrl,
@@ -876,7 +876,7 @@ export const createUseCases = ({
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
       uowPerformer,
       deps: {
-        oAuthGateway: gateways.proConnectOAuthGateway,
+        proConnectOAuthGateway: gateways.proConnectOAuthGateway,
         ftConnectGateway: gateways.ftConnectGateway,
       },
     }),

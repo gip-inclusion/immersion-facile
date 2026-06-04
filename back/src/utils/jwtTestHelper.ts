@@ -2,7 +2,6 @@ import {
   type ConnectedUserJwt,
   type ConnectedUserQueryParams,
   decodeURIWithParams,
-  errors,
   filterNotFalsy,
   frontRoutes,
   makeRouteAbsoluteUrl,
@@ -55,15 +54,11 @@ export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
   user,
   ongoingOAuth,
 }) => {
-  if (ongoingOAuth.provider === "peConnect")
-    // TODO : implement
-    throw errors.auth.missingOAuth({ state: ongoingOAuth.state });
-
   const { uriWithoutParams, params } = decodeURIWithParams(
     ongoingOAuth.fromUri,
   );
 
-  return `${"http://fake-connected-user"}${uriWithoutParams}?${queryParamsAsString<ConnectedUserQueryParams>(
+  return `http://fake-connected-user${uriWithoutParams}?${queryParamsAsString<ConnectedUserQueryParams>(
     {
       ...params,
       token: user.id as ConnectedUserJwt,

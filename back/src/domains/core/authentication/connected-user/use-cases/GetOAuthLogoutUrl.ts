@@ -16,14 +16,14 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
   .withOutput<AbsoluteUrl>()
   .withCurrentUser<ConnectedUser | undefined>()
   .withDeps<{
-    oAuthGateway: OAuthGateway;
+    proConnectOAuthGateway: OAuthGateway;
     ftConnectGateway: FtConnectGateway;
   }>()
   .build(
     async ({
       inputParams,
       uow,
-      deps: { oAuthGateway, ftConnectGateway },
+      deps: { proConnectOAuthGateway: oAuthGateway, ftConnectGateway },
       currentUser,
     }) => {
       if (inputParams.provider === "peConnect") {

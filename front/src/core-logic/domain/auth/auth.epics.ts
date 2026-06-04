@@ -7,7 +7,6 @@ import {
   type ConventionJwt,
   type EmailAuthCodeJwt,
   errors,
-  isFederatedIdentityProviderWithLogoutCallback,
   type RenewExpiredJwtRequestDto,
 } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
@@ -136,10 +135,7 @@ const getLogoutUrl$ = (
   if (!federatedIdentityWithUser)
     return throwError(() => errors.auth.missingOAuth({}));
   const { provider } = federatedIdentityWithUser;
-  if (
-    isFederatedIdentityProviderWithLogoutCallback(provider) &&
-    action.payload.mode === "device-and-oauth"
-  ) {
+  if (action.payload.mode === "device-and-oauth") {
     const { idToken } = federatedIdentityWithUser;
     return authGateway.getLogoutUrl$({
       idToken: authState.federatedIdentityWithUser ? idToken : "",

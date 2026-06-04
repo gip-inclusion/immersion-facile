@@ -25,7 +25,10 @@ export const allowedLoginSources = [
 export type ExternalId = Flavor<string, "ExternalId">;
 
 export type IdToken = Flavor<string, "IdToken">;
-export type IdentityProvider = "proConnect" | "email";
+export type IdentityProvider = Extract<
+  FederatedIdentityProvider,
+  "proConnect" | "email"
+>;
 export type OAuthState = Flavor<string, "OAuthState">;
 export type OAuthCode = Flavor<string, "OAuthCode">;
 
@@ -42,8 +45,11 @@ export type WithRedirectUri = {
   redirectUri: AllowedRedirectUri;
 };
 
-export const oAuthProvidersForLogin = ["proConnect", "peConnect"] as const;
-export type OAuthProviderForLogin = (typeof oAuthProvidersForLogin)[number];
+export type OAuthProviderForLogin = Exclude<FederatedIdentityProvider, "email">;
+export const oAuthProvidersForLogin = [
+  "proConnect",
+  "peConnect",
+] as const satisfies OAuthProviderForLogin[];
 
 export type InitiateLoginByOAuthParams = WithRedirectUri & {
   provider: OAuthProviderForLogin;

@@ -5,32 +5,16 @@ import type { Flavor } from "../typeFlavors";
 export type FederatedIdentityProvider =
   (typeof federatedIdentityProviders)[number];
 
-export type FederatedIdentityProviderWithLogoutCallback =
-  (typeof federatedIdentityProvidersWithLogoutCallback)[number];
-
-export const federatedIdentityProvidersWithLogoutCallback = [
-  //TODO : nettoyage
+export const federatedIdentityProviders = [
   "proConnect",
   "email",
   "peConnect",
-] as const;
-
-export const federatedIdentityProviders = [
-  ...federatedIdentityProvidersWithLogoutCallback,
-  "email",
 ] as const;
 
 export const isFederatedIdentityProvider = (
   provider: string,
 ): provider is FederatedIdentityProvider =>
   federatedIdentityProviders.includes(provider as FederatedIdentityProvider);
-
-export const isFederatedIdentityProviderWithLogoutCallback = (
-  provider: string,
-): provider is FederatedIdentityProviderWithLogoutCallback =>
-  federatedIdentityProvidersWithLogoutCallback.includes(
-    provider as FederatedIdentityProviderWithLogoutCallback,
-  );
 
 type GenericFederatedIdentity<
   Provider extends FederatedIdentityProvider,

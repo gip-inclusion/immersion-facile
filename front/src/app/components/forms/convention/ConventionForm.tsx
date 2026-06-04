@@ -374,7 +374,7 @@ const ConventionFormContent = ({
   const route = useConventionRoute();
   const fromPeConnectedUser =
     "fedIdProvider" in route.params
-      ? route.params.fedIdProvider === "ftConnect"
+      ? route.params.fedIdProvider === "peConnect"
       : undefined;
 
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
@@ -523,7 +523,8 @@ const ConventionFormContent = ({
       frontRoutes
         .conventionTemplate({
           fromRoute:
-            "fromRoute" in route.params
+            "fromRoute" in route.params &&
+            isConventionTemplateFromRoute(route.params.fromRoute)
               ? route.params.fromRoute
               : "agencyDashboard",
           conventionTemplateId: conventionToSave.id,
