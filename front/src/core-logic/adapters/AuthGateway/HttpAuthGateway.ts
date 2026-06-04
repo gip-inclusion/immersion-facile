@@ -98,7 +98,7 @@ export class HttpAuthGateway implements AuthGateway {
   ): Observable<AfterOAuthSuccessRedirectionResponse> {
     return from(
       this.httpClient
-        .afterProConnectOAuthLogin({
+        .afterEmailOrProConnectOAuthLogin({
           queryParams: params,
         })
         .then((response) =>

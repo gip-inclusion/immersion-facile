@@ -121,7 +121,7 @@ describe("auth router", () => {
         it.each(allowedLoginUris)(`${displayRouteName(
           authRoutes.initiateLoginByOAuth,
         )} 302 > [ProConnect]/login - 302 > ${displayRouteName(
-          authRoutes.afterProConnectOAuthLogin,
+          authRoutes.afterEmailOrProConnectOAuthLogin,
         )} 302 > page %s with required connected user params`, async (page) => {
           const generatedUserId = "my-user-id";
           const uuids = [nonce, state, generatedUserId];
@@ -167,12 +167,13 @@ describe("auth router", () => {
             },
           });
 
-          const response = await authRoutesClient.afterProConnectOAuthLogin({
-            queryParams: {
-              code: authCode,
-              state,
-            },
-          });
+          const response =
+            await authRoutesClient.afterEmailOrProConnectOAuthLogin({
+              queryParams: {
+                code: authCode,
+                state,
+              },
+            });
 
           if (response.status !== 302)
             throw errors.generic.testError("Response must be 302");
@@ -268,12 +269,13 @@ describe("auth router", () => {
           },
         });
 
-        const response = await authRoutesClient.afterProConnectOAuthLogin({
-          queryParams: {
-            code: authCode,
-            state,
-          },
-        });
+        const response =
+          await authRoutesClient.afterEmailOrProConnectOAuthLogin({
+            queryParams: {
+              code: authCode,
+              state,
+            },
+          });
 
         expectHttpResponseToEqual(response, {
           body: {},
@@ -299,7 +301,7 @@ describe("auth router", () => {
         it.each(allowedLoginUris)(`${displayRouteName(
           authRoutes.initiateLoginByEmail,
         )} 200 | EMAIL with connexion link > ${displayRouteName(
-          authRoutes.afterProConnectOAuthLogin,
+          authRoutes.afterEmailOrProConnectOAuthLogin,
         )} 200 > page %s with required connected user params`, async (uri) => {
           const email: Email = "mail@email.com";
           const generatedUserId = "my-user-id";
@@ -341,12 +343,13 @@ describe("auth router", () => {
             throw new Error(
               `missing code on url ${notification.templatedContent.params.loginLink}`,
             );
-          const response = await authRoutesClient.afterProConnectOAuthLogin({
-            queryParams: {
-              code,
-              state,
-            },
-          });
+          const response =
+            await authRoutesClient.afterEmailOrProConnectOAuthLogin({
+              queryParams: {
+                code,
+                state,
+              },
+            });
 
           if (response.status !== 200)
             throw errors.generic.testError("Response must be 200");
