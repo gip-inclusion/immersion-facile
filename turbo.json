@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": ["SSH_AUTH_SOCK"],
   "tasks": {
     "includecheck": {
       "outputs": []
