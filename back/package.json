@@ -36,6 +36,7 @@
     "trigger-add-agencies-and-users": "ts-node src/scripts/triggerAddAgenciesAndUsers.ts",
     "trigger-archive-discussions": "ts-node src/scripts/triggerArchiveDiscussions.ts",
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
+    "trigger-delegation-convention-reminder": "ts-node src/scripts/triggerDelegationConventionReminder.ts",
     "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",
     "trigger-contact-request-reminder-7d": "ts-node src/scripts/triggerContactRequestReminder7Days.ts",
     "trigger-contact-request-beneficiary-reminder-15d": "ts-node src/scripts/triggerContactRequestBeneficiaryReminder15Days.ts",
