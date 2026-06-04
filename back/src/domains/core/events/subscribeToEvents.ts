@@ -240,6 +240,9 @@ const getUseCasesByTopics = (
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
   AgencyRegisteredToConnectedUser: [],
   AgencyHasBeenPutOnHold: [useCases.notifyAgencyHasBeenPutOnHold],
+  DelegationConventionReminderRequired: [
+    useCases.notifyDelegationConventionReminder,
+  ],
 
   // Assessment related:
   AssessmentCreated: [
