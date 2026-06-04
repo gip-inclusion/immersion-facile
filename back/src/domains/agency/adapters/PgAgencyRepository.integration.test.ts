@@ -1517,6 +1517,68 @@ describe("PgAgencyRepository", () => {
         expectToEqual(agencies, []);
       });
     });
+
+    describe("filter delegationConventionEndDate", () => {
+      it("returns only agencies whose delegation convention ends on the given date", async () => {
+        const delegationEndDate = new Date("2031-06-30").toISOString();
+        const otherDelegationEndDate = new Date("2031-12-31").toISOString();
+
+        const agencyWithMatchingEndDate = toAgencyWithRights(
+          agency1builder
+            .withId("00000000-0000-0000-0000-000000000099")
+            .withKind("autre")
+            .withStatus("active")
+            .withDelegationAgencyInfo({
+              delegationEndDate,
+              delegationAgencyName: "DR France Travail",
+              delegationAgencyKind: "pole-emploi",
+            })
+            .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
+        );
+        const agencyWithOtherEndDate = toAgencyWithRights(
+          agency1builder
+            .withId("00000000-0000-0000-0000-000000000098")
+            .withKind("autre")
+            .withStatus("active")
+            .withDelegationAgencyInfo({
+              delegationEndDate: otherDelegationEndDate,
+              delegationAgencyName: "DR France Travail",
+              delegationAgencyKind: "pole-emploi",
+            })
+            .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
+        );
+        const agencyWithoutDelegation = toAgencyWithRights(
+          agency1builder
+            .withId("00000000-0000-0000-0000-000000000097")
+            .withKind("autre")
+            .withStatus("active")
+            .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
+        );
+
+        await agencyRepository.insert(agencyWithMatchingEndDate);
+        await agencyRepository.insert(agencyWithOtherEndDate);
+        await agencyRepository.insert(agencyWithoutDelegation);
+
+        const { data: agencies } = await agencyRepository.getAgencies({
+          filters: {
+            kinds: ["autre"],
+            status: ["active"],
+            delegationConventionEndDate: delegationEndDate,
+          },
+        });
+
+        expectToEqual(agencies, [agencyWithMatchingEndDate]);
+      });
+    });
   });
 
   describe("getAgenciesRelatedToAgency()", () => {
