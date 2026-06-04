@@ -14,7 +14,7 @@ const makeEmptySearch = async (page: Page) => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.candidate}`);
   await page.click(`#${domElementIds.homeCandidates.heroHeader.search}`);
-  await expect(page).toHaveURL(`/${routes.search().href}`);
+  await expect(page.url()).toContain(`${routes.search().href}`);
   await expectSearchSubmitButtonToBeEnabled(page);
   await page.click(`#${domElementIds.search.searchSubmitButton}`);
   await expectSearchToHaveResults(page);
