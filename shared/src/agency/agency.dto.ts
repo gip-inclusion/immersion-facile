@@ -180,6 +180,15 @@ export type DelegationAgencyInfo = {
   delegationAgencyKind: DelegationAgencyKind | null;
 };
 
+export const delegationConventionReminderKinds = [
+  "threeMonthsBefore",
+  "oneMonthBefore",
+  "dayAfterExpiry",
+] as const;
+
+export type DelegationConventionReminderKind =
+  (typeof delegationConventionReminderKinds)[number];
+
 export type AgencyOption = {
   id: AgencyId;
   name: string;

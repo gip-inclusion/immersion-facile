@@ -42,6 +42,7 @@ import type { WithNotificationIdAndKind } from "../notifications/helpers/Notific
 import type { UpdatePhonePayload } from "../phone-number/use-cases/UpdateInvalidPhone";
 import type {
   ConventionReminderPayload,
+  DelegationConventionReminderPayload,
   TransferConventionToAgencyPayload,
 } from "./eventPayload.dto";
 
@@ -165,6 +166,10 @@ export type DomainEvent =
   | GenericEvent<"AgencyUpdated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyRejected", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyHasBeenPutOnHold", WithAgencyId & WithTriggeredBy>
+  | GenericEvent<
+      "DelegationConventionReminderRequired",
+      DelegationConventionReminderPayload
+    >
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithConventionDto & WithAssessmentDto & WithTriggeredBy>

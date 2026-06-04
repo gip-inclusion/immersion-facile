@@ -1,6 +1,7 @@
 import type {
   AgencyId,
   ConventionId,
+  DelegationConventionReminderKind,
   ReminderKind,
   WithAgencyId,
   WithConventionDto,
@@ -9,6 +10,11 @@ import type {
 export type ConventionReminderPayload = {
   reminderKind: ReminderKind;
   conventionId: ConventionId;
+};
+
+export type DelegationConventionReminderPayload = {
+  agencyId: AgencyId;
+  reminderKind: DelegationConventionReminderKind;
 };
 
 export type TransferConventionToAgencyPayload = WithConventionDto &
