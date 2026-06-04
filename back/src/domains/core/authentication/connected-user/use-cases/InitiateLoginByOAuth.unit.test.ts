@@ -11,7 +11,7 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   fakeProviderConfig,
-  InMemoryOAuthGateway,
+  InMemoryProConnectOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
@@ -30,8 +30,8 @@ describe("InitiateLoginByOAuth usecase", () => {
         new InMemoryUowPerformer(uow),
         uuidGenerator,
         {
-          proConnect: new InMemoryOAuthGateway(fakeProviderConfig),
-          peConnect: new InMemoryOAuthGateway(fakeProviderConfig),
+          proConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+          peConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
         },
       );
 

@@ -5,7 +5,7 @@ import { createApp } from "../config/bootstrap/server";
 import type { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import type { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import type { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import type { InMemoryOAuthGateway } from "../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import type { InMemoryProConnectOAuthGateway } from "../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OAuthGateway } from "../domains/core/authentication/connected-user/port/OAuthGateway";
 import type { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import type { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
@@ -40,7 +40,7 @@ export type InMemoryGateways = {
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
   franceTravailGateway: InMemoryFranceTravailGateway;
-  proConnectOAuthGateway: InMemoryOAuthGateway;
+  proConnectOAuthGateway: InMemoryProConnectOAuthGateway;
   ftConnectOAuthGateway: OAuthGateway;
   documentGateway: InMemoryDocumentGateway;
   dashboardGateway: StubDashboardGateway;
