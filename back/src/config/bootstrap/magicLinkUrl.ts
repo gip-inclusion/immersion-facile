@@ -3,7 +3,6 @@ import {
   type ConnectedUserQueryParams,
   decodeURIWithParams,
   type Email,
-  errors,
   type FrontRouteKeys,
   frontRoutes,
   makeRouteAbsoluteUrl,
@@ -12,7 +11,10 @@ import {
   queryParamsAsString,
   type User,
 } from "shared";
-import type { OngoingOAuth } from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
+import type {
+  EmailOngoingAuth,
+  ProConnectOngoingAuth,
+} from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
 import type { GetAccessTokenResult } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
 import type {
   GenerateConnectedUserJwt,
@@ -87,7 +89,7 @@ export type GenerateConnectedUserLoginUrl = ReturnType<
 export type GenerateConnectedUserLoginUrlParams = {
   user: User;
   accessToken: GetAccessTokenResult | undefined;
-  ongoingOAuth: OngoingOAuth;
+  ongoingOAuth: ProConnectOngoingAuth | EmailOngoingAuth;
   now: Date;
 };
 
@@ -99,10 +101,6 @@ export const makeGenerateConnectedUserLoginUrl =
     ongoingOAuth,
     now,
   }: GenerateConnectedUserLoginUrlParams): AbsoluteUrl => {
-    if (ongoingOAuth.provider === "peConnect")
-      // TODO : implement
-      throw errors.auth.missingOAuth({ state: ongoingOAuth.state });
-
     const { uriWithoutParams, params } = decodeURIWithParams(
       ongoingOAuth.fromUri,
     );

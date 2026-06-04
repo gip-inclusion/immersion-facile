@@ -18,18 +18,18 @@ import {
   type WithRedirectUri,
 } from "./auth.dto";
 
-export const allowedLoginUris = allowedLoginSources.map(
+export const allowedLoginUris: string[] = allowedLoginSources.map(
   (source) => legacyFrontRoutes[source],
-) as [string, ...string[]];
+);
 
-const ftConnectAllowedOAuthRedirectUris: string[] = [
+const ftConnectAllowedOAuthRedirectUris: [string, ...string[]] = [
   legacyFrontRoutes.conventionImmersion,
 ];
 
-export const allowedOAuthRedirectUris = [
-  ...allowedLoginUris,
+export const allowedOAuthRedirectUris: [string, ...string[]] = [
   ...ftConnectAllowedOAuthRedirectUris,
-] as [string, ...string[]];
+  ...allowedLoginUris,
+];
 
 const isAllowedRedirectPath = (
   redirectPath: string,

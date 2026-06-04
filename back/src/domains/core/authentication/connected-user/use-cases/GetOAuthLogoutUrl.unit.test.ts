@@ -45,7 +45,9 @@ describe("GetOAuthLogoutUrl", () => {
       getOAuthLogoutUrl = makeGetOAuthLogoutUrl({
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
-          oAuthGateway: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+          proConnectOAuthGateway: new InMemoryProConnectOAuthGateway(
+            fakeProviderConfig,
+          ),
           ftConnectGateway: new InMemoryFtConnectGateway(),
         },
       });

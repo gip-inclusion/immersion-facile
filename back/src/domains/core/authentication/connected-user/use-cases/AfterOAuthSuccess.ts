@@ -68,7 +68,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
   constructor({
     uowPerformer,
     createNewEvent,
-    oAuthGateway,
+    proConnectOAuthGateway: oAuthGateway,
     uuidGenerator,
     ftConnectGateway,
     generateConnectedUserLoginUrl,
@@ -78,7 +78,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
   }: {
     uowPerformer: UnitOfWorkPerformer;
     createNewEvent: CreateNewEvent;
-    oAuthGateway: OAuthGateway;
+    proConnectOAuthGateway: OAuthGateway;
     ftConnectGateway: FtConnectGateway;
     uuidGenerator: UuidGenerator;
     generateConnectedUserLoginUrl: GenerateConnectedUserLoginUrl;

@@ -18,7 +18,7 @@ import { InMemoryFtConnectGateway } from "../../ft-connect/adapters/ft-connect-g
 import {
   fakeProConnectSiret,
   fakeProviderConfig,
-  InMemoryOAuthGateway,
+  InMemoryProConnectOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { ProConnectGetAccessTokenPayload } from "../port/OAuthGateway";
@@ -38,7 +38,7 @@ describe("AfterOAuthSuccess use case", () => {
   let pool: Pool;
   let db: KyselyDb;
   let uow: UnitOfWork;
-  let oAuthGateway: InMemoryOAuthGateway;
+  let proConnectOAuthGateway: InMemoryProConnectOAuthGateway;
   let ftConnectGateway: InMemoryFtConnectGateway;
   let afterOAuthSuccessRedirection: AfterOAuthSuccess;
   let timeGateway: CustomTimeGateway;
@@ -48,7 +48,9 @@ describe("AfterOAuthSuccess use case", () => {
     db = makeKyselyDb(pool);
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
-    oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    proConnectOAuthGateway = new InMemoryProConnectOAuthGateway(
+      fakeProviderConfig,
+    );
     ftConnectGateway = new InMemoryFtConnectGateway();
     timeGateway = new CustomTimeGateway();
     afterOAuthSuccessRedirection = new AfterOAuthSuccess({
@@ -57,7 +59,7 @@ describe("AfterOAuthSuccess use case", () => {
         timeGateway,
         uuidGenerator,
       }),
-      oAuthGateway,
+      proConnectOAuthGateway,
       ftConnectGateway,
       uuidGenerator,
       generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
@@ -185,7 +187,7 @@ describe("AfterOAuthSuccess use case", () => {
 
     const accessToken = "access-token";
     const idToken = "fake-id-token";
-    oAuthGateway.setAccessTokenResponse({
+    proConnectOAuthGateway.setAccessTokenResponse({
       type: "proConnect",
       payload: expectedIcIdTokenPayload,
       accessToken,
