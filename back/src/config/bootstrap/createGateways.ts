@@ -11,7 +11,7 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { InMemoryProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { ProConnectOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/ProConnectOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
 import type { OAuthGateway } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
@@ -202,7 +202,7 @@ export const createGateways = async (
           }),
           config.proConnectConfig,
         )
-      : new InMemoryOAuthGateway(config.proConnectConfig);
+      : new InMemoryProConnectOAuthGateway(config.proConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({

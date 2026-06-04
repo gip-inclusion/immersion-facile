@@ -15,7 +15,7 @@ import { InMemoryFtConnectGateway } from "../../ft-connect/adapters/ft-connect-g
 import {
   fakeProConnectLogoutUri,
   fakeProviderConfig,
-  InMemoryOAuthGateway,
+  InMemoryProConnectOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
@@ -45,7 +45,7 @@ describe("GetOAuthLogoutUrl", () => {
       getOAuthLogoutUrl = makeGetOAuthLogoutUrl({
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
-          oAuthGateway: new InMemoryOAuthGateway(fakeProviderConfig),
+          oAuthGateway: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
           ftConnectGateway: new InMemoryFtConnectGateway(),
         },
       });

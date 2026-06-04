@@ -34,7 +34,7 @@ import type {
 import type { FtConnectUserDto } from "../../ft-connect/dto/FtConnectUserDto";
 import {
   fakeProviderConfig,
-  InMemoryOAuthGateway,
+  InMemoryProConnectOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type {
@@ -68,7 +68,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     };
 
   let uow: InMemoryUnitOfWork;
-  let oAuthGateway: InMemoryOAuthGateway;
+  let proConnectOAuthGateway: InMemoryProConnectOAuthGateway;
   let ftConnectGateway: InMemoryFtConnectGateway;
   let uuidGenerator: TestUuidGenerator;
   let afterOAuthSuccessRedirection: AfterOAuthSuccess;
@@ -77,7 +77,9 @@ describe("AfterOAuthSuccessRedirection use case", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
-    oAuthGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    proConnectOAuthGateway = new InMemoryProConnectOAuthGateway(
+      fakeProviderConfig,
+    );
     ftConnectGateway = new InMemoryFtConnectGateway();
     timeGateway = new CustomTimeGateway();
     const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
@@ -88,7 +90,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         timeGateway: timeGateway,
         uuidGenerator,
       }),
-      oAuthGateway,
+      proConnectOAuthGateway: proConnectOAuthGateway,
       ftConnectGateway,
       uuidGenerator,
       generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
@@ -402,7 +404,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       const idToken: IdToken = "id-token";
 
       it("rejects the connection if no state match the provided one in DB", async () => {
-        oAuthGateway.setAccessTokenResponse({
+        proConnectOAuthGateway.setAccessTokenResponse({
           type: "proConnect",
           expire: 60,
           payload: defaultExpectedProConnectIcIdTokenPayload,
@@ -434,7 +436,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         };
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-        oAuthGateway.setAccessTokenResponse({
+        proConnectOAuthGateway.setAccessTokenResponse({
           type: "proConnect",
           expire: 60,
           payload: defaultExpectedProConnectIcIdTokenPayload,
@@ -697,7 +699,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
     describe("wrong paths", () => {
       it("rejects the connection if no state match the provided one in DB", async () => {
-        oAuthGateway.setAccessTokenResponse({
+        proConnectOAuthGateway.setAccessTokenResponse({
           type: "ftConnect",
           expire: 60,
           payload: defaultExpectedIftConnectcIdTokenPayload,
@@ -799,7 +801,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
             timeGateway: timeGateway,
             uuidGenerator,
           }),
-          oAuthGateway,
+          proConnectOAuthGateway: proConnectOAuthGateway,
           ftConnectGateway,
           uuidGenerator,
           generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
@@ -968,7 +970,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
     const accessToken = "access-token";
     const idToken: IdToken = "id-token";
-    oAuthGateway.setAccessTokenResponse({
+    proConnectOAuthGateway.setAccessTokenResponse({
       type: "proConnect",
       payload: expectedIcIdTokenPayload,
       accessToken,

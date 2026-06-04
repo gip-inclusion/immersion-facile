@@ -28,7 +28,7 @@ export const fakeProviderConfig: OAuthConfig = {
 
 export const fakeProConnectLogoutUri = "/logout-pro-connect";
 
-export class InMemoryOAuthGateway implements OAuthGateway {
+export class InMemoryProConnectOAuthGateway implements OAuthGateway {
   constructor(private providerConfig: OAuthConfig) {}
 
   public async getLoginUrl(params: GetLoginUrlParams): Promise<AbsoluteUrl> {
