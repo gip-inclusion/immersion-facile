@@ -20,7 +20,7 @@ type: feature
 ### ☑️ Checklist
 
 <!-- Questions à se poser systématiquer lors de la session de grooming -->
-- [] Effet de bord potentiel côté dev ou/et métier ? 
-- [] Impact potentiel au support
-- [] Communication bizdev à prévoir (si oui : label déploiement)
-- [] Quelles fonctionnalités d'Immersion Facilitée sont à créer/modifier/supprimer pour résoudre le problème
+- [ ] Effet de bord potentiel côté dev ou/et métier ?
+- [ ] Impact potentiel au support
+- [ ] Communication bizdev à prévoir (si oui : label déploiement)
+- [ ] Quelles fonctionnalités d'Immersion Facilitée sont à créer/modifier/supprimer pour résoudre le problème
