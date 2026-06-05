@@ -248,11 +248,7 @@ const getUseCasesByTopics = (
       useCases.broadcastToFranceTravailOnAssessmentCreated,
     ),
   ],
-  AssessmentDeleted: [
-    useCases.notifyActorsThatAssessmentDeleted,
-    useCases.broadcastToFranceTravailOnConventionUpdates,
-    useCases.broadcastToPartnersOnConventionUpdates,
-  ],
+  AssessmentDeleted: [useCases.notifyActorsThatAssessmentDeleted],
   AssessmentSignedByBeneficiary: [
     useCases.notifyAgencyThatAssessmentIsCreated,
     useCases.notifyEstablishmentThatAssessmentWasCreated,
