@@ -7,10 +7,12 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   isSuperEstablishment,
+  type NafCode,
   UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -33,6 +35,8 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let updateMarketingEstablishmentContactList: UpdateMarketingEstablishmentContactList;
+  let siretGateway: InMemorySiretGateway;
+
   const now = new Date();
 
   const userMarketingContact = new UserBuilder()
@@ -90,10 +94,15 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway(now);
     marketingGateway = new InMemoryEstablishmentMarketingGateway();
+    siretGateway = new InMemorySiretGateway();
     updateMarketingEstablishmentContactList =
       makeUpdateMarketingEstablishmentContactList({
         uowPerformer: new InMemoryUowPerformer(uow),
-        deps: { establishmentMarketingGateway: marketingGateway, timeGateway },
+        deps: {
+          establishmentMarketingGateway: marketingGateway,
+          timeGateway,
+          siretGateway,
+        },
       });
     uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
     uow.userRepository.users = [userMarketingContact];
@@ -138,6 +147,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
         contactEmail: userMarketingContact.email,
         siret: establishment.establishment.siret,
         emailContactHistory: [marketingContact],
+        nafCode: null,
       };
 
     beforeEach(() => {
@@ -298,6 +308,14 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           .build(),
       ];
 
+      siretGateway.setSirenEstablishment({
+        siret: "",
+        businessAddress: "",
+        businessName: "",
+        isOpen: false,
+        numberEmployeesRange: "+10000",
+      });
+
       await updateMarketingEstablishmentContactList.execute({
         siret: establishment.establishment.siret,
       });
@@ -455,11 +473,12 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       numberEmployeesRange: convention.establishmentNumberEmployeesRange,
     };
 
-    const establishmentMarketingContactEntity: EstablishmentMarketingContactEntity =
+    const establishmentMarketingContactEntityWithoutNafCode: EstablishmentMarketingContactEntity =
       {
         contactEmail: convention.signatories.establishmentRepresentative.email,
         siret: convention.siret,
         emailContactHistory: [conventionMarketingContact],
+        nafCode: null,
       };
 
     it("Add contact property & convention related properties of establishment marketing contact when convention were found", async () => {
@@ -471,7 +490,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       });
 
       expectToEqual(uow.establishmentMarketingRepository.contacts, [
-        establishmentMarketingContactEntity,
+        establishmentMarketingContactEntityWithoutNafCode,
       ]);
 
       expectToEqual(marketingGateway.marketingEstablishments, [
@@ -491,7 +510,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
 
       uow.establishmentMarketingRepository.contacts = [
         {
-          ...establishmentMarketingContactEntity,
+          ...establishmentMarketingContactEntityWithoutNafCode,
           contactEmail: previousContact.email,
           emailContactHistory: [previousContact],
         },
@@ -529,13 +548,25 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
         },
       ];
 
+      const expectedNafCode: NafCode = "KIKI";
+
+      siretGateway.setSirenEstablishment({
+        siret: convention.siret,
+        businessAddress: "",
+        businessName: "",
+        isOpen: true,
+        numberEmployeesRange: "0",
+        nafDto: { code: expectedNafCode, nomenclature: "" },
+      });
+
       await updateMarketingEstablishmentContactList.execute({
         siret: convention.siret,
       });
 
       expectToEqual(uow.establishmentMarketingRepository.contacts, [
         {
-          ...establishmentMarketingContactEntity,
+          ...establishmentMarketingContactEntityWithoutNafCode,
+          nafCode: expectedNafCode,
           emailContactHistory: [conventionMarketingContact, previousContact],
         },
       ]);
@@ -545,11 +576,81 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       ]);
     });
 
+    it("Update naf code to null when siren api returns no naf code", async () => {
+      uow.conventionRepository.setConventions([convention]);
+
+      const contact: MarketingContact = {
+        createdAt: new Date(),
+        email: "Bidule@gail.com",
+        firstName: "bibi",
+        lastName: "machin",
+      };
+      uow.establishmentMarketingRepository.contacts = [
+        {
+          ...establishmentMarketingContactEntityWithoutNafCode,
+          contactEmail: contact.email,
+          emailContactHistory: [contact],
+        },
+      ];
+
+      marketingGateway.marketingEstablishments = [
+        {
+          email: contact.email,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          conventions: {
+            numberOfValidatedConvention: 20,
+            lastConvention: {
+              endDate: new Date(),
+              validationDate: new Date(),
+            },
+            firstConventionValidationDate: new Date(),
+          },
+          romes: establishment.offers.map(({ romeCode }) => romeCode),
+          departmentCode: "974",
+          hasIcAccount: true,
+          isRegistered: true,
+          maxContactsPerMonth: 99999,
+          nafCode: "789",
+          numberOfDiscussionsAnswered: 657486,
+          numberOfDiscussionsReceived: 121234256,
+          searchableBy: "jobSeekers",
+          siret: convention.siret,
+          isCommited: false,
+          nextAvailabilityDate: new Date(),
+          numberEmployeesRange: "+10000",
+          isSuperEstablishment: isSuperEstablishment(
+            establishment.establishment.score,
+          ),
+        },
+      ];
+
+      siretGateway.setSirenEstablishment({
+        siret: convention.siret,
+        businessAddress: "",
+        businessName: "",
+        isOpen: true,
+        numberEmployeesRange: "0",
+      });
+
+      await updateMarketingEstablishmentContactList.execute({
+        siret: convention.siret,
+      });
+
+      expectToEqual(uow.establishmentMarketingRepository.contacts, [
+        {
+          ...establishmentMarketingContactEntityWithoutNafCode,
+          nafCode: null,
+          emailContactHistory: [conventionMarketingContact, contact],
+        },
+      ]);
+    });
+
     it("Remove establishment marketing if no convention were found", async () => {
       uow.conventionRepository.setConventions([]);
 
       uow.establishmentMarketingRepository.contacts = [
-        establishmentMarketingContactEntity,
+        establishmentMarketingContactEntityWithoutNafCode,
       ];
 
       marketingGateway.marketingEstablishments = [

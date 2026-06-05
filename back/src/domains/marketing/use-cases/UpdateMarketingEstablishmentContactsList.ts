@@ -7,6 +7,7 @@ import {
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
+import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -30,12 +31,13 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
   .withCurrentUser<void>()
   .withDeps<{
     establishmentMarketingGateway: EstablishmentMarketingGateway;
+    siretGateway: SiretGateway;
     timeGateway: TimeGateway;
   }>()
   .build(
     async ({
       inputParams: { siret },
-      deps: { establishmentMarketingGateway, timeGateway },
+      deps: { establishmentMarketingGateway, timeGateway, siretGateway },
       uow,
     }): Promise<void> => {
       const establishment =
@@ -58,34 +60,44 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
       };
 
       return establishment
-        ? onEstablishment(
+        ? onEstablishment({
             uow,
-            establishmentMarketingGateway,
+            marketingGateway: establishmentMarketingGateway,
             timeGateway,
-            establishment,
+            establishmentAggregate: establishment,
             marketingConventionsData,
-          )
-        : onMissingEstablishment(
+            siretGateway,
+          })
+        : onMissingEstablishment({
             uow,
             timeGateway,
+            siretGateway,
             establishmentMarketingGateway,
             marketingConventionsData,
             siret,
-          );
+          });
     },
   );
 
-const onMissingEstablishment = async (
-  uow: UnitOfWork,
-  timeGateway: TimeGateway,
-  establishmentMarketingGateway: EstablishmentMarketingGateway,
+const onMissingEstablishment = async ({
+  uow,
+  timeGateway,
+  siretGateway,
+  establishmentMarketingGateway,
+  marketingConventionsData,
+  siret,
+}: {
+  uow: UnitOfWork;
+  timeGateway: TimeGateway;
+  siretGateway: SiretGateway;
+  establishmentMarketingGateway: EstablishmentMarketingGateway;
   marketingConventionsData: {
     firstConvention: ConventionDto | undefined;
     lastConvention: ConventionDto | undefined;
     totalNumberOfConvention: number;
-  },
-  siret: SiretDto,
-): Promise<void> => {
+  };
+  siret: SiretDto;
+}): Promise<void> => {
   const { lastConvention } = marketingConventionsData;
 
   if (!lastConvention) {
@@ -103,7 +115,12 @@ const onMissingEstablishment = async (
     lastName: lastConvention.signatories.establishmentRepresentative.lastName,
   };
 
-  await saveMarketingContactEntity(uow, lastConvention.siret, marketingContact);
+  await saveMarketingContactEntity({
+    uow,
+    siret: lastConvention.siret,
+    marketingContact,
+    siretGateway,
+  });
 
   return establishmentMarketingGateway.save({
     isRegistered: false,
@@ -117,17 +134,25 @@ const onMissingEstablishment = async (
   });
 };
 
-const onEstablishment = async (
-  uow: UnitOfWork,
-  marketingGateway: EstablishmentMarketingGateway,
-  timeGateway: TimeGateway,
-  establishmentAggregate: EstablishmentAggregate,
+const onEstablishment = async ({
+  uow,
+  marketingGateway,
+  timeGateway,
+  establishmentAggregate,
+  marketingConventionsData,
+  siretGateway,
+}: {
+  uow: UnitOfWork;
+  marketingGateway: EstablishmentMarketingGateway;
+  timeGateway: TimeGateway;
+  establishmentAggregate: EstablishmentAggregate;
   marketingConventionsData: {
     firstConvention: ConventionDto | undefined;
     lastConvention: ConventionDto | undefined;
     totalNumberOfConvention: number;
-  },
-): Promise<void> => {
+  };
+  siretGateway: SiretGateway;
+}): Promise<void> => {
   const firstLocation = establishmentAggregate.establishment.locations.at(0);
   if (!firstLocation) throw new Error("Establishement has no location.");
 
@@ -152,11 +177,13 @@ const onEstablishment = async (
     lastName: userMarketingContact.lastName,
   };
 
-  await saveMarketingContactEntity(
+  await saveMarketingContactEntity({
     uow,
-    establishmentAggregate.establishment.siret,
+    siret: establishmentAggregate.establishment.siret,
     marketingContact,
-  );
+    siretGateway,
+  });
+
   const user = await uow.userRepository.findByEmail(marketingContact.email);
 
   const hasIcAccount = !!user?.proConnect;
@@ -230,11 +257,17 @@ const makeConventionInfos = (marketingConventionsData: {
   };
 };
 
-const saveMarketingContactEntity = async (
-  uow: UnitOfWork,
-  siret: SiretDto,
-  marketingContact: MarketingContact,
-): Promise<void> => {
+const saveMarketingContactEntity = async ({
+  uow,
+  siret,
+  marketingContact,
+  siretGateway,
+}: {
+  uow: UnitOfWork;
+  siret: SiretDto;
+  marketingContact: MarketingContact;
+  siretGateway: SiretGateway;
+}): Promise<void> => {
   const establishmentMarketingContactEntity =
     await uow.establishmentMarketingRepository.getBySiret(siret);
 
@@ -256,6 +289,9 @@ const saveMarketingContactEntity = async (
           : []),
       ],
       siret,
+      nafCode:
+        (await siretGateway.getEstablishmentBySiret(siret))?.nafDto?.code ??
+        null,
     });
 };
 
