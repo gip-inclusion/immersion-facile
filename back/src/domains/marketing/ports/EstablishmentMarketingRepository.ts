@@ -1,9 +1,10 @@
-import type { Email, SiretDto } from "shared";
+import type { Email, NafCode, SiretDto } from "shared";
 import type { MarketingContact } from "../entities/MarketingContact";
 
 export type EstablishmentMarketingContactEntity = {
   contactEmail: Email;
   siret: SiretDto;
+  nafCode: NafCode | null;
   emailContactHistory: MarketingContact[];
 };
 

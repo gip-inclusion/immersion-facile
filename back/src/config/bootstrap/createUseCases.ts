@@ -1000,6 +1000,7 @@ export const createUseCases = ({
         deps: {
           establishmentMarketingGateway: gateways.establishmentMarketingGateway,
           timeGateway: gateways.timeGateway,
+          siretGateway: gateways.siret,
         },
         uowPerformer,
       }),

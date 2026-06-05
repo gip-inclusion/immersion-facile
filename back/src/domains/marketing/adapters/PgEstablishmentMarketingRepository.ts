@@ -16,7 +16,7 @@ export class PgEstablishmentMarketingRepository
   ): Promise<EstablishmentMarketingContactEntity | undefined> {
     const establishmentMarketingContact = await this.transaction
       .selectFrom("marketing_establishment_contacts")
-      .select(["siret", "email", "contact_history"])
+      .select(["siret", "email", "contact_history", "naf_code"])
       .where("siret", "=", siret)
       .executeTakeFirst();
 
@@ -24,6 +24,7 @@ export class PgEstablishmentMarketingRepository
       establishmentMarketingContact && {
         contactEmail: establishmentMarketingContact.email,
         siret: establishmentMarketingContact.siret,
+        nafCode: establishmentMarketingContact.naf_code,
         emailContactHistory: establishmentMarketingContact.contact_history.map(
           ({ createdAt, ...rest }) => ({
             ...rest,
@@ -45,11 +46,13 @@ export class PgEstablishmentMarketingRepository
     contactEmail,
     emailContactHistory,
     siret,
+    nafCode,
   }: EstablishmentMarketingContactEntity): Promise<void> {
     const values = {
       contact_history: JSON.stringify(emailContactHistory),
       email: contactEmail,
       siret,
+      naf_code: nafCode,
     };
     await this.transaction
       .insertInto("marketing_establishment_contacts")

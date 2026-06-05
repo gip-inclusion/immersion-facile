@@ -843,11 +843,12 @@ interface ShortLinks {
 
 interface MarketingEstablishmentContacts {
   siret: string;
+  naf_code: string | null;
   email: string;
   contact_history: JSONColumnType<
     {
-      firstName: string; //PRENOM
-      lastName: string; //NOM
+      firstName: string;
+      lastName: string;
       email: Email;
       createdAt: DateTimeIsoString;
     }[]

@@ -34,6 +34,7 @@ describe("PgAgencyRepository", () => {
     const establishmentMarketingContact: EstablishmentMarketingContactEntity = {
       contactEmail: "jean-bidule@gmail.com",
       siret: "11112222333344",
+      nafCode: "0111Z",
       emailContactHistory: [
         {
           email: "jean-bidule@gmail.com",
@@ -69,6 +70,7 @@ describe("PgAgencyRepository", () => {
     const updatedEstablishmentMarketingContact: EstablishmentMarketingContactEntity =
       {
         contactEmail: newContact.email,
+        nafCode: "1910Z",
         emailContactHistory: [
           newContact,
           ...establishmentMarketingContact.emailContactHistory,
