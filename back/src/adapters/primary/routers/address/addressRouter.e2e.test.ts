@@ -1,6 +1,6 @@
 import {
+  type AddressAndPositionWithFormattedAddress,
   type AddressRoutes,
-  type AddressWithCountryCodeAndPosition,
   addressRoutes,
   defaultCountryCode,
   displayRouteName,
@@ -19,13 +19,14 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 describe("address router", () => {
   let httpClient: HttpClient<AddressRoutes>;
   let addressGateway: InMemoryAddressGateway;
-  const expectedAddressAndPositions: AddressWithCountryCodeAndPosition[] =
+  const expectedAddressAndPositions: AddressAndPositionWithFormattedAddress[] =
     expected8bdduportAddressAndPositions.map((location) => ({
       ...location,
       address: {
         ...location.address,
         countryCode: defaultCountryCode,
       },
+      formattedAddress: "Fake address",
     }));
 
   beforeEach(async () => {

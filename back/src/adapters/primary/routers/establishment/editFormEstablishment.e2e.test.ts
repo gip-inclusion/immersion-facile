@@ -88,6 +88,7 @@ describe("Edit form establishments", () => {
             countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
+          formattedAddress: "Fake address",
         },
       ],
     ]);

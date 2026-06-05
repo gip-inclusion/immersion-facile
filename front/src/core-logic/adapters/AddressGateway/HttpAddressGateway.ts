@@ -1,7 +1,7 @@
 import { from, type Observable } from "rxjs";
 import type {
+  AddressAndPositionWithFormattedAddress,
   AddressRoutes,
-  AddressWithCountryCodeAndPosition,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
@@ -27,14 +27,14 @@ export class HttpAddressGateway implements AddressGateway {
   public lookupStreetAddress$(
     lookup: LookupAddress,
     countryCode: SupportedCountryCode,
-  ): Observable<AddressWithCountryCodeAndPosition[]> {
+  ): Observable<AddressAndPositionWithFormattedAddress[]> {
     return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
     countryCode: SupportedCountryCode,
-  ): Promise<AddressWithCountryCodeAndPosition[]> {
+  ): Promise<AddressAndPositionWithFormattedAddress[]> {
     const response = await this.httpClient.lookupStreetAddress({
       queryParams: {
         lookup,

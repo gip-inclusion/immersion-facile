@@ -1,6 +1,6 @@
 import type {
-  AddressDto,
-  AddressWithCountryCodeAndPosition,
+  AddressAndPositionWithFormattedAddress,
+  AddressDtoWithCountryCode,
   GeoPositionDto,
   LookupLocationInput,
   LookupSearchResult,
@@ -11,9 +11,9 @@ export interface AddressGateway {
   lookupStreetAddress(
     query: string,
     countryCode: SupportedCountryCode,
-  ): Promise<AddressWithCountryCodeAndPosition[]>;
+  ): Promise<AddressAndPositionWithFormattedAddress[]>;
   lookupLocationName(query: LookupLocationInput): Promise<LookupSearchResult[]>;
   getAddressFromPosition(
     position: GeoPositionDto,
-  ): Promise<AddressDto | undefined>;
+  ): Promise<AddressDtoWithCountryCode | undefined>;
 }

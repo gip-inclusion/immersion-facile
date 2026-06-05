@@ -1,5 +1,5 @@
 import {
-  type AddressWithCountryCodeAndPosition,
+  type AddressAndPositionWithFormattedAddress,
   type WithLookupAddressQueryParams,
   withLookupStreetAddressQueryParamsSchema,
 } from "shared";
@@ -13,7 +13,7 @@ export const makeLookupStreetAddress = useCaseBuilder("LookupStreetAddress")
   .withInput<WithLookupAddressQueryParams>(
     withLookupStreetAddressQueryParamsSchema,
   )
-  .withOutput<AddressWithCountryCodeAndPosition[]>()
+  .withOutput<AddressAndPositionWithFormattedAddress[]>()
   .withDeps<{ addressGateway: AddressGateway }>()
   .build(async ({ inputParams, deps }) =>
     deps.addressGateway.lookupStreetAddress(

@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import type { AddressWithCountryCodeAndPosition } from "shared";
+import type { AddressAndPositionWithFormattedAddress } from "shared";
 import type { AutocompleteState } from "src/core-logic/domain/autocomplete.utils";
 import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
@@ -14,7 +14,7 @@ export const makeGeocodingLocatorSelector = (
     (
       state: AutocompleteState<
         AddressAutocompleteLocator,
-        AddressWithCountryCodeAndPosition
+        AddressAndPositionWithFormattedAddress
       >,
     ) => state.data[locator],
   );

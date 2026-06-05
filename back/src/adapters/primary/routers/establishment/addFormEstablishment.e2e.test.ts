@@ -88,6 +88,7 @@ describe("Add form establishment", () => {
               departmentCode: "75",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Fake address",
           },
         ],
       ]);

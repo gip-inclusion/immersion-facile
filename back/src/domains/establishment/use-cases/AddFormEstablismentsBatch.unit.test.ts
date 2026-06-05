@@ -110,6 +110,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             ...defaultAddress.addressAndPosition.address,
             countryCode: defaultCountryCode,
           },
+          formattedAddress: "Fake address",
         },
       ],
       [
@@ -119,6 +120,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             ...defaultAddress.addressAndPosition.address,
             countryCode: defaultCountryCode,
           },
+          formattedAddress: "Fake address",
         },
       ],
     ]);

@@ -91,6 +91,7 @@ describe("POST /add-form-establishment-batch", () => {
             countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
+          formattedAddress: "Fake address",
         },
       ],
     ]);

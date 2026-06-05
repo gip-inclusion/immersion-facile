@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { keys } from "ramda";
 import {
+  type AddressAndPositionWithFormattedAddress,
   type AddressWithCountryCodeAndPosition,
+  addressDtoToString,
   defaultCountryCode,
   type LookupAddress,
   type SupportedCountryCode,
@@ -27,7 +29,7 @@ export type AddressAutocompleteLocator =
 
 const initialState: AutocompleteState<
   AddressAutocompleteLocator,
-  AddressWithCountryCodeAndPosition
+  AddressAndPositionWithFormattedAddress
 > = {
   data: {},
 };
@@ -174,7 +176,7 @@ export const geocodingSlice = createSlice({
       action: PayloadActionWithLocator<
         AddressAutocompleteLocator,
         {
-          suggestions: AddressWithCountryCodeAndPosition[];
+          suggestions: AddressAndPositionWithFormattedAddress[];
           selectFirstSuggestion: boolean;
         }
       >,
@@ -192,7 +194,7 @@ export const geocodingSlice = createSlice({
             ...(action.payload.selectFirstSuggestion
               ? { value: action.payload.suggestions[0] }
               : {}),
-          },
+          } satisfies AutocompleteItem<AddressAndPositionWithFormattedAddress>,
         },
       };
     },
@@ -250,6 +252,7 @@ export const geocodingSlice = createSlice({
               lat: action.payload.position.lat,
               lon: action.payload.position.lon,
             },
+            formattedAddress: addressDtoToString(action.payload.address),
           },
         };
       },

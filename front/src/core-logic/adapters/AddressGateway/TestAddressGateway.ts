@@ -1,6 +1,6 @@
 import { type Observable, Subject } from "rxjs";
 import type {
-  AddressWithCountryCodeAndPosition,
+  AddressAndPositionWithFormattedAddress,
   LookupSearchResult,
 } from "shared";
 import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
@@ -8,7 +8,7 @@ import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
 export class TestAddressGateway implements AddressGateway {
   public lookupLocationResults$ = new Subject<LookupSearchResult[]>();
   public lookupStreetAddressResults$ = new Subject<
-    AddressWithCountryCodeAndPosition[]
+    AddressAndPositionWithFormattedAddress[]
   >();
 
   public lookupLocation$(): Observable<LookupSearchResult[]> {
@@ -16,7 +16,7 @@ export class TestAddressGateway implements AddressGateway {
   }
 
   public lookupStreetAddress$(): Observable<
-    AddressWithCountryCodeAndPosition[]
+    AddressAndPositionWithFormattedAddress[]
   > {
     return this.lookupStreetAddressResults$;
   }

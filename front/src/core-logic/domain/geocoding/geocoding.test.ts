@@ -1,6 +1,8 @@
 import {
+  type AddressAndPositionWithFormattedAddress,
   type AddressWithCountryCodeAndPosition,
   AgencyDtoBuilder,
+  addressDtoToString,
   defaultCountryCode,
   expectArraysToEqual,
   expectObjectsToMatch,
@@ -205,7 +207,7 @@ describe("Geocoding epic", () => {
 
   it("should trigger a new request to the gateway when query > threshold", () => {
     const query = "Poit";
-    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
+    const expectedSuggestions: AddressAndPositionWithFormattedAddress[] = [
       {
         address: {
           city: "Saint-Georges-les-Baillargeaux",
@@ -218,6 +220,7 @@ describe("Geocoding epic", () => {
           lat: 45.984,
           lon: 2.5465,
         },
+        formattedAddress: "TODO",
       },
     ];
     store.dispatch(
@@ -324,7 +327,7 @@ describe("Geocoding epic", () => {
   });
 
   it("should select the first suggestion if selectFirstSuggestion is true", () => {
-    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
+    const expectedSuggestions: AddressAndPositionWithFormattedAddress[] = [
       {
         address: {
           city: "Paris",
@@ -337,6 +340,7 @@ describe("Geocoding epic", () => {
           lat: 48.8566,
           lon: 2.3522,
         },
+        formattedAddress: "TODO",
       },
     ];
     store.dispatch(
@@ -355,7 +359,7 @@ describe("Geocoding epic", () => {
   });
 
   it("should select the first suggestion if siret info is successfully fetched", () => {
-    const expectedSuggestions: AddressWithCountryCodeAndPosition[] = [
+    const expectedSuggestions: AddressAndPositionWithFormattedAddress[] = [
       {
         address: {
           city: "Paris",
@@ -368,6 +372,7 @@ describe("Geocoding epic", () => {
           lat: 48.8566,
           lon: 2.3522,
         },
+        formattedAddress: "TODO",
       },
     ];
     store.dispatch(
@@ -454,6 +459,7 @@ describe("Geocoding epic", () => {
           lat: agencyDto.position.lat,
           lon: agencyDto.position.lon,
         },
+        formattedAddress: addressDtoToString(agencyDto.address),
       },
     );
   });

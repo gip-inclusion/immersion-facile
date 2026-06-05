@@ -44,6 +44,7 @@ const openCageDataFeatureSchema = z.object({
     type: z.literal("Point"),
   }),
   properties: z.object({
+    formatted: z.string(),
     components: z
       .object({
         region: z.string(),

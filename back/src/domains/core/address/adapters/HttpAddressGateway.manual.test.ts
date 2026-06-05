@@ -1,6 +1,6 @@
 import {
   type AddressAndPosition,
-  type AddressDto,
+  type AddressDtoWithCountryCode,
   defaultCountryCode,
   errors,
   expectPromiseToFailWithError,
@@ -357,8 +357,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
         [
           {
             position: {
-              lat: 45.0907535,
-              lon: 6.0631237,
+              lat: 45.0891528,
+              lon: 6.0575141,
             },
             address: {
               streetNumberAndAddress: "Route d'Huez",
@@ -367,63 +367,26 @@ describe("HttpOpenCageDataAddressGateway", () => {
               city: "L'Alpe d'Huez",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Route d'Huez, 38750 L'Alpe d'Huez, France",
           },
           {
             position: {
-              lat: 45.090225,
-              lon: 6.05878,
+              lat: 45.091271,
+              lon: 6.061676,
             },
             address: {
-              streetNumberAndAddress: "Route d'Huez",
+              streetNumberAndAddress: "Route d’Huez",
               postcode: "38750",
               departmentCode: "38",
               city: "Huez",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Route d’Huez, 38750 Huez, France",
           },
           {
             position: {
-              lat: 45.081563,
-              lon: 6.057102,
-            },
-            address: {
-              streetNumberAndAddress: "Village d'  Huez",
-              postcode: "38750",
-              departmentCode: "38",
-              city: "Huez",
-              countryCode: defaultCountryCode,
-            },
-          },
-          {
-            position: {
-              lat: 45.108082,
-              lon: 6.076213,
-            },
-            address: {
-              streetNumberAndAddress: "Route des Lacs",
-              postcode: "38750",
-              departmentCode: "38",
-              city: "Huez",
-              countryCode: defaultCountryCode,
-            },
-          },
-          {
-            position: {
-              lat: 45.090225,
-              lon: 6.05878,
-            },
-            address: {
-              streetNumberAndAddress: "Grand Broue",
-              postcode: "38750",
-              departmentCode: "38",
-              city: "Huez",
-              countryCode: defaultCountryCode,
-            },
-          },
-          {
-            position: {
-              lat: 45.092948,
-              lon: 6.066249,
+              lat: 45.093113,
+              lon: 6.064856,
             },
             address: {
               streetNumberAndAddress: "Route du Signal",
@@ -432,11 +395,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
               city: "Huez",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Route du Signal, 38750 Huez, France",
           },
           {
             position: {
-              lat: 45.091407,
-              lon: 6.066528,
+              lat: 45.091898,
+              lon: 6.065363,
             },
             address: {
               streetNumberAndAddress: "Route du Coulet",
@@ -445,37 +409,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
               city: "Huez",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Route du Coulet, 38750 Huez, France",
           },
           {
             position: {
-              lat: 45.093366,
-              lon: 6.069915,
-            },
-            address: {
-              streetNumberAndAddress: "Rue du Poutat",
-              postcode: "38750",
-              departmentCode: "38",
-              city: "Huez",
-              countryCode: defaultCountryCode,
-            },
-          },
-          {
-            position: {
-              lat: 45.090127,
-              lon: 6.06432,
-            },
-            address: {
-              streetNumberAndAddress: "Route Romaine",
-              postcode: "38750",
-              departmentCode: "38",
-              city: "Huez",
-              countryCode: defaultCountryCode,
-            },
-          },
-          {
-            position: {
-              lat: 45.091708,
-              lon: 6.063246,
+              lat: 45.091666,
+              lon: 6.063278,
             },
             address: {
               streetNumberAndAddress: "Route de la Poste",
@@ -484,6 +423,63 @@ describe("HttpOpenCageDataAddressGateway", () => {
               city: "Huez",
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Route de la Poste, 38750 Huez, France",
+          },
+          {
+            position: {
+              lat: 45.09258,
+              lon: 6.06999,
+            },
+            address: {
+              streetNumberAndAddress: "Avenue de l’Etendard",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+              countryCode: defaultCountryCode,
+            },
+            formattedAddress: "Avenue de l’Etendard, 38750 Huez, France",
+          },
+          {
+            position: {
+              lat: 45.0905,
+              lon: 6.059899,
+            },
+            address: {
+              streetNumberAndAddress: "Rue des Sagnes",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+              countryCode: defaultCountryCode,
+            },
+            formattedAddress: "Rue des Sagnes, 38750 Huez, France",
+          },
+          {
+            position: {
+              lat: 45.08667,
+              lon: 6.066699,
+            },
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+              countryCode: defaultCountryCode,
+            },
+            formattedAddress: "Huez, Isère, France",
+          },
+          {
+            position: {
+              lat: 45.091617,
+              lon: 6.068107,
+            },
+            address: {
+              streetNumberAndAddress: "Avenue des Jeux",
+              postcode: "38750",
+              departmentCode: "38",
+              city: "Huez",
+              countryCode: defaultCountryCode,
+            },
+            formattedAddress: "Avenue des Jeux, 38750 Huez, France",
           },
         ],
       );
@@ -526,16 +522,17 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
       expectToEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
         address: {
-          city: "Rots",
-          departmentCode: "14",
-          postcode: "14980",
+          city: "Saillagouse",
+          departmentCode: "66",
+          postcode: "66800",
           streetNumberAndAddress: "",
           countryCode: defaultCountryCode,
         },
         position: {
-          lat: 49.2062576,
-          lon: -0.4775068,
+          lat: 42.4583078,
+          lon: 2.018601,
         },
+        formattedAddress: "66800 Saillagouse, France",
       });
     });
   });
@@ -730,7 +727,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
     it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
       const coordinates: GeoPositionDto[] = [];
-      const expectedResults: AddressDto[] = [];
+      const expectedResults: AddressDtoWithCountryCode[] = [];
 
       for (let index = 0; index < parallelCalls; index++) {
         coordinates.push({
@@ -742,13 +739,15 @@ describe("HttpOpenCageDataAddressGateway", () => {
           city: "Molsheim",
           departmentCode: "67",
           postcode: "67120",
+          countryCode: defaultCountryCode,
         });
       }
-      const results: (AddressDto | undefined)[] = await Promise.all(
-        coordinates.map((coordinate) =>
-          httpAddressGateway.getAddressFromPosition(coordinate),
-        ),
-      );
+      const results: (AddressDtoWithCountryCode | undefined)[] =
+        await Promise.all(
+          coordinates.map((coordinate) =>
+            httpAddressGateway.getAddressFromPosition(coordinate),
+          ),
+        );
 
       expectToEqual(results, expectedResults);
     }, 15000);

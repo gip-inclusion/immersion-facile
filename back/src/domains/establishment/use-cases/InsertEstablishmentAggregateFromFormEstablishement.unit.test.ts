@@ -129,6 +129,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             countryCode: defaultCountryCode,
           },
           position: defaultAddress.addressAndPosition.position,
+          formattedAddress: "Fake address",
         },
       ],
     ]);
@@ -648,6 +649,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             countryCode: defaultCountryCode,
           },
           position: { lat: 1, lon: 1 },
+          formattedAddress: "Fake address",
         },
       ],
     ]);

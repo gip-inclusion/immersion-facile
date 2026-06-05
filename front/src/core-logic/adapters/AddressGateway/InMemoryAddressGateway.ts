@@ -1,6 +1,6 @@
 import { from, type Observable } from "rxjs";
 import {
-  type AddressWithCountryCodeAndPosition,
+  type AddressAndPositionWithFormattedAddress,
   defaultCountryCode,
   type LookupAddress,
   type LookupLocationInput,
@@ -22,14 +22,14 @@ export class InMemoryAddressGateway implements AddressGateway {
   public lookupStreetAddress$(
     lookup: LookupAddress,
     countryCode: SupportedCountryCode,
-  ): Observable<AddressWithCountryCodeAndPosition[]> {
+  ): Observable<AddressAndPositionWithFormattedAddress[]> {
     return from(this.#lookupStreetAddress(lookup, countryCode));
   }
 
   async #lookupStreetAddress(
     lookup: LookupAddress,
     countryCode: SupportedCountryCode,
-  ): Promise<AddressWithCountryCodeAndPosition[]> {
+  ): Promise<AddressAndPositionWithFormattedAddress[]> {
     // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log(
       "InMemoryApiAddresseGateway.lookupStreetAddress",
@@ -51,6 +51,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           countryCode: defaultCountryCode,
         },
         position: { lat: 45, lon: 2 },
+        formattedAddress: "60 Rue des Lombards, 75001 PARIS",
       },
       {
         address: {
@@ -61,6 +62,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           countryCode: defaultCountryCode,
         },
         position: { lat: 45.1, lon: 2.1 },
+        formattedAddress: "81 Bd Gouvion-Saint-Cyr, 75017 PARIS",
       },
       {
         address: {
@@ -71,6 +73,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           countryCode: defaultCountryCode,
         },
         position: { lat: 46, lon: 2.5 },
+        formattedAddress: "71 Bd Saint-Michel, 75005 PARIS",
       },
       {
         address: {
@@ -81,6 +84,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           countryCode: defaultCountryCode,
         },
         position: { lat: 45.5, lon: 1.9 },
+        formattedAddress: "5 Rue de la Huchette, 75005 PARIS",
       },
       {
         address: {
@@ -91,6 +95,7 @@ export class InMemoryAddressGateway implements AddressGateway {
           countryCode: "DE",
         },
         position: { lat: 52.370216, lon: 9.73322 },
+        formattedAddress: "20 A KRONENSTRASSE, 30161 HANNOVEY",
       },
     ];
   }

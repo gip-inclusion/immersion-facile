@@ -1,6 +1,7 @@
 import {
-  type AddressWithCountryCodeAndPosition,
+  type AddressAndPositionWithFormattedAddress,
   defaultCountryCode,
+  expectToEqual,
   type Location,
   type WithLookupAddressQueryParams,
 } from "shared";
@@ -37,15 +38,19 @@ describe("Lookup Street Address", () => {
         lon: 1111,
       },
     };
-    const expectedStreetAndAddresses: AddressWithCountryCodeAndPosition[] = [
-      {
-        ...location,
-        address: {
-          ...location.address,
-          countryCode: defaultCountryCode,
+
+    const expectedStreetAndAddresses: AddressAndPositionWithFormattedAddress[] =
+      [
+        {
+          ...location,
+          address: {
+            ...location.address,
+            countryCode: defaultCountryCode,
+          },
+          formattedAddress: "Fake address",
         },
-      },
-    ];
+      ];
+
     addressGateway.setNextLookupStreetAndAddresses([
       expectedStreetAndAddresses,
     ]);
@@ -54,8 +59,9 @@ describe("Lookup Street Address", () => {
       lookup: "1 rue",
       countryCode: defaultCountryCode,
     };
-    expect(await useCase.execute(lookupStreetAddressQuery)).toEqual(
-      expectedStreetAndAddresses,
-    );
+
+    const results = await useCase.execute(lookupStreetAddressQuery);
+
+    expectToEqual(results, expectedStreetAndAddresses);
   });
 });

@@ -1,8 +1,8 @@
 import Bottleneck from "bottleneck";
 import type { Point } from "geojson";
 import {
+  type AddressAndPositionWithFormattedAddress,
   type AddressDtoWithCountryCode,
-  type AddressWithCountryCodeAndPosition,
   type City,
   type DepartmentName,
   defaultCountryCode,
@@ -71,11 +71,10 @@ export class HttpAddressGateway implements AddressGateway {
 
     if (status !== 200) return;
 
-    const addresses: AddressDtoWithCountryCode[] = body.features
-      .map(this.#featureToAddress)
-      .filter(filterNotFalsy);
-
-    return addresses.at(0);
+    return body.features
+      .map((feature) => this.#featureToAddress(feature))
+      .filter(filterNotFalsy)
+      .at(0);
   }
 
   public async lookupLocationName(
@@ -131,7 +130,7 @@ export class HttpAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     query: string,
     countryCode?: SupportedCountryCode,
-  ): Promise<AddressWithCountryCodeAndPosition[]> {
+  ): Promise<AddressAndPositionWithFormattedAddress[]> {
     return this.#limiter
       .schedule(() => {
         if (
@@ -176,7 +175,7 @@ export class HttpAddressGateway implements AddressGateway {
 
   #toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-  ): AddressWithCountryCodeAndPosition | undefined {
+  ): AddressAndPositionWithFormattedAddress | undefined {
     const address = this.#featureToAddress(feature);
     return (
       address && {
@@ -185,6 +184,7 @@ export class HttpAddressGateway implements AddressGateway {
           lon: feature.geometry.coordinates[0],
         },
         address,
+        formattedAddress: feature.properties.formatted,
       }
     );
   }

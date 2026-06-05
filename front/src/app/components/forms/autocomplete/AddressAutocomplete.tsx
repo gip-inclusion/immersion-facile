@@ -6,7 +6,6 @@ import {
 import { useDispatch } from "react-redux";
 import {
   type AddressWithCountryCodeAndPosition,
-  addressDtoToString,
   defaultCountryCode,
   type SupportedCountryCode,
 } from "shared";
@@ -29,10 +28,13 @@ const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
   const geocodingLocatorSelector = useAppSelector(
     makeGeocodingLocatorSelector(locator),
   );
-  const options = (geocodingLocatorSelector?.suggestions ?? []).map(
-    (suggestion) => ({
-      value: suggestion,
-      label: addressDtoToString(suggestion.address),
+  const options: {
+    value: AddressWithCountryCodeAndPosition;
+    label: string;
+  }[] = (geocodingLocatorSelector?.suggestions ?? []).map(
+    ({ address, formattedAddress, position }) => ({
+      value: { address, position },
+      label: formattedAddress,
     }),
   );
   const value = geocodingLocatorSelector?.value;
@@ -77,8 +79,8 @@ export const AddressAutocomplete = ({
         value:
           value && !Array.isArray(value)
             ? {
-                label: addressDtoToString(value?.address),
-                value,
+                label: value.formattedAddress,
+                value: { address: value.address, position: value.position },
               }
             : undefined,
         onChange: (searchResult, actionMeta) => {
