@@ -99,6 +99,7 @@ describe("discussion e2e", () => {
             countryCode: defaultCountryCode,
           },
           position: updatedAddress1.addressAndPosition.position,
+          formattedAddress: "Fake address",
         },
       ],
     ]);

@@ -14,21 +14,24 @@ export const rawAddressToLocation = async (
   businessSiret: SiretDto,
   formEstablishementAddress: FormEstablishmentAddress,
 ): Promise<Location> => {
-  const addressWithCountryCodeAndPosition = (
+  const addressAndPositionWithFormattedAddress = (
     await addressGateway.lookupStreetAddress(
       formEstablishementAddress.rawAddress,
       defaultCountryCode,
     )
   ).at(0);
 
-  if (!addressWithCountryCodeAndPosition)
+  if (!addressAndPositionWithFormattedAddress)
     throw new Error(
       `Cannot find the address ${formEstablishementAddress.rawAddress} in API for establishment with siret ${businessSiret}`,
     );
 
   return {
-    ...addressWithCountryCodeAndPosition,
-    address: omit(["countryCode"], addressWithCountryCodeAndPosition.address),
+    position: addressAndPositionWithFormattedAddress.position,
+    address: omit(
+      ["countryCode"],
+      addressAndPositionWithFormattedAddress.address,
+    ),
     id: formEstablishementAddress.id,
   };
 };

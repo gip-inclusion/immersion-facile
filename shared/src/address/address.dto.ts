@@ -49,6 +49,11 @@ export type Location = {
 
 export type AddressAndPosition = Omit<Location, "id">;
 
+export type AddressAndPositionWithFormattedAddress =
+  AddressWithCountryCodeAndPosition & {
+    formattedAddress: string;
+  };
+
 export type AddressWithCountryCodeAndPosition = OmitFromExistingKeys<
   AddressAndPosition,
   "address"

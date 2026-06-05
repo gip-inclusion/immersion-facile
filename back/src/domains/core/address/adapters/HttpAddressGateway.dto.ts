@@ -47,6 +47,7 @@ export type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
 export type OpenCageDataProperties = {
   components: OpenCageDataAddressComponents; // The address component
   confidence: number; // 10 is the best match inferior is less good
+  formatted: string;
 };
 
 //Aliases Reference : https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml

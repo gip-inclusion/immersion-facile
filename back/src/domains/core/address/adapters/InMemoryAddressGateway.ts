@@ -1,7 +1,7 @@
 import {
+  type AddressAndPositionWithFormattedAddress,
   type AddressDto,
   type AddressDtoWithCountryCode,
-  type AddressWithCountryCodeAndPosition,
   errors,
   type GeoPositionDto,
   type LookupSearchResult,
@@ -14,7 +14,8 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   #lookupSearchResults: LookupSearchResult[] = [];
 
-  #nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][] = [];
+  #nextLookupStreetAndAddresses: AddressAndPositionWithFormattedAddress[][] =
+    [];
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
@@ -33,7 +34,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     _query: string,
     _countryCode: SupportedCountryCode,
-  ): Promise<AddressWithCountryCodeAndPosition[]> {
+  ): Promise<AddressAndPositionWithFormattedAddress[]> {
     const nextLookupStreetAndAddresses =
       this.#nextLookupStreetAndAddresses.shift();
     if (!nextLookupStreetAndAddresses)
@@ -44,7 +45,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   public setNextLookupStreetAndAddresses(
-    nextLookupStreetAndAddresses: AddressWithCountryCodeAndPosition[][],
+    nextLookupStreetAndAddresses: AddressAndPositionWithFormattedAddress[][],
   ) {
     this.#nextLookupStreetAndAddresses = nextLookupStreetAndAddresses;
   }

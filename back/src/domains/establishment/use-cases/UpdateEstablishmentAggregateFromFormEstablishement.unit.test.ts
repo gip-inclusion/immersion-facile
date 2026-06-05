@@ -296,6 +296,7 @@ describe("Update Establishment aggregate from form data", () => {
               countryCode: defaultCountryCode,
             },
             position: { lon: 1, lat: 2 },
+            formattedAddress: "Fake address",
           },
         ],
       ]);
@@ -752,6 +753,7 @@ describe("Update Establishment aggregate from form data", () => {
               ...updatedAddress1.addressAndPosition.address,
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Fake address",
           },
         ],
         [
@@ -761,6 +763,7 @@ describe("Update Establishment aggregate from form data", () => {
               ...updatedAddress2.addressAndPosition.address,
               countryCode: defaultCountryCode,
             },
+            formattedAddress: "Fake address",
           },
         ],
       ]);

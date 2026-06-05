@@ -10,9 +10,9 @@ import {
 } from "../zodUtils";
 import {
   type AddressAndPosition,
+  type AddressAndPositionWithFormattedAddress,
   type AddressDto,
   type AddressDtoWithCountryCode,
-  type AddressWithCountryCodeAndPosition,
   type DepartmentCode,
   type LookupSearchResult,
   supportedCountryCodes,
@@ -71,9 +71,13 @@ export const addressWithCountryCodeAndPositionSchema = z.object({
   position: geoPositionSchema,
 });
 
-export const addressWithCountryCodeAndPositionListSchema: ZodSchemaWithInputMatchingOutput<
-  AddressWithCountryCodeAndPosition[]
-> = z.array(addressWithCountryCodeAndPositionSchema);
+export const addressAndPositionWithFormattedAddressListSchema: ZodSchemaWithInputMatchingOutput<
+  AddressAndPositionWithFormattedAddress[]
+> = z.array(
+  addressWithCountryCodeAndPositionSchema.and(
+    z.object({ formattedAddress: z.string() }),
+  ),
+);
 
 export const lookupSearchResultsSchema: ZodSchemaWithInputMatchingOutput<
   LookupSearchResult[]

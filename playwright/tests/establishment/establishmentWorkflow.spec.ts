@@ -105,7 +105,7 @@ test.describe("Establishment creation and modification workflow", () => {
       .withBusinessAddresses([
         {
           id: "fake-id",
-          rawAddress: "6 rue de la chaîne 86000 Poitiers",
+          rawAddress: "6 rue de la chaîne, 86000 Poitiers, France",
         },
       ])
       .withWebsite("https://new.website.com")
