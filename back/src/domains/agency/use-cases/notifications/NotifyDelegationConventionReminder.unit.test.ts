@@ -110,7 +110,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
@@ -143,7 +143,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
@@ -170,7 +170,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
@@ -187,7 +187,7 @@ describe("NotifyDelegationConventionReminder", () => {
       });
     });
 
-    it("sends DELEGATION_CONVENTION_EXPIRED notification when reminderKind is dayAfterExpiry", async () => {
+    it("sends AGENCY_DELEGATION_CONVENTION_EXPIRED notification when reminderKind is dayAfterExpiry", async () => {
       await useCase.execute({
         agencyId: agency.id,
         reminderKind: "dayAfterExpiry",
@@ -196,7 +196,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRED",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRED",
             params: {
               agencyName: agency.name,
               delegationAgencyName,
@@ -212,7 +212,7 @@ describe("NotifyDelegationConventionReminder", () => {
       });
     });
 
-    it("does not send DELEGATION_CONVENTION_EXPIRED notification when email was already sent", async () => {
+    it("does not send AGENCY_DELEGATION_CONVENTION_EXPIRED notification when email was already sent", async () => {
       await useCase.execute({
         agencyId: agency.id,
         reminderKind: "dayAfterExpiry",
@@ -226,7 +226,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRED",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRED",
             params: {
               agencyName: agency.name,
               delegationAgencyName,
@@ -255,7 +255,7 @@ describe("NotifyDelegationConventionReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
@@ -269,7 +269,7 @@ describe("NotifyDelegationConventionReminder", () => {
             ],
           },
           {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
