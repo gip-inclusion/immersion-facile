@@ -151,6 +151,12 @@ export class InMemoryNotificationRepository implements NotificationRepository {
         )
           return false;
 
+        if (
+          filters.agencyId &&
+          notification.followedIds.agencyId !== filters.agencyId
+        )
+          return false;
+
         const startOfDay = filters.createdAt
           ? new Date(
               filters.createdAt.getFullYear(),
