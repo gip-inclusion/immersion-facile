@@ -15,10 +15,12 @@
       "outputs": []
     },
     "dev": {
-      "outputs": []
+      "cache": false,
+      "persistent": true
     },
     "dev:no-typecheck": {
-      "outputs": []
+      "cache": false,
+      "persistent": true
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
