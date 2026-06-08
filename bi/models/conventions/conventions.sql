@@ -107,7 +107,7 @@ case
     else false
 end as is_referenced_establishment,
 estab.source_provider as establishment_source_provider,
-estab.naf_code as establishment_naf_code,
+coalesce(mec.naf_code, estab.naf_code) as establishment_naf_code,
 naf.naf_label as establishment_naf_label,
 estab.name as establishment_name,
 estab.customized_name as establishment_customized_name,
@@ -252,12 +252,14 @@ inner join {{ source('immersion', 'public_romes_data') }} as prd
     on pad.code_rome::bpchar = prd.code_rome
 
 -- Establishment enrichment
+left join {{ source('immersion', 'marketing_establishment_contacts') }} as mec
+    on mec.siret = c.siret
 left join {{ source('immersion', 'establishments') }} as estab
     on estab.siret = c.siret
 left join {{ source('immersion', 'public_department_region') }} as dept_estab
     on dept_estab.department_code = estab.welcome_address_department_code
 left join {{ ref('naf_nomenclature') }} as naf
-    on naf.naf_code = regexp_replace(upper(estab.naf_code), '[^0-9A-Z]', '', 'g')
+    on naf.naf_code = regexp_replace(upper(coalesce(mec.naf_code, estab.naf_code)), '[^0-9A-Z]', '', 'g')
 
 -- Assessment
 left join {{ source('immersion', 'immersion_assessments') }} as ass
