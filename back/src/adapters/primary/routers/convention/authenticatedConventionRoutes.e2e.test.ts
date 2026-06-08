@@ -406,6 +406,7 @@ describe("authenticatedConventionRoutes", () => {
           filters: {
             dateStart: { from: "2023-01-01" },
             statuses: ["ACCEPTED_BY_VALIDATOR", "PARTIALLY_SIGNED"],
+            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
           },
           pagination: {
             page: 1,
@@ -478,6 +479,7 @@ describe("authenticatedConventionRoutes", () => {
           agencyUserId: validator.id,
           filters: {
             assessmentCompletionStatus: ["finalized"],
+            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
           },
           pagination: {
             page: 1,
@@ -515,7 +517,7 @@ describe("authenticatedConventionRoutes", () => {
           data: [],
           pagination: {
             currentPage: 1,
-            totalPages: 0,
+            totalPages: 1,
             numberPerPage: 10,
             totalRecords: 0,
           },
@@ -527,6 +529,7 @@ describe("authenticatedConventionRoutes", () => {
           agencyUserId: validator.id,
           filters: {
             assessmentCompletionStatus: ["to-complete"],
+            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
           },
           pagination: {
             page: 1,
@@ -606,6 +609,7 @@ describe("authenticatedConventionRoutes", () => {
           agencyUserId: validator.id,
           filters: {
             agencyIds: [peAgency.id],
+            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
           },
           pagination: {
             page: 1,

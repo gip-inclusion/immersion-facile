@@ -5,6 +5,7 @@ models:
     description: |
       Comprehensive conventions (immersion applications) data enriched with all related entities:
       agencies, actors (beneficiary, tutors, representatives), establishments, assessments, and reference data.
+      Excludes conventions whose end date (date_end) is older than 25 months from today.
       Grain: 1 row per convention.
     columns:
       - name: id
@@ -277,6 +278,7 @@ models:
     description: |
       Lightweight conventions table optimized for aggregation queries (counting, grouping).
       Contains only filter and grouping columns - no large JSON or text fields.
+      Includes all conventions (no 25-month date_end filter), unlike the conventions table.
       Use this table for Metabase dashboards that count conventions by agency, region, etc.
       Grain: 1 row per convention.
     columns:
