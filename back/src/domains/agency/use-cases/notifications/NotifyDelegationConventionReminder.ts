@@ -57,7 +57,7 @@ export const makeNotifyDelegationConventionReminder = useCaseBuilder(
     const templatedContent: TemplatedEmail =
       reminderKind === "dayAfterExpiry"
         ? {
-            kind: "DELEGATION_CONVENTION_EXPIRED",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRED",
             params: {
               agencyName: agency.name,
               delegationAgencyName,
@@ -66,7 +66,7 @@ export const makeNotifyDelegationConventionReminder = useCaseBuilder(
             recipients,
           }
         : {
-            kind: "DELEGATION_CONVENTION_EXPIRING_SOON",
+            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
               agencyName: agency.name,
               delegationEndDate,
@@ -111,7 +111,7 @@ const hasDelegationConventionReminderAlreadyBeenSent = async ({
 
   if (emails.length === 0) return false;
 
-  if (emailType !== "DELEGATION_CONVENTION_EXPIRING_SOON") return true;
+  if (emailType !== "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON") return true;
 
   return emails.some(
     (email) =>

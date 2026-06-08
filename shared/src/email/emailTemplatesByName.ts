@@ -90,7 +90,7 @@ export const emailTemplatesByName =
         `,
       }),
     },
-    DELEGATION_CONVENTION_EXPIRED: {
+    AGENCY_DELEGATION_CONVENTION_EXPIRED: {
       niceName:
         "Espace prescripteur - Prescripteurs - Expiration convention de délégation",
       tags: [
@@ -137,7 +137,7 @@ export const emailTemplatesByName =
     `,
       }),
     },
-    DELEGATION_CONVENTION_EXPIRING_SOON: {
+    AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON: {
       niceName:
         "Espace prescripteur - Prescripteurs - Expiration prochaine de convention de délégation",
       tags: [

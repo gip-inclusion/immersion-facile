@@ -53,12 +53,12 @@ export type EmailParamsByEmailType = {
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     delegationProviderMail: string;
   };
-  DELEGATION_CONVENTION_EXPIRED: {
+  AGENCY_DELEGATION_CONVENTION_EXPIRED: {
     agencyName: string;
     delegationAgencyName: string;
     delegationAgencyKind: DelegationAgencyKind | null;
   };
-  DELEGATION_CONVENTION_EXPIRING_SOON: {
+  AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON: {
     agencyName: string;
     delegationEndDate: DateString;
     delegationAgencyName: string;
