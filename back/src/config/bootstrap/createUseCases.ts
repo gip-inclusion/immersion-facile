@@ -14,6 +14,7 @@ import { makeCloseAgencyAndTransferConventions } from "../../domains/agency/use-
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { makeNotifyAgencyHasBeenPutOnHold } from "../../domains/agency/use-cases/NotifyAgencyHasBeenPutOnHold";
+import { makeNotifyDelegationConventionReminder } from "../../domains/agency/use-cases/notifications/NotifyDelegationConventionReminder";
 import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
 import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
@@ -616,6 +617,11 @@ export const createUseCases = ({
     }),
 
     notifyAgencyHasBeenPutOnHold: makeNotifyAgencyHasBeenPutOnHold({
+      uowPerformer,
+      deps: { saveNotificationAndRelatedEvent },
+    }),
+
+    notifyDelegationConventionReminder: makeNotifyDelegationConventionReminder({
       uowPerformer,
       deps: { saveNotificationAndRelatedEvent },
     }),
