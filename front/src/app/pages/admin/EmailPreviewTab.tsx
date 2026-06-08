@@ -279,6 +279,17 @@ export const defaultEmailValueByEmailKind: {
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     delegationProviderMail: "DELEGATION_PROVIDER_EMAIL",
   },
+  DELEGATION_CONVENTION_EXPIRED: {
+    agencyName: "AGENCY_NAME",
+    delegationAgencyName: "DR France Travail",
+    delegationAgencyKind: "pole-emploi",
+  },
+  DELEGATION_CONVENTION_EXPIRING_SOON: {
+    agencyName: "AGENCY_NAME",
+    delegationAgencyName: "DR France Travail",
+    delegationEndDate: "2026-06-30T00:00:00.000Z",
+    reminderKind: "oneMonthBefore",
+  },
   ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",

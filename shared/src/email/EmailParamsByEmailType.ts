@@ -1,5 +1,9 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type {
+  DelegationAgencyKind,
+  DelegationConventionReminderKind,
+} from "../agency/agency.dto";
+import type {
   AssessmentDtoCompleted,
   AssessmentDtoPartiallyCompleted,
 } from "../assessment/assessment.dto";
@@ -48,6 +52,20 @@ export type EmailParamsByEmailType = {
   };
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     delegationProviderMail: string;
+  };
+  DELEGATION_CONVENTION_EXPIRED: {
+    agencyName: string;
+    delegationAgencyName: string;
+    delegationAgencyKind: DelegationAgencyKind | null;
+  };
+  DELEGATION_CONVENTION_EXPIRING_SOON: {
+    agencyName: string;
+    delegationEndDate: DateString;
+    delegationAgencyName: string;
+    reminderKind: Extract<
+      DelegationConventionReminderKind,
+      "threeMonthsBefore" | "oneMonthBefore"
+    >;
   };
   AGENCY_FIRST_REMINDER: {
     manageConventionLink: string;

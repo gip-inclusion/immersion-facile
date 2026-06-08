@@ -90,6 +90,109 @@ export const emailTemplatesByName =
         `,
       }),
     },
+    DELEGATION_CONVENTION_EXPIRED: {
+      niceName:
+        "Espace prescripteur - Prescripteurs - Expiration convention de délégation",
+      tags: [
+        "template:expirationConventionDelegation",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:admin",
+        "role:valideur",
+        "role:preValideur",
+        "role:lecteur",
+      ],
+      createEmailVariables: ({
+        agencyName,
+        delegationAgencyName,
+        delegationAgencyKind,
+      }) => ({
+        subject:
+          "Action requise : Fermeture de votre accès à Immersion Facilitée (Convention expirée)",
+        greetings: "Bonjour,",
+        content: `
+      Votre convention de délégation, vous autorisant à prescrire des immersions professionnelles (PMSMP) avec <strong>${agencyName}</strong>, est arrivée à échéance.
+
+      À ce jour, nous n'avons pas reçu de nouvelle convention en cours de validité. Par conséquent, votre accès à la plateforme Immersion Facilitée est désormais suspendu.
+
+      <strong>Comment réactiver votre accès ?</strong>
+
+      <strong>• Vous avez votre nouvelle convention</strong>
+      Transmettez-nous le document immédiatement à l'adresse : <a href="mailto:${immersionFacileDelegationEmail}" target="_blank">${immersionFacileDelegationEmail}</a>. Votre référencement sera réactivé dès sa réception.
+
+      <strong>• Vous devez encore en faire la demande</strong>
+      Adressez-vous directement à votre prescripteur de droit : <strong>${delegationAgencyName}</strong>.
+      ${
+        delegationAgencyKind === "pole-emploi"
+          ? `• Pour France Travail : utilisez ce formulaire pour obtenir le bon interlocuteur : <a href="https://tally.so/r/w7WM49" target="_blank">https://tally.so/r/w7WM49</a>`
+          : ""
+      }
+
+      Notre équipe est à votre disposition pour vous accompagner dans cette démarche.
+      N'hésitez pas à nous contacter à l'adresse : <a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>
+    `,
+        subContent: `
+      Bien cordialement,
+      L'équipe Immersion Facilitée
+    `,
+      }),
+    },
+    DELEGATION_CONVENTION_EXPIRING_SOON: {
+      niceName:
+        "Espace prescripteur - Prescripteurs - Expiration prochaine de convention de délégation",
+      tags: [
+        "template:expirationProchaineConventionDelegation",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:admin",
+        "role:valideur",
+        "role:preValideur",
+        "role:lecteur",
+      ],
+      createEmailVariables: ({
+        agencyName,
+        delegationEndDate,
+        delegationAgencyName,
+      }) => {
+        const displayedDelegationEndDate = toDisplayedDate({
+          date: new Date(delegationEndDate),
+          withHours: false,
+        });
+
+        return {
+          subject: `🚨 Renouvellement de votre convention de délégation avant fermeture de votre structure le ${displayedDelegationEndDate}`,
+          greetings: "Bonjour,",
+          content: `
+      Votre structure <strong>${agencyName}</strong> bénéficie actuellement d'une convention de délégation délivrée par <strong>${delegationAgencyName}</strong>, vous permettant de prescrire des immersions professionnelles (PMSMP).
+
+      Cette convention arrive à échéance le <strong>${displayedDelegationEndDate}</strong>.
+
+      Afin de maintenir votre référencement sur la plateforme Immersion Facilitée, merci de nous transmettre votre nouvelle convention avant cette date.
+
+      <strong>Deux situations possibles :</strong>
+        
+          <strong>• Vous avez déjà votre nouvelle convention</strong>
+          Envoyez-nous le document dès maintenant à l'adresse suivante : <a href="mailto:${immersionFacileDelegationEmail}" target="_blank">${immersionFacileDelegationEmail}</a>
+       
+        
+          <strong>• Vous n'avez pas encore la nouvelle convention</strong>
+          Faites-en la demande dès que possible auprès du prescripteur de droit qui vous a délivré la première.
+          • Pour une demande auprès de France Travail, vous pouvez utiliser ce formulaire pour obtenir le bon interlocuteur : <a href="https://tally.so/r/w7WM49" target="_blank">https://tally.so/r/w7WM49</a>
+          • Besoin d'un modèle ? Un exemplaire standard est joint à cet email à titre indicatif.
+          
+      <strong>Que se passe-t-il si la date est dépassée ?</strong>
+
+      Sans réception d'un document en cours de validité nous serons contraints de suspendre votre référencement le <strong>${displayedDelegationEndDate}</strong>. Il pourra bien sûr être réactivé dès réception de la nouvelle convention !
+
+      Nous vous remercions et restons à votre disposition pour toute question à l'adresse <a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>
+    `,
+          subContent: `
+      Bien cordialement,
+      L'équipe Immersion Facilitée
+    `,
+        };
+      },
+    },
     AGENCY_DELEGATION_CONTACT_INFORMATION: {
       niceName: "Délégation - Information de contact DR",
       tags: [
@@ -748,7 +851,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName} est désormais finalisé et signé par le candidat.
   
           <strong>📄 Informations principales</strong>
-          <ul>
+          
             <li>Métier observé : ${immersionAppellationLabel}</li>
             <li>Objectif ${
               internshipKind === "immersion"
