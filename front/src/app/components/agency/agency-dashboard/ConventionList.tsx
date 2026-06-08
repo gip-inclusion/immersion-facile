@@ -7,6 +7,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
+import { format, subMonths } from "date-fns";
 import { equals, pick } from "ramda";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { HeadingSection, RichTable } from "react-design-system";
@@ -14,6 +15,7 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionStatus,
   conventionStatuses,
+  defaultMonthsThresholdForConventionsListing,
   defaultPerPageInWebPagination,
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
@@ -624,6 +626,13 @@ export const ConventionList = () => {
                               label="Date"
                               nativeInputProps={{
                                 type: "date",
+                                min: format(
+                                  subMonths(
+                                    new Date(),
+                                    defaultMonthsThresholdForConventionsListing,
+                                  ),
+                                  "yyyy-MM-dd",
+                                ),
                                 value: dateFilterStates.dateEnd.value,
                                 onChange: (event) => {
                                   setDateFilterStates((prev) => ({
