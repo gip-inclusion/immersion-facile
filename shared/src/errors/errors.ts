@@ -866,6 +866,14 @@ export const errors = {
       new NotFoundError(
         `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
       ),
+    forbiddenDelegationConventionReminder: ({
+      agencyId,
+    }: {
+      agencyId: AgencyId;
+    }) =>
+      new ForbiddenError(
+        `L'agence '${agencyId}' n'est pas éligible pour ce rappel de convention de délégation.`,
+      ),
     invalidSiret: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
         `Le SIRET que vous avez saisi (${siret}) n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.`,
