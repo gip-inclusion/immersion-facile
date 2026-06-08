@@ -295,3 +295,5 @@ left join {{ source('immersion', 'phone_numbers') }} as pn_bce
 -- Status translation
 inner join {{ source('immersion', 'convention_status_translations') }} as cst
     on c.status = cst.status
+
+where c.date_end >= (current_date - interval '25 months')
