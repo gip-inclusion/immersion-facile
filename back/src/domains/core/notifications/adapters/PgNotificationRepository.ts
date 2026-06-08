@@ -234,6 +234,8 @@ export class PgNotificationRepository implements NotificationRepository {
         filters.conventionId
           ? qb.where("e.convention_id", "=", filters?.conventionId)
           : qb,
+      (qb) =>
+        filters.agencyId ? qb.where("e.agency_id", "=", filters.agencyId) : qb,
     )
       .orderBy("e.created_at", "desc")
       .limit(filters.limit ?? this.maxRetrievedNotifications)

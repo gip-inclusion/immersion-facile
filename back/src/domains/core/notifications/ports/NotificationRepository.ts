@@ -1,4 +1,5 @@
 import type {
+  AgencyId,
   ConventionId,
   DateRange,
   Email,
@@ -18,6 +19,7 @@ export type EmailNotificationFilters = {
   email?: Email;
   emailType?: EmailType;
   conventionId?: ConventionId;
+  agencyId?: AgencyId;
   createdAt?: Date;
   offset?: number;
   limit?: number;
