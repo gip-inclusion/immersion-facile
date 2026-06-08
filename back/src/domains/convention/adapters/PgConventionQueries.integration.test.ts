@@ -1607,6 +1607,42 @@ describe("Pg implementation of ConventionQueries", () => {
         },
       ]);
     });
+    it("should filter conventions by date range with only from", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            dateEnd: {
+              from: "2023-03-01",
+            },
+          },
+          sort: {
+            by: "dateEnd",
+            direction: "desc",
+          },
+        });
+
+      expectToEqual(result.data, [
+        {
+          ...conventionD,
+          ...differentAgencyFields,
+          assessment: null,
+          isEstablishmentBanned: false,
+        },
+        {
+          ...conventionC,
+          ...agencyFields,
+          assessment: {
+            status: "COMPLETED",
+            endedWithAJob: false,
+            signedAt: null,
+            createdAt: completedAssessment.createdAt,
+          },
+          isEstablishmentBanned: false,
+        },
+      ]);
+    });
 
     describe("assessment completion status filter", () => {
       describe("assessment filter is 'finalized'", () => {

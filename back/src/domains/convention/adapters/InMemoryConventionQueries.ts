@@ -2,6 +2,8 @@ import { addDays, isAfter, isBefore, subMonths } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
+  type AgencyRole,
+  type AgencyWithUsersRights,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type ConventionDto,
   type ConventionId,
@@ -10,12 +12,15 @@ import {
   type ConventionsWithErroredBroadcastFeedbackFilters,
   type ConventionWithBroadcastFeedback,
   type ConventionWithUnfinalizedAssessment,
+  calculatePaginationResult,
   conventionReadSchema,
   conventionSchema,
   conventionStatusesDemonstratingUserActivity,
   type DataWithPagination,
+  type DateFilter,
   errors,
   type GetPaginatedConventionsFilters,
+  type GetPaginatedConventionsSortBy,
   isConventionEndingInOneDayOrMore,
   isFunctionalBroadcastFeedbackError,
   isUnvalidatedConventionStatus,
@@ -24,6 +29,7 @@ import {
   type SiretDto,
   type UserId,
   type WithBannedEstablishmentInformations,
+  type WithSort,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
@@ -163,41 +169,65 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
   ): Promise<DataWithPagination<ConventionReadDto>> {
-    // Store the params for later inspection in tests
     this.paginatedConventionsParams.push(params);
 
-    // Get all conventions
-    const conventions = this.conventionRepository.conventions;
+    const { filters = {}, pagination, sort, agencyUserId } = params;
+    const agencyIdsForUser = this.#getAgencyIdsForAgencyUser(agencyUserId);
 
-    // Apply pagination
-    const { page, perPage } = params.pagination;
+    const filteredConventions = this.conventionRepository.conventions
+      .filter((convention) => agencyIdsForUser.includes(convention.agencyId))
+      .filter(
+        makeApplyPaginatedFiltersToConventions(
+          filters,
+          this.agencyRepository.agencies,
+        ),
+      );
+
+    const sortedConventions = sortConventionsInMemory(
+      filteredConventions,
+      sort,
+    );
+
+    const { page, perPage } = pagination;
     const startIndex = (page - 1) * perPage;
-    const endIndex = Math.min(startIndex + perPage, conventions.length);
-    const paginatedData = conventions.slice(startIndex, endIndex);
 
-    // Transform ConventionDto to ConventionReadDto
+    if (filters.assessmentCompletionStatus?.length) {
+      const conventionsRead = await Promise.all(
+        sortedConventions.map((convention) =>
+          this.#addAgencyAndAssessmentDataToConvention(convention),
+        ),
+      );
+
+      const filteredConventionsRead = conventionsRead.filter(
+        makeApplyAssessmentCompletionStatusFilterConventionsRead(filters),
+      );
+
+      return {
+        data: filteredConventionsRead.slice(startIndex, startIndex + perPage),
+        pagination: calculatePaginationResult({
+          ...pagination,
+          totalRecords: filteredConventionsRead.length,
+        }),
+      };
+    }
+
+    const paginatedData = sortedConventions.slice(
+      startIndex,
+      startIndex + perPage,
+    );
+
     const conventionsRead = await Promise.all(
       paginatedData.map((convention) =>
         this.#addAgencyAndAssessmentDataToConvention(convention),
       ),
-    ).then((conventionsRead) =>
-      params.filters?.assessmentCompletionStatus
-        ? conventionsRead.filter(
-            makeApplyAssessmentCompletionStatusFilterConventionsRead(
-              params.filters,
-            ),
-          )
-        : conventionsRead,
     );
 
     return {
       data: conventionsRead,
-      pagination: {
-        totalRecords: conventionsRead.length,
-        currentPage: page,
-        totalPages: Math.ceil(conventionsRead.length / perPage),
-        numberPerPage: perPage,
-      },
+      pagination: calculatePaginationResult({
+        ...pagination,
+        totalRecords: sortedConventions.length,
+      }),
     };
   }
 
@@ -270,6 +300,18 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
     return Object.values(latestConventionsBySiret);
   }
+
+  #getAgencyIdsForAgencyUser = (agencyUserId: UserId): AgencyId[] =>
+    this.agencyRepository.agencies
+      .filter((agency) => {
+        const userRights = agency.usersRights[agencyUserId];
+        if (!userRights) return false;
+
+        return userRights.roles.some((role) =>
+          agencyUserRolesWithConventionAccess.includes(role),
+        );
+      })
+      .map((agency) => agency.id);
 
   #addAgencyAndAssessmentDataToConvention = async (
     convention: ConventionDto,
@@ -636,6 +678,149 @@ const makeApplyFiltersToGetConventionIds =
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
+
+const agencyUserRolesWithConventionAccess: AgencyRole[] = [
+  "counsellor",
+  "validator",
+  "agency-admin",
+  "agency-viewer",
+];
+
+const matchesDateFilter = (
+  date: string,
+  dateFilter: DateFilter | undefined,
+): boolean => {
+  if (!dateFilter) return true;
+
+  const dateValue = new Date(date);
+
+  if (dateFilter.from && dateFilter.to)
+    return (
+      dateValue >= new Date(dateFilter.from) &&
+      dateValue <= new Date(dateFilter.to)
+    );
+
+  if (dateFilter.from) return dateValue >= new Date(dateFilter.from);
+  if (dateFilter.to) return dateValue <= new Date(dateFilter.to);
+
+  return true;
+};
+
+const matchesConventionSearch = (
+  convention: ConventionDto,
+  search: string,
+): boolean => {
+  const pattern = search.toLowerCase();
+  const {
+    beneficiary,
+    establishmentRepresentative,
+    beneficiaryRepresentative,
+    beneficiaryCurrentEmployer,
+  } = convention.signatories;
+
+  const searchableFields = [
+    convention.id,
+    beneficiary.firstName,
+    beneficiary.lastName,
+    `${beneficiary.firstName} ${beneficiary.lastName}`,
+    `${beneficiary.lastName} ${beneficiary.firstName}`,
+    convention.businessName,
+    convention.siret,
+    beneficiary.email,
+    establishmentRepresentative.email,
+    convention.establishmentTutor.email,
+    beneficiaryRepresentative?.email,
+    beneficiaryCurrentEmployer?.email,
+    convention.agencyReferent?.firstname,
+    convention.agencyReferent?.lastname,
+    convention.agencyReferent
+      ? `${convention.agencyReferent.firstname} ${convention.agencyReferent.lastname}`
+      : undefined,
+    convention.agencyReferent
+      ? `${convention.agencyReferent.lastname} ${convention.agencyReferent.firstname}`
+      : undefined,
+  ];
+
+  return searchableFields.some(
+    (field) => field && field.toLowerCase().includes(pattern),
+  );
+};
+
+const sortConventionsInMemory = (
+  conventions: ConventionDto[],
+  sort?: Partial<WithSort<GetPaginatedConventionsSortBy>["sort"]>,
+): ConventionDto[] => {
+  const sortBy = sort?.by ?? "dateStart";
+  const direction = sort?.direction ?? "desc";
+  const multiplier = direction === "asc" ? 1 : -1;
+
+  return [...conventions].sort((previous, current) => {
+    const previousDate = previous[sortBy];
+    const currentDate = current[sortBy];
+
+    if (!previousDate && !currentDate)
+      return previous.id.localeCompare(current.id);
+    if (!previousDate) return 1;
+    if (!currentDate) return -1;
+
+    const dateCompare =
+      (new Date(previousDate).getTime() - new Date(currentDate).getTime()) *
+      multiplier;
+
+    if (dateCompare !== 0) return dateCompare;
+
+    return previous.id.localeCompare(current.id);
+  });
+};
+
+const makeApplyPaginatedFiltersToConventions =
+  (
+    {
+      search,
+      statuses,
+      agencyIds,
+      agencyDepartmentCodes,
+      dateStart,
+      dateEnd,
+      dateSubmission,
+    }: GetPaginatedConventionsFilters,
+    agencies: AgencyWithUsersRights[],
+  ) =>
+  (convention: ConventionDto) => {
+    const trimmedSearch = search?.trim();
+
+    return (
+      [
+        () =>
+          trimmedSearch
+            ? matchesConventionSearch(convention, trimmedSearch)
+            : true,
+        ({ dateStart: conventionDateStart }) =>
+          matchesDateFilter(conventionDateStart, dateStart),
+        ({ dateEnd: conventionDateEnd }) =>
+          matchesDateFilter(conventionDateEnd, dateEnd),
+        ({ dateSubmission: conventionDateSubmission }) =>
+          matchesDateFilter(conventionDateSubmission, dateSubmission),
+        ({ status }) =>
+          statuses && statuses.length > 0 ? statuses.includes(status) : true,
+        ({ agencyId }) =>
+          agencyIds && agencyIds.length > 0
+            ? agencyIds.includes(agencyId)
+            : true,
+        ({ agencyId }) => {
+          if (!agencyDepartmentCodes || agencyDepartmentCodes.length === 0)
+            return true;
+
+          const agency = agencies.find(({ id }) => id === agencyId);
+
+          return (
+            !!agency &&
+            agencyDepartmentCodes.includes(agency.address.departmentCode)
+          );
+        },
+      ] satisfies Array<(convention: ConventionDto) => boolean>
+    ).every((filter) => filter(convention));
+  };
 
 const makeApplyFiltersToConventions =
   ({

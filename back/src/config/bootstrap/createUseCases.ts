@@ -1062,6 +1062,7 @@ export const createUseCases = ({
     }),
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
+      deps: { timeGateway: gateways.timeGateway },
     }),
     getConventionsWithUnfinalizedAssessment:
       makeGetConventionsWithUnfinalizedAssessment({

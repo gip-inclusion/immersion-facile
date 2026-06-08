@@ -324,3 +324,5 @@ export const getConventionManageAllowedRoles = (
 export const isConventionEndingInOneDayOrMore = (
   convention: ConventionReadDto,
 ) => isAfter(new Date(convention.dateEnd), addDays(new Date(), 1));
+
+export const defaultMonthsThresholdForConventionsListing = 25;
