@@ -23,6 +23,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_id ON {{ this }} (id)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_appellation_label ON {{ this }} (appellation_label)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_rome_label ON {{ this }} (rome_label)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_analytics_assessment_completed ON {{ this }} (status_technical, internship_kind, updated_at) INCLUDE (date_end, assessment_signed_at, assessment_created_at) WHERE assessment_status IN ('COMPLETED', 'PARTIALLY_COMPLETED') AND assessment_signed_at IS NOT NULL AND assessment_created_at IS NOT NULL",
     ]
   )
 }}
