@@ -16,6 +16,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conv_count_establishment_naf_label ON {{ this }} (establishment_naf_label)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_id ON {{ this }} (agency_id)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_name ON {{ this }} (agency_name)",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_grouping_filters ON {{ this }} (agency_name, agency_kind, status_technical, agency_status, date_start) INCLUDE (agency_id)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_siret ON {{ this }} (siret)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_immersion_objective ON {{ this }} (immersion_objective)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_rome_label ON {{ this }} (rome_label)",
