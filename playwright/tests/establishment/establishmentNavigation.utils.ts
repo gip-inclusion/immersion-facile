@@ -5,6 +5,7 @@ import {
   type SiretDto,
 } from "shared";
 import { goToAdminTab } from "../../utils/admin";
+import { getFormEstablishmentApiPath } from "../../utils/apiRoutes";
 import { waitForVisibleLoaderHidden } from "../../utils/utils";
 
 export const goToManageEstablishmentThroughEstablishmentDashboard = async (
@@ -39,9 +40,10 @@ export const goToManageEtablishmentBySiretInAdmin = async (
   );
   await siretInputLocator.waitFor();
   await siretInputLocator.fill(siret);
+  const formEstablishmentApiPath = getFormEstablishmentApiPath(siret);
   const establishmentResponsePromise = page.waitForResponse(
     (response) =>
-      response.url().includes(`/api/form-establishments/${siret}`) &&
+      response.url().includes(formEstablishmentApiPath) &&
       response.status() === 200,
   );
   await page.click(`#${domElementIds.admin.manageEstablishment.searchButton}`);

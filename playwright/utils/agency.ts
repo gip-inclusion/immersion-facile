@@ -14,7 +14,7 @@ export const fillAndSubmitBasicAgencyForm = async (
     agencyContactEmail?: string;
   },
 ): Promise<AgencyId | null> => {
-  await goToAddAgencyForm(page);
+  await goToAddAgencyFormThroughAgencyLandingPage(page);
   await page
     .locator(`[for="${domElementIds.addAgency.agencyRefersToInput}-0"]`)
     .click();
@@ -168,7 +168,7 @@ export const addUserToAgency = async (page: Page, agencyName: string) => {
   await expect(page.locator(".fr-alert--success").first()).toBeVisible();
 };
 
-export const goToAddAgencyForm = async (page: Page) => {
+export const goToAddAgencyFormThroughAgencyLandingPage = async (page: Page) => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.agency}`);
   await page.click(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`);
