@@ -27,3 +27,19 @@ In dev mode the PostgreSQL container stays alive between runs, skipping containe
 Front and back servers are also reused (`reuseExistingServer` in playwright config) — start them with `pnpm dev` before running tests, or let Playwright start them automatically on first run.
 
 Everything after `--` is passed through to Playwright (`--grep`, `--headed`, `--workers`, `--project`, etc.).
+
+## VSCode Playwright plugin / running one test
+
+The automatic PostgreSQL testcontainer setup is done by `start-e2e.ts`, so it only runs when using the `pnpm test:e2e*` scripts above.
+
+If you run a single test directly from the Playwright VSCode plugin, first start the E2E infra once:
+
+```bash
+pnpm test:e2e:dev -- --grep "a test that can pass quickly"
+```
+
+Then use the plugin while the cached container and local servers stay available. Stop the cached container with:
+
+```bash
+pnpm test:e2e:dev:stop
+```

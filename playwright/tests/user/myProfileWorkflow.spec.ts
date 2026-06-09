@@ -6,16 +6,17 @@ import { fillAutocomplete, test } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
-const newAgencyUserEmail = "recette+playwright@immersion-facile.beta.gouv.fr";
+const newAgencyUserEmail = testConfig.proConnect.username;
 
-const goToMyProfilePage = async (page: Page) => {
+const goToMyProfilePageFromHome = async (page: Page) => {
+  await page.goto("/");
   await page.locator("#fr-header-quick-access-item-1").click();
   await page
     .locator(`#${domElementIds.header.navLinks.quickAccess.myAccount}`)
     .click();
 };
 
-const goToFtAgencyAdminTab = async (page: Page) => {
+const goToFtAgencyAdminTabFromHome = async (page: Page) => {
   await page.goto("/");
   await goToAdminTab(page, "adminAgencies");
   await fillAutocomplete({
@@ -56,8 +57,7 @@ test.describe("User workflow", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
     test("can access infos on MyProfile page", async ({ page }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       const agenciesCount = await page
         .locator(`[id^=${domElementIds.myProfile.editRoleButton}]`)
@@ -92,7 +92,7 @@ test.describe("User workflow", () => {
     test("create a user with agency-admin and validator rights for agency", async ({
       page,
     }) => {
-      await goToFtAgencyAdminTab(page);
+      await goToFtAgencyAdminTabFromHome(page);
       await removeNewAgencyUserIfPresent(page);
 
       await page
@@ -134,8 +134,7 @@ test.describe("User workflow", () => {
     test.use({ storageState: testConfig.agencyAuthFile });
 
     test("can access infos on MyProfile page", async ({ page }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       await expect(
         page.locator(`[id^=${domElementIds.myProfile.adminAgencyLink}]`),
@@ -146,8 +145,7 @@ test.describe("User workflow", () => {
     });
 
     test("can remove its own agency-admin right", async ({ page }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       const ftAgencyEditRoleButton = page.locator(
         `#${domElementIds.myProfile.editRoleButton}-${SEED_FT_AGENCY_ID}`,
@@ -187,8 +185,7 @@ test.describe("User workflow", () => {
     test.use({ storageState: testConfig.agencyAuthFile });
 
     test("can access infos on MyProfile page", async ({ page }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       await expect(
         page.locator(`#${domElementIds.myProfile.updateOwnInfosLink}`),
@@ -201,8 +198,7 @@ test.describe("User workflow", () => {
     test("can request to register on agencies from MyProfile page", async ({
       page,
     }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       await expect(
         page.locator(`#${domElementIds.myProfile.registerAgenciesSearchLink}`),
@@ -240,8 +236,7 @@ test.describe("User workflow", () => {
     });
 
     test("has access to his notification preferences", async ({ page }) => {
-      await page.goto("/");
-      await goToMyProfilePage(page);
+      await goToMyProfilePageFromHome(page);
 
       await page
         .locator(`[id^=${domElementIds.myProfile.editRoleButton}]`)
@@ -281,7 +276,7 @@ test.describe("User workflow", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
     test("Remove new user from agency", async ({ page }) => {
-      await goToFtAgencyAdminTab(page);
+      await goToFtAgencyAdminTabFromHome(page);
       await removeNewAgencyUserIfPresent(page);
     });
   });

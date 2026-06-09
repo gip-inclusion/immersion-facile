@@ -22,7 +22,7 @@
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
     "playwright": "pnpm --dir playwright",
-    "playwright:test": "pnpm back db:seed:bun && pnpm playwright test:local",
+    "playwright:test": "pnpm test:e2e",
     "test:e2e": "pnpm playwright test:e2e",
     "test:e2e:dev": "pnpm playwright test:e2e:dev",
     "test:e2e:dev:reset": "pnpm playwright test:e2e:dev:reset",

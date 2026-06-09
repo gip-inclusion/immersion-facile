@@ -3,6 +3,7 @@ import { addMonths } from "date-fns";
 import { domElementIds, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
+import { getFormEstablishmentApiPath } from "../../utils/apiRoutes";
 import { test, validPhonesData } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
@@ -127,13 +128,15 @@ test.describe("Establishment creation and modification workflow", () => {
         );
         await siretInput.waitFor();
         await siretInput.fill(siret);
-        const establishmentResponsePromise = page.waitForResponse((response) =>
-          response.url().includes(`/api/form-establishments/${siret}`),
-        );
-        await page.click(
-          `#${domElementIds.admin.manageEstablishment.searchButton}`,
-        );
-        const establishmentResponse = await establishmentResponsePromise;
+        const formEstablishmentApiPath = getFormEstablishmentApiPath(siret);
+        const [establishmentResponse] = await Promise.all([
+          page.waitForResponse((response) =>
+            response.url().includes(formEstablishmentApiPath),
+          ),
+          page.click(
+            `#${domElementIds.admin.manageEstablishment.searchButton}`,
+          ),
+        ]);
         if (establishmentResponse.status() === 404) return;
 
         const deleteButton = page.locator(
