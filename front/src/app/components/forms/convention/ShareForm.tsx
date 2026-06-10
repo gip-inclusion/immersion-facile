@@ -24,31 +24,20 @@ import { conventionDraftSlice } from "src/core-logic/domain/convention/conventio
 
 export type ShareFormProps = {
   conventionFormData: CreateConventionPresentationInitialValues;
-  firstName: string;
-  lastName: string;
 };
 
 const makeInitialValues = ({
   conventionFormData,
-  firstName,
-  lastName,
 }: {
   conventionFormData: CreateConventionPresentationInitialValues;
-  firstName: string;
-  lastName: string;
 }): SaveConventionDraftFromConventionDto => ({
   senderEmail: "",
   conventionDraft: toConventionDraftDto({ convention: conventionFormData }),
-  details: `${firstName || "Prénom"} ${
-    lastName || "Nom"
-  } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
+  details:
+    "Je vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !",
 });
 
-export const ShareForm = ({
-  conventionFormData,
-  firstName,
-  lastName,
-}: ShareFormProps) => {
+export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
   const dispatch = useDispatch();
   const [isOnlyForSelf, setIsOnlyForSelf] = useState(false);
   const onSubmit = (values: SaveConventionDraftFromConventionDto) => {
@@ -63,8 +52,6 @@ export const ShareForm = ({
     mode: "onTouched",
     defaultValues: makeInitialValues({
       conventionFormData,
-      firstName,
-      lastName,
     }),
     resolver: zodResolver(saveConventionDraftFromConventionSchema),
   });
@@ -79,8 +66,8 @@ export const ShareForm = ({
   );
 
   useEffect(() => {
-    reset(makeInitialValues({ conventionFormData, firstName, lastName }));
-  }, [conventionFormData, firstName, lastName, reset]);
+    reset(makeInitialValues({ conventionFormData }));
+  }, [conventionFormData, reset]);
 
   return (
     <WithFeedbackReplacer topic="convention-draft">
