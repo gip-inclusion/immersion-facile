@@ -5,13 +5,79 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionDto,
   domElementIds,
+  type EditConventionWithFinalStatusFormValues,
   type EditConventionWithFinalStatusRequestDto,
-  editConventionWithFinalStatusRequestSchema,
+  editConventionWithFinalStatusFormSchema,
   toDateUTCString,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
+
+const pickChangedFields = (
+  fields: readonly (readonly [string, unknown, unknown])[],
+) =>
+  Object.fromEntries(
+    fields
+      .filter(([, formValue, originalValue]) => formValue !== originalValue)
+      .map(([key, formValue]) => [key, formValue]),
+  );
+
+const isNonEmptyObject = (value: Record<string, unknown>) =>
+  Object.keys(value).length > 0;
+
+const buildPartialEditConventionWithFinalStatusRequest = ({
+  convention,
+  formValues,
+  canEditBeneficiary,
+}: {
+  convention: ConventionDto;
+  formValues: EditConventionWithFinalStatusFormValues;
+  canEditBeneficiary: boolean;
+}): EditConventionWithFinalStatusRequestDto | undefined => {
+  const { establishmentTutor: formTutor, beneficiary: formBeneficiary } =
+    formValues;
+  const originalTutor = convention.establishmentTutor;
+  const originalBeneficiary = convention.signatories.beneficiary;
+
+  const establishmentTutor = pickChangedFields([
+    ["firstname", formTutor.firstname, originalTutor.firstName],
+    ["lastname", formTutor.lastname, originalTutor.lastName],
+    ["job", formTutor.job, originalTutor.job],
+    ["email", formTutor.email, originalTutor.email],
+    ["phone", formTutor.phone, originalTutor.phone],
+  ]);
+
+  const beneficiary =
+    canEditBeneficiary && formBeneficiary
+      ? pickChangedFields([
+          [
+            "updatedBeneficiaryBirthDate",
+            formBeneficiary.updatedBeneficiaryBirthDate,
+            originalBeneficiary.birthdate,
+          ],
+          [
+            "firstname",
+            formBeneficiary.firstname,
+            originalBeneficiary.firstName,
+          ],
+          ["lastname", formBeneficiary.lastname, originalBeneficiary.lastName],
+        ])
+      : {};
+
+  if (!isNonEmptyObject(establishmentTutor) && !isNonEmptyObject(beneficiary))
+    return undefined;
+
+  return {
+    conventionId: formValues.conventionId,
+    ...(isNonEmptyObject(establishmentTutor) && {
+      establishmentTutor: establishmentTutor,
+    }),
+    ...(isNonEmptyObject(beneficiary) && {
+      beneficiary: beneficiary,
+    }),
+  };
+};
 
 export const EditConventionWithFinalStatusModalContent = ({
   convention,
@@ -29,8 +95,8 @@ export const EditConventionWithFinalStatusModalContent = ({
   const canEditBeneficiary = currentUser?.isBackofficeAdmin ?? false;
 
   const { register, handleSubmit, formState } =
-    useForm<EditConventionWithFinalStatusRequestDto>({
-      resolver: zodResolver(editConventionWithFinalStatusRequestSchema),
+    useForm<EditConventionWithFinalStatusFormValues>({
+      resolver: zodResolver(editConventionWithFinalStatusFormSchema),
       mode: "onTouched",
       defaultValues: {
         conventionId: convention.id,
@@ -51,16 +117,18 @@ export const EditConventionWithFinalStatusModalContent = ({
       },
     });
 
-  const onFormSubmit: SubmitHandler<EditConventionWithFinalStatusRequestDto> = (
+  const onFormSubmit: SubmitHandler<EditConventionWithFinalStatusFormValues> = (
     values,
   ) => {
-    onSubmit({
-      conventionId: values.conventionId,
-      establishmentTutor: values.establishmentTutor,
-      ...(canEditBeneficiary && values.beneficiary
-        ? { beneficiary: values.beneficiary }
-        : {}),
+    const request = buildPartialEditConventionWithFinalStatusRequest({
+      convention,
+      formValues: values,
+      canEditBeneficiary,
     });
+
+    if (!request) return;
+
+    onSubmit(request);
     closeModal();
   };
 

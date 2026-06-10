@@ -41,6 +41,7 @@ import {
   conventionInternshipKindSpecificSchema,
   conventionReadSchema,
   conventionSchema,
+  editConventionWithFinalStatusFormSchema,
   editConventionWithFinalStatusRequestSchema,
   updateConventionStatusRequestSchema,
 } from "./convention.schema";
@@ -1458,6 +1459,57 @@ describe("conventionDtoSchema", () => {
   });
 });
 
+describe("editConventionWithFinalStatusFormSchema", () => {
+  const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
+
+  const validFormValues = {
+    conventionId,
+    establishmentTutor: {
+      firstname: "Marie",
+      lastname: "Tutor",
+      job: "Responsable RH",
+      email: "tutor@mail.com",
+      phone: "+33601020304",
+    },
+    beneficiary: {
+      updatedBeneficiaryBirthDate: "2008-06-01",
+      firstname: "Jean",
+      lastname: "Dupont",
+    },
+  };
+
+  it("accepts valid form values", () => {
+    expectDtoToBeValid(
+      editConventionWithFinalStatusFormSchema,
+      validFormValues,
+    );
+  });
+
+  it("rejects empty establishment tutor lastname", () => {
+    expect(() =>
+      editConventionWithFinalStatusFormSchema.parse({
+        ...validFormValues,
+        establishmentTutor: {
+          ...validFormValues.establishmentTutor,
+          lastname: "",
+        },
+      }),
+    ).toThrow();
+  });
+
+  it("rejects empty beneficiary firstname", () => {
+    expect(() =>
+      editConventionWithFinalStatusFormSchema.parse({
+        ...validFormValues,
+        beneficiary: {
+          ...validFormValues.beneficiary,
+          firstname: "",
+        },
+      }),
+    ).toThrow();
+  });
+});
+
 describe("editConventionWithFinalStatusRequestSchema", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
@@ -1476,6 +1528,24 @@ describe("editConventionWithFinalStatusRequestSchema", () => {
     });
   });
 
+  it("accepts request with partial establishment tutor update", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
+      conventionId,
+      establishmentTutor: {
+        email: "new-tutor@mail.com",
+      },
+    });
+  });
+
+  it("accepts request with beneficiary only", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
+      conventionId,
+      beneficiary: {
+        updatedBeneficiaryBirthDate: "2008-06-01",
+      },
+    });
+  });
+
   it("accepts request with establishment tutor and beneficiary updates", () => {
     expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
       conventionId,
@@ -1488,10 +1558,37 @@ describe("editConventionWithFinalStatusRequestSchema", () => {
     });
   });
 
-  it("rejects request without establishment tutor", () => {
+  it("accepts request with only conventionId at schema level", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
+      conventionId,
+    });
+  });
+
+  it("accepts request with empty establishment tutor object at schema level", () => {
+    expectDtoToBeValid(editConventionWithFinalStatusRequestSchema, {
+      conventionId,
+      establishmentTutor: {},
+    });
+  });
+
+  it("rejects empty string for establishment tutor lastname", () => {
     expect(() =>
       editConventionWithFinalStatusRequestSchema.parse({
         conventionId,
+        establishmentTutor: {
+          lastname: "",
+        },
+      }),
+    ).toThrow();
+  });
+
+  it("rejects empty string for beneficiary lastname", () => {
+    expect(() =>
+      editConventionWithFinalStatusRequestSchema.parse({
+        conventionId,
+        beneficiary: {
+          lastname: "",
+        },
       }),
     ).toThrow();
   });
@@ -1500,11 +1597,8 @@ describe("editConventionWithFinalStatusRequestSchema", () => {
     expect(() =>
       editConventionWithFinalStatusRequestSchema.parse({
         conventionId,
-        establishmentTutor,
         beneficiary: {
           updatedBeneficiaryBirthDate: "",
-          firstname: "Jean",
-          lastname: "Dupont",
         },
       }),
     ).toThrow();

@@ -364,10 +364,6 @@ export const errors = {
       new BadRequestError(
         `Impossible de modifier la convention : ${conventionId} en tant qu'admin : le statut "${status}" ne permet pas cette action.`,
       ),
-    editConventionWithFinalStatusBeneficiaryForbiddenForRole: () =>
-      new ForbiddenError(
-        "Seuls les administrateurs backoffice sont autorisés à modifier les informations du candidat lorsque la convention est finalisée.",
-      ),
     invalidConventionAfterFinalStatusEdit: ({
       message,
       conventionId,

@@ -696,9 +696,7 @@ describe("Magic link router", () => {
       expectHttpResponseToEqual(response, {
         body: {
           status: 403,
-          message:
-            errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole()
-              .message,
+          message: errors.user.forbidden({ userId: validator.id }).message,
         },
         status: 403,
       });
@@ -852,7 +850,6 @@ describe("Magic link router", () => {
         headers: { authorization: adminToken },
         body: {
           conventionId,
-          establishmentTutor: establishmentTutorBody,
           beneficiary: beneficiaryBody,
         },
       });
@@ -875,7 +872,10 @@ describe("Magic link router", () => {
         updatedConvention?.signatories.beneficiary.lastName,
         newLastName,
       );
-      expectToEqual(updatedConvention?.establishmentTutor.email, newTutorEmail);
+      expectToEqual(
+        updatedConvention?.establishmentTutor.email,
+        convention.establishmentTutor.email,
+      );
 
       expectArraysToMatch(inMemoryUow.outboxRepository.events, [
         {

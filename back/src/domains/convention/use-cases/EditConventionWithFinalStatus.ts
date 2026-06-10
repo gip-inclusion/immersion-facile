@@ -13,7 +13,10 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
-import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
+import {
+  throwIfNotAdmin,
+  throwIfNotAuthorizedForRole,
+} from "../../connected-users/helpers/authorization.helper";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -24,6 +27,12 @@ import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 export type EditConventionWithFinalStatus = ReturnType<
   typeof makeEditConventionWithFinalStatus
 >;
+
+const hasAtLeastOneDefinedValueInPartialUpdate = (
+  values: Record<string, unknown> | undefined,
+): boolean =>
+  values !== undefined &&
+  Object.values(values).some((value) => value !== undefined);
 
 export const makeEditConventionWithFinalStatus = useCaseBuilder(
   "EditConventionWithFinalStatus",
@@ -86,33 +95,63 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       isValidatorOfAgencyRefersToAllowed: true,
     });
 
-    const updatedEstablishmentTutor = {
-      ...convention.establishmentTutor,
-      firstName: inputParams.establishmentTutor.firstname,
-      lastName: inputParams.establishmentTutor.lastname,
-      job: inputParams.establishmentTutor.job,
-      email: inputParams.establishmentTutor.email,
-      phone: inputParams.establishmentTutor.phone,
-    };
+    if (
+      !hasAtLeastOneDefinedValueInPartialUpdate(
+        inputParams.establishmentTutor,
+      ) &&
+      !hasAtLeastOneDefinedValueInPartialUpdate(inputParams.beneficiary)
+    )
+      return;
 
-    const updatedConvention = inputParams.beneficiary
+    const updatedEstablishmentTutor = inputParams.establishmentTutor
       ? {
-          ...convention,
-          establishmentTutor: updatedEstablishmentTutor,
-          signatories: {
-            ...convention.signatories,
-            beneficiary: {
-              ...convention.signatories.beneficiary,
-              birthdate: inputParams.beneficiary.updatedBeneficiaryBirthDate,
-              firstName: inputParams.beneficiary.firstname,
-              lastName: inputParams.beneficiary.lastname,
-            },
-          },
+          ...convention.establishmentTutor,
+          ...(inputParams.establishmentTutor.firstname !== undefined && {
+            firstName: inputParams.establishmentTutor.firstname,
+          }),
+          ...(inputParams.establishmentTutor.lastname !== undefined && {
+            lastName: inputParams.establishmentTutor.lastname,
+          }),
+          ...(inputParams.establishmentTutor.job !== undefined && {
+            job: inputParams.establishmentTutor.job,
+          }),
+          ...(inputParams.establishmentTutor.email !== undefined && {
+            email: inputParams.establishmentTutor.email,
+          }),
+          ...(inputParams.establishmentTutor.phone !== undefined && {
+            phone: inputParams.establishmentTutor.phone,
+          }),
         }
-      : {
-          ...convention,
-          establishmentTutor: updatedEstablishmentTutor,
-        };
+      : convention.establishmentTutor;
+
+    const updatedBeneficiary = inputParams.beneficiary
+      ? {
+          ...convention.signatories.beneficiary,
+          ...(inputParams.beneficiary.updatedBeneficiaryBirthDate !==
+            undefined && {
+            birthdate: inputParams.beneficiary.updatedBeneficiaryBirthDate,
+          }),
+          ...(inputParams.beneficiary.firstname !== undefined && {
+            firstName: inputParams.beneficiary.firstname,
+          }),
+          ...(inputParams.beneficiary.lastname !== undefined && {
+            lastName: inputParams.beneficiary.lastname,
+          }),
+        }
+      : convention.signatories.beneficiary;
+
+    const updatedConvention = {
+      ...convention,
+      establishmentTutor: updatedEstablishmentTutor,
+      ...(inputParams.beneficiary
+        ? {
+            signatories: {
+              ...convention.signatories,
+              beneficiary: updatedBeneficiary,
+            },
+          }
+        : {}),
+    };
 
     const conventionValidation = conventionSchema.safeParse(updatedConvention);
     if (!conventionValidation.success)
@@ -160,10 +199,9 @@ const throwIfNotAllowedToEditBeneficiary = async ({
   if (!hasBeneficiaryUpdate) return;
 
   if (!("userId" in jwtPayload))
-    throw errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole();
+    throw errors.convention.unsupportedRole({ role: jwtPayload.role });
 
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
 
-  if (!userWithRights.isBackofficeAdmin)
-    throw errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole();
+  throwIfNotAdmin(userWithRights);
 };

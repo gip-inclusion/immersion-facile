@@ -94,6 +94,7 @@ import {
   conventionStatusesWithValidator,
   DATE_CONSIDERED_OLD,
   type EditConventionCounsellorNameRequestDto,
+  type EditConventionWithFinalStatusFormValues,
   type EditConventionWithFinalStatusRequestDto,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
@@ -252,23 +253,49 @@ export const editConventionCounsellorNameRequestSchema: ZodSchemaWithInputMatchi
     }),
   );
 
+const editConventionWithFinalStatusEstablishmentTutorUpdateSchema = z.object({
+  firstname: firstnameMandatorySchema.optional(),
+  lastname: lastnameMandatorySchema.optional(),
+  job: stringWithMaxLength255.optional(),
+  email: emailSchema.optional(),
+  phone: phoneNumberSchema.optional(),
+});
+
+const editConventionWithFinalStatusBeneficiaryUpdateSchema = z.object({
+  updatedBeneficiaryBirthDate: makeDateStringSchema().optional(),
+  firstname: firstnameMandatorySchema.optional(),
+  lastname: lastnameMandatorySchema.optional(),
+});
+
 export const editConventionWithFinalStatusRequestSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusRequestDto> =
   z.object({
     conventionId: conventionIdSchema,
-    establishmentTutor: z.object({
-      firstname: firstnameSchema,
-      lastname: lastnameSchema,
-      job: stringWithMaxLength255,
-      email: emailSchema,
-      phone: phoneNumberSchema,
-    }),
-    beneficiary: z
-      .object({
-        updatedBeneficiaryBirthDate: makeDateStringSchema(),
-        firstname: firstnameSchema,
-        lastname: lastnameSchema,
-      })
-      .optional(),
+    establishmentTutor:
+      editConventionWithFinalStatusEstablishmentTutorUpdateSchema.optional(),
+    beneficiary:
+      editConventionWithFinalStatusBeneficiaryUpdateSchema.optional(),
+  });
+
+const editConventionWithFinalStatusFormEstablishmentTutorSchema = z.object({
+  firstname: firstnameMandatorySchema,
+  lastname: lastnameMandatorySchema,
+  job: stringWithMaxLength255,
+  email: emailSchema,
+  phone: phoneNumberSchema,
+});
+
+const editConventionWithFinalStatusFormBeneficiarySchema = z.object({
+  updatedBeneficiaryBirthDate: makeDateStringSchema(),
+  firstname: firstnameMandatorySchema,
+  lastname: lastnameMandatorySchema,
+});
+
+export const editConventionWithFinalStatusFormSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusFormValues> =
+  z.object({
+    conventionId: conventionIdSchema,
+    establishmentTutor:
+      editConventionWithFinalStatusFormEstablishmentTutorSchema,
+    beneficiary: editConventionWithFinalStatusFormBeneficiarySchema.optional(),
   });
 
 export const renewedSchema = z.object({

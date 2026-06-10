@@ -1,8 +1,4 @@
-import {
-  type EditConventionWithFinalStatusRequestDto,
-  expectObjectsToMatch,
-  expectToEqual,
-} from "shared";
+import { expectObjectsToMatch, expectToEqual } from "shared";
 import {
   type EditConventionWithFinalStatusState,
   editConventionWithFinalStatusInitialState,
@@ -19,22 +15,6 @@ describe("editConventionWithFinalStatus slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
-  const basePayload: EditConventionWithFinalStatusRequestDto = {
-    conventionId: "fake-convention-id",
-    establishmentTutor: {
-      firstname: "Marie",
-      lastname: "Curie",
-      job: "Tuteur",
-      email: "tutor@mail.com",
-      phone: "+33601020304",
-    },
-    beneficiary: {
-      updatedBeneficiaryBirthDate: "1995-03-15",
-      firstname: "Jean",
-      lastname: "Martin",
-    },
-  };
-
   beforeEach(() => {
     ({ store, dependencies } = createTestStore({
       editConventionWithFinalStatus: {
@@ -47,7 +27,10 @@ describe("editConventionWithFinalStatus slice", () => {
     store.dispatch(
       editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusRequested(
         {
-          ...basePayload,
+          conventionId: "fake-convention-id",
+          establishmentTutor: {
+            email: "new-tutor@mail.com",
+          },
           jwt: "fake-jwt",
           feedbackTopic: "edit-convention-with-final-status",
         },
@@ -79,7 +62,10 @@ describe("editConventionWithFinalStatus slice", () => {
     store.dispatch(
       editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusRequested(
         {
-          ...basePayload,
+          conventionId: "fake-convention-id",
+          establishmentTutor: {
+            email: "new-tutor@mail.com",
+          },
           jwt: "fake-jwt",
           feedbackTopic: "edit-convention-with-final-status",
         },
