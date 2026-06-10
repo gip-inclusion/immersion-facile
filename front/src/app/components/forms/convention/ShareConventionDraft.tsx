@@ -20,8 +20,6 @@ const shareConventionDraftModal = createFormModal(
 
 export const ShareConventionDraft = ({
   conventionFormData,
-  firstName,
-  lastName,
 }: ShareFormProps) => {
   const dispatch = useDispatch();
   const t = useConventionTexts(conventionFormData.internshipKind);
@@ -75,11 +73,7 @@ export const ShareConventionDraft = ({
             ...(!conventionDraftFeedback ? [submitConventionDraftButton] : []),
           ]}
         >
-          <ShareForm
-            conventionFormData={conventionFormData}
-            firstName={firstName}
-            lastName={lastName}
-          />
+          <ShareForm conventionFormData={conventionFormData} />
         </shareConventionDraftModal.Component>,
         document.body,
       )}

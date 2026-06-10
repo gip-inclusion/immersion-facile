@@ -1056,12 +1056,6 @@ const ConventionFormContent = ({
                     conventionValues,
                   ) && (
                     <ShareConventionDraft
-                      firstName={
-                        conventionValues.signatories.beneficiary.firstName
-                      }
-                      lastName={
-                        conventionValues.signatories.beneficiary.lastName
-                      }
                       conventionFormData={{
                         ...conventionValues,
                         agencyKind: isAllAgencyKinds(
