@@ -517,7 +517,24 @@ export type TransferConventionToAgencyRequestDto = WithConventionId & {
 export type EditConventionCounsellorNameRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname;
 
+export type EditConventionWithFinalStatusEstablishmentTutorUpdate =
+  WithOptionalFirstnameAndLastname & {
+    job?: string;
+    email?: Email;
+    phone?: PhoneNumber;
+  };
+
+export type EditConventionWithFinalStatusBeneficiaryUpdate =
+  WithOptionalFirstnameAndLastname & {
+    updatedBeneficiaryBirthDate?: DateString;
+  };
+
 export type EditConventionWithFinalStatusRequestDto = WithConventionId & {
+  establishmentTutor?: EditConventionWithFinalStatusEstablishmentTutorUpdate;
+  beneficiary?: EditConventionWithFinalStatusBeneficiaryUpdate;
+};
+
+export type EditConventionWithFinalStatusFormValues = WithConventionId & {
   establishmentTutor: WithFirstnameAndLastname & {
     job: string;
     email: Email;

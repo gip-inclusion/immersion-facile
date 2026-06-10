@@ -168,7 +168,7 @@ describe("EditConventionWithFinalStatus", () => {
 
       await expectPromiseToFailWithError(
         usecase.execute(baseRequest, counsellorJwtPayload),
-        errors.convention.editConventionWithFinalStatusBeneficiaryForbiddenForRole(),
+        errors.user.forbidden({ userId: counsellorUser.id }),
       );
     });
 
@@ -239,8 +239,32 @@ describe("EditConventionWithFinalStatus", () => {
   });
 
   describe("Right path", () => {
-    it("updates beneficiary and establishment tutor and saves ConventionWithFinalStatusEdited event", async () => {
+    beforeEach(() => {
       uow.conventionRepository.setConventions([convention]);
+    });
+
+    it("does nothing when no field is provided to update", async () => {
+      uow.userRepository.users = [backOfficeAdmin];
+
+      await usecase.execute({ conventionId }, adminJwtPayload);
+
+      expectToEqual(uow.conventionRepository.conventions, [convention]);
+      expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    it("does nothing when establishment tutor and beneficiary objects are empty", async () => {
+      uow.userRepository.users = [backOfficeAdmin];
+
+      await usecase.execute(
+        { conventionId, establishmentTutor: {}, beneficiary: {} },
+        adminJwtPayload,
+      );
+
+      expectToEqual(uow.conventionRepository.conventions, [convention]);
+      expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    it("updates beneficiary and establishment tutor and saves ConventionWithFinalStatusEdited event", async () => {
       uow.userRepository.users = [backOfficeAdmin];
 
       await usecase.execute(baseRequest, adminJwtPayload);
@@ -270,8 +294,53 @@ describe("EditConventionWithFinalStatus", () => {
       ]);
     });
 
+    it("updates only establishment tutor email with partial request", async () => {
+      uow.userRepository.users = [counsellorUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [counsellorUser.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      await usecase.execute(
+        {
+          conventionId,
+          establishmentTutor: {
+            email: newTutorEmail,
+          },
+        },
+        counsellorJwtPayload,
+      );
+
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withEstablishmentTutorEmail(newTutorEmail)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
+    });
+
+    it("updates only beneficiary birthdate with partial request", async () => {
+      uow.userRepository.users = [backOfficeAdmin];
+
+      await usecase.execute(
+        {
+          conventionId,
+          beneficiary: {
+            updatedBeneficiaryBirthDate: newBirthdate,
+          },
+        },
+        adminJwtPayload,
+      );
+
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryBirthdate(newBirthdate)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
+    });
+
     it("updates only establishment tutor when counsellor edits without beneficiary", async () => {
-      uow.conventionRepository.setConventions([convention]);
       uow.userRepository.users = [counsellorUser];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
@@ -307,7 +376,6 @@ describe("EditConventionWithFinalStatus", () => {
     });
 
     it("does not update establishment representative signatory when only tutor is edited", async () => {
-      uow.conventionRepository.setConventions([convention]);
       uow.userRepository.users = [backOfficeAdmin];
 
       await usecase.execute(tutorOnlyRequest, adminJwtPayload);
@@ -345,7 +413,6 @@ describe("EditConventionWithFinalStatus", () => {
         now: new Date(),
       });
 
-      uow.conventionRepository.setConventions([convention]);
       uow.userRepository.users = [repUser];
 
       await usecase.execute(tutorOnlyRequest, repJwtPayload);
