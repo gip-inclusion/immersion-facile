@@ -1,14 +1,7 @@
 import { uniq } from "ramda";
-import {
-  type AgencyId,
-  type DelegationConventionReminderKind,
-  type EmailType,
-  errors,
-  type TemplatedEmail,
-} from "shared";
+import { errors, type TemplatedEmail } from "shared";
 import { delegationConventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import type { NotificationRepository } from "../../../core/notifications/ports/NotificationRepository";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { getUserIdsWithoutRoleFromAgencyRights } from "../../entities/Agency";
 
@@ -76,46 +69,9 @@ export const makeNotifyDelegationConventionReminder = useCaseBuilder(
             recipients,
           };
 
-    if (
-      await hasDelegationConventionReminderAlreadyBeenSent({
-        notificationRepository: uow.notificationRepository,
-        agencyId,
-        emailType: templatedContent.kind,
-        reminderKind,
-      })
-    )
-      return;
-
     await deps.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       followedIds: { agencyId: agency.id },
       templatedContent,
     });
   });
-
-const hasDelegationConventionReminderAlreadyBeenSent = async ({
-  notificationRepository,
-  agencyId,
-  emailType,
-  reminderKind,
-}: {
-  notificationRepository: NotificationRepository;
-  agencyId: AgencyId;
-  emailType: EmailType;
-  reminderKind: DelegationConventionReminderKind;
-}): Promise<boolean> => {
-  const emails = await notificationRepository.getEmailsByFilters({
-    agencyId,
-    emailType,
-  });
-
-  if (emails.length === 0) return false;
-
-  if (emailType !== "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON") return true;
-
-  return emails.some(
-    (email) =>
-      "reminderKind" in email.templatedContent.params &&
-      email.templatedContent.params.reminderKind === reminderKind,
-  );
-};

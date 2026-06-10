@@ -851,7 +851,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName} est désormais finalisé et signé par le candidat.
   
           <strong>📄 Informations principales</strong>
-          
+          <ul>
             <li>Métier observé : ${immersionAppellationLabel}</li>
             <li>Objectif ${
               internshipKind === "immersion"

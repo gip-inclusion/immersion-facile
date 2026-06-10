@@ -127,40 +127,17 @@ describe("NotifyDelegationConventionReminder", () => {
       });
     });
 
-    it("includes users with isNotifiedByEmail false", async () => {
+    it("includes users regardless of isNotifiedByEmail value", async () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [readOnlyUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["agency-viewer"],
+          },
         }),
       ];
-      uow.userRepository.users = [counsellor];
-
-      await useCase.execute({
-        agencyId: agency.id,
-        reminderKind: "threeMonthsBefore",
-      });
-
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
-            params: {
-              agencyName: agency.name,
-              delegationEndDate,
-              delegationAgencyName,
-              reminderKind: "threeMonthsBefore",
-            },
-            recipients: [agency.contactEmail, counsellor.email],
-          },
-        ],
-      });
-    });
-
-    it("does not send notification when email was already sent for agency and type", async () => {
-      await useCase.execute({
-        agencyId: agency.id,
-        reminderKind: "threeMonthsBefore",
-      });
+      uow.userRepository.users = [counsellor, readOnlyUser];
 
       await useCase.execute({
         agencyId: agency.id,
@@ -212,41 +189,7 @@ describe("NotifyDelegationConventionReminder", () => {
       });
     });
 
-    it("does not send AGENCY_DELEGATION_CONVENTION_EXPIRED notification when email was already sent", async () => {
-      await useCase.execute({
-        agencyId: agency.id,
-        reminderKind: "dayAfterExpiry",
-      });
-
-      await useCase.execute({
-        agencyId: agency.id,
-        reminderKind: "dayAfterExpiry",
-      });
-
-      expectSavedNotificationsAndEvents({
-        emails: [
-          {
-            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRED",
-            params: {
-              agencyName: agency.name,
-              delegationAgencyName,
-              delegationAgencyKind,
-            },
-            recipients: [
-              agency.contactEmail,
-              counsellor.email,
-              readOnlyUser.email,
-            ],
-          },
-        ],
-      });
-    });
-
-    it("allows M3 and M1 notifications for the same agency", async () => {
-      await useCase.execute({
-        agencyId: agency.id,
-        reminderKind: "threeMonthsBefore",
-      });
+    it("sends notification when reminderKind is oneMonthBefore", async () => {
       await useCase.execute({
         agencyId: agency.id,
         reminderKind: "oneMonthBefore",
@@ -254,20 +197,6 @@ describe("NotifyDelegationConventionReminder", () => {
 
       expectSavedNotificationsAndEvents({
         emails: [
-          {
-            kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
-            params: {
-              agencyName: agency.name,
-              delegationEndDate,
-              delegationAgencyName,
-              reminderKind: "threeMonthsBefore",
-            },
-            recipients: [
-              agency.contactEmail,
-              counsellor.email,
-              readOnlyUser.email,
-            ],
-          },
           {
             kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
             params: {
@@ -288,36 +217,6 @@ describe("NotifyDelegationConventionReminder", () => {
   });
 
   describe("wrong path", () => {
-    it("throws when agency is not eligible", async () => {
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(
-          new AgencyDtoBuilder()
-            .withId(agency.id)
-            .withKind("autre")
-            .withStatus("closed")
-            .withDelegationAgencyInfo({
-              delegationEndDate,
-              delegationAgencyName,
-              delegationAgencyKind,
-            })
-            .build(),
-          {},
-        ),
-      ];
-
-      await expectPromiseToFailWithError(
-        useCase.execute({
-          agencyId: agency.id,
-          reminderKind: "threeMonthsBefore",
-        }),
-        errors.agency.forbiddenDelegationConventionReminder({
-          agencyId: agency.id,
-        }),
-      );
-
-      expectSavedNotificationsAndEvents({ emails: [] });
-    });
-
     it("throws when agency is not found", async () => {
       await expectPromiseToFailWithError(
         useCase.execute({
@@ -326,6 +225,118 @@ describe("NotifyDelegationConventionReminder", () => {
         }),
         errors.agency.notFound({ agencyId: agency.id }),
       );
+
+      expectSavedNotificationsAndEvents({ emails: [] });
+    });
+
+    it("throws forbidden when agency status is not active", async () => {
+      const closedAgency = new AgencyDtoBuilder()
+        .withId(agency.id)
+        .withKind("autre")
+        .withStatus("closed")
+        .withDelegationAgencyInfo({
+          delegationEndDate,
+          delegationAgencyName,
+          delegationAgencyKind,
+        })
+        .build();
+      uow.agencyRepository.agencies = [toAgencyWithRights(closedAgency, {})];
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          agencyId: closedAgency.id,
+          reminderKind: "threeMonthsBefore",
+        }),
+        errors.agency.forbiddenDelegationConventionReminder({
+          agencyId: closedAgency.id,
+        }),
+      );
+
+      expectSavedNotificationsAndEvents({ emails: [] });
+    });
+
+    it("throws forbidden when agency kind is not autre", async () => {
+      const poleEmploiAgency = new AgencyDtoBuilder()
+        .withId(agency.id)
+        .withKind("pole-emploi")
+        .withStatus("active")
+        .withDelegationAgencyInfo({
+          delegationEndDate,
+          delegationAgencyName,
+          delegationAgencyKind,
+        })
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(poleEmploiAgency, {}),
+      ];
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          agencyId: poleEmploiAgency.id,
+          reminderKind: "threeMonthsBefore",
+        }),
+        errors.agency.forbiddenDelegationConventionReminder({
+          agencyId: poleEmploiAgency.id,
+        }),
+      );
+
+      expectSavedNotificationsAndEvents({ emails: [] });
+    });
+
+    it("throws forbidden when delegation end date is missing", async () => {
+      const agencyWithoutEndDate = new AgencyDtoBuilder()
+        .withId(agency.id)
+        .withKind("autre")
+        .withStatus("active")
+        .withDelegationAgencyInfo({
+          delegationEndDate: null,
+          delegationAgencyName,
+          delegationAgencyKind,
+        })
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithoutEndDate, {}),
+      ];
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          agencyId: agencyWithoutEndDate.id,
+          reminderKind: "threeMonthsBefore",
+        }),
+        errors.agency.forbiddenDelegationConventionReminder({
+          agencyId: agencyWithoutEndDate.id,
+        }),
+      );
+
+      expectSavedNotificationsAndEvents({ emails: [] });
+    });
+
+    it("throws forbidden when delegation agency name is missing", async () => {
+      const agencyWithoutDelegationName = new AgencyDtoBuilder()
+        .withId(agency.id)
+        .withKind("autre")
+        .withStatus("active")
+        .withDelegationAgencyInfo({
+          delegationEndDate,
+          delegationAgencyName: null,
+          delegationAgencyKind,
+        })
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithoutDelegationName, {}),
+      ];
+
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          agencyId: agencyWithoutDelegationName.id,
+          reminderKind: "threeMonthsBefore",
+        }),
+        errors.agency.forbiddenDelegationConventionReminder({
+          agencyId: agencyWithoutDelegationName.id,
+        }),
+      );
+
+      expectSavedNotificationsAndEvents({ emails: [] });
     });
   });
 });

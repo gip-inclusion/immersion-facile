@@ -149,6 +149,149 @@ describe("DelegationConventionReminder", () => {
     expectToEqual(uow.outboxRepository.events, []);
   });
 
+  it("does not emit event when threeMonthsBefore reminder was already sent", async () => {
+    timeGateway.setNextDate(subMonths(delegationEndDate, 3));
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+    uow.notificationRepository.notifications = [
+      {
+        id: "past-notification",
+        createdAt: new Date().toISOString(),
+        kind: "email",
+        followedIds: { agencyId: agencyWithDelegation.id },
+        templatedContent: {
+          kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
+          recipients: ["contact@example.com"],
+          params: {
+            agencyName: agencyWithDelegation.name,
+            delegationEndDate: delegationEndDateIso,
+            delegationAgencyName: "DR France Travail",
+            reminderKind: "threeMonthsBefore",
+          },
+        },
+      },
+    ];
+
+    const summary = await delegationConventionReminder.execute();
+
+    expectToEqual(summary, { success: 0, failures: [] });
+    expectToEqual(uow.outboxRepository.events, []);
+  });
+
+  it("does not emit event when oneMonthBefore reminder was already sent", async () => {
+    timeGateway.setNextDate(subMonths(delegationEndDate, 1));
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+    uow.notificationRepository.notifications = [
+      {
+        id: "past-notification",
+        createdAt: new Date().toISOString(),
+        kind: "email",
+        followedIds: { agencyId: agencyWithDelegation.id },
+        templatedContent: {
+          kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
+          recipients: ["contact@example.com"],
+          params: {
+            agencyName: agencyWithDelegation.name,
+            delegationEndDate: delegationEndDateIso,
+            delegationAgencyName: "DR France Travail",
+            reminderKind: "oneMonthBefore",
+          },
+        },
+      },
+    ];
+
+    const summary = await delegationConventionReminder.execute();
+
+    expectToEqual(summary, { success: 0, failures: [] });
+    expectToEqual(uow.outboxRepository.events, []);
+  });
+
+  it("does not emit event when dayAfterExpiry reminder was already sent", async () => {
+    timeGateway.setNextDate(addDays(delegationEndDate, 1));
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+    uow.notificationRepository.notifications = [
+      {
+        id: "past-notification",
+        createdAt: new Date().toISOString(),
+        kind: "email",
+        followedIds: { agencyId: agencyWithDelegation.id },
+        templatedContent: {
+          kind: "AGENCY_DELEGATION_CONVENTION_EXPIRED",
+          recipients: ["contact@example.com"],
+          params: {
+            agencyName: agencyWithDelegation.name,
+            delegationAgencyName: "DR France Travail",
+            delegationAgencyKind: "pole-emploi",
+          },
+        },
+      },
+    ];
+
+    const summary = await delegationConventionReminder.execute();
+
+    expectToEqual(summary, { success: 0, failures: [] });
+    expectToEqual(uow.outboxRepository.events, []);
+  });
+  it("emits oneMonthBefore event when threeMonthsBefore was already sent", async () => {
+    timeGateway.setNextDate(subMonths(delegationEndDate, 1));
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+    uow.notificationRepository.notifications = [
+      {
+        id: "past-notification",
+        createdAt: new Date().toISOString(),
+        kind: "email",
+        followedIds: { agencyId: agencyWithDelegation.id },
+        templatedContent: {
+          kind: "AGENCY_DELEGATION_CONVENTION_EXPIRING_SOON",
+          recipients: ["contact@example.com"],
+          params: {
+            agencyName: agencyWithDelegation.name,
+            delegationEndDate: delegationEndDateIso,
+            delegationAgencyName: "DR France Travail",
+            reminderKind: "threeMonthsBefore",
+          },
+        },
+      },
+    ];
+
+    const summary = await delegationConventionReminder.execute();
+
+    expectToEqual(summary, { success: 1, failures: [] });
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      {
+        topic,
+        payload: {
+          agencyId: agencyWithDelegation.id,
+          reminderKind: "oneMonthBefore",
+        },
+      },
+    ]);
+  });
+
+  it("returns failure when outbox save fails", async () => {
+    timeGateway.setNextDate(subMonths(delegationEndDate, 3));
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithDelegation, {}),
+    ];
+    const saveError = new Error("outbox save failed");
+    uow.outboxRepository.save = async () => Promise.reject(saveError);
+
+    const summary = await delegationConventionReminder.execute();
+
+    expectToEqual(summary, {
+      success: 0,
+      failures: [{ id: agencyWithDelegation.id, error: saveError }],
+    });
+    expectToEqual(uow.outboxRepository.events, []);
+  });
+
   it("does not emit event for agencies outside scope", async () => {
     timeGateway.setNextDate(subMonths(delegationEndDate, 3));
     const inactiveAgency = new AgencyDtoBuilder()
