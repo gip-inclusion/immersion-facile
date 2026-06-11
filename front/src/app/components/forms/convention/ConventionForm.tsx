@@ -92,6 +92,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   conventionPresentationFromConventionDraft,
   makeConventionPresentationFromConventionTemplate,
+  makeConventionTemplatePresentationFromConventionTemplate,
   makeEmptyConventionInitialValues,
 } from "src/app/routes/routeParams/convention";
 import {
@@ -245,19 +246,22 @@ export const ConventionForm = ({
     [fetchedConventionDraft],
   );
 
-  const conventionPresentationFromConventionTemplate = useMemo(
-    () =>
-      fetchedConventionTemplate &&
-      makeConventionPresentationFromConventionTemplate(
-        fetchedConventionTemplate,
-      ),
-    [fetchedConventionTemplate],
-  );
-
   const isTemplateForm =
     ["create-convention-template", "edit-convention-template"].includes(mode) &&
     !!connectedUserJwt &&
     !!currentUser;
+
+  const conventionPresentationFromConventionTemplate = useMemo(() => {
+    if (!fetchedConventionTemplate) return undefined;
+
+    return isTemplateForm
+      ? makeConventionTemplatePresentationFromConventionTemplate(
+          fetchedConventionTemplate,
+        )
+      : makeConventionPresentationFromConventionTemplate(
+          fetchedConventionTemplate,
+        );
+  }, [fetchedConventionTemplate, isTemplateForm]);
 
   const defaultValues: ConventionFormInitialValues = useMemo(() => {
     const isCreationMode = creationFormModes.includes(
@@ -273,8 +277,19 @@ export const ConventionForm = ({
         : conventionPresentationFromConventionTemplate || initialValues;
     }
 
+    const conventionFromTemplate =
+      conventionPresentationFromConventionTemplate &&
+      isCreateConventionPresentationInitialValues(
+        conventionPresentationFromConventionTemplate,
+      )
+        ? conventionPresentationFromConventionTemplate
+        : undefined;
+
     const convention: CreateConventionPresentationInitialValues =
-      fetchedConvention || conventionPresentationFromDraft || initialValues;
+      fetchedConvention ||
+      conventionPresentationFromDraft ||
+      conventionFromTemplate ||
+      initialValues;
 
     const hasRouteParam = <
       TKey extends ConventionParamKey | FtConnectParamKey,
