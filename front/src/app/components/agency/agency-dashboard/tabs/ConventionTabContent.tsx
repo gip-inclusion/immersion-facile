@@ -21,8 +21,8 @@ import {
   type ConventionTemplateId,
   conventionTemplateIdSchema,
   domElementIds,
+  frontRoutes,
   miniStageAgencyKinds,
-  routes,
   toDisplayedDate,
 } from "shared";
 import { AgencyTasks } from "src/app/components/agency/agency-dashboard/AgencyTasks";
@@ -159,7 +159,7 @@ export const ConventionTabContent = ({
       : "immersion";
 
     internshipKind === "immersion"
-      ? routes
+      ? frontRoutes
           .conventionImmersion({
             skipIntro: true,
             agencyDepartment: agency.address.departmentCode,
@@ -167,7 +167,7 @@ export const ConventionTabContent = ({
             agencyId: agency.id,
           })
           .push()
-      : routes
+      : frontRoutes
           .conventionMiniStage({
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
@@ -205,7 +205,7 @@ export const ConventionTabContent = ({
     );
     if (selectedConventionTemplate) {
       selectAgencyToInitiateConventionModal.close();
-      routes
+      frontRoutes
         .conventionImmersion({
           conventionTemplateId: selectedConventionTemplate.id,
           skipIntro: true,
@@ -256,7 +256,7 @@ export const ConventionTabContent = ({
       />
       <ConventionList />
 
-      <ConventionTemplatesList fromRoute={routes.agencyDashboard()} />
+      <ConventionTemplatesList fromRoute={frontRoutes.agencyDashboard()} />
 
       {createPortal(
         <FormProvider {...initiateConventionMethods}>

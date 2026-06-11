@@ -1,8 +1,8 @@
 import {
   type DiscussionStatus,
   errors,
+  frontRoutes,
   makeRouteAbsoluteUrl,
-  routes,
   withDiscussionIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -58,10 +58,10 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
                 beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
                 beneficiaryLastName: discussion.potentialBeneficiary.lastName,
                 businessName: discussion.businessName,
-                establishmentDashboardUrl: makeRouteAbsoluteUrl(
-                  routes.establishmentDashboard(),
-                  deps.config.immersionFacileBaseUrl,
-                ),
+                establishmentDashboardUrl: makeRouteAbsoluteUrl({
+                  route: frontRoutes.establishmentDashboard(),
+                  baseUrl: deps.config.immersionFacileBaseUrl,
+                }),
                 discussionCreatedAt: discussion.createdAt,
               },
             },
@@ -88,10 +88,10 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
             beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
             beneficiaryLastName: discussion.potentialBeneficiary.lastName,
             businessName: discussion.businessName,
-            searchPageUrl: makeRouteAbsoluteUrl(
-              routes.search(),
-              deps.config.immersionFacileBaseUrl,
-            ),
+            searchPageUrl: makeRouteAbsoluteUrl({
+              route: frontRoutes.search(),
+              baseUrl: deps.config.immersionFacileBaseUrl,
+            }),
             discussionCreatedAt: discussion.createdAt,
           },
         },

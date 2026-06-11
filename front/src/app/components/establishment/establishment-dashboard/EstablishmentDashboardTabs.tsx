@@ -10,9 +10,9 @@ import {
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
+  frontRoutes,
   immersionFacileHelpdeskRootUrl,
   onlyAdminUserRightsWithStatusAccepted,
-  routes,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
@@ -75,7 +75,7 @@ export const EstablishmentDashboardTabs = ({
     );
 
   if (shouldRedirectToMainTab) {
-    routes.establishmentDashboard().push();
+    frontRoutes.establishmentDashboard().push();
     return;
   }
 
@@ -109,7 +109,7 @@ export const EstablishmentDashboardTabs = ({
         onTabChange={(tab) => {
           if (isEstablishmentDashboardTab(tab)) {
             const routeName = establishmentDashboardRouteNameFromTabId[tab];
-            routes[routeName]().push();
+            frontRoutes[routeName]().push();
           }
         }}
       >
@@ -163,7 +163,7 @@ const makeEstablishmentDashboardTabs = (
             <p> Aucune convention trouvée pour votre compte</p>
           )}
           <ConventionTemplatesList
-            fromRoute={routes.establishmentDashboard()}
+            fromRoute={frontRoutes.establishmentDashboard()}
           />
         </>
       ),
@@ -290,7 +290,7 @@ const OnboardingTabContent = () => (
         .
       </Highlight>
       <Button
-        {...routes.formEstablishment().link}
+        {...frontRoutes.formEstablishment().link}
         iconId="fr-icon-add-line"
         iconPosition="left"
       >

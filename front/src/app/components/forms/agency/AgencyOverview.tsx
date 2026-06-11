@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type { AgencyDto, routes } from "shared";
+import type { AgencyDto, frontRoutes } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
@@ -14,10 +14,10 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 
 export type AgencyOverviewRouteName = Route<
-  | typeof routes.adminAgencyDetail
-  | typeof routes.adminAgencies
-  | typeof routes.myProfile
-  | typeof routes.agencyDashboardAgencyDetails
+  | typeof frontRoutes.adminAgencyDetail
+  | typeof frontRoutes.adminAgencies
+  | typeof frontRoutes.myProfile
+  | typeof frontRoutes.agencyDashboardAgencyDetails
 >["name"];
 
 type AgencyOverviewProps = {

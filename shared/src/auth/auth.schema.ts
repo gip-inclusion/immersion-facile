@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { FederatedIdentityProvider, LogoutQueryParams } from "..";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { emailSchema } from "../email/email.schema";
-import { frontRoutes } from "../routes/routes";
+import { legacyFrontRoutes } from "../routes/routes";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import {
   type AfterOAuthSuccessRedirectionResponse,
@@ -13,7 +13,7 @@ import {
 } from "./auth.dto";
 
 export const allowedLoginUris = allowedLoginSources.map(
-  (source) => frontRoutes[source],
+  (source) => legacyFrontRoutes[source],
 ) as [string, ...string[]];
 
 const isAllowedRedirectPath = (

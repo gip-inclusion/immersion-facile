@@ -18,8 +18,8 @@ import {
   discussionStatuses,
   domElementIds,
   type ExchangeRole,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
-  routes,
   toDisplayedDate,
   toDisplayedPhoneNumber,
 } from "shared";
@@ -294,7 +294,7 @@ const EstablishmentDiscussionTable = ({
           size="small"
           priority="secondary"
           linkProps={{
-            ...routes.establishmentDashboardDiscussions({
+            ...frontRoutes.establishmentDashboardDiscussions({
               discussionId: discussion.id,
             }).link,
           }}
@@ -455,7 +455,7 @@ const BeneficiaryDiscussionTable = ({
           size="small"
           priority="secondary"
           linkProps={{
-            ...routes.beneficiaryDashboardDiscussions({
+            ...frontRoutes.beneficiaryDashboardDiscussions({
               discussionId: discussion.id,
             }).link,
           }}

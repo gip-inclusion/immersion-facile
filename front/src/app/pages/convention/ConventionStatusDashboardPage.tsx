@@ -6,7 +6,7 @@ import {
   type ConventionJwt,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  type routes,
+  type frontRoutes,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { MetabaseView } from "src/app/components/MetabaseView";
@@ -20,7 +20,7 @@ import type { Route } from "type-route";
 export const ConventionStatusDashboardPage = ({
   route,
 }: {
-  route: Route<typeof routes.conventionStatusDashboard>;
+  route: Route<typeof frontRoutes.conventionStatusDashboard>;
 }) => (
   <HeaderFooterLayout>
     <MainWrapper layout="default">

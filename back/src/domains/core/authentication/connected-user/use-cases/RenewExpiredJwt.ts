@@ -7,11 +7,11 @@ import {
   type ConventionDomainJwtPayload,
   errors,
   ForbiddenError,
+  frontRoutes,
   type MagicLinkRenewalParams,
   type OAuthState,
   type RenewExpiredJwtRequestDto,
   renewExpiredJwtRequestSchema,
-  routes,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../../config/bootstrap/appConfig";
@@ -284,15 +284,15 @@ export class RenewExpiredJwt extends TransactionalUseCase<
       GenerateConventionMagicLinkRouteName,
       string
     > = {
-      conventionToSign: routes.conventionToSign({ jwt: "" }).href,
-      manageConvention: routes.manageConvention({ jwt: "" }).href,
-      assessment: routes.assessment({ jwt: "" }).href,
-      assessmentDocument: routes.assessmentDocument({ jwt: "" }).href,
-      conventionImmersion: routes.conventionImmersion({ jwt: "" }).href,
-      unregisterEstablishmentLead: routes.unregisterEstablishmentLead({
+      conventionToSign: frontRoutes.conventionToSign({ jwt: "" }).href,
+      manageConvention: frontRoutes.manageConvention({ jwt: "" }).href,
+      assessment: frontRoutes.assessment({ jwt: "" }).href,
+      assessmentDocument: frontRoutes.assessmentDocument({ jwt: "" }).href,
+      conventionImmersion: frontRoutes.conventionImmersion({ jwt: "" }).href,
+      unregisterEstablishmentLead: frontRoutes.unregisterEstablishmentLead({
         jwt: "",
       }).href,
-      conventionDocument: routes.conventionDocument({ jwt: "" }).href,
+      conventionDocument: frontRoutes.conventionDocument({ jwt: "" }).href,
     };
 
     const supportedRouteToRenew = keys(supportedRenewRoutesByRouteName).find(

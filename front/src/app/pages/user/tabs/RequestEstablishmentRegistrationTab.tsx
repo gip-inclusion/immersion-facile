@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Loader, PageHeader } from "react-design-system";
-import { routes } from "shared";
+import { frontRoutes } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { RequestRegisterEstablishmentsForUserForm } from "src/app/components/forms/register-establishments/RequestRegisterEstablishmentsForUserForm";
@@ -23,7 +23,7 @@ export const RequestEstablishmentRegistrationTab = () => {
         breadcrumbs={<Breadcrumbs />}
         badge={
           <Button
-            linkProps={routes.myProfile().link}
+            linkProps={frontRoutes.myProfile().link}
             priority={"secondary"}
             size="small"
             className={fr.cx("fr-mb-6w")}

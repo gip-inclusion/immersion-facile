@@ -9,10 +9,10 @@ import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
   type Role,
-  routes,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -29,7 +29,7 @@ import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import type { Route } from "type-route";
 
-type AssessmentRoute = Route<typeof routes.assessment>;
+type AssessmentRoute = Route<typeof frontRoutes.assessment>;
 
 interface AssessmentPageProps {
   route: AssessmentRoute;
@@ -153,14 +153,14 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                   : "Créer mon espace",
                 onClick: () => {
                   isEstablishmentRegistered
-                    ? routes.establishmentDashboard().push()
-                    : routes.formEstablishment().push();
+                    ? frontRoutes.establishmentDashboard().push()
+                    : frontRoutes.formEstablishment().push();
                 },
               }
             : {
                 children: "Accéder à mon espace prescripteur",
                 onClick: () => {
-                  routes.agencyDashboard().push();
+                  frontRoutes.agencyDashboard().push();
                 },
               }),
         }}

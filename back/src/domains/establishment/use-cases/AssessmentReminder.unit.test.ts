@@ -9,11 +9,11 @@ import {
   ConventionDtoBuilder,
   type DateString,
   expectObjectInArrayToMatch,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
   type Notification,
   reasonableSchedule,
-  routes,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -235,12 +235,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: makeRouteAbsoluteUrl(
-                routes.manageConventionConnectedUser({
+              manageConventionLink: makeRouteAbsoluteUrl({
+                route: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }),
-                config.immersionFacileBaseUrl,
-              ),
+                baseUrl: config.immersionFacileBaseUrl,
+              }),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -316,12 +316,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: makeRouteAbsoluteUrl(
-                routes.manageConventionConnectedUser({
+              manageConventionLink: makeRouteAbsoluteUrl({
+                route: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }),
-                config.immersionFacileBaseUrl,
-              ),
+                baseUrl: config.immersionFacileBaseUrl,
+              }),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
@@ -413,12 +413,12 @@ describe("AssessmentReminder", () => {
               beneficiaryLastName: getFormattedFirstnameAndLastname({
                 lastname: convention.signatories.beneficiary.lastName,
               }),
-              manageConventionLink: makeRouteAbsoluteUrl(
-                routes.manageConventionConnectedUser({
+              manageConventionLink: makeRouteAbsoluteUrl({
+                route: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }),
-                config.immersionFacileBaseUrl,
-              ),
+                baseUrl: config.immersionFacileBaseUrl,
+              }),
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),

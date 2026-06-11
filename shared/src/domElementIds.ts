@@ -1,6 +1,6 @@
-import type { routes } from "./routes/routes";
+import type { frontRoutes } from "./routes/routes";
 
-type FrontRoutesKeys = keyof typeof routes | "home" | "header" | "footer";
+type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
 
 type FrontRouteParametrizedKeys =
   | "mode"

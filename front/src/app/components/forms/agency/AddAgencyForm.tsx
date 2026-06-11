@@ -19,7 +19,7 @@ import {
   createAgencySchema,
   type DepartmentCode,
   domElementIds,
-  routes,
+  frontRoutes,
   toDateUTCString,
 } from "shared";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
@@ -181,7 +181,7 @@ type AgencyFormProps = {
 };
 
 const useAddAgencyRoute =
-  makeUseTypedRoute<(typeof routes.addAgency)["name"]>();
+  makeUseTypedRoute<(typeof frontRoutes.addAgency)["name"]>();
 
 const AgencyForm = ({
   refersToOtherAgency,
@@ -192,7 +192,7 @@ const AgencyForm = ({
   const { getFormErrors, getFormFields } = getFormContents(
     formAgencyFieldsLabels,
   );
-  const { params } = useAddAgencyRoute([routes.addAgency.name]);
+  const { params } = useAddAgencyRoute([frontRoutes.addAgency.name]);
   const { siret } = params;
   const formContents = getFormFields();
   const acquisitionParams = useGetAcquisitionParams();
@@ -463,7 +463,7 @@ const agencyErrorMessage = (
   <span>
     Attention, toutes les agences France Travail ont déjà été ajoutées par notre
     équipe sur Immersion Facilitée.{" "}
-    <LinkHome {...routes.agencyDashboardMain().link}>
+    <LinkHome {...frontRoutes.agencyDashboardMain().link}>
       Accéder à votre espace prescripteur.
     </LinkHome>
   </span>

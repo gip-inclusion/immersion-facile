@@ -6,17 +6,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   domElementIds,
+  frontRoutes,
   type ManageConventionAdminForm,
   manageConventionAdminFormSchema,
-  routes,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import type { Route } from "type-route";
 
 type SelectConventionFromIdFormProps = {
   routeNameToRedirectTo: Route<
-    | typeof routes.adminConventionDetail
-    | typeof routes.manageConventionConnectedUser
+    | typeof frontRoutes.adminConventionDetail
+    | typeof frontRoutes.manageConventionConnectedUser
   >["name"];
 };
 
@@ -33,7 +33,7 @@ export const SelectConventionFromIdForm = ({
     <div className={fr.cx("fr-mb-4w")}>
       <form
         onSubmit={handleSubmit(({ conventionId }) => {
-          routes[routeNameToRedirectTo]({ conventionId }).push();
+          frontRoutes[routeNameToRedirectTo]({ conventionId }).push();
         })}
       >
         <div className={fr.cx("fr-grid-row")}>

@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { type routes, type StandardPageSlugs, useRoute } from "shared";
+import { type frontRoutes, type StandardPageSlugs, useRoute } from "shared";
 import {
   defaultMetaContents,
   defaultPageMetaContents,
@@ -31,7 +31,7 @@ export const DefaultMetaContent = (): JSX.Element => {
 };
 
 const getMetaContents = (
-  route: Route<typeof routes>,
+  route: Route<typeof frontRoutes>,
 ): MetaContentType | undefined => {
   if (route.name) {
     if (route.name === "standard") {

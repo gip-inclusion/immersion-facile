@@ -3,7 +3,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
-import { type ConnectedUser, domElementIds, routes, type UserId } from "shared";
+import {
+  type ConnectedUser,
+  domElementIds,
+  frontRoutes,
+  type UserId,
+} from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -15,10 +20,10 @@ import { EstablishmentsTablesSection } from "../establishment/establishments-tab
 import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
 
 type UserProfileAllowedRouteNames = Route<
-  | typeof routes.adminUserDetailAgencies
-  | typeof routes.adminUserDetailEstablishments
-  | typeof routes.myProfileAgencies
-  | typeof routes.myProfileEstablishments
+  | typeof frontRoutes.adminUserDetailAgencies
+  | typeof frontRoutes.adminUserDetailEstablishments
+  | typeof frontRoutes.myProfileAgencies
+  | typeof frontRoutes.myProfileEstablishments
 >["name"];
 
 type UserProfileTabId = "establishments" | "agencies";
@@ -47,16 +52,18 @@ const adminTabChange =
   (userId: string) =>
   (tabId: UserProfileTabId): void =>
     match(tabId)
-      .with("agencies", () => routes.adminUserDetailAgencies({ userId }).push())
+      .with("agencies", () =>
+        frontRoutes.adminUserDetailAgencies({ userId }).push(),
+      )
       .with("establishments", () =>
-        routes.adminUserDetailEstablishments({ userId }).push(),
+        frontRoutes.adminUserDetailEstablishments({ userId }).push(),
       )
       .exhaustive();
 
 const myProfileTabChange = (tabId: UserProfileTabId): void =>
   match(tabId)
-    .with("agencies", () => routes.myProfileAgencies().push())
-    .with("establishments", () => routes.myProfileEstablishments().push())
+    .with("agencies", () => frontRoutes.myProfileAgencies().push())
+    .with("establishments", () => frontRoutes.myProfileEstablishments().push())
     .exhaustive();
 
 const getRouteConfig = (
@@ -138,7 +145,7 @@ export const UserProfile = ({
                   id={domElementIds.myProfile.registerAgenciesSearchLink}
                   priority="primary"
                   linkProps={{
-                    href: `${routes.myProfileAgencyRegistration().href}`,
+                    href: `${frontRoutes.myProfileAgencyRegistration().href}`,
                   }}
                   iconId="fr-icon-add-line"
                   className={fr.cx("fr-ml-auto")}
@@ -170,7 +177,9 @@ export const UserProfile = ({
                       .registerEstablishmentButton
                   }
                   priority="primary"
-                  linkProps={routes.myProfileEstablishmentRegistration({}).link}
+                  linkProps={
+                    frontRoutes.myProfileEstablishmentRegistration({}).link
+                  }
                   className={fr.cx("fr-ml-auto")}
                   iconId="fr-icon-add-line"
                 >
@@ -261,7 +270,7 @@ const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
         <Button
           id={domElementIds.myProfile.registerAgencyButton}
           priority="primary"
-          linkProps={routes.myProfileAgencyRegistration().link}
+          linkProps={frontRoutes.myProfileAgencyRegistration().link}
           className={fr.cx("fr-ml-auto")}
           iconId="fr-icon-add-line"
         >
@@ -320,7 +329,7 @@ const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
               .registerEstablishmentButton
           }
           priority="primary"
-          linkProps={routes.myProfileEstablishmentRegistration().link}
+          linkProps={frontRoutes.myProfileEstablishmentRegistration().link}
           className={fr.cx("fr-ml-auto")}
           iconId="fr-icon-add-line"
         >

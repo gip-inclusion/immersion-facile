@@ -9,10 +9,10 @@ import {
   displayEmergencyContactInfos,
   type Email,
   errors,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   makeRouteAbsoluteUrl,
-  routes,
   type TemplatedEmail,
   withConventionSchema,
 } from "shared";
@@ -178,12 +178,12 @@ const prepareEmail = async ({
       }),
       agencyLogoUrl: agency.logoUrl ?? undefined,
       magicLink: agencyModifierRoles.includes(role as AgencyModifierRole)
-        ? makeRouteAbsoluteUrl(
-            routes.manageConventionConnectedUser({
+        ? makeRouteAbsoluteUrl({
+            route: frontRoutes.manageConventionConnectedUser({
               conventionId: convention.id,
             }),
-            deps.config.immersionFacileBaseUrl,
-          )
+            baseUrl: deps.config.immersionFacileBaseUrl,
+          })
         : await makeShortMagicLink({
             targetRoute: "conventionDocument",
             lifetime: "1Month",

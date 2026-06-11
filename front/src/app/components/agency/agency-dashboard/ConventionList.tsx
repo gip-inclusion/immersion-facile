@@ -19,11 +19,11 @@ import {
   defaultPerPageInWebPagination,
   domElementIds,
   type FlatGetConventionsForAgencyUserParams,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   isConventionEndingInOneDayOrMore,
   isConventionValidated,
   isNotEmptyArray,
-  routes,
   toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -438,7 +438,7 @@ export const ConventionList = () => {
                   iconPosition="right"
                   priority="secondary"
                   linkProps={{
-                    ...routes.manageConventionConnectedUser({
+                    ...frontRoutes.manageConventionConnectedUser({
                       conventionId: convention.id,
                     }).link,
                     target: "_blank",

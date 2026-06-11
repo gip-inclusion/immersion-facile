@@ -3,7 +3,7 @@ import {
   absoluteUrlSchema,
   type ConventionDraftDto,
   type ConventionReadDto,
-  routes,
+  frontRoutes,
   toConventionDraftDto,
 } from "shared";
 import type { VerificationActionWithOnClick } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
@@ -27,11 +27,11 @@ export const onClickByAction = (
       const conventionDraft = toConventionDraftDto({ convention });
       const redirectPath =
         convention.internshipKind === "immersion"
-          ? routes.conventionImmersion({
+          ? frontRoutes.conventionImmersion({
               skipIntro: true,
               conventionDraftId: conventionDraft.id,
             }).href
-          : routes.conventionMiniStage({
+          : frontRoutes.conventionMiniStage({
               conventionDraftId: conventionDraft.id,
             }).href;
 

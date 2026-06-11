@@ -1,4 +1,4 @@
-import { routes, useRoute } from "shared";
+import { frontRoutes, useRoute } from "shared";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import type { Route } from "type-route";
 
@@ -37,22 +37,22 @@ const useTypedRoute = <
 
 export const makeUseTypedRoute =
   <TRouteName extends CurrentRouteName>() =>
-  <const TRouteNames extends readonly TRouteName[]>(
-    routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
-  ) =>
-    useTypedRoute<TRouteName, TRouteNames>(routeNames);
+    <const TRouteNames extends readonly TRouteName[]>(
+      routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
+    ) =>
+      useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
 type ConventionRouteName =
-  | (typeof routes.conventionImmersion)["name"]
-  | (typeof routes.conventionMiniStage)["name"]
-  | (typeof routes.conventionImmersionForExternals)["name"]
-  | (typeof routes.conventionTemplate)["name"];
+  | (typeof frontRoutes.conventionImmersion)["name"]
+  | (typeof frontRoutes.conventionMiniStage)["name"]
+  | (typeof frontRoutes.conventionImmersionForExternals)["name"]
+  | (typeof frontRoutes.conventionTemplate)["name"];
 
 const conventionRouteNames = [
-  routes.conventionImmersion.name,
-  routes.conventionMiniStage.name,
-  routes.conventionImmersionForExternals.name,
-  routes.conventionTemplate.name,
+  frontRoutes.conventionImmersion.name,
+  frontRoutes.conventionMiniStage.name,
+  frontRoutes.conventionImmersionForExternals.name,
+  frontRoutes.conventionTemplate.name,
 ] as const;
 
 const useConventionTypedRoute = makeUseTypedRoute<ConventionRouteName>();
@@ -61,9 +61,9 @@ export const useConventionRoute = () =>
   useConventionTypedRoute(conventionRouteNames);
 
 export type RouteByMode = {
-  create: Route<typeof routes.formEstablishment>;
-  edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
-  admin: Route<typeof routes.adminEstablishments>;
+  create: Route<typeof frontRoutes.formEstablishment>;
+  edit: Route<typeof frontRoutes.establishmentDashboardFormEstablishment>;
+  admin: Route<typeof frontRoutes.adminEstablishments>;
 };
 
 export type Mode = keyof RouteByMode;
@@ -84,20 +84,20 @@ export const useEstablishmentRoute = () =>
 export const useSearchResultRoute =
   makeUseTypedRoute<
     (
-      | typeof routes.searchResult
-      | typeof routes.searchResultForStudent
-      | typeof routes.searchResultExternal
+      | typeof frontRoutes.searchResult
+      | typeof frontRoutes.searchResultForStudent
+      | typeof frontRoutes.searchResultExternal
     )["name"]
   >();
 
 type CreateDiscussionRouteName = (
-  | typeof routes.searchResult
-  | typeof routes.searchResultForStudent
+  | typeof frontRoutes.searchResult
+  | typeof frontRoutes.searchResultForStudent
 )["name"];
 
 const createDiscussionRouteNames = [
-  routes.searchResult.name,
-  routes.searchResultForStudent.name,
+  frontRoutes.searchResult.name,
+  frontRoutes.searchResultForStudent.name,
 ] as const;
 
 const useCreateDiscussionTypedRoute =

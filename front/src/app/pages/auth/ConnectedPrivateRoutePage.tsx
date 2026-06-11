@@ -22,11 +22,11 @@ import {
   domElementIds,
   type Email,
   emailSchema,
+  frontRoutes,
   immersionFacileHelpdeskRootUrl,
   immersionFacileNoReplyEmail,
   isFederatedIdentityProvider,
   makeUrlWithQueryParams,
-  routes,
   toLowerCaseWithoutDiacritics,
   useRoute,
   withRedirectUriSchema,
@@ -53,11 +53,11 @@ import { LoginByEmailFeedbackPage } from "./LoginByEmailFeedbackPage";
 
 export type FrontAdminRoute =
   | FrontAdminRouteTab
-  | Route<typeof routes.adminUserDetail>
-  | Route<typeof routes.adminUserDetailAgencies>
-  | Route<typeof routes.adminUserDetailEstablishments>
-  | Route<typeof routes.adminConventionDetail>
-  | Route<typeof routes.adminAgencyDetail>;
+  | Route<typeof frontRoutes.adminUserDetail>
+  | Route<typeof frontRoutes.adminUserDetailAgencies>
+  | Route<typeof frontRoutes.adminUserDetailEstablishments>
+  | Route<typeof frontRoutes.adminConventionDetail>
+  | Route<typeof frontRoutes.adminAgencyDetail>;
 
 export const agencyDashboardTabsList = [
   "agencyDashboardMain",
@@ -83,17 +83,17 @@ export type BeneficiaryDashboardRouteName =
   FrontBeneficiaryDashboardRoute["name"];
 
 export type FrontBeneficiaryDashboardRoute =
-  | Route<typeof routes.beneficiaryDashboard>
-  | Route<typeof routes.beneficiaryDashboardDiscussions>;
+  | Route<typeof frontRoutes.beneficiaryDashboard>
+  | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>;
 
 export type EstablishmentDashboardRouteName =
   FrontEstablishmentDashboardRoute["name"];
 
 export type FrontEstablishmentDashboardRoute =
-  | Route<typeof routes.establishmentDashboard>
-  | Route<typeof routes.establishmentDashboardConventions>
-  | Route<typeof routes.establishmentDashboardFormEstablishment>
-  | Route<typeof routes.establishmentDashboardDiscussions>;
+  | Route<typeof frontRoutes.establishmentDashboard>
+  | Route<typeof frontRoutes.establishmentDashboardConventions>
+  | Route<typeof frontRoutes.establishmentDashboardFormEstablishment>
+  | Route<typeof frontRoutes.establishmentDashboardDiscussions>;
 
 export const establishmentDashboardRoutes = [
   "establishmentDashboard",
@@ -105,13 +105,13 @@ export const establishmentDashboardRoutes = [
 export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
 
 export type FrontAgencyDashboardRoute =
-  | Route<typeof routes.agencyDashboardMain>
-  | Route<typeof routes.agencyDashboardOnboarding>
-  | Route<typeof routes.agencyDashboardAgencies>
-  | Route<typeof routes.agencyDashboardAgencyDetails>
-  | Route<typeof routes.agencyManagement>
-  | Route<typeof routes.establishmentManagement>
-  | Route<typeof routes.statsEstablishmentDetails>;
+  | Route<typeof frontRoutes.agencyDashboardMain>
+  | Route<typeof frontRoutes.agencyDashboardOnboarding>
+  | Route<typeof frontRoutes.agencyDashboardAgencies>
+  | Route<typeof frontRoutes.agencyDashboardAgencyDetails>
+  | Route<typeof frontRoutes.agencyManagement>
+  | Route<typeof frontRoutes.establishmentManagement>
+  | Route<typeof frontRoutes.statsEstablishmentDetails>;
 
 export type FrontDashboardRoute =
   | FrontAgencyDashboardRoute
@@ -122,15 +122,15 @@ export type FrontDashboardRoute =
 type ConnectPrivateRoute =
   | FrontAdminRoute
   | FrontDashboardRoute
-  | Route<typeof routes.formEstablishment>
-  | Route<typeof routes.myProfile>
-  | Route<typeof routes.myProfileAgencies>
-  | Route<typeof routes.myProfileAgencyRegistration>
-  | Route<typeof routes.myProfileEstablishments>
-  | Route<typeof routes.myProfileEstablishmentRegistration>
-  | Route<typeof routes.addAgency>
-  | Route<typeof routes.manageConventionConnectedUser>
-  | Route<typeof routes.beneficiaryDashboardDiscussions>;
+  | Route<typeof frontRoutes.formEstablishment>
+  | Route<typeof frontRoutes.myProfile>
+  | Route<typeof frontRoutes.myProfileAgencies>
+  | Route<typeof frontRoutes.myProfileAgencyRegistration>
+  | Route<typeof frontRoutes.myProfileEstablishments>
+  | Route<typeof frontRoutes.myProfileEstablishmentRegistration>
+  | Route<typeof frontRoutes.addAgency>
+  | Route<typeof frontRoutes.manageConventionConnectedUser>
+  | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>;
 
 type ConnectedPrivateRoutePageProps = {
   route: ConnectPrivateRoute;
@@ -187,7 +187,7 @@ export const ConnectedPrivateRoutePage = ({
       );
 
       const { token: _, ...routeParams } = route.params;
-      routes[route.name](routeParams as any).replace();
+      frontRoutes[route.name](routeParams as any).replace();
     }
   }, [route.params, dispatch, route.name]);
 

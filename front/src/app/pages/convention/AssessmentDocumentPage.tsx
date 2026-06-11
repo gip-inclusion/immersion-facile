@@ -10,13 +10,13 @@ import {
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   escapeHtml,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileHelpdeskRootUrl,
   isAssessmentDto,
   isBeforeAssessmentSignatureReleaseDate,
   isStringDate,
   makeSiretDescriptionLink,
-  routes,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -62,7 +62,7 @@ const {
 } = createFormModal(createAssessmentSignModalParams);
 
 type AssessmentDocumentPageProps = {
-  route: Route<typeof routes.assessmentDocument>;
+  route: Route<typeof frontRoutes.assessmentDocument>;
 };
 
 export const AssessmentDocumentPage = ({
@@ -156,7 +156,7 @@ export const AssessmentDocumentPage = ({
         }
         buttonProps={{
           children: "Retourner sur la page d’accueil",
-          onClick: () => routes.home().push(),
+          onClick: () => frontRoutes.home().push(),
         }}
       />
     );
@@ -184,7 +184,7 @@ export const AssessmentDocumentPage = ({
         }
         buttonProps={{
           children: "Découvrir d'autres immersions",
-          onClick: () => routes.search().push(),
+          onClick: () => frontRoutes.search().push(),
         }}
       />
     );

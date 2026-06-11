@@ -2,7 +2,7 @@ import {
   type ConventionJwtPayload,
   type ConventionSupportedJwt,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  type routes,
+  type frontRoutes,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -10,7 +10,8 @@ import type { Route } from "type-route";
 
 export const useJwt = (
   route: Route<
-    typeof routes.conventionDocument | typeof routes.assessmentDocument
+    | typeof frontRoutes.conventionDocument
+    | typeof frontRoutes.assessmentDocument
   >,
 ) => {
   const jwtQueryParam: ConventionSupportedJwt | undefined = route.params?.jwt;

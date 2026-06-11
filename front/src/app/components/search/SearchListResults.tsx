@@ -13,11 +13,11 @@ import {
 import {
   type AppellationCode,
   domElementIds,
+  frontRoutes,
   hasSearchGeoParams,
   isPhysicalWorkMode,
   isSuperEstablishment,
   type OfferDto,
-  routes,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -159,7 +159,7 @@ export const SearchListResults = ({
                           <Button
                             id={domElementIds.search.noResultsLbbButton}
                             linkProps={
-                              routes.externalSearch(
+                              frontRoutes.externalSearch(
                                 getFilteredSearchParamsForLBB(searchParams),
                               ).link
                             }
@@ -180,7 +180,7 @@ export const SearchListResults = ({
                       <Button
                         id={domElementIds.search.noResultsLbbButton}
                         linkProps={
-                          routes.externalSearch(
+                          frontRoutes.externalSearch(
                             getFilteredSearchParamsForLBB(searchParams),
                           ).link
                         }
@@ -362,7 +362,7 @@ const makeOfferLink = (
 ): Link => {
   const definedAppellationCode: AppellationCode = appellationCode ?? "";
   if (!voluntaryToImmersion)
-    return routes.searchResultExternal({
+    return frontRoutes.searchResultExternal({
       siret,
       appellationCode: [definedAppellationCode],
     }).link;
@@ -374,8 +374,8 @@ const makeOfferLink = (
   };
 
   return route.name === "search" || route.name === "externalSearch"
-    ? routes.searchResult(searchParams).link
-    : routes.searchResultForStudent(searchParams).link;
+    ? frontRoutes.searchResult(searchParams).link
+    : frontRoutes.searchResultForStudent(searchParams).link;
 };
 
 const getFilteredSearchParamsForLBB = (
@@ -412,7 +412,7 @@ const LaBonneBoiteCallToAction = ({
         desc="Explorez plus d'opportunités avec notre partenaire La Bonne Boite"
         footer={
           <Button
-            linkProps={routes.externalSearch(filteredSearchParams).link}
+            linkProps={frontRoutes.externalSearch(filteredSearchParams).link}
             priority="primary"
           >
             Découvrez d'autres entreprises avec La Bonne Boite

@@ -17,13 +17,13 @@ import {
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   errors,
+  type frontRoutes,
   getFormattedFirstnameAndLastname,
   isConventionRenewed,
   isStringDate,
   makeSiretDescriptionLink,
   npsFormIds,
   prettyPrintSchedule,
-  type routes,
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
@@ -64,7 +64,7 @@ const isStartingByVowel = (string: string): boolean => {
 };
 
 type ConventionDocumentPageProps = {
-  route: Route<typeof routes.conventionDocument>;
+  route: Route<typeof frontRoutes.conventionDocument>;
 };
 
 type FormattedScheduleByWeek = {

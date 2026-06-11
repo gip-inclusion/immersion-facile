@@ -11,8 +11,8 @@ import {
   expectJwtInMagicLinkAndGetIt,
   expectObjectInArrayToMatch,
   expectToEqual,
+  frontRoutes,
   makeRouteAbsoluteUrl,
-  routes,
   type Signatories,
   type TemplatedEmail,
   technicalRoutes,
@@ -369,12 +369,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     expect(needsReviewEmail.recipients).toEqual([validator.email]);
 
     expect(needsReviewEmail.params.manageConventionLink).toBe(
-      makeRouteAbsoluteUrl(
-        routes.manageConventionConnectedUser({
+      makeRouteAbsoluteUrl({
+        route: frontRoutes.manageConventionConnectedUser({
           conventionId: initialConvention.id,
         }),
-        appConfig.immersionFacileBaseUrl,
-      ),
+        baseUrl: appConfig.immersionFacileBaseUrl,
+      }),
     );
   };
 
@@ -453,12 +453,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     // Validators now get user-connected URLs instead of magic link shortlinks
     expect(needsToTriggerConventionSentEmail.params.magicLink).toBe(
-      makeRouteAbsoluteUrl(
-        routes.manageConventionConnectedUser({
+      makeRouteAbsoluteUrl({
+        route: frontRoutes.manageConventionConnectedUser({
           conventionId: initialConvention.id,
         }),
-        appConfig.immersionFacileBaseUrl,
-      ),
+        baseUrl: appConfig.immersionFacileBaseUrl,
+      }),
     );
   };
 

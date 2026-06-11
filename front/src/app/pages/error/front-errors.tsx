@@ -5,7 +5,7 @@ import {
   domElementIds,
   type Email,
   expiredJwtErrorTitle,
-  routes,
+  frontRoutes,
   type SiretDto,
 } from "shared";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
@@ -281,7 +281,7 @@ export const frontErrors = {
             key="InitiateConventionButton"
             priority="primary"
             linkProps={{
-              ...routes.initiateConvention().link,
+              ...frontRoutes.initiateConvention().link,
               id: domElementIds.temporaryError.initiateConventionButton,
             }}
           >
@@ -313,7 +313,7 @@ const EstablishmentDashboardButton: ErrorButton = (
   <Button
     priority="primary"
     linkProps={{
-      ...routes.establishmentDashboard().link,
+      ...frontRoutes.establishmentDashboard().link,
       id: domElementIds.temporaryError.establishmentDashboardButton,
     }}
   >
@@ -325,7 +325,7 @@ export const HomeButton: ErrorButton = (
   <Button
     priority="primary"
     linkProps={{
-      ...routes.home().link,
+      ...frontRoutes.home().link,
       id: domElementIds.temporaryError.homeButton,
     }}
   >

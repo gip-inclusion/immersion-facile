@@ -11,8 +11,8 @@ import {
   type AdminTabRouteName,
   type AppellationAndRomeDto,
   adminTabRouteNames,
+  frontRoutes,
   parseStringToJsonOrThrow,
-  routes,
   useRoute,
 } from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
@@ -73,7 +73,7 @@ const OpenApiDocV3Page = lazy(
   () => import("src/app/pages/open-api-doc/OpenApiDocV3Page"),
 );
 
-type Routes = typeof routes;
+type Routes = typeof frontRoutes;
 
 const adminRoutes: {
   [K in AdminTabRouteName]: (route: Route<Routes[K]>) => ReactElement;
@@ -92,7 +92,7 @@ const adminRoutes: {
   },
 );
 
-const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
+const RedirectTo = ({ route }: { route: Route<typeof frontRoutes> }) => {
   const routePush = useCallback(() => {
     route.push();
   }, [route]);
@@ -160,8 +160,8 @@ const getPageByRouteName: {
 } = {
   addAgency: (route) => <AddAgencyPage route={route} />,
   admin: (route) => (
-    <AdminPrivateRoutePage route={routes.adminConventions(route.params)}>
-      <AdminTabs route={routes.adminConventions(route.params)} />
+    <AdminPrivateRoutePage route={frontRoutes.adminConventions(route.params)}>
+      <AdminTabs route={frontRoutes.adminConventions(route.params)} />
     </AdminPrivateRoutePage>
   ),
   ...adminRoutes,
@@ -176,7 +176,7 @@ const getPageByRouteName: {
     </AdminPrivateRoutePage>
   ),
   adminUserDetail: (route) => (
-    <RedirectTo route={routes.adminUserDetailAgencies(route.params)} />
+    <RedirectTo route={frontRoutes.adminUserDetailAgencies(route.params)} />
   ),
   adminUserDetailAgencies: (route) => (
     <AdminPrivateRoutePage route={route}>
@@ -189,7 +189,7 @@ const getPageByRouteName: {
     </AdminPrivateRoutePage>
   ),
   agencyDashboard: (route) => (
-    <RedirectTo route={routes.agencyDashboardMain(route.params)} />
+    <RedirectTo route={frontRoutes.agencyDashboardMain(route.params)} />
   ),
   agencyDashboardMain: (route) => (
     <DashboardPrivateRoutePage route={route}>
@@ -233,7 +233,9 @@ const getPageByRouteName: {
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
   beneficiaryDashboard: (route) => (
-    <RedirectTo route={routes.beneficiaryDashboardDiscussions(route.params)} />
+    <RedirectTo
+      route={frontRoutes.beneficiaryDashboardDiscussions(route.params)}
+    />
   ),
   beneficiaryDashboardDiscussions: (route) => (
     <ConnectedPrivateRoutePage
@@ -262,7 +264,7 @@ const getPageByRouteName: {
 
   establishmentDashboard: (route) => (
     <RedirectTo
-      route={routes.establishmentDashboardConventions(route.params)}
+      route={frontRoutes.establishmentDashboardConventions(route.params)}
     />
   ),
   establishmentDashboardConventions: (route) => (
@@ -302,7 +304,7 @@ const getPageByRouteName: {
     </ConnectedPrivateRoutePage>
   ),
   myProfile: (route) => (
-    <RedirectTo route={routes.myProfileAgencies(route.params)} />
+    <RedirectTo route={frontRoutes.myProfileAgencies(route.params)} />
   ),
   myProfileAgencies: (route) => (
     <ConnectedPrivateRoutePage
@@ -349,7 +351,7 @@ const getPageByRouteName: {
       <RequestEstablishmentRegistrationTab />
     </ConnectedPrivateRoutePage>
   ),
-  openApiDoc: (route: Route<typeof routes.openApiDoc>) => {
+  openApiDoc: (route: Route<typeof frontRoutes.openApiDoc>) => {
     if (route.params.version === "v3") return <OpenApiDocV3Page />;
     return <OpenApiDocV2Page />;
   },

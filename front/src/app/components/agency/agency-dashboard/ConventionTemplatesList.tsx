@@ -18,7 +18,7 @@ import {
   type ConventionTemplateId,
   domElementIds,
   errors,
-  routes,
+  frontRoutes,
   type SaveConventionDraftFromConventionTemplateDto,
   saveConventionDraftFromConventionTemplateSchema,
   toDisplayedDate,
@@ -57,7 +57,8 @@ export const ConventionTemplatesList = ({
   fromRoute,
 }: {
   fromRoute: Route<
-    typeof routes.agencyDashboard | typeof routes.establishmentDashboard
+    | typeof frontRoutes.agencyDashboard
+    | typeof frontRoutes.establishmentDashboard
   >;
 }) => {
   const dispatch = useDispatch();
@@ -158,7 +159,7 @@ export const ConventionTemplatesList = ({
             priority="primary"
             iconId="fr-icon-add-line"
             linkProps={
-              routes.conventionTemplate({
+              frontRoutes.conventionTemplate({
                 fromRoute: fromRoute.name,
               }).link
             }
@@ -218,7 +219,7 @@ export const ConventionTemplatesList = ({
                           iconId="fr-icon-edit-line"
                           iconPosition="right"
                           linkProps={
-                            routes.conventionTemplate({
+                            frontRoutes.conventionTemplate({
                               fromRoute: fromRoute.name,
                               conventionTemplateId: template.id,
                             }).link

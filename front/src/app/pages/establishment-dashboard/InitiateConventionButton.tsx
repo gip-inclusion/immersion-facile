@@ -16,7 +16,7 @@ import {
   appellationCodeSchema,
   conventionTemplateIdSchema,
   domElementIds,
-  routes,
+  frontRoutes,
   type SiretDto,
   siretSchema,
   toDisplayedDate,
@@ -154,7 +154,7 @@ export const InitiateConventionButton = () => {
         (offer) => offer.appellationCode === establishmentValues.appellation,
       );
       closeInitiateConventionModal();
-      routes
+      frontRoutes
         .conventionImmersion({
           siret: establishmentValues.siret,
           immersionAppellation: appellation,
@@ -168,7 +168,7 @@ export const InitiateConventionButton = () => {
     );
     if (selectedConventionTemplate) {
       closeInitiateConventionModal();
-      routes
+      frontRoutes
         .conventionImmersion({
           conventionTemplateId: selectedConventionTemplate.id,
           skipIntro: true,

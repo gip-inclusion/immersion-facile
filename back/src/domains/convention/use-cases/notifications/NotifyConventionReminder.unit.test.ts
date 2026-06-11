@@ -12,11 +12,11 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
   type ReminderKind,
-  routes,
   splitCasesBetweenPassingAndFailing,
   type TemplatedEmail,
 } from "shared";
@@ -198,10 +198,12 @@ describe("NotifyConventionReminder use case", () => {
 
         //Assert
 
-        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-          routes.manageConventionConnectedUser({ conventionId: convention.id }),
-          config.immersionFacileBaseUrl,
-        );
+        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+          route: frontRoutes.manageConventionConnectedUser({
+            conventionId: convention.id,
+          }),
+          baseUrl: config.immersionFacileBaseUrl,
+        });
 
         expectSavedNotificationsBatchAndEvent({
           emails: [
@@ -278,10 +280,12 @@ describe("NotifyConventionReminder use case", () => {
 
         //Assert
 
-        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-          routes.manageConventionConnectedUser({ conventionId: convention.id }),
-          config.immersionFacileBaseUrl,
-        );
+        const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+          route: frontRoutes.manageConventionConnectedUser({
+            conventionId: convention.id,
+          }),
+          baseUrl: config.immersionFacileBaseUrl,
+        });
 
         expectSavedNotificationsBatchAndEvent({
           emails: [

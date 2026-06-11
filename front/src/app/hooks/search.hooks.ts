@@ -2,9 +2,9 @@ import { useDispatch } from "react-redux";
 import {
   type AcquisitionParams,
   acquisitionParams,
+  frontRoutes,
   type GetOffersFlatQueryParams,
   keys,
-  routes,
   searchParams,
 } from "shared";
 import {
@@ -22,9 +22,9 @@ export const encodedSearchUriParams = [
 ] satisfies (keyof GetOffersFlatQueryParams)[];
 
 export type SearchRoute = Route<
-  | typeof routes.search
-  | typeof routes.searchForStudent
-  | typeof routes.externalSearch
+  | typeof frontRoutes.search
+  | typeof frontRoutes.searchForStudent
+  | typeof frontRoutes.externalSearch
 >;
 
 const filterUrlsParamsAndUpdateUrl = ({
@@ -57,7 +57,7 @@ const filterUrlsParamsAndUpdateUrl = ({
       return acc;
     }, filteredUrlParams),
   };
-  routes[routeName](encodedUrlParams).replace();
+  frontRoutes[routeName](encodedUrlParams).replace();
 };
 
 export const useSearch = ({ name }: SearchRoute) => {

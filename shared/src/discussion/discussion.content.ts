@@ -1,5 +1,5 @@
 import { errors } from "../errors/errors";
-import { routes } from "../routes/routes";
+import { frontRoutes } from "../routes/routes";
 import type { User } from "../user/user.dto";
 import type {
   DiscussionDto,
@@ -20,7 +20,7 @@ Malheureusement, nous ne souhaitons pas donner suite à votre candidature à l�
 
 La raison du refus est : ${makeRejectionText(params)}
 
-N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr${routes.search().href}">rechercher une immersion dans une autre entreprise</a> !
+N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr${frontRoutes.search().href}">rechercher une immersion dans une autre entreprise</a> !
 
 Bonne journée, 
 ${fromUser.firstName} ${fromUser.lastName}, représentant de l'entreprise ${discussion.businessName}`,

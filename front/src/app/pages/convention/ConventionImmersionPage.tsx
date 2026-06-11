@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, loginFtConnect, routes } from "shared";
+import { domElementIds, frontRoutes, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -23,7 +23,7 @@ import { match } from "ts-pattern";
 import type { Route } from "type-route";
 
 export type ConventionImmersionPageRoute = Route<
-  typeof routes.conventionImmersion
+  typeof frontRoutes.conventionImmersion
 >;
 
 interface ConventionImmersionPageProps {
@@ -199,7 +199,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
             feedbackTopic: "auth-global",
           }),
         );
-      routes.conventionImmersion(paramsWithoutFederatedIdentity).replace();
+      frontRoutes.conventionImmersion(paramsWithoutFederatedIdentity).replace();
     }
   }, [initialRouteParams, dispatch]);
 };

@@ -4,7 +4,7 @@ import {
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
-  routes,
+  frontRoutes,
 } from "shared";
 import { getTabIndexByTabName } from "./admin";
 import { fillConventionForm } from "./convention";
@@ -45,7 +45,7 @@ export const createConventionTemplate = async (
     `#${domElementIds.conventionTemplate.createConventionTemplateButton}`,
   );
   await page.waitForURL(
-    `**${routes.conventionTemplate({ fromRoute: dashboardKind === "agency" ? "agencyDashboard" : "establishmentDashboard" }).href}**`,
+    `**${frontRoutes.conventionTemplate({ fromRoute: dashboardKind === "agency" ? "agencyDashboard" : "establishmentDashboard" }).href}**`,
   );
 
   const templateName = "Mon premier modèle de convention";

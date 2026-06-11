@@ -1,5 +1,5 @@
 import type { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import type { VersionnedStandardContent } from "./textSetup";
 
 const { siteMap: siteMapIds } = domElementIds.standard;
@@ -8,61 +8,61 @@ const siteMapLinks: RegisteredLinkProps[] = [
   {
     title: "Accueil",
     id: siteMapIds.home,
-    ...routes.home().link,
+    ...frontRoutes.home().link,
   },
   {
     title: "Accueil candidat",
     id: siteMapIds.candidateHome,
-    ...routes.homeCandidates().link,
+    ...frontRoutes.homeCandidates().link,
   },
   {
     title: "Accueil entreprise",
     id: siteMapIds.establishmentHome,
-    ...routes.homeEstablishments().link,
+    ...frontRoutes.homeEstablishments().link,
   },
   {
     title: "Accueil prescripteurs",
     id: siteMapIds.agencyHome,
-    ...routes.homeAgencies().link,
+    ...frontRoutes.homeAgencies().link,
   },
   {
     title: "Trouver une entreprise accueillante",
     id: siteMapIds.search,
-    ...routes.search().link,
+    ...frontRoutes.search().link,
   },
   {
     title: "Remplir la demande de convention",
     id: siteMapIds.coventionForm,
-    ...routes.conventionImmersion().link,
+    ...frontRoutes.conventionImmersion().link,
   },
   {
     title: "Référencer une entreprise",
     id: siteMapIds.establishmentForm,
-    ...routes.formEstablishment().link,
+    ...frontRoutes.formEstablishment().link,
   },
   {
     title: "Référencer un organisme",
     id: siteMapIds.agencyForm,
-    ...routes.addAgency().link,
+    ...frontRoutes.addAgency().link,
   },
   {
     title: "Accessibilité",
     id: siteMapIds.accessibility,
-    ...routes.standard({ pagePath: "accessibilite" }).link,
+    ...frontRoutes.standard({ pagePath: "accessibilite" }).link,
   },
   {
     title: "Mentions légales",
     id: siteMapIds.legals,
-    ...routes.standard({ pagePath: "mentions-legales" }).link,
+    ...frontRoutes.standard({ pagePath: "mentions-legales" }).link,
   },
   {
     title: "Politique de confidentialité",
-    ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
+    ...frontRoutes.standard({ pagePath: "politique-de-confidentialite" }).link,
     id: siteMapIds.privacy,
   },
   {
     title: "Conditions générales d'utilisation",
-    ...routes.standard({ pagePath: "cgu" }).link,
+    ...frontRoutes.standard({ pagePath: "cgu" }).link,
     id: siteMapIds.cgu,
   },
   {

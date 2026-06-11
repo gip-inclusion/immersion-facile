@@ -2,13 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { format } from "date-fns";
 import { renderContent } from "html-templates/src/components/email";
 import { MainWrapper } from "react-design-system";
-import { routes, type StandardPageSlugs } from "shared";
+import { frontRoutes, type StandardPageSlugs } from "shared";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
 import type { Route } from "type-route";
 import { HeaderFooterLayout } from "./HeaderFooterLayout";
 
 type StandardLayoutPageProps = {
-  route: Route<typeof routes.standard>;
+  route: Route<typeof frontRoutes.standard>;
 };
 
 export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
@@ -41,7 +41,7 @@ export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
               {allVersions.map((version) => (
                 <li key={version}>
                   <a
-                    {...routes.standard({
+                    {...frontRoutes.standard({
                       pagePath: route.params.pagePath,
                       version,
                     }).link}

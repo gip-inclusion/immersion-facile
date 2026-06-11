@@ -22,8 +22,8 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
   expiredJwtErrorMessage,
+  frontRoutes,
   makeRouteAbsoluteUrl,
-  routes,
   type TechnicalRoutes,
   technicalRoutes,
   type UnauthenticatedConventionRoutes,
@@ -192,10 +192,10 @@ describe("convention e2e", () => {
         const conventionDraftId: ConventionDraftId =
           "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
         const localBaseUrl: AbsoluteUrl = "http://localhost";
-        const conventionDraftLink = makeRouteAbsoluteUrl(
-          routes.conventionImmersion({ conventionDraftId }),
-          localBaseUrl,
-        );
+        const conventionDraftLink = makeRouteAbsoluteUrl({
+          route: frontRoutes.conventionImmersion({ conventionDraftId }),
+          baseUrl: localBaseUrl,
+        });
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
         const response = await unauthenticatedRequest.saveConventionDraft({

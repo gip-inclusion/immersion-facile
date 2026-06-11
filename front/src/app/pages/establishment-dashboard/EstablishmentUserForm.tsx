@@ -10,8 +10,8 @@ import {
   establishmentsRoles,
   type FormEstablishmentUserRight,
   formEstablishmentUserRightSchema,
+  type frontRoutes,
   type OmitFromExistingKeys,
-  type routes,
   type SiretDto,
   useRoute,
 } from "shared";
@@ -52,9 +52,9 @@ export const EstablishmentUserForm = ({
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const route = useRoute() as Route<
-    | typeof routes.establishmentDashboardFormEstablishment
-    | typeof routes.adminEstablishments
-    | typeof routes.myProfileEstablishmentRegistration
+    | typeof frontRoutes.establishmentDashboardFormEstablishment
+    | typeof frontRoutes.adminEstablishments
+    | typeof frontRoutes.myProfileEstablishmentRegistration
   >;
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";

@@ -1,4 +1,4 @@
-import type { frontRoutes } from "..";
+import type { legacyFrontRoutes } from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
@@ -6,7 +6,7 @@ import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 
 export type AllowedLoginSource = (typeof allowedLoginSources)[number];
-export type AllowedRedirectUri = (typeof frontRoutes)[AllowedLoginSource];
+export type AllowedRedirectUri = (typeof legacyFrontRoutes)[AllowedLoginSource];
 
 export const allowedLoginSources = [
   "admin",

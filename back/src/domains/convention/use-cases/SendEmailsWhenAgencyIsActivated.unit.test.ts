@@ -4,8 +4,8 @@ import {
   ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  frontRoutes,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -81,10 +81,10 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   let timeGateway: TimeGateway;
   const config = new AppConfigBuilder().build();
 
-  const agencyDashboardUrl: AbsoluteUrl = makeRouteAbsoluteUrl(
-    routes.agencyDashboardMain(),
-    config.immersionFacileBaseUrl,
-  );
+  const agencyDashboardUrl: AbsoluteUrl = makeRouteAbsoluteUrl({
+    route: frontRoutes.agencyDashboardMain(),
+    baseUrl: config.immersionFacileBaseUrl,
+  });
 
   beforeEach(() => {
     uow = createInMemoryUow();

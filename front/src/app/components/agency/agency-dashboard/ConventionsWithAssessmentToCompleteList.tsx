@@ -8,8 +8,8 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionWithUnfinalizedAssessment,
   domElementIds,
+  frontRoutes,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
-  routes,
   toDisplayedDate,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -147,7 +147,7 @@ const AssessmentToCompleteTaskItem = ({
               linkProps={{
                 target: "_blank",
                 rel: "noreferrer",
-                href: routes.manageConventionConnectedUser({
+                href: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }).link.href,
               }}

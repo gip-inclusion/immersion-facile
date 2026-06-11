@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { keys, type routes } from "shared";
+import { type frontRoutes, keys } from "shared";
 import {
   type ConventionFormMode,
   ConventionFormWrapper,
@@ -13,7 +13,7 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { Route } from "type-route";
 
 export type ConventionMiniStagePageRoute = Route<
-  typeof routes.conventionMiniStage
+  typeof frontRoutes.conventionMiniStage
 >;
 
 type ConventionMiniStagePageProps = {

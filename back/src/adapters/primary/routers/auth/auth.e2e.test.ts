@@ -16,12 +16,12 @@ import {
   expectEmailOfType,
   expectHttpResponseToEqual,
   expectToEqual,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   noAgencyDashboards,
   noEstablishmentDashboard,
   queryParamsAsString,
   type Role,
-  routes,
   type TechnicalRoutes,
   technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -734,10 +734,10 @@ describe("auth router", () => {
           const shortLinkIds = ["shortLink1", "shortLinkg2"];
           gateways.shortLinkGenerator.addMoreShortLinkIds(shortLinkIds);
 
-          const originalUrl = makeRouteAbsoluteUrl(
-            routes.conventionToSign({ jwt: "" }),
-            appConfig.immersionFacileBaseUrl,
-          );
+          const originalUrl = makeRouteAbsoluteUrl({
+            route: frontRoutes.conventionToSign({ jwt: "" }),
+            baseUrl: appConfig.immersionFacileBaseUrl,
+          });
 
           const expiredJwt = generateConventionJwt(
             createConventionMagicLinkPayload({
@@ -815,10 +815,10 @@ describe("auth router", () => {
                   now: gateways.timeGateway.now(),
                 }),
               ),
-              originalUrl: makeRouteAbsoluteUrl(
-                routes.assessment({ jwt: "fake-jwt" }),
-                appConfig.immersionFacileBaseUrl,
-              ),
+              originalUrl: makeRouteAbsoluteUrl({
+                route: frontRoutes.assessment({ jwt: "fake-jwt" }),
+                baseUrl: appConfig.immersionFacileBaseUrl,
+              }),
             },
           });
 

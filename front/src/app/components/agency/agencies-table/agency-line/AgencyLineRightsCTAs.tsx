@@ -1,6 +1,6 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
-import { type AgencyRight, domElementIds, routes } from "shared";
+import { type AgencyRight, domElementIds, frontRoutes } from "shared";
 
 export const AgencyLineRightsCTAs = ({
   agencyRight,
@@ -32,7 +32,7 @@ export const AgencyLineRightsCTAs = ({
         id={`${domElementIds.myProfile.adminAgencyLink}-${agencyRight.agency.id}`}
         size="small"
         linkProps={
-          routes.adminAgencyDetail({
+          frontRoutes.adminAgencyDetail({
             agencyId: agencyRight.agency.id,
           }).link
         }

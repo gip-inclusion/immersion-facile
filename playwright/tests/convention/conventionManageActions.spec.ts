@@ -1,7 +1,7 @@
 import test, { expect, type Page } from "@playwright/test";
 import {
   domElementIds,
-  routes,
+  frontRoutes,
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_1_ID,
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_2_ID,
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_3_ID,
@@ -117,9 +117,12 @@ test.describe("Convention manage actions from prescriber dashboard", () => {
       domElementIds.manageConvention.otherActionsButton,
       domElementIds.manageConvention.duplicateConventionButton,
     );
-    await managePage.waitForURL(`**${routes.conventionImmersion().href}**`, {
-      timeout: 30_000,
-    });
+    await managePage.waitForURL(
+      `**${frontRoutes.conventionImmersion().href}**`,
+      {
+        timeout: 30_000,
+      },
+    );
     const {
       conventionSection,
       beneficiarySection,

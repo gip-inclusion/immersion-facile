@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 
@@ -10,7 +10,7 @@ export const searchEstablishmentAndExpectResultToHaveLength =
   ): PlaywrightTestCallback =>
   async ({ page }, { retry }) => {
     const updatedEstablishment = makeUpdatedEstablishment(retry);
-    await page.goto(routes.search().href);
+    await page.goto(frontRoutes.search().href);
     await page.fill(
       `#${domElementIds.search.placeAutocompleteInput}`,
       "Poitiers",

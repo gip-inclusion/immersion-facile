@@ -5,9 +5,9 @@ import {
   type EmailAttachment,
   type Exchange,
   errors,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   renderCTAInEmailContent,
-  routes,
   type SiretDto,
   type WithDiscussionId,
   withDiscussionIdSchema,
@@ -110,20 +110,21 @@ export const makeSendExchangeToRecipient = useCaseBuilder(
                   } ${discussion.address.postcode} ${discussion.address.city}</li>
                   </ul><br />
                   ${renderCTAInEmailContent({
-                    url: makeRouteAbsoluteUrl(
-                      lastExchange.sender === "establishment"
-                        ? routes.beneficiaryDashboardDiscussions({
-                            discussionId: discussion.id,
-                            mtm_campaign:
-                              "inbound-parsing-reponse-via-tableau-de-bord",
-                          })
-                        : routes.establishmentDashboardDiscussions({
-                            discussionId: discussion.id,
-                            mtm_campaign:
-                              "inbound-parsing-reponse-via-tableau-de-bord",
-                          }),
-                      deps.config.immersionFacileBaseUrl,
-                    ),
+                    url: makeRouteAbsoluteUrl({
+                      route:
+                        lastExchange.sender === "establishment"
+                          ? frontRoutes.beneficiaryDashboardDiscussions({
+                              discussionId: discussion.id,
+                              mtm_campaign:
+                                "inbound-parsing-reponse-via-tableau-de-bord",
+                            })
+                          : frontRoutes.establishmentDashboardDiscussions({
+                              discussionId: discussion.id,
+                              mtm_campaign:
+                                "inbound-parsing-reponse-via-tableau-de-bord",
+                            }),
+                      baseUrl: deps.config.immersionFacileBaseUrl,
+                    }),
                     label: "Répondre depuis mon espace",
                   })}
                   </div>

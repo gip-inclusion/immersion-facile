@@ -32,9 +32,9 @@ import {
   emailExchangeSplitters,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeEmptyConventionInitialValues,
-  routes,
   splitTextOnFirstSeparator,
   toConventionDraftDto,
   toDisplayedDate,
@@ -181,13 +181,13 @@ const getActivateDraftConventionButtonProps = ({
 
   const redirectPath =
     internshipKind === "immersion"
-      ? routes.conventionImmersion({
+      ? frontRoutes.conventionImmersion({
           skipIntro: true,
           conventionDraftId: conventionDraft.id,
           discussionId: discussion.id,
           mtm_campaign: "mise_en_relation_activation_convention",
         }).href
-      : routes.conventionMiniStage({
+      : frontRoutes.conventionMiniStage({
           // TODO add discussionId as quaryPram for mini-stage. Do we need acquisitionParams ?
           conventionDraftId: conventionDraft.id,
         }).href;
@@ -348,8 +348,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           type="button"
           onClick={() =>
             viewer === "establishment"
-              ? routes.establishmentDashboardDiscussions().push()
-              : routes.beneficiaryDashboardDiscussions().push()
+              ? frontRoutes.establishmentDashboardDiscussions().push()
+              : frontRoutes.beneficiaryDashboardDiscussions().push()
           }
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
@@ -445,7 +445,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               target="_blank"
               rel="noreferrer"
               href={
-                routes.searchResult({
+                frontRoutes.searchResult({
                   appellationCode: [discussion.appellation.appellationCode],
                   siret: discussion.siret,
                   location: discussion.locationId,

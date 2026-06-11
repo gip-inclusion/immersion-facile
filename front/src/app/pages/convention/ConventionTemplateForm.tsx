@@ -3,7 +3,7 @@ import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { errors, routes } from "shared";
+import { errors, frontRoutes } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -16,7 +16,7 @@ import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 
 export type ConventionTemplateFormRoute = Route<
-  typeof routes.conventionTemplate
+  typeof frontRoutes.conventionTemplate
 >;
 
 export const ConventionTemplateForm = ({
@@ -38,7 +38,7 @@ export const ConventionTemplateForm = ({
   const backButtonProps: ButtonProps = {
     priority: "tertiary",
     iconId: "fr-icon-arrow-left-line",
-    linkProps: routes[fromRoute]().link,
+    linkProps: frontRoutes[fromRoute]().link,
     className: fr.cx("fr-mb-4w"),
     children: conventionTemplateFeedback
       ? "Aller à mon espace"

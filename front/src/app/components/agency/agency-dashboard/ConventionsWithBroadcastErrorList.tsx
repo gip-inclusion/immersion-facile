@@ -21,11 +21,11 @@ import {
   conventionStatuses,
   domElementIds,
   type FlatGetConventionsWithErroredBroadcastFeedbackParams,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
-  routes,
 } from "shared";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import {
@@ -461,7 +461,7 @@ export const ConventionsWithBroadcastErrorList = ({
                     linkProps={{
                       target: "_blank",
                       rel: "noreferrer",
-                      href: routes.manageConventionConnectedUser({
+                      href: frontRoutes.manageConventionConnectedUser({
                         conventionId: conventionWithBroadcastFeedback.id,
                       }).link.href,
                     }}

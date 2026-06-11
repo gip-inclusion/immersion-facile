@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { routes, useRoute } from "shared";
+import { frontRoutes, useRoute } from "shared";
 import { AddEstablishmentsByBatch } from "src/app/components/admin/establishments/AddEstablishmentsByBatch";
 import { ManageEstablishment } from "src/app/components/admin/establishments/ManageEstablishment";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -12,7 +12,7 @@ import type { Route } from "type-route";
 import { useAdminDashboard } from "./useAdminDashboard";
 
 export const EstablishmentsTab = () => {
-  const route = useRoute() as Route<typeof routes.adminEstablishments>;
+  const route = useRoute() as Route<typeof frontRoutes.adminEstablishments>;
   const { siret } = route.params;
   const { url, error } = useAdminDashboard({ name: "adminEstablishments" });
   const { cx } = useStyles();
@@ -24,7 +24,7 @@ export const EstablishmentsTab = () => {
     return (
       <>
         <Button
-          linkProps={routes.adminEstablishments().link}
+          linkProps={frontRoutes.adminEstablishments().link}
           iconId="fr-icon-arrow-go-back-line"
           iconPosition="left"
           size="small"

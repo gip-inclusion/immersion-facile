@@ -11,8 +11,8 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   type RenewExpiredJwtRequestDto,
-  routes,
   type ShortLinkId,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -315,13 +315,13 @@ describe("RenewExpiredJwt use case", () => {
           errors.convention.unsupportedRenewRoute({
             originalUrl: request.originalUrl,
             supportedRenewRoutes: [
-              routes.conventionToSign({ jwt: "" }).href,
-              routes.manageConvention({ jwt: "" }).href,
-              routes.assessment({ jwt: "" }).href,
-              routes.assessmentDocument({ jwt: "" }).href,
-              routes.conventionImmersion({ jwt: "" }).href,
-              routes.unregisterEstablishmentLead({ jwt: "" }).href,
-              routes.conventionDocument({ jwt: "" }).href,
+              frontRoutes.conventionToSign({ jwt: "" }).href,
+              frontRoutes.manageConvention({ jwt: "" }).href,
+              frontRoutes.assessment({ jwt: "" }).href,
+              frontRoutes.assessmentDocument({ jwt: "" }).href,
+              frontRoutes.conventionImmersion({ jwt: "" }).href,
+              frontRoutes.unregisterEstablishmentLead({ jwt: "" }).href,
+              frontRoutes.conventionDocument({ jwt: "" }).href,
             ],
           }),
         );

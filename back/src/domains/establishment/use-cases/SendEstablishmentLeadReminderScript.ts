@@ -5,10 +5,10 @@ import {
   type ConventionId,
   castError,
   executeInSequence,
+  frontRoutes,
   immersionFacileNoReplyEmailSender,
   localization,
   makeRouteAbsoluteUrl,
-  routes,
   type SiretDto,
 } from "shared";
 import { z } from "zod";
@@ -198,10 +198,10 @@ const generateAddEstablishmentFormLink = ({
   convention: ConventionDto;
   acquisitionCampaign: string;
 }): AbsoluteUrl =>
-  makeRouteAbsoluteUrl(
-    routes.formEstablishment({
+  makeRouteAbsoluteUrl({
+    route: frontRoutes.formEstablishment({
       fromConventionId: convention.id,
       mtm_campaign: acquisitionCampaign,
     }),
-    config.immersionFacileBaseUrl,
-  );
+    baseUrl: config.immersionFacileBaseUrl,
+  });

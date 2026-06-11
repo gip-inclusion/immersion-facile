@@ -13,9 +13,9 @@ import {
   type AgencyId,
   type AgencyRight,
   domElementIds,
+  frontRoutes,
   type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
-  routes,
   type User,
   type UserId,
   type UserParamsForAgency,
@@ -58,7 +58,7 @@ const AgencyReviewForm = ({
           </p>
           <p className={fr.cx("fr-card__desc")}>
             <a
-              {...routes.adminAgencyDetail({ agencyId: agency.id }).link}
+              {...frontRoutes.adminAgencyDetail({ agencyId: agency.id }).link}
               target="_blank"
             >
               Voir les détails de l'agence

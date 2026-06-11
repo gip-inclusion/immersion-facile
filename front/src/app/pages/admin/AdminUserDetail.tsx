@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
@@ -14,8 +14,8 @@ import type { Route } from "type-route";
 
 type AdminUserDetailProps = {
   route: Route<
-    | typeof routes.adminUserDetailAgencies
-    | typeof routes.adminUserDetailEstablishments
+    | typeof frontRoutes.adminUserDetailAgencies
+    | typeof frontRoutes.adminUserDetailEstablishments
   >;
 };
 

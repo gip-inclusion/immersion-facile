@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { AgencyOverview } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
@@ -9,7 +9,7 @@ import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fe
 import type { Route } from "type-route";
 
 type AgencyDetailForAgencyDashboardProps = {
-  route: Route<typeof routes.agencyDashboardAgencyDetails>;
+  route: Route<typeof frontRoutes.agencyDashboardAgencyDetails>;
 };
 
 export const AgencyDetailForAgencyDashboard = ({

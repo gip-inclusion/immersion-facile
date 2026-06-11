@@ -7,7 +7,7 @@ import {
   SearchResultIllustration,
   useScrollTo,
 } from "react-design-system";
-import { domElementIds, type InternalOfferDto, routes } from "shared";
+import { domElementIds, frontRoutes, type InternalOfferDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { searchIllustrations } from "src/assets/img/illustrations";
 
@@ -77,7 +77,7 @@ export const GroupListResults = ({
                   }
                   searchResult={searchResult}
                   linkProps={
-                    routes.searchResult({
+                    frontRoutes.searchResult({
                       appellationCode: [appellationCode],
                       siret: searchResult.siret,
                       location: searchResult.locationId ?? undefined,

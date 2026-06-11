@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr/fr";
 import { useState } from "react";
 import { MainWrapper, NavCard, PageHeader } from "react-design-system";
-import { domElementIds, loginFtConnect, routes } from "shared";
+import { domElementIds, frontRoutes, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 
 const useInitiateConventionRoute =
-  makeUseTypedRoute<(typeof routes.initiateConvention)["name"]>();
+  makeUseTypedRoute<(typeof frontRoutes.initiateConvention)["name"]>();
 
 export const InitiateConventionPage = () => {
   const route = useInitiateConventionRoute(["initiateConvention"]);
@@ -54,7 +54,7 @@ export const InitiateConventionPage = () => {
                   total={1}
                   type="establishment"
                   id={domElementIds.initiateConvention.navCards.establishment}
-                  link={routes.conventionImmersion().link}
+                  link={frontRoutes.conventionImmersion().link}
                   withBorder
                   alternateTitle="Je vais accueillir un candidat dans mon entreprise : je suis un employeur et je souhaite initier une demande de convention"
                 />
@@ -67,7 +67,7 @@ export const InitiateConventionPage = () => {
                   total={1}
                   type="agency"
                   id={domElementIds.initiateConvention.navCards.agency}
-                  link={routes.conventionImmersion().link}
+                  link={frontRoutes.conventionImmersion().link}
                   withBorder
                   alternateTitle="J'accompagne un bénéficiaire d'immersion : je suis un conseiller en insertion professionnelle (Mission locale, CAP Emploi, France Travail, etc) et je souhaite remplir une convention pour un candidat"
                 />
@@ -135,7 +135,7 @@ export const InitiateConventionPage = () => {
                   type="candidate"
                   total={1}
                   id={domElementIds.initiateConvention.otherStructureButton}
-                  link={routes.conventionImmersion().link}
+                  link={frontRoutes.conventionImmersion().link}
                   withBorder
                   alternateTitle="Je suis accompagné(e) par une autre structure : si vous n'êtes pas accompagné par France Travail (CAP Emploi, Mission locale, etc), cliquez ici"
                 />

@@ -8,7 +8,7 @@ import {
   useCopyButton,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, errors, type routes, zUuidLike } from "shared";
+import { domElementIds, errors, type frontRoutes, zUuidLike } from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -22,7 +22,9 @@ type ConventionConfirmationPageProps = {
   route: ConventionImmersionPageRoute;
 };
 
-type ConventionImmersionPageRoute = Route<typeof routes.conventionConfirmation>;
+type ConventionImmersionPageRoute = Route<
+  typeof frontRoutes.conventionConfirmation
+>;
 
 const nextSteps: SectionConventionNextStepsProps["nextSteps"] = [
   {

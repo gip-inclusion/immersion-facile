@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
   decodeJwtWithoutSignatureCheck,
-  routes,
+  frontRoutes,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -18,7 +18,7 @@ import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/
 import type { Route } from "type-route";
 
 type EstablishmentFormForExternalsProps = {
-  route: Route<typeof routes.unregisterEstablishmentLead>;
+  route: Route<typeof frontRoutes.unregisterEstablishmentLead>;
 };
 
 export const EstablishmentLeadRegistrationRejectedPage = ({
@@ -95,7 +95,7 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
               className={fr.cx("fr-mt-4w", "fr-mb-5w")}
               iconId="fr-icon-arrow-right-line"
               linkProps={{
-                href: `${routes.formEstablishment().href}`,
+                href: `${frontRoutes.formEstablishment().href}`,
               }}
             >
               Je m'inscris en 2 minutes

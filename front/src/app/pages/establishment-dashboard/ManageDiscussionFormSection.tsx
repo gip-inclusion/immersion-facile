@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   domElementIds,
-  routes,
+  frontRoutes,
   type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
@@ -23,7 +23,9 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
       <div className={fr.cx("fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ discussionId }) => {
-            routes.establishmentDashboardDiscussions({ discussionId }).push();
+            frontRoutes
+              .establishmentDashboardDiscussions({ discussionId })
+              .push();
           })}
         >
           <div className={fr.cx("fr-grid-row")}>

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ENV } from "src/config/environmentVariables";
@@ -13,7 +13,8 @@ import type { Route } from "type-route";
 
 type MyProfileMainTabProps = {
   route: Route<
-    typeof routes.myProfileAgencies | typeof routes.myProfileEstablishments
+    | typeof frontRoutes.myProfileAgencies
+    | typeof frontRoutes.myProfileEstablishments
   >;
 };
 
