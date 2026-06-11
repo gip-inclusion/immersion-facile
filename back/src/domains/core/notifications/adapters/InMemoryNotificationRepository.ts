@@ -8,6 +8,7 @@ import {
   type EmailNotification,
   errors,
   expectToEqual,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
   type Notification,
@@ -15,7 +16,6 @@ import {
   type NotificationKind,
   type NotificationState,
   replaceElementWhere,
-  routes,
   type ShortLinkId,
   type Signatory,
   type SmsNotification,
@@ -350,10 +350,12 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
 ) => {
   const isAgencyModifierRole = role === "validator" || role === "counsellor";
   const magicLink = isAgencyModifierRole
-    ? makeRouteAbsoluteUrl(
-        routes.manageConventionConnectedUser({ conventionId: convention.id }),
-        config.immersionFacileBaseUrl,
-      )
+    ? makeRouteAbsoluteUrl({
+        route: frontRoutes.manageConventionConnectedUser({
+          conventionId: convention.id,
+        }),
+        baseUrl: config.immersionFacileBaseUrl,
+      })
     : makeShortLinkUrl(config, conventionToSignLinkId);
 
   return expectToEqual(templatedEmails, {

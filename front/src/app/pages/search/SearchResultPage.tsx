@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
   type ContactMode,
+  frontRoutes,
   getMapsLink,
   isInternalOfferDto,
   isPhysicalWorkMode,
@@ -23,7 +24,6 @@ import {
   makeSiretDescriptionLink,
   type OfferDto,
   remoteWorkModeLabels,
-  routes,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -154,7 +154,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
   const onGoBackClick = () => {
     window.history.length > 2
       ? window.history.back()
-      : routes.search({}).push();
+      : frontRoutes.search({}).push();
   };
 
   const miniMapMarkerKey = "single-result-mini-map-marker";

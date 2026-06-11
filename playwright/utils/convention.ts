@@ -7,7 +7,7 @@ import {
   type ConventionId,
   domElementIds,
   executeInSequence,
-  routes,
+  frontRoutes,
   SEED_FT_AGENCY_ID,
   technicalRoutes,
 } from "shared";
@@ -176,7 +176,7 @@ export const fillConventionForm = async (page: Page) => {
 export const goToFormPageAndFillConventionForm = async (
   page: Page,
 ): Promise<AgencyId | undefined> => {
-  await page.goto(routes.initiateConvention().href);
+  await page.goto(frontRoutes.initiateConvention().href);
   await expect(
     await page.request.get(technicalRoutes.featureFlags.url),
   ).toBeOK();
@@ -188,7 +188,7 @@ export const goToFormPageAndFillConventionForm = async (
   await page
     .locator(`#${domElementIds.initiateConvention.otherStructureButton}`)
     .click();
-  await page.waitForURL(`${routes.conventionImmersion().href}**`);
+  await page.waitForURL(`${frontRoutes.conventionImmersion().href}**`);
 
   await fillConventionForm(page);
 
@@ -490,7 +490,7 @@ export const confirmCreateConventionFormSubmit = async (
 
 const getRandomSiret = () =>
   ["722 003 936 02320", "94937244500013", "130 005 481 00010"][
-  Math.floor(Math.random() * 3)
+    Math.floor(Math.random() * 3)
   ];
 
 export const shareConventionDraftByEmail = async (page: Page) => {
@@ -532,7 +532,7 @@ export const openManageConventionPageFromDashboard = async (
   ]);
   await manageConventionPage.waitForLoadState("domcontentloaded");
   await manageConventionPage.waitForURL(
-    `**${routes.manageConventionConnectedUser({ conventionId }).href}**`,
+    `**${frontRoutes.manageConventionConnectedUser({ conventionId }).href}**`,
   );
   await acceptCookiesIfBannerVisible(manageConventionPage);
   return manageConventionPage;

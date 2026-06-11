@@ -21,11 +21,11 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
+  frontRoutes,
   hasAllowedRolesToEditConvention,
   type InternshipKind,
   isSignatory,
   type Role,
-  routes,
   toDisplayedDate,
   type WithStatusJustification,
   withStatusJustificationSchema,
@@ -357,7 +357,7 @@ export const ConventionFormWrapper = ({
               mode === "create-convention-from-scratch" ||
               mode === "create-convention-from-shared"
             ) {
-              routes
+              frontRoutes
                 .conventionConfirmation({
                   conventionId: fetchedConvention.id,
                 })
@@ -648,7 +648,7 @@ const DuplicateConventionAlert = (props: {
               <li key={id}>
                 {currentUser ? (
                   <a
-                    {...routes.manageConventionConnectedUser({
+                    {...frontRoutes.manageConventionConnectedUser({
                       conventionId: id,
                     }).link}
                     target="_blank"
@@ -705,9 +705,9 @@ const getRouteToRedirectAfterSubmit = ({
           );
 
         if (applicationId) {
-          return routes.conventionToSign({ jwt: route.params.jwt });
+          return frontRoutes.conventionToSign({ jwt: route.params.jwt });
         }
-        return routes.manageConventionConnectedUser({
+        return frontRoutes.manageConventionConnectedUser({
           conventionId: fetchedConvention.id,
         });
       },
@@ -719,7 +719,7 @@ const getRouteToRedirectAfterSubmit = ({
         fetchedConvention: { id: P.string },
       },
       ({ fetchedConvention }) =>
-        routes.adminConventionDetail({
+        frontRoutes.adminConventionDetail({
           conventionId: fetchedConvention.id,
         }),
     )
@@ -742,9 +742,9 @@ const getRouteToRedirectAfterSubmit = ({
             route.params.jwt,
           );
         if (applicationId) {
-          return routes.manageConvention({ jwt: route.params.jwt });
+          return frontRoutes.manageConvention({ jwt: route.params.jwt });
         }
-        return routes.manageConventionConnectedUser({
+        return frontRoutes.manageConventionConnectedUser({
           conventionId: fetchedConvention.id,
         });
       },

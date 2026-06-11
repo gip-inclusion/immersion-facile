@@ -1,5 +1,5 @@
 import { expect, type Page, test as setup } from "@playwright/test";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../custom.config";
 import { acceptCookiesIfBannerVisible } from "../utils/utils";
 
@@ -51,12 +51,12 @@ const loginWithIdentityProvider = async (
 
   if (routeName === "admin") {
     await page.goto("/admin");
-    await expect(page.url()).toContain(routes[routeName]().href);
+    await expect(page.url()).toContain(frontRoutes[routeName]().href);
   } else {
     await page.goto("/");
     await page.click(`#${headerNavLink}`);
     await page.click(`#${navLink}`);
-    await expect(page.url()).toContain(routes[routeName]().href);
+    await expect(page.url()).toContain(frontRoutes[routeName]().href);
   }
 
   const currentPage = await page.url();
@@ -92,7 +92,7 @@ const loginWithIdentityProvider = async (
         .click();
 
   await page.waitForURL(currentPage);
-  expect(page.url()).toContain(routes[routeName]().href);
+  expect(page.url()).toContain(frontRoutes[routeName]().href);
 };
 
 type ConnectedUserRoute =

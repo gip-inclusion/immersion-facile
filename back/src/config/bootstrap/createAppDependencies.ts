@@ -1,10 +1,10 @@
 import {
   type AbsoluteUrl,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   oneDayInSecond,
   oneHourInSeconds,
   oneMinuteInSeconds,
-  routes,
 } from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
@@ -77,10 +77,10 @@ export const createAppDependencies = async (config: AppConfig) => {
   const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =
     makeVerifyJwtES256<"emailAuthCode">(config.jwtPrivateKey);
 
-  const redirectErrorUrl: AbsoluteUrl = makeRouteAbsoluteUrl(
-    routes.temporaryError(),
-    config.immersionFacileBaseUrl,
-  );
+  const redirectErrorUrl: AbsoluteUrl = makeRouteAbsoluteUrl({
+    route: frontRoutes.temporaryError(),
+    baseUrl: config.immersionFacileBaseUrl,
+  });
 
   const errorHandlers = {
     handleManagedRedirectResponseError:

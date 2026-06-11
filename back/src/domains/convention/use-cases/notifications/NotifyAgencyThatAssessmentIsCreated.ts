@@ -3,9 +3,9 @@ import {
   computeTotalHours,
   type Email,
   executeInSequence,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
-  routes,
   withAssessmentSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -90,12 +90,12 @@ export const makeNotifyAgencyThatAssessmentIsCreated = useCaseBuilder(
       });
 
       await executeInSequence(agencyEmails, async (email) => {
-        const manageConventionLink = makeRouteAbsoluteUrl(
-          routes.manageConventionConnectedUser({
+        const manageConventionLink = makeRouteAbsoluteUrl({
+          route: frontRoutes.manageConventionConnectedUser({
             conventionId: convention.id,
           }),
-          deps.config.immersionFacileBaseUrl,
-        );
+          baseUrl: deps.config.immersionFacileBaseUrl,
+        });
         await deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {

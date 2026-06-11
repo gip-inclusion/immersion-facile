@@ -17,8 +17,8 @@ import {
   agencyKindToLabelIncludingIFAndPrepa,
   type ConnectedUser,
   domElementIds,
+  frontRoutes,
   looksLikeSiret,
-  routes,
   type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -134,7 +134,7 @@ export const RegisterAgenciesForm = ({
                 domElementIds.agencyDashboard.registerAgencies.newAgencyButton
               }
               linkProps={{
-                href: `${routes.addAgency().href}`,
+                href: `${frontRoutes.addAgency().href}`,
               }}
             >
               Créer un nouvel organisme sur Immersion Facilitée

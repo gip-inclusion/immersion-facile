@@ -6,7 +6,7 @@ import { HeadingSection } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   domElementIds,
-  routes,
+  frontRoutes,
   type UserEstablishmentRightDetails,
 } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
@@ -22,7 +22,7 @@ type ManageEstablishmentTabProps = {
 
 const useEstablishmentDashboardFormEstablishmentRoute =
   makeUseTypedRoute<
-    (typeof routes.establishmentDashboardFormEstablishment)["name"]
+    (typeof frontRoutes.establishmentDashboardFormEstablishment)["name"]
   >();
 
 export const ManageEstablishmentsTab = ({
@@ -35,7 +35,7 @@ export const ManageEstablishmentsTab = ({
   const { siret } = route.params;
   const initialUrlParams = getUrlParameters(window.location);
   if (establishments.length === 1) {
-    routes
+    frontRoutes
       .establishmentDashboardFormEstablishment({
         siret: establishments[0].siret,
         shouldUpdateAvailability: initialUrlParams.shouldUpdateAvailability,
@@ -52,7 +52,7 @@ export const ManageEstablishmentsTab = ({
           iconId="fr-icon-add-circle-line"
           type="button"
           onClick={() => {
-            routes.formEstablishment().push();
+            frontRoutes.formEstablishment().push();
           }}
           id={
             domElementIds.establishmentDashboard.manageEstablishments
@@ -89,7 +89,7 @@ export const ManageEstablishmentsTab = ({
                     locator: "create-establishment-in-person-address",
                   }),
                 );
-                routes
+                frontRoutes
                   .establishmentDashboardFormEstablishment({
                     siret: event.currentTarget.value,
                   })

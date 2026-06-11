@@ -7,11 +7,11 @@ import {
   type Email,
   errors,
   executeInSequence,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   localization,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -301,12 +301,12 @@ const sendAgencyAssessmentReminder = async ({
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            manageConventionLink: makeRouteAbsoluteUrl(
-              routes.manageConventionConnectedUser({
+            manageConventionLink: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
                 conventionId: convention.id,
               }),
-              config.immersionFacileBaseUrl,
-            ),
+              baseUrl: config.immersionFacileBaseUrl,
+            }),
             tutorEmail: convention.establishmentTutor.email,
           },
         },

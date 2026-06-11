@@ -1,8 +1,8 @@
 import { useDispatch } from "react-redux";
 import {
+  type frontRoutes,
   getJwtExpiredSinceInSeconds,
   handleJWTStringPossiblyContainingJsonError,
-  type routes,
 } from "shared";
 import { RenewExpiredJwtButton } from "src/app/components/auth/RenewExpiredJwtButton";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -15,7 +15,7 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 
 const useMagicLinkInterstitialRoute =
-  makeUseTypedRoute<(typeof routes.magicLinkInterstitial)["name"]>();
+  makeUseTypedRoute<(typeof frontRoutes.magicLinkInterstitial)["name"]>();
 
 export const MagicLinkInterstitialPage = () => {
   const { params } = useMagicLinkInterstitialRoute(["magicLinkInterstitial"]);

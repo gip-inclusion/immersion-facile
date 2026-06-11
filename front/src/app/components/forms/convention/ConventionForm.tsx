@@ -46,6 +46,7 @@ import {
   errors as errorMessage,
   establishmentFormOfferSchema,
   type FederatedIdentityWithUser,
+  frontRoutes,
   type ftConnectParams,
   type InternshipKind,
   isBeneficiaryMinor,
@@ -62,7 +63,6 @@ import {
   remoteWorkModeLabels,
   remoteWorkModes,
   replaceEmptyValuesByUndefinedFromObject,
-  routes,
   toConventionTemplate,
   type UserWithRights,
   undefinedIfEmptyString,
@@ -560,7 +560,7 @@ const ConventionFormContent = ({
         ? fromRouteParam
         : "agencyDashboard";
 
-      routes
+      frontRoutes
         .conventionTemplate({
           fromRoute,
           conventionTemplateId: conventionToSave.id,

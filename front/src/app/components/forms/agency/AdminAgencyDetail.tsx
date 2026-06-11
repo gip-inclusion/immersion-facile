@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { AgencyOverview } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -13,7 +13,7 @@ import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fe
 import type { Route } from "type-route";
 
 type AdminAgencyDetailProps = {
-  route: Route<typeof routes.adminAgencyDetail>;
+  route: Route<typeof frontRoutes.adminAgencyDetail>;
 };
 
 export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {

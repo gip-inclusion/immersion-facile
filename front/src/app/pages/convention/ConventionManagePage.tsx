@@ -2,7 +2,7 @@ import { MainWrapper } from "react-design-system";
 import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  type routes,
+  type frontRoutes,
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -15,8 +15,8 @@ import { ConventionManageContent } from "../../components/admin/conventions/Conv
 
 type ConventionManagePageProps = {
   route:
-    | Route<typeof routes.manageConvention>
-    | Route<typeof routes.adminConventionDetail>;
+    | Route<typeof frontRoutes.manageConvention>
+    | Route<typeof frontRoutes.adminConventionDetail>;
 };
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {

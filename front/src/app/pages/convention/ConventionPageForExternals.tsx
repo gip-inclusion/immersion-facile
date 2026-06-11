@@ -1,5 +1,5 @@
 import { MainWrapper } from "react-design-system";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { frontErrors } from "src/app/pages/error/front-errors";
@@ -7,7 +7,7 @@ import type { Route } from "type-route";
 import { ErrorPage } from "../error/ErrorPage";
 
 export type ConventionImmersionForExternalsRoute = Route<
-  typeof routes.conventionImmersionForExternals
+  typeof frontRoutes.conventionImmersionForExternals
 >;
 
 type ConventionPageForExternalsProperties = {

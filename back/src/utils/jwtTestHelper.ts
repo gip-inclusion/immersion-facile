@@ -3,9 +3,9 @@ import {
   type ConnectedUserQueryParams,
   decodeURIWithParams,
   filterNotFalsy,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   queryParamsAsString,
-  routes,
 } from "shared";
 import type {
   ConventionMagicLinkLifetime,
@@ -40,13 +40,13 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
     .filter(filterNotFalsy)
     .join("/");
 
-  return makeRouteAbsoluteUrl(
-    routes[targetRoute]({
+  return makeRouteAbsoluteUrl({
+    route: frontRoutes[targetRoute]({
       ...extraQueryParams,
       jwt: fakeJwt,
     }),
-    "http://fake-magic-link",
-  );
+    baseUrl: "http://fake-magic-link",
+  });
 };
 
 export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
@@ -76,11 +76,11 @@ export const fakeGenerateEmailAuthCodeUrlFn: GenerateEmailAuthCodeUrl = ({
   state,
   targetRoute,
 }) =>
-  makeRouteAbsoluteUrl(
-    routes[targetRoute]({
+  makeRouteAbsoluteUrl({
+    route: frontRoutes[targetRoute]({
       code: "EmailAuthCodeJwt",
       email,
       state,
     }),
-    "http://fake-connected-user",
-  );
+    baseUrl: "http://fake-connected-user",
+  });

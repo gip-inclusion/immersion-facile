@@ -41,7 +41,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
 };
 
-export const frontRoutes = {
+export const legacyFrontRoutes = {
   ...allowedLoginSourcesRoutes,
   assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
@@ -165,22 +165,25 @@ export const searchParams = {
   ...acquisitionParams,
 };
 
-export type FrontRouteUnion = ValueOf<typeof routes>;
-export type FrontRouteKeys = keyof typeof routes;
+export type FrontRouteUnion = ValueOf<typeof frontRoutes>;
+export type FrontRouteKeys = keyof typeof frontRoutes;
 
 export type ConventionTemplateFromRoute = Extract<
   FrontRouteKeys,
   "agencyDashboard" | "establishmentDashboard"
 >;
 
-const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
+const admin = defineRoute(
+  connectedUserParams,
+  () => `/${legacyFrontRoutes.admin}`,
+);
 
 const beneficiaryDashboard = defineRoute(
   {
     ...connectedUserParams,
     ...acquisitionParams,
   },
-  () => `/${frontRoutes.beneficiaryDashboard}`,
+  () => `/${legacyFrontRoutes.beneficiaryDashboard}`,
 );
 
 const agencyDashboard = defineRoute(
@@ -189,7 +192,7 @@ const agencyDashboard = defineRoute(
     isAgencyRegistration: param.query.optional.boolean,
   },
   () => [
-    `/${frontRoutes.agencyDashboard}`,
+    `/${legacyFrontRoutes.agencyDashboard}`,
     "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
   ],
 );
@@ -199,12 +202,12 @@ const establishmentDashboard = defineRoute(
     ...connectedUserParams,
     ...acquisitionParams,
   },
-  () => `/${frontRoutes.establishmentDashboard}`,
+  () => `/${legacyFrontRoutes.establishmentDashboard}`,
 );
 
 const myProfile = defineRoute(
   connectedUserParams,
-  () => `/${frontRoutes.profile}`,
+  () => `/${legacyFrontRoutes.profile}`,
 );
 
 const agencyDashboardAgencies = agencyDashboard.extend("/agences");
@@ -246,10 +249,14 @@ export const conventionTemplateFromRouteSerializer: ValueSerializer<
   stringify: (value) => value,
 };
 
-export const { RouteProvider, useRoute, routes } = createRouter({
+export const {
+  RouteProvider,
+  useRoute,
+  routes: frontRoutes,
+} = createRouter({
   addAgency: defineRoute(
     { ...connectedUserParams, siret: param.query.optional.string },
-    () => `/${frontRoutes.addAgency}`,
+    () => `/${legacyFrontRoutes.addAgency}`,
   ),
 
   admin,
@@ -297,7 +304,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   myProfileEstablishmentRegistration: myProfile.extend(
     { siret: param.query.optional.string },
-    () => `/${frontRoutes.myProfileEstablishmentRegistration}`,
+    () => `/${legacyFrontRoutes.myProfileEstablishmentRegistration}`,
   ),
   agencyDashboardAgencies: agencyDashboardAgencies,
   agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
@@ -316,7 +323,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.path.string,
     },
     ({ conventionId }) =>
-      `/${frontRoutes.conventionImmersion}/confirmation/${conventionId}`,
+      `/${legacyFrontRoutes.conventionImmersion}/confirmation/${conventionId}`,
   ),
   assessmentDocument: defineRoute(
     {
@@ -324,21 +331,21 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
       ...acquisitionParams,
     },
-    () => `/${frontRoutes.assessmentDocument}`,
+    () => `/${legacyFrontRoutes.assessmentDocument}`,
   ),
   conventionDocument: defineRoute(
     {
       jwt: param.query.optional.string,
       conventionId: param.query.optional.string,
     },
-    () => `/${frontRoutes.conventionDocument}`,
+    () => `/${legacyFrontRoutes.conventionDocument}`,
   ),
   initiateConvention: defineRoute(
     {
       ...acquisitionParams,
       skipFirstStep: param.query.optional.boolean,
     },
-    () => `/${frontRoutes.initiateConvention}`,
+    () => `/${legacyFrontRoutes.initiateConvention}`,
   ),
   conventionImmersion: defineRoute(
     {
@@ -353,7 +360,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...ftConnectParams,
       ...acquisitionParams,
     },
-    () => `/${frontRoutes.conventionImmersion}`,
+    () => `/${legacyFrontRoutes.conventionImmersion}`,
   ),
   conventionImmersionForExternals: defineRoute(
     {
@@ -364,7 +371,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...acquisitionParams,
       ...conventionForExternalParams,
     },
-    (params) => `/${frontRoutes.conventionImmersion}/${params.consumer}`,
+    (params) => `/${legacyFrontRoutes.conventionImmersion}/${params.consumer}`,
   ),
   conventionMiniStage: defineRoute(
     {
@@ -375,11 +382,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...agencyParamsForConventionForm,
       ...establishmentParamsForConventionForm,
     },
-    () => `/${frontRoutes.conventionMiniStageRoute}`,
+    () => `/${legacyFrontRoutes.conventionMiniStageRoute}`,
   ),
   conventionStatusDashboard: defineRoute(
     { jwt: param.query.string },
-    () => `/${frontRoutes.conventionStatusDashboard}`,
+    () => `/${legacyFrontRoutes.conventionStatusDashboard}`,
   ),
   conventionTemplate: defineRoute(
     {
@@ -394,7 +401,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       jwt: param.query.string,
       ...acquisitionParams,
     },
-    () => `/${frontRoutes.conventionToSign}`,
+    () => `/${legacyFrontRoutes.conventionToSign}`,
   ),
   establishmentDashboard,
   establishmentDashboardConventions:
@@ -417,24 +424,24 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ...connectedUserParams,
       ...establishmentParams,
     },
-    () => `/${frontRoutes.formEstablishment}`,
+    () => `/${legacyFrontRoutes.formEstablishment}`,
   ),
   unregisterEstablishmentLead: defineRoute(
     {
       jwt: param.query.string,
     },
-    () => `/${frontRoutes.unsubscribeEstablishmentLead}`,
+    () => `/${legacyFrontRoutes.unsubscribeEstablishmentLead}`,
   ),
   group: defineRoute(
     { groupSlug: param.path.string },
-    (params) => `/${frontRoutes.group}/${params.groupSlug}`,
+    (params) => `/${legacyFrontRoutes.group}/${params.groupSlug}`,
   ),
   home: defineRoute("/"),
-  homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
-  homeCandidates: defineRoute(`/${frontRoutes.homeCandidates}`),
+  homeAgencies: defineRoute(`/${legacyFrontRoutes.homeAgencies}`),
+  homeCandidates: defineRoute(`/${legacyFrontRoutes.homeCandidates}`),
   homeEstablishments: defineRoute([
-    `/${frontRoutes.homeEstablishments}`,
-    `/${frontRoutes.landingEstablishment}`,
+    `/${legacyFrontRoutes.homeEstablishments}`,
+    `/${legacyFrontRoutes.landingEstablishment}`,
   ]),
   assessment: defineRoute(
     {
@@ -442,7 +449,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       conventionId: param.query.optional.string,
       ...acquisitionParams,
     },
-    () => `/${frontRoutes.assessment}`,
+    () => `/${legacyFrontRoutes.assessment}`,
   ),
   searchResult: defineRoute(
     {
@@ -455,7 +462,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       contactPhone: param.query.optional.string,
       contactMessage: param.query.optional.string,
     },
-    () => `/${frontRoutes.searchResult}`,
+    () => `/${legacyFrontRoutes.searchResult}`,
   ),
   searchResultForStudent: defineRoute(
     {
@@ -468,14 +475,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       contactPhone: param.query.optional.string,
       contactMessage: param.query.optional.string,
     },
-    () => `/${frontRoutes.searchResultForStudent}`,
+    () => `/${legacyFrontRoutes.searchResultForStudent}`,
   ),
   searchResultExternal: defineRoute(
     {
       siret: param.query.string,
       appellationCode: param.query.ofType(appellationStringSerializer),
     },
-    () => `/${frontRoutes.searchResultExternal}`,
+    () => `/${legacyFrontRoutes.searchResultExternal}`,
   ),
   magicLinkInterstitial: defineRoute(
     {
@@ -483,43 +490,44 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       state: param.query.string,
       email: param.query.string,
     },
-    () => `/${frontRoutes.magicLinkInterstitial}`,
+    () => `/${legacyFrontRoutes.magicLinkInterstitial}`,
   ),
   manageConvention: defineRoute(
     { jwt: param.query.string },
-    () => `/${frontRoutes.manageConvention}`,
+    () => `/${legacyFrontRoutes.manageConvention}`,
   ),
   manageConventionConnectedUser: defineRoute(
     { ...connectedUserParams, conventionId: param.query.string },
-    () => `/${frontRoutes.manageConventionConnectedUser}`,
+    () => `/${legacyFrontRoutes.manageConventionConnectedUser}`,
   ),
   openApiDoc: defineRoute(
     { version: param.query.optional.string },
     () => "/doc-api",
   ),
-  search: defineRoute(searchParams, () => `/${frontRoutes.search}`),
+  search: defineRoute(searchParams, () => `/${legacyFrontRoutes.search}`),
   externalSearch: defineRoute(
     searchParams,
-    () => `/${frontRoutes.externalSearch}`,
+    () => `/${legacyFrontRoutes.externalSearch}`,
   ),
   searchForStudent: defineRoute(
     searchParams,
-    () => `/${frontRoutes.searchForStudent}`,
+    () => `/${legacyFrontRoutes.searchForStudent}`,
   ),
   standard: defineRoute(
     {
       pagePath: param.path.ofType(standardPagesSerializer),
       version: param.query.optional.string,
     },
-    (params) => `/${frontRoutes.standard}/${params.pagePath}`,
+    (params) => `/${legacyFrontRoutes.standard}/${params.pagePath}`,
   ),
   stats: defineRoute("/stats"),
   temporaryError: defineRoute("/error"),
 });
 
-export const makeRouteAbsoluteUrl = (
-  route: Route<typeof routes>,
-  immersionFacileBaseUrl: AbsoluteUrl,
-): AbsoluteUrl => {
-  return `${immersionFacileBaseUrl}${route.href}`;
-};
+export const makeRouteAbsoluteUrl = ({
+  route,
+  baseUrl,
+}: {
+  route: Route<typeof frontRoutes>;
+  baseUrl: AbsoluteUrl;
+}): AbsoluteUrl => `${baseUrl}${route.href}`;

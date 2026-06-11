@@ -8,11 +8,11 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   domElementIds,
+  frontRoutes,
   getDaysBetween,
   getFormattedFirstnameAndLastname,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
   relativeTimeFormat,
-  routes,
 } from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -192,7 +192,7 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
               linkProps={{
                 target: "_blank",
                 rel: "noreferrer",
-                href: routes.manageConventionConnectedUser({
+                href: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }).link.href,
               }}

@@ -1,5 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 
 import { ConventionManageContent } from "src/app/components/admin/conventions/ConventionManageContent";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -8,7 +8,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 
 type ConventionManageConnectedUserProps = {
-  route: Route<typeof routes.manageConventionConnectedUser>;
+  route: Route<typeof frontRoutes.manageConventionConnectedUser>;
 };
 
 export const ConventionManageConnectedUser = ({

@@ -8,7 +8,7 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import { routes } from "shared";
+import { frontRoutes } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -166,14 +166,14 @@ export const SearchMiniMap = ({
                       searchResult={searchResult}
                       linkProps={
                         searchResult.voluntaryToImmersion
-                          ? routes.searchResult({
+                          ? frontRoutes.searchResult({
                               appellationCode: [appellationCode ?? ""],
                               siret: searchResult.siret,
                               ...(searchResult.locationId
                                 ? { location: searchResult.locationId }
                                 : {}),
                             }).link
-                          : routes.searchResultExternal({
+                          : frontRoutes.searchResultExternal({
                               siret: searchResult.siret,
                               appellationCode: [appellationCode ?? ""],
                             }).link

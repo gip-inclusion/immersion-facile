@@ -6,7 +6,7 @@ import {
   domElementIds,
   type EmailType,
   type EstablishmentDashboardTab,
-  routes,
+  frontRoutes,
 } from "shared";
 
 export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
@@ -24,7 +24,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
   await expect(tabLocator).toBeVisible();
   await tabLocator.click();
   expect(await page.url()).toContain(
-    `${routes.admin().href}/${adminTabs[tabName].slug}`,
+    `${frontRoutes.admin().href}/${adminTabs[tabName].slug}`,
   );
 };
 

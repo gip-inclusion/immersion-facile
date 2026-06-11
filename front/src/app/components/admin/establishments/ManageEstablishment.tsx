@@ -11,9 +11,9 @@ import {
   banEstablishmentAdminFormSchema,
   domElementIds,
   errors,
+  frontRoutes,
   type ManageEstablishmentAdminForm,
   manageEstablishmentAdminFormSchema,
-  routes,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -54,7 +54,7 @@ export const ManageEstablishment = (): JSX.Element => {
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ siret }) =>
-            routes.adminEstablishments({ siret }).push(),
+            frontRoutes.adminEstablishments({ siret }).push(),
           )}
         >
           <div className={fr.cx("fr-grid-row")}>

@@ -4,11 +4,11 @@ import {
   decodeURIWithParams,
   type Email,
   type FrontRouteKeys,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
   type OmitFromExistingKeys,
   queryParamsAsString,
-  routes,
   type User,
 } from "shared";
 import type { OngoingOAuth } from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
@@ -70,13 +70,13 @@ export const makeGenerateConventionMagicLinkUrl =
       }),
     );
 
-    return makeRouteAbsoluteUrl(
-      routes[targetRoute]({
+    return makeRouteAbsoluteUrl({
+      route: frontRoutes[targetRoute]({
         ...extraQueryParams,
         jwt,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
   };
 
 export type GenerateConnectedUserLoginUrl = ReturnType<
@@ -154,12 +154,12 @@ export const makeGenerateEmailAuthCodeUrl =
       }),
     );
 
-    return makeRouteAbsoluteUrl(
-      routes[targetRoute]({
+    return makeRouteAbsoluteUrl({
+      route: frontRoutes[targetRoute]({
         code: jwt,
         email,
         state,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
   };

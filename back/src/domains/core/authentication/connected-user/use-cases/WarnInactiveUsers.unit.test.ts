@@ -10,9 +10,9 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   expectToEqual,
+  frontRoutes,
   makeBooleanFeatureFlag,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import {
   type ExpectSavedNotificationsBatchAndEvent,
@@ -152,10 +152,10 @@ describe("WarnInactiveUsers", () => {
           params: {
             fullName: `${inactiveUser.firstName} ${inactiveUser.lastName}`,
             deletionDate: "22 janvier 2026",
-            loginUrl: makeRouteAbsoluteUrl(
-              routes.myProfile(),
-              immersionBaseUrl,
-            ),
+            loginUrl: makeRouteAbsoluteUrl({
+              route: frontRoutes.myProfile(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         },
         {
@@ -164,10 +164,10 @@ describe("WarnInactiveUsers", () => {
           params: {
             fullName: `${neverLoggedInUserAndCreatedMoreThan2YearsAgo.firstName} ${neverLoggedInUserAndCreatedMoreThan2YearsAgo.lastName}`,
             deletionDate: "22 janvier 2026",
-            loginUrl: makeRouteAbsoluteUrl(
-              routes.myProfile(),
-              immersionBaseUrl,
-            ),
+            loginUrl: makeRouteAbsoluteUrl({
+              route: frontRoutes.myProfile(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         },
       ],
@@ -296,10 +296,10 @@ describe("WarnInactiveUsers", () => {
           params: {
             fullName: `${userWithOldActivity.firstName} ${userWithOldActivity.lastName}`,
             deletionDate: "22 janvier 2026",
-            loginUrl: makeRouteAbsoluteUrl(
-              routes.myProfile(),
-              immersionBaseUrl,
-            ),
+            loginUrl: makeRouteAbsoluteUrl({
+              route: frontRoutes.myProfile(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         },
       ],

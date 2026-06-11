@@ -14,8 +14,8 @@ import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
+  type frontRoutes,
   isSignatory,
-  type routes,
   type SignatoryRole,
 } from "shared";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
@@ -32,7 +32,7 @@ import { useConvention } from "../../hooks/convention.hooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "./ShowConventionErrorOrRenewExpiredJwt";
 
 interface ConventionSignPageProperties {
-  route: Route<typeof routes.conventionToSign>;
+  route: Route<typeof frontRoutes.conventionToSign>;
 }
 
 const useClearConventionOnUnmount = () => {

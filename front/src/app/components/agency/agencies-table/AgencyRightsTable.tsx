@@ -11,7 +11,7 @@ import {
   type AgencyRight,
   addressDtoToString,
   agencyKindToLabelIncludingIFAndPrepa,
-  routes,
+  frontRoutes,
   type User,
   type UserParamsForAgency,
 } from "shared";
@@ -178,7 +178,7 @@ const AgencyRightLine = (
       <Button
         key={`${agencyRight.agency.id}-see-agency-link`}
         linkProps={
-          routes.agencyDashboardAgencyDetails({
+          frontRoutes.agencyDashboardAgencyDetails({
             agencyId: agencyRight.agency.id,
           }).link
         }

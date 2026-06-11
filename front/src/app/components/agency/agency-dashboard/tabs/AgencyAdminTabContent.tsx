@@ -7,7 +7,7 @@ import {
   type AgencyRight,
   type ConnectedUser,
   domElementIds,
-  routes,
+  frontRoutes,
 } from "shared";
 import { AgencyRightsTable } from "src/app/components/agency/agencies-table/AgencyRightsTable";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -65,7 +65,7 @@ export const AgencyAdminTabContent = ({
           <Button
             id={domElementIds.agencyDashboard.registerAgencies.newAgencyButton}
             linkProps={
-              routes.addAgency({
+              frontRoutes.addAgency({
                 siret: hasAgencyRoleOnProConnectSiret
                   ? undefined
                   : proConnectSiret,

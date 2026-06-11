@@ -4,10 +4,10 @@ import { useDispatch } from "react-redux";
 import {
   type AdminTabRouteName,
   adminTabs,
+  frontRoutes,
   keys,
   type OmitFromExistingKeys,
   type Prettify,
-  routes,
 } from "shared";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
@@ -62,7 +62,7 @@ const rawAdminTabs: Record<AdminTabRouteName, RawAdminTab> = {
   },
 };
 
-export type FrontAdminRouteTab = Route<(typeof routes)[AdminTabRouteName]>;
+export type FrontAdminRouteTab = Route<(typeof frontRoutes)[AdminTabRouteName]>;
 
 const getAdminTabs = (currentTab: AdminTabRouteName) =>
   keys(rawAdminTabs)
@@ -84,7 +84,7 @@ export const AdminTabs = ({ route }: { route: FrontAdminRouteTab }) => {
       selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
       onTabChange={(tab) => {
         dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-        routes[tab as AdminTabRouteName]().push();
+        frontRoutes[tab as AdminTabRouteName]().push();
       }}
       id="admin-tabs"
     >

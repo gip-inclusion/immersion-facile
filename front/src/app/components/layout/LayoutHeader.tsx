@@ -9,7 +9,7 @@ import {
   useLayout,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds, routes, useRoute } from "shared";
+import { domElementIds, frontRoutes, useRoute } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -64,7 +64,7 @@ export const LayoutHeader = () => {
       text: "Remplir la demande de convention",
       iconId: "fr-icon-draft-line",
       linkProps: {
-        ...routes.initiateConvention().link,
+        ...frontRoutes.initiateConvention().link,
         id: quickAccessIds.initiateConvention,
       },
     },
@@ -75,24 +75,24 @@ export const LayoutHeader = () => {
         {
           children: "Je suis un candidat",
           id: quickAccessIds.beneficiary,
-          linkProps: routes.beneficiaryDashboard().link,
+          linkProps: frontRoutes.beneficiaryDashboard().link,
         },
         {
           children: "Je suis une entreprise",
           id: quickAccessIds.establishment,
-          linkProps: routes.establishmentDashboard().link,
+          linkProps: frontRoutes.establishmentDashboard().link,
         },
         {
           children: "Je suis un prescripteur",
           id: quickAccessIds.agency,
-          linkProps: routes.agencyDashboardMain().link,
+          linkProps: frontRoutes.agencyDashboardMain().link,
         },
         ...(isConnectedUser
           ? [
               {
                 children: "Mon profil",
                 id: quickAccessIds.myAccount,
-                linkProps: routes.myProfile().link,
+                linkProps: frontRoutes.myProfile().link,
               },
             ]
           : []),
@@ -129,26 +129,26 @@ export const LayoutHeader = () => {
               fedIdToken: _3,
               ...rest
             } = currentRoute.params;
-            routes.conventionImmersion(rest).replace();
+            frontRoutes.conventionImmersion(rest).replace();
             return;
           }
-          routes.home().push();
+          frontRoutes.home().push();
         },
       },
     });
   }
 
   const isCandidateRoute =
-    currentRoute.name === routes.search().name ||
-    currentRoute.name === routes.homeCandidates().name ||
-    currentRoute.name === routes.beneficiaryDashboard().name;
+    currentRoute.name === frontRoutes.search().name ||
+    currentRoute.name === frontRoutes.homeCandidates().name ||
+    currentRoute.name === frontRoutes.beneficiaryDashboard().name;
   const isEstablishmentRoute =
-    currentRoute.name === routes.formEstablishment().name ||
-    currentRoute.name === routes.homeEstablishments().name ||
-    currentRoute.name === routes.establishmentDashboard().name;
+    currentRoute.name === frontRoutes.formEstablishment().name ||
+    currentRoute.name === frontRoutes.homeEstablishments().name ||
+    currentRoute.name === frontRoutes.establishmentDashboard().name;
   const isAgencyRoute =
-    currentRoute.name === routes.addAgency().name ||
-    currentRoute.name === routes.homeAgencies().name ||
+    currentRoute.name === frontRoutes.addAgency().name ||
+    currentRoute.name === frontRoutes.homeAgencies().name ||
     agencyDashboardRoutes.includes(
       currentRoute.name as AgencyDashboardRouteName,
     );
@@ -156,10 +156,10 @@ export const LayoutHeader = () => {
     {
       text: "Accueil",
       linkProps: {
-        ...routes.home().link,
+        ...frontRoutes.home().link,
         id: domElementIds.header.navLinks.home,
       },
-      isActive: currentRoute.name === routes.home().name,
+      isActive: currentRoute.name === frontRoutes.home().name,
     },
     {
       text: "Candidats",
@@ -167,17 +167,17 @@ export const LayoutHeader = () => {
       menuLinks: [
         {
           text: "Accueil candidat",
-          isActive: currentRoute.name === routes.homeCandidates().name,
+          isActive: currentRoute.name === frontRoutes.homeCandidates().name,
           linkProps: {
-            ...routes.homeCandidates().link,
+            ...frontRoutes.homeCandidates().link,
             id: candidateIds.home,
           },
         },
         {
           text: "Trouver une entreprise accueillante",
-          isActive: currentRoute.name === routes.search().name,
+          isActive: currentRoute.name === frontRoutes.search().name,
           linkProps: {
-            ...routes.search().link,
+            ...frontRoutes.search().link,
             id: candidateIds.search,
           },
         },
@@ -185,7 +185,7 @@ export const LayoutHeader = () => {
           text: "Remplir la demande de convention",
           isActive: false,
           linkProps: {
-            ...routes.initiateConvention({
+            ...frontRoutes.initiateConvention({
               skipFirstStep: true,
             }).link,
             id: candidateIds.formConvention,
@@ -193,9 +193,10 @@ export const LayoutHeader = () => {
         },
         {
           text: "Mon espace",
-          isActive: currentRoute.name === routes.beneficiaryDashboard().name,
+          isActive:
+            currentRoute.name === frontRoutes.beneficiaryDashboard().name,
           linkProps: {
-            ...routes.beneficiaryDashboard().link,
+            ...frontRoutes.beneficiaryDashboard().link,
             id: candidateIds.dashboard,
           },
         },
@@ -207,17 +208,17 @@ export const LayoutHeader = () => {
       menuLinks: [
         {
           text: "Accueil entreprise",
-          isActive: currentRoute.name === routes.homeEstablishments().name,
+          isActive: currentRoute.name === frontRoutes.homeEstablishments().name,
           linkProps: {
-            ...routes.homeEstablishments().link,
+            ...frontRoutes.homeEstablishments().link,
             id: establishmentIds.home,
           },
         },
         {
           text: "Proposer une immersion",
-          isActive: currentRoute.name === routes.formEstablishment().name,
+          isActive: currentRoute.name === frontRoutes.formEstablishment().name,
           linkProps: {
-            ...routes.formEstablishment().link,
+            ...frontRoutes.formEstablishment().link,
             id: establishmentIds.addEstablishmentForm,
           },
         },
@@ -225,7 +226,7 @@ export const LayoutHeader = () => {
           text: "Remplir la demande de convention",
           isActive: false,
           linkProps: {
-            ...routes.conventionImmersion().link,
+            ...frontRoutes.conventionImmersion().link,
             id: establishmentIds.formConvention,
           },
         },
@@ -233,9 +234,9 @@ export const LayoutHeader = () => {
           text: "Mon espace",
           isActive:
             currentRoute.name ===
-            routes.establishmentDashboardConventions().name,
+            frontRoutes.establishmentDashboardConventions().name,
           linkProps: {
-            ...routes.establishmentDashboardConventions().link,
+            ...frontRoutes.establishmentDashboardConventions().link,
             id: establishmentIds.dashboard,
           },
         },
@@ -247,18 +248,19 @@ export const LayoutHeader = () => {
       menuLinks: [
         {
           text: "Accueil prescripteurs",
-          isActive: currentRoute.name === routes.homeAgencies().name,
+          isActive: currentRoute.name === frontRoutes.homeAgencies().name,
           linkProps: {
-            ...routes.homeAgencies().link,
+            ...frontRoutes.homeAgencies().link,
             id: agencyIds.home,
           },
         },
         {
           text: "Inscrire mon organisme",
-          isActive: currentRoute.name === routes.addAgency().name,
+          isActive: currentRoute.name === frontRoutes.addAgency().name,
           linkProps: {
-            ...routes.agencyDashboardAgencies({ isAgencyRegistration: true })
-              .link,
+            ...frontRoutes.agencyDashboardAgencies({
+              isAgencyRegistration: true,
+            }).link,
             id: agencyIds.agencyDashboardAgencies,
           },
         },
@@ -266,7 +268,7 @@ export const LayoutHeader = () => {
           text: "Remplir la demande de convention",
           isActive: false,
           linkProps: {
-            ...routes.conventionImmersion().link,
+            ...frontRoutes.conventionImmersion().link,
             id: agencyIds.formConvention,
           },
         },
@@ -274,7 +276,7 @@ export const LayoutHeader = () => {
           text: "Mon espace",
           isActive: false,
           linkProps: {
-            ...routes.agencyDashboardMain().link,
+            ...frontRoutes.agencyDashboardMain().link,
             id: agencyIds.dashboard,
           },
         },
@@ -293,13 +295,13 @@ export const LayoutHeader = () => {
   if (isAdminConnected) {
     links.push({
       text: "Admin",
-      isActive: currentRoute.name === routes.adminConventions().name,
+      isActive: currentRoute.name === frontRoutes.adminConventions().name,
       menuLinks: [
         {
           text: "Backoffice",
           isActive: false,
           linkProps: {
-            ...routes.adminConventions().link,
+            ...frontRoutes.adminConventions().link,
             id: adminIds.backOffice,
           },
         },
@@ -307,7 +309,7 @@ export const LayoutHeader = () => {
           text: "Notifications",
           isActive: false,
           linkProps: {
-            ...routes.adminNotifications().link,
+            ...frontRoutes.adminNotifications().link,
             id: adminIds.emails,
           },
         },

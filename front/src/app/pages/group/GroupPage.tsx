@@ -16,7 +16,12 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import type { Group, GroupWithResults, InternalOfferDto, routes } from "shared";
+import type {
+  frontRoutes,
+  Group,
+  GroupWithResults,
+  InternalOfferDto,
+} from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { makeStyles } from "tss-react/dsfr";
@@ -24,7 +29,7 @@ import type { Route } from "type-route";
 import { GroupListResults } from "./GroupListResults";
 
 type GroupPageProps = {
-  route: Route<typeof routes.group>;
+  route: Route<typeof frontRoutes.group>;
 };
 const useStyles = makeStyles({ name: "GroupPage" });
 

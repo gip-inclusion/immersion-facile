@@ -5,8 +5,8 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -41,10 +41,12 @@ describe("NotifyConventionDraftSaved", () => {
   const recipientEmail: Email = "recipient@mail.com";
   const senderEmail: Email = "sender@mail.com";
   const config = new AppConfigBuilder().build();
-  const expectedLongLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-    routes.conventionImmersion({ conventionDraftId: conventionDraft.id }),
-    config.immersionFacileBaseUrl,
-  );
+  const expectedLongLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+    route: frontRoutes.conventionImmersion({
+      conventionDraftId: conventionDraft.id,
+    }),
+    baseUrl: config.immersionFacileBaseUrl,
+  });
   const expectedShortLink: AbsoluteUrl = `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`;
 
   let useCase: NotifyConventionDraftSaved;

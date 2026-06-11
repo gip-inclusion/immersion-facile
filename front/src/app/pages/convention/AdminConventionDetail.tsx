@@ -1,12 +1,12 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import type { routes } from "shared";
+import type { frontRoutes } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManageAdminPageProps = {
-  route: Route<typeof routes.adminConventionDetail>;
+  route: Route<typeof frontRoutes.adminConventionDetail>;
 };
 
 export const AdminConventionDetail = ({

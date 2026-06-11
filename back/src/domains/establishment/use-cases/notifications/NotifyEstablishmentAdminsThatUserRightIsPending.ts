@@ -2,9 +2,9 @@ import {
   errors,
   establishmentRoleSchema,
   executeInSequence,
+  frontRoutes,
   makeRouteAbsoluteUrl,
   onlyAdminUserRightsWithStatusAccepted,
-  routes,
   siretSchema,
   userIdSchema,
   type WithSiretDto,
@@ -67,10 +67,10 @@ export const makeNotifyEstablishmentAdminsThatUserRightIsPending =
             kind: "ESTABLISHMENT_USER_RIGHT_IS_PENDING",
             recipients: [adminUser.email],
             params: {
-              establishmentDashboardUrl: makeRouteAbsoluteUrl(
-                routes.establishmentDashboard(),
-                deps.config.immersionFacileBaseUrl,
-              ),
+              establishmentDashboardUrl: makeRouteAbsoluteUrl({
+                route: frontRoutes.establishmentDashboard(),
+                baseUrl: deps.config.immersionFacileBaseUrl,
+              }),
               adminFirstName: adminUser.firstName,
               adminLastName: adminUser.lastName,
               pendingUserFirstName: pendingUser.firstName,

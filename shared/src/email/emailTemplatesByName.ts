@@ -16,7 +16,7 @@ import type {
 import { isDiscussionExchangeForbiddenParamsWithRequestEstablishmentRegistrationUrl } from "../discussion/discussion.schema";
 import type { AgencyRole } from "../role/role.dto";
 import { titleByRole } from "../role/role.utils";
-import { makeRouteAbsoluteUrl, routes } from "../routes/routes";
+import { frontRoutes, makeRouteAbsoluteUrl } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { displayDuration, oneMinuteInSeconds } from "../utils/durations";
 import { advices } from "./advices";
@@ -79,7 +79,10 @@ export const emailTemplatesByName =
         buttons: [
           {
             label: "Accéder à mon espace",
-            url: `${immersionBaseUrl}/${routes.agencyDashboard({}).href}/agences`,
+            url: makeRouteAbsoluteUrl({
+              route: frontRoutes.agencyDashboardAgencies(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         ],
         highlight: {
@@ -1766,7 +1769,7 @@ Tél : ${beneficiaryPhone}`,
 
         Indiquez-le dans votre espace entreprise en marquant la candidature comme acceptée ou refusée, cela nous permet de mieux vous accompagner et de tenir à jour le suivi côté candidat.
 
-        <a href="https://${domain}/${routes.establishmentDashboard().href}" class target="_blank">Se connecter à l'espace entreprise</a>
+        <a href="${makeRouteAbsoluteUrl({ route: frontRoutes.establishmentDashboard(), baseUrl: `https://${domain}` })}" class target="_blank">Se connecter à l'espace entreprise</a>
 
 
         Si la connexion ne fonctionne pas ou si vous ne recevez pas le lien de réinitialisation du mot de passe, c’est probablement que vous n’avez pas encore créé votre compte.
@@ -1864,7 +1867,10 @@ Tél : ${beneficiaryPhone}`,
         buttons: [
           {
             label: "Voir les offres d'immersion",
-            url: makeRouteAbsoluteUrl(routes.search(), immersionBaseUrl),
+            url: makeRouteAbsoluteUrl({
+              route: frontRoutes.search(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         ],
         subContent: defaultSignature("immersion"),
@@ -1944,10 +1950,10 @@ Tél : ${beneficiaryPhone}`,
         buttons: [
           {
             label: "Créer mon compte",
-            url: makeRouteAbsoluteUrl(
-              routes.establishmentDashboard(),
-              immersionBaseUrl,
-            ),
+            url: makeRouteAbsoluteUrl({
+              route: frontRoutes.establishmentDashboard(),
+              baseUrl: immersionBaseUrl,
+            }),
           },
         ],
         subContent: defaultSignature("immersion"),
@@ -2020,10 +2026,10 @@ Tél : ${beneficiaryPhone}`,
               ? [
                   {
                     label: "Accéder à mon espace",
-                    url: makeRouteAbsoluteUrl(
-                      routes.establishmentDashboard(),
-                      immersionBaseUrl,
-                    ),
+                    url: makeRouteAbsoluteUrl({
+                      route: frontRoutes.establishmentDashboard(),
+                      baseUrl: immersionBaseUrl,
+                    }),
                   },
                 ]
               : [],

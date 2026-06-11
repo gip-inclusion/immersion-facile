@@ -4,7 +4,7 @@ import type {
   HeroHeaderNavCard,
   Stat,
 } from "react-design-system";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
@@ -71,7 +71,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-user-line",
         type: "candidate",
         id: domElementIds.home.heroHeader.candidate,
-        link: routes.homeCandidates().link,
+        link: frontRoutes.homeCandidates().link,
       },
       {
         overtitle: "Entreprise",
@@ -79,7 +79,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-building-line",
         id: domElementIds.home.heroHeader.establishment,
         type: "establishment",
-        link: routes.homeEstablishments().link,
+        link: frontRoutes.homeEstablishments().link,
       },
       {
         overtitle: "Prescripteur",
@@ -87,7 +87,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-map-pin-user-line",
         id: domElementIds.home.heroHeader.agency,
         type: "agency",
-        link: routes.homeAgencies().link,
+        link: frontRoutes.homeAgencies().link,
       },
     ],
     candidate: [
@@ -96,14 +96,14 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-search-line",
         type: "candidate",
         id: domElementIds.homeCandidates.heroHeader.search,
-        link: routes.search().link,
+        link: frontRoutes.search().link,
       },
       {
         title: "Remplir la demande de convention",
         icon: "fr-icon-draft-line",
         type: "candidate",
         id: domElementIds.homeCandidates.heroHeader.formConvention,
-        link: routes.initiateConvention({ skipFirstStep: true }).link,
+        link: frontRoutes.initiateConvention({ skipFirstStep: true }).link,
         alternateTitle:
           "Remplir la demande de convention : en quelques minutes, sans avoir besoin de créer un compte.",
       },
@@ -114,7 +114,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-award-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
-        link: routes.formEstablishment().link,
+        link: frontRoutes.formEstablishment().link,
         alternateTitle:
           "Proposer une immersion : mon entreprise apparaîtra dans les résultats de recherche des candidats.",
       },
@@ -133,7 +133,7 @@ export const heroHeaderNavCards: (
                 feedbackTopic: "auth-global",
               }),
             );
-            routes.conventionImmersion().push();
+            frontRoutes.conventionImmersion().push();
           },
         },
         alternateTitle:
@@ -144,7 +144,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-admin-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.establishmentDashboard,
-        link: routes.establishmentDashboardConventions().link,
+        link: frontRoutes.establishmentDashboardConventions().link,
         alternateTitle:
           "Mon espace : espace personnel nominatif où retrouver mes conventions, échanges avec les candidats, etc.",
       },
@@ -155,7 +155,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-hotel-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
-        link: routes.agencyDashboardAgencies().link,
+        link: frontRoutes.agencyDashboardAgencies().link,
       },
       {
         title: "Remplir la demande de convention",
@@ -172,7 +172,7 @@ export const heroHeaderNavCards: (
                 feedbackTopic: "auth-global",
               }),
             );
-            routes.conventionImmersion().push();
+            frontRoutes.conventionImmersion().push();
           },
         },
         alternateTitle:
@@ -183,7 +183,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-admin-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.agencyDashboard,
-        link: routes.agencyDashboardMain().link,
+        link: frontRoutes.agencyDashboardMain().link,
         alternateTitle:
           "Mon espace : espace personnel nominatif où retrouver mes conventions et statistiques.",
       },

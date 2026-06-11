@@ -3,9 +3,9 @@ import {
   type ConventionRole,
   type ConventionStatus,
   executeInSequence,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
-  routes,
   type TemplatedEmail,
   withConventionSchema,
 } from "shared";
@@ -81,12 +81,12 @@ export const makeNotifyNewConventionNeedsReview = useCaseBuilder(
           businessName: convention.businessName,
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
-          manageConventionLink: makeRouteAbsoluteUrl(
-            routes.manageConventionConnectedUser({
+          manageConventionLink: makeRouteAbsoluteUrl({
+            route: frontRoutes.manageConventionConnectedUser({
               conventionId: convention.id,
             }),
-            deps.config.immersionFacileBaseUrl,
-          ),
+            baseUrl: deps.config.immersionFacileBaseUrl,
+          }),
           possibleRoleAction:
             recipient.role === "counsellor"
               ? "en vérifier l'éligibilité"

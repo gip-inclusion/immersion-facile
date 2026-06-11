@@ -2,9 +2,9 @@ import {
   type AppellationAndRomeDto,
   type DiscussionDto,
   type EmailParamsByEmailType,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 
@@ -19,14 +19,14 @@ export const makeContactByEmailRequestParams = ({
 }): EmailParamsByEmailType["CONTACT_BY_EMAIL_REQUEST"] => ({
   replyToEmail: discussion.potentialBeneficiary.email,
   appellationLabel: appellation.appellationLabel,
-  discussionUrl: makeRouteAbsoluteUrl(
-    routes.establishmentDashboardDiscussions({
+  discussionUrl: makeRouteAbsoluteUrl({
+    route: frontRoutes.establishmentDashboardDiscussions({
       discussionId: discussion.id,
       mtm_campaign: "inbound-parsing-reponse-via-espace-entreprise",
       mtm_kwd: "inbound-parsing-reponse-via-espace-entreprise",
     }),
-    immersionFacileBaseUrl,
-  ),
+    baseUrl: immersionFacileBaseUrl,
+  }),
   businessName: discussion.businessName,
   businessAddress: `${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}`,
   potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({

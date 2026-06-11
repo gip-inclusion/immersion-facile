@@ -7,7 +7,7 @@ import {
   activeAgencyStatuses,
   type ConnectedUser,
   domElementIds,
-  routes,
+  frontRoutes,
   type WithDashboards,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -85,7 +85,7 @@ export const AgencyDashboard = ({
         id={domElementIds.agencyDashboard.dashboard.tabContainer}
         selectedTabId={currentTab}
         onTabChange={(tab) => {
-          if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
+          if (isAgencyDashboardTabRoute(tab)) frontRoutes[tab]().push();
         }}
       >
         {agencyTabs.find((tab) => tab.tabId === currentTab)?.content}

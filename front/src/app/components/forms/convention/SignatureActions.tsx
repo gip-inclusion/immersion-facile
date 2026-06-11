@@ -5,9 +5,9 @@ import type { Dispatch, SetStateAction } from "react";
 import {
   type ConventionDto,
   domElementIds,
+  frontRoutes,
   type InternshipKind,
   isConventionRenewed,
-  routes,
   type Signatory,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
@@ -57,7 +57,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
             iconId="fr-icon-edit-fill"
             iconPosition="left"
             linkProps={
-              routes.conventionImmersion({
+              frontRoutes.conventionImmersion({
                 jwt: props.jwt,
               }).link
             }

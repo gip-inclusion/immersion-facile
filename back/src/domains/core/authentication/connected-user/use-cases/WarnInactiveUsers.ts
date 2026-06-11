@@ -1,5 +1,5 @@
 import { addDays, subDays, subYears } from "date-fns";
-import { type AbsoluteUrl, makeRouteAbsoluteUrl, routes } from "shared";
+import { type AbsoluteUrl, frontRoutes, makeRouteAbsoluteUrl } from "shared";
 import { z } from "zod";
 import type {
   NotificationContentAndFollowedIds,
@@ -96,10 +96,10 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
           year: "numeric",
         });
 
-        const loginUrl: AbsoluteUrl = makeRouteAbsoluteUrl(
-          routes.myProfile(),
-          deps.immersionBaseUrl,
-        );
+        const loginUrl: AbsoluteUrl = makeRouteAbsoluteUrl({
+          route: frontRoutes.myProfile(),
+          baseUrl: deps.immersionBaseUrl,
+        });
 
         const notifications: NotificationContentAndFollowedIds[] =
           inactiveUsers.map((user) => ({

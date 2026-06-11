@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Tag } from "react-design-system";
 import {
   domElementIds,
-  routes,
+  frontRoutes,
   type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
@@ -40,7 +40,7 @@ export const EstablishmentLineBusinessName = ({
         id={`${domElementIds.myProfile.adminEstablishmentLink}-${data.siret}`}
         size="small"
         linkProps={
-          routes.adminEstablishments({
+          frontRoutes.adminEstablishments({
             siret: data.siret,
           }).link
         }

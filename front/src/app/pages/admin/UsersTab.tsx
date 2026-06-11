@@ -2,7 +2,7 @@ import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { type ElementRef, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
@@ -86,7 +86,7 @@ const UsersTable = () => {
         user.numberOfEstablishments,
         <a
           key={`${user.id}-details-link`}
-          {...routes.adminUserDetail({ userId: user.id })}
+          {...frontRoutes.adminUserDetail({ userId: user.id })}
         >
           Détails
         </a>,

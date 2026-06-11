@@ -3,7 +3,7 @@ import {
   addressRoutes,
   domElementIds,
   formCompletionRoutes,
-  routes,
+  frontRoutes,
 } from "shared";
 import {
   expectLocatorToBeVisibleAndEnabled,
@@ -14,7 +14,7 @@ const makeEmptySearch = async (page: Page) => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.candidate}`);
   await page.click(`#${domElementIds.homeCandidates.heroHeader.search}`);
-  await expect(page.url()).toContain(`${routes.search().href}`);
+  await expect(page.url()).toContain(`${frontRoutes.search().href}`);
   await expectSearchSubmitButtonToBeEnabled(page);
   await page.click(`#${domElementIds.search.searchSubmitButton}`);
   await expectSearchToHaveResults(page);
@@ -41,7 +41,7 @@ test.describe("Search", () => {
   test("can search with location fields and clear it", async ({ page }) => {
     const defaultPlaceAutocompleteValue = "France entière";
     const defaultAppellationsAutocompleteValue = "Tous les métiers";
-    await page.goto(routes.search().href);
+    await page.goto(frontRoutes.search().href);
     await expectSearchSubmitButtonToBeEnabled(page);
     await fillAutocomplete({
       page,

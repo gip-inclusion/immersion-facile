@@ -7,10 +7,10 @@ import {
   type ExtractFromExisting,
   errors,
   expectPromiseToFailWithError,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
   reasonableSchedule,
-  routes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -164,12 +164,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment: signedAssessment,
             numberOfHoursMade: "17h",
-            manageConventionLink: makeRouteAbsoluteUrl(
-              routes.manageConventionConnectedUser({
+            manageConventionLink: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
                 conventionId: convention.id,
               }),
-              config.immersionFacileBaseUrl,
-            ),
+              baseUrl: config.immersionFacileBaseUrl,
+            }),
           },
           recipients: [validator.email],
         },
@@ -194,12 +194,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment: signedAssessment,
             numberOfHoursMade: "17h",
-            manageConventionLink: makeRouteAbsoluteUrl(
-              routes.manageConventionConnectedUser({
+            manageConventionLink: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
                 conventionId: convention.id,
               }),
-              config.immersionFacileBaseUrl,
-            ),
+              baseUrl: config.immersionFacileBaseUrl,
+            }),
           },
           recipients: [validator2.email],
         },
@@ -345,12 +345,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
                 convention.immersionAppellation.appellationLabel,
               assessment: signedAssessment,
               numberOfHoursMade: "17h",
-              manageConventionLink: makeRouteAbsoluteUrl(
-                routes.manageConventionConnectedUser({
+              manageConventionLink: makeRouteAbsoluteUrl({
+                route: frontRoutes.manageConventionConnectedUser({
                   conventionId: convention.id,
                 }),
-                config.immersionFacileBaseUrl,
-              ),
+                baseUrl: config.immersionFacileBaseUrl,
+              }),
             },
             recipients: [advisorEmail],
           },

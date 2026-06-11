@@ -8,7 +8,11 @@ import { Fragment, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import { domElementIds, type FormEstablishmentUserRight, routes } from "shared";
+import {
+  domElementIds,
+  type FormEstablishmentUserRight,
+  frontRoutes,
+} from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -203,7 +207,7 @@ const EstablishmentUsersDeleteContent = ({
     );
     establishmentUsersDeleteModal.close();
     if (isCurrentUserDeleted) {
-      routes.establishmentDashboard().push();
+      frontRoutes.establishmentDashboard().push();
       window.location.reload();
     }
   };

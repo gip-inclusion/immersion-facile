@@ -6,9 +6,9 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type FtConnectIdentity,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
-  routes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -175,12 +175,12 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       convention: validConvention,
     });
 
-    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-      routes.manageConventionConnectedUser({
+    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+      route: frontRoutes.manageConventionConnectedUser({
         conventionId: validConvention.id,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -206,12 +206,12 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withAgencyId(agencyWithConsellorsAndValidator.id)
       .build();
 
-    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-      routes.manageConventionConnectedUser({
+    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+      route: frontRoutes.manageConventionConnectedUser({
         conventionId: validConvention.id,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
 
     await notifyToAgencyConventionSubmitted.execute({
       convention: validConvention,
@@ -267,12 +267,12 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withFederatedIdentity(ftIdentity)
       .build();
 
-    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-      routes.manageConventionConnectedUser({
+    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+      route: frontRoutes.manageConventionConnectedUser({
         conventionId: validConvention.id,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
 
     uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [
@@ -345,12 +345,12 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withFederatedIdentity(ftIdentity)
       .build();
 
-    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl(
-      routes.manageConventionConnectedUser({
+    const manageConventionLink: AbsoluteUrl = makeRouteAbsoluteUrl({
+      route: frontRoutes.manageConventionConnectedUser({
         conventionId: validConvention.id,
       }),
-      config.immersionFacileBaseUrl,
-    );
+      baseUrl: config.immersionFacileBaseUrl,
+    });
 
     const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
       _entityName: "ConventionFranceTravailAdvisor",

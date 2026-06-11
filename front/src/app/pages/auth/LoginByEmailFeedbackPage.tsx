@@ -7,9 +7,9 @@ import {
   type AllowedLoginSource,
   displayDuration,
   domElementIds,
+  frontRoutes,
   loginByEmailLinkDurationInMinutes,
   oneMinuteInSeconds,
-  routes,
   useRoute,
 } from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
@@ -92,7 +92,7 @@ export const LoginByEmailFeedbackPage = ({
       buttonProps: {
         children: "Retourner sur la page d'accueil",
         className: fr.cx("fr-mt-2w"),
-        onClick: () => routes.home().push(),
+        onClick: () => frontRoutes.home().push(),
         id: domElementIds[page].login.navigateToHome,
       },
     },

@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { Loader, SectionHighlight } from "react-design-system";
-import { domElementIds, routes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -36,7 +36,7 @@ export const BeneficiaryDashboardDiscussionsTab = () => {
         id={domElementIds.beneficiaryDashboard.tabContainer}
         className={fr.cx("fr-mt-4w")}
         onTabChange={() => {
-          routes.beneficiaryDashboardDiscussions().push();
+          frontRoutes.beneficiaryDashboardDiscussions().push();
         }}
       />
     </>

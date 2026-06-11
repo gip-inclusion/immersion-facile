@@ -14,7 +14,7 @@ import {
   OverFooter,
   type OverFooterCols,
 } from "react-design-system";
-import { type AbsoluteUrl, domElementIds, routes } from "shared";
+import { type AbsoluteUrl, domElementIds, frontRoutes } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { makeStyles, useStyles } from "tss-react/dsfr";
@@ -119,7 +119,7 @@ const overFooterCols: OverFooterCols = [
     iconTitle: "fr-icon-line-chart-line",
     link: {
       label: "Nos statistiques",
-      url: routes.stats().link.href,
+      url: frontRoutes.stats().link.href,
     },
     id: overFooterColsIds.contact,
   },
@@ -145,22 +145,22 @@ export const immersionFacileSupportUrl: AbsoluteUrl =
 const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   {
     label: "Accessibilité : partiellement conforme",
-    ...routes.standard({ pagePath: "accessibilite" }).link,
+    ...frontRoutes.standard({ pagePath: "accessibilite" }).link,
     id: bottomsLinksIds.accessibility,
   },
   {
     label: "Mentions légales",
-    ...routes.standard({ pagePath: "mentions-legales" }).link,
+    ...frontRoutes.standard({ pagePath: "mentions-legales" }).link,
     id: bottomsLinksIds.legals,
   },
   {
     label: "Politique de confidentialité",
-    ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
+    ...frontRoutes.standard({ pagePath: "politique-de-confidentialite" }).link,
     id: bottomsLinksIds.privacy,
   },
   {
     label: "Conditions générales d'utilisation",
-    ...routes.standard({ pagePath: "cgu" }).link,
+    ...frontRoutes.standard({ pagePath: "cgu" }).link,
     id: bottomsLinksIds.cgu,
   },
   {
@@ -177,12 +177,12 @@ const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   },
   {
     label: "Plan du site",
-    ...routes.standard({ pagePath: "plan-du-site" }).link,
+    ...frontRoutes.standard({ pagePath: "plan-du-site" }).link,
     id: bottomsLinksIds.sitemap,
   },
   {
     label: "Budget",
-    ...routes.standard({ pagePath: "budget" }).link,
+    ...frontRoutes.standard({ pagePath: "budget" }).link,
     id: bottomsLinksIds.budget,
   },
   {
@@ -218,12 +218,12 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
     links: [
       {
         label: "Trouver une entreprise accueillante",
-        ...routes.search().link,
+        ...frontRoutes.search().link,
         id: navTopGroupLinksIds.search,
       },
       {
         label: "Remplir la demande de convention",
-        ...routes.conventionImmersion().link,
+        ...frontRoutes.conventionImmersion().link,
         id: `${navTopGroupLinksIds.formConvention}-candidats`,
       },
     ],
@@ -233,12 +233,12 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
     links: [
       {
         label: "Référencer mon entreprise",
-        ...routes.formEstablishment().link,
+        ...frontRoutes.formEstablishment().link,
         id: navTopGroupLinksIds.addEstablishmentForm,
       },
       {
         label: "Remplir la demande de convention",
-        ...routes.conventionImmersion().link,
+        ...frontRoutes.conventionImmersion().link,
         id: `${navTopGroupLinksIds.formConvention}-entreprises`,
       },
     ],
@@ -248,12 +248,12 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
     links: [
       {
         label: "Référencer mon organisme",
-        ...routes.addAgency().link,
+        ...frontRoutes.addAgency().link,
         id: navTopGroupLinksIds.addAgencyForm,
       },
       {
         label: "Remplir la demande de convention",
-        ...routes.conventionImmersion().link,
+        ...frontRoutes.conventionImmersion().link,
         id: navTopGroupLinksIds.agencyformConvention,
       },
     ],

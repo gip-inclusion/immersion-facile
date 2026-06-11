@@ -16,8 +16,8 @@ import { useDispatch } from "react-redux";
 import {
   type ConnectedUser,
   domElementIds,
+  frontRoutes,
   looksLikeSiret,
-  routes,
   type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -38,7 +38,7 @@ const establishmentRegisterEstablishmentModal = createFormModal({
 
 const useMyProfileEstablishmentRegistrationRoute =
   makeUseTypedRoute<
-    (typeof routes.myProfileEstablishmentRegistration)["name"]
+    (typeof frontRoutes.myProfileEstablishmentRegistration)["name"]
   >();
 
 export const RequestRegisterEstablishmentsForUserForm = ({
@@ -227,7 +227,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
           {establishmentPublicOptions.length === 0 && (
             <Button
               linkProps={{
-                href: `${routes.formEstablishment().href}`,
+                href: `${frontRoutes.formEstablishment().href}`,
               }}
               className={fr.cx("fr-mt-2w")}
             >

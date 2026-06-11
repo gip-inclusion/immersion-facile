@@ -14,6 +14,7 @@ import {
   errors,
   executeInSequence,
   filterNotFalsy,
+  frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -21,7 +22,6 @@ import {
   isValidMobilePhone,
   makeRouteAbsoluteUrl,
   type ReminderKind,
-  routes,
   type TemplatedEmail,
   type TemplatedSms,
 } from "shared";
@@ -326,12 +326,12 @@ const createAgencyReminderEmail = async ({
             businessName: conventionRead.businessName,
             dateStart: conventionRead.dateStart,
             dateEnd: conventionRead.dateEnd,
-            manageConventionLink: makeRouteAbsoluteUrl(
-              routes.manageConventionConnectedUser({
+            manageConventionLink: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
                 conventionId: conventionRead.id,
               }),
-              config.immersionFacileBaseUrl,
-            ),
+              baseUrl: config.immersionFacileBaseUrl,
+            }),
           },
         }
       : {
@@ -349,12 +349,12 @@ const createAgencyReminderEmail = async ({
               lastname: conventionRead.signatories.beneficiary.lastName,
             }),
             businessName: conventionRead.businessName,
-            manageConventionLink: makeRouteAbsoluteUrl(
-              routes.manageConventionConnectedUser({
+            manageConventionLink: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
                 conventionId: conventionRead.id,
               }),
-              config.immersionFacileBaseUrl,
-            ),
+              baseUrl: config.immersionFacileBaseUrl,
+            }),
           },
         };
 

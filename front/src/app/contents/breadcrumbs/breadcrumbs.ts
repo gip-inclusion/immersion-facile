@@ -2,7 +2,7 @@ import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
 import {
   type FrontRouteKeys,
   type FrontRouteUnion,
-  routes,
+  frontRoutes,
   useRoute,
 } from "shared";
 import { makeBreadcrumbsSegments } from "src/app/utils/breadcrumbs";
@@ -22,138 +22,142 @@ export type Breadcrumbs<T extends string> = {
 
 export const defaultAncestor: BreadcrumbProps["segments"][0] = {
   label: "Accueil",
-  linkProps: routes.home().link,
+  linkProps: frontRoutes.home().link,
 };
 
 export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
   homeAgencies: {
     label: "Organismes prescripteurs",
-    route: routes.homeAgencies(),
+    route: frontRoutes.homeAgencies(),
     children: {
       addAgency: {
         label: "Inscrire mon organisme",
-        route: routes.addAgency(),
+        route: frontRoutes.addAgency(),
       },
       agencyDashboardMain: {
         label: "Tableau de bord",
-        route: routes.agencyDashboardMain(),
+        route: frontRoutes.agencyDashboardMain(),
       },
       agencyDashboardAgencyDetails: {
         label: "Détail de l'organisme",
-        route: routes.agencyDashboardAgencyDetails({ agencyId: "" }),
+        route: frontRoutes.agencyDashboardAgencyDetails({ agencyId: "" }),
       },
     },
   },
   homeCandidates: {
     label: "Candidats",
-    route: routes.homeCandidates(),
+    route: frontRoutes.homeCandidates(),
     children: {
       search: {
         label: "Recherche",
         route: () => {
           const route = useRoute();
-          return routes.search(
+          return frontRoutes.search(
             route.name === "externalSearch" ? route.params : {},
           );
         },
         children: {
           externalSearch: {
             label: "Résultats LaBonneBoite",
-            route: routes.externalSearch(),
+            route: frontRoutes.externalSearch(),
           },
         },
       },
       searchForStudent: {
         label: "Recherche scolaire",
-        route: routes.searchForStudent(),
+        route: frontRoutes.searchForStudent(),
       },
       beneficiaryDashboard: {
         label: "Tableau de bord",
-        route: routes.beneficiaryDashboard(),
+        route: frontRoutes.beneficiaryDashboard(),
       },
     },
   },
   homeEstablishments: {
     label: "Entreprises",
-    route: routes.homeEstablishments(),
+    route: frontRoutes.homeEstablishments(),
     children: {
       formEstablishment: {
         label: "Proposer une immersion",
-        route: routes.formEstablishment(),
+        route: frontRoutes.formEstablishment(),
       },
       establishmentDashboard: {
         label: "Tableau de bord",
-        route: routes.establishmentDashboard(),
+        route: frontRoutes.establishmentDashboard(),
       },
     },
   },
   initiateConvention: {
     label: "Initier une convention",
-    route: routes.initiateConvention(),
+    route: frontRoutes.initiateConvention(),
     children: {
       conventionImmersion: {
         label: "Remplir la demande de convention",
-        route: routes.conventionImmersion(),
+        route: frontRoutes.conventionImmersion(),
       },
     },
   },
   assessment: {
     label: "Bilan d'immersion",
-    route: routes.assessment({ jwt: "", conventionId: "" }),
+    route: frontRoutes.assessment({ jwt: "", conventionId: "" }),
   },
   assessmentDocument: {
     label: "Bilan d'immersion",
-    route: routes.assessmentDocument({ jwt: "", conventionId: "" }),
+    route: frontRoutes.assessmentDocument({ jwt: "", conventionId: "" }),
   },
   myProfile: {
     label: "Mon profil",
-    route: routes.myProfile(),
+    route: frontRoutes.myProfile(),
     children: {
       myProfileAgencyRegistration: {
         label: "Demander l'accès à des organismes",
-        route: routes.myProfileAgencyRegistration(),
+        route: frontRoutes.myProfileAgencyRegistration(),
       },
       myProfileEstablishmentRegistration: {
         label: "Se rattacher à une entreprise",
-        route: routes.myProfileEstablishmentRegistration(),
+        route: frontRoutes.myProfileEstablishmentRegistration(),
       },
     },
   },
   admin: {
     label: "Administration",
-    route: routes.admin(),
+    route: frontRoutes.admin(),
   },
   establishmentDashboard: {
     label: "Tableau de bord entreprise",
-    route: routes.establishmentDashboard(),
+    route: frontRoutes.establishmentDashboard(),
     children: {
       establishmentDashboardConventions: {
         label: "Conventions",
-        route: routes.establishmentDashboardConventions(),
+        route: frontRoutes.establishmentDashboardConventions(),
       },
       establishmentDashboardDiscussions: {
         label: "Discussions",
-        route: routes.establishmentDashboardDiscussions(),
+        route: frontRoutes.establishmentDashboardDiscussions(),
       },
       establishmentDashboardFormEstablishment: {
         label: "Fiche entreprise",
-        route: routes.formEstablishment(),
+        route: frontRoutes.formEstablishment(),
       },
     },
   },
   beneficiaryDashboard: {
     label: "Tableau de bord bénéficiaire",
-    route: routes.beneficiaryDashboard(),
+    route: frontRoutes.beneficiaryDashboard(),
     children: {
       beneficiaryDashboardDiscussions: {
         label: "Candidatures",
-        route: routes.beneficiaryDashboardDiscussions(),
+        route: frontRoutes.beneficiaryDashboardDiscussions(),
       },
     },
   },
   magicLinkInterstitial: {
     label: "Connexion à Immersion Facilitée",
-    route: routes.magicLinkInterstitial({ email: "", code: "", state: "" }),
+    route: frontRoutes.magicLinkInterstitial({
+      email: "",
+      code: "",
+      state: "",
+    }),
   },
 };
 
