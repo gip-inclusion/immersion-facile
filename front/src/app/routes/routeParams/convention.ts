@@ -497,7 +497,7 @@ export const conventionPresentationFromConventionDraft = (
   immersionSkills: conventionDraft.immersionSkills ?? "",
 });
 
-export const makeConventionPresentationFromConventionTemplate = (
+export const makeConventionTemplatePresentationFromConventionTemplate = (
   conventionTemplate: ConventionTemplate,
 ): CreateConventionTemplatePresentationInitialValues => {
   const { id, name, userId: _, ...conventionDraft } = conventionTemplate;
@@ -509,4 +509,19 @@ export const makeConventionPresentationFromConventionTemplate = (
     id,
     name,
   };
+};
+
+export const makeConventionPresentationFromConventionTemplate = (
+  conventionTemplate: ConventionTemplate,
+): CreateConventionPresentationInitialValues => {
+  const {
+    id: _id,
+    name: _name,
+    userId: _userId,
+    ...conventionDraft
+  } = conventionTemplate;
+  return conventionPresentationFromConventionDraft({
+    ...conventionDraft,
+    id: uuidV4(),
+  });
 };
