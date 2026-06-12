@@ -83,4 +83,12 @@
       }
     }
   }
+
+  .fr-modal & {
+    pointer-events: none;
+  }
+
+  .fr-modal--opened & {
+    pointer-events: auto;
+  }
 }
