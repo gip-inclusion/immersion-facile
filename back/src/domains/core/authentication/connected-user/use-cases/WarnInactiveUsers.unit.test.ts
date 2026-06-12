@@ -1,4 +1,10 @@
-import { addDays, subDays, subYears } from "date-fns";
+import {
+  addDays,
+  subDays,
+  subMilliseconds,
+  subMonths,
+  subYears,
+} from "date-fns";
 import {
   type AbsoluteUrl,
   ConventionDtoBuilder,
@@ -33,13 +39,13 @@ import {
   type WarnInactiveUsers,
 } from "./WarnInactiveUsers";
 
-const immersionBaseUrl: AbsoluteUrl = "https://immersion-facile.test";
-
-const now = new Date("2026-01-15T10:00:00.000Z");
-const twoYearsAgo = subYears(now, 2);
-const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
-
 describe("WarnInactiveUsers", () => {
+  const immersionBaseUrl: AbsoluteUrl = "https://immersion-facile.test";
+
+  const now = new Date("2026-01-15T10:00:00.000Z");
+  const twoYearsAgo = subYears(now, 2);
+  const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
+
   let uow: InMemoryUnitOfWork;
   let warnInactiveUsers: WarnInactiveUsers;
   let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
@@ -104,16 +110,34 @@ describe("WarnInactiveUsers", () => {
       email: "boundary@test.fr",
       lastLoginAt: twoYearsAgo.toISOString(),
     });
-    const neverLoggedInUser = makeUser({
-      id: "never-logged-id",
-      email: "never@test.fr",
+    const neverLoggedInUserAndCreatedMoreThan2YearsAgo = makeUser({
+      id: "never-logged-id-26",
+      email: "never-26@test.fr",
       firstName: "Paul",
       lastName: "Durand",
+      createdAt: subMilliseconds(twoYearsAgo, 1).toISOString(),
     });
+    const neverLoggedInUserAndCreated2YearsAgo = makeUser({
+      id: "never-logged-id-25",
+      email: "never-25@test.fr",
+      firstName: "Paul",
+      lastName: "Durand",
+      createdAt: twoYearsAgo.toISOString(),
+    });
+    const neverLoggedInUserAndCreated1MonthAgo = makeUser({
+      id: "never-logged-id-1",
+      email: "never-1@test.fr",
+      firstName: "Paul",
+      lastName: "Durand",
+      createdAt: subMonths(now, 1).toISOString(),
+    });
+
     uow.userRepository.users = [
       inactiveUser,
       boundaryActiveUser,
-      neverLoggedInUser,
+      neverLoggedInUserAndCreatedMoreThan2YearsAgo,
+      neverLoggedInUserAndCreated2YearsAgo,
+      neverLoggedInUserAndCreated1MonthAgo,
     ];
 
     const result = await warnInactiveUsers.execute();
@@ -132,9 +156,9 @@ describe("WarnInactiveUsers", () => {
         },
         {
           kind: "ACCOUNT_DELETION_WARNING",
-          recipients: [neverLoggedInUser.email],
+          recipients: [neverLoggedInUserAndCreatedMoreThan2YearsAgo.email],
           params: {
-            fullName: `${neverLoggedInUser.firstName} ${neverLoggedInUser.lastName}`,
+            fullName: `${neverLoggedInUserAndCreatedMoreThan2YearsAgo.firstName} ${neverLoggedInUserAndCreatedMoreThan2YearsAgo.lastName}`,
             deletionDate: "22 janvier 2026",
             loginUrl: `${immersionBaseUrl}/${frontRoutes.profile}`,
           },
@@ -337,26 +361,26 @@ describe("WarnInactiveUsers", () => {
     );
     expectToEqual(countingUowPerformer.getCount(), 4);
   });
-});
 
-const makeInactiveUsers = (count: number) =>
-  Array.from({ length: count }, (_, index) =>
-    makeUser({
-      id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
-      email: `inactive-${index + 1}@test.fr`,
-      lastLoginAt: inactiveLastLoginAt,
-    }),
-  );
+  const makeInactiveUsers = (count: number) =>
+    Array.from({ length: count }, (_, index) =>
+      makeUser({
+        id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
+        email: `inactive-${index + 1}@test.fr`,
+        lastLoginAt: inactiveLastLoginAt,
+      }),
+    );
 
-const makeCountingUowPerformer = (
-  uow: UnitOfWork,
-): UnitOfWorkPerformer & { getCount: () => number } => {
-  let count = 0;
-  return {
-    perform: async (cb) => {
-      count++;
-      return cb(uow);
-    },
-    getCount: () => count,
+  const makeCountingUowPerformer = (
+    uow: UnitOfWork,
+  ): UnitOfWorkPerformer & { getCount: () => number } => {
+    let count = 0;
+    return {
+      perform: async (cb) => {
+        count++;
+        return cb(uow);
+      },
+      getCount: () => count,
+    };
   };
-};
+});

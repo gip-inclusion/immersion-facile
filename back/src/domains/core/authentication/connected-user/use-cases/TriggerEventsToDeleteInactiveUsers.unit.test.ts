@@ -1,4 +1,4 @@
-import { subDays, subYears } from "date-fns";
+import { subDays, subMilliseconds, subYears } from "date-fns";
 import { expectToEqual, makeBooleanFeatureFlag } from "shared";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -22,11 +22,11 @@ import {
   type TriggerEventsToDeleteInactiveUsers,
 } from "./TriggerEventsToDeleteInactiveUsers";
 
-const now = new Date("2026-01-15T10:00:00.000Z");
-const twoYearsAgo = subYears(now, 2);
-const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
-
 describe("TriggerEventsToDeleteInactiveUsers", () => {
+  const now = new Date("2026-01-15T10:00:00.000Z");
+  const twoYearsAgo = subYears(now, 2);
+  const inactiveLastLoginAt = subDays(twoYearsAgo, 1).toISOString();
+
   let uow: InMemoryUnitOfWork;
   let triggerEventsToDeleteInactiveUsers: TriggerEventsToDeleteInactiveUsers;
   let timeGateway: CustomTimeGateway;
@@ -154,6 +154,72 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
 
     expectToEqual(result, { numberOfDeletionsTriggered: 0 });
     expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("does not trigger deletion for warned user not logged in and created 2 years ago", async () => {
+    const userNotLoggedAndCreatedTwoYearsAgo = makeUser({
+      id: "user",
+      email: "inactive@test.fr",
+      lastLoginAt: undefined,
+      createdAt: twoYearsAgo.toISOString(),
+    });
+
+    uow.userRepository.users = [userNotLoggedAndCreatedTwoYearsAgo];
+
+    saveDeletionWarningNotification({
+      uow,
+      userId: userNotLoggedAndCreatedTwoYearsAgo.id,
+      createdAt: subDays(now, 8),
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 0 });
+    expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("does not trigger deletion for warned user logged in and created 2 years ago", async () => {
+    const userLoggedAndCreatedTwoYearsAgo = makeUser({
+      id: "user",
+      email: "inactive@test.fr",
+      lastLoginAt: twoYearsAgo.toISOString(),
+      createdAt: twoYearsAgo.toISOString(),
+    });
+
+    uow.userRepository.users = [userLoggedAndCreatedTwoYearsAgo];
+
+    saveDeletionWarningNotification({
+      uow,
+      userId: userLoggedAndCreatedTwoYearsAgo.id,
+      createdAt: subDays(now, 8),
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 0 });
+    expectToEqual(uow.outboxRepository.events.length, 0);
+  });
+
+  it("not trigger deletion for warned user not logged in and created more than 2 years ago", async () => {
+    const userNotLoggedAndCreatedMoreThanTwoYearsAgo = makeUser({
+      id: "user",
+      email: "inactive@test.fr",
+      lastLoginAt: undefined,
+      createdAt: subMilliseconds(twoYearsAgo, 1).toISOString(),
+    });
+
+    uow.userRepository.users = [userNotLoggedAndCreatedMoreThanTwoYearsAgo];
+
+    saveDeletionWarningNotification({
+      uow,
+      userId: userNotLoggedAndCreatedMoreThanTwoYearsAgo.id,
+      createdAt: subDays(now, 8),
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 1 });
+    expectToEqual(uow.outboxRepository.events.length, 1);
   });
 
   it("does not trigger deletion for user who sent a recent exchange as establishment (30 days ago or 23 months ago)", async () => {
@@ -299,26 +365,26 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     );
     expectToEqual(countingUowPerformer.getCount(), 4);
   });
-});
 
-const makeInactiveUsers = (count: number) =>
-  Array.from({ length: count }, (_, index) =>
-    makeUser({
-      id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
-      email: `inactive-${index + 1}@test.fr`,
-      lastLoginAt: inactiveLastLoginAt,
-    }),
-  );
+  const makeInactiveUsers = (count: number) =>
+    Array.from({ length: count }, (_, index) =>
+      makeUser({
+        id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
+        email: `inactive-${index + 1}@test.fr`,
+        lastLoginAt: inactiveLastLoginAt,
+      }),
+    );
 
-const makeCountingUowPerformer = (
-  uow: UnitOfWork,
-): UnitOfWorkPerformer & { getCount: () => number } => {
-  let count = 0;
-  return {
-    perform: async (cb) => {
-      count++;
-      return cb(uow);
-    },
-    getCount: () => count,
+  const makeCountingUowPerformer = (
+    uow: UnitOfWork,
+  ): UnitOfWorkPerformer & { getCount: () => number } => {
+    let count = 0;
+    return {
+      perform: async (cb) => {
+        count++;
+        return cb(uow);
+      },
+      getCount: () => count,
+    };
   };
-};
+});

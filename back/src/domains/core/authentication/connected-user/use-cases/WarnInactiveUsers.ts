@@ -50,7 +50,7 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
     while (true) {
       const batchResult = await deps.uowPerformer.perform(async (uow) => {
         const loggedInLongAgoUserIds =
-          await uow.userRepository.getUserIdsLoggedInLongAgo({
+          await uow.userRepository.getUserIdsLoggedInAndCreatedLongAgo({
             since: twoYearsAgo,
             limit: deps.batchSize,
             offset,
