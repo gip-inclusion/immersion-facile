@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import { subMonths } from "date-fns";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import {
@@ -174,6 +175,10 @@ export const ConventionValidation = ({
     );
   };
 
+  const shouldShowArchivedConventionWarning =
+    currentUser?.isBackofficeAdmin &&
+    new Date(convention.dateEnd) < subMonths(new Date(), 25);
+
   return (
     <>
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-3w")}>
@@ -203,6 +208,7 @@ export const ConventionValidation = ({
             }
           </Badge>
         )}
+        {shouldShowArchivedConventionWarning && <Badge>Archivée</Badge>}
       </div>
       <h1 className={fr.cx("fr-h3")}>{title}</h1>
       {convention.statusJustification && (
