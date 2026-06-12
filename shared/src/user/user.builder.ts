@@ -107,10 +107,10 @@ export class ConnectedUserBuilder implements Builder<ConnectedUser> {
     return this.#dto.agencyRights;
   }
 
-  withCreatedAt(createdAt: Date): ConnectedUserBuilder {
+  withCreatedAt(createdAt: Date | undefined): ConnectedUserBuilder {
     return new ConnectedUserBuilder({
       ...this.#dto,
-      createdAt: createdAt.toISOString(),
+      ...(createdAt ? { createdAt: createdAt.toISOString() } : {}),
     });
   }
 

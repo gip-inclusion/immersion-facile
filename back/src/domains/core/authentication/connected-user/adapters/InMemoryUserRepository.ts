@@ -136,13 +136,17 @@ export class InMemoryUserRepository implements UserRepository {
     return values(this.#usersById);
   }
 
-  public async getUserIdsLoggedInLongAgo({
+  public async getUserIdsLoggedInAndCreatedLongAgo({
     since,
     limit,
     offset,
   }: GetUserIdsLoggedInLongAgoParams): Promise<UserId[]> {
     return values(this.#usersById)
-      .filter((user) => !user.lastLoginAt || new Date(user.lastLoginAt) < since)
+      .filter((user) =>
+        !user.lastLoginAt
+          ? new Date(user.createdAt) < since
+          : new Date(user.lastLoginAt) < since,
+      )
       .sort((a, b) => a.id.localeCompare(b.id))
       .slice(offset, offset + limit)
       .map((u) => u.id);
