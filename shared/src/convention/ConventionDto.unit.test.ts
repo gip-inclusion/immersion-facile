@@ -33,6 +33,7 @@ import {
   type ConventionInternshipKindSpecific,
   type ConventionReadDto,
   conventionStatuses,
+  type EditConventionWithFinalStatusFormValues,
   type EstablishmentRepresentative,
   type InternshipKind,
   maximumCalendarDayByInternshipKind,
@@ -1462,7 +1463,7 @@ describe("conventionDtoSchema", () => {
 describe("editConventionWithFinalStatusFormSchema", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
-  const validFormValues = {
+  const validFormValues: EditConventionWithFinalStatusFormValues = {
     conventionId,
     establishmentTutor: {
       firstname: "Marie",
