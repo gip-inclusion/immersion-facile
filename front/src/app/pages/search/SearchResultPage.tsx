@@ -1,7 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import {
   type ElementRef,
   type ReactNode,
@@ -14,6 +15,7 @@ import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
+  type ConnectedUser,
   type ContactMode,
   frontRoutes,
   getMapsLink,
@@ -38,6 +40,7 @@ import { defaultPageMetaContents } from "src/app/contents/meta/metaContents";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchResultRoute } from "src/app/routes/routes.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 
@@ -91,6 +94,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
   const currentSearchResult = useAppSelector(
     searchSelectors.currentSearchResult,
   );
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const defaultMetaContents = defaultPageMetaContents.searchResult;
   const isLoading = useAppSelector(searchSelectors.isLoading);
   const formContactRef = useRef<ElementRef<"div">>(null);
@@ -143,7 +147,11 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
       behavior: "smooth",
     });
     setShowConfirmationMessage(
-      getFeedBackContent(currentSearchResult?.contactMode)?.content,
+      getFeedBackContent(
+        currentUser,
+        onGoBackClick,
+        currentSearchResult?.contactMode,
+      )?.content,
     );
   };
   const scrollToContactForm = () => {
@@ -416,11 +424,9 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
         )}
         {currentSearchResult?.contactMode && showConfirmationMessage && (
           <FullPageFeedback
-            {...feedbackMessageByContactMode[currentSearchResult.contactMode]}
-            buttonProps={{
-              children: "Retour à la recherche",
-              onClick: onGoBackClick,
-            }}
+            {...feedbackMessageByContactMode(currentUser, onGoBackClick)[
+              currentSearchResult.contactMode
+            ]}
             includeWrapper={false}
           />
         )}
@@ -433,27 +439,59 @@ type CreateDiscussionFeedbackContent = {
   content: ReactNode;
   illustration: string;
   title: string;
+  buttons: ButtonProps[];
 };
 
 const getFeedBackContent = (
+  currentUser: ConnectedUser | null,
+  onGoBackClick: () => void,
   contactMode?: ContactMode,
 ): CreateDiscussionFeedbackContent | null => {
-  return contactMode ? feedbackMessageByContactMode[contactMode] : null;
+  return contactMode
+    ? feedbackMessageByContactMode(currentUser, onGoBackClick)[contactMode]
+    : null;
 };
 
-const feedbackMessageByContactMode: Record<
-  ContactMode,
-  CreateDiscussionFeedbackContent
-> = {
+const feedbackMessageByContactMode = (
+  currentUser: ConnectedUser | null,
+  onGoBackClick: () => void,
+): Record<ContactMode, CreateDiscussionFeedbackContent> => ({
   EMAIL: {
     content: (
       <>
-        L’entreprise a bien <strong>reçu votre email</strong>. Laissez-lui un
-        peu de temps pour vous répondre avant de la relancer.
+        <p>
+          L’entreprise a bien reçu votre e-mail. Laissez-lui quelques jours pour
+          vous répondre avant de la relancer.
+        </p>
+        <p>
+          Gardez à l'esprit que les entreprises manquent parfois de temps et ne
+          peuvent pas répondre à toutes les sollicitations : une absence de
+          retour ne remet pas en cause votre valeur ! Contactez en moyenne 3
+          entreprises pour maximiser vos chances d'obtenir une réponse
+          favorable.
+        </p>
+        <Highlight>
+          <strong>Suivez l'avancée de votre demande</strong> : Vous pouvez
+          retrouver cette candidature et répondre aux futurs messages de
+          l'entreprise directement depuis votre espace personnel.
+        </Highlight>
       </>
     ),
     illustration: commonIllustrations.contact,
-    title: "Bravo !",
+    title: "Votre demande de contact a bien été envoyée !",
+    buttons: [
+      {
+        children: currentUser ? "Accéder à mon espace" : "Me connecter",
+        onClick: () => {
+          routes.beneficiaryDashboard().push();
+        },
+      },
+      {
+        children: "Retour à la recherche",
+        onClick: onGoBackClick,
+        priority: "secondary",
+      },
+    ],
   },
   PHONE: {
     content: (
@@ -464,6 +502,12 @@ const feedbackMessageByContactMode: Record<
     ),
     illustration: commonIllustrations.inscription,
     title: "Merci pour votre intérêt !",
+    buttons: [
+      {
+        children: "Retour à la recherche",
+        onClick: onGoBackClick,
+      },
+    ],
   },
   IN_PERSON: {
     content: (
@@ -475,5 +519,11 @@ const feedbackMessageByContactMode: Record<
     ),
     illustration: commonIllustrations.annuaireDesEntreprises,
     title: "Merci pour votre intérêt !",
+    buttons: [
+      {
+        children: "Retour à la recherche",
+        onClick: onGoBackClick,
+      },
+    ],
   },
-};
+});

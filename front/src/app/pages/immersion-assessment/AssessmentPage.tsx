@@ -9,7 +9,7 @@ import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  frontRoutes,
+  type frontRoutes,
   getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
   type Role,
@@ -145,25 +145,27 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
             ) : null}
           </>
         }
-        buttonProps={{
-          ...(roles.includes("establishment-tutor")
-            ? {
-                children: isEstablishmentRegistered
-                  ? "Accéder à ma fiche entreprise"
-                  : "Créer mon espace",
-                onClick: () => {
-                  isEstablishmentRegistered
-                    ? frontRoutes.establishmentDashboard().push()
-                    : frontRoutes.formEstablishment().push();
-                },
-              }
-            : {
-                children: "Accéder à mon espace prescripteur",
-                onClick: () => {
-                  frontRoutes.agencyDashboard().push();
-                },
-              }),
-        }}
+        buttons={[
+          {
+            ...(roles.includes("establishment-tutor")
+              ? {
+                  children: isEstablishmentRegistered
+                    ? "Accéder à ma fiche entreprise"
+                    : "Créer mon espace",
+                  onClick: () => {
+                    isEstablishmentRegistered
+                      ? routes.establishmentDashboard().push()
+                      : routes.formEstablishment().push();
+                  },
+                }
+              : {
+                  children: "Accéder à mon espace prescripteur",
+                  onClick: () => {
+                    routes.agencyDashboard().push();
+                  },
+                }),
+          },
+        ]}
       />
     );
 

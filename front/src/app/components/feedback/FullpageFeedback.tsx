@@ -15,12 +15,12 @@ export const FullPageFeedback = ({
   titleAs,
   illustration,
   content,
-  buttonProps,
+  buttons,
   includeWrapper = true,
 }: FullPageFeedbackProps) => {
   const feedbackContent = (
     <FeedbackContent
-      buttonProps={buttonProps}
+      buttons={buttons}
       illustration={illustration}
       title={title}
       titleAs={titleAs}

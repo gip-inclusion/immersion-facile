@@ -123,16 +123,18 @@ export const ConventionConfirmationPage = ({
               </p>
             </>
           }
-          buttonProps={{
-            id: domElementIds.conventionImmersion.conventionConfirmation
-              .copyConventionIdButton,
-            children: copyButtonLabel,
-            disabled: copyButtonIsDisabled,
-            onClick: () => onCopyButtonClick(conventionId),
-            priority: "primary",
-            size: "small",
-            iconId: "fr-icon-clipboard-line",
-          }}
+          buttons={[
+            {
+              id: domElementIds.conventionImmersion.conventionConfirmation
+                .copyConventionIdButton,
+              children: copyButtonLabel,
+              disabled: copyButtonIsDisabled,
+              onClick: () => onCopyButtonClick(conventionId),
+              priority: "primary",
+              size: "small",
+              iconId: "fr-icon-clipboard-line",
+            },
+          ]}
         />
         <SectionConventionNextSteps nextSteps={nextSteps} />
       </MainWrapper>

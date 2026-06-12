@@ -62,19 +62,21 @@ export const MagicLinkInterstitialPage = () => {
             compte <strong>{email}</strong>, souhaitez-vous continuer ?
           </p>
         }
-        buttonProps={{
-          children: "Oui, me connecter à Immersion Facilitée",
-          onClick: () => {
-            dispatch(
-              authSlice.actions.confirmLoginByMagicLinkRequested({
-                code,
-                state,
-                email,
-                feedbackTopic: "magic-link-interstitial",
-              }),
-            );
+        buttons={[
+          {
+            children: "Oui, me connecter à Immersion Facilitée",
+            onClick: () => {
+              dispatch(
+                authSlice.actions.confirmLoginByMagicLinkRequested({
+                  code,
+                  state,
+                  email,
+                  feedbackTopic: "magic-link-interstitial",
+                }),
+              );
+            },
           },
-        }}
+        ]}
       />
     </WithFeedbackReplacer>
   );
