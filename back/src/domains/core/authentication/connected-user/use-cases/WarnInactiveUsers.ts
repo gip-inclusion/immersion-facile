@@ -49,14 +49,14 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
 
     while (true) {
       const batchResult = await deps.uowPerformer.perform(async (uow) => {
-        const loggedInLongAgoUserIds =
+        const userIdsLoggedInAndCreatedLongAgo =
           await uow.userRepository.getUserIdsLoggedInAndCreatedLongAgo({
             since: twoYearsAgo,
             limit: deps.batchSize,
             offset,
           });
 
-        if (loggedInLongAgoUserIds.length === 0)
+        if (userIdsLoggedInAndCreatedLongAgo.length === 0)
           return {
             hasMore: false,
             numberOfWarningsSent: 0,
@@ -65,13 +65,13 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         const alreadyWarnedUserIds =
           await uow.notificationRepository.filterUserDeletionWarningNotifications(
             {
-              userIds: loggedInLongAgoUserIds,
+              userIds: userIdsLoggedInAndCreatedLongAgo,
               excludeWarnedSince: warningCutoff,
             },
           );
 
         const alreadyWarned = new Set(alreadyWarnedUserIds);
-        const notYetWarnedUserIds = loggedInLongAgoUserIds.filter(
+        const notYetWarnedUserIds = userIdsLoggedInAndCreatedLongAgo.filter(
           (id) => !alreadyWarned.has(id),
         );
 

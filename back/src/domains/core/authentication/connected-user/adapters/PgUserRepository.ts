@@ -15,7 +15,7 @@ import {
   type KyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import type {
-  GetUserIdsLoggedInLongAgoParams,
+  GetUserIdsLoggedInAndCreatedLongAgoParams,
   UserRepository,
 } from "../port/UserRepository";
 
@@ -199,7 +199,7 @@ export class PgUserRepository implements UserRepository {
     since,
     limit,
     offset,
-  }: GetUserIdsLoggedInLongAgoParams): Promise<UserId[]> {
+  }: GetUserIdsLoggedInAndCreatedLongAgoParams): Promise<UserId[]> {
     const rows = await this.transaction
       .selectFrom("users")
       .select("users.id")

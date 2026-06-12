@@ -426,8 +426,8 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       lastLoginAt: overrides.lastLoginAt,
     });
 
-    it("returns never-logged-in users when last_login_at is null", async () => {
-      const neverLoggedIn = makeUserWithOldLogin({
+    it("returns users never logged after since param", async () => {
+      const logged3yrAgo = makeUserWithOldLogin({
         id: uuid(),
         email: "never-logged@test.fr",
         lastLoginAt: threeYearsAgoIso,
@@ -438,7 +438,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
         lastLoginAt: oneYearAgo.toISOString(),
       });
 
-      await userRepository.save(neverLoggedIn);
+      await userRepository.save(logged3yrAgo);
       await userRepository.save(recentlyActiveUser);
 
       const result = await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
@@ -447,7 +447,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
         offset: 0,
       });
 
-      expectArraysToEqualIgnoringOrder(result, [neverLoggedIn.id]);
+      expectArraysToEqualIgnoringOrder(result, [logged3yrAgo.id]);
     });
 
     it("returns users with old login", async () => {
