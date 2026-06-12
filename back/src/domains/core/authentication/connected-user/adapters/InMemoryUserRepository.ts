@@ -8,7 +8,7 @@ import {
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 import type {
-  GetUserIdsLoggedInLongAgoParams,
+  GetUserIdsLoggedInAndCreatedLongAgoParams,
   UserRepository,
 } from "../port/UserRepository";
 
@@ -140,7 +140,7 @@ export class InMemoryUserRepository implements UserRepository {
     since,
     limit,
     offset,
-  }: GetUserIdsLoggedInLongAgoParams): Promise<UserId[]> {
+  }: GetUserIdsLoggedInAndCreatedLongAgoParams): Promise<UserId[]> {
     return values(this.#usersById)
       .filter((user) =>
         !user.lastLoginAt

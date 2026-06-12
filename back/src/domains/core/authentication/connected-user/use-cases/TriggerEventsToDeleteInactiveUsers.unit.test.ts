@@ -200,7 +200,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     expectToEqual(uow.outboxRepository.events.length, 0);
   });
 
-  it("not trigger deletion for warned user not logged in and created more than 2 years ago", async () => {
+  it("trigger deletion for warned user that never logged in and created more than 2 years ago", async () => {
     const userNotLoggedAndCreatedMoreThanTwoYearsAgo = makeUser({
       id: "user",
       email: "inactive@test.fr",
