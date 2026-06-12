@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -141,7 +142,10 @@ export const EditConventionWithFinalStatusModalContent = ({
       <p className={fr.cx("fr-text--sm", "fr-mb-2w")}>
         <strong>ID :</strong> {convention.id}
       </p>
-
+      <Highlight className={fr.cx("fr-ml-0")} size="sm">
+        La convention étant déjà validée, seules certaines informations peuvent
+        encore être modifiées.
+      </Highlight>
       {canEditBeneficiary && (
         <div className={fr.cx("fr-card", "fr-p-2w", "fr-mb-3w")}>
           <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Personne en immersion</h3>
