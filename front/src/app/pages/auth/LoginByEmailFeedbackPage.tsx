@@ -158,7 +158,7 @@ export const LoginByEmailFeedbackPage = ({
         title={contents[mode].title}
         illustration={loginIllustration}
         content={contents[mode].content}
-        buttonProps={contents[mode].buttonProps}
+        buttons={[contents[mode].buttonProps]}
       />
     </>
   );

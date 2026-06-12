@@ -10,7 +10,7 @@ import {
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   escapeHtml,
-  frontRoutes,
+  type frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileHelpdeskRootUrl,
   isAssessmentDto,
@@ -154,10 +154,12 @@ export const AssessmentDocumentPage = ({
             </p>
           </>
         }
-        buttonProps={{
-          children: "Retourner sur la page d’accueil",
-          onClick: () => frontRoutes.home().push(),
-        }}
+        buttons={[
+          {
+            children: "Retourner sur la page d’accueil",
+            onClick: () => routes.home().push(),
+          },
+        ]}
       />
     );
   if (isSignAssessmentSuccess)
@@ -182,10 +184,12 @@ export const AssessmentDocumentPage = ({
             </p>
           </>
         }
-        buttonProps={{
-          children: "Découvrir d'autres immersions",
-          onClick: () => frontRoutes.search().push(),
-        }}
+        buttons={[
+          {
+            children: "Découvrir d'autres immersions",
+            onClick: () => routes.search().push(),
+          },
+        ]}
       />
     );
 

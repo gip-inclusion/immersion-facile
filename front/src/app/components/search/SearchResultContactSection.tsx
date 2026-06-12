@@ -49,11 +49,13 @@ export const SearchResultContactSection = ({
                 </Highlight>
               </>
             }
-            buttonProps={{
-              children: "Rechercher une autre entreprise",
-              onClick: onButtonClick,
-              iconId: "fr-icon-search-line",
-            }}
+            buttons={[
+              {
+                children: "Rechercher une autre entreprise",
+                onClick: onButtonClick,
+                iconId: "fr-icon-search-line",
+              },
+            ]}
             illustration={commonIllustrations.error}
             titleClassName="fr-h3"
           />
