@@ -1,4 +1,4 @@
-import { subYears } from "date-fns";
+import { subMilliseconds, subYears } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
@@ -406,7 +406,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
     });
   });
 
-  describe("getUserIdsLoggedInLongAgo()", () => {
+  describe("getUserIdsLoggedInAndCreatedLongAgo()", () => {
     const now = new Date("2026-01-15T10:00:00.000Z");
     const twoYearsAgo = subYears(now, 2);
     const oneYearAgo = subYears(now, 1);
@@ -419,16 +419,18 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       email: overrides.email,
       firstName: overrides.firstName ?? "Jean",
       lastName: overrides.lastName ?? "Dupont",
-      createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
+      createdAt:
+        overrides.createdAt ??
+        new Date("2024-04-28T12:00:00.000Z").toISOString(),
       proConnect: null,
-      lastLoginAt: overrides.lastLoginAt ?? threeYearsAgoIso,
+      lastLoginAt: overrides.lastLoginAt,
     });
 
     it("returns never-logged-in users when last_login_at is null", async () => {
       const neverLoggedIn = makeUserWithOldLogin({
         id: uuid(),
         email: "never-logged@test.fr",
-        lastLoginAt: undefined,
+        lastLoginAt: threeYearsAgoIso,
       });
       const recentlyActiveUser = makeUserWithOldLogin({
         id: uuid(),
@@ -439,7 +441,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       await userRepository.save(neverLoggedIn);
       await userRepository.save(recentlyActiveUser);
 
-      const result = await userRepository.getUserIdsLoggedInLongAgo({
+      const result = await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
         since: twoYearsAgo,
         limit: 100,
         offset: 0,
@@ -452,6 +454,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       const inactiveUser = makeUserWithOldLogin({
         id: uuid(),
         email: "inactive@test.fr",
+        lastLoginAt: threeYearsAgoIso,
       });
       const recentlyActiveUser = makeUserWithOldLogin({
         id: uuid(),
@@ -461,7 +464,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       await userRepository.save(inactiveUser);
       await userRepository.save(recentlyActiveUser);
 
-      const result = await userRepository.getUserIdsLoggedInLongAgo({
+      const result = await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
         since: twoYearsAgo,
         limit: 100,
         offset: 0,
@@ -474,14 +477,17 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       const inactiveUserA = makeUserWithOldLogin({
         id: "11111111-1111-4111-9111-111111111111",
         email: "inactive-a@test.fr",
+        lastLoginAt: threeYearsAgoIso,
       });
       const inactiveUserB = makeUserWithOldLogin({
         id: "22222222-2222-4222-9222-222222222222",
         email: "inactive-b@test.fr",
+        lastLoginAt: threeYearsAgoIso,
       });
       const inactiveUserC = makeUserWithOldLogin({
         id: "33333333-3333-4333-9333-333333333333",
         email: "inactive-c@test.fr",
+        lastLoginAt: threeYearsAgoIso,
       });
       await Promise.all([
         userRepository.save(inactiveUserC),
@@ -489,19 +495,75 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
         userRepository.save(inactiveUserB),
       ]);
 
-      const firstPage = await userRepository.getUserIdsLoggedInLongAgo({
-        since: twoYearsAgo,
-        limit: 2,
-        offset: 0,
-      });
-      const secondPage = await userRepository.getUserIdsLoggedInLongAgo({
-        since: twoYearsAgo,
-        limit: 2,
-        offset: 2,
-      });
+      const firstPage =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
+          since: twoYearsAgo,
+          limit: 2,
+          offset: 0,
+        });
+      const secondPage =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
+          since: twoYearsAgo,
+          limit: 2,
+          offset: 2,
+        });
 
       expectToEqual(firstPage, [inactiveUserA.id, inactiveUserB.id]);
       expectToEqual(secondPage, [inactiveUserC.id]);
+    });
+
+    it("returns user that are created since expected date", async () => {
+      const moreThanTwoYearsAgo = subMilliseconds(twoYearsAgo, 1).toISOString();
+
+      const notLoggedInAndCreatedNow = makeUserWithOldLogin({
+        id: "11111111-1111-4111-9111-111111111111",
+        email: "created-now@test.fr",
+        lastLoginAt: undefined,
+        createdAt: now.toISOString(),
+      });
+      const loggedInNowAndCreatedMoreThan2YrAgo = makeUserWithOldLogin({
+        id: "33333333-3333-4333-9333-333333333333",
+        email: "active-now@test.fr",
+        createdAt: twoYearsAgo.toISOString(),
+        lastLoginAt: now.toISOString(),
+      });
+      const notLoggedInAndCreatedMoreThan2YrAgo = makeUserWithOldLogin({
+        id: "22222222-2222-4222-9222-222222222222",
+        email: "inactive-not-loggedin@test.fr",
+        lastLoginAt: undefined,
+        createdAt: moreThanTwoYearsAgo,
+      });
+      const loggedInAndCreatedMoreThan2YrAgo = makeUserWithOldLogin({
+        id: "44444444-4444-4444-4444-444444444444",
+        email: "inactive-@test.fr",
+        createdAt: moreThanTwoYearsAgo,
+        lastLoginAt: moreThanTwoYearsAgo,
+      });
+      await Promise.all([
+        userRepository.save(loggedInNowAndCreatedMoreThan2YrAgo),
+        userRepository.save(notLoggedInAndCreatedNow),
+        userRepository.save(notLoggedInAndCreatedMoreThan2YrAgo),
+        userRepository.save(loggedInAndCreatedMoreThan2YrAgo),
+      ]);
+
+      const firstPage =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
+          since: twoYearsAgo,
+          limit: 2,
+          offset: 0,
+        });
+      const secondPage =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
+          since: twoYearsAgo,
+          limit: 1,
+          offset: 1,
+        });
+
+      expectToEqual(firstPage, [
+        notLoggedInAndCreatedMoreThan2YrAgo.id,
+        loggedInAndCreatedMoreThan2YrAgo.id,
+      ]);
+      expectToEqual(secondPage, [loggedInAndCreatedMoreThan2YrAgo.id]);
     });
   });
 });
