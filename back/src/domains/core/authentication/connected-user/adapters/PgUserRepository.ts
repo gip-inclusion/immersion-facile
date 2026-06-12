@@ -195,7 +195,7 @@ export class PgUserRepository implements UserRepository {
     return usersInDb;
   }
 
-  public async getUserIdsLoggedInLongAgo({
+  public async getUserIdsLoggedInAndCreatedLongAgo({
     since,
     limit,
     offset,
@@ -203,10 +203,13 @@ export class PgUserRepository implements UserRepository {
     const rows = await this.transaction
       .selectFrom("users")
       .select("users.id")
-      .where(({ eb, or }) =>
+      .where(({ eb, or, and }) =>
         or([
           eb("users.last_login_at", "<", since),
-          eb("users.last_login_at", "is", null),
+          and([
+            eb("users.last_login_at", "is", null),
+            eb("users.created_at", "<", since.toISOString()),
+          ]),
         ]),
       )
       .orderBy("users.id")
