@@ -9,7 +9,7 @@ import {
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  type frontRoutes,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
   type Role,
@@ -154,14 +154,14 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                     : "Créer mon espace",
                   onClick: () => {
                     isEstablishmentRegistered
-                      ? routes.establishmentDashboard().push()
-                      : routes.formEstablishment().push();
+                      ? frontRoutes.establishmentDashboard().push()
+                      : frontRoutes.formEstablishment().push();
                   },
                 }
               : {
                   children: "Accéder à mon espace prescripteur",
                   onClick: () => {
-                    routes.agencyDashboard().push();
+                    frontRoutes.agencyDashboard().push();
                   },
                 }),
           },
