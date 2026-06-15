@@ -1,25 +1,29 @@
 import { expectToEqual } from "shared";
-import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemoryAppellationsGateway } from "../adapters/InMemoryAppellationsGateway";
-import { InMemoryRomeRepository } from "../adapters/InMemoryRomeRepository";
-import { AppellationSearch } from "./AppellationSearch";
+import {
+  type AppellationSearch,
+  makeAppellationSearch,
+} from "./AppellationSearch";
 
 describe("AppellationSearch", () => {
-  let romeRepo: InMemoryRomeRepository;
+  let uow: InMemoryUnitOfWork;
   let appellationsGateway: InMemoryAppellationsGateway;
   let appellationSearch: AppellationSearch;
 
   beforeEach(() => {
-    romeRepo = new InMemoryRomeRepository();
+    uow = createInMemoryUow();
     appellationsGateway = new InMemoryAppellationsGateway();
-    appellationSearch = new AppellationSearch(
-      new InMemoryUowPerformer({
-        ...createInMemoryUow(),
-        romeRepository: romeRepo,
-      }),
-      appellationsGateway,
-    );
+    appellationSearch = makeAppellationSearch({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        appellationsGateway,
+      },
+    });
   });
 
   it("returns the list of found matches with ranges", async () => {
@@ -87,7 +91,7 @@ describe("AppellationSearch", () => {
         },
       ]);
 
-      romeRepo.appellations = [
+      uow.romeRepository.appellations = [
         {
           romeCode: "M1607",
           appellationCode: "19364",
@@ -140,7 +144,7 @@ describe("AppellationSearch", () => {
         },
       ]);
 
-      romeRepo.appellations = [
+      uow.romeRepository.appellations = [
         {
           romeCode: "M1607",
           appellationCode: "19364",
