@@ -424,7 +424,7 @@ export const SearchResultPage = ({ isExternal }: { isExternal: boolean }) => {
         )}
         {currentSearchResult?.contactMode && showConfirmationMessage && (
           <FullPageFeedback
-            {...feedbackMessageByContactMode(currentUser, onGoBackClick)[
+            {...feedbackMessageByContactMode({ currentUser, onGoBackClick })[
               currentSearchResult.contactMode
             ]}
             includeWrapper={false}
@@ -448,14 +448,17 @@ const getFeedBackContent = (
   contactMode?: ContactMode,
 ): CreateDiscussionFeedbackContent | null => {
   return contactMode
-    ? feedbackMessageByContactMode(currentUser, onGoBackClick)[contactMode]
+    ? feedbackMessageByContactMode({ currentUser, onGoBackClick })[contactMode]
     : null;
 };
 
-const feedbackMessageByContactMode = (
-  currentUser: ConnectedUser | null,
-  onGoBackClick: () => void,
-): Record<ContactMode, CreateDiscussionFeedbackContent> => ({
+const feedbackMessageByContactMode = ({
+  currentUser,
+  onGoBackClick,
+}: {
+  currentUser: ConnectedUser | null;
+  onGoBackClick: () => void;
+}): Record<ContactMode, CreateDiscussionFeedbackContent> => ({
   EMAIL: {
     content: (
       <>
