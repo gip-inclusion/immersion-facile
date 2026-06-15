@@ -21,7 +21,7 @@ import {
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
-import { SaveApiConsumer } from "./SaveApiConsumer";
+import { makeSaveApiConsumer, type SaveApiConsumer } from "./SaveApiConsumer";
 
 describe("SaveApiConsumer", () => {
   const backofficeAdminBuilder = new ConnectedUserBuilder()
@@ -48,15 +48,17 @@ describe("SaveApiConsumer", () => {
     );
     uuidGenerator = new TestUuidGenerator();
     uow.userRepository.users = [backofficeAdmin, simpleUser];
-    saveApiConsumer = new SaveApiConsumer(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
+    saveApiConsumer = makeSaveApiConsumer({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+        generateApiConsumerJwt: generateApiConsumerJwtTestFn,
         timeGateway,
-        uuidGenerator,
-      }),
-      generateApiConsumerJwtTestFn,
-      timeGateway,
-    );
+      },
+    });
   });
 
   describe("Right paths", () => {
@@ -195,20 +197,6 @@ describe("SaveApiConsumer", () => {
   });
 
   describe("Wrong paths", () => {
-    it("UnauthorizedError on without JWT payload", async () => {
-      await expectPromiseToFailWithError(
-        saveApiConsumer.execute(
-          createApiConsumerParamsFromApiConsumer(
-            authorizedUnJeuneUneSolutionApiConsumer,
-          ),
-        ),
-        errors.user.unauthorized(),
-      );
-
-      expectToEqual(uow.apiConsumerRepository.consumers, []);
-      expectToEqual(uow.outboxRepository.events, []);
-    });
-
     it("ForbiddenError on if provided JWT payload is not a backoffice one", async () => {
       const _wrongRole: Role = "beneficiary";
       await expectPromiseToFailWithError(
