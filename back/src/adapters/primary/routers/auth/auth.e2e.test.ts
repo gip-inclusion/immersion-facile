@@ -18,6 +18,7 @@ import {
   expectToEqual,
   FTConnectError,
   frontRoutes,
+  legacyFrontRoutes,
   ManagedFTConnectError,
   makeRouteAbsoluteUrl,
   noAgencyDashboards,
@@ -29,7 +30,6 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
   UserBuilder,
-  legacyFrontRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -574,7 +574,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${frontRoutes.temporaryError}?kind=peConnectNoAuthorisation`,
+              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.error}`,
             },
           });
         });
@@ -606,7 +606,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${frontRoutes.temporaryError}?title=${encodeURIComponent(rawErrorTitle)}&message=${encodeURIComponent(rawErrorMessage)}`,
+              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.error}?title=${encodeURIComponent(rawErrorTitle)}&message=${encodeURIComponent(rawErrorMessage)}`,
             },
           });
         });

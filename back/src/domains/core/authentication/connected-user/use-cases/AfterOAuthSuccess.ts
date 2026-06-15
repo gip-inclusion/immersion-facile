@@ -9,11 +9,11 @@ import {
   executeInSequence,
   type FederatedIdentityProvider,
   frontRoutes,
+  makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
   oAuthSuccessLoginParamsSchema,
   type UserId,
   type UserWithAdminRights,
-  makeRouteAbsoluteUrl,
 } from "shared";
 import { match } from "ts-pattern";
 import type { GenerateConnectedUserLoginUrl } from "../../../../../config/bootstrap/magicLinkUrl";

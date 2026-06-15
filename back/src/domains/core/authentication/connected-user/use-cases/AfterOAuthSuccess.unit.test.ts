@@ -8,7 +8,9 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   type IdToken,
+  makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
   type SiretDto,
   type UserWithAdminRights,
@@ -756,7 +758,14 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         expectToEqual(uow.conventionDraftRepository.conventionDrafts, []);
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}&fedIdToken=id-token`,
+          redirectUri: makeRouteAbsoluteUrl({
+            route: frontRoutes.conventionImmersion({
+              fedId: authFailed,
+              fedIdToken: idToken,
+              fedIdProvider: "peConnect",
+            }),
+            baseUrl: immersionFacileBaseUrl,
+          }),
         });
       });
     });

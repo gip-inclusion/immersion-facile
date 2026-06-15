@@ -37,10 +37,7 @@ export const createAuthRouter = (deps: AppDependencies) => {
         return res.status(302).redirect(useCaseResult.redirectUri);
       } catch (error) {
         if (error instanceof ManagedFTConnectError)
-          return deps.errorHandlers.handleManagedRedirectResponseError(
-            error,
-            res,
-          );
+          return deps.errorHandlers.handleManagedRedirectResponseError(res);
         if (error instanceof FTConnectError)
           return deps.errorHandlers.handleRawRedirectResponseError(error, res);
         throw error;

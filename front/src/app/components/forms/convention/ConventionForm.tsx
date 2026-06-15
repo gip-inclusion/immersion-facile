@@ -43,7 +43,6 @@ import {
   type ExcludeFromExisting,
   errors as errorMessage,
   establishmentFormOfferSchema,
-  type FederatedIdentityWithUser,
   frontRoutes,
   type ftConnectParams,
   type InternshipKind,
