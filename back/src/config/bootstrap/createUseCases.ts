@@ -90,7 +90,7 @@ import { makeUpdateConventionStatus } from "../../domains/convention/use-cases/U
 import { makeLookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { makeLookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
 import { makeBroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
-import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
+import { makeDeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
 import { makeRevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
@@ -387,7 +387,6 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.timeGateway,
       ),
-      deleteSubscription: new DeleteSubscription(uowPerformer),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
       saveApiConsumer: new SaveApiConsumer(
         uowPerformer,
@@ -396,6 +395,8 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
     }),
+
+    deleteSubscription: makeDeleteSubscription({ uowPerformer }),
 
     addValidatedConventionNPS: makeAddValidatedConventionNps({
       uowPerformer,

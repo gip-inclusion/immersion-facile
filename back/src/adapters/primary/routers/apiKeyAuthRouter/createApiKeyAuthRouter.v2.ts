@@ -151,7 +151,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.deleteSubscription.execute(
           req.params.subscriptionId,
-          req.apiConsumer,
+          getGenericAuthOrThrow(req.apiConsumer),
         ),
       ),
   );
