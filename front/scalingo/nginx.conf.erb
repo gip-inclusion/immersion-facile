@@ -45,3 +45,24 @@ location = /etablissement {
 location = /recherche-diagoriente {
     return 301 $scheme://$http_host/recherche;
 }
+
+location ~ ^/tableau-de-bord-beneficiaire(.*)$ {
+    return 301 $scheme://$http_host/mon-compte/tableau-de-bord-beneficiaire$1$is_args$args;
+}
+
+location ~ ^/tableau-de-bord-agence(.*)$ {
+    return 301 $scheme://$http_host/mon-compte/tableau-de-bord-agence$1$is_args$args;
+}
+
+location ~ ^/agence-dashboard(.*)$ {
+    return 301 $scheme://$http_host/mon-compte/tableau-de-bord-agence$1$is_args$args;
+}
+
+location ~ ^/tableau-de-bord-etablissement(.*)$ {
+    return 301 $scheme://$http_host/mon-compte/tableau-de-bord-etablissement$1$is_args$args;
+}
+
+location ~ ^/mon-profil(.*)$ {
+    return 301 $scheme://$http_host/mon-compte$1$is_args$args;
+}
+
