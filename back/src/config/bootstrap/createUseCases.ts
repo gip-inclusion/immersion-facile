@@ -164,7 +164,7 @@ import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { makeInsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { makeMarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
-import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
+import { makeMarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
@@ -334,12 +334,6 @@ export const createUseCases = ({
         uowPerformer,
         gateways.timeGateway,
       ),
-
-      markEstablishmentLeadAsRegistrationRejected:
-        new MarkEstablishmentLeadAsRegistrationRejected(
-          uowPerformer,
-          gateways.timeGateway,
-        ),
       contactEstablishment: new ContactEstablishment(
         uowPerformer,
         createNewEvent,
@@ -541,6 +535,13 @@ export const createUseCases = ({
 
     markEstablishmentLeadAsRegistrationAccepted:
       makeMarkEstablishmentLeadAsRegistrationAccepted({
+        uowPerformer,
+        deps: {
+          timeGateway: gateways.timeGateway,
+        },
+      }),
+    markEstablishmentLeadAsRegistrationRejected:
+      makeMarkEstablishmentLeadAsRegistrationRejected({
         uowPerformer,
         deps: {
           timeGateway: gateways.timeGateway,

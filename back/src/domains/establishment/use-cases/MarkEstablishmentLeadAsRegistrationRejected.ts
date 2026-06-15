@@ -1,37 +1,25 @@
 import { type ConventionJwtPayload, errors } from "shared";
-import { z } from "zod";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 
-export class MarkEstablishmentLeadAsRegistrationRejected extends TransactionalUseCase<
-  void,
-  void,
-  ConventionJwtPayload
-> {
-  protected inputSchema = z.void();
+export type MarkEstablishmentLeadAsRegistrationRejected = ReturnType<
+  typeof makeMarkEstablishmentLeadAsRegistrationRejected
+>;
 
-  #timeGateway: TimeGateway;
-
-  constructor(uowPerformer: UnitOfWorkPerformer, timeGateway: TimeGateway) {
-    super(uowPerformer);
-    this.#timeGateway = timeGateway;
-  }
-
-  public async _execute(
-    _: void,
-    uow: UnitOfWork,
-    jwtPayload: ConventionJwtPayload,
-  ): Promise<void> {
+export const makeMarkEstablishmentLeadAsRegistrationRejected = useCaseBuilder(
+  "MarkEstablishmentLeadAsRegistrationRejected",
+)
+  .withCurrentUser<ConventionJwtPayload>()
+  .withDeps<{ timeGateway: TimeGateway }>()
+  .build(async ({ uow, currentUser, deps: { timeGateway } }) => {
     const convention = await uow.conventionRepository.getById(
-      jwtPayload.applicationId,
+      currentUser.applicationId,
     );
 
     if (!convention)
       throw errors.convention.notFound({
-        conventionId: jwtPayload.applicationId,
+        conventionId: currentUser.applicationId,
       });
 
     const establishmentLead = await uow.establishmentLeadRepository.getBySiret(
@@ -49,10 +37,9 @@ export class MarkEstablishmentLeadAsRegistrationRejected extends TransactionalUs
       lastEventKind: "registration-refused",
       events: [
         ...events,
-        { kind: "registration-refused", occurredAt: this.#timeGateway.now() },
+        { kind: "registration-refused", occurredAt: timeGateway.now() },
       ],
     };
 
     await uow.establishmentLeadRepository.save(updatedEstablishmentLead);
-  }
-}
+  });
