@@ -95,7 +95,7 @@ import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use
 import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
 import { makeRevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
 import { makeSaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
-import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
+import { makeSubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
@@ -375,11 +375,6 @@ export const createUseCases = ({
           config,
         ),
 
-      subscribeToWebhook: new SubscribeToWebhook(
-        uowPerformer,
-        uuidGenerator,
-        gateways.timeGateway,
-      ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
 
@@ -1255,6 +1250,13 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         saveNotificationAndRelatedEvent,
+      },
+    }),
+    subscribeToWebhook: makeSubscribeToWebhook({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        timeGateway: gateways.timeGateway,
       },
     }),
     saveApiConsumer: makeSaveApiConsumer({
