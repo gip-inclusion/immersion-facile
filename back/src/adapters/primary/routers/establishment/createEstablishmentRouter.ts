@@ -35,7 +35,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
           {
             formEstablishment: req.body,
           },
-          req.payloads?.currentUser,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

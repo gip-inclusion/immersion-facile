@@ -39,7 +39,10 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
+import {
+  type InsertEstablishmentAggregateFromForm,
+  makeInsertEstablishmentAggregateFromForm,
+} from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 describe("InsertEstablishmentAggregateFromForm", () => {
   const validFormEstablishmentWithSiret = FormEstablishmentDtoBuilder.valid()
@@ -98,7 +101,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
   };
 
   let siretGateway: InMemorySiretGateway;
-  let addressAPI: InMemoryAddressGateway;
+  let addressGateway: InMemoryAddressGateway;
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
@@ -106,22 +109,24 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
-    addressAPI = new InMemoryAddressGateway();
+    addressGateway = new InMemoryAddressGateway();
     uuidGenerator = new TestUuidGenerator();
     timeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
 
     insertEstablishmentAggregateFromForm =
-      new InsertEstablishmentAggregateFromForm(
-        new InMemoryUowPerformer(uow),
-        siretGateway,
-        addressAPI,
-        uuidGenerator,
-        timeGateway,
-        makeCreateNewEvent({ timeGateway, uuidGenerator }),
-      );
+      makeInsertEstablishmentAggregateFromForm({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          siretGateway,
+          addressGateway,
+          uuidGenerator,
+          timeGateway,
+          createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+        },
+      });
 
-    addressAPI.setNextLookupStreetAndAddresses([
+    addressGateway.setNextLookupStreetAndAddresses([
       [
         {
           address: {
@@ -520,15 +525,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       );
     });
 
-    it("Throws forbidden when no user provided", async () => {
-      await expectPromiseToFailWithError(
-        insertEstablishmentAggregateFromForm.execute({
-          formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
-        }),
-        errors.user.noJwtProvided(),
-      );
-    });
-
     it("Can't create establishment when establishment siret is banned", async () => {
       const banEstablishment: BanEstablishmentPayload = {
         siret: "12345678912345",
@@ -641,7 +637,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       numberEmployeesRange: "6-9",
     });
 
-    addressAPI.setNextLookupStreetAndAddresses([
+    addressGateway.setNextLookupStreetAndAddresses([
       [
         {
           address: {
