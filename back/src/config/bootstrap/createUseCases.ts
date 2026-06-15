@@ -163,7 +163,7 @@ import { makeGetOffersByGroupSlug } from "../../domains/establishment/use-cases/
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { makeInsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
-import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
+import { makeMarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
@@ -334,11 +334,7 @@ export const createUseCases = ({
         uowPerformer,
         gateways.timeGateway,
       ),
-      markEstablishmentLeadAsRegistrationAccepted:
-        new MarkEstablishmentLeadAsRegistrationAccepted(
-          uowPerformer,
-          gateways.timeGateway,
-        ),
+
       markEstablishmentLeadAsRegistrationRejected:
         new MarkEstablishmentLeadAsRegistrationRejected(
           uowPerformer,
@@ -542,6 +538,14 @@ export const createUseCases = ({
       },
       uowPerformer,
     }),
+
+    markEstablishmentLeadAsRegistrationAccepted:
+      makeMarkEstablishmentLeadAsRegistrationAccepted({
+        uowPerformer,
+        deps: {
+          timeGateway: gateways.timeGateway,
+        },
+      }),
 
     deleteEstablishment: makeDeleteEstablishment({
       uowPerformer,

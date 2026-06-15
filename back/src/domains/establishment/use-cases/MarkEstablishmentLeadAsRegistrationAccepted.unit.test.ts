@@ -13,7 +13,10 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEstablishmentLeadRepository";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { MarkEstablishmentLeadAsRegistrationAccepted } from "./MarkEstablishmentLeadAsRegistrationAccepted";
+import {
+  type MarkEstablishmentLeadAsRegistrationAccepted,
+  makeMarkEstablishmentLeadAsRegistrationAccepted,
+} from "./MarkEstablishmentLeadAsRegistrationAccepted";
 
 describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
   let uow: InMemoryUnitOfWork;
@@ -25,10 +28,12 @@ describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
 
-    updateEstablishmentLead = new MarkEstablishmentLeadAsRegistrationAccepted(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-    );
+    updateEstablishmentLead = makeMarkEstablishmentLeadAsRegistrationAccepted({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+      },
+    });
     establishmentLeadRepository = uow.establishmentLeadRepository;
   });
 
