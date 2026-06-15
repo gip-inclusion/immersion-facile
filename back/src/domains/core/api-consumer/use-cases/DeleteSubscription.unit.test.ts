@@ -11,7 +11,10 @@ import {
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
-import { DeleteSubscription } from "./DeleteSubscription";
+import {
+  type DeleteSubscription,
+  makeDeleteSubscription,
+} from "./DeleteSubscription";
 
 describe("DeleteSubscription", () => {
   const uuidGenerator = new TestUuidGenerator();
@@ -22,7 +25,7 @@ describe("DeleteSubscription", () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
 
-    deleteSubscription = new DeleteSubscription(uowPerformer);
+    deleteSubscription = makeDeleteSubscription({ uowPerformer });
   });
 
   it("throws error when apiConsumer does not have the rights", async () => {
