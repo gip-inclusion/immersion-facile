@@ -72,7 +72,7 @@ import { makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
 import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
-import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
+import { makeMarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSaveConventionDraft } from "../../domains/convention/use-cases/SaveConventionDraft";
@@ -321,13 +321,6 @@ export const createUseCases = ({
         createNewEvent,
       }),
 
-      markPartnersErroredConventionAsHandled:
-        new MarkPartnersErroredConventionAsHandled(
-          uowPerformer,
-          createNewEvent,
-          gateways.timeGateway,
-        ),
-
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
         uowPerformer,
@@ -396,6 +389,14 @@ export const createUseCases = ({
       ),
     }),
 
+    markPartnersErroredConventionAsHandled:
+      makeMarkPartnersErroredConventionAsHandled({
+        uowPerformer,
+        deps: {
+          createNewEvent,
+          timeGateway: gateways.timeGateway,
+        },
+      }),
     deleteSubscription: makeDeleteSubscription({ uowPerformer }),
 
     addValidatedConventionNPS: makeAddValidatedConventionNps({

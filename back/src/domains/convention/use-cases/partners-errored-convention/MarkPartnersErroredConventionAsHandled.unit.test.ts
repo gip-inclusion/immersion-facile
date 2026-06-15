@@ -23,7 +23,10 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { MarkPartnersErroredConventionAsHandled } from "./MarkPartnersErroredConventionAsHandled";
+import {
+  type MarkPartnersErroredConventionAsHandled,
+  makeMarkPartnersErroredConventionAsHandled,
+} from "./MarkPartnersErroredConventionAsHandled";
 
 describe("mark partners errored convention as handled", () => {
   let uow: InMemoryUnitOfWork;
@@ -72,11 +75,13 @@ describe("mark partners errored convention as handled", () => {
     });
 
     markPartnersErroredConventionAsHandled =
-      new MarkPartnersErroredConventionAsHandled(
-        new InMemoryUowPerformer(uow),
-        createNewEvent,
-        timeGateway,
-      );
+      makeMarkPartnersErroredConventionAsHandled({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          createNewEvent,
+          timeGateway,
+        },
+      });
   });
 
   it("Mark partner errored convention as handled", async () => {
@@ -186,15 +191,6 @@ describe("mark partners errored convention as handled", () => {
       errors.broadcastFeedback.notFound({
         conventionId,
       }),
-    );
-  });
-
-  it("Throw when no jwt were provided", async () => {
-    await expectPromiseToFailWithError(
-      markPartnersErroredConventionAsHandled.execute({
-        conventionId,
-      }),
-      errors.user.unauthorized(),
     );
   });
 
