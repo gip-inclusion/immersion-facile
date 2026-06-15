@@ -246,10 +246,9 @@ export const InitiateConventionButton = () => {
   };
 
   const onOpenModal = () => {
-    const siret = currentUserEstablishments?.[0]?.siret ?? "";
-    if (currentUserEstablishments?.length === 1 && siret)
-      fetchEstablishment(siret);
-    makeResetFormValues(siret);
+    const firstSiret = currentUserEstablishments?.[0]?.siret ?? "";
+    if (firstSiret) fetchEstablishment(firstSiret);
+    makeResetFormValues(firstSiret);
     openInitiateConventionModal();
   };
 
