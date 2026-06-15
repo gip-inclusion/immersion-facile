@@ -23,7 +23,10 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
 import type { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
-import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "./NotifyFranceTravailUserAdvisorOnConventionFullySigned";
+import {
+  makeNotifyFranceTravailUserAdvisorOnConventionFullySigned,
+  type NotifyFranceTravailUserAdvisorOnConventionFullySigned,
+} from "./NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 
 describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
@@ -68,11 +71,13 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     );
 
     notifyFranceTravailUserAdvisorOnConventionFullySigned =
-      new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
-        new InMemoryUowPerformer(uow),
-        saveNotificationAndRelatedEvent,
-        config,
-      );
+      makeNotifyFranceTravailUserAdvisorOnConventionFullySigned({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          saveNotificationAndRelatedEvent,
+          config,
+        },
+      });
   });
 
   it("should resolve to undefined if the convention France Travail OAuth advisor is not found", async () => {
