@@ -1218,7 +1218,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
         content: `<strong>Nous vous confirmons que votre candidature pour ${kind === "IF" ? "une immersion professionnelle" : "un stage"} a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
 
-          Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre ${kind === "IF" ? "immersion" : "stage"}.
+        L'entreprise va maintenant examiner votre demande. Si elle l'accepte, elle vous contactera pour discuter des détails de votre ${kind === "IF" ? "immersion" : "stage"}.
+        De votre côté, vous avez la possibilité d'échanger avec elle directement depuis votre espace personnel. C'est l'endroit idéal pour appuyer votre candidature, montrer votre motivation ou répondre à ses éventuelles questions.
         `,
         buttons: [
           {
@@ -3291,5 +3292,5 @@ export const renderCTAInEmailContent = ({
   url: AbsoluteUrl;
   label: string;
 }) => `
-  <a href="${url}" style="display: inline-block; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">${label}</a><br />
+    <a href="${url}" style="display: inline-flex; align-items: center; margin: 1.5rem 0; font-weight: 500; font-size: 0.875rem; line-height: 1.5rem; min-height: 2rem; padding: 0.25rem 0.75rem; background-color: #000091; color: #f5f5fe; text-decoration: none;">${label}</a>
   `;
