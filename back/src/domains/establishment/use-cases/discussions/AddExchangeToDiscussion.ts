@@ -2,7 +2,6 @@ import {
   type AbsoluteUrl,
   type Attachment,
   attachmentSchema,
-  type BusinessName,
   type ConnectedUser,
   type DateString,
   type DiscussionDto,
@@ -322,8 +321,9 @@ const addExchangeAndSendEvent = async ({
       subject: isMessageInputFromEmail(messageInput)
         ? messageInput.subject
         : undefined,
-      businessName: discussion.businessName,
+      discussion,
       source,
+      exchangeSender,
     }),
     sentAt: isMessageInputFromEmail(messageInput)
       ? messageInput.sentAt
@@ -405,16 +405,20 @@ const notifyForbidden = async ({
 
 const makeFormattedSubject = ({
   subject,
-  businessName,
+  discussion,
   source,
+  exchangeSender,
 }: {
   subject?: string;
-  businessName: BusinessName;
+  discussion: DiscussionDto;
   source: InputSource;
+  exchangeSender: ExchangeSender;
 }): string => {
   const hasNoSubject = !subject || subject === "";
   if (source === "dashboard" && hasNoSubject) {
-    return `Réponse de ${businessName} à votre demande d'immersion`;
+    return exchangeSender.sender === "establishment"
+      ? `Réponse de ${discussion.businessName} à votre demande d'immersion`
+      : `Réponse de ${discussion.potentialBeneficiary.lastName.toUpperCase()} ${discussion.potentialBeneficiary.firstName.toUpperCase()} à votre message`;
   }
   return hasNoSubject ? defaultSubject : subject;
 };

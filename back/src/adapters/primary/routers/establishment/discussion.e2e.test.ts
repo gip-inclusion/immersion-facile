@@ -598,8 +598,7 @@ describe("discussion e2e", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
 
       const expectedExchange: Exchange = {
-        subject:
-          "Réponse de My default business name à votre demande d'immersion",
+        subject: "Réponse de BABA ALI à votre message",
         message: "Message from potential beneficiary",
         sentAt: gateways.timeGateway.now().toISOString(),
         sender: "potentialBeneficiary",

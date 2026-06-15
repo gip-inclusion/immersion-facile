@@ -499,8 +499,7 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
             message: "Hello from potential beneficiary",
             sender: "potentialBeneficiary",
-            subject:
-              "Réponse de My default business name à votre demande d'immersion",
+            subject: "Réponse de BABA ALI à votre message",
             sentAt: "2021-09-01T10:10:00.000Z",
             attachments: [],
           });
