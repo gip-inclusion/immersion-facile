@@ -126,7 +126,7 @@ import { SendNotification } from "../../domains/core/notifications/useCases/Send
 import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
-import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
+import { makeAppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { makeRomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { makeGetLink } from "../../domains/core/short-link/use-cases/GetLink";
 import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
@@ -350,12 +350,6 @@ export const createUseCases = ({
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
         config.immersionFacileBaseUrl,
-      ),
-
-      // romes
-      appellationSearch: new AppellationSearch(
-        uowPerformer,
-        gateways.appellationsGateway,
       ),
 
       // agencies
@@ -716,6 +710,13 @@ export const createUseCases = ({
         },
       )({}),
 
+    // romes
+    appellationSearch: makeAppellationSearch({
+      uowPerformer,
+      deps: {
+        appellationsGateway: gateways.appellationsGateway,
+      },
+    }),
     getOffers: makeGetOffers({
       uowPerformer,
       deps: {
