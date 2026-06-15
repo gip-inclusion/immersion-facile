@@ -16,7 +16,10 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { SuggestEstablishmentReengagement } from "./SuggestEstablishmentReengagement";
+import {
+  makeSuggestEstablishmentReengagement,
+  type SuggestEstablishmentReengagement,
+} from "./SuggestEstablishmentReengagement";
 
 describe("SuggestEditEstablishment", () => {
   let suggestEstablishmentReengagement: SuggestEstablishmentReengagement;
@@ -33,10 +36,15 @@ describe("SuggestEditEstablishment", () => {
       uow.outboxRepository,
     );
 
-    suggestEstablishmentReengagement = new SuggestEstablishmentReengagement(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-    );
+    suggestEstablishmentReengagement = makeSuggestEstablishmentReengagement({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+      },
+    });
   });
 
   it("Sends an email to each ACCEPTED establishment admin with specific jwt", async () => {

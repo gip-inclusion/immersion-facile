@@ -3,60 +3,54 @@ import {
   executeInSequence,
   immersionFacileNoReplyEmailSender,
   onlyAdminUserRightsWithStatusAccepted,
-  type SiretDto,
   siretSchema,
 } from "shared";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class SuggestEstablishmentReengagement extends TransactionalUseCase<
-  SiretDto,
-  void
-> {
-  protected inputSchema = siretSchema;
+export type SuggestEstablishmentReengagement = ReturnType<
+  typeof makeSuggestEstablishmentReengagement
+>;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+export const makeSuggestEstablishmentReengagement = useCaseBuilder(
+  "SuggestEstablishmentReengagement",
+)
+  .withInput(siretSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  }>()
+  .build(
+    async ({ inputParams, uow, deps: { saveNotificationAndRelatedEvent } }) => {
+      const establishmentAggregate =
+        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          inputParams,
+        );
+      if (!establishmentAggregate)
+        throw errors.establishment.notFound({ siret: inputParams });
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-  ) {
-    super(uowPerformer);
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-  }
+      const { userRights, establishment } = establishmentAggregate;
+      const adminIds = userRights
+        .filter(onlyAdminUserRightsWithStatusAccepted)
+        .map((right) => right.userId);
 
-  protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const establishmentAggregate =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
-      );
-    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
+      const admins = await uow.userRepository.getByIds(adminIds);
 
-    const { userRights, establishment } = establishmentAggregate;
-    const adminIds = userRights
-      .filter(onlyAdminUserRightsWithStatusAccepted)
-      .map((right) => right.userId);
-
-    const admins = await uow.userRepository.getByIds(adminIds);
-
-    await executeInSequence(admins, (user) =>
-      this.#saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
-          sender: immersionFacileNoReplyEmailSender,
-          recipients: [user.email],
-          params: {
-            businessName: establishment.customizedName ?? establishment.name,
+      await executeInSequence(admins, (user) =>
+        saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            kind: "ESTABLISHMENT_REENGAGEMENT_SUGGESTION",
+            sender: immersionFacileNoReplyEmailSender,
+            recipients: [user.email],
+            params: {
+              businessName: establishment.customizedName ?? establishment.name,
+            },
           },
-        },
-        followedIds: {
-          establishmentSiret: siret,
-        },
-      }).catch((error) => notifyErrorObjectToTeam(error)),
-    );
-  }
-}
+          followedIds: {
+            establishmentSiret: establishmentAggregate.establishment.siret,
+          },
+        }).catch((error) => notifyErrorObjectToTeam(error)),
+      );
+    },
+  );
