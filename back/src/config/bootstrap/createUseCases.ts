@@ -130,7 +130,7 @@ import { AppellationSearch } from "../../domains/core/rome/use-cases/Appellation
 import { makeRomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { makeGetLink } from "../../domains/core/short-link/use-cases/GetLink";
 import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
-import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
+import { makeGetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
@@ -352,11 +352,6 @@ export const createUseCases = ({
         config.immersionFacileBaseUrl,
       ),
 
-      getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
-        uowPerformer,
-        gateways.siret,
-      ),
-
       // romes
       appellationSearch: new AppellationSearch(
         uowPerformer,
@@ -452,6 +447,12 @@ export const createUseCases = ({
     getSiret: makeGetSiret({
       deps: { siretGateway: gateways.siret },
       uowPerformer,
+    }),
+    getSiretIfNotAlreadySaved: makeGetSiretIfNotAlreadySaved({
+      uowPerformer,
+      deps: {
+        siretGateway: gateways.siret,
+      },
     }),
     getOffersByGroupSlug: makeGetOffersByGroupSlug({ uowPerformer }),
     romeSearch: makeRomeSearch({ uowPerformer }),

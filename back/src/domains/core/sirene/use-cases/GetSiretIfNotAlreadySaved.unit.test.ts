@@ -13,7 +13,10 @@ import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
 } from "../adapters/InMemorySiretGateway";
-import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
+import {
+  type GetSiretIfNotAlreadySaved,
+  makeGetSiretIfNotAlreadySaved,
+} from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
   let siretGateway: InMemorySiretGateway;
@@ -31,10 +34,12 @@ describe("GetSiretIfNotAlreadySaved", () => {
       establishmentAggregateRepository: establishmentAggregateRepo,
       bannedEstablishmentRepository: bannedEstablishmentRepo,
     });
-    getSiretIfNotAlreadySaved = new GetSiretIfNotAlreadySaved(
+    getSiretIfNotAlreadySaved = makeGetSiretIfNotAlreadySaved({
       uowPerformer,
-      siretGateway,
-    );
+      deps: {
+        siretGateway,
+      },
+    });
   });
 
   it("throws an error if the siret is already saved", async () => {
