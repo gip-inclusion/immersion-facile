@@ -486,7 +486,7 @@ const feedbackMessageByContactMode = ({
       {
         children: currentUser ? "Accéder à mon espace" : "Me connecter",
         onClick: () => {
-          routes.beneficiaryDashboard().push();
+          frontRoutes.beneficiaryDashboard().push();
         },
       },
       {
