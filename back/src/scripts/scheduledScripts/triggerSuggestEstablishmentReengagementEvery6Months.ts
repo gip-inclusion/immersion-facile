@@ -5,7 +5,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifica
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createDbRelatedSystems } from "../../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SuggestEstablishmentReengagement } from "../../domains/establishment/use-cases/SuggestEstablishmentReengagement";
+import { makeSuggestEstablishmentReengagement } from "../../domains/establishment/use-cases/SuggestEstablishmentReengagement";
 import { makeSuggestEstablishmentReengagementsScript } from "../../domains/establishment/use-cases/SuggestEstablishmentReengagementsScript";
 import { handleCRONScript } from "../handleCRONScript";
 
@@ -26,10 +26,15 @@ const startScript = async (): Promise<Report> => {
 
   return makeSuggestEstablishmentReengagementsScript({
     deps: {
-      suggestEstablishmentReengagement: new SuggestEstablishmentReengagement(
+      suggestEstablishmentReengagement: makeSuggestEstablishmentReengagement({
         uowPerformer,
-        makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      ),
+        deps: {
+          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+            new UuidV4Generator(),
+            timeGateway,
+          ),
+        },
+      }),
       timeGateway,
       uowPerformer,
     },
