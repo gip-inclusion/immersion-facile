@@ -94,7 +94,7 @@ import { makeDeleteSubscription } from "../../domains/core/api-consumer/use-case
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cases/RenewApiConsumerKey";
 import { makeRevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
-import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
+import { makeSaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
@@ -381,12 +381,6 @@ export const createUseCases = ({
         gateways.timeGateway,
       ),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
-      saveApiConsumer: new SaveApiConsumer(
-        uowPerformer,
-        createNewEvent,
-        generateApiConsumerJwt,
-        gateways.timeGateway,
-      ),
     }),
 
     markPartnersErroredConventionAsHandled:
@@ -1261,6 +1255,14 @@ export const createUseCases = ({
       uowPerformer,
       deps: {
         saveNotificationAndRelatedEvent,
+      },
+    }),
+    saveApiConsumer: makeSaveApiConsumer({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        generateApiConsumerJwt,
+        timeGateway: gateways.timeGateway,
       },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;

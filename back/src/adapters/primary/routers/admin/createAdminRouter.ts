@@ -128,7 +128,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.saveApiConsumer.execute(
           req.body,
-          req.payloads?.currentUser,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
