@@ -127,7 +127,7 @@ import { SendNotificationInBatch } from "../../domains/core/notifications/useCas
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
-import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
+import { makeRomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { makeGetLink } from "../../domains/core/short-link/use-cases/GetLink";
 import { makeGetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
@@ -362,7 +362,6 @@ export const createUseCases = ({
         uowPerformer,
         gateways.appellationsGateway,
       ),
-      romeSearch: new RomeSearch(uowPerformer),
 
       // agencies
 
@@ -455,6 +454,7 @@ export const createUseCases = ({
       uowPerformer,
     }),
     getOffersByGroupSlug: makeGetOffersByGroupSlug({ uowPerformer }),
+    romeSearch: makeRomeSearch({ uowPerformer }),
 
     // Address
     lookupLocation: makeLookupLocation({
