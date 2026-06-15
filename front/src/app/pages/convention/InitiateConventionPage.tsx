@@ -1,7 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr/fr";
 import { useState } from "react";
 import { MainWrapper, NavCard, PageHeader } from "react-design-system";
-import { authRoutes, domElementIds, frontRoutes, legacyFrontRoutes, makeUrlWithQueryParams } from "shared";
+import {
+  authRoutes,
+  domElementIds,
+  frontRoutes,
+  legacyFrontRoutes,
+  makeUrlWithQueryParams,
+} from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";

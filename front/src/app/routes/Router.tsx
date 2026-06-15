@@ -389,8 +389,15 @@ const getPageByRouteName: {
   unregisterEstablishmentLead: (route) => (
     <EstablishmentLeadRegistrationRejectedPage route={route} />
   ),
-  temporaryError: () => (
-    <ErrorPage error={frontErrors.generic.temporaryError()} />
+  temporaryError: (route) => (
+    <ErrorPage
+      error={
+        route.params.message
+          ? new Error(route.params.message)
+          : frontErrors.generic.temporaryError()
+      }
+      title={route.params.title ? route.params.title : undefined}
+    />
   ),
 };
 

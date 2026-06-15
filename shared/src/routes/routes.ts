@@ -143,6 +143,12 @@ export const establishmentParams = {
   fromConventionId: param.query.optional.string,
 };
 
+const temporaryErrorParams = {
+  message: param.query.optional.string,
+  kind: param.query.optional.string,
+  title: param.query.optional.string,
+};
+
 export const searchParams = {
   distanceKm: param.query.optional.number,
   latitude: param.query.optional.number,
@@ -511,7 +517,10 @@ export const {
     (params) => `/${legacyFrontRoutes.standard}/${params.pagePath}`,
   ),
   stats: defineRoute("/stats"),
-  temporaryError: defineRoute("/error"),
+  temporaryError: defineRoute(
+    temporaryErrorParams,
+    () => `/${legacyFrontRoutes.error}`,
+  ),
 });
 
 export const makeRouteAbsoluteUrl = ({
