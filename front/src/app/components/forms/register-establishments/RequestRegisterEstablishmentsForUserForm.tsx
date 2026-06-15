@@ -38,7 +38,7 @@ const establishmentRegisterEstablishmentModal = createFormModal({
 
 const useMyProfileEstablishmentRegistrationRoute =
   makeUseTypedRoute<
-    (typeof frontRoutes.myProfileEstablishmentRegistration)["name"]
+    (typeof frontRoutes.myAccountEstablishmentRegistration)["name"]
   >();
 
 export const RequestRegisterEstablishmentsForUserForm = ({
@@ -48,7 +48,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
 }) => {
   const dispatch = useDispatch();
   const route = useMyProfileEstablishmentRegistrationRoute([
-    "myProfileEstablishmentRegistration",
+    "myAccountEstablishmentRegistration",
   ]);
   const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
@@ -114,7 +114,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
           label="Se rattacher à une entreprise"
           hintText="Rechercher par n° SIRET ou nom sous lequel il est enregistré sur Immersion Facilitée"
           nativeInputProps={{
-            id: domElementIds.myProfileEstablishmentRegistration
+            id: domElementIds.myAccountEstablishmentRegistration
               .registerEstablishmentSearch,
             type: "search",
             placeholder: "",
@@ -200,7 +200,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
                         establishmentRegisterEstablishmentModal.open();
                       }}
                       size="small"
-                      id={`${domElementIds.myProfileEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
+                      id={`${domElementIds.myAccountEstablishmentRegistration.registerEstablishmentButton}-${establishmentPublicOption.siret}`}
                       disabled={
                         establishmentPublicOption.isEstablishmentBanned ||
                         getStatusOnEstablishment(

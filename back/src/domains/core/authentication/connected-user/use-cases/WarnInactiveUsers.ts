@@ -99,7 +99,7 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         });
 
         const loginUrl: AbsoluteUrl = makeRouteAbsoluteUrl({
-          route: frontRoutes.myProfile(),
+          route: frontRoutes.myAccount(),
           baseUrl: deps.immersionBaseUrl,
         });
 

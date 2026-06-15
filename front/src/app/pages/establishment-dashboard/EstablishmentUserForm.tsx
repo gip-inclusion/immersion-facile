@@ -46,7 +46,7 @@ const useEstablishmentUserFormRoute =
     (
       | typeof frontRoutes.establishmentDashboardFormEstablishment
       | typeof frontRoutes.adminEstablishments
-      | typeof frontRoutes.myProfileEstablishmentRegistration
+      | typeof frontRoutes.myAccountEstablishmentRegistration
     )["name"]
   >();
 
@@ -62,12 +62,12 @@ export const EstablishmentUserForm = ({
   const route = useEstablishmentUserFormRoute([
     "establishmentDashboardFormEstablishment",
     "adminEstablishments",
-    "myProfileEstablishmentRegistration",
+    "myAccountEstablishmentRegistration",
   ]);
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";
   const isMyProfileEstablishmentRegistration =
-    route.name === "myProfileEstablishmentRegistration";
+    route.name === "myAccountEstablishmentRegistration";
   const isManageEstablishmentAdmin = route.name === "adminEstablishments";
   const dispatch = useDispatch();
   const emptyValues = {

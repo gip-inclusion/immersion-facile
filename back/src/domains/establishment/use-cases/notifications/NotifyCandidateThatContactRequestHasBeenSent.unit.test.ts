@@ -84,7 +84,7 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
             }),
             kind: discussion.kind,
             beneficiaryDashboardUrl:
-              "http://localhost/tableau-de-bord-beneficiaire",
+              "http://localhost/mon-compte/tableau-de-bord-beneficiaire",
           },
         },
       ],

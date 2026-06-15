@@ -175,7 +175,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             beneficiaryLastName: discussion.potentialBeneficiary.lastName,
             businessName: discussion.businessName,
             establishmentDashboardUrl:
-              "http://localhost/tableau-de-bord-etablissement",
+              "http://localhost/mon-compte/tableau-de-bord-etablissement",
             discussionCreatedAt: discussion.createdAt,
           },
         },

@@ -25,7 +25,7 @@ export const PersonnalInformationsSection = ({
           href: editInformationsLink,
           target: "_blank",
         }}
-        id={domElementIds.myProfile.updateOwnInfosLink}
+        id={domElementIds.myAccount.updateOwnInfosLink}
         size="small"
       >
         Changer mes informations sur ProConnect

@@ -139,7 +139,7 @@ export const AgencyRightsTable = ({
                   !selectedAgencyRight.roles.includes("agency-admin")
                 }
                 onSubmit={onUserUpdateRequested}
-                routeName="myProfile"
+                routeName="myAccount"
                 hasCounsellorRoles={selectedAgencyHasCounsellorRoles}
                 isFTAgency={selectedAgencyRight.agency.kind === "pole-emploi"}
               />
