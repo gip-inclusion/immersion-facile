@@ -37,10 +37,10 @@ const useTypedRoute = <
 
 export const makeUseTypedRoute =
   <TRouteName extends CurrentRouteName>() =>
-    <const TRouteNames extends readonly TRouteName[]>(
-      routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
-    ) =>
-      useTypedRoute<TRouteName, TRouteNames>(routeNames);
+  <const TRouteNames extends readonly TRouteName[]>(
+    routeNames: EnsureRouteNamesMatchUnion<TRouteName, TRouteNames>,
+  ) =>
+    useTypedRoute<TRouteName, TRouteNames>(routeNames);
 
 type ConventionRouteName =
   | (typeof frontRoutes.conventionImmersion)["name"]
@@ -71,9 +71,9 @@ export type Mode = keyof RouteByMode;
 type EstablishmentRouteName = RouteByMode[Mode]["name"];
 
 const establishmentRouteNames = [
-  routes.formEstablishment.name,
-  routes.establishmentDashboardFormEstablishment.name,
-  routes.adminEstablishments.name,
+  frontRoutes.formEstablishment.name,
+  frontRoutes.establishmentDashboardFormEstablishment.name,
+  frontRoutes.adminEstablishments.name,
 ] as const;
 
 const useEstablishmentTypedRoute = makeUseTypedRoute<EstablishmentRouteName>();
