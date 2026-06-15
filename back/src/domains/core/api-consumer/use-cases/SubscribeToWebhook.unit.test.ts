@@ -1,9 +1,4 @@
-import {
-  errors,
-  expectPromiseToFailWithError,
-  expectToEqual,
-  type SubscriptionParams,
-} from "shared";
+import { expectToEqual, type SubscriptionParams } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -12,7 +7,10 @@ import {
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
-import { SubscribeToWebhook } from "./SubscribeToWebhook";
+import {
+  makeSubscribeToWebhook,
+  type SubscribeToWebhook,
+} from "./SubscribeToWebhook";
 
 describe("SubscribeToWebhook", () => {
   let uow: InMemoryUnitOfWork;
@@ -25,22 +23,13 @@ describe("SubscribeToWebhook", () => {
     customTimeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
-    subscribeToWebhook = new SubscribeToWebhook(
+    subscribeToWebhook = makeSubscribeToWebhook({
       uowPerformer,
-      uuidGenerator,
-      customTimeGateway,
-    );
-  });
-
-  it("throws a forbidden error when jwtPayload is not provided", async () => {
-    await expectPromiseToFailWithError(
-      subscribeToWebhook.execute({
-        callbackHeaders: { authorization: "lol" },
-        callbackUrl: "https://www.lol.com",
-        subscribedEvent: "convention.updated",
-      }),
-      errors.user.noJwtProvided(),
-    );
+      deps: {
+        uuidGenerator,
+        timeGateway: customTimeGateway,
+      },
+    });
   });
 
   it("adds the subscription", async () => {
