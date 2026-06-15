@@ -1,22 +1,12 @@
-import {
-  errors,
-  type GroupWithResults,
-  type WithGroupSlug,
-  withGroupSlugSchema,
-} from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { errors, type GroupWithResults, withGroupSlugSchema } from "shared";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class GetOffersByGroupSlug extends TransactionalUseCase<
-  WithGroupSlug,
-  GroupWithResults
-> {
-  protected inputSchema = withGroupSlugSchema;
+export type GetOffersByGroupSlug = ReturnType<typeof makeGetOffersByGroupSlug>;
 
-  public async _execute(
-    { groupSlug }: WithGroupSlug,
-    uow: UnitOfWork,
-  ): Promise<GroupWithResults> {
+export const makeGetOffersByGroupSlug = useCaseBuilder("GetOffersByGroupSlug")
+  .withInput(withGroupSlugSchema)
+  .withOutput<GroupWithResults>()
+  .build(async ({ inputParams: { groupSlug }, uow }) => {
     const groupWithResults =
       await uow.groupRepository.getGroupWithSearchResultsBySlug(groupSlug);
 
@@ -24,5 +14,4 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
       throw errors.establishmentGroup.missingBySlug({ groupSlug });
 
     return groupWithResults;
-  }
-}
+  });

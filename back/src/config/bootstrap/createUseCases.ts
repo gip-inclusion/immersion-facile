@@ -159,7 +159,7 @@ import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/u
 import { makeGetEstablishmentPublicOptionsByFilters } from "../../domains/establishment/use-cases/GetEstablishmentPublicOptionsByFilters";
 import { makeGetExternalOffers } from "../../domains/establishment/use-cases/GetExternalOffers";
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
-import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
+import { makeGetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
@@ -321,7 +321,6 @@ export const createUseCases = ({
         createNewEvent,
       }),
 
-      getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
         uowPerformer,
       ),
@@ -455,6 +454,7 @@ export const createUseCases = ({
       deps: { siretGateway: gateways.siret },
       uowPerformer,
     }),
+    getOffersByGroupSlug: makeGetOffersByGroupSlug({ uowPerformer }),
 
     // Address
     lookupLocation: makeLookupLocation({
