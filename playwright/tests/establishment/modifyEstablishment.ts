@@ -3,6 +3,7 @@ import {
   addressRoutes,
   domElementIds,
   type FormEstablishmentDto,
+  frontRoutes,
 } from "shared";
 import {
   goToDashboard,
@@ -29,7 +30,9 @@ export const updateEstablishmentThroughEstablishmentDashboard =
     await goToEstablishmentDashboardTab(page, "fiche-entreprise");
 
     await page.waitForURL(
-      `/tableau-de-bord-etablissement/fiche-entreprise?siret=${updatedFormEstablishment.siret}`,
+      frontRoutes.establishmentDashboardFormEstablishment({
+        siret: updatedFormEstablishment.siret,
+      }).href,
     );
 
     await editEstablishmentInEstablishmentDashboard(
