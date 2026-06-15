@@ -103,7 +103,7 @@ import { InitiateLoginByOAuth } from "../../domains/core/authentication/connecte
 import { RenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
-import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
+import { makeNotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { makeValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
@@ -367,14 +367,6 @@ export const createUseCases = ({
 
       // agencies
 
-      // notifications
-      notifyFranceTravailUserAdvisorOnConventionFullySigned:
-        new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          config,
-        ),
-
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
 
@@ -503,6 +495,16 @@ export const createUseCases = ({
           saveNotificationAndRelatedEvent,
         },
         uowPerformer,
+      }),
+
+    // notifications
+    notifyFranceTravailUserAdvisorOnConventionFullySigned:
+      makeNotifyFranceTravailUserAdvisorOnConventionFullySigned({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          config,
+        },
       }),
 
     notifyConfirmationEstablishmentCreated:
