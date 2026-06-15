@@ -14,7 +14,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { MarkEstablishmentLeadAsRegistrationRejected } from "./MarkEstablishmentLeadAsRegistrationRejected";
+import {
+  type MarkEstablishmentLeadAsRegistrationRejected,
+  makeMarkEstablishmentLeadAsRegistrationRejected,
+} from "./MarkEstablishmentLeadAsRegistrationRejected";
 
 const convention = new ConventionDtoBuilder().build();
 
@@ -28,10 +31,12 @@ describe("MarkEstablishmentLeadAsRegistrationRejected", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
 
-    usecase = new MarkEstablishmentLeadAsRegistrationRejected(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-    );
+    usecase = makeMarkEstablishmentLeadAsRegistrationRejected({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+      },
+    });
 
     conventionJwt = createConventionMagicLinkPayload({
       id: convention.id,

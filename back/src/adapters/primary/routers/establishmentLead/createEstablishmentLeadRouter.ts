@@ -3,6 +3,7 @@ import { establishmentLeadRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getGenericAuthOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createEstablishmentLeadRouter = (deps: AppDependencies) => {
   const establishmentLeadRouter = Router({ mergeParams: true });
@@ -18,7 +19,7 @@ export const createEstablishmentLeadRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.markEstablishmentLeadAsRegistrationRejected.execute(
           undefined,
-          req.payloads?.convention,
+          getGenericAuthOrThrow(req.payloads?.convention),
         ),
       ),
   );
