@@ -34,7 +34,7 @@ import {
   type AddFormEstablishmentBatch,
   makeAddFormEstablishmentBatch,
 } from "./AddFormEstablismentsBatch";
-import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
+import { makeInsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 describe("AddFormEstablishmentsBatch Use Case", () => {
   const userNotAdmin = new ConnectedUserBuilder().withIsAdmin(false).build();
@@ -87,17 +87,19 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     addFormEstablishmentBatch = makeAddFormEstablishmentBatch({
       deps: {
         insertEstablishmentAggregateFromForm:
-          new InsertEstablishmentAggregateFromForm(
+          makeInsertEstablishmentAggregateFromForm({
             uowPerformer,
-            siretGateway,
-            addressGateway,
-            uuidGenerator,
-            timeGateway,
-            makeCreateNewEvent({
-              timeGateway,
+            deps: {
+              siretGateway,
+              addressGateway,
               uuidGenerator,
-            }),
-          ),
+              timeGateway,
+              createNewEvent: makeCreateNewEvent({
+                timeGateway,
+                uuidGenerator,
+              }),
+            },
+          }),
         uowPerformer,
       },
     });

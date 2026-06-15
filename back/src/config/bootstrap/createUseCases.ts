@@ -162,7 +162,7 @@ import { makeGetExternalSearchResult } from "../../domains/establishment/use-cas
 import { makeGetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
-import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
+import { makeInsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
@@ -231,14 +231,16 @@ export const createUseCases = ({
     );
 
   const insertEstablishmentAggregateFromForm =
-    new InsertEstablishmentAggregateFromForm(
+    makeInsertEstablishmentAggregateFromForm({
       uowPerformer,
-      gateways.siret,
-      gateways.addressApi,
-      uuidGenerator,
-      gateways.timeGateway,
-      createNewEvent,
-    );
+      deps: {
+        addressGateway: gateways.addressApi,
+        createNewEvent,
+        siretGateway: gateways.siret,
+        timeGateway: gateways.timeGateway,
+        uuidGenerator,
+      },
+    });
 
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
     config,
@@ -328,7 +330,6 @@ export const createUseCases = ({
       retrieveFormEstablishmentFromAggregates:
         new RetrieveFormEstablishmentFromAggregates(uowPerformer),
 
-      insertEstablishmentAggregateFromForm,
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
         gateways.timeGateway,
@@ -478,7 +479,7 @@ export const createUseCases = ({
         immersionFacileDomain: config.immersionFacileDomain,
       },
     }),
-
+    insertEstablishmentAggregateFromForm,
     updateEstablishmentAggregateFromForm:
       makeUpdateEstablishmentAggregateFromForm({
         deps: {
