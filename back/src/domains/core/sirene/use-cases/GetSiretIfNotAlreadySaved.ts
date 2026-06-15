@@ -1,34 +1,24 @@
 import {
   errors,
-  type GetSiretRequestDto,
   getSiretRequestSchema,
   type SiretEstablishmentDto,
 } from "shared";
-import { TransactionalUseCase } from "../../UseCase";
-import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
 import type { SiretGateway } from "../ports/SiretGateway";
 
-export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
-  GetSiretRequestDto,
-  SiretEstablishmentDto
-> {
-  protected inputSchema = getSiretRequestSchema;
+export type GetSiretIfNotAlreadySaved = ReturnType<
+  typeof makeGetSiretIfNotAlreadySaved
+>;
 
-  readonly #siretGateway: SiretGateway;
-
-  constructor(uowPerformer: UnitOfWorkPerformer, siretGateway: SiretGateway) {
-    super(uowPerformer);
-
-    this.#siretGateway = siretGateway;
-  }
-
-  public async _execute(
-    params: GetSiretRequestDto,
-    uow: UnitOfWork,
-  ): Promise<SiretEstablishmentDto> {
-    const { siret } = params;
+export const makeGetSiretIfNotAlreadySaved = useCaseBuilder(
+  "GetSiretIfNotAlreadySaved",
+)
+  .withInput(getSiretRequestSchema)
+  .withOutput<SiretEstablishmentDto>()
+  .withDeps<{ siretGateway: SiretGateway }>()
+  .build(async ({ inputParams, uow, deps: { siretGateway } }) => {
+    const { siret } = inputParams;
 
     if (
       await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
@@ -49,11 +39,10 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
       throw errors.establishment.conflictError({ siret });
 
     const siretEstablishment = await getSiretEstablishmentFromApi(
-      params,
-      this.#siretGateway,
+      inputParams,
+      siretGateway,
     );
 
     if (siretEstablishment) return siretEstablishment;
     throw errors.siretApi.notFound({ siret });
-  }
-}
+  });
