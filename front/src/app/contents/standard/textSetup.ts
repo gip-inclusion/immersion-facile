@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { MainWrapperProps } from "react-design-system";
 import type { StandardPageSlugs } from "shared";
 import accessibilityContent from "./accessibilite";
@@ -10,10 +11,9 @@ import siteMapContent from "./siteMap";
 
 export type StandardPageContent = {
   title: string;
-  content: string;
+  content: () => ReactElement;
   options?: {
     layout?: MainWrapperProps["layout"];
-    replaceNewLines?: boolean;
   };
 };
 

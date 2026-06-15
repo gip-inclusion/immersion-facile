@@ -2,6 +2,13 @@ import type { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 import { domElementIds, frontRoutes } from "shared";
 import type { VersionnedStandardContent } from "./textSetup";
 
+export default {
+  latest: {
+    title: "Plan du site",
+    content: () => <LatestSiteMapContent />,
+  },
+} satisfies VersionnedStandardContent;
+
 const { siteMap: siteMapIds } = domElementIds.standard;
 
 const siteMapLinks: RegisteredLinkProps[] = [
@@ -72,17 +79,18 @@ const siteMapLinks: RegisteredLinkProps[] = [
   },
 ];
 
-export default {
-  latest: {
-    title: "Plan du site",
-    content: `
-  <ul>${siteMapLinks
-    .map(
-      (link) =>
-        `<li><a class="fr-link fr-fi-arrow-right-line fr-link--icon-right" href=${link.href} id=${link.id}>${link.title}</a></li>`,
-    )
-    .join("")} 
+const LatestSiteMapContent = () => (
+  <ul>
+    {siteMapLinks.map((link) => (
+      <li key={link.id}>
+        <a
+          className="fr-link fr-fi-arrow-right-line fr-link--icon-right"
+          href={link.href}
+          id={link.id}
+        >
+          {link.title}
+        </a>
+      </li>
+    ))}
   </ul>
-  `,
-  },
-} satisfies VersionnedStandardContent;
+);

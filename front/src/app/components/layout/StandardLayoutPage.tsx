@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { format } from "date-fns";
-import { renderContent } from "html-templates/src/components/email";
 import { MainWrapper } from "react-design-system";
 import { frontRoutes, type StandardPageSlugs } from "shared";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
@@ -16,7 +15,7 @@ export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
     route.params.pagePath as StandardPageSlugs,
     route.params.version,
   );
-  const { title, content, options } = page;
+  const { title, content: Content, options } = page;
 
   return (
     <HeaderFooterLayout>
@@ -25,15 +24,7 @@ export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
           {title} (
           {version === "latest" ? "dernière version" : `version du ${version}`})
         </h1>
-        <div
-          dangerouslySetInnerHTML={{
-            __html:
-              renderContent(content, {
-                wrapInTable: false,
-                replaceNewLines: options?.replaceNewLines ?? true,
-              }) || "",
-          }}
-        />
+        <Content />
         {allVersions.length > 1 ? (
           <>
             <h2 className={fr.cx("fr-h3")}>Versions</h2>
