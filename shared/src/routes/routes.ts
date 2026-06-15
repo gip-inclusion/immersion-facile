@@ -36,7 +36,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   addAgency: "ajouter-prescripteur",
   manageConventionConnectedUser: "pilotage-convention-inclusion-connect",
   conventionTemplate: "modele-convention",
-  myProfile: "mon-profil",
+  myAccount: "mon-compte",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
 };
@@ -65,7 +65,7 @@ export const legacyFrontRoutes = {
   manageConvention: "pilotage-convention",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   myProfileEstablishmentRegistration: "rattachement-entreprise",
-  profile: "mon-profil",
+  myAccount: "mon-compte",
   search: "recherche",
   externalSearch: "recherche-partenaires",
   searchForStudent: "recherche-scolaire",
@@ -178,17 +178,20 @@ const admin = defineRoute(
   () => `/${legacyFrontRoutes.admin}`,
 );
 
-const beneficiaryDashboard = defineRoute(
+const myAccount = defineRoute(
   {
     ...connectedUserParams,
     ...acquisitionParams,
   },
-  () => `/${legacyFrontRoutes.beneficiaryDashboard}`,
+  () => `/${legacyFrontRoutes.myAccount}`,
 );
 
-const agencyDashboard = defineRoute(
+const beneficiaryDashboard = myAccount.extend(
+  `/${legacyFrontRoutes.beneficiaryDashboard}`,
+);
+
+const agencyDashboard = myAccount.extend(
   {
-    ...connectedUserParams,
     isAgencyRegistration: param.query.optional.boolean,
   },
   () => [
@@ -197,17 +200,8 @@ const agencyDashboard = defineRoute(
   ],
 );
 
-const establishmentDashboard = defineRoute(
-  {
-    ...connectedUserParams,
-    ...acquisitionParams,
-  },
-  () => `/${legacyFrontRoutes.establishmentDashboard}`,
-);
-
-const myProfile = defineRoute(
-  connectedUserParams,
-  () => `/${legacyFrontRoutes.profile}`,
+const establishmentDashboard = myAccount.extend(
+  `/${legacyFrontRoutes.establishmentDashboard}`,
 );
 
 const agencyDashboardAgencies = agencyDashboard.extend("/agences");
@@ -298,11 +292,11 @@ export const {
   agencyManagement: agencyDashboard.extend("/pilotage-structure"),
   establishmentManagement: agencyDashboard.extend("/pilotage-entreprises"),
 
-  myProfile,
-  myProfileAgencies: myProfile.extend("/mes-agences"),
-  myProfileEstablishments: myProfile.extend("/mes-etablissements"),
-  myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
-  myProfileEstablishmentRegistration: myProfile.extend(
+  myAccount,
+  myAccountAgencies: myAccount.extend("/mes-agences"),
+  myAccountEstablishments: myAccount.extend("/mes-etablissements"),
+  myAccountAgencyRegistration: myAccount.extend("/agency-registration"),
+  myAccountEstablishmentRegistration: myAccount.extend(
     { siret: param.query.optional.string },
     () => `/${legacyFrontRoutes.myProfileEstablishmentRegistration}`,
   ),

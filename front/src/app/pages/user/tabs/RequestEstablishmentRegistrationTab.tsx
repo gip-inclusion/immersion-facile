@@ -23,7 +23,7 @@ export const RequestEstablishmentRegistrationTab = () => {
         breadcrumbs={<Breadcrumbs />}
         badge={
           <Button
-            linkProps={frontRoutes.myProfile().link}
+            linkProps={frontRoutes.myAccount().link}
             priority={"secondary"}
             size="small"
             className={fr.cx("fr-mb-6w")}

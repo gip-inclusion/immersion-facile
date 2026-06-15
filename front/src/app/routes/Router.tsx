@@ -303,10 +303,10 @@ const getPageByRouteName: {
       <ConventionManageConnectedUser route={route} />
     </ConnectedPrivateRoutePage>
   ),
-  myProfile: (route) => (
-    <RedirectTo route={frontRoutes.myProfileAgencies(route.params)} />
+  myAccount: (route) => (
+    <RedirectTo route={frontRoutes.myAccountAgencies(route.params)} />
   ),
-  myProfileAgencies: (route) => (
+  myAccountAgencies: (route) => (
     <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
@@ -317,7 +317,7 @@ const getPageByRouteName: {
     </ConnectedPrivateRoutePage>
   ),
 
-  myProfileEstablishments: (route) => (
+  myAccountEstablishments: (route) => (
     <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
@@ -327,7 +327,7 @@ const getPageByRouteName: {
       <MyProfileMainTab route={route} />
     </ConnectedPrivateRoutePage>
   ),
-  myProfileAgencyRegistration: (route) => (
+  myAccountAgencyRegistration: (route) => (
     <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={
@@ -338,7 +338,7 @@ const getPageByRouteName: {
     </ConnectedPrivateRoutePage>
   ),
 
-  myProfileEstablishmentRegistration: (route) => (
+  myAccountEstablishmentRegistration: (route) => (
     <ConnectedPrivateRoutePage
       route={route}
       oAuthConnectionPageHeader={

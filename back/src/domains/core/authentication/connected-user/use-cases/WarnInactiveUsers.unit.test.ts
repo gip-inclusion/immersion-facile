@@ -163,7 +163,7 @@ describe("WarnInactiveUsers", () => {
             fullName: `${inactiveUser.firstName} ${inactiveUser.lastName}`,
             deletionDate: "22 janvier 2026",
             loginUrl: makeRouteAbsoluteUrl({
-              route: frontRoutes.myProfile(),
+              route: frontRoutes.myAccount(),
               baseUrl: immersionBaseUrl,
             }),
           },
@@ -175,7 +175,7 @@ describe("WarnInactiveUsers", () => {
             fullName: `${neverLoggedInUserAndCreatedMoreThan2YearsAgo.firstName} ${neverLoggedInUserAndCreatedMoreThan2YearsAgo.lastName}`,
             deletionDate: "22 janvier 2026",
             loginUrl: makeRouteAbsoluteUrl({
-              route: frontRoutes.myProfile(),
+              route: frontRoutes.myAccount(),
               baseUrl: immersionBaseUrl,
             }),
           },
@@ -307,7 +307,7 @@ describe("WarnInactiveUsers", () => {
             fullName: `${userWithOldActivity.firstName} ${userWithOldActivity.lastName}`,
             deletionDate: "22 janvier 2026",
             loginUrl: makeRouteAbsoluteUrl({
-              route: frontRoutes.myProfile(),
+              route: frontRoutes.myAccount(),
               baseUrl: immersionBaseUrl,
             }),
           },

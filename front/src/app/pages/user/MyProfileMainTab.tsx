@@ -13,8 +13,8 @@ import type { Route } from "type-route";
 
 type MyProfileMainTabProps = {
   route: Route<
-    | typeof frontRoutes.myProfileAgencies
-    | typeof frontRoutes.myProfileEstablishments
+    | typeof frontRoutes.myAccountAgencies
+    | typeof frontRoutes.myAccountEstablishments
   >;
 };
 

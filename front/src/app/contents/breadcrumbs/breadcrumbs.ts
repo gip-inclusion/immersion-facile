@@ -34,14 +34,6 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Inscrire mon organisme",
         route: frontRoutes.addAgency(),
       },
-      agencyDashboardMain: {
-        label: "Tableau de bord",
-        route: frontRoutes.agencyDashboardMain(),
-      },
-      agencyDashboardAgencyDetails: {
-        label: "Détail de l'organisme",
-        route: frontRoutes.agencyDashboardAgencyDetails({ agencyId: "" }),
-      },
     },
   },
   homeCandidates: {
@@ -105,51 +97,59 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
     label: "Bilan d'immersion",
     route: frontRoutes.assessmentDocument({ jwt: "", conventionId: "" }),
   },
-  myProfile: {
+  myAccount: {
     label: "Mon profil",
-    route: frontRoutes.myProfile(),
+    route: frontRoutes.myAccount(),
     children: {
-      myProfileAgencyRegistration: {
+      myAccountAgencyRegistration: {
         label: "Demander l'accès à des organismes",
-        route: frontRoutes.myProfileAgencyRegistration(),
+        route: frontRoutes.myAccountAgencyRegistration(),
       },
-      myProfileEstablishmentRegistration: {
+      myAccountEstablishmentRegistration: {
         label: "Se rattacher à une entreprise",
-        route: frontRoutes.myProfileEstablishmentRegistration(),
+        route: frontRoutes.myAccountEstablishmentRegistration(),
+      },
+      establishmentDashboard: {
+        label: "Tableau de bord entreprise",
+        route: frontRoutes.establishmentDashboard(),
+        children: {
+          establishmentDashboardConventions: {
+            label: "Conventions",
+            route: frontRoutes.establishmentDashboardConventions(),
+          },
+          establishmentDashboardDiscussions: {
+            label: "Discussions",
+            route: frontRoutes.establishmentDashboardDiscussions(),
+          },
+          establishmentDashboardFormEstablishment: {
+            label: "Fiche entreprise",
+            route: frontRoutes.formEstablishment(),
+          },
+        },
+      },
+      beneficiaryDashboard: {
+        label: "Tableau de bord bénéficiaire",
+        route: frontRoutes.beneficiaryDashboard(),
+        children: {
+          beneficiaryDashboardDiscussions: {
+            label: "Candidatures",
+            route: frontRoutes.beneficiaryDashboardDiscussions(),
+          },
+        },
+      },
+      agencyDashboardMain: {
+        label: "Tableau de bord",
+        route: frontRoutes.agencyDashboardMain(),
+      },
+      agencyDashboardAgencyDetails: {
+        label: "Détail de l'organisme",
+        route: frontRoutes.agencyDashboardAgencyDetails({ agencyId: "" }),
       },
     },
   },
   admin: {
     label: "Administration",
     route: frontRoutes.admin(),
-  },
-  establishmentDashboard: {
-    label: "Tableau de bord entreprise",
-    route: frontRoutes.establishmentDashboard(),
-    children: {
-      establishmentDashboardConventions: {
-        label: "Conventions",
-        route: frontRoutes.establishmentDashboardConventions(),
-      },
-      establishmentDashboardDiscussions: {
-        label: "Discussions",
-        route: frontRoutes.establishmentDashboardDiscussions(),
-      },
-      establishmentDashboardFormEstablishment: {
-        label: "Fiche entreprise",
-        route: frontRoutes.formEstablishment(),
-      },
-    },
-  },
-  beneficiaryDashboard: {
-    label: "Tableau de bord bénéficiaire",
-    route: frontRoutes.beneficiaryDashboard(),
-    children: {
-      beneficiaryDashboardDiscussions: {
-        label: "Candidatures",
-        route: frontRoutes.beneficiaryDashboardDiscussions(),
-      },
-    },
   },
   magicLinkInterstitial: {
     label: "Connexion à Immersion Facilitée",
