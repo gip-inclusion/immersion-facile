@@ -13,6 +13,7 @@ import {
   frontRoutes,
   immersionFacileHelpdeskRootUrl,
   onlyAdminUserRightsWithStatusAccepted,
+  type UserEstablishmentRightDetails,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
 import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
@@ -59,7 +60,7 @@ export const EstablishmentDashboardTabs = ({
   const tabs = useMemo(
     () =>
       getDashboardTabs(
-        makeEstablishmentDashboardTabs(currentUser, route, userHasDiscussions),
+        makeEstablishmentDashboardTabs(currentUser, userHasDiscussions),
         currentTab,
       ),
     [currentUser, currentTab, route, userHasDiscussions],
@@ -118,6 +119,11 @@ export const EstablishmentDashboardTabs = ({
     </>
   );
 };
+const filterActiveEstablishmentsForUser = (
+  establishment: UserEstablishmentRightDetails,
+) =>
+  !establishment.isEstablishmentBanned &&
+  onlyAdminUserRightsWithStatusAccepted(establishment);
 
 const makeEstablishmentDashboardTabs = (
   {
@@ -126,18 +132,13 @@ const makeEstablishmentDashboardTabs = (
     },
     establishments,
   }: ConnectedUser,
-  route: FrontEstablishmentDashboardRoute,
   userHasDiscussions: boolean,
 ): DashboardTab[] => {
   const establishmentsArray = establishments
-    ? establishments.filter(
-        (establishment) => !establishment.isEstablishmentBanned,
-      )
+    ? establishments.filter(filterActiveEstablishmentsForUser)
     : [];
   const userIsOnboarding = establishmentsArray.length === 0;
-  const userCanManageEstablishments =
-    establishmentsArray.filter(onlyAdminUserRightsWithStatusAccepted).length >
-    0;
+  const userCanManageEstablishments = establishmentsArray.length > 0;
 
   return [
     {
