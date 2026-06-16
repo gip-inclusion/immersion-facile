@@ -2,9 +2,12 @@
   display: flex;
   align-items: center;
   list-style: none;
+  flex-wrap: wrap;
+
   &__item {
-    & + & {
+    &+& {
       margin-left: .5rem;
+
       &::before {
         content: '•';
         margin-right: .5rem;
