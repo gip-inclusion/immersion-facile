@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
+  businessCustomizedNameSchema,
   businessNameSchema,
-  customizedNameSchema,
-} from "../establishment/businessName";
+} from "../establishment/businessComponents.schema";
 import { fitForDisabledWorkersSchema } from "../formEstablishment/FormEstablishment.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { nafCodeSchema, nafSousClasseLabelSchema } from "../naf/naf.schema";
@@ -44,7 +44,7 @@ const commonOfferSchema = z.object({
   siret: siretSchema,
   establishmentScore: z.number(),
   name: businessNameSchema,
-  customizedName: customizedNameSchema.optional(),
+  customizedName: businessCustomizedNameSchema.optional(),
   voluntaryToImmersion: z.boolean(),
   position: geoPositionSchema,
   address: z.object({

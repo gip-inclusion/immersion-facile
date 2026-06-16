@@ -1,7 +1,7 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { AgencyDashboards, AgencyId } from "../agency/agency.dto";
 import type { ConventionId } from "../convention/convention.dto";
-import type { EstablishmentDashboards } from "../establishment/establishment";
+import type { EstablishmentDashboards } from "../establishment/establishment.dto";
 import type { UserId } from "../user/user.dto";
 
 export type DashboardName =

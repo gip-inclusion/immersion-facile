@@ -8,7 +8,7 @@ import type { Email } from "../email/email.dto";
 import type {
   WithEstablishmentDashboards,
   WithUserEstablishmentRightDetails,
-} from "../establishment/establishment";
+} from "../establishment/establishment.dto";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 import type { DateTimeIsoString } from "../utils/date";

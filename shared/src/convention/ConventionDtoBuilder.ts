@@ -1,7 +1,7 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AgencyId } from "../agency/agency.dto";
 import type { Builder } from "../Builder";
-import type { BusinessName } from "../establishment/businessName";
+import type { BusinessName } from "../establishment/establishment.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { RemoteWorkMode } from "../remoteWorkMode/remoteWorkMode.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";

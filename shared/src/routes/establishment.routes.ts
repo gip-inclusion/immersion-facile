@@ -12,7 +12,7 @@ import {
   establishmentNameAndAdminsSchema,
   establishmentPublicOptionsSchema,
   getEstablishmentPublicOptionsByFiltersSchema,
-} from "../establishment/establishment";
+} from "../establishment/establishment.schema";
 import {
   formEstablishmentPendingUserRightSchema,
   formEstablishmentSchema,

@@ -1,68 +1,30 @@
-import { z } from "zod";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
-import { emailSchema } from "../email/email.schema";
 import type {
   EstablishmentUserRightStatus,
   FormEstablishmentDto,
   FormEstablishmentPendingUserRight,
 } from "../formEstablishment/FormEstablishment.dto";
-import { formEstablishmentPendingUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
-import { siretSchema } from "../siret/siret.schema";
-import { zStringMinLength1Max1024 } from "../utils/string.schema";
-import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
-import {
-  type WithBannedEstablishmentInformations,
-  withBannedEstablishmentInformationSchema,
-} from "./bannedEstablishmentInformations";
-import {
-  type BusinessName,
-  businessNameSchema,
-  customizedNameSchema,
-} from "./businessName";
+import type { Flavor } from "../typeFlavors";
+import type { WithBannedEstablishmentInformations } from "./bannedEstablishmentInformations.dto";
+
+export type BusinessAddress = Flavor<string, "BusinessAddress">;
+
+export type BusinessName = Flavor<string, "BusinessName">;
+
+export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
 
 export type EstablishmentNameAndAdmins = {
   name: string;
   adminEmails: Email[];
 };
 
-export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<EstablishmentNameAndAdmins> =
-  z.object({
-    name: zStringMinLength1Max1024,
-    adminEmails: z.array(emailSchema),
-  });
-
 export type GetEstablishmentPublicOptionsByFiltersInput = {
   nameIncludes?: string;
   siret?: SiretDto;
 };
-
-export const getEstablishmentPublicOptionsByFiltersSchema: ZodSchemaWithInputMatchingOutput<GetEstablishmentPublicOptionsByFiltersInput> =
-  z.object({
-    nameIncludes: z.string().optional(),
-    siret: z.string().optional(),
-  });
-
-export const establishmentPublicOptionSchema: ZodSchemaWithInputMatchingOutput<EstablishmentPublicOption> =
-  z
-    .object({
-      businessName: businessNameSchema,
-      businessNameCustomized: customizedNameSchema.optional(),
-      siret: siretSchema,
-    })
-    .and(withBannedEstablishmentInformationSchema);
-
-export const establishmentPublicOptionsSchema: ZodSchemaWithInputMatchingOutput<
-  EstablishmentPublicOption[]
-> = z.array(establishmentPublicOptionSchema);
-
-export const registerUserOnEstablishmentPayloadSchema: ZodSchemaWithInputMatchingOutput<RegisterUserOnEstablishmentPayload> =
-  z.object({
-    siret: siretSchema,
-    userRight: formEstablishmentPendingUserRightSchema,
-  });
 
 export type RegisterUserOnEstablishmentPayload = {
   siret: SiretDto;

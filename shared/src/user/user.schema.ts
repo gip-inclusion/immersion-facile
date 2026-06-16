@@ -7,12 +7,12 @@ import {
 } from "../agency/agency.schema";
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
 import { emailSchema } from "../email/email.schema";
-import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
-import { businessNameSchema } from "../establishment/businessName";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations.schema";
+import { businessNameSchema } from "../establishment/businessComponents.schema";
 import type {
   UserEstablishmentRightDetails,
   WithEstablishmentDashboards,
-} from "../establishment/establishment";
+} from "../establishment/establishment.dto";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";

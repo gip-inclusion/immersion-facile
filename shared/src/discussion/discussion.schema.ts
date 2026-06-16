@@ -8,7 +8,7 @@ import {
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
-import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations.schema";
 import { contactModeSchema } from "../formEstablishment/FormEstablishment.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
