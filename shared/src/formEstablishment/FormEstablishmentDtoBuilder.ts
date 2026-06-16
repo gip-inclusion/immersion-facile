@@ -3,7 +3,7 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
 import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
-import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations";
+import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations.dto";
 import type { NafDto } from "../naf/naf.dto";
 import type { SiretDto } from "../siret/siret";
 import type {

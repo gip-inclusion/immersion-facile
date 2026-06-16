@@ -13,9 +13,11 @@ import {
   legacyAssessmentStatuses,
 } from "../assessment/assessment.dto";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
-import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations";
-import { businessAddressSchema } from "../establishment/businessAddress";
-import { businessNameSchema } from "../establishment/businessName";
+import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations.schema";
+import {
+  businessAddressSchema,
+  businessNameSchema,
+} from "../establishment/businessComponents.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { dateFilterSchema } from "../filters";
 import {

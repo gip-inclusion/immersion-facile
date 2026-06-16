@@ -2,7 +2,7 @@ import type { AddressDto, LocationId } from "../address/address.dto";
 import type {
   BusinessName,
   BusinessNameCustomized,
-} from "../establishment/businessName";
+} from "../establishment/establishment.dto";
 import type {
   ContactMode,
   EstablishmentWebSite,

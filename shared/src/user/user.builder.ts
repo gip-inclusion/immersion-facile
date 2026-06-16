@@ -6,7 +6,7 @@ import {
   noEstablishmentDashboard,
 } from "../dashboard/dashboard.dto";
 import type { Email } from "../email/email.dto";
-import type { UserEstablishmentRightDetails } from "../establishment/establishment";
+import type { UserEstablishmentRightDetails } from "../establishment/establishment.dto";
 import type {
   ConnectedUser,
   User,

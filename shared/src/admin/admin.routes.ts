@@ -7,7 +7,7 @@ import {
   writeApiConsumerSchema,
 } from "../apiConsumer/apiConsumer.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
-import { banEstablishmentPayloadSchema } from "../establishment/bannedEstablishmentInformations";
+import { banEstablishmentPayloadSchema } from "../establishment/bannedEstablishmentInformations.schema";
 import { setFeatureFlagSchema } from "../featureFlag/featureFlags.schema";
 import {
   establishmentBatchReportSchema,
