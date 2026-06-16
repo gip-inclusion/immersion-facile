@@ -708,15 +708,14 @@ describe("authenticatedConventionRoutes", () => {
     });
 
     it("200 - returns paginated conventions to-complete and to-sign", async () => {
-      const jwt = generateConnectedUserJwt({
-        userId: validator.id,
-        version: currentJwtVersions.connectedUser,
-        iat: Math.round(now.getTime() / 1000),
-      });
-
       const response = await httpClient.getConventionsWithUnfinalizedAssessment(
         {
-          headers: { authorization: jwt },
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: validator.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
           queryParams: { page: 1, perPage: 10 },
         },
       );
