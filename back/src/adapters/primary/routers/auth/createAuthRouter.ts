@@ -31,17 +31,21 @@ export const createAuthRouter = (deps: AppDependencies) => {
 
   authSharedRouter.afterFTConnectOAuthLogin(async (req, res) => {
     return sendHttpResponse(req, res, async () => {
-      try {
-        const useCaseResult =
-          await deps.useCases.afterOAuthSuccessRedirection.execute(req.query);
-        return res.status(302).redirect(useCaseResult.redirectUri);
-      } catch (error) {
-        if (error instanceof ManagedFTConnectError)
-          return deps.errorHandlers.handleManagedRedirectResponseError(res);
-        if (error instanceof FTConnectError)
-          return deps.errorHandlers.handleRawRedirectResponseError(error, res);
-        throw error;
-      }
+      return deps.useCases.afterOAuthSuccessRedirection
+        .execute(req.query)
+        .then((result) => {
+          return res.status(302).redirect(result.redirectUri);
+        })
+        .catch((error) => {
+          if (error instanceof ManagedFTConnectError)
+            return deps.errorHandlers.handleManagedRedirectResponseError(res);
+          if (error instanceof FTConnectError)
+            return deps.errorHandlers.handleRawRedirectResponseError(
+              error,
+              res,
+            );
+          throw error;
+        });
     });
   });
 

@@ -81,13 +81,13 @@ export const oAuthSuccessLoginParamsSchema: ZodSchemaWithInputMatchingOutput<OAu
     state: z.string(),
   });
 
-const oauthProviderSchema: ZodSchemaWithInputMatchingOutput<OAuthProviderForLogin> =
+const oAuthProviderForLoginSchema: ZodSchemaWithInputMatchingOutput<OAuthProviderForLogin> =
   z.enum(["proConnect", "peConnect"]);
 
 export const logoutQueryParamsSchema: ZodSchemaWithInputMatchingOutput<LogoutQueryParams> =
   z.object({
     idToken: z.string(),
-    provider: oauthProviderSchema,
+    provider: oAuthProviderForLoginSchema,
   });
 
 export const afterOAuthSuccessRedirectionResponseSchema: ZodSchemaWithInputMatchingOutput<AfterOAuthSuccessRedirectionResponse> =

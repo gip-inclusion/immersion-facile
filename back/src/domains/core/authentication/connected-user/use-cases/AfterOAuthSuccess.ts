@@ -1,13 +1,10 @@
 import {
   type AbsoluteUrl,
   type AfterOAuthSuccessRedirectionResponse,
-  absoluteUrlSchema,
   authFailed,
   type ConventionDraftDto,
-  type ExtractFromExisting,
   errors,
   executeInSequence,
-  type FederatedIdentityProvider,
   frontRoutes,
   makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
@@ -110,9 +107,8 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     return match(ongoingOAuth)
       .with({ provider: "email" }, async (emailOauth: EmailOngoingAuth) => {
         if (emailOauth.usedAt) throw errors.auth.alreadyUsedAuthentication();
-        return this.#saveAuthenticationDataAndReturnRedirectURI({
+        return this.#saveEmailAuthenticationDataAndReturnRedirectURI({
           uow,
-          provider: emailOauth.provider,
           ...(await this.#onEmailProvider(uow, emailOauth, code)),
         });
       })
@@ -122,14 +118,12 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
           if (ongoingOAuth.usedAt) {
             return {
               provider: ongoingOAuth.provider,
-              redirectUri: absoluteUrlSchema.parse(
-                `${this.#immersionFacileBaseUrl}${ongoingOAuth.fromUri}?alreadyUsedAuthentication=true`,
-              ),
+              redirectUri:
+                `${this.#immersionFacileBaseUrl}${ongoingOAuth.fromUri}?alreadyUsedAuthentication=true` satisfies AbsoluteUrl,
             };
           }
-          return this.#saveAuthenticationDataAndReturnRedirectURI({
+          return this.#saveProConnectAuthenticationDataAndReturnRedirectURI({
             uow,
-            provider: proConnectOngoingOAuth.provider,
             ...(await this.#onProConnectProvider(
               uow,
               proConnectOngoingOAuth,
@@ -141,9 +135,8 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       .with(
         { provider: "peConnect" },
         async (ftConnectOngoinOAuth: FTConnectOngoingAuth) => {
-          return this.#saveAuthenticationDataAndReturnRedirectURI({
+          return this.#saveFTConnectAuthenticationDataAndReturnRedirectURI({
             uow,
-            provider: ftConnectOngoinOAuth.provider,
             ...(await this.#onFTConnectProvider(ftConnectOngoinOAuth, code)),
           });
         },
@@ -151,172 +144,159 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       .exhaustive();
   }
 
-  async #saveAuthenticationDataAndReturnRedirectURI(
-    params:
-      | {
-          uow: UnitOfWork;
-          provider: ExtractFromExisting<FederatedIdentityProvider, "email">;
-          newOrUpdatedUser: UserWithAdminRights;
-          updatedOngoingOAuth: EmailOngoingAuth;
-        }
-      | {
-          uow: UnitOfWork;
-          provider: ExtractFromExisting<
-            FederatedIdentityProvider,
-            "proConnect"
-          >;
-          newOrUpdatedUser: UserWithAdminRights;
-          updatedOngoingOAuth: ProConnectOngoingAuth;
-          accessToken: GetAccessTokenResult;
-        }
-      | {
-          uow: UnitOfWork;
-          provider: ExtractFromExisting<FederatedIdentityProvider, "peConnect">;
-          updatedOngoingOAuth: FTConnectOngoingAuth;
-          accessToken: GetAccessTokenResult;
-        },
-  ): Promise<AfterOAuthSuccessRedirectionResponse> {
-    return match(params)
-      .with(
-        { provider: "email" },
-        async ({ uow, newOrUpdatedUser, updatedOngoingOAuth }) => {
-          await uow.userRepository.save({
-            ...newOrUpdatedUser,
-            lastLoginAt: this.#timeGateway.now().toISOString(),
-          });
-          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+  async #saveEmailAuthenticationDataAndReturnRedirectURI({
+    uow,
+    newOrUpdatedUser,
+    updatedOngoingOAuth,
+  }: {
+    uow: UnitOfWork;
+    newOrUpdatedUser: UserWithAdminRights;
+    updatedOngoingOAuth: EmailOngoingAuth;
+  }): Promise<AfterOAuthSuccessRedirectionResponse> {
+    await uow.userRepository.save({
+      ...newOrUpdatedUser,
+      lastLoginAt: this.#timeGateway.now().toISOString(),
+    });
+    await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
 
-          return {
-            provider: updatedOngoingOAuth.provider,
-            redirectUri: this.#generateConnectedUserLoginUrl({
-              user: newOrUpdatedUser,
-              ongoingOAuth: updatedOngoingOAuth,
-              now: this.#timeGateway.now(),
-              accessToken: undefined,
-            }),
-          };
+    return {
+      provider: updatedOngoingOAuth.provider,
+      redirectUri: this.#generateConnectedUserLoginUrl({
+        user: newOrUpdatedUser,
+        ongoingOAuth: updatedOngoingOAuth,
+        now: this.#timeGateway.now(),
+        accessToken: undefined,
+      }),
+    };
+  }
+
+  async #saveProConnectAuthenticationDataAndReturnRedirectURI({
+    uow,
+    newOrUpdatedUser,
+    updatedOngoingOAuth,
+    accessToken,
+  }: {
+    uow: UnitOfWork;
+    newOrUpdatedUser: UserWithAdminRights;
+    updatedOngoingOAuth: ProConnectOngoingAuth;
+    accessToken: GetAccessTokenResult;
+  }): Promise<AfterOAuthSuccessRedirectionResponse> {
+    await uow.userRepository.save({
+      ...newOrUpdatedUser,
+      lastLoginAt: this.#timeGateway.now().toISOString(),
+    });
+    await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "UserAuthenticatedSuccessfully",
+        payload: {
+          userId: newOrUpdatedUser.id,
+          codeSafir:
+            accessToken &&
+            "structure_pe" in accessToken.payload &&
+            accessToken.payload.structure_pe
+              ? accessToken.payload.structure_pe
+              : null,
+          triggeredBy: {
+            kind: "connected-user",
+            userId: newOrUpdatedUser.id,
+          },
         },
-      )
-      .with(
-        { provider: "proConnect" },
-        async ({ uow, newOrUpdatedUser, updatedOngoingOAuth, accessToken }) => {
-          await uow.userRepository.save({
-            ...newOrUpdatedUser,
-            lastLoginAt: this.#timeGateway.now().toISOString(),
-          });
-          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
-          await uow.outboxRepository.save(
-            this.#createNewEvent({
-              topic: "UserAuthenticatedSuccessfully",
-              payload: {
-                userId: newOrUpdatedUser.id,
-                codeSafir:
-                  accessToken &&
-                  "structure_pe" in accessToken.payload &&
-                  accessToken.payload.structure_pe
-                    ? accessToken.payload.structure_pe
-                    : null,
-                triggeredBy: {
-                  kind: "connected-user",
-                  userId: newOrUpdatedUser.id,
-                },
-              },
-            }),
-          );
-          return {
-            provider: updatedOngoingOAuth.provider,
-            redirectUri: this.#generateConnectedUserLoginUrl({
-              user: newOrUpdatedUser,
-              accessToken,
-              ongoingOAuth: updatedOngoingOAuth,
-              now: this.#timeGateway.now(),
-            }),
-          };
+      }),
+    );
+    return {
+      provider: updatedOngoingOAuth.provider,
+      redirectUri: this.#generateConnectedUserLoginUrl({
+        user: newOrUpdatedUser,
+        accessToken,
+        ongoingOAuth: updatedOngoingOAuth,
+        now: this.#timeGateway.now(),
+      }),
+    };
+  }
+
+  async #saveFTConnectAuthenticationDataAndReturnRedirectURI({
+    uow,
+    updatedOngoingOAuth,
+    accessToken,
+  }: {
+    uow: UnitOfWork;
+    updatedOngoingOAuth: FTConnectOngoingAuth;
+    accessToken: GetAccessTokenResult;
+  }): Promise<AfterOAuthSuccessRedirectionResponse> {
+    await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
+    const userAndAdvisors = await this.#ftConnectGateway.getUserAndAdvisors({
+      value: accessToken.accessToken,
+      expiresIn: accessToken.expire,
+      idToken: accessToken.idToken,
+    });
+    if (!userAndAdvisors) {
+      return {
+        provider: updatedOngoingOAuth.provider,
+        redirectUri: makeRouteAbsoluteUrl({
+          route: frontRoutes.conventionImmersion({
+            fedId: authFailed,
+            fedIdToken: accessToken.idToken,
+            fedIdProvider: "peConnect",
+          }),
+          baseUrl: this.#immersionFacileBaseUrl,
+        }),
+      };
+    }
+    const validAdvisor = userAndAdvisors.user.isJobseeker
+      ? chooseValidAdvisor(userAndAdvisors.user, userAndAdvisors.advisors)
+      : undefined;
+
+    await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
+      advisor: validAdvisor,
+      user: userAndAdvisors.user,
+    });
+
+    const conventionDraft: ConventionDraftDto = {
+      id: this.#uuidGenerator.new(),
+      internshipKind: "immersion",
+      fromPeConnectedUser: true,
+      signatories: {
+        beneficiary: {
+          birthdate: userAndAdvisors.user.birthdate,
+          email: userAndAdvisors.user.email,
+          firstName: userAndAdvisors.user.firstName,
+          lastName: userAndAdvisors.user.lastName,
+          phone: userAndAdvisors.user.phone,
+          federatedIdentity: {
+            provider: "peConnect",
+            token: userAndAdvisors.user.peExternalId,
+          },
         },
-      )
-      .with(
-        { provider: "peConnect" },
-        async ({ uow, updatedOngoingOAuth, accessToken }) => {
-          await uow.ongoingOAuthRepository.save(updatedOngoingOAuth);
-          const userAndAdvisors =
-            await this.#ftConnectGateway.getUserAndAdvisors({
-              value: accessToken.accessToken,
-              expiresIn: accessToken.expire,
-              idToken: accessToken.idToken,
-            });
-          if (!userAndAdvisors) {
-            return {
-              provider: updatedOngoingOAuth.provider,
-              redirectUri: makeRouteAbsoluteUrl({
-                route: frontRoutes.conventionImmersion({
-                  fedId: authFailed,
-                  fedIdToken: accessToken.idToken,
-                  fedIdProvider: "peConnect",
-                }),
-                baseUrl: this.#immersionFacileBaseUrl,
-              }),
-            };
+      },
+      validators: validAdvisor
+        ? {
+            agencyCounsellor: {
+              firstname: validAdvisor.firstName,
+              lastname: validAdvisor.lastName,
+            },
           }
-          const validAdvisor = userAndAdvisors.user.isJobseeker
-            ? chooseValidAdvisor(userAndAdvisors.user, userAndAdvisors.advisors)
-            : undefined;
+        : undefined,
+    };
+    await uow.conventionDraftRepository.save(
+      conventionDraft,
+      this.#timeGateway.now().toISOString(),
+    );
 
-          await uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
-            {
-              advisor: validAdvisor,
-              user: userAndAdvisors.user,
-            },
-          );
-
-          const conventionDraft: ConventionDraftDto = {
-            id: this.#uuidGenerator.new(),
-            internshipKind: "immersion",
-            fromPeConnectedUser: true,
-            signatories: {
-              beneficiary: {
-                birthdate: userAndAdvisors.user.birthdate,
-                email: userAndAdvisors.user.email,
-                firstName: userAndAdvisors.user.firstName,
-                lastName: userAndAdvisors.user.lastName,
-                phone: userAndAdvisors.user.phone,
-                federatedIdentity: {
-                  provider: "peConnect",
-                  token: userAndAdvisors.user.peExternalId,
-                },
-              },
-            },
-            validators: validAdvisor
-              ? {
-                  agencyCounsellor: {
-                    firstname: validAdvisor.firstName,
-                    lastname: validAdvisor.lastName,
-                  },
-                }
-              : undefined,
-          };
-          await uow.conventionDraftRepository.save(
-            conventionDraft,
-            this.#timeGateway.now().toISOString(),
-          );
-
-          await uow.outboxRepository.save(
-            this.#createNewEvent({
-              topic: "FTConnectedSuccessfully",
-              payload: {
-                ftConnectUserId: userAndAdvisors.user.peExternalId,
-                conventionDraftId: conventionDraft.id,
-              },
-            }),
-          );
-          return {
-            provider: updatedOngoingOAuth.provider,
-            redirectUri: absoluteUrlSchema.parse(
-              `${this.#immersionFacileBaseUrl}${updatedOngoingOAuth.fromUri}?conventionDraftId=${conventionDraft.id}`,
-            ),
-          };
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "FTConnectedSuccessfully",
+        payload: {
+          ftConnectUserId: userAndAdvisors.user.peExternalId,
+          conventionDraftId: conventionDraft.id,
         },
-      )
-      .exhaustive();
+      }),
+    );
+    return {
+      provider: updatedOngoingOAuth.provider,
+      redirectUri:
+        `${this.#immersionFacileBaseUrl}${updatedOngoingOAuth.fromUri}?conventionDraftId=${conventionDraft.id}` satisfies AbsoluteUrl,
+    };
   }
 
   async #onProConnectProvider(
