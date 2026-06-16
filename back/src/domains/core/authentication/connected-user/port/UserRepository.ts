@@ -6,7 +6,7 @@ import type {
   UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 
-export type GetUserIdsLoggedInAndCreatedLongAgoParams = {
+export type GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams = {
   since: Date;
   limit: number;
   offset: number;
@@ -25,7 +25,7 @@ export interface UserRepository {
     externalId: string,
   ): Promise<UserWithAdminRights | undefined>;
   findByEmail(email: Email): Promise<UserWithAdminRights | undefined>;
-  getUserIdsLoggedInAndCreatedLongAgo(
-    params: GetUserIdsLoggedInAndCreatedLongAgoParams,
+  getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+    params: GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams,
   ): Promise<UserId[]>;
 }

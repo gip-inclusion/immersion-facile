@@ -15,7 +15,7 @@ import {
   type KyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import type {
-  GetUserIdsLoggedInAndCreatedLongAgoParams,
+  GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams,
   UserRepository,
 } from "../port/UserRepository";
 
@@ -29,6 +29,7 @@ type PersistenceAuthenticatedUser = {
   created_at: string;
   isBackofficeAdmin: SqlBool;
   last_login_at: string | null;
+  prevent_to_delete: boolean;
 };
 
 export class PgUserRepository implements UserRepository {
@@ -64,6 +65,7 @@ export class PgUserRepository implements UserRepository {
       createdAt,
       proConnect,
       lastLoginAt,
+      preventToDelete,
     } = user;
 
     const existingUser = await this.#findById(id);
@@ -80,6 +82,7 @@ export class PgUserRepository implements UserRepository {
           pro_connect_siret: proConnect?.siret,
           created_at: createdAt,
           last_login_at: lastLoginAt ? sql`${lastLoginAt}` : sql`NULL`,
+          prevent_to_delete: preventToDelete ?? false,
         })
         .execute();
       return;
@@ -90,7 +93,8 @@ export class PgUserRepository implements UserRepository {
       existingUser.lastName === lastName &&
       existingUser.email === email &&
       existingUser.proConnect?.externalId === proConnect?.externalId &&
-      existingUser.proConnect?.siret === proConnect?.siret
+      existingUser.proConnect?.siret === proConnect?.siret &&
+      (existingUser.preventToDelete ?? false) === (preventToDelete ?? false)
     ) {
       if (lastLoginAt) {
         await this.transaction
@@ -112,6 +116,7 @@ export class PgUserRepository implements UserRepository {
         pro_connect_siret: proConnect?.siret,
         updated_at: sql`now()`,
         ...(lastLoginAt ? { last_login_at: sql`${lastLoginAt}` } : {}),
+        prevent_to_delete: preventToDelete ?? false,
       })
       .where("id", "=", id)
       .execute();
@@ -195,11 +200,13 @@ export class PgUserRepository implements UserRepository {
     return usersInDb;
   }
 
-  public async getUserIdsLoggedInAndCreatedLongAgo({
+  public async getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete({
     since,
     limit,
     offset,
-  }: GetUserIdsLoggedInAndCreatedLongAgoParams): Promise<UserId[]> {
+  }: GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams): Promise<
+    UserId[]
+  > {
     const rows = await this.transaction
       .selectFrom("users")
       .select("users.id")
@@ -212,6 +219,7 @@ export class PgUserRepository implements UserRepository {
           ]),
         ]),
       )
+      .where("users.prevent_to_delete", "=", false)
       .orderBy("users.id")
       .limit(limit)
       .offset(offset)
@@ -265,6 +273,7 @@ export class PgUserRepository implements UserRepository {
           sql<string>`date_to_iso(${qb.ref("users.last_login_at")})`.as(
             "last_login_at",
           ),
+        "users.prevent_to_delete as prevent_to_delete",
       ])
       .groupBy("users.id")
       .orderBy("users.email");
@@ -291,6 +300,7 @@ export class PgUserRepository implements UserRepository {
         lastLoginAt: raw.last_login_at
           ? new Date(raw.last_login_at).toISOString()
           : undefined,
+        ...(raw.prevent_to_delete ? { preventToDelete: true } : {}),
       }
     );
   }

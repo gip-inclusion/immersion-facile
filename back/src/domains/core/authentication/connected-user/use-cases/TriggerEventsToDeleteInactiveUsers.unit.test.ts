@@ -101,6 +101,40 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     expectToEqual(event.priority, 8);
   });
 
+  it("triggers deletion for warned inactive users, skips user prevented to be deleted", async () => {
+    const inactiveUser = makeUser({
+      id: "inactive-id",
+      email: "inactive@test.fr",
+      lastLoginAt: inactiveLastLoginAt,
+    });
+    const inactiveUserPreventedToBeDeleted = makeUser({
+      id: "inactive-id-prevented-to-be-deleted",
+      email: "inactive-prevented-to-be-deleted@test.fr",
+      firstName: "Marie",
+      lastName: "Martin Prevented",
+      lastLoginAt: inactiveLastLoginAt,
+      preventToDelete: true,
+    });
+
+    uow.userRepository.users = [inactiveUser, inactiveUserPreventedToBeDeleted];
+    [inactiveUser, inactiveUserPreventedToBeDeleted].forEach((user) => {
+      saveDeletionWarningNotification({
+        uow,
+        userId: user.id,
+        createdAt: subDays(now, 8),
+      });
+    });
+
+    const result = await triggerEventsToDeleteInactiveUsers.execute();
+
+    expectToEqual(result, { numberOfDeletionsTriggered: 1 });
+    expectToEqual(uow.outboxRepository.events.length, 1);
+    expectToEqual(uow.outboxRepository.events[0].payload, {
+      userId: inactiveUser.id,
+      triggeredBy: { kind: "crawler" },
+    });
+  });
+
   it("saves non-quarantined events when enableInactiveUsersDeletionAutoProcessing is on", async () => {
     uow.featureFlagRepository.featureFlags = {
       enableInactiveUsersCleanup: makeBooleanFeatureFlag(true),
