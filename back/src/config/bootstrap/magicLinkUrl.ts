@@ -11,10 +11,7 @@ import {
   queryParamsAsString,
   type User,
 } from "shared";
-import type {
-  EmailOngoingAuth,
-  ProConnectOngoingAuth,
-} from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
+import type { EmailOrProConnectOngoingAuth } from "../../domains/core/authentication/connected-user/entities/OngoingOAuth";
 import type { GetAccessTokenResult } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
 import type {
   GenerateConnectedUserJwt,
@@ -89,7 +86,7 @@ export type GenerateConnectedUserLoginUrl = ReturnType<
 export type GenerateConnectedUserLoginUrlParams = {
   user: User;
   accessToken: GetAccessTokenResult | undefined;
-  ongoingOAuth: ProConnectOngoingAuth | EmailOngoingAuth;
+  ongoingOAuth: EmailOrProConnectOngoingAuth;
   now: Date;
 };
 

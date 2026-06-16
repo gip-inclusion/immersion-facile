@@ -22,8 +22,8 @@ import {
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
 import { scheduleWithBackpressure } from "../../../../../../utils/scheduleWithBackpressure";
 import type {
-  FTConnectAccessTokenResult,
   GetAccessTokenParams,
+  GetAccessTokenResult,
   GetLoginUrlParams,
 } from "../../../connected-user/port/OAuthGateway";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
@@ -154,7 +154,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
 
   public async getAccessToken(
     params: GetAccessTokenParams,
-  ): Promise<FTConnectAccessTokenResult> {
+  ): Promise<GetAccessTokenResult> {
     const log = exchangeCodeForAccessTokenLogger;
     try {
       log.total({});

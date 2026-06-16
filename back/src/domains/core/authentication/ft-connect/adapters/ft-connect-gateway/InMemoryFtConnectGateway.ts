@@ -5,8 +5,8 @@ import {
   type WithIdToken,
 } from "shared";
 import type {
-  FTConnectAccessTokenResult,
   GetAccessTokenParams,
+  GetAccessTokenResult,
   GetLoginUrlParams,
 } from "../../../connected-user/port/OAuthGateway";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
@@ -15,7 +15,7 @@ import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import type { FtConnectGateway } from "../../port/FtConnectGateway";
 
 export class InMemoryFtConnectGateway implements FtConnectGateway {
-  #accessToken: FTConnectAccessTokenResult | undefined = undefined;
+  #accessToken: GetAccessTokenResult | undefined = undefined;
 
   #advisors: FtConnectAdvisorDto[] = [];
 
@@ -27,7 +27,7 @@ export class InMemoryFtConnectGateway implements FtConnectGateway {
 
   public async getAccessToken(
     _: GetAccessTokenParams,
-  ): Promise<FTConnectAccessTokenResult> {
+  ): Promise<GetAccessTokenResult> {
     if (this.#accessToken) return this.#accessToken;
     throw errors.generic.fakeError("No access token provided (in memory)");
   }
@@ -53,7 +53,7 @@ export class InMemoryFtConnectGateway implements FtConnectGateway {
     })}`;
   }
 
-  public setAccessTokenResult(accessTokenResult: FTConnectAccessTokenResult) {
+  public setAccessTokenResult(accessTokenResult: GetAccessTokenResult) {
     this.#accessToken = accessTokenResult;
   }
 

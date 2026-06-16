@@ -66,4 +66,19 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   public get conventionFranceTravailUsers() {
     return this.#conventionFranceTravailUsers;
   }
+
+  public set conventionFranceTravailUsers(value: Record<
+    ConventionId,
+    FtExternalId
+  >) {
+    this.#conventionFranceTravailUsers = value;
+  }
+
+  public get ftConnectedUsers() {
+    return this.#ftConnectedUsers;
+  }
+
+  public set ftConnectedUsers(value: Record<FtExternalId, FtUserAndAdvisor>) {
+    this.#ftConnectedUsers = value;
+  }
 }

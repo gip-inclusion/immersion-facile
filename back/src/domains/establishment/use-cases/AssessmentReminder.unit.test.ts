@@ -345,32 +345,36 @@ describe("AssessmentReminder", () => {
 
     it("when there is an advisor, send assessment reminder to tutor and advisor", async () => {
       const advisorEmail = "johnny.joey@mail.fr";
-      uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
-        user: {
-          email: "john.doe@mail.fr",
-          firstName: "John",
-          lastName: "Doe",
-          isJobseeker: true,
-          peExternalId: "pe-external-id",
-          birthdate: "1990-01-01",
+      uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers = {
+        "pe-external-id": {
+          user: {
+            email: "john.doe@mail.fr",
+            firstName: "John",
+            lastName: "Doe",
+            isJobseeker: true,
+            peExternalId: "pe-external-id",
+            birthdate: "1990-01-01",
+          },
+          advisor: {
+            firstName: "Johnny",
+            lastName: "Joey",
+            type: "PLACEMENT",
+            email: advisorEmail,
+          },
         },
-        advisor: {
-          firstName: "Johnny",
-          lastName: "Joey",
-          type: "PLACEMENT",
-          email: advisorEmail,
-        },
-      });
-      uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
-        convention.id,
-        "pe-external-id",
-      );
+      };
+      uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers =
+        {
+          [convention.id]: "pe-external-id",
+        };
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention,
           createdAt: subDays(now, 3).toISOString(),
         });
-      await uow.notificationRepository.save(initialEstablishmentNotification);
+      uow.notificationRepository.notifications = [
+        initialEstablishmentNotification,
+      ];
 
       const { numberOfConventionsReminded } = await assessmentReminder.execute({
         mode: "3daysAfterInitialAssessmentEmail",

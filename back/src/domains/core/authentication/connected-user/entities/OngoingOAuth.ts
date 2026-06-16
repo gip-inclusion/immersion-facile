@@ -21,6 +21,10 @@ type OngoingAuthCommon = {
   updatedAt?: Date;
 };
 
+export type EmailOrProConnectOngoingAuth =
+  | EmailOngoingAuth
+  | ProConnectOngoingAuth;
+
 export type EmailOngoingAuth = OngoingAuthCommon & {
   provider: ExtractFromExisting<FederatedIdentityProvider, "email">;
   email: Email;

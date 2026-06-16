@@ -109,11 +109,10 @@ describe("AssociateFtConnectFederatedIdentity", () => {
   });
 
   it("should save event FtConnectFederatedIdentityAssociated", async () => {
-    conventionFranceTravailAdvisorRepo.saveFtUserAndAdvisor(userAdvisorDto);
-    expectToEqual(
-      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers,
-      {},
-    );
+    conventionFranceTravailAdvisorRepo.ftConnectedUsers = {
+      [userFtExternalId]: userAdvisorDto,
+    };
+    conventionFranceTravailAdvisorRepo.conventionFranceTravailUsers = {};
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)

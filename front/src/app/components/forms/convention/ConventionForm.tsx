@@ -39,6 +39,7 @@ import {
   conventionSchema,
   type DepartmentCode,
   defaultCountryCode,
+  distinguishAgencyRights,
   domElementIds,
   type ExcludeFromExisting,
   errors as errorMessage,
@@ -61,6 +62,7 @@ import {
   remoteWorkModes,
   replaceEmptyValuesByUndefinedFromObject,
   toConventionTemplate,
+  type UserWithRights,
   undefinedIfEmptyString,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
@@ -140,6 +142,15 @@ type ConventionRouteParams = Pick<
 type ConventionParamKey = keyof ConventionRouteParams;
 type FtConnectParamKey = keyof typeof ftConnectParams;
 
+const shouldPrefillAgencyReferentFromConnectedUser = (
+  user: UserWithRights,
+): boolean => {
+  if (!user.agencyRights.length) return false;
+  if (user.isBackofficeAdmin) return false;
+  const { activeAgencyRights } = distinguishAgencyRights(user.agencyRights);
+  return activeAgencyRights.length > 0;
+};
+
 export const ConventionForm = ({
   mode,
   internshipKind,
@@ -165,21 +176,23 @@ export const ConventionForm = ({
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const acquisitionParams = useGetAcquisitionParams();
 
+  const currentUserAgencyReferentName =
+    currentUser && shouldPrefillAgencyReferentFromConnectedUser(currentUser)
+      ? {
+          firstname: currentUser.firstName,
+          lastname: currentUser.lastName,
+        }
+      : {
+          firstname: "",
+          lastname: "",
+        };
+
   const agencyReferentName = federatedIdentity?.payload?.advisor
     ? {
         firstname: federatedIdentity.payload.advisor.firstName,
         lastname: federatedIdentity.payload.advisor.lastName,
       }
-    : {
-        firstname:
-          currentUser && currentUser.agencyRights?.length > 0
-            ? currentUser.firstName
-            : "",
-        lastname:
-          currentUser && currentUser.agencyRights?.length > 0
-            ? currentUser.lastName
-            : "",
-      };
+    : currentUserAgencyReferentName;
 
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
     ...makeEmptyConventionInitialValues({
@@ -306,12 +319,19 @@ export const ConventionForm = ({
     const conventionDefaultValues: CreateConventionPresentationInitialValues = {
       ...convention,
       status: "READY_TO_SIGN",
-      agencyReferent: {
-        firstname:
-          convention.agencyReferent?.firstname ?? agencyReferentName.firstname,
-        lastname:
-          convention.agencyReferent?.lastname ?? agencyReferentName.lastname,
-      },
+      agencyReferent: isCreationMode
+        ? {
+            firstname:
+              convention.agencyReferent?.firstname ??
+              initialValues.agencyReferent?.firstname,
+            lastname:
+              convention.agencyReferent?.lastname ??
+              initialValues.agencyReferent?.lastname,
+          }
+        : {
+            firstname: convention.agencyReferent?.firstname ?? "",
+            lastname: convention.agencyReferent?.lastname ?? "",
+          },
       agencyId: pickConventionValueFromRouteParams("agencyId"),
       agencyDepartment: pickConventionValueFromRouteParams("agencyDepartment"),
       agencyKind: pickConventionValueFromRouteParams("agencyKind"),
