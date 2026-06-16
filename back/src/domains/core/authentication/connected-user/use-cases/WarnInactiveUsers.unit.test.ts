@@ -98,7 +98,7 @@ describe("WarnInactiveUsers", () => {
     expectToEqual(uow.outboxRepository.events.length, 0);
   });
 
-  it("warns inactive and never-logged-in users, skips boundary-active user", async () => {
+  it("warns inactive and never-logged-in users, skips boundary-active user, skip user prevented to be deleted", async () => {
     const inactiveUser = makeUser({
       id: "inactive-id",
       email: "inactive@test.fr",
@@ -106,6 +106,15 @@ describe("WarnInactiveUsers", () => {
       lastName: "Martin",
       lastLoginAt: inactiveLastLoginAt,
     });
+    const inactiveUserPreventedToBeDeleted = makeUser({
+      id: "inactive-id-prevented-to-be-deleted",
+      email: "inactive-prevented-to-be-deleted@test.fr",
+      firstName: "Marie",
+      lastName: "Martin Prevented",
+      lastLoginAt: inactiveLastLoginAt,
+      preventToDelete: true,
+    });
+
     const boundaryActiveUser = makeUser({
       id: "boundary-id",
       email: "boundary@test.fr",
@@ -135,6 +144,7 @@ describe("WarnInactiveUsers", () => {
 
     uow.userRepository.users = [
       inactiveUser,
+      inactiveUserPreventedToBeDeleted,
       boundaryActiveUser,
       neverLoggedInUserAndCreatedMoreThan2YearsAgo,
       neverLoggedInUserAndCreated2YearsAgo,

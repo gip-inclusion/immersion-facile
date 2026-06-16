@@ -114,6 +114,13 @@ export class ConnectedUserBuilder implements Builder<ConnectedUser> {
     });
   }
 
+  withPreventToDelete(preventToDelete: boolean) {
+    return new ConnectedUserBuilder({
+      ...this.#dto,
+      preventToDelete,
+    });
+  }
+
   withIsAdmin(isBackofficeAdmin: boolean): ConnectedUserBuilder {
     return new ConnectedUserBuilder({
       ...this.#dto,
