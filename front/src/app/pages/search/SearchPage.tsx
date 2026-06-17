@@ -102,6 +102,20 @@ const defaultValuesForExternalSearch: Required<
   ],
 };
 
+const appellationHintText = (useNaturalLanguageForAppellations?: boolean) =>
+  useNaturalLanguageForAppellations
+    ? "Un métier, un domaine ou une activité qui vous intéresse"
+    : "Un métier qui vous intéresse";
+
+const appellationPlaceholder = (useNaturalLanguageForAppellations?: boolean) =>
+  useNaturalLanguageForAppellations
+    ? "Boulanger, comptabilité, travailler avec des enfants..."
+    : "Ex : Boulanger, styliste, etc";
+
+const radiusHintText = "Affinez votre localisation";
+
+const placeHintText = "Une ville, un département, une région, etc.";
+
 export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
@@ -268,12 +282,12 @@ export const SearchPage = ({
   const appellationInputLabel = (
     <>
       {useNaturalLanguageForAppellations
-        ? "Je recherche le métier ou la compétence"
+        ? "Que souhaitez-vous faire ou découvrir ?"
         : "Je recherche le métier..."}
     </>
   );
 
-  const placeInputLabel = <>...dans la ville</>;
+  const placeInputLabel = <>Dans quelle ville ?</>;
   const displayAppellationsOrNaf = (): string => {
     const appellationDisplayed = formValues.appellations?.length
       ? formValues.appellations.map(
@@ -287,6 +301,7 @@ export const SearchPage = ({
       .filter(Boolean)
       .join(" - ");
   };
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -316,6 +331,9 @@ export const SearchPage = ({
                   <AppellationAutocomplete
                     locator="search-form-appellation"
                     label={appellationInputLabel}
+                    hintText={appellationHintText(
+                      useNaturalLanguageForAppellations,
+                    )}
                     onAppellationSelected={(appellationMatch) => {
                       setValue("appellations", [appellationMatch.appellation]);
                       setValue("appellationCodes", [
@@ -329,9 +347,9 @@ export const SearchPage = ({
                     selectProps={{
                       inputId:
                         domElementIds[route.name].appellationAutocomplete,
-                      placeholder: useNaturalLanguageForAppellations
-                        ? "Ex : Boulanger, faire du pain, etc"
-                        : "Ex : Boulanger, styliste, etc",
+                      placeholder: appellationPlaceholder(
+                        useNaturalLanguageForAppellations,
+                      ),
                     }}
                   />
                 </div>
@@ -340,6 +358,7 @@ export const SearchPage = ({
                     locator="search-form-place"
                     label={placeInputLabel}
                     initialInputValue={place}
+                    hintText="Une ville, un département, une région, etc."
                     onPlaceSelected={(lookupSearchResult) => {
                       if (!lookupSearchResult) return;
                       setValue("latitude", lookupSearchResult.position.lat);
@@ -366,6 +385,7 @@ export const SearchPage = ({
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
                   <Select
                     label="Dans un rayon de :"
+                    hint={radiusHintText}
                     options={radiusOptions}
                     disabled={!lat || !lon}
                     nativeSelectProps={{
@@ -484,13 +504,16 @@ export const SearchPage = ({
                   onSearchFormSubmit(updatedValues);
                 }}
                 submenu={{
-                  title: "Quel métier souhaitez-vous découvrir ?",
+                  title: "Quel métier ou secteur souhaitez-vous découvrir ?",
                   content: (
                     <>
                       <AppellationAutocomplete
                         locator="search-form-appellation"
                         className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
+                        hintText={appellationHintText(
+                          useNaturalLanguageForAppellations,
+                        )}
                         onAppellationSelected={(appellationMatch) => {
                           clearErrors("appellations");
                           setTempValue({
@@ -511,9 +534,9 @@ export const SearchPage = ({
                         selectProps={{
                           inputId:
                             domElementIds[route.name].appellationAutocomplete,
-                          placeholder: useNaturalLanguageForAppellations
-                            ? "Ex : Boulanger, faire du pain, etc"
-                            : "Ex : Boulanger, styliste, etc",
+                          placeholder: appellationPlaceholder(
+                            useNaturalLanguageForAppellations,
+                          ),
                           defaultInputValue:
                             formValues.appellations?.[0]?.appellationLabel,
                         }}
@@ -596,6 +619,7 @@ export const SearchPage = ({
                       <PlaceAutocomplete
                         locator="search-form-place"
                         label={placeInputLabel}
+                        hintText={placeHintText}
                         onPlaceSelected={(lookupSearchResult) => {
                           clearErrors("place");
                           if (!lookupSearchResult) return;
@@ -651,6 +675,7 @@ export const SearchPage = ({
                         label="Dans un rayon de :"
                         options={radiusOptions}
                         disabled={!tempValue.latitude || !tempValue.longitude}
+                        hint={radiusHintText}
                         nativeSelectProps={{
                           ...register("distanceKm"),
                           title:
