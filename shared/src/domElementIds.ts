@@ -146,6 +146,7 @@ export const domElementIds = {
     heroHeader: {
       search: buildHeroHeaderId("candidate-search"),
       formConvention: buildHeroHeaderId("candidate-form-convention"),
+      dashboard: buildHeroHeaderId("candidate-dashboard"),
     },
   },
 
