@@ -46,7 +46,7 @@ import { canAssessmentBeFilled } from "src/core-logic/domain/convention/conventi
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import {
-  makeConventionSections,
+  makeConventionSummaryContent,
   SendAssessmentLinkModalWrapper,
   SendAssessmentSignatureReminderModalWrapper,
   SendSignatureLinkModalWrapper,
@@ -253,7 +253,7 @@ export const ConventionValidation = ({
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}
-        summary={makeConventionSections(
+        {...makeConventionSummaryContent(
           convention,
           sendSignatureLinkButtonProps({
             onClick: ({ signatoryRole, signatoryPhone, signatoryEmail }) => {
