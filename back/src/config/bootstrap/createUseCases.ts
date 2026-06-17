@@ -516,6 +516,7 @@ export const createUseCases = ({
         deps: {
           saveNotificationAndRelatedEvent,
           immersionBaseUrl: config.immersionFacileBaseUrl,
+          timeGateway: gateways.timeGateway,
         },
       }),
     addExchangeToDiscussion: makeAddExchangeToDiscussion({
