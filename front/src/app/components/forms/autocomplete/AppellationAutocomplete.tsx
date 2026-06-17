@@ -50,6 +50,7 @@ export const AppellationAutocomplete = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { value, options, isSearching, isDebouncing } =
     useAppellationAutocomplete(props.locator);
+
   return (
     <RSAutocomplete
       {...props}
@@ -59,7 +60,8 @@ export const AppellationAutocomplete = ({
         isLoading: isSearching,
         loadingMessage: () => <>Recherche de métiers en cours... 🔎</>,
         inputValue: searchTerm,
-        placeholder: "Ex : Boulanger, styliste, etc.",
+        placeholder:
+          props.selectProps?.placeholder ?? "Ex : Boulanger, styliste, etc.",
         value: value
           ? {
               label: value.appellation.appellationLabel,
