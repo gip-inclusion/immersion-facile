@@ -1,3 +1,4 @@
+import { uniq } from "ramda";
 import {
   type AbsoluteUrl,
   type ConventionStatus,
@@ -8,10 +9,14 @@ import {
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
+import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 
-const conventionStatusesAffectedByBannishment: ConventionStatus[] = [
+const conventionStatusesBeforeValidation: ConventionStatus[] = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "IN_REVIEW",
@@ -31,6 +36,7 @@ export const makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBann
     .withDeps<{
       saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
       immersionBaseUrl: AbsoluteUrl;
+      timeGateway: TimeGateway;
     }>()
     .build(async ({ uow, inputParams, deps }) => {
       const { siret } = inputParams;
@@ -44,80 +50,167 @@ export const makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBann
       if (!establishment.establishment.isEstablishmentBanned)
         throw errors.establishment.establishmentNotBanned({ siret });
 
-      const userRightIds = establishment.userRights
-        .filter(
-          (right) =>
-            onlyAdminUserRightsWithStatusAccepted(right) ||
-            onlyContactUserRightsWithStatusAccepted(right),
-        )
-        .map((right) => right.userId);
-
-      const users = await uow.userRepository.getByIds(userRightIds);
-
-      await executeInSequence(users, (user) =>
-        deps.saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
-            recipients: [user.email],
-            params: { businessName: establishment.establishment.name, siret },
-          },
-          followedIds: { establishmentSiret: siret },
-        }),
+      await notifyEstablishmentUsers(
+        uow,
+        deps.saveNotificationAndRelatedEvent,
+        establishment,
       );
 
-      const discussions = await uow.discussionRepository.getDiscussions({
-        filters: { sirets: [siret] },
-        limit: 1000,
-      });
-
-      const pendingDiscussions = discussions.filter(
-        (d) => d.status === "PENDING",
+      await notifyBeneficiaries(
+        uow,
+        deps.saveNotificationAndRelatedEvent,
+        deps.immersionBaseUrl,
+        establishment,
       );
 
-      await executeInSequence(pendingDiscussions, (discussion) =>
-        deps.saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY",
-            recipients: [discussion.potentialBeneficiary.email],
-            params: {
-              businessName: establishment.establishment.name,
-              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-              immersionBaseUrl: deps.immersionBaseUrl,
-            },
-          },
-          followedIds: { establishmentSiret: siret },
-        }),
-      );
-
-      const conventions = await uow.conventionQueries.getConventions({
-        filters: {
-          withSirets: [siret],
-          withStatuses: conventionStatusesAffectedByBannishment,
-        },
-        sortBy: "dateStart",
-      });
-
-      await executeInSequence(conventions, (convention) =>
-        deps.saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY",
-            recipients: [convention.signatories.beneficiary.email],
-            params: {
-              businessName: establishment.establishment.name,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              immersionBaseUrl: deps.immersionBaseUrl,
-            },
-          },
-          followedIds: {
-            establishmentSiret: siret,
-            conventionId: convention.id,
-          },
-        }),
+      await notifyValidatorsAndPreValidators(
+        uow,
+        deps.timeGateway,
+        deps.saveNotificationAndRelatedEvent,
+        deps.immersionBaseUrl,
+        establishment,
       );
     });
+
+const notifyEstablishmentUsers = async (
+  uow: UnitOfWork,
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+  bannedEstablishment: EstablishmentAggregate,
+) => {
+  const userRightIds = bannedEstablishment.userRights
+    .filter(
+      (right) =>
+        onlyAdminUserRightsWithStatusAccepted(right) ||
+        onlyContactUserRightsWithStatusAccepted(right),
+    )
+    .map((right) => right.userId);
+
+  const users = await uow.userRepository.getByIds(userRightIds);
+
+  await executeInSequence(users, (user) =>
+    saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+        recipients: [user.email],
+        params: {
+          businessName: bannedEstablishment.establishment.name,
+          siret: bannedEstablishment.establishment.siret,
+        },
+      },
+      followedIds: {
+        establishmentSiret: bannedEstablishment.establishment.siret,
+      },
+    }),
+  );
+};
+
+const notifyBeneficiaries = async (
+  uow: UnitOfWork,
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+  immersionBaseUrl: AbsoluteUrl,
+  bannedEstablishment: EstablishmentAggregate,
+) => {
+  const discussions = await uow.discussionRepository.getDiscussions({
+    filters: { sirets: [bannedEstablishment.establishment.siret] },
+    limit: 1000,
+  });
+
+  const pendingDiscussions = discussions.filter((d) => d.status === "PENDING");
+
+  await executeInSequence(pendingDiscussions, (discussion) =>
+    saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY",
+        recipients: [discussion.potentialBeneficiary.email],
+        params: {
+          businessName: bannedEstablishment.establishment.name,
+          beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+          beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+          immersionBaseUrl: immersionBaseUrl,
+        },
+      },
+      followedIds: {
+        establishmentSiret: bannedEstablishment.establishment.siret,
+      },
+    }),
+  );
+
+  const conventionsBeforeValidation =
+    await uow.conventionQueries.getConventions({
+      filters: {
+        withSirets: [bannedEstablishment.establishment.siret],
+        withStatuses: conventionStatusesBeforeValidation,
+      },
+      sortBy: "dateStart",
+    });
+
+  await executeInSequence(conventionsBeforeValidation, (convention) =>
+    saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_BENEFICIARY",
+        recipients: [convention.signatories.beneficiary.email],
+        params: {
+          businessName: bannedEstablishment.establishment.name,
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          immersionBaseUrl: immersionBaseUrl,
+        },
+      },
+      followedIds: {
+        establishmentSiret: bannedEstablishment.establishment.siret,
+        conventionId: convention.id,
+      },
+    }),
+  );
+};
+
+const notifyValidatorsAndPreValidators = async (
+  uow: UnitOfWork,
+  timeGateway: TimeGateway,
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+  immersionBaseUrl: AbsoluteUrl,
+  bannedEstablishment: EstablishmentAggregate,
+) => {
+  const validatedConventions = await uow.conventionQueries.getConventions({
+    filters: {
+      withSirets: [bannedEstablishment.establishment.siret],
+      withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+      endDate: { from: timeGateway.now() },
+    },
+    sortBy: "dateStart",
+  });
+
+  await executeInSequence(validatedConventions, async (convention) => {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agencyWithUserEmailNotificationActivated =
+      await agencyWithRightToAgencyDto(uow, agency);
+
+    await saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+        recipients: uniq([
+          ...agencyWithUserEmailNotificationActivated.validatorEmails,
+          ...agencyWithUserEmailNotificationActivated.counsellorEmails,
+        ]),
+        params: {
+          businessName: bannedEstablishment.establishment.name,
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          immersionBaseUrl: immersionBaseUrl,
+          conventionId: convention.id,
+        },
+      },
+      followedIds: {
+        establishmentSiret: bannedEstablishment.establishment.siret,
+        conventionId: convention.id,
+      },
+    });
+  });
+};
