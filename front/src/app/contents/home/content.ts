@@ -107,6 +107,15 @@ export const heroHeaderNavCards: (
         alternateTitle:
           "Remplir la demande de convention : en quelques minutes, sans avoir besoin de créer un compte.",
       },
+      {
+        title: "Mon espace",
+        icon: "fr-icon-admin-line",
+        type: "candidate",
+        id: domElementIds.homeCandidates.heroHeader.dashboard,
+        link: frontRoutes.beneficiaryDashboard().link,
+        alternateTitle:
+          "Mon espace : espace personnel nominatif où retrouver mes échanges avec les entreprises, etc.",
+      },
     ],
     establishment: [
       {
