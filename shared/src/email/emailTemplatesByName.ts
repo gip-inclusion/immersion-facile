@@ -1869,6 +1869,62 @@ Tél : ${beneficiaryPhone}`,
         subContent: defaultSignature("immersion"),
       }),
     },
+    ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR: {
+      niceName:
+        "Convention - Prescripteurs - EntrepriseBannieConventionValidée",
+      tags: [
+        "template:entrepriseBannieConventionValidée",
+        "theme:convention",
+        "acteur:prescripteur",
+        "role:conseillerFTlié",
+        "role:valideur",
+        "role:preValideur",
+        "theme:entrepriseBannie",
+      ],
+      createEmailVariables: ({
+        conventionId,
+        businessName,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        immersionBaseUrl,
+      }) => ({
+        subject: `Urgent : Entreprise bannie - Convention à revoir pour ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        greetings: `${greetingsWithConventionId(conventionId)} Bonjour${beneficiaryFirstName ? ` ${beneficiaryFirstName}` : ""}${beneficiaryLastName ? ` ${beneficiaryLastName}` : ""},`,
+        content: `
+        Nous vous contactons car une convention d'immersion a été validée pour ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName}.
+
+        Nous vous informons que cette entreprise a été bannie de notre plateforme suite à des signalements, car elle ne respectait pas la législation ou le cadre bienveillant exigé en matière d'immersion.
+
+        <strong>Que pouvez-vous faire ?</strong>
+
+          • <strong>Si l'immersion n'a pas encore commencé :</strong> Nous vous recommandons fortement de procéder à l'annulation de cette convention afin de protéger le bénéficiaire.
+          • <strong>Si l'immersion est actuellement en cours :</strong> Nous vous conseillons de contacter le bénéficiaire dans les plus brefs délais pour faire un point sur sa situation au sein de l'établissement. S'il s'avère que les conditions d'accueil ne sont pas respectées, vous pouvez procéder à une rupture anticipée de l’immersion.
+
+        
+        Ne vous découragez pas ! De nombreuses autres entreprises sont prêtes à vous accueillir. Si vous souhaitez toujours réaliser une immersion, vous pouvez :
+
+          • Rechercher d'autres immersions sur notre site.
+          • Contacter votre conseiller pour vous aider dans vos recherches.
+        `,
+        buttons: [
+          {
+            label: "Voir la convention",
+            url: makeRouteAbsoluteUrl({
+              route: frontRoutes.manageConventionConnectedUser({
+                conventionId,
+              }),
+              baseUrl: immersionBaseUrl,
+            }),
+          },
+        ],
+        subContent: `
+        Le bénéficiaire a également reçu un email l'informant que l'entreprise a été bannie de notre site et lui demandant de se rapprocher de vous pour annuler sa démarche.
+        Nous restons à votre entière disposition si vous avez des questions concernant cette situation exceptionnelle.
+
+        ${defaultSignature("immersion")}
+        `,
+      }),
+    },
     ESTABLISHMENT_LEAD_REMINDER: {
       niceName: "Establishment Lead - Premier rappel d'inscription",
       tags: [
