@@ -1,10 +1,15 @@
+import { addDays, subDays } from "date-fns";
 import {
+  AgencyDtoBuilder,
+  type ConventionDto,
   ConventionDtoBuilder,
   DiscussionBuilder,
   errors,
   expectPromiseToFailWithError,
+  reasonableSchedule,
   UserBuilder,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -30,6 +35,7 @@ const immersionBaseUrl = "https://immersion-facile.beta.gouv.fr";
 
 describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", () => {
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned: NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -47,6 +53,40 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
   const pendingContactUser = new UserBuilder()
     .withId("pending-contact-id")
     .withEmail("pending.contact@company.com")
+    .build();
+
+  const validator1 = new UserBuilder()
+    .withId("validator1-id")
+    .withEmail("validator1@company.com")
+    .build();
+
+  const validator2 = new UserBuilder()
+    .withId("validator2-id")
+    .withEmail("validator2@company.com")
+    .build();
+
+  const counsellor1 = new UserBuilder()
+    .withId("counsellor1-id")
+    .withEmail("counsellor1@company.com")
+    .build();
+
+  const counsellor2 = new UserBuilder()
+    .withId("counsellor2-id")
+    .withEmail("counsellor2@company.com")
+    .build();
+
+  const agency = new AgencyDtoBuilder()
+    .withId("agency-id")
+    .withName("Agence validatrice")
+    .withAgencyContactEmail("agency@company.com")
+    .build();
+
+  const agencyWithRefersToAgency = new AgencyDtoBuilder()
+    .withRefersToAgencyInfo({
+      refersToAgencyId: agency.id,
+      refersToAgencyName: agency.name,
+      refersToAgencyContactEmail: agency.contactEmail,
+    })
     .build();
 
   const bannedEstablishmentAggregate = new EstablishmentAggregateBuilder()
@@ -129,15 +169,13 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     .withBeneficiaryLastName("Bernard")
     .build();
 
-  const validatedConvention = new ConventionDtoBuilder()
-    .withId("eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee")
-    .withSiret(bannedEstablishmentAggregate.establishment.siret)
-    .withStatus("ACCEPTED_BY_VALIDATOR")
-    .withBeneficiaryEmail("beneficiary-validated@test.com")
-    .build();
+  let validatedConvention: ConventionDto;
+
+  let validatedConventionWithRefersToAgency: ConventionDto;
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
       new UuidV4Generator(),
       new CustomTimeGateway(),
@@ -149,11 +187,58 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned =
       makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned({
         uowPerformer: new InMemoryUowPerformer(uow),
-        deps: { saveNotificationAndRelatedEvent, immersionBaseUrl },
+        deps: {
+          saveNotificationAndRelatedEvent,
+          immersionBaseUrl,
+          timeGateway,
+        },
       });
-    uow.userRepository.users = [adminUser, contactUser, pendingContactUser];
+
+    validatedConvention = new ConventionDtoBuilder()
+      .withId("eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee")
+      .withSiret(bannedEstablishmentAggregate.establishment.siret)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withBeneficiaryEmail("beneficiary-validated@test.com")
+      .withDateStart(subDays(timeGateway.now(), 1).toISOString())
+      .withDateEnd(addDays(timeGateway.now(), 1).toISOString())
+      .withSchedule(reasonableSchedule)
+      .withAgencyId(agency.id)
+      .build();
+
+    validatedConventionWithRefersToAgency = new ConventionDtoBuilder()
+      .withId("ffffffff-ffff-4fff-afff-ffffffffffff")
+      .withSiret(bannedEstablishmentAggregate.establishment.siret)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withBeneficiaryEmail("beneficiary-validated@test.com")
+      .withDateStart(subDays(timeGateway.now(), 1).toISOString())
+      .withDateEnd(addDays(timeGateway.now(), 1).toISOString())
+      .withSchedule(reasonableSchedule)
+      .withAgencyId(agencyWithRefersToAgency.id)
+      .build();
+
+    uow.userRepository.users = [
+      adminUser,
+      contactUser,
+      pendingContactUser,
+      validator1,
+      validator2,
+      counsellor1,
+      counsellor2,
+    ];
     uow.establishmentAggregateRepository.establishmentAggregates = [
       bannedEstablishmentAggregate,
+    ];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator1.id]: { roles: ["validator"], isNotifiedByEmail: true },
+        [validator2.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      }),
+      toAgencyWithRights(agencyWithRefersToAgency, {
+        [validator1.id]: { roles: ["validator"], isNotifiedByEmail: true },
+        [validator2.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        [counsellor1.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+        [counsellor2.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
+      }),
     ];
   });
 
@@ -333,9 +418,13 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     });
 
     it("sends emails to convention beneficiaries in affected statuses only", async () => {
+      const concelledConvention: ConventionDto = {
+        ...validatedConvention,
+        status: "CANCELLED",
+      };
       uow.conventionRepository.setConventions([
         readyToSignConvention,
-        validatedConvention,
+        concelledConvention,
       ]);
 
       await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
@@ -393,9 +482,170 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
       });
     });
 
+    it("sends email only to FT advisor when present", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
+        { siret },
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [adminUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [contactUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+            recipients: [agency.contactEmail],
+            params: {
+              businessName,
+              conventionId: validatedConvention.id,
+              beneficiaryFirstName:
+                validatedConvention.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                validatedConvention.signatories.beneficiary.lastName,
+              immersionBaseUrl,
+            },
+          },
+        ],
+      });
+      throw new Error(
+        "Use repo when conventionFranceTravailAdvisorRepository is updated",
+      );
+    });
+
+    it("sends email to agency validators when convention is validated and agency has no refersToAgency", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
+        { siret },
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [adminUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [contactUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+            recipients: [validator1.email],
+            params: {
+              businessName,
+              conventionId: validatedConvention.id,
+              beneficiaryFirstName:
+                validatedConvention.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                validatedConvention.signatories.beneficiary.lastName,
+              immersionBaseUrl,
+            },
+          },
+        ],
+      });
+    });
+
+    it("sends email to agency validators and agency counsellor when convention is validated and agency has refersToAgency", async () => {
+      uow.conventionRepository.setConventions([
+        validatedConvention,
+        validatedConventionWithRefersToAgency,
+      ]);
+
+      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
+        { siret },
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [adminUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [contactUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+            recipients: [validator1.email],
+            params: {
+              businessName,
+              conventionId: validatedConvention.id,
+              beneficiaryFirstName:
+                validatedConvention.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                validatedConvention.signatories.beneficiary.lastName,
+              immersionBaseUrl,
+            },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+            recipients: [validator1.email, counsellor1.email],
+            params: {
+              businessName,
+              conventionId: validatedConventionWithRefersToAgency.id,
+              beneficiaryFirstName:
+                validatedConventionWithRefersToAgency.signatories.beneficiary
+                  .firstName,
+              beneficiaryLastName:
+                validatedConventionWithRefersToAgency.signatories.beneficiary
+                  .lastName,
+              immersionBaseUrl,
+            },
+          },
+        ],
+      });
+    });
+
+    it("does not send email to agency validators and agency counsellor when convention has ended", async () => {
+      const endedConvention = new ConventionDtoBuilder(
+        validatedConventionWithRefersToAgency,
+      )
+        .withDateEnd(subDays(timeGateway.now(), 1).toISOString())
+        .build();
+
+      uow.conventionRepository.setConventions([endedConvention]);
+
+      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
+        { siret },
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [adminUser.email],
+            params: { businessName, siret },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_ESTABLISHMENT_USERS",
+            recipients: [contactUser.email],
+            params: { businessName, siret },
+          },
+        ],
+      });
+    });
+
     it("sends all notification types", async () => {
       uow.discussionRepository.discussions = [pendingDiscussion];
-      uow.conventionRepository.setConventions([readyToSignConvention]);
+      uow.conventionRepository.setConventions([
+        readyToSignConvention,
+        validatedConvention,
+      ]);
 
       await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
         { siret },
@@ -434,6 +684,19 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
                 readyToSignConvention.signatories.beneficiary.firstName,
               beneficiaryLastName:
                 readyToSignConvention.signatories.beneficiary.lastName,
+              immersionBaseUrl,
+            },
+          },
+          {
+            kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+            recipients: [validator1.email],
+            params: {
+              businessName,
+              conventionId: validatedConvention.id,
+              beneficiaryFirstName:
+                validatedConvention.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                validatedConvention.signatories.beneficiary.lastName,
               immersionBaseUrl,
             },
           },
