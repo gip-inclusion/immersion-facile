@@ -2,7 +2,7 @@ import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
-  type ConventionSummaryField,
+  type AgencySubSection,
   ConventionWeeklySchedule,
   CopyButton,
 } from "react-design-system";
@@ -33,6 +33,130 @@ import {
 import { SendReminderModal } from "src/app/components/convention/SendReminderModal";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
+const shouldDisplayDefaultAgencyBadge = (convention: ConventionReadDto) =>
+  convention.status === "IN_REVIEW" ||
+  convention.status === "ACCEPTED_BY_COUNSELLOR";
+
+const getAgencyApprovalStatusBadge = (
+  convention: ConventionReadDto,
+): BadgeProps | undefined => {
+  if (convention.agencyRefersTo && convention.dateApproval)
+    return {
+      children: `Pré-validée - Le ${toDisplayedDate({
+        date: new Date(convention.dateApproval),
+      })}`,
+      severity: "success",
+    };
+
+  if (
+    shouldDisplayDefaultAgencyBadge(convention) &&
+    convention.agencyRefersTo &&
+    !convention.dateApproval
+  )
+    return {
+      children: "Pré-validation en attente",
+      severity: "warning",
+    };
+
+  return undefined;
+};
+
+const getAgencyValidationStatusBadge = (
+  convention: ConventionReadDto,
+): BadgeProps | undefined => {
+  if (convention.dateValidation)
+    return {
+      children: `Validée - Le ${toDisplayedDate({
+        date: new Date(convention.dateValidation),
+      })}`,
+      severity: "success",
+    };
+
+  if (shouldDisplayDefaultAgencyBadge(convention) && !convention.dateValidation)
+    return {
+      children: "Validation en attente",
+      severity: "warning",
+    };
+
+  return undefined;
+};
+
+export const makeAgencySubSection = (
+  convention: ConventionReadDto,
+): AgencySubSection => {
+  const prescriberStructureName = convention.agencyRefersTo
+    ? convention.agencyRefersTo.name
+    : convention.agencyName;
+
+  return {
+    agencyReferent: {
+      fullName:
+        getFormattedFirstnameAndLastname(convention.agencyReferent ?? {}) ?? "",
+    },
+    ...(convention.agencyRefersTo
+      ? {
+          refersToAgency: {
+            structureName: convention.agencyName,
+            structureCopyButton: (
+              <CopyButton
+                withIcon={true}
+                textToCopy={convention.agencyName}
+                label="Copier la structure d'accompagnement"
+                iconOnly
+                className="fr-ml-1v"
+              />
+            ),
+            representedBy: convention.validators?.agencyCounsellor
+              ? getFormattedFirstnameAndLastname(
+                  convention.validators.agencyCounsellor,
+                )
+              : undefined,
+            statusBadge: getAgencyApprovalStatusBadge(convention),
+          },
+        }
+      : {}),
+    agency: {
+      title: convention.agencyRefersTo ? "Prescripteur lié" : "Prescripteur",
+      structureName: prescriberStructureName,
+      structureCopyButton: (
+        <CopyButton
+          withIcon={true}
+          textToCopy={prescriberStructureName}
+          label="Copier le prescripteur"
+          iconOnly
+          className="fr-ml-1v"
+        />
+      ),
+      representedBy: convention.validators?.agencyValidator
+        ? getFormattedFirstnameAndLastname(
+            convention.validators.agencyValidator,
+          )
+        : undefined,
+      statusBadge: getAgencyValidationStatusBadge(convention),
+    },
+  };
+};
+
+export const makeConventionSummaryContent = (
+  convention: ConventionReadDto,
+  signatoriesSubsectionButtonProps?: (
+    signatoryRole: SignatoryRole,
+    signatoryPhone: PhoneNumber,
+    signatoryEmail: Email,
+    signatoryAlreadySign: boolean,
+  ) => ButtonProps | null,
+  assesmentReminderButtonProps?: (phone: PhoneNumber) => ButtonProps,
+  assessmentSignatureReminderButtonProps?: () => ButtonProps | null,
+) => ({
+  summary: makeConventionSections(
+    convention,
+    signatoriesSubsectionButtonProps,
+    assesmentReminderButtonProps,
+    assessmentSignatureReminderButtonProps,
+  ),
+  agencySubSection: makeAgencySubSection(convention),
+});
+
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
   signatoriesSubsectionButtonProps?: (
@@ -46,9 +170,6 @@ const makeSignatoriesSubsections = (
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
     convention.status === "PARTIALLY_SIGNED";
-  const shouldDisplayDefaultAgencyBadge =
-    convention.status === "IN_REVIEW" ||
-    convention.status === "ACCEPTED_BY_COUNSELLOR";
   const defaultSignatoryBadgeValue = (): BadgeProps | undefined =>
     shouldDisplayDefaultSignatoryBadge
       ? {
@@ -56,27 +177,6 @@ const makeSignatoriesSubsections = (
           severity: "warning",
         }
       : undefined;
-
-  const defaultAgencyBadgeValue = (
-    hasAgencyWithRefersTo: boolean,
-    key: "dateApproval" | "dateValidation",
-    value: string,
-  ): ConventionSummaryField | null => {
-    if (!shouldDisplayDefaultAgencyBadge) {
-      return null;
-    }
-    if (
-      key === "dateValidation" ||
-      (key === "dateApproval" && hasAgencyWithRefersTo)
-    ) {
-      return {
-        key,
-        children: value,
-        severity: "warning",
-      };
-    }
-    return null;
-  };
 
   return removeEmptyValue([
     {
@@ -419,102 +519,6 @@ const makeSignatoriesSubsections = (
           ]),
         }
       : null,
-    {
-      key: "agency",
-      title: "Structure du bénéficiaire",
-      fields: removeEmptyValue([
-        convention.agencyRefersTo && convention.dateApproval
-          ? ({
-              key: "dateApproval",
-              children:
-                convention.dateApproval &&
-                `Pré-validée - Le ${toDisplayedDate({
-                  date: new Date(convention.dateApproval),
-                })}`,
-              severity: "success",
-            } satisfies ConventionSummaryField)
-          : defaultAgencyBadgeValue(
-              !!convention.agencyRefersTo,
-              "dateApproval",
-              "Pré-validation en attente",
-            ),
-        convention.agencyRefersTo
-          ? {
-              key: "agencyWithRefersTo",
-              label: "Structure d'accompagnement",
-              value: convention.agencyName,
-              copyButton: (
-                <CopyButton
-                  withIcon={true}
-                  textToCopy={convention.agencyName}
-                  label="Copier la structure d'accompagnement"
-                  iconOnly
-                  className="fr-ml-1v"
-                />
-              ),
-            }
-          : null,
-        convention.agencyRefersTo &&
-        (convention.agencyReferent?.firstname ||
-          convention.agencyReferent?.lastname)
-          ? {
-              key: "agencyReferent",
-              label: "Accompagnateur",
-              value:
-                getFormattedFirstnameAndLastname(convention.agencyReferent) ??
-                "",
-            }
-          : null,
-        convention.dateValidation
-          ? ({
-              key: "dateValidation",
-              children:
-                convention.dateValidation &&
-                `Validée - Le ${toDisplayedDate({
-                  date: new Date(convention.dateValidation),
-                })}`,
-              severity: "success",
-            } satisfies ConventionSummaryField)
-          : defaultAgencyBadgeValue(
-              false,
-              "dateValidation",
-              "Validation en attente",
-            ),
-        {
-          key: "agencyName",
-          label: `Prescripteur ${convention.agencyRefersTo ? "lié" : ""}`,
-          value: convention.agencyRefersTo
-            ? convention.agencyRefersTo.name
-            : convention.agencyName,
-          copyButton: (
-            <CopyButton
-              withIcon={true}
-              textToCopy={
-                convention.agencyRefersTo
-                  ? convention.agencyRefersTo.name
-                  : convention.agencyName
-              }
-              label="Copier le prescripteur"
-              iconOnly
-              className="fr-ml-1v"
-            />
-          ),
-        },
-        !convention.agencyRefersTo &&
-        (convention.agencyReferent?.firstname ||
-          convention.agencyReferent?.lastname)
-          ? {
-              key: "agencyReferent",
-              label: "Conseiller",
-              value:
-                getFormattedFirstnameAndLastname(convention.agencyReferent) ??
-                "",
-            }
-          : null,
-      ]),
-      isFullWidthDisplay: true,
-      hasBackgroundColor: true,
-    },
   ]);
 };
 

@@ -1,4 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { agencySubSectionForConventionSummaryStory } from "../convention-agency-sub-section/ConventionAgencySubSection.fixtures";
 import {
   ConventionSummary,
   type ConventionSummaryProperties,
@@ -34,5 +35,6 @@ export const Default: Story = {
     conventionId: "Titre de la section",
     submittedAt: "",
     summary: [],
+    agencySubSection: agencySubSectionForConventionSummaryStory,
   },
 };

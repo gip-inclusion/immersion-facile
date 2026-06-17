@@ -24,7 +24,7 @@ import {
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import {
-  makeConventionSections,
+  makeConventionSummaryContent,
   SendSignatureLinkModalWrapper,
   sendSignatureLinkButtonProps,
   sendSignatureLinkModal,
@@ -159,7 +159,7 @@ export const ConventionSignForm = ({
             submittedAt={toDisplayedDate({
               date: new Date(convention.dateSubmission),
             })}
-            summary={makeConventionSections(
+            {...makeConventionSummaryContent(
               convention,
               sendSignatureLinkButtonProps({
                 triggeredByRole: currentSignatory.role,
@@ -210,7 +210,7 @@ export const ConventionSignForm = ({
                 submittedAt={toDisplayedDate({
                   date: new Date(convention.dateSubmission),
                 })}
-                summary={makeConventionSections(
+                {...makeConventionSummaryContent(
                   convention,
                   sendSignatureLinkButtonProps({
                     triggeredByRole: currentSignatory.role,

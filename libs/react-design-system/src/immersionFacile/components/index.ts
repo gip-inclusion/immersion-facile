@@ -1,4 +1,5 @@
 export * from "./button-with-submenu";
+export * from "./convention-agency-sub-section";
 export * from "./convention-form-layout";
 export * from "./convention-form-sidebar";
 export * from "./convention-job-and-objective";

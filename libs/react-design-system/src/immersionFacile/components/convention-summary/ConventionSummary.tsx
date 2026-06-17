@@ -3,14 +3,21 @@ import { Badge, type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
+import {
+  type AgencySubSection,
+  ConventionAgencySubSection,
+} from "../convention-agency-sub-section/ConventionAgencySubSection";
 import { CopyButton } from "../copy-button/CopyButton";
 import { conventionSummaryStyles } from "./ConventionSummary.styles";
+
+export type { AgencySubSection } from "../convention-agency-sub-section/ConventionAgencySubSection";
 
 export type ConventionSummaryProperties = {
   conventionId?: string;
   submittedAt: string;
   summary: ConventionSummarySection[];
   illustration: string;
+  agencySubSection: AgencySubSection;
 };
 
 export type ConventionSummarySection = {
@@ -47,6 +54,7 @@ export const ConventionSummary = ({
   submittedAt,
   summary,
   illustration,
+  agencySubSection,
 }: ConventionSummaryProperties) => {
   const { cx } = useStyles();
 
@@ -114,7 +122,7 @@ export const ConventionSummary = ({
           </div>
         </section>
       )}
-      {summary.map((section) => (
+      {summary.map((section, sectionIndex) => (
         <section
           className={cx(
             fr.cx("fr-mb-3w", "fr-p-2w"),
@@ -140,6 +148,9 @@ export const ConventionSummary = ({
               );
             })}
           </div>
+          {sectionIndex === 0 && (
+            <ConventionAgencySubSection {...agencySubSection} />
+          )}
         </section>
       ))}
     </>

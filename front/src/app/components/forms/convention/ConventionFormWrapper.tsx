@@ -33,7 +33,7 @@ import {
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
-import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import { makeConventionSummaryContent } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -467,7 +467,7 @@ const ConventionSummarySection = ({
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}
-        summary={makeConventionSections(convention)}
+        {...makeConventionSummaryContent(convention)}
       />
 
       {convention?.internshipKind === "mini-stage-cci" && (

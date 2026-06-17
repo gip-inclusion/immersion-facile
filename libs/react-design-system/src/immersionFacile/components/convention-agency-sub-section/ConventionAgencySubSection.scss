@@ -1,0 +1,12 @@
+.im-convention-agency-sub-section {
+  dl,
+  dt,
+  dd {
+    padding-inline-start: 0;
+  }
+
+  &__card {
+    height: 100%;
+    background-color: var(--background-default-grey);
+  }
+}
