@@ -423,7 +423,7 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
         overrides.createdAt ??
         new Date("2024-04-28T12:00:00.000Z").toISOString(),
       proConnect: null,
-      preventToDelete: overrides.preventToDelete ?? false,
+      preventToDelete: overrides.preventToDelete ?? undefined,
       lastLoginAt: overrides.lastLoginAt,
     });
 

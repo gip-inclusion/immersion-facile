@@ -56,7 +56,7 @@ const userSchema: ZodSchemaWithInputMatchingOutput<User> = z.object({
   createdAt: dateTimeIsoStringSchema,
   firstName: zStringCanBeEmpty,
   lastName: zStringCanBeEmpty,
-  preventToDelete: z.boolean().optional(),
+  preventToDelete: z.literal(true).optional(),
   proConnect: proConnectInfoSchema.or(z.null()),
 });
 

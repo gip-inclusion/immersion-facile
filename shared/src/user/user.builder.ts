@@ -117,7 +117,9 @@ export class ConnectedUserBuilder implements Builder<ConnectedUser> {
   withPreventToDelete(preventToDelete: boolean) {
     return new ConnectedUserBuilder({
       ...this.#dto,
-      preventToDelete,
+      ...(preventToDelete
+        ? { preventToDelete: true }
+        : { preventToDelete: undefined }),
     });
   }
 
