@@ -43,7 +43,8 @@ type Role =
   | "valideur"
   | "preValideur"
   | "lecteur"
-  | "adminIF";
+  | "adminIF"
+  | "conseillerFTlié";
 type RoleTag = `role:${Role}`;
 
 type TemplateTag = `template:${string}`;
