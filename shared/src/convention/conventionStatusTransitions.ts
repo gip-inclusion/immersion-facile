@@ -63,7 +63,7 @@ export const statusTransitionConfigs: Record<
     refine: (conventionRead) => ({
       isError:
         conventionRead.status === "IN_REVIEW" &&
-        conventionRead.agencyCounsellorEmails.length > 0,
+        conventionRead.agencyValidationSteps === "counsellor-and-validator",
       errorMessage: `Vous ne pouvez pas valider la convention: '${conventionRead.id}', elle doit d'abord être revue et marquée comme éligible par un conseiller.`,
     }),
   },
