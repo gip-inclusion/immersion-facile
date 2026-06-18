@@ -2945,6 +2945,8 @@ L'équipe d'Immersion Facilitée`,
         internshipKind,
         magicLink,
         assessmentMagicLink,
+        agencyReferentName,
+        agencyName,
         validatorName,
       }) => ({
         subject:
@@ -2959,9 +2961,8 @@ L'équipe d'Immersion Facilitée`,
         isStringDate(beneficiaryBirthdate)
           ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
           : "Date invalide"
-      }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
-        validatorName ? ` par ${validatorName} ` : " "
-      }et la convention est bien enregistrée. 
+      })${agencyReferentName ? `, suivi par ${agencyReferentName}` : ""} pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée par ${agencyName} représentée par ${validatorName} 
+      et la convention est bien enregistrée. 
       
       ${internshipKind === "immersion" ? "L'immersion" : "Le mini stage"} peut donc démarrer aux dates convenues.       
       `,

@@ -390,6 +390,10 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
       assessmentMagicLink: assessmentShortlink
         ? makeShortLinkUrl(config, assessmentShortlink)
         : undefined,
+      agencyName: agency.name,
+      agencyReferentName: convention.agencyReferent
+        ? getFormattedFirstnameAndLastname(convention.agencyReferent)
+        : undefined,
       validatorName: convention.validators?.agencyValidator
         ? getFormattedFirstnameAndLastname(
             convention.validators.agencyValidator,
