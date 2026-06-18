@@ -378,24 +378,29 @@ export const ConventionDocumentPage = ({
             )}
           {convention.validators?.agencyCounsellor && (
             <li>
-              Examinée par :{" "}
+              Pré-validée par : <strong>{convention.agencyName}</strong>{" "}
+              représenté par :{" "}
               <strong>
                 {getFormattedFirstnameAndLastname(
                   convention.validators.agencyCounsellor,
                 )}
               </strong>{" "}
-              (conseiller qui examine préalablement la demande de convention)
             </li>
           )}
           {convention.validators?.agencyValidator && (
             <li>
               Validée par :{" "}
               <strong>
+                {convention.agencyRefersTo
+                  ? convention.agencyRefersTo.name
+                  : convention.agencyName}
+              </strong>{" "}
+              représenté par :{" "}
+              <strong>
                 {getFormattedFirstnameAndLastname(
                   convention.validators.agencyValidator,
                 )}
-              </strong>{" "}
-              (conseiller qui valide définitivement la demande de convention)
+              </strong>
             </li>
           )}
         </ul>
