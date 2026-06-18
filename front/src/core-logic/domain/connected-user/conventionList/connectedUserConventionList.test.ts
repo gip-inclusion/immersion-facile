@@ -1,4 +1,5 @@
 import {
+  type ConventionAgencyPublicFields,
   ConventionDtoBuilder,
   type ConventionReadDto,
   type DataWithPagination,
@@ -31,14 +32,13 @@ describe("ConnectedUserConventionList", () => {
   };
   const jwt = "my-jwt";
 
-  const agencyFields = {
+  const agencyFields: ConventionAgencyPublicFields = {
     agencyContactEmail: "contact@mail.com",
     agencyName: "Agency Name",
     agencyDepartment: "75",
     agencyKind: "pole-emploi" as const,
     agencySiret: "11112222000033",
-    agencyCounsellorEmails: [],
-    agencyValidatorEmails: [],
+    agencyValidationSteps: "validator-only",
   };
 
   const convention1: ConventionReadDto = {

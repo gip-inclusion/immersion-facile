@@ -542,12 +542,7 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
-
-  agencyCounsellorEmails: {
-    label: "",
-    id: "",
-  },
-  agencyValidatorEmails: {
+  agencyValidationSteps: {
     label: "",
     id: "",
   },

@@ -54,7 +54,7 @@ export const getConventionSubStatus = (
     isConventionEndingInOneDayOrMore(convention);
   const isSingleValidation =
     !convention.agencyRefersTo &&
-    convention.agencyCounsellorEmails.length === 0;
+    convention.agencyValidationSteps === "validator-only";
   const hasAssessment = !!convention.assessment;
   const conventionAlreadyStarted = isConventionAlreadyStarted(convention);
 
