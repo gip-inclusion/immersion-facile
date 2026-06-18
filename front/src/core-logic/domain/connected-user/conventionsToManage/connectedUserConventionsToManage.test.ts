@@ -1,4 +1,5 @@
 import {
+  type ConventionAgencyPublicFields,
   ConventionDtoBuilder,
   type ConventionReadDto,
   type ConventionWithUnfinalizedAssessment,
@@ -42,14 +43,13 @@ describe("ConnectedUserConventionsToManage", () => {
       connectedUserConventionsToManageSelectors.isLoading(store.getState()),
       true,
     );
-    const agencyFields = {
+    const agencyFields: ConventionAgencyPublicFields = {
       agencyContactEmail: "contact@mail.com",
       agencyName: "Agency Name",
       agencyDepartment: "75",
       agencyKind: "pole-emploi" as const,
       agencySiret: "11112222000033",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [],
+      agencyValidationSteps: "validator-only",
     };
 
     const convention: ConventionReadDto = {

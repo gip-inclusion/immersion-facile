@@ -326,8 +326,7 @@ describe("InclusionConnected", () => {
       agencyContactEmail: "contact@mail.com",
       agencyKind: "mission-locale",
       agencySiret: "11112222000033",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [],
+      agencyValidationSteps: "validator-only",
       assessment: null,
       isEstablishmentBanned: false,
     };

@@ -1,5 +1,7 @@
 import {
   type Beneficiary,
+  type ConventionAgencyPublicFields,
+  type ConventionAssessmentFields,
   ConventionDtoBuilder,
   type ConventionReadDto,
   type DashboardUrlAndName,
@@ -8,6 +10,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   type SignatoryRole,
+  type WithBannedEstablishmentInformations,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -23,15 +26,15 @@ import {
 } from "./convention.slice";
 
 describe("Convention slice", () => {
-  const conventionReadDtoRemainingProps = {
+  const conventionReadDtoRemainingProps: ConventionAgencyPublicFields &
+    ConventionAssessmentFields &
+    WithBannedEstablishmentInformations = {
     agencyDepartment: "75",
     agencyContactEmail: "contact@mail.com",
-    agencyId: "some-agency-id",
     agencyName: "some-agency-name",
     agencyKind: "pole-emploi" as const,
     agencySiret: "11112222000033",
-    agencyCounsellorEmails: [],
-    agencyValidatorEmails: ["validator@mail.com"],
+    agencyValidationSteps: "validator-only",
     assessment: null,
     isEstablishmentBanned: false as const,
   };
@@ -208,8 +211,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "pole-emploi",
             agencySiret: "11112222000033",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           },
@@ -267,8 +269,7 @@ describe("Convention slice", () => {
         agencyContactEmail: "contact@mail.com",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000033",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: null,
         isEstablishmentBanned: false,
       };
@@ -321,8 +322,7 @@ describe("Convention slice", () => {
         agencyContactEmail: "contact@mail.com",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000033",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: null,
         isEstablishmentBanned: false,
       };
@@ -387,8 +387,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "cci",
             agencySiret: "11112222000044",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -445,8 +444,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "cci",
             agencySiret: "11112222000055",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -497,8 +495,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "cci",
             agencySiret: "11112222000055",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -541,8 +538,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "cci",
             agencySiret: "11112222000055",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -587,8 +583,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "mission-locale",
             agencySiret: "11112222000055",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -641,8 +636,7 @@ describe("Convention slice", () => {
             agencyContactEmail: "contact@mail.com",
             agencyKind: "mission-locale",
             agencySiret: "11112222000055",
-            agencyCounsellorEmails: [],
-            agencyValidatorEmails: ["validator@mail.com"],
+            agencyValidationSteps: "validator-only",
             assessment: null,
             isEstablishmentBanned: false,
           };
@@ -694,8 +688,7 @@ describe("Convention slice", () => {
         agencyContactEmail: "contact@mail.com",
         agencyKind: "cap-emploi",
         agencySiret: "11112222000055",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: null,
         isEstablishmentBanned: false,
       };
@@ -742,8 +735,7 @@ describe("Convention slice", () => {
         agencyContactEmail: "contact@mail.com",
         agencyKind: "conseil-departemental",
         agencySiret: "11112222000066",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: null,
         isEstablishmentBanned: false,
       };
@@ -967,8 +959,7 @@ describe("Convention slice", () => {
       agencyContactEmail: "contact@mail.com",
       agencyKind: "cci",
       agencySiret: "11112222000077",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: ["validator@mail.com"],
+      agencyValidationSteps: "validator-only",
       assessment: null,
       isEstablishmentBanned: false,
     };

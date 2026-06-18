@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import {
+  type ConventionAgencyPublicFields,
   ConventionDtoBuilder,
   type ConventionReadDto,
   expectObjectsToMatch,
@@ -24,15 +25,14 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
-const agencyFields = {
-  agencyCounsellorEmails: [],
+const agencyFields: ConventionAgencyPublicFields = {
   agencyContactEmail: "contact@mail.com",
   agencyDepartment: "75",
   agencyKind: "mission-locale" as const,
   agencyName: "Agence Mission Locale",
   agencyRefersTo: undefined,
   agencySiret: "11110000111155",
-  agencyValidatorEmails: [],
+  agencyValidationSteps: "validator-only",
 };
 const convention: ConventionReadDto = {
   ...agencyFields,
@@ -617,13 +617,12 @@ describe("convention action slice", () => {
       );
       const conventionWithAgencyChanged: ConventionReadDto = {
         agencyName: "agency-transferred-name",
-        agencyCounsellorEmails: [],
         agencyContactEmail: "contact@mail.com",
         agencyDepartment: "87",
         agencyKind: "pole-emploi" as const,
         agencyRefersTo: undefined,
         agencySiret: "22220000111155",
-        agencyValidatorEmails: [],
+        agencyValidationSteps: "validator-only",
         ...new ConventionDtoBuilder(convention)
           .withAgencyId("agency-transferred-id")
           .build(),

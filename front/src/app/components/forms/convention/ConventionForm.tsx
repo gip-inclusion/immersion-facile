@@ -491,8 +491,7 @@ const ConventionFormContent = ({
       agencyKind: selectedAgency.kind,
       agencyName: selectedAgency.name,
       agencyContactEmail: "",
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [],
+      agencyValidationSteps: "validator-only",
       assessment: null,
       isEstablishmentBanned: false,
     };
