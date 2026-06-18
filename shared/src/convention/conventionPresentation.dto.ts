@@ -48,10 +48,7 @@ export const isCreateConventionPresentationInitialValues = (
 
 export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   Partial<ConventionReadDto>,
-  | "agencyName"
-  | "agencyCounsellorEmails"
-  | "agencyValidatorEmails"
-  | "agencySiret"
+  "agencyName" | "agencySiret" | "agencyValidationSteps"
 > &
   Partial<WithFromConventionDraftId> &
   WithSignatures &
@@ -67,11 +64,10 @@ export type ConventionPresentation = OmitFromExistingKeys<
   ConventionReadDto,
   | "agencyKind"
   | "agencyName"
-  | "agencyCounsellorEmails"
-  | "agencyValidatorEmails"
   | "agencySiret"
   | "agencyContactEmail"
   | "assessment"
+  | "agencyValidationSteps"
 > &
   Partial<WithFromConventionDraftId> &
   WithSignatures &

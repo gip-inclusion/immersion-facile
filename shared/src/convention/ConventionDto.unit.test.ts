@@ -215,8 +215,7 @@ describe("conventionDtoSchema", () => {
         agencyContactEmail: "contact@mail.com",
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: {
           status: "COMPLETED",
           endedWithAJob: false,
@@ -239,8 +238,7 @@ describe("conventionDtoSchema", () => {
         agencyContactEmail: "contact@mail.com",
         agencyDepartment: "90",
         agencyKind: "pole-emploi",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidationSteps: "validator-only",
         assessment: {
           status: "COMPLETED",
           endedWithAJob: false,

@@ -152,8 +152,7 @@ describe("Assessment form schema", () => {
     agencyKind: "pole-emploi",
     agencyContactEmail: "agency@mail.fr",
     agencySiret: "77567187800032",
-    agencyCounsellorEmails: [],
-    agencyValidatorEmails: [],
+    agencyValidationSteps: "validator-only",
     assessment: null,
     isEstablishmentBanned: false,
   };

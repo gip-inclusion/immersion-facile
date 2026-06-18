@@ -470,14 +470,20 @@ export type AgencyRefersToInConvention = {
   siret: SiretDto;
 };
 
-export type ConventionAgencyFields = {
+export type AgencyValidationStep = (typeof agencyValidationSteps)[number];
+
+export const agencyValidationSteps = [
+  "validator-only",
+  "counsellor-and-validator",
+] as const;
+
+export type ConventionAgencyPublicFields = {
   agencyName: string;
   agencyDepartment: DepartmentCode;
   agencyContactEmail: Email;
   agencyKind: AgencyKind;
   agencySiret: SiretDto;
-  agencyCounsellorEmails: string[];
-  agencyValidatorEmails: string[];
+  agencyValidationSteps: AgencyValidationStep;
   agencyRefersTo?: AgencyRefersToInConvention;
 };
 
@@ -494,7 +500,7 @@ export type ConventionAssessmentFields = {
 };
 
 export type ConventionReadDto = ConventionDto &
-  ConventionAgencyFields &
+  ConventionAgencyPublicFields &
   ConventionAssessmentFields &
   WithBannedEstablishmentInformations;
 

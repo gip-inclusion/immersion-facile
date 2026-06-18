@@ -77,6 +77,8 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
+  type AgencyValidationStep,
+  agencyValidationSteps,
   ageRequirementByInternshipKind,
   assessmentCompletionStatusFilters,
   BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
@@ -576,6 +578,9 @@ export const conventionAssessmentFieldsSchema = z
   ])
   .nullable();
 
+export const agencyValidationStepSchema: ZodSchemaWithInputMatchingOutput<AgencyValidationStep> =
+  z.enum(agencyValidationSteps);
+
 export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionReadDto> =
   conventionSchema.and(
     z
@@ -585,8 +590,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
         agencyKind: agencyKindSchema,
         agencyContactEmail: emailSchema,
         agencySiret: siretSchema,
-        agencyCounsellorEmails: z.array(emailSchema),
-        agencyValidatorEmails: z.array(emailSchema),
+        agencyValidationSteps: agencyValidationStepSchema,
         agencyRefersTo: z
           .object({
             id: refersToAgencyIdSchema,
