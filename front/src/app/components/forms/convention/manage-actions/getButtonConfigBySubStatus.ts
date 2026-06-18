@@ -640,7 +640,7 @@ const createButtonPropsByVerificationAction = (
     DECLARE_ABANDONMENT: {
       props: getVerificationActionProps({
         verificationAction: "DECLARE_ABANDONMENT",
-        children: "Déclarer un abandon",
+        children: "Déclarer une fin anticipée",
         jwt,
         convention,
         buttonId: domElementIds.manageConvention.abandonAssessmentButton,
