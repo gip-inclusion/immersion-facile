@@ -9,10 +9,7 @@ import {
   editConventionWithFinalStatusRequestSchema,
   errors,
 } from "shared";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import {
   throwIfNotAdmin,
   throwIfNotAuthorizedForRole,
@@ -22,7 +19,10 @@ import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
+import {
+  retrieveConventionWithAgency,
+  throwErrorOnConventionIdMismatch,
+} from "../entities/Convention";
 
 export type EditConventionWithFinalStatus = ReturnType<
   typeof makeEditConventionWithFinalStatus
@@ -51,14 +51,10 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       inputParams.conventionId,
     );
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: inputParams.conventionId,
-      });
 
     throwErrorIfConventionStatusNotAllowed(
       convention.status,
@@ -69,11 +65,6 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
         status: convention.status,
         conventionId: convention.id,
       }),
-    );
-
-    const conventionRead = await conventionDtoToConventionReadDto(
-      convention,
-      uow,
     );
 
     if (inputParams.beneficiary) {
@@ -87,7 +78,8 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
     await throwIfNotAuthorizedForRole({
       uow,
       jwtPayload,
-      convention: conventionRead,
+      convention,
+      agencyWithUserRights: agency,
       authorizedRoles: [...allowedRolesToEditConventionWithFinalStatus],
       errorToThrow:
         errors.convention.editConventionWithFinalStatusNotAuthorizedForRole(),

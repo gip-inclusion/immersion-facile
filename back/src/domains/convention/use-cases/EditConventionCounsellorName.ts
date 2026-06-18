@@ -6,15 +6,15 @@ import {
   editConventionCounsellorNameRequestSchema,
   errors,
 } from "shared";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
+import {
+  retrieveConventionWithAgency,
+  throwErrorOnConventionIdMismatch,
+} from "../entities/Convention";
 
 export type EditConventionCounsellorName = ReturnType<
   typeof makeEditConventionCounsellorName
@@ -37,14 +37,10 @@ export const makeEditConventionCounsellorName = useCaseBuilder(
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       inputParams.conventionId,
     );
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: inputParams.conventionId,
-      });
 
     throwErrorIfConventionStatusNotAllowed(
       convention.status,
@@ -54,17 +50,13 @@ export const makeEditConventionCounsellorName = useCaseBuilder(
       }),
     );
 
-    const conventionRead = await conventionDtoToConventionReadDto(
-      convention,
-      uow,
-    );
-
     await throwIfNotAuthorizedForRole({
       uow,
       jwtPayload,
-      convention: conventionRead,
+      convention,
       authorizedRoles: [...agencyModifierRoles, "back-office"],
       errorToThrow: errors.convention.editCounsellorNameNotAuthorizedForRole(),
+      agencyWithUserRights: agency,
       isPeAdvisorAllowed: true,
       isValidatorOfAgencyRefersToAllowed: false,
     });

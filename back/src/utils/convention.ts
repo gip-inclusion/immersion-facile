@@ -1,4 +1,5 @@
 import {
+  type AgencyDto,
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionReadDto,
@@ -11,10 +12,13 @@ import {
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import type { BannedEstablishment } from "../domains/establishment/ports/BannedEstablishmentRepository";
-import { agencyWithRightToAgencyDto } from "./agency";
+import {
+  agencyDtoToConventionAgencyFields,
+  agencyWithRightToAgencyDto,
+} from "./agency";
 
 export const conventionEmailsByRole =
-  (convention: ConventionReadDto) =>
+  (convention: ConventionDto, agency: AgencyDto) =>
   (role: ConventionRole): Email[] => {
     const emailsByRole: Record<ConventionRole, Email[] | Error | undefined> = {
       beneficiary: [convention.signatories.beneficiary.email],
@@ -32,8 +36,8 @@ export const conventionEmailsByRole =
             conventionId: convention.id,
             role: "beneficiary-representative",
           }),
-      counsellor: convention.agencyCounsellorEmails,
-      validator: convention.agencyValidatorEmails,
+      counsellor: agency.counsellorEmails,
+      validator: agency.validatorEmails,
       "establishment-representative": [
         convention.signatories.establishmentRepresentative.email,
       ],
@@ -71,35 +75,19 @@ export const conventionDtoToConventionReadDto = async (
       : { isEstablishmentBanned: false };
 
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-  const agencyRefersTo = agency.refersToAgencyId
-    ? await uow.agencyRepository.getById(agency.refersToAgencyId)
-    : undefined;
-
   const assessment = await uow.assessmentRepository.getByConventionId(
     conventionDto.id,
   );
 
   return {
     ...conventionDto,
-    agencyCounsellorEmails: agency.counsellorEmails,
-    agencyValidatorEmails: agency.validatorEmails,
-    agencyName: agency.name,
-    agencyContactEmail: agency.contactEmail,
-    agencyDepartment: agency.coveredDepartments.at(0) ?? "",
-    agencySiret: agency.agencySiret,
-    agencyKind: agency.kind,
-    ...(agencyRefersTo
-      ? {
-          agencyRefersTo: {
-            id: agencyRefersTo.id,
-            name: agencyRefersTo.name,
-            contactEmail: agencyRefersTo.contactEmail,
-            kind: agencyRefersTo.kind,
-            siret: agencyRefersTo.agencySiret,
-          },
-        }
-      : {}),
+    ...agencyDtoToConventionAgencyFields(
+      agency,
+      agency.refersToAgencyId
+        ? ((await uow.agencyRepository.getById(agency.refersToAgencyId)) ??
+            null)
+        : null,
+    ),
     ...assesmentEntityToConventionAssessmentFields(assessment),
     ...withBannedEstablishmentInformations,
   };

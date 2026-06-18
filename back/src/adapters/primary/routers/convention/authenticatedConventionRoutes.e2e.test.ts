@@ -7,6 +7,7 @@ import {
   authenticatedConventionRoutes,
   ConnectedUserBuilder,
   type ConnectedUserJwt,
+  type ConventionAgencyPublicFields,
   ConventionDtoBuilder,
   type ConventionReadDto,
   type ConventionTemplate,
@@ -361,14 +362,13 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields = {
+      const agencyFields: ConventionAgencyPublicFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
         agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [validator.email],
+        agencyValidationSteps: "validator-only",
         agencyRefersTo: undefined,
       };
 
@@ -442,14 +442,13 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields = {
+      const agencyFields: ConventionAgencyPublicFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
         agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [validator.email],
+        agencyValidationSteps: "validator-only",
         agencyRefersTo: undefined,
       };
 
@@ -565,14 +564,13 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields = {
+      const agencyFields: ConventionAgencyPublicFields = {
         agencyName: peAgency.name,
         agencyDepartment: peAgency.address.departmentCode,
         agencyContactEmail: peAgency.contactEmail,
         agencyKind: peAgency.kind,
         agencySiret: peAgency.agencySiret,
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [validator.email],
+        agencyValidationSteps: "validator-only",
         agencyRefersTo: undefined,
       };
 

@@ -23,11 +23,10 @@ import type {
   GenerateConventionMagicLinkUrl,
   GenerateEmailAuthCodeUrl,
 } from "../../../../../config/bootstrap/magicLinkUrl";
-import {
-  conventionDtoToConventionReadDto,
-  conventionEmailsByRole,
-} from "../../../../../utils/convention";
+import { agencyWithRightToAgencyDto } from "../../../../../utils/agency";
+import { conventionEmailsByRole } from "../../../../../utils/convention";
 import { makeEmailHash } from "../../../../../utils/jwt";
+import { retrieveConventionWithAgency } from "../../../../convention/entities/Convention";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import type { ShortLinkIdGeneratorGateway } from "../../../short-link/ports/ShortLinkIdGeneratorGateway";
@@ -213,16 +212,14 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     conventionJwt: ConventionDomainJwtPayload,
     originalUrl: string,
   ): Promise<void> {
-    const convention = await uow.conventionRepository.getById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       conventionJwt.applicationId,
     );
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: conventionJwt.applicationId,
-      });
 
     const emails = conventionEmailsByRole(
-      await conventionDtoToConventionReadDto(convention, uow),
+      convention,
+      await agencyWithRightToAgencyDto(uow, agency),
     )(conventionJwt.role);
 
     const emailMatchingEmailHash = emails.find(

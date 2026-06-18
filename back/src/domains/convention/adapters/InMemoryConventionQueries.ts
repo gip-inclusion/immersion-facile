@@ -125,6 +125,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
     const conventionReadDto =
       await this.#addAgencyAndAssessmentDataToConvention(convention);
+
     return validateAndParseZodSchema({
       schemaName: "conventionReadSchema",
       inputSchema: conventionReadSchema,
@@ -343,29 +344,13 @@ export class InMemoryConventionQueries implements ConventionQueries {
         (agency) => agency.id === agency.refersToAgencyId,
       );
 
-    const { counsellorIds, validatorIds } = toPairs(agency.usersRights).reduce<{
-      counsellorIds: UserId[];
-      validatorIds: UserId[];
-    }>(
-      (acc, item) => {
-        const [userId, userRights] = item;
-
-        return {
-          counsellorIds: [
-            ...acc.counsellorIds,
-            ...(userRights?.roles.includes("counsellor") ? [userId] : []),
-          ],
-          validatorIds: [
-            ...acc.validatorIds,
-            ...(userRights?.roles.includes("validator") ? [userId] : []),
-          ],
-        };
-      },
-      { counsellorIds: [], validatorIds: [] },
+    const counsellorIds = toPairs(agency.usersRights).reduce<UserId[]>(
+      (acc, [userId, userRights]) => [
+        ...acc,
+        ...(userRights?.roles.includes("counsellor") ? [userId] : []),
+      ],
+      [],
     );
-
-    const counsellors = await this.userRepository.getByIds(counsellorIds);
-    const validators = await this.userRepository.getByIds(validatorIds);
 
     const assessment = this.assessmentRepository.assessments.find(
       (assessment) => assessment.conventionId === convention.id,
@@ -378,8 +363,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
       agencyContactEmail: agency.contactEmail,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
-      agencyCounsellorEmails: counsellors.map(({ email }) => email),
-      agencyValidatorEmails: validators.map(({ email }) => email),
+      agencyValidationSteps: counsellorIds.length
+        ? "counsellor-and-validator"
+        : "validator-only",
       agencyRefersTo: referedAgency
         ? {
             id: referedAgency.id,

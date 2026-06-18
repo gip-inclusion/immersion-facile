@@ -3,8 +3,8 @@ import {
   agencyModifierRoles,
   allSignatoryRoles,
   assessmentEmailSender,
+  type ConventionDto,
   type ConventionId,
-  type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
   formatHoursCooldownTimeRemaining,
@@ -17,10 +17,7 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -31,7 +28,10 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import { throwErrorIfPhoneNumberNotValid } from "../entities/Convention";
+import {
+  retrieveConventionWithAgency,
+  throwErrorIfPhoneNumberNotValid,
+} from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
@@ -50,29 +50,15 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
   }>()
   .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     const notificationKind = inputParams.notificationKind;
-    const convention = await uow.conventionRepository.getById(
-      inputParams.conventionId,
-    );
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: inputParams.conventionId,
-      });
-
-    const agencyWithRights = await uow.agencyRepository.getById(
-      convention.agencyId,
-    );
-    if (!agencyWithRights)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-    const conventionRead = await conventionDtoToConventionReadDto(
-      convention,
+    const { agency, convention } = await retrieveConventionWithAgency(
       uow,
+      inputParams.conventionId,
     );
 
     await throwIfNotAuthorizedForRole({
       uow,
-      convention: conventionRead,
+      convention,
+      agencyWithUserRights: agency,
       authorizedRoles: [
         ...agencyModifierRoles,
         ...allSignatoryRoles,
@@ -126,7 +112,7 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
         userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
         recipientPhone,
         uow,
-        convention: conventionRead,
+        convention,
         ...deps,
       });
     }
@@ -139,7 +125,7 @@ export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
           now: deps.timeGateway.now(),
         },
         uow,
-        convention: conventionRead,
+        convention,
         ...deps,
       });
     }
@@ -201,7 +187,7 @@ const sendSms = async ({
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   recipientPhone: string;
   userId: UserId | undefined;
@@ -250,7 +236,7 @@ const sendEmail = async ({
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
 }) => {
   const makeShortMagicLink = prepareConventionMagicShortLinkMaker({

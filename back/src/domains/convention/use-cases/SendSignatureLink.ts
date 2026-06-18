@@ -1,8 +1,8 @@
 import {
   agencyModifierRoles,
   allSignatoryRoles,
+  type ConventionDto,
   type ConventionId,
-  type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   conventionSignatoryRoleBySignatoryKey,
   errors,
@@ -17,10 +17,7 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -32,6 +29,7 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
+  retrieveConventionWithAgency,
   throwErrorIfSignatoryAlreadySigned,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
@@ -60,16 +58,9 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(conventionId);
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId,
-      });
-
-    const conventionRead = await conventionDtoToConventionReadDto(
-      convention,
+    const { agency, convention } = await retrieveConventionWithAgency(
       uow,
+      inputParams.conventionId,
     );
 
     throwErrorIfConventionStatusNotAllowed(
@@ -82,7 +73,8 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
 
     await throwIfNotAuthorizedForRole({
       uow,
-      convention: conventionRead,
+      convention,
+      agencyWithUserRights: agency,
       authorizedRoles: [
         ...agencyModifierRoles,
         "back-office",
@@ -104,7 +96,7 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
     }
 
     throwErrorIfSignatoryAlreadySigned({
-      convention: conventionRead,
+      convention,
       signatoryKey,
       signatoryRole,
     });
@@ -131,12 +123,12 @@ export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
       signatoryPhone: signatory.phone,
       signatory,
       uow,
-      convention: conventionRead,
+      convention,
       ...deps,
     };
     if (notificationKind === "sms") {
       throwErrorIfSignatoryPhoneNumberNotValid({
-        convention: conventionRead,
+        convention,
         signatoryKey,
         signatoryRole,
       });
@@ -184,7 +176,7 @@ const sendSms = async ({
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   signatoryPhone: string;
   userId: UserId | undefined;
@@ -234,7 +226,7 @@ const sendEmail = async ({
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   signatory: {
     email: string;

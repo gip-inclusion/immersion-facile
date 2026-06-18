@@ -1,5 +1,6 @@
 import {
   agencyKindSchema,
+  agencyValidationSteps,
   assessmentStatuses,
   conventionSchema,
   dateTimeIsoStringSchema,
@@ -22,8 +23,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
         agencyKind: agencyKindSchema,
         agencyContactEmail: emailSchema,
         agencySiret: siretSchema,
-        agencyCounsellorEmails: z.array(emailSchema),
-        agencyValidatorEmails: z.array(emailSchema),
+        agencyValidationSteps: z.enum(agencyValidationSteps),
         agencyRefersToOtherAgency: z
           .object({
             id: z.string(),

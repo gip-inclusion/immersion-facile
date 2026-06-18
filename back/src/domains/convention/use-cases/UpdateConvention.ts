@@ -9,15 +9,9 @@ import {
   type Signatories,
   statusTransitionConfigs,
   updateConventionRequestSchema,
-  type WithBannedEstablishmentInformations,
   type WithConventionIdLegacy,
 } from "shared";
 import {
-  agencyDtoToConventionAgencyFields,
-  agencyWithRightToAgencyDto,
-} from "../../../utils/agency";
-import {
-  assesmentEntityToConventionAssessmentFields,
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
@@ -28,6 +22,7 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   extractUserRolesOnConventionFromJwtPayload,
+  retrieveConventionWithAgency,
   signConvention,
 } from "../entities/Convention";
 
@@ -50,20 +45,13 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
     }) => {
       if (!jwtPayload) throw errors.user.unauthorized();
 
-      const conventionFromRepo = await uow.conventionRepository.getById(
-        convention.id,
-      );
+      const { agency, convention: conventionFromRepo } =
+        await retrieveConventionWithAgency(uow, convention.id);
 
-      if (!conventionFromRepo)
-        throw errors.convention.notFound({ conventionId: convention.id });
-
-      const conventionReadDto = await conventionDtoToConventionReadDto(
-        conventionFromRepo,
-        uow,
-      );
       await throwIfNotAuthorizedForRole({
         uow,
-        convention: conventionReadDto,
+        convention: conventionFromRepo,
+        agencyWithUserRights: agency,
         authorizedRoles: [...allModifierRoles],
         errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
         jwtPayload,
@@ -71,15 +59,6 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
         isValidatorOfAgencyRefersToAllowed:
           conventionFromRepo.status !== "ACCEPTED_BY_COUNSELLOR",
       });
-
-      const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
-        conventionReadDto.isEstablishmentBanned
-          ? {
-              isEstablishmentBanned: true,
-              establishmentBannishmentJustification:
-                conventionReadDto.establishmentBannishmentJustification,
-            }
-          : { isEstablishmentBanned: false };
 
       const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
@@ -131,28 +110,12 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
             };
 
       if (hasSignatoryRole) {
-        const agencyWithRights = await uow.agencyRepository.getById(
-          convention.agencyId,
-        );
-        const assessment = await uow.assessmentRepository.getByConventionId(
-          convention.id,
-        );
-        const assessmentFields =
-          assesmentEntityToConventionAssessmentFields(assessment);
-
-        if (!agencyWithRights)
-          throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-        const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
         const { signedConvention } = await signConvention({
           uow,
-          convention: {
-            ...conventionWithSignatoriesSignedAtAndDateApprovalCleared,
-            ...agencyDtoToConventionAgencyFields(agency),
-            ...assessmentFields,
-            ...withBannedEstablishmentInformations,
-          },
+          convention: await conventionDtoToConventionReadDto(
+            conventionWithSignatoriesSignedAtAndDateApprovalCleared,
+            uow,
+          ),
           jwtPayload,
           now: deps.timeGateway.now().toISOString(),
         });

@@ -2,6 +2,7 @@ import {
   type AgencyWithUsersRights,
   type ApiConsumer,
   type ConventionDomainJwtPayload,
+  type ConventionDto,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
@@ -9,6 +10,7 @@ import {
   type UserId,
   withConventionIdSchema,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import {
   isHashMatchConventionEmails,
   isHashMatchNotNotifiedCounsellorOrValidator,
@@ -112,7 +114,7 @@ const isConventionDomainPayloadHasRight = async ({
   const isUserHasRight = await isEmailHashMatch({
     payload: jwtPayload,
     convention,
-    agency,
+    agencyWithUserRights: agency,
     uow,
   });
 
@@ -127,12 +129,12 @@ const isConventionDomainPayloadHasRight = async ({
 const isEmailHashMatch = async ({
   payload: { emailHash, role },
   convention,
-  agency,
+  agencyWithUserRights,
   uow,
 }: {
   payload: ConventionDomainJwtPayload;
-  convention: ConventionReadDto;
-  agency: AgencyWithUsersRights;
+  convention: ConventionDto;
+  agencyWithUserRights: AgencyWithUsersRights;
   uow: UnitOfWork;
 }): Promise<boolean> => {
   if (
@@ -140,6 +142,7 @@ const isEmailHashMatch = async ({
       role,
       emailHash,
       convention,
+      agency: await agencyWithRightToAgencyDto(uow, agencyWithUserRights),
     })
   )
     return true;
@@ -155,6 +158,6 @@ const isEmailHashMatch = async ({
   return await isHashMatchNotNotifiedCounsellorOrValidator({
     uow,
     emailHash,
-    agency,
+    agency: agencyWithUserRights,
   });
 };
