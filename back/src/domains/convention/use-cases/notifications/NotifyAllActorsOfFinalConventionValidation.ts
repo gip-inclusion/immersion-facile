@@ -194,6 +194,10 @@ const prepareEmail = async ({
             lifetime: "2Days",
           })
         : undefined,
+      agencyName: agency.name,
+      agencyReferentName: convention.agencyReferent
+        ? getFormattedFirstnameAndLastname(convention.agencyReferent)
+        : undefined,
       validatorName: convention.validators?.agencyValidator
         ? getFormattedFirstnameAndLastname(
             convention.validators.agencyValidator,

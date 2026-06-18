@@ -716,6 +716,8 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     assessmentMagicLink: "ASSESSMENT_MAGIC_LINK",
     validatorName: "VALIDATOR_NAME",
+    agencyName: "AGENCY_NAME",
+    agencyReferentName: "AGENCY_REFERENT_NAME",
   },
   ESTABLISHMENT_USER_RIGHTS_UPDATED: {
     businessName: "BUSINESS_NAME",
