@@ -7,7 +7,7 @@ import {
   type AgencyRole,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
-  type ConventionAgencyFields,
+  type ConventionAgencyPublicFields,
   type Email,
   errors,
   pipeWithValue,
@@ -221,12 +221,26 @@ export const throwErrorIfAttemptToAddCounsellorRoleToFTAgency = ({
 
 export const agencyDtoToConventionAgencyFields = (
   agency: AgencyDto,
-): ConventionAgencyFields => ({
-  agencyContactEmail: agency.contactEmail,
-  agencyCounsellorEmails: agency.counsellorEmails,
-  agencyValidatorEmails: agency.validatorEmails,
-  agencyKind: agency.kind,
+  agencyRefersTo: AgencyWithUsersRights | null,
+): ConventionAgencyPublicFields => ({
+  agencyValidationSteps:
+    agency.counsellorEmails.length > 0
+      ? "counsellor-and-validator"
+      : "validator-only",
   agencyName: agency.name,
+  agencyContactEmail: agency.contactEmail,
+  agencyDepartment: agency.coveredDepartments.at(0) ?? "",
   agencySiret: agency.agencySiret,
-  agencyDepartment: agency.coveredDepartments[0],
+  agencyKind: agency.kind,
+  ...(agencyRefersTo
+    ? {
+        agencyRefersTo: {
+          id: agencyRefersTo.id,
+          name: agencyRefersTo.name,
+          contactEmail: agencyRefersTo.contactEmail,
+          kind: agencyRefersTo.kind,
+          siret: agencyRefersTo.agencySiret,
+        },
+      }
+    : {}),
 });

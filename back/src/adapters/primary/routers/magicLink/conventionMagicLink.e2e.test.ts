@@ -737,6 +737,11 @@ describe("Magic link router", () => {
         .build();
       inMemoryUow.conventionRepository.setConventions([conventionInReview]);
       inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       const response = await httpClient.editConventionWithFinalStatus({
         headers: {

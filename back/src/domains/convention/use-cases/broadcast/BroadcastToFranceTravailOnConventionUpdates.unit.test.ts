@@ -28,43 +28,6 @@ import {
   makeBroadcastToFranceTravailOnConventionUpdates,
 } from "./BroadcastToFranceTravailOnConventionUpdates";
 
-const conventionReadDtoFrom = ({
-  convention,
-  agency,
-  referredAgency,
-  assessment,
-}: {
-  convention: ConventionDto;
-  agency: AgencyDto;
-  referredAgency?: AgencyDto;
-  assessment?: AssessmentDto;
-}): ConventionReadDto => ({
-  ...convention,
-  agencyName: agency.name,
-  agencyContactEmail: agency.contactEmail,
-  agencyDepartment: agency.address.departmentCode,
-  agencyKind: agency.kind,
-  agencySiret: agency.agencySiret,
-  agencyRefersTo: referredAgency && {
-    id: referredAgency.id,
-    name: referredAgency.name,
-    contactEmail: referredAgency.contactEmail,
-    kind: referredAgency.kind,
-    siret: referredAgency.agencySiret,
-  },
-  agencyCounsellorEmails: agency.counsellorEmails,
-  agencyValidatorEmails: agency.validatorEmails,
-  assessment: assessment
-    ? {
-        status: assessment.status,
-        endedWithAJob: assessment.endedWithAJob,
-        signedAt: assessment.signedAt,
-        createdAt: assessment.createdAt,
-      }
-    : null,
-  isEstablishmentBanned: false,
-});
-
 describe("Broadcasts events to France Travail", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
     .withId("some-pe-agency")
@@ -827,5 +790,43 @@ describe("Broadcasts events to France Travail", () => {
 
       expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
     });
+  });
+
+  const conventionReadDtoFrom = ({
+    convention,
+    agency,
+    referredAgency,
+    assessment,
+  }: {
+    convention: ConventionDto;
+    agency: AgencyDto;
+    referredAgency?: AgencyDto;
+    assessment?: AssessmentDto;
+  }): ConventionReadDto => ({
+    ...convention,
+    agencyName: agency.name,
+    agencyContactEmail: agency.contactEmail,
+    agencyDepartment: agency.address.departmentCode,
+    agencyKind: agency.kind,
+    agencySiret: agency.agencySiret,
+    agencyRefersTo: referredAgency && {
+      id: referredAgency.id,
+      name: referredAgency.name,
+      contactEmail: referredAgency.contactEmail,
+      kind: referredAgency.kind,
+      siret: referredAgency.agencySiret,
+    },
+    agencyValidationSteps: agency.counsellorEmails.length
+      ? "counsellor-and-validator"
+      : "validator-only",
+    assessment: assessment
+      ? {
+          status: assessment.status,
+          endedWithAJob: assessment.endedWithAJob,
+          signedAt: assessment.signedAt,
+          createdAt: assessment.createdAt,
+        }
+      : null,
+    isEstablishmentBanned: false,
   });
 });

@@ -87,10 +87,9 @@ export const retrieveConventionWithAgency = async (
   conventionId: ConventionId,
 ): Promise<{
   agency: AgencyWithUsersRights;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
 }> => {
-  const convention =
-    await uow.conventionQueries.getConventionById(conventionId);
+  const convention = await uow.conventionRepository.getById(conventionId);
   if (!convention)
     throw errors.convention.notFound({
       conventionId,
@@ -188,7 +187,7 @@ export const throwErrorIfSignatoryAlreadySigned = ({
   signatoryRole,
   signatoryKey,
 }: {
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   signatoryRole: SignatoryRole;
   signatoryKey: keyof Signatories;
 }) => {
@@ -205,7 +204,7 @@ export const throwErrorIfSignatoryPhoneNumberNotValid = ({
   signatoryRole,
   signatoryKey,
 }: {
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   signatoryKey: keyof Signatories;
   signatoryRole: SignatoryRole;
 }) => {

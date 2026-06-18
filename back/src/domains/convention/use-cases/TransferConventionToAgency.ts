@@ -7,15 +7,15 @@ import {
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
+import {
+  retrieveConventionWithAgency,
+  throwErrorOnConventionIdMismatch,
+} from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
   typeof makeTransferConventionToAgency
@@ -38,14 +38,10 @@ export const makeTransferConventionToAgency = useCaseBuilder(
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       inputParams.conventionId,
     );
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: inputParams.conventionId,
-      });
 
     throwErrorIfConventionStatusNotAllowed(
       convention.status,
@@ -60,13 +56,10 @@ export const makeTransferConventionToAgency = useCaseBuilder(
       agencyRepository: uow.agencyRepository,
     });
 
-    const conventionReadDto = await conventionDtoToConventionReadDto(
-      convention,
-      uow,
-    );
     await throwIfNotAuthorizedForRole({
       uow,
-      convention: conventionReadDto,
+      convention,
+      agencyWithUserRights: agency,
       authorizedRoles: [...agencyModifierRoles, "back-office"],
       errorToThrow: errors.convention.transferNotAuthorizedForRole(),
       jwtPayload,

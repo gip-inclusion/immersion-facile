@@ -70,8 +70,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       siret: referredAgency.agencySiret,
     },
     agencyDepartment: agency.address.departmentCode,
-    agencyValidatorEmails: [validator.email],
-    agencyCounsellorEmails: [],
+    agencyValidationSteps: "validator-only",
     assessment: {
       status: assessment.status,
       endedWithAJob: assessment.endedWithAJob,
@@ -139,8 +138,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         siret: referredAgency.agencySiret,
       },
       agencyDepartment: agency.address.departmentCode,
-      agencyValidatorEmails: [validator.email],
-      agencyCounsellorEmails: [],
+      agencyValidationSteps: "validator-only",
       assessment: null,
       isEstablishmentBanned: false,
     };
@@ -203,8 +201,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
             siret: referredAgency.agencySiret,
           },
           agencyDepartment: agency.address.departmentCode,
-          agencyValidatorEmails: [validator.email],
-          agencyCounsellorEmails: [],
+          agencyValidationSteps: "validator-only",
           assessment: {
             status: "FINISHED",
             createdAt: new Date("2023-03-11").toISOString(),

@@ -92,8 +92,7 @@ const conventionExample: ConventionReadDto = {
   agencyKind: "pole-emploi",
   agencySiret: "11112222000033",
   agencyContactEmail: "contact@mail.com",
-  agencyCounsellorEmails: [],
-  agencyValidatorEmails: ["validator@mail.com"],
+  agencyValidationSteps: "validator-only",
   agencyRefersTo: undefined,
   assessment: {
     status: "COMPLETED",

@@ -2,7 +2,6 @@ import {
   assessmentSignatureReminderAuthorizedRoles,
   type ConventionDto,
   type ConventionId,
-  type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
   formatHoursCooldownTimeRemaining,
@@ -16,10 +15,7 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import {
-  conventionDtoToConventionReadDto,
-  throwErrorIfConventionStatusNotAllowed,
-} from "../../../utils/convention";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import type { CreateConventionMagicLinkPayloadProperties } from "../../../utils/jwt";
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -32,6 +28,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { getOnlyAssessmentDto } from "../entities/AssessmentEntity";
 import {
+  retrieveConventionWithAgency,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
 } from "../entities/Convention";
@@ -63,16 +60,9 @@ export const makeSendAssessmentSignatureReminder = useCaseBuilder(
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(conventionId);
-
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId,
-      });
-
-    const conventionRead = await conventionDtoToConventionReadDto(
-      convention,
+    const { agency, convention } = await retrieveConventionWithAgency(
       uow,
+      conventionId,
     );
 
     throwErrorIfConventionStatusNotAllowed(
@@ -85,7 +75,8 @@ export const makeSendAssessmentSignatureReminder = useCaseBuilder(
 
     await throwIfNotAuthorizedForRole({
       uow,
-      convention: conventionRead,
+      convention,
+      agencyWithUserRights: agency,
       authorizedRoles: [...assessmentSignatureReminderAuthorizedRoles],
       errorToThrow:
         errors.assessment.sendAssessmentSignatureReminderForbidden(),
@@ -124,7 +115,7 @@ export const makeSendAssessmentSignatureReminder = useCaseBuilder(
 
     if (notificationKind === "sms") {
       throwErrorIfSignatoryPhoneNumberNotValid({
-        convention: conventionRead,
+        convention,
         signatoryKey: "beneficiary",
         signatoryRole: "beneficiary",
       });
@@ -138,7 +129,7 @@ export const makeSendAssessmentSignatureReminder = useCaseBuilder(
         userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
         recipientPhone: convention.signatories.beneficiary.phone,
         uow,
-        convention: conventionRead,
+        convention,
         ...deps,
       });
     }
@@ -251,7 +242,7 @@ const sendAssessmentSignatureReminderSms = async ({
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   config: AppConfig;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   recipientPhone: string;
   userId: UserId | undefined;

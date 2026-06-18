@@ -1,14 +1,17 @@
 import {
+  type AgencyDto,
   type AgencyId,
+  type AgencyWithUsersRights,
   type ConnectedUser,
   type ConnectedUserDomainJwtPayload,
   type ConventionDomainJwtPayload,
-  type ConventionReadDto,
+  type ConventionDto,
   type ConventionRelatedJwtPayload,
   errors,
   type Role,
   type UserWithAdminRights,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
@@ -45,6 +48,7 @@ export const throwIfNotAuthorizedForRole = async ({
   authorizedRoles,
   errorToThrow,
   convention,
+  agencyWithUserRights,
   isPeAdvisorAllowed,
   isValidatorOfAgencyRefersToAllowed,
 }: {
@@ -52,10 +56,12 @@ export const throwIfNotAuthorizedForRole = async ({
   jwtPayload: ConventionRelatedJwtPayload;
   authorizedRoles: Role[];
   errorToThrow: Error;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
+  agencyWithUserRights: AgencyWithUsersRights;
   isPeAdvisorAllowed: boolean;
   isValidatorOfAgencyRefersToAllowed: boolean;
 }): Promise<void> => {
+  const agency = await agencyWithRightToAgencyDto(uow, agencyWithUserRights);
   if ("userId" in jwtPayload) {
     await onConnectedUser({
       uow,
@@ -63,6 +69,7 @@ export const throwIfNotAuthorizedForRole = async ({
       authorizedRoles,
       errorToThrow,
       convention,
+      agency,
       isPeAdvisorAllowed,
       isValidatorOfAgencyRefersToAllowed,
     });
@@ -75,6 +82,7 @@ export const throwIfNotAuthorizedForRole = async ({
       authorizedRoles,
       errorToThrow,
       convention,
+      agency,
       isPeAdvisorAllowed,
       isValidatorOfAgencyRefersToAllowed,
     });
@@ -87,6 +95,7 @@ const onMagicLink = async ({
   authorizedRoles,
   errorToThrow,
   convention,
+  agency,
   isPeAdvisorAllowed,
   isValidatorOfAgencyRefersToAllowed,
 }: {
@@ -94,7 +103,8 @@ const onMagicLink = async ({
   jwtPayload: ConventionDomainJwtPayload;
   authorizedRoles: Role[];
   errorToThrow: Error;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
+  agency: AgencyDto;
   isPeAdvisorAllowed: boolean;
   isValidatorOfAgencyRefersToAllowed: boolean;
 }) => {
@@ -118,7 +128,7 @@ const onMagicLink = async ({
     throw errorToThrow;
   }
 
-  const emailsOrError = conventionEmailsByRole(convention)(role);
+  const emailsOrError = conventionEmailsByRole(convention, agency)(role);
 
   if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
     throw errors.convention.emailNotLinkedToConvention(role);
@@ -141,26 +151,24 @@ const onConnectedUser = async ({
   uow,
   jwtPayload,
   authorizedRoles,
+  agency,
+  isPeAdvisorAllowed,
   errorToThrow,
   convention,
   isValidatorOfAgencyRefersToAllowed,
 }: {
   uow: UnitOfWork;
   jwtPayload: ConnectedUserDomainJwtPayload;
+  agency: AgencyDto;
   authorizedRoles: Role[];
   errorToThrow: Error;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   isPeAdvisorAllowed: boolean;
   isValidatorOfAgencyRefersToAllowed: boolean;
 }) => {
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
 
   if (!isValidatorOfAgencyRefersToAllowed) {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-
-    if (!agency)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
     if (agency.refersToAgencyId) {
       const agencyRightOnAgency = userWithRights.agencyRights.find(
         (agencyRight) => agencyRight.agency.id === convention.agencyId,

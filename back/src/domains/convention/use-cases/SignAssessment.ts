@@ -8,6 +8,7 @@ import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { getOnlyAssessmentDto } from "../entities/AssessmentEntity";
+import { retrieveConventionWithAgency } from "../entities/Convention";
 
 export type SignAssessment = ReturnType<typeof makeSignAssessment>;
 
@@ -20,19 +21,17 @@ export const makeSignAssessment = useCaseBuilder("SignAssessment")
     timeGateway: TimeGateway;
   }>()
   .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
-    const convention = await uow.conventionQueries.getConventionById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       inputParams.conventionId,
     );
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: inputParams.conventionId,
-      });
 
     await throwIfNotAuthorizedForRole({
       authorizedRoles: ["beneficiary"],
       uow,
       jwtPayload,
       convention,
+      agencyWithUserRights: agency,
       errorToThrow: errors.assessment.signForbidden(),
       isPeAdvisorAllowed: false,
       isValidatorOfAgencyRefersToAllowed: false,

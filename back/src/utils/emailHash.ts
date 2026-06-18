@@ -1,10 +1,10 @@
 import { toPairs } from "ramda";
 import {
+  type AgencyDto,
   type AgencyId,
   type AgencyWithUsersRights,
   type Beneficiary,
   type ConventionDto,
-  type ConventionReadDto,
   type ConventionRole,
   type Email,
   type EmailHash,
@@ -67,12 +67,14 @@ export const isHashMatchConventionEmails = ({
   convention,
   emailHash,
   role,
+  agency,
 }: {
-  convention: ConventionReadDto;
+  convention: ConventionDto;
+  agency: AgencyDto;
   emailHash: EmailHash;
   role: ConventionRole;
 }) => {
-  const emailsByRole = conventionEmailsByRole(convention)(role);
+  const emailsByRole = conventionEmailsByRole(convention, agency)(role);
   return isSomeEmailMatchingEmailHash(emailsByRole, emailHash);
 };
 

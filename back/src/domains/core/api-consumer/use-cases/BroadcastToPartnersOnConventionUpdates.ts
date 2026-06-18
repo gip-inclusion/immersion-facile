@@ -8,16 +8,13 @@ import {
   executeInSequence,
   isApiConsumerAllowed,
   pipeWithValue,
-  type WithBannedEstablishmentInformations,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { assesmentEntityToConventionAssessmentFields } from "../../../../utils/convention";
+import { conventionDtoToConventionReadDto } from "../../../../utils/convention";
 import { createLogger } from "../../../../utils/logger";
 import {
   type WithConventionIdAndPreviousAgencyId,
   withConventionIdAndPreviousAgencySchema,
 } from "../../../convention/use-cases/broadcast/broadcastConventionParams";
-import type { BannedEstablishment } from "../../../establishment/ports/BannedEstablishmentRepository";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -47,55 +44,17 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
     const convention = await uow.conventionRepository.getById(conventionId);
     if (!convention) throw errors.convention.notFound({ conventionId });
 
-    const bannedEstablishment: BannedEstablishment | undefined =
-      await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
-        convention.siret,
-      );
-
-    const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
-      bannedEstablishment
-        ? {
-            isEstablishmentBanned: true,
-            establishmentBannishmentJustification:
-              bannedEstablishment.establishmentBannishmentJustification,
-          }
-        : { isEstablishmentBanned: false };
-
-    const agencyWithRights = await uow.agencyRepository.getById(
-      convention.agencyId,
-    );
-    if (!agencyWithRights)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
     const {
       acquisitionCampaign: _,
       acquisitionKeyword: __,
       ...conventionWithoutAcquisitionParams
     } = convention;
 
-    const assessment = await uow.assessmentRepository.getByConventionId(
-      convention.id,
-    );
-
-    const assessmentFields =
-      assesmentEntityToConventionAssessmentFields(assessment);
-
-    const conventionRead: ConventionReadDto = {
-      ...conventionWithoutAcquisitionParams,
-      agencyName: agencyWithRights.name,
-      agencyContactEmail: agencyWithRights.contactEmail,
-      agencyDepartment: agencyWithRights.address.departmentCode,
-      agencyKind: agencyWithRights.kind,
-      agencySiret: agencyWithRights.agencySiret,
-      agencyRefersTo: agencyWithRights.refersToAgencyId
-        ? await getReferedAgency(uow, agencyWithRights.refersToAgencyId)
-        : undefined,
-      agencyCounsellorEmails: agency.counsellorEmails,
-      agencyValidatorEmails: agency.validatorEmails,
-      ...assessmentFields,
-      ...withBannedEstablishmentInformations,
-    };
+    const conventionRead: ConventionReadDto =
+      await conventionDtoToConventionReadDto(
+        conventionWithoutAcquisitionParams,
+        uow,
+      );
 
     const previousAgencyWithRights = inputParams.previousAgencyId
       ? await uow.agencyRepository.getById(inputParams.previousAgencyId)
@@ -133,7 +92,7 @@ export const makeBroadcastToPartnersOnConventionUpdates = useCaseBuilder(
       ),
     );
 
-    if (agencyWithRights.kind === "mission-locale") {
+    if (conventionRead.agencyKind === "mission-locale") {
       logger.warn({
         message: debugDoubleBroadcastMessage(
           `apiConsumers.length: ${apiConsumers.length}. ${apiConsumers.length > 1 ? JSON.stringify(apiConsumers) : ""}`,
