@@ -251,6 +251,7 @@ const getUseCasesByTopics = (
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnAssessmentCreated,
     ),
+    useCases.notifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow,
   ],
   AssessmentDeleted: [
     useCases.notifyActorsThatAssessmentDeleted,
