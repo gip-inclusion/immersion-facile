@@ -3,7 +3,7 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type EstablishmentRole,
@@ -13,12 +13,12 @@ import {
   type frontRoutes,
   type OmitFromExistingKeys,
   type SiretDto,
-  useRoute,
 } from "shared";
 import { PhoneInput } from "src/app/components/forms/commons/PhoneInput";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { mergeUserRights } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
+import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
 import {
   type createFormModal,
   useFormModal,
@@ -26,7 +26,6 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import type { Route } from "type-route";
 
 type EstablishmentUserUserFormProps = {
   alreadyExistingUserRight:
@@ -42,6 +41,15 @@ type EstablishmentUserFormEmptyValues = OmitFromExistingKeys<
   "role"
 > & { role?: EstablishmentRole };
 
+const useEstablishmentUserFormRoute =
+  makeUseTypedRoute<
+    (
+      | typeof frontRoutes.establishmentDashboardFormEstablishment
+      | typeof frontRoutes.adminEstablishments
+      | typeof frontRoutes.myProfileEstablishmentRegistration
+    )["name"]
+  >();
+
 export const EstablishmentUserForm = ({
   alreadyExistingUserRight,
   establishmentUsersEditModal,
@@ -51,11 +59,11 @@ export const EstablishmentUserForm = ({
     establishmentSelectors.formEstablishment,
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const route = useRoute() as Route<
-    | typeof frontRoutes.establishmentDashboardFormEstablishment
-    | typeof frontRoutes.adminEstablishments
-    | typeof frontRoutes.myProfileEstablishmentRegistration
-  >;
+  const route = useEstablishmentUserFormRoute([
+    "establishmentDashboardFormEstablishment",
+    "adminEstablishments",
+    "myProfileEstablishmentRegistration",
+  ]);
   const isEstablishmentDashboardFormEstablishment =
     route.name === "establishmentDashboardFormEstablishment";
   const isMyProfileEstablishmentRegistration =
@@ -136,7 +144,7 @@ export const EstablishmentUserForm = ({
 
   const values = watch();
 
-  return (
+  const formJsx = (
     <>
       {values.email && isEstablishmentDashboardFormEstablishment && (
         <p>
@@ -217,4 +225,8 @@ export const EstablishmentUserForm = ({
       </form>
     </>
   );
+  if (isMyProfileEstablishmentRegistration) {
+    return <FormProvider {...methods}>{formJsx}</FormProvider>;
+  }
+  return formJsx;
 };
