@@ -123,6 +123,7 @@ type ConnectPrivateRoute =
   | FrontAdminRoute
   | FrontDashboardRoute
   | Route<typeof frontRoutes.formEstablishment>
+  | Route<typeof frontRoutes.myAccount>
   | Route<typeof frontRoutes.myProfile>
   | Route<typeof frontRoutes.myProfileAgencies>
   | Route<typeof frontRoutes.myProfileAgencyRegistration>
@@ -635,6 +636,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withProConnectLogin: true,
     },
     conventionTemplate: defaultPageContent,
+    myAccount: defaultPageContent,
     myProfile: defaultPageContent,
     beneficiaryDashboard: beneficiaryDashboardContent,
     beneficiaryDashboardDiscussions: beneficiaryDashboardContent,

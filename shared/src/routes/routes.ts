@@ -36,6 +36,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   addAgency: "ajouter-prescripteur",
   manageConventionConnectedUser: "pilotage-convention-inclusion-connect",
   conventionTemplate: "modele-convention",
+  myAccount: "mon-compte",
   myProfile: "mon-profil",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
@@ -205,6 +206,11 @@ const establishmentDashboard = defineRoute(
   () => `/${legacyFrontRoutes.establishmentDashboard}`,
 );
 
+const myAccount = defineRoute(
+  connectedUserParams,
+  () => `/${legacyFrontRoutes.myAccount}`,
+);
+
 const myProfile = defineRoute(
   connectedUserParams,
   () => `/${legacyFrontRoutes.profile}`,
@@ -298,6 +304,7 @@ export const {
   agencyManagement: agencyDashboard.extend("/pilotage-structure"),
   establishmentManagement: agencyDashboard.extend("/pilotage-entreprises"),
 
+  myAccount,
   myProfile,
   myProfileAgencies: myProfile.extend("/mes-agences"),
   myProfileEstablishments: myProfile.extend("/mes-etablissements"),

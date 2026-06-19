@@ -922,6 +922,21 @@ export const domElementIds = {
       formLoginSubmitButton: "im-login__submit-button",
     },
   },
+  myAccount: {
+    registerAgencyButton: "im-profile__register-agency-button",
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--my-profile-establishment-registration",
+      byEmailButton:
+        "im-login-form__connect-button--my-profile-establishment-registration-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--my-profile-establishment-registration",
+      retryButton:
+        "im-login-form__retry-login-button--my-profile-establishment-registration",
+      contactSupport:
+        "im-login-form__contact-support-link--my-profile-establishment-registration",
+    },
+  },
   myProfile: {
     firstName: "im-profile__first-name",
     lastName: "im-profile__last-name",

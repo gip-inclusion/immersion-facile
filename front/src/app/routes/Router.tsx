@@ -64,6 +64,7 @@ import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { AssessmentPage } from "../pages/immersion-assessment/AssessmentPage";
 import { SearchResultPage } from "../pages/search/SearchResultPage";
+import { MyAccount } from "../pages/user/myAccount";
 
 const OpenApiDocV2Page = lazy(
   () => import("src/app/pages/open-api-doc/OpenApiDocV2Page"),
@@ -301,6 +302,16 @@ const getPageByRouteName: {
       }
     >
       <ConventionManageConnectedUser route={route} />
+    </ConnectedPrivateRoutePage>
+  ),
+  myAccount: (route) => (
+    <ConnectedPrivateRoutePage
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre compte" />
+      }
+    >
+      <MyAccount route={route} />
     </ConnectedPrivateRoutePage>
   ),
   myProfile: (route) => (
