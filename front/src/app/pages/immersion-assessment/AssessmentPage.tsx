@@ -110,21 +110,44 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         illustration={commonIllustrations.success}
         content={
           <>
-            <p id={domElementIds.assessment.successMessage}>
-              Nous vous remercions d'avoir utilisé Immersion Facilitée pour
-              accompagner {convention?.signatories.beneficiary.firstName}{" "}
-              {convention?.signatories.beneficiary.lastName} dans son immersion.
-              Votre implication contribue à améliorer notre site et à enrichir
-              le dossier du candidat.
-            </p>
             {submittedAssessmentStatus !== "DID_NOT_SHOW" && (
-              <p>
-                {convention?.signatories.beneficiary.firstName}{" "}
-                {convention?.signatories.beneficiary.lastName} recevra un mail
-                pour consulter le bilan, le signer et, s’il le souhaite, ajouter
-                un commentaire. Une fois signé, la version finale au format PDF
-                sera automatiquement envoyée à toutes les parties
-              </p>
+              <>
+                <p id={domElementIds.assessment.successMessage}>
+                  Nous vous remercions d'avoir utilisé Immersion Facilitée pour
+                  accompagner {convention?.signatories.beneficiary.firstName}{" "}
+                  {convention?.signatories.beneficiary.lastName} dans son
+                  immersion. Votre implication contribue à améliorer notre site
+                  et à enrichir le dossier du candidat.
+                </p>
+                <p>
+                  {convention?.signatories.beneficiary.firstName}{" "}
+                  {convention?.signatories.beneficiary.lastName} recevra un mail
+                  pour consulter le bilan, le signer et, s’il le souhaite,
+                  ajouter un commentaire. Une fois signé, la version finale au
+                  format PDF sera automatiquement envoyée à toutes les parties
+                </p>
+              </>
+            )}
+            {submittedAssessmentStatus === "DID_NOT_SHOW" && (
+              <>
+                <p>
+                  Nous vous remercions d'avoir pris le temps de nous informer de
+                  l'absence de {convention?.signatories.beneficiary.firstName}{" "}
+                  {convention?.signatories.beneficiary.lastName}. Votre retour
+                  est essentiel pour assurer un suivi de qualité.
+                </p>
+                <p>
+                  Le prescripteur en charge de son accompagnement a été
+                  automatiquement prévenu par e-mail afin de faire le point avec
+                  lui.
+                </p>
+                <p>
+                  L'immersion n'ayant pas eu lieu, le processus est désormais
+                  clos (aucune signature requise, aucun PDF généré). Nous vous
+                  remercions pour votre disponibilité et espérons que votre
+                  prochaine immersion sera une réussite.
+                </p>
+              </>
             )}
             {roles.includes("establishment-tutor") ? (
               <Highlight>
