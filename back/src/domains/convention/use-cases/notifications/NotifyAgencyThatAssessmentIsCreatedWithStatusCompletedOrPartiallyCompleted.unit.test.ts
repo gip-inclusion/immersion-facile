@@ -29,9 +29,9 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import {
-  makeNotifyAgencyThatAssessmentIsCreated,
-  type NotifyAgencyThatAssessmentIsCreated,
-} from "./NotifyAgencyThatAssessmentIsCreated";
+  makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted,
+  type NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted,
+} from "./NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted";
 
 const agency = new AgencyDtoBuilder().build();
 const validator = new ConnectedUserBuilder()
@@ -65,9 +65,9 @@ const signedAssessment: Extract<
   createdAt: new Date("2025-01-01").toISOString(),
 };
 
-describe("NotifyAgencyThatAssessmentIsCreated", () => {
+describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted", () => {
   let uow: InMemoryUnitOfWork;
-  let usecase: NotifyAgencyThatAssessmentIsCreated;
+  let usecase: NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
   let config: AppConfig;
@@ -77,16 +77,20 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     timeGateway = new CustomTimeGateway();
     config = new AppConfigBuilder().build();
-    usecase = makeNotifyAgencyThatAssessmentIsCreated({
-      uowPerformer: new InMemoryUowPerformer(uow),
-      deps: {
-        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-          new UuidV4Generator(),
-          timeGateway,
-        ),
-        config,
-      },
-    });
+    usecase =
+      makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted(
+        {
+          uowPerformer: new InMemoryUowPerformer(uow),
+          deps: {
+            saveNotificationAndRelatedEvent:
+              makeSaveNotificationAndRelatedEvent(
+                new UuidV4Generator(),
+                timeGateway,
+              ),
+            config,
+          },
+        },
+      );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
