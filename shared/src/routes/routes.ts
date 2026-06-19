@@ -194,10 +194,7 @@ const agencyDashboard = myAccount.extend(
   {
     isAgencyRegistration: param.query.optional.boolean,
   },
-  () => [
-    `/${legacyFrontRoutes.agencyDashboard}`,
-    "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
-  ],
+  () => `/${legacyFrontRoutes.agencyDashboard}`,
 );
 
 const establishmentDashboard = myAccount.extend(
