@@ -29,6 +29,10 @@ export const makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartial
       config: AppConfig;
     }>()
     .build(async ({ inputParams: { assessment }, uow, deps }) => {
+      if (assessment.status === "DID_NOT_SHOW" || !assessment.signedAt) {
+        return;
+      }
+
       const { agency, convention } = await retrieveConventionWithAgency(
         uow,
         assessment.conventionId,
@@ -46,12 +50,31 @@ export const makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartial
         ? [conventionAdvisor?.advisor.email]
         : uniq([...validatorEmails, ...counsellorEmails]);
 
-      if (assessment.status === "DID_NOT_SHOW") {
+      const numberOfHoursMade = computeTotalHours({
+        convention,
+        lastDayOfPresence:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? assessment.lastDayOfPresence
+            : "",
+        numberOfMissedHours:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? assessment.numberOfMissedHours
+            : 0,
+        status: assessment.status,
+      });
+
+      await executeInSequence(agencyEmails, async (email) => {
+        const manageConventionLink = makeRouteAbsoluteUrl({
+          route: frontRoutes.manageConventionConnectedUser({
+            conventionId: convention.id,
+          }),
+          baseUrl: deps.config.immersionFacileBaseUrl,
+        });
         await deps.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
-            recipients: agencyEmails,
+            kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
+            recipients: [email],
             params: {
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
@@ -66,8 +89,12 @@ export const makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartial
               conventionId: convention.id,
               immersionObjective: convention.immersionObjective,
               internshipKind: convention.internshipKind,
+              conventionDateEnd: convention.dateEnd,
               immersionAppellationLabel:
                 convention.immersionAppellation.appellationLabel,
+              assessment,
+              numberOfHoursMade,
+              manageConventionLink,
             },
           },
           followedIds: {
@@ -76,61 +103,5 @@ export const makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartial
             establishmentSiret: convention.siret,
           },
         });
-      } else {
-        if (!assessment.signedAt) return;
-        const numberOfHoursMade = computeTotalHours({
-          convention,
-          lastDayOfPresence:
-            assessment.status === "PARTIALLY_COMPLETED"
-              ? assessment.lastDayOfPresence
-              : "",
-          numberOfMissedHours:
-            assessment.status === "PARTIALLY_COMPLETED"
-              ? assessment.numberOfMissedHours
-              : 0,
-          status: assessment.status,
-        });
-
-        await executeInSequence(agencyEmails, async (email) => {
-          const manageConventionLink = makeRouteAbsoluteUrl({
-            route: frontRoutes.manageConventionConnectedUser({
-              conventionId: convention.id,
-            }),
-            baseUrl: deps.config.immersionFacileBaseUrl,
-          });
-          await deps.saveNotificationAndRelatedEvent(uow, {
-            kind: "email",
-            templatedContent: {
-              kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-              recipients: [email],
-              params: {
-                agencyReferentName: getFormattedFirstnameAndLastname(
-                  convention.agencyReferent ?? {},
-                ),
-                beneficiaryFirstName: getFormattedFirstnameAndLastname({
-                  firstname: convention.signatories.beneficiary.firstName,
-                }),
-                beneficiaryLastName: getFormattedFirstnameAndLastname({
-                  lastname: convention.signatories.beneficiary.lastName,
-                }),
-                businessName: convention.businessName,
-                conventionId: convention.id,
-                immersionObjective: convention.immersionObjective,
-                internshipKind: convention.internshipKind,
-                conventionDateEnd: convention.dateEnd,
-                immersionAppellationLabel:
-                  convention.immersionAppellation.appellationLabel,
-                assessment,
-                numberOfHoursMade,
-                manageConventionLink,
-              },
-            },
-            followedIds: {
-              conventionId: convention.id,
-              agencyId: convention.agencyId,
-              establishmentSiret: convention.siret,
-            },
-          });
-        });
-      }
+      });
     });

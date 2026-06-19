@@ -55,6 +55,7 @@ import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted";
+import { makeNotifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow";
 import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { makeNotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { makeNotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -1148,6 +1149,13 @@ export const createUseCases = ({
           },
         },
       ),
+    notifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow:
+      makeNotifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+        },
+      }),
     notifyAllActorsOfFinalConventionValidation:
       makeNotifyAllActorsOfFinalConventionValidation({
         uowPerformer,
