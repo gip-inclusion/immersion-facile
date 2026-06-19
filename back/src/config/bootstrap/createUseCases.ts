@@ -54,7 +54,7 @@ import { makeGetConventionTemplatesForCurrentUser } from "../../domains/conventi
 import { makeGetLastBroadcastFeedback } from "../../domains/convention/use-cases/GetLastBroadcastFeedback";
 import { makeNotifyActorsThatAssessmentDeleted } from "../../domains/convention/use-cases/notifications/NotifyActorsThatAssessmentDeleted";
 import { makeNotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
-import { makeNotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
+import { makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted";
 import { makeNotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { makeNotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { makeNotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
@@ -1138,14 +1138,16 @@ export const createUseCases = ({
       uowPerformer,
       deps: { saveNotificationAndRelatedEvent },
     }),
-    notifyAgencyThatAssessmentIsCreated:
-      makeNotifyAgencyThatAssessmentIsCreated({
-        uowPerformer,
-        deps: {
-          saveNotificationAndRelatedEvent,
-          config,
+    notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted:
+      makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted(
+        {
+          uowPerformer,
+          deps: {
+            saveNotificationAndRelatedEvent,
+            config,
+          },
         },
-      }),
+      ),
     notifyAllActorsOfFinalConventionValidation:
       makeNotifyAllActorsOfFinalConventionValidation({
         uowPerformer,

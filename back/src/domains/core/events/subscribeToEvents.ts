@@ -258,7 +258,7 @@ const getUseCasesByTopics = (
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   AssessmentSignedByBeneficiary: [
-    useCases.notifyAgencyThatAssessmentIsCreated,
+    useCases.notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted,
     useCases.notifyEstablishmentThatAssessmentWasCreated,
     useCases.notifyBeneficiaryThatAssessmentIsCreated,
   ],
