@@ -2,8 +2,8 @@ import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig
 import type {
   FranceTravailBroadcastResponse,
   FranceTravailGateway,
+  NotifyFranceTravailOnConventionUpdatedParams,
 } from "../../ports/FranceTravailGateway";
-import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
 
 export class InMemoryFranceTravailGateway implements FranceTravailGateway {
   #nextResponse: FranceTravailBroadcastResponse = {
@@ -11,7 +11,9 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
     body: { success: true },
   };
 
-  constructor(public broadcastParamsCalls: BroadcastConventionParams[] = []) {}
+  constructor(
+    public broadcastParamsCalls: NotifyFranceTravailOnConventionUpdatedParams[] = [],
+  ) {}
 
   public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return {
@@ -23,7 +25,7 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
   }
 
   public async notifyOnConventionUpdated(
-    params: BroadcastConventionParams,
+    params: NotifyFranceTravailOnConventionUpdatedParams,
   ): Promise<FranceTravailBroadcastResponse> {
     this.broadcastParamsCalls.push(params);
     return this.#nextResponse;

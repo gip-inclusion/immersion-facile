@@ -1,8 +1,16 @@
 import {
+  type AgencyDto,
+  type AgencyId,
+  type AssessmentFormDto,
+  agencyIdSchema,
+  assessmentDtoSchema,
   type ConventionReadDto,
   cleanSpecialChars,
+  conventionReadSchema,
   sliceTextUpToBytesLimit,
 } from "shared";
+import z from "zod";
+import { isAxiosError } from "../../../../utils/axiosUtils";
 import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
@@ -11,14 +19,40 @@ import {
   shouldBroadcastToFranceTravail,
 } from "../../entities/Convention";
 import {
+  type FranceTravailBroadcastResponse,
+  type FranceTravailConventionReadDto,
   type FranceTravailGateway,
-  isBroadcastResponseOk,
-  isBroadcastTimeoutError,
+  isBroadcastSuccessResponse,
+  notifyFranceTravailOnConventionUpdatedParamsSchema,
 } from "../../ports/FranceTravailGateway";
-import {
-  type BroadcastConventionParams,
-  broadcastConventionParamsSchema,
-} from "./broadcastConventionParams";
+import type { BroadcastConventionParams } from "./broadcastConventionParams";
+
+export const broadcastToFranceTravailOnConventionUpdatesInputSchema: z.ZodType<
+  BroadcastConventionParams,
+  | {
+      eventType: "CONVENTION_UPDATED";
+      convention: ConventionReadDto;
+      previousAgencyId?: AgencyId;
+      assessment?: AssessmentFormDto;
+    }
+  | {
+      eventType: "ASSESSMENT_CREATED";
+      convention: ConventionReadDto;
+      assessment: AssessmentFormDto;
+    }
+> = z.union([
+  z.object({
+    eventType: z.literal("CONVENTION_UPDATED"),
+    convention: conventionReadSchema,
+    previousAgencyId: agencyIdSchema.optional(),
+    assessment: assessmentDtoSchema.optional(),
+  }),
+  z.object({
+    eventType: z.literal("ASSESSMENT_CREATED"),
+    convention: conventionReadSchema,
+    assessment: assessmentDtoSchema,
+  }),
+]);
 
 export type BroadcastToFranceTravailOnConventionUpdates = ReturnType<
   typeof makeBroadcastToFranceTravailOnConventionUpdates
@@ -26,7 +60,7 @@ export type BroadcastToFranceTravailOnConventionUpdates = ReturnType<
 export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
   "BroadcastToFranceTravailOnConventionUpdates",
 )
-  .withInput<BroadcastConventionParams>(broadcastConventionParamsSchema)
+  .withInput(broadcastToFranceTravailOnConventionUpdatesInputSchema)
   .withDeps<{
     franceTravailGateway: FranceTravailGateway;
     timeGateway: TimeGateway;
@@ -74,17 +108,22 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
           })
         : undefined;
 
-    const response = await deps.franceTravailGateway.notifyOnConventionUpdated({
-      ...inputParams,
-      convention: makeFranceTravailSupportedConvention(inputParams.convention),
-    });
+    const response = await deps.franceTravailGateway.notifyOnConventionUpdated(
+      notifyFranceTravailOnConventionUpdatedParamsSchema.parse({
+        ...inputParams,
+        convention: makeFranceTravailSupportedConvention(
+          inputParams.convention,
+          agency,
+        ),
+      }),
+    );
 
     if (isBroadcastTimeoutError(response))
       await uow.conventionsToSyncRepository.save({
         id: inputParams.convention.id,
         status: "TO_PROCESS",
       });
-    else if (deps.options.resyncMode && isBroadcastResponseOk(response))
+    else if (deps.options.resyncMode && isBroadcastSuccessResponse(response))
       await uow.conventionsToSyncRepository.save({
         id: inputParams.convention.id,
         status: "SUCCESS",
@@ -104,7 +143,7 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
       response: { httpStatus: response.status, body: response.body },
       occurredAt: deps.timeGateway.now().toISOString(),
       handledByAgency: false,
-      ...(!isBroadcastResponseOk(response)
+      ...(!isBroadcastSuccessResponse(response)
         ? { subscriberErrorFeedback: response.subscriberErrorFeedback }
         : {}),
     });
@@ -112,7 +151,8 @@ export const makeBroadcastToFranceTravailOnConventionUpdates = useCaseBuilder(
 
 const makeFranceTravailSupportedConvention = (
   convention: ConventionReadDto,
-): ConventionReadDto => ({
+  agency: AgencyDto,
+): FranceTravailConventionReadDto => ({
   ...convention,
   establishmentTutor: {
     ...convention.establishmentTutor,
@@ -126,4 +166,21 @@ const makeFranceTravailSupportedConvention = (
     cleanSpecialChars(convention.individualProtectionDescription),
     255,
   ),
+  agencyValidatorEmails: agency.validatorEmails,
 });
+
+const isBroadcastTimeoutError = (
+  response: FranceTravailBroadcastResponse,
+): boolean => {
+  if (isBroadcastSuccessResponse(response)) return false;
+  const message = response.subscriberErrorFeedback.message.toLowerCase();
+  if (message.includes("timeout")) return true;
+  const error = response.subscriberErrorFeedback.error;
+
+  if (
+    isAxiosError(error) &&
+    (error.code === "ECONNABORTED" || error.code === "ECONNRESET")
+  )
+    return true;
+  return false;
+};

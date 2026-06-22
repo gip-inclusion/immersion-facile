@@ -20,8 +20,8 @@ import {
 import type {
   FranceTravailBroadcastResponse,
   FranceTravailGateway,
+  NotifyFranceTravailOnConventionUpdatedParams,
 } from "../../ports/FranceTravailGateway";
-import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
 import {
   type FrancetTravailRoutes,
   getFtTestPrefix,
@@ -145,7 +145,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
   }
 
   public async notifyOnConventionUpdated(
-    broadcastConventionParams: BroadcastConventionParams,
+    broadcastConventionParams: NotifyFranceTravailOnConventionUpdatedParams,
   ): Promise<FranceTravailBroadcastResponse> {
     const { convention } = broadcastConventionParams;
     logger.info({
@@ -172,7 +172,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
       .catch(handleError(conventionParams));
   }
 
-  async #postConvention(params: BroadcastConventionParams) {
+  async #postConvention(params: NotifyFranceTravailOnConventionUpdatedParams) {
     const accessTokenResponse = await this.getAccessToken(
       `echangespmsmp api_${this.#ftTestPrefix}immersion-prov3`, // scope should be provided by FT
     );
