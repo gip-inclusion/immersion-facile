@@ -61,18 +61,6 @@ export const adminRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  removeUserFromAgency: defineRoute({
-    method: "delete",
-    url: "/admin/inclusion-connected/users/:userId/agency/:agencyId",
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-    },
-  }),
 
   // Cette route existe aussi dans le agency router, qui enclenche le même usecase >> c'est un bordel ici ...
   createUserForAgency: defineRoute({

@@ -28,9 +28,6 @@ const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
         connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(
           action,
         ) ||
-        connectedUsersAdminSlice.actions.removeUserFromAgencySucceeded.match(
-          action,
-        ) ||
         connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
           action,
         ) ||
