@@ -17,8 +17,10 @@ import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { makeRedisWithCache } from "../../../core/caching-gateway/adapters/makeRedisWithCache";
 import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
-import { isBroadcastResponseOk } from "../../ports/FranceTravailGateway";
-import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
+import {
+  isBroadcastSuccessResponse,
+  type NotifyFranceTravailOnConventionUpdatedParams,
+} from "../../ports/FranceTravailGateway";
 import { createFranceTravailRoutes } from "./FranceTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
@@ -31,7 +33,7 @@ const ftRoutesWithFakeUrls = createFranceTravailRoutes({
   ftEnterpriseUrl: fakeFtEnterpriseUrl,
 });
 
-const broadcastParams = (): BroadcastConventionParams => {
+const broadcastParams = (): NotifyFranceTravailOnConventionUpdatedParams => {
   const convention = new ConventionDtoBuilder()
     .withBeneficiaryEmail("test@PE-TEST.FR")
     .withBeneficiaryBirthdate("1994-10-22")
@@ -49,6 +51,7 @@ const broadcastParams = (): BroadcastConventionParams => {
       agencyRefersTo: undefined,
       assessment: null,
       isEstablishmentBanned: false,
+      agencyValidatorEmails: ["email@email.com"],
     },
   };
 };
@@ -147,7 +150,7 @@ describe("HttpFranceTravailGateway", () => {
       broadcastParams(),
     );
 
-    if (!isBroadcastResponseOk(response))
+    if (!isBroadcastSuccessResponse(response))
       throw errors.generic.testError(
         `FT broadcast expected 200/201/204, got ${JSON.stringify(response)}`,
       );
@@ -194,7 +197,7 @@ describe("HttpFranceTravailGateway", () => {
 
     const response = await gateway.notifyOnConventionUpdated(broadcastParams());
 
-    if (isBroadcastResponseOk(response))
+    if (isBroadcastSuccessResponse(response))
       throw errors.generic.testError(
         `Expected error response, got success status ${response.status}`,
       );
@@ -251,7 +254,7 @@ describe("HttpFranceTravailGateway", () => {
 
     const response = await gateway.notifyOnConventionUpdated(broadcastParams());
 
-    if (isBroadcastResponseOk(response))
+    if (isBroadcastSuccessResponse(response))
       throw errors.generic.testError(
         `PE broadcast OK must not occur, response status was : ${response.status}`,
       );

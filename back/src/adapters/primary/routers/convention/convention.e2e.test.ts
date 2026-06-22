@@ -675,6 +675,7 @@ describe("convention e2e", () => {
             agencyContactEmail: peAgency.contactEmail,
             agencyKind: peAgency.kind,
             agencySiret: peAgency.agencySiret,
+            agencyValidatorEmails: peAgency.validatorEmails,
             agencyValidationSteps: "validator-only",
             agencyRefersTo: undefined,
             assessment: null,

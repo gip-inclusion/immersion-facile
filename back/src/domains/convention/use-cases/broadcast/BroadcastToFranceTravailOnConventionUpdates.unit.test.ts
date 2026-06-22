@@ -28,16 +28,11 @@ import {
   makeBroadcastToFranceTravailOnConventionUpdates,
 } from "./BroadcastToFranceTravailOnConventionUpdates";
 
-describe("Broadcasts events to France Travail", () => {
+describe("BroadcastToFranceTravailOnConventionUpdates", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
     .withId("some-pe-agency")
     .withKind("pole-emploi")
     .build();
-
-  let franceTravailGateway: InMemoryFranceTravailGateway;
-  let uow: InMemoryUnitOfWork;
-  let timeGateway: CustomTimeGateway;
-  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
 
   const agencySIAE = toAgencyWithRights(
     new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
@@ -68,6 +63,11 @@ describe("Broadcasts events to France Travail", () => {
     .withEmail("validator@mail.com")
     .build();
 
+  let franceTravailGateway: InMemoryFranceTravailGateway;
+  let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
+  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
+
   beforeEach(() => {
     uow = createInMemoryUow();
     franceTravailGateway = new InMemoryFranceTravailGateway();
@@ -82,8 +82,13 @@ describe("Broadcasts events to France Travail", () => {
         },
       });
 
+    uow.userRepository.users = [counsellor, validator];
+
     uow.agencyRepository.agencies = [
-      toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
+      toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+      }),
     ];
   });
 
@@ -102,7 +107,7 @@ describe("Broadcasts events to France Travail", () => {
       }),
     });
 
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+    expectToEqual(franceTravailGateway.broadcastParamsCalls, []);
   });
 
   it("Conventions without federated id are still sent, with their externalId", async () => {
@@ -111,31 +116,31 @@ describe("Broadcasts events to France Travail", () => {
       [conventionLinkedToFTWithoutFederatedIdentity.id]: externalId,
     };
 
+    const convention = conventionReadDtoFrom({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+      agency: {
+        ...peAgencyWithoutCounsellorsAndValidators,
+        counsellorEmails: [counsellor.email],
+        validatorEmails: [validator.email],
+      },
+    });
+
     await broadcastToFranceTravailOnConventionUpdates.execute({
       eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToFTWithoutFederatedIdentity,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
-        },
-      }),
+      convention,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectObjectsToMatch(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToFTWithoutFederatedIdentity,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
+
+    expectObjectsToMatch(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: {
+          ...convention,
+          agencyValidatorEmails: [validator.email],
         },
-      }),
-    });
+      },
+    ]);
   });
 
   it("save the convention id with status TO_PROCESS in the conventionsToSyncWithPe repository when FT broadcast times out", async () => {
@@ -150,22 +155,34 @@ describe("Broadcasts events to France Travail", () => {
     const now = new Date();
     timeGateway.setNextDate(now);
 
+    const conventionRead = conventionReadDtoFrom({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+      agency: {
+        ...peAgencyWithoutCounsellorsAndValidators,
+        counsellorEmails: [counsellor.email],
+        validatorEmails: [validator.email],
+      },
+    });
+
     await broadcastToFranceTravailOnConventionUpdates.execute({
       eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToFTWithoutFederatedIdentity,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
-        },
-      }),
+      convention: conventionRead,
     });
 
     expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
       {
         id: conventionLinkedToFTWithoutFederatedIdentity.id,
         status: "TO_PROCESS",
+      },
+    ]);
+
+    expectObjectsToMatch(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: {
+          ...conventionRead,
+          agencyValidatorEmails: [validator.email],
+        },
       },
     ]);
   });
@@ -188,22 +205,34 @@ describe("Broadcasts events to France Travail", () => {
     });
     timeGateway.setNextDate(new Date());
 
+    const conventionRead = conventionReadDtoFrom({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+      agency: {
+        ...peAgencyWithoutCounsellorsAndValidators,
+        counsellorEmails: [counsellor.email],
+        validatorEmails: [validator.email],
+      },
+    });
+
     await broadcastToFranceTravailOnConventionUpdates.execute({
       eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToFTWithoutFederatedIdentity,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
-        },
-      }),
+      convention: conventionRead,
     });
 
     expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
       {
         id: conventionLinkedToFTWithoutFederatedIdentity.id,
         status: "TO_PROCESS",
+      },
+    ]);
+
+    expectObjectsToMatch(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: {
+          ...conventionRead,
+          agencyValidatorEmails: [validator.email],
+        },
       },
     ]);
   });
@@ -231,7 +260,6 @@ describe("Broadcasts events to France Travail", () => {
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         consumerId: null,
@@ -326,32 +354,30 @@ describe("Broadcasts events to France Travail", () => {
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
+    const conventionRead = conventionReadDtoFrom({
+      convention: convention,
+      agency: {
+        ...peAgencyWithoutCounsellorsAndValidators,
+        counsellorEmails: [counsellor.email],
+        validatorEmails: [validator.email],
+      },
+    });
     // Act
     await broadcastToFranceTravailOnConventionUpdates.execute({
       eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: convention,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
-        },
-      }),
+      convention: conventionRead,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention,
-        agency: {
-          ...peAgencyWithoutCounsellorsAndValidators,
-          counsellorEmails: [counsellor.email],
-          validatorEmails: [validator.email],
+    expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: {
+          ...conventionRead,
+          agencyValidatorEmails: [validator.email],
         },
-      }),
-    });
+      },
+    ]);
   });
 
   it("Converts and sends conventions, with limit 255 bytes on sanitaryPreventionDescription, individualProtectionDescription & tutor job", async () => {
@@ -383,24 +409,27 @@ describe("Broadcasts events to France Travail", () => {
     expectToEqual(franceTravailGateway.broadcastParamsCalls, [
       {
         eventType: "CONVENTION_UPDATED",
-        convention: conventionReadDtoFrom({
-          convention: {
-            ...convention,
-            sanitaryPreventionDescription:
-              "•	Lavage regulier des mains 	•	Port d'une tenue propre (blouse, tablier) 	•	Port du filet a cheveux ou charlotte 	•	Nettoyage frequent du plan de travail et du materiel 	•	Respect des regles d'hygiene liees a la manipulation des produits aliment",
-            individualProtectionDescription:
-              "Gants a usage unique  Masques (chirurgicaux ou FFP2 selon les situations)  Tenue professionnelle (pantalon, polo ou blouson aux normes)  Chaussures de securite ou adaptees au transport sanitaire  Gilet fluorescent pour interventions sur voie publique",
-            establishmentTutor: {
-              ...convention.establishmentTutor,
-              job: "Responsable des affaires juridiques et institutionnelles au sein du Service des Affaires juridiques et institutionnelles ; Délégué à la protection des données personnelles (DPO) ; Responsable de l’accès aux documents administratifs (PRADA)",
+        convention: {
+          ...conventionReadDtoFrom({
+            convention: {
+              ...convention,
+              sanitaryPreventionDescription:
+                "•	Lavage regulier des mains 	•	Port d'une tenue propre (blouse, tablier) 	•	Port du filet a cheveux ou charlotte 	•	Nettoyage frequent du plan de travail et du materiel 	•	Respect des regles d'hygiene liees a la manipulation des produits aliment",
+              individualProtectionDescription:
+                "Gants a usage unique  Masques (chirurgicaux ou FFP2 selon les situations)  Tenue professionnelle (pantalon, polo ou blouson aux normes)  Chaussures de securite ou adaptees au transport sanitaire  Gilet fluorescent pour interventions sur voie publique",
+              establishmentTutor: {
+                ...convention.establishmentTutor,
+                job: "Responsable des affaires juridiques et institutionnelles au sein du Service des Affaires juridiques et institutionnelles ; Délégué à la protection des données personnelles (DPO) ; Responsable de l’accès aux documents administratifs (PRADA)",
+              },
             },
-          },
-          agency: {
-            ...peAgencyWithoutCounsellorsAndValidators,
-            counsellorEmails: [counsellor.email],
-            validatorEmails: [validator.email],
-          },
-        }),
+            agency: {
+              ...peAgencyWithoutCounsellorsAndValidators,
+              counsellorEmails: [counsellor.email],
+              validatorEmails: [validator.email],
+            },
+          }),
+          agencyValidatorEmails: [validator.email],
+        },
       },
     ]);
   });
@@ -450,35 +479,32 @@ describe("Broadcasts events to France Travail", () => {
       [conventionLinkedToAgencyReferingToOther.id]: externalId,
     };
 
+    const conventionRead = conventionReadDtoFrom({
+      convention: conventionLinkedToAgencyReferingToOther,
+      agency: {
+        ...agencyWithRefersTo,
+        validatorEmails: [],
+        counsellorEmails: [],
+      },
+      referredAgency: peAgencyWithoutCounsellorsAndValidators,
+      assessment: assessment,
+    });
+
     await broadcastToFranceTravailOnConventionUpdates.execute({
       eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToAgencyReferingToOther,
-        agency: {
-          ...agencyWithRefersTo,
-          validatorEmails: [],
-          counsellorEmails: [],
-        },
-        referredAgency: peAgencyWithoutCounsellorsAndValidators,
-        assessment: assessment,
-      }),
+      convention: conventionRead,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention: conventionReadDtoFrom({
-        convention: conventionLinkedToAgencyReferingToOther,
-        agency: {
-          ...agencyWithRefersTo,
-          validatorEmails: [],
-          counsellorEmails: [],
+    expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+      {
+        eventType: "CONVENTION_UPDATED",
+        convention: {
+          ...conventionRead,
+          agencyValidatorEmails: [],
         },
-        referredAgency: peAgencyWithoutCounsellorsAndValidators,
-        assessment: assessment,
-      }),
-    });
+      },
+    ]);
   });
 
   describe("sends also other type of Convention when corresponding feature flag is activated", () => {
@@ -550,30 +576,26 @@ describe("Broadcasts events to France Travail", () => {
           },
           ...featureFlag,
         };
-        await broadcastToFranceTravailOnConventionUpdates.execute({
-          eventType: "CONVENTION_UPDATED",
-          convention: conventionReadDtoFrom({
-            convention,
-            agency: {
-              ...agency,
-              validatorEmails: [],
-              counsellorEmails: [],
-            },
-          }),
+        const conventionRead = conventionReadDtoFrom({
+          convention,
+          agency: {
+            ...agency,
+            validatorEmails: [],
+            counsellorEmails: [],
+          },
         });
 
-        expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-        expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
+        await broadcastToFranceTravailOnConventionUpdates.execute({
           eventType: "CONVENTION_UPDATED",
-          convention: conventionReadDtoFrom({
-            convention,
-            agency: {
-              ...agency,
-              validatorEmails: [],
-              counsellorEmails: [],
-            },
-          }),
+          convention: conventionRead,
         });
+
+        expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+          {
+            eventType: "CONVENTION_UPDATED",
+            convention: { ...conventionRead, agencyValidatorEmails: [] },
+          },
+        ]);
       });
 
       it(`do not broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
@@ -623,7 +645,7 @@ describe("Broadcasts events to France Travail", () => {
         });
 
         // Assert
-        expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+        expectToEqual(franceTravailGateway.broadcastParamsCalls, []);
       });
     });
 
@@ -674,7 +696,7 @@ describe("Broadcasts events to France Travail", () => {
           }),
         });
 
-        expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+        expectToEqual(franceTravailGateway.broadcastParamsCalls, []);
       });
     });
   });
@@ -709,20 +731,31 @@ describe("Broadcasts events to France Travail", () => {
     it("broadcasts when current agency does not qualify but previous agency does", async () => {
       uow.agencyRepository.agencies = [siaeAgency, peAgency];
 
+      const conventionRead = conventionReadDtoFrom({
+        convention: conventionOnSiaeAgency,
+        agency: {
+          ...siaeAgency,
+          validatorEmails: [],
+          counsellorEmails: [],
+        },
+      });
+
       await broadcastToFranceTravailOnConventionUpdates.execute({
         eventType: "CONVENTION_UPDATED",
-        convention: conventionReadDtoFrom({
-          convention: conventionOnSiaeAgency,
-          agency: {
-            ...siaeAgency,
-            validatorEmails: [],
-            counsellorEmails: [],
-          },
-        }),
+        convention: conventionRead,
         previousAgencyId: peAgency.id,
       });
 
-      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
+      expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+        {
+          eventType: "CONVENTION_UPDATED",
+          convention: {
+            ...conventionRead,
+            agencyValidatorEmails: [],
+          },
+          previousAgencyId: peAgency.id,
+        },
+      ]);
     });
 
     it("broadcasts only once when both current and previous agencies qualify", async () => {
@@ -738,20 +771,31 @@ describe("Broadcasts events to France Travail", () => {
       );
       uow.agencyRepository.agencies = [peAgency, anotherPeAgency];
 
+      const conventionRead = conventionReadDtoFrom({
+        convention: conventionOnPeAgency,
+        agency: {
+          ...peAgency,
+          validatorEmails: [],
+          counsellorEmails: [],
+        },
+      });
+
       await broadcastToFranceTravailOnConventionUpdates.execute({
         eventType: "CONVENTION_UPDATED",
-        convention: conventionReadDtoFrom({
-          convention: conventionOnPeAgency,
-          agency: {
-            ...peAgency,
-            validatorEmails: [],
-            counsellorEmails: [],
-          },
-        }),
+        convention: conventionRead,
         previousAgencyId: anotherPeAgency.id,
       });
 
-      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
+      expectToEqual(franceTravailGateway.broadcastParamsCalls, [
+        {
+          eventType: "CONVENTION_UPDATED",
+          convention: {
+            ...conventionRead,
+            agencyValidatorEmails: [],
+          },
+          previousAgencyId: anotherPeAgency.id,
+        },
+      ]);
     });
 
     it("does not broadcast when neither current nor previous agency qualifies", async () => {
@@ -770,7 +814,7 @@ describe("Broadcasts events to France Travail", () => {
         previousAgencyId: autreAgency.id,
       });
 
-      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+      expectToEqual(franceTravailGateway.broadcastParamsCalls, []);
     });
 
     it("does not broadcast when no previousAgencyId and current agency does not qualify", async () => {
@@ -788,21 +832,23 @@ describe("Broadcasts events to France Travail", () => {
         }),
       });
 
-      expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+      expectToEqual(franceTravailGateway.broadcastParamsCalls, []);
     });
   });
+
+  type ConvertParams = {
+    convention: ConventionDto;
+    agency: AgencyDto;
+    referredAgency?: AgencyDto;
+    assessment?: AssessmentDto;
+  };
 
   const conventionReadDtoFrom = ({
     convention,
     agency,
     referredAgency,
     assessment,
-  }: {
-    convention: ConventionDto;
-    agency: AgencyDto;
-    referredAgency?: AgencyDto;
-    assessment?: AssessmentDto;
-  }): ConventionReadDto => ({
+  }: ConvertParams): ConventionReadDto => ({
     ...convention,
     agencyName: agency.name,
     agencyContactEmail: agency.contactEmail,
