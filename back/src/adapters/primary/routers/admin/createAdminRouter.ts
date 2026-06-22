@@ -100,17 +100,6 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
-  sharedAdminRouter.removeUserFromAgency(
-    deps.connectedUserAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.removeUserFromAgency.execute(
-          req.params,
-          getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
-  );
-
   sharedAdminRouter.rejectIcUserForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
