@@ -8,7 +8,7 @@ import {
   type AppellationLabel,
   type AssessmentStatus,
   type Beneficiary,
-  type ConventionAgencyFields,
+  type ConventionAgencyPublicFields,
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
@@ -531,11 +531,11 @@ export const createBroadcastFeedbackCountBuilder = ({
 export const getConventionAgencyFieldsForAgencies = async (
   transaction: KyselyDb,
   agencyIds: AgencyId[],
-): Promise<Record<AgencyId, ConventionAgencyFields>> => {
+): Promise<Record<AgencyId, ConventionAgencyPublicFields>> => {
   const withAgencyFields: {
     agencyFields: OmitFromExistingKeys<
-      ConventionAgencyFields,
-      "agencyCounsellorEmails" | "agencyValidatorEmails"
+      ConventionAgencyPublicFields,
+      "agencyValidationSteps"
     > & { agencyId: AgencyId };
   }[] = await transaction
     .selectFrom("agencies")
@@ -577,31 +577,31 @@ export const getConventionAgencyFieldsForAgencies = async (
     .where("agencies.id", "in", agencyIds)
     .execute();
 
-  const usersWithAgencyRole = await getUsersWithAgencyRole(transaction, {
-    agencyIds,
-    isNotifiedByEmail: true,
-  });
-
-  return withAgencyFields.reduce(
-    (acc, { agencyFields }) => {
-      const completeAgencyFields: ConventionAgencyFields = {
-        ...agencyFields,
-        agencyCounsellorEmails: getEmailsFromUsersWithAgencyRoles(
-          usersWithAgencyRole,
-          { agencyIdToMatch: agencyFields.agencyId, roleToMatch: "counsellor" },
-        ),
-        agencyValidatorEmails: getEmailsFromUsersWithAgencyRoles(
-          usersWithAgencyRole,
-          { agencyIdToMatch: agencyFields.agencyId, roleToMatch: "validator" },
-        ),
-      };
-
-      return {
-        ...acc,
-        [agencyFields.agencyId]: completeAgencyFields,
-      };
+  const notifiedUsersWithAgencyRole = await getUsersWithAgencyRole(
+    transaction,
+    {
+      agencyIds,
     },
-    {} as Record<AgencyId, ConventionAgencyFields>,
+  );
+
+  const notifiedCounsellorUsers = notifiedUsersWithAgencyRole.filter(
+    (userWithAgencyRole) => userWithAgencyRole.roles.includes("counsellor"),
+  );
+
+  return withAgencyFields.reduce<
+    Record<AgencyId, ConventionAgencyPublicFields>
+  >(
+    (acc, { agencyFields }) => ({
+      ...acc,
+      [agencyFields.agencyId]: {
+        ...agencyFields,
+        agencyValidationSteps:
+          notifiedCounsellorUsers.length > 0
+            ? "counsellor-and-validator"
+            : "validator-only",
+      },
+    }),
+    {},
   );
 };
 
@@ -667,52 +667,25 @@ const getUsersWithAgencyRole = async (
   transaction: KyselyDb,
   {
     agencyIds,
-    isNotifiedByEmail,
   }: {
     agencyIds: AgencyId[];
-    isNotifiedByEmail?: boolean;
   },
-): Promise<UserWithAgencyRole[]> => {
-  if (agencyIds.length === 0) return [];
-
-  return pipeWithValue(
-    transaction
-      .selectFrom("users__agencies")
-      .innerJoin("users", "users.id", "users__agencies.user_id")
-      .where("agency_id", "in", agencyIds)
-      .orderBy("users.email")
-      .select([
-        "users.id as userId",
-        "users.email",
-        sql<AgencyRole[]>`users__agencies.roles`.as("roles"),
-        "users__agencies.agency_id as agencyId",
-        "users__agencies.is_notified_by_email as isNotifiedByEmail",
-      ]),
-    (builder) => {
-      if (isNotifiedByEmail !== undefined)
-        return builder.where("is_notified_by_email", "=", isNotifiedByEmail);
-      return builder;
-    },
-    (builder) => builder.execute(),
-  );
-};
-
-type AgencyMatchingCriteria = {
-  agencyIdToMatch: AgencyId;
-  roleToMatch: AgencyRole;
-};
-
-const getEmailsFromUsersWithAgencyRoles = (
-  usersWithAgencyRole: UserWithAgencyRole[],
-  { agencyIdToMatch, roleToMatch }: AgencyMatchingCriteria,
-) => {
-  return usersWithAgencyRole
-    .filter(
-      (user) =>
-        user.agencyId === agencyIdToMatch && user.roles.includes(roleToMatch),
-    )
-    .map((user) => user.email);
-};
+): Promise<UserWithAgencyRole[]> =>
+  agencyIds.length === 0
+    ? []
+    : transaction
+        .selectFrom("users__agencies")
+        .innerJoin("users", "users.id", "users__agencies.user_id")
+        .where("agency_id", "in", agencyIds)
+        .orderBy("users.email")
+        .select([
+          "users.id as userId",
+          "users.email",
+          sql<AgencyRole[]>`users__agencies.roles`.as("roles"),
+          "users__agencies.agency_id as agencyId",
+          "users__agencies.is_notified_by_email as isNotifiedByEmail",
+        ])
+        .execute();
 
 export const getAssessmentFieldsByConventionId = async (
   transaction: KyselyDb,
