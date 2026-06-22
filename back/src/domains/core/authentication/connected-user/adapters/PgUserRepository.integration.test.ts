@@ -423,7 +423,35 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
         overrides.createdAt ??
         new Date("2024-04-28T12:00:00.000Z").toISOString(),
       proConnect: null,
+      preventToDelete: overrides.preventToDelete ?? undefined,
       lastLoginAt: overrides.lastLoginAt,
+    });
+
+    it("does not return users prevented to delete", async () => {
+      const inactiveUser = makeUserWithOldLogin({
+        id: uuid(),
+        email: "inactive@test.fr",
+        lastLoginAt: threeYearsAgoIso,
+      });
+      const preventedToDeleteInactiveUser = makeUserWithOldLogin({
+        id: uuid(),
+        email: "prevented-to-delete@test.fr",
+        lastLoginAt: threeYearsAgoIso,
+        preventToDelete: true,
+      });
+      await userRepository.save(inactiveUser);
+      await userRepository.save(preventedToDeleteInactiveUser);
+
+      const result =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 100,
+            offset: 0,
+          },
+        );
+
+      expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
     });
 
     it("returns users never logged after since param", async () => {
@@ -441,11 +469,14 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       await userRepository.save(logged3yrAgo);
       await userRepository.save(recentlyActiveUser);
 
-      const result = await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-        since: twoYearsAgo,
-        limit: 100,
-        offset: 0,
-      });
+      const result =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 100,
+            offset: 0,
+          },
+        );
 
       expectArraysToEqualIgnoringOrder(result, [logged3yrAgo.id]);
     });
@@ -464,11 +495,14 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       await userRepository.save(inactiveUser);
       await userRepository.save(recentlyActiveUser);
 
-      const result = await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-        since: twoYearsAgo,
-        limit: 100,
-        offset: 0,
-      });
+      const result =
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 100,
+            offset: 0,
+          },
+        );
 
       expectArraysToEqualIgnoringOrder(result, [inactiveUser.id]);
     });
@@ -496,17 +530,21 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       ]);
 
       const firstPage =
-        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-          since: twoYearsAgo,
-          limit: 2,
-          offset: 0,
-        });
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 2,
+            offset: 0,
+          },
+        );
       const secondPage =
-        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-          since: twoYearsAgo,
-          limit: 2,
-          offset: 2,
-        });
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 2,
+            offset: 2,
+          },
+        );
 
       expectToEqual(firstPage, [inactiveUserA.id, inactiveUserB.id]);
       expectToEqual(secondPage, [inactiveUserC.id]);
@@ -547,17 +585,21 @@ describe.each(adapters)("%s UserRepository", (adapter) => {
       ]);
 
       const firstPage =
-        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-          since: twoYearsAgo,
-          limit: 2,
-          offset: 0,
-        });
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 2,
+            offset: 0,
+          },
+        );
       const secondPage =
-        await userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-          since: twoYearsAgo,
-          limit: 1,
-          offset: 1,
-        });
+        await userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+          {
+            since: twoYearsAgo,
+            limit: 1,
+            offset: 1,
+          },
+        );
 
       expectToEqual(firstPage, [
         notLoggedInAndCreatedMoreThan2YrAgo.id,

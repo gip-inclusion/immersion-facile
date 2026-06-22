@@ -221,5 +221,5 @@ const agencyUserModificationFormIds = (routeName: AgencyOverviewRouteName) =>
       "agencyDashboardAgencyDetails",
       () => domElementIds.agencyDashboard.agencyDetails,
     )
-    .with("myProfile", () => domElementIds.myProfile)
+    .with("myAccount", () => domElementIds.myAccount)
     .exhaustive();

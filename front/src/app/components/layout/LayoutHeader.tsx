@@ -92,7 +92,7 @@ export const LayoutHeader = () => {
               {
                 children: "Mon profil",
                 id: quickAccessIds.myAccount,
-                linkProps: frontRoutes.myProfile().link,
+                linkProps: frontRoutes.myAccount().link,
               },
             ]
           : []),

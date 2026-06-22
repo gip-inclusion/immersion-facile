@@ -37,7 +37,7 @@ export const EstablishmentLineBusinessName = ({
     {isBackofficeAdmin && (
       <Button
         priority="tertiary no outline"
-        id={`${domElementIds.myProfile.adminEstablishmentLink}-${data.siret}`}
+        id={`${domElementIds.myAccount.adminEstablishmentLink}-${data.siret}`}
         size="small"
         linkProps={
           frontRoutes.adminEstablishments({

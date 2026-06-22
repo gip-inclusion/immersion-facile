@@ -60,14 +60,14 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       const agenciesCount = await page
-        .locator(`[id^=${domElementIds.myProfile.editRoleButton}]`)
+        .locator(`[id^=${domElementIds.myAccount.editRoleButton}]`)
         .count();
       await expect(
-        page.locator(`[id^=${domElementIds.myProfile.adminAgencyLink}]`),
+        page.locator(`[id^=${domElementIds.myAccount.adminAgencyLink}]`),
       ).toHaveCount(agenciesCount);
 
       await page
-        .locator(`[id^=${domElementIds.myProfile.editRoleButton}]`)
+        .locator(`[id^=${domElementIds.myAccount.editRoleButton}]`)
         .first()
         .click();
       await expect(
@@ -76,15 +76,15 @@ test.describe("User workflow", () => {
         ),
       ).toBeVisible();
       await expect(
-        page.locator(`#${domElementIds.myProfile.editAgencyUserEmail}`),
+        page.locator(`#${domElementIds.myAccount.editAgencyUserEmail}`),
       ).toBeDisabled();
       await page
         .locator(
-          `[for="${domElementIds.myProfile.editAgencyManageUserCheckbox}-3"]`,
+          `[for="${domElementIds.myAccount.editAgencyManageUserCheckbox}-3"]`,
         )
         .click();
       await page
-        .locator(`#${domElementIds.myProfile.editAgencyUserRoleSubmitButton}`)
+        .locator(`#${domElementIds.myAccount.editAgencyUserRoleSubmitButton}`)
         .click();
       await expect(page.locator(".fr-alert--success").first()).toBeVisible();
     });
@@ -137,10 +137,10 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       await expect(
-        page.locator(`[id^=${domElementIds.myProfile.adminAgencyLink}]`),
+        page.locator(`[id^=${domElementIds.myAccount.adminAgencyLink}]`),
       ).toHaveCount(0);
       await expect(
-        page.locator(`[id^=${domElementIds.myProfile.editRoleButton}]`).first(),
+        page.locator(`[id^=${domElementIds.myAccount.editRoleButton}]`).first(),
       ).toBeVisible();
     });
 
@@ -148,7 +148,7 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       const ftAgencyEditRoleButton = page.locator(
-        `#${domElementIds.myProfile.editRoleButton}-${SEED_FT_AGENCY_ID}`,
+        `#${domElementIds.myAccount.editRoleButton}-${SEED_FT_AGENCY_ID}`,
       );
       const isAlreadyBasicAgencyUser = await ftAgencyEditRoleButton
         .waitFor({ state: "visible", timeout: 5_000 })
@@ -156,7 +156,7 @@ test.describe("User workflow", () => {
         .catch(() => true);
       if (isAlreadyBasicAgencyUser) {
         await expect(
-          page.locator(`#${domElementIds.myProfile.updateOwnInfosLink}`),
+          page.locator(`#${domElementIds.myAccount.updateOwnInfosLink}`),
         ).toBeVisible();
         return;
       }
@@ -167,15 +167,15 @@ test.describe("User workflow", () => {
         ),
       ).toBeVisible();
       await expect(
-        page.locator(`#${domElementIds.myProfile.editAgencyUserEmail}`),
+        page.locator(`#${domElementIds.myAccount.editAgencyUserEmail}`),
       ).toBeDisabled();
       await page
         .locator(
-          `[for="${domElementIds.myProfile.editAgencyManageUserCheckbox}-0"]`,
+          `[for="${domElementIds.myAccount.editAgencyManageUserCheckbox}-0"]`,
         )
         .click();
       await page
-        .locator(`#${domElementIds.myProfile.editAgencyUserRoleSubmitButton}`)
+        .locator(`#${domElementIds.myAccount.editAgencyUserRoleSubmitButton}`)
         .click();
       await expect(page.locator(".fr-alert--success").first()).toBeVisible();
     });
@@ -188,10 +188,10 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       await expect(
-        page.locator(`#${domElementIds.myProfile.updateOwnInfosLink}`),
+        page.locator(`#${domElementIds.myAccount.updateOwnInfosLink}`),
       ).toBeVisible();
       await expect(
-        page.locator(`[id^=${domElementIds.myProfile.adminAgencyLink}]`),
+        page.locator(`[id^=${domElementIds.myAccount.adminAgencyLink}]`),
       ).toHaveCount(0);
     });
 
@@ -201,10 +201,10 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       await expect(
-        page.locator(`#${domElementIds.myProfile.registerAgenciesSearchLink}`),
+        page.locator(`#${domElementIds.myAccount.registerAgenciesSearchLink}`),
       ).toBeVisible();
       await page
-        .locator(`#${domElementIds.myProfile.registerAgenciesSearchLink}`)
+        .locator(`#${domElementIds.myAccount.registerAgenciesSearchLink}`)
         .click();
 
       await expect(
@@ -239,7 +239,7 @@ test.describe("User workflow", () => {
       await goToMyProfilePageFromHome(page);
 
       await page
-        .locator(`[id^=${domElementIds.myProfile.editRoleButton}]`)
+        .locator(`[id^=${domElementIds.myAccount.editRoleButton}]`)
         .first()
         .click();
       await expect(
@@ -248,25 +248,25 @@ test.describe("User workflow", () => {
         ),
       ).toBeVisible();
       await expect(
-        page.locator(`#${domElementIds.myProfile.editAgencyUserEmail}`),
+        page.locator(`#${domElementIds.myAccount.editAgencyUserEmail}`),
       ).toBeDisabled();
       const roleOptionsCount = await page
         .locator(
-          `input[id^=${domElementIds.myProfile.editAgencyManageUserCheckbox}]`,
+          `input[id^=${domElementIds.myAccount.editAgencyManageUserCheckbox}]`,
         )
         .count();
 
       for (let i = 0; i < roleOptionsCount; i++) {
         await expect(
           page.locator(
-            `[for="${domElementIds.myProfile.editAgencyManageUserCheckbox}-${i}"]`,
+            `[for="${domElementIds.myAccount.editAgencyManageUserCheckbox}-${i}"]`,
           ),
         ).toBeDisabled();
       }
 
       await expect(
         page.locator(
-          `#${domElementIds.myProfile.editAgencyUserIsNotifiedByEmail}`,
+          `#${domElementIds.myAccount.editAgencyUserIsNotifiedByEmail}`,
         ),
       ).toBeEnabled();
     });

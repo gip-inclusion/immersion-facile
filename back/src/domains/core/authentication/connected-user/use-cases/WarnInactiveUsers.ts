@@ -50,11 +50,13 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
     while (true) {
       const batchResult = await deps.uowPerformer.perform(async (uow) => {
         const userIdsLoggedInAndCreatedLongAgo =
-          await uow.userRepository.getUserIdsLoggedInAndCreatedLongAgo({
-            since: twoYearsAgo,
-            limit: deps.batchSize,
-            offset,
-          });
+          await uow.userRepository.getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete(
+            {
+              since: twoYearsAgo,
+              limit: deps.batchSize,
+              offset,
+            },
+          );
 
         if (userIdsLoggedInAndCreatedLongAgo.length === 0)
           return {
@@ -97,7 +99,7 @@ export const makeWarnInactiveUsers = useCaseBuilder("WarnInactiveUsers")
         });
 
         const loginUrl: AbsoluteUrl = makeRouteAbsoluteUrl({
-          route: frontRoutes.myProfile(),
+          route: frontRoutes.myAccount(),
           baseUrl: deps.immersionBaseUrl,
         });
 

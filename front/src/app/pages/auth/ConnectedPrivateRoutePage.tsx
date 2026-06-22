@@ -123,11 +123,11 @@ type ConnectPrivateRoute =
   | FrontAdminRoute
   | FrontDashboardRoute
   | Route<typeof frontRoutes.formEstablishment>
-  | Route<typeof frontRoutes.myProfile>
-  | Route<typeof frontRoutes.myProfileAgencies>
-  | Route<typeof frontRoutes.myProfileAgencyRegistration>
-  | Route<typeof frontRoutes.myProfileEstablishments>
-  | Route<typeof frontRoutes.myProfileEstablishmentRegistration>
+  | Route<typeof frontRoutes.myAccount>
+  | Route<typeof frontRoutes.myAccountAgencies>
+  | Route<typeof frontRoutes.myAccountAgencyRegistration>
+  | Route<typeof frontRoutes.myAccountEstablishments>
+  | Route<typeof frontRoutes.myAccountEstablishmentRegistration>
   | Route<typeof frontRoutes.addAgency>
   | Route<typeof frontRoutes.manageConventionConnectedUser>
   | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>;
@@ -375,8 +375,8 @@ const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
   routeParams: ConnectPrivateRoute["params"],
 ): AllowedLoginSource => {
-  if (routeName === "myProfile") return "myProfile";
-  if (routeName === "myProfileEstablishmentRegistration") return "myProfile";
+  if (routeName === "myAccount") return "myAccount";
+  if (routeName === "myAccountEstablishmentRegistration") return "myAccount";
   if (routeName === "beneficiaryDashboardDiscussions")
     return "beneficiaryDashboardDiscussions";
   if (routeName === "beneficiaryDashboard") return "beneficiaryDashboard";
@@ -635,7 +635,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withProConnectLogin: true,
     },
     conventionTemplate: defaultPageContent,
-    myProfile: defaultPageContent,
+    myAccount: defaultPageContent,
     beneficiaryDashboard: beneficiaryDashboardContent,
     beneficiaryDashboardDiscussions: beneficiaryDashboardContent,
     default: defaultPageContent,

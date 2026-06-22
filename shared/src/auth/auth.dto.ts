@@ -17,7 +17,7 @@ export const allowedLoginSources = [
   "addAgency",
   "manageConventionConnectedUser",
   "conventionTemplate",
-  "myProfile",
+  "myAccount",
   "beneficiaryDashboard",
   "beneficiaryDashboardDiscussions",
 ] as const;

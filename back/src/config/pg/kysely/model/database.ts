@@ -468,6 +468,7 @@ interface Users {
   pro_connect_sub: string | null;
   pro_connect_siret: SiretDto | null;
   last_login_at: Timestamp | null;
+  prevent_to_delete: Generated<boolean>;
 }
 
 interface OngoingOauths {

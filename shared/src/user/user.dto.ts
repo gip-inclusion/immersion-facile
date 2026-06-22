@@ -30,6 +30,7 @@ export type User = {
   firstName: Firstname;
   lastName: Lastname;
   createdAt: DateTimeIsoString;
+  preventToDelete?: true;
   lastLoginAt?: DateTimeIsoString;
   proConnect: ProConnectInfos | null;
 };

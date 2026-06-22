@@ -22,8 +22,8 @@ import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
 type UserProfileAllowedRouteNames = Route<
   | typeof frontRoutes.adminUserDetailAgencies
   | typeof frontRoutes.adminUserDetailEstablishments
-  | typeof frontRoutes.myProfileAgencies
-  | typeof frontRoutes.myProfileEstablishments
+  | typeof frontRoutes.myAccountAgencies
+  | typeof frontRoutes.myAccountEstablishments
 >["name"];
 
 type UserProfileTabId = "establishments" | "agencies";
@@ -62,8 +62,8 @@ const adminTabChange =
 
 const myProfileTabChange = (tabId: UserProfileTabId): void =>
   match(tabId)
-    .with("agencies", () => frontRoutes.myProfileAgencies().push())
-    .with("establishments", () => frontRoutes.myProfileEstablishments().push())
+    .with("agencies", () => frontRoutes.myAccountAgencies().push())
+    .with("establishments", () => frontRoutes.myAccountEstablishments().push())
     .exhaustive();
 
 const getRouteConfig = (
@@ -84,13 +84,13 @@ const getRouteConfig = (
       onTabChange: adminTabChange(userId),
       emptyContent: adminEmptyContent,
     }))
-    .with("myProfileAgencies", () => ({
+    .with("myAccountAgencies", () => ({
       tabId: "agencies",
       showRegistrationButtons: true,
       onTabChange: myProfileTabChange,
       emptyContent: myProfileEmptyContent,
     }))
-    .with("myProfileEstablishments", () => ({
+    .with("myAccountEstablishments", () => ({
       tabId: "establishments",
       showRegistrationButtons: true,
       onTabChange: myProfileTabChange,
@@ -142,10 +142,10 @@ export const UserProfile = ({
             {showAddButtons && (
               <div className={fr.cx("fr-grid-row")}>
                 <Button
-                  id={domElementIds.myProfile.registerAgenciesSearchLink}
+                  id={domElementIds.myAccount.registerAgenciesSearchLink}
                   priority="primary"
                   linkProps={{
-                    href: `${frontRoutes.myProfileAgencyRegistration().href}`,
+                    href: `${frontRoutes.myAccountAgencyRegistration().href}`,
                   }}
                   iconId="fr-icon-add-line"
                   className={fr.cx("fr-ml-auto")}
@@ -173,12 +173,12 @@ export const UserProfile = ({
               <div className={fr.cx("fr-grid-row")}>
                 <Button
                   id={
-                    domElementIds.myProfileEstablishmentRegistration
+                    domElementIds.myAccountEstablishmentRegistration
                       .registerEstablishmentButton
                   }
                   priority="primary"
                   linkProps={
-                    frontRoutes.myProfileEstablishmentRegistration({}).link
+                    frontRoutes.myAccountEstablishmentRegistration({}).link
                   }
                   className={fr.cx("fr-ml-auto")}
                   iconId="fr-icon-add-line"
@@ -268,9 +268,9 @@ const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
           guidé(e) vers le formulaire de création.
         </Highlight>
         <Button
-          id={domElementIds.myProfile.registerAgencyButton}
+          id={domElementIds.myAccount.registerAgencyButton}
           priority="primary"
-          linkProps={frontRoutes.myProfileAgencyRegistration().link}
+          linkProps={frontRoutes.myAccountAgencyRegistration().link}
           className={fr.cx("fr-ml-auto")}
           iconId="fr-icon-add-line"
         >
@@ -325,11 +325,11 @@ const myProfileEmptyContent: Record<UserProfileTabId, ReactNode> = {
         </p>
         <Button
           id={
-            domElementIds.myProfileEstablishmentRegistration
+            domElementIds.myAccountEstablishmentRegistration
               .registerEstablishmentButton
           }
           priority="primary"
-          linkProps={frontRoutes.myProfileEstablishmentRegistration().link}
+          linkProps={frontRoutes.myAccountEstablishmentRegistration().link}
           className={fr.cx("fr-ml-auto")}
           iconId="fr-icon-add-line"
         >

@@ -16,7 +16,7 @@ import type { Route } from "type-route";
 export type AgencyOverviewRouteName = Route<
   | typeof frontRoutes.adminAgencyDetail
   | typeof frontRoutes.adminAgencies
-  | typeof frontRoutes.myProfile
+  | typeof frontRoutes.myAccount
   | typeof frontRoutes.agencyDashboardAgencyDetails
 >["name"];
 

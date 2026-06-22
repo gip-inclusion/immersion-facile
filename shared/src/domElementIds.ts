@@ -146,6 +146,7 @@ export const domElementIds = {
     heroHeader: {
       search: buildHeroHeaderId("candidate-search"),
       formConvention: buildHeroHeaderId("candidate-form-convention"),
+      dashboard: buildHeroHeaderId("candidate-dashboard"),
     },
   },
 
@@ -922,7 +923,7 @@ export const domElementIds = {
       formLoginSubmitButton: "im-login__submit-button",
     },
   },
-  myProfile: {
+  myAccount: {
     firstName: "im-profile__first-name",
     lastName: "im-profile__last-name",
     email: "im-profile__email",
@@ -953,7 +954,7 @@ export const domElementIds = {
         "im-login-form__contact-support-link--my-profile-establishment-registration",
     },
   },
-  myProfileEstablishmentRegistration: {
+  myAccountEstablishmentRegistration: {
     registerEstablishmentButton: "im-profile__register-establishment-button",
     registerEstablishmentSearch: "im-register-establishment__search",
   },
@@ -1274,9 +1275,9 @@ export const domElementIds = {
   statsEstablishmentDetails: {},
   agencyManagement: {},
   establishmentManagement: {},
-  myProfileAgencies: {},
-  myProfileEstablishments: {},
-  myProfileAgencyRegistration: {},
+  myAccountAgencies: {},
+  myAccountEstablishments: {},
+  myAccountAgencyRegistration: {},
   agencyDashboardAgencies: {},
   agencyDashboardAgencyDetails: {},
   conventionConfirmation: {},

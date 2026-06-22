@@ -8,7 +8,7 @@ import {
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
 import type {
-  GetUserIdsLoggedInAndCreatedLongAgoParams,
+  GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams,
   UserRepository,
 } from "../port/UserRepository";
 
@@ -136,17 +136,20 @@ export class InMemoryUserRepository implements UserRepository {
     return values(this.#usersById);
   }
 
-  public async getUserIdsLoggedInAndCreatedLongAgo({
+  public async getUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDelete({
     since,
     limit,
     offset,
-  }: GetUserIdsLoggedInAndCreatedLongAgoParams): Promise<UserId[]> {
+  }: GetUserIdsLoggedInAndCreatedLongAgoAndNotPreventedToDeleteParams): Promise<
+    UserId[]
+  > {
     return values(this.#usersById)
       .filter((user) =>
         !user.lastLoginAt
           ? new Date(user.createdAt) < since
           : new Date(user.lastLoginAt) < since,
       )
+      .filter((user) => !user.preventToDelete)
       .sort((a, b) => a.id.localeCompare(b.id))
       .slice(offset, offset + limit)
       .map((u) => u.id);

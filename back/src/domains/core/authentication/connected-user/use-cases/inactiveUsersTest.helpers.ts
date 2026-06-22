@@ -17,6 +17,7 @@ export const makeUser = (
     .withFirstName(overrides.firstName ?? "Jean")
     .withLastName(overrides.lastName ?? "Dupont")
     .withCreatedAt(overrides.createdAt && new Date(overrides.createdAt))
+    .withPreventToDelete(overrides.preventToDelete ?? false)
     .buildUser(),
   lastLoginAt: overrides.lastLoginAt,
 });
