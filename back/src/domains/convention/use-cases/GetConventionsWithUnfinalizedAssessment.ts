@@ -1,7 +1,9 @@
 import {
+  type AgencyRole,
   type ConnectedUser,
   type ConventionWithUnfinalizedAssessment,
   type DataWithPagination,
+  errors,
   getPaginationParamsForWeb,
   paginationRequiredQueryParamsSchema,
 } from "shared";
@@ -20,14 +22,26 @@ export const makeGetConventionsWithUnfinalizedAssessment = useCaseBuilder(
   .withCurrentUser<ConnectedUser>()
   .withDeps<{ timeGateway: TimeGateway }>()
   .build(async ({ inputParams, uow, currentUser, deps }) => {
-    const pagination = getPaginationParamsForWeb(inputParams);
+    const allowedAgencyRoles: AgencyRole[] = [
+      "agency-admin",
+      "agency-viewer",
+      "counsellor",
+      "validator",
+    ];
+
+    const allowedAgencyRights = currentUser.agencyRights.filter((agencyRight) =>
+      agencyRight.roles.some((role) => allowedAgencyRoles.includes(role)),
+    );
+
+    if (!allowedAgencyRights.length)
+      throw errors.agencies.noAgencyRights(currentUser.id);
 
     return uow.conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
       {
-        userAgencyIds: currentUser.agencyRights
-          .filter((agencyRight) => agencyRight.roles.length > 0)
-          .map((agencyRight) => agencyRight.agency.id),
-        pagination,
+        userAgencyIds: allowedAgencyRights.map(
+          (agencyRight) => agencyRight.agency.id,
+        ),
+        pagination: getPaginationParamsForWeb(inputParams),
         now: deps.timeGateway.now(),
       },
     );

@@ -867,6 +867,8 @@ export const errors = {
       referedAgencyId: AgencyId;
     }) =>
       `Le refersToAgencyId de l'agence '${agencyWithRefersToId}' ne correspond pas avec l'agence '${referedAgencyId}' à laquelle elle est référencée.`,
+    noAgencyRights: (userId: UserId) =>
+      new ForbiddenError(`L'utilisateur ${userId} n'a pas de droit d'agence.`),
   },
   agency: {
     missingParamAgencyId: () =>

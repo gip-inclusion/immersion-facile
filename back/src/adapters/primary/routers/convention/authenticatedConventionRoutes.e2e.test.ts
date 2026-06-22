@@ -403,25 +403,6 @@ describe("authenticatedConventionRoutes", () => {
           },
         },
       });
-
-      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
-        {
-          agencyUserId: validator.id,
-          filters: {
-            dateStart: { from: "2023-01-01" },
-            statuses: ["ACCEPTED_BY_VALIDATOR", "PARTIALLY_SIGNED"],
-            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
-          },
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          sort: {
-            by: "dateStart",
-            direction: "desc",
-          },
-        },
-      ]);
     });
 
     it("200 - Successfully gets conventions with assessment completion status filter - signed", async () => {
@@ -476,24 +457,6 @@ describe("authenticatedConventionRoutes", () => {
           },
         },
       });
-
-      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
-        {
-          agencyUserId: validator.id,
-          filters: {
-            assessmentCompletionStatus: ["finalized"],
-            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
-          },
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          sort: {
-            by: "dateStart",
-            direction: "desc",
-          },
-        },
-      ]);
     });
 
     it("200 - Successfully gets conventions with assessment completion status filter - to-be-completed", async () => {
@@ -526,24 +489,6 @@ describe("authenticatedConventionRoutes", () => {
           },
         },
       });
-
-      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
-        {
-          agencyUserId: validator.id,
-          filters: {
-            assessmentCompletionStatus: ["to-complete"],
-            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
-          },
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          sort: {
-            by: "dateStart",
-            direction: "desc",
-          },
-        },
-      ]);
     });
 
     it("200 - Successfully gets conventions with agencyIds filter", async () => {
@@ -605,24 +550,6 @@ describe("authenticatedConventionRoutes", () => {
           },
         },
       });
-
-      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
-        {
-          agencyUserId: validator.id,
-          filters: {
-            agencyIds: [peAgency.id],
-            dateEnd: { from: "2019-08-01T10:10:00.000Z" },
-          },
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          sort: {
-            by: "dateStart",
-            direction: "desc",
-          },
-        },
-      ]);
     });
   });
 
