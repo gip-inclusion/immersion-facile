@@ -342,12 +342,12 @@ export const feedbacks: Record<
       message: "Une erreur est survenue lors de la création de l'utilisateur",
     },
     "delete.success": {
-      action: connectedUsersAdminSlice.actions.removeUserFromAgencySucceeded,
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
       title: "L'utilisateur n'est plus rattaché à cette agence",
       message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
     },
     "delete.error": {
-      action: connectedUsersAdminSlice.actions.removeUserFromAgencyFailed,
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencyFailed,
       title:
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:

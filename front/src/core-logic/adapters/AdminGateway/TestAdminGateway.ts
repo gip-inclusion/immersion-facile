@@ -15,7 +15,6 @@ import type {
   SetFeatureFlagParam,
   UserParamsForAgency,
   UserWithNumberOfAgenciesAndEstablishments,
-  WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -43,8 +42,6 @@ export class TestAdminGateway implements AdminGateway {
   public token$ = new Subject<string>();
 
   public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
-
-  public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
 
@@ -107,13 +104,6 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;
-  }
-
-  public removeUserFromAgency$(
-    _params: WithAgencyIdAndUserId,
-    _token: string,
-  ): Observable<void> {
-    return this.removeUserFromAgencyResponse$;
   }
 
   public listUsers$(

@@ -156,21 +156,15 @@ export const AgencyUsers = ({
   const onUserRemoveSubmitted = () => {
     if (!selectedUserData) return;
 
-    isLocationAdmin
-      ? dispatch(
-          connectedUsersAdminSlice.actions.removeUserFromAgencyRequested({
-            userId: selectedUserData.userId,
-            agencyId: agency.id,
-            feedbackTopic: "agency-user",
-          }),
-        )
-      : dispatch(
-          removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
-            userId: selectedUserData.userId,
-            agencyId: agency.id,
-            feedbackTopic: "agency-user-for-dashboard",
-          }),
-        );
+    dispatch(
+      removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
+        userId: selectedUserData.userId,
+        agencyId: agency.id,
+        feedbackTopic: isLocationAdmin
+          ? "agency-user"
+          : "agency-user-for-dashboard",
+      }),
+    );
 
     removeUserModal.close();
   };
