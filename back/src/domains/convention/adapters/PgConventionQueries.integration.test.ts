@@ -12,6 +12,7 @@ import {
   AssessmentDtoBuilder,
   type BroadcastFeedback,
   ConnectedUserBuilder,
+  type ConventionAgencyPublicFields,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -56,7 +57,11 @@ describe("Pg implementation of ConventionQueries", () => {
 
   const validator = new ConnectedUserBuilder()
     .withEmail("validator@mail.com")
-    .withId("77777777-6666-4777-7777-777777777777")
+    .withId(uuid())
+    .buildUser();
+  const counsellor = new ConnectedUserBuilder()
+    .withEmail("counsellor@mail.com")
+    .withId(uuid())
     .buildUser();
 
   let pool: Pool;
@@ -86,6 +91,7 @@ describe("Pg implementation of ConventionQueries", () => {
     await db.deleteFrom("notifications_email_recipients").execute();
     await db.deleteFrom("notifications_email").execute();
     await db.deleteFrom("immersion_assessments").execute();
+    await db.deleteFrom("users").execute();
 
     conventionQueries = new PgConventionQueries(db);
     agencyRepo = new PgAgencyRepository(db);
@@ -93,7 +99,9 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionRepository = new PgConventionRepository(db);
     broadcastFeedbacksRepository = new PgBroadcastFeedbacksRepository(db);
 
-    await new PgUserRepository(db).save(validator);
+    const userRepository = new PgUserRepository(db);
+    await userRepository.save(validator);
+    await userRepository.save(counsellor);
   });
 
   afterAll(async () => {
@@ -1099,8 +1107,7 @@ describe("Pg implementation of ConventionQueries", () => {
         kind: withRefersToAgency.kind,
         siret: withRefersToAgency.agencySiret,
       },
-      agencyValidatorEmails: [validatorUser.email],
-      agencyCounsellorEmails: [],
+      agencyValidationSteps: "validator-only",
       updatedAt: conventionUpdatedAt,
       ...assesmentEntityToConventionAssessmentFields(assessment),
       ...withBannedEstablishmentInformations,
@@ -1206,25 +1213,23 @@ describe("Pg implementation of ConventionQueries", () => {
       )
       .build();
 
-    const agencyFields = {
+    const agencyFields: ConventionAgencyPublicFields = {
       agencyName: agency.name,
       agencyContactEmail: agency.contactEmail,
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [singleAgencyUser.email, validator.email],
+      agencyValidationSteps: "validator-only",
       agencyRefersTo: undefined,
     };
 
-    const differentAgencyFields = {
+    const differentAgencyFields: ConventionAgencyPublicFields = {
       agencyName: differentAgency.name,
       agencyContactEmail: differentAgency.contactEmail,
       agencyDepartment: differentAgency.address.departmentCode,
       agencyKind: differentAgency.kind,
       agencySiret: differentAgency.agencySiret,
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [validator.email],
+      agencyValidationSteps: "counsellor-and-validator",
       agencyRefersTo: undefined,
     };
 
@@ -1244,6 +1249,7 @@ describe("Pg implementation of ConventionQueries", () => {
       await agencyRepo.insert(
         toAgencyWithRights(differentAgency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
         }),
       );
 
@@ -1287,6 +1293,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
@@ -1382,6 +1389,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionA,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
@@ -1633,6 +1641,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
@@ -2149,24 +2158,28 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionA,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
         {
           ...sameDateStartConvention,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
         {
           ...conventionB,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
         {
           ...conventionC,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
@@ -2206,6 +2219,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
@@ -2403,6 +2417,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionC,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: {
             status: "COMPLETED",
             endedWithAJob: false,
@@ -2414,12 +2429,14 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...conventionB,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
         {
           ...conventionA,
           ...agencyFields,
+          agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
           isEstablishmentBanned: false,
         },
