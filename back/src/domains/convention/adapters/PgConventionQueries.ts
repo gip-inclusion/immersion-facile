@@ -1,4 +1,4 @@
-import { addDays, subMonths } from "date-fns";
+import { addDays, subDays, subMonths } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
@@ -483,6 +483,7 @@ export class PgConventionQueries implements ConventionQueries {
       };
 
     const threeMonthsAgo = subMonths(now, 3);
+    const twoDaysAgo = subDays(now, 2);
     const signatureReleaseThreshold = addDays(
       ASSESSEMENT_SIGNATURE_RELEASE_DATE,
       1,
@@ -523,7 +524,8 @@ export class PgConventionQueries implements ConventionQueries {
       .where("ia.signed_at", "is", null)
       .where("ia.status", "!=", "DID_NOT_SHOW")
       .where("ia.created_at", ">", signatureReleaseThreshold)
-      .where("ia.created_at", ">=", threeMonthsAgo);
+      .where("ia.created_at", ">=", threeMonthsAgo)
+      .where("ia.created_at", "<", twoDaysAgo);
 
     const paginatedUnfinalizedAssessmentQuery = conventionsWithoutAssessmentRows
       .select((eb) => [

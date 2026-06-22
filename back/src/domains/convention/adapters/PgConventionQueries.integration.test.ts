@@ -1,4 +1,4 @@
-import { addDays, subDays, subMonths } from "date-fns";
+import { addDays, subDays, subMilliseconds, subMonths } from "date-fns";
 import { sql } from "kysely";
 import type { Pool } from "pg";
 import {
@@ -3757,6 +3757,7 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("getConventionsWithUnfinalizedAssessmentForAgencyUser", () => {
     const now = new Date("2026-06-15T10:00:00Z");
     const threeMonthsAgo = subMonths(now, 3);
+    const twoDaysAgo = subDays(now, 2);
     const lessThanThreeMonthsAgo = addDays(threeMonthsAgo, 2);
     const moreThanThreeMonthsAgo = subDays(threeMonthsAgo, 2);
     const afterSignatureRelease = addDays(
@@ -3997,6 +3998,70 @@ describe("Pg implementation of ConventionQueries", () => {
         );
 
       expectToEqual(result.data, []);
+    });
+
+    it("excludes assessments created two days ago", async () => {
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEnded5DaysAgo.id)
+        .withCreatedAt(twoDaysAgo.toISOString())
+        .build();
+
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, validatedConventionEnded5DaysAgo),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result.data, []);
+    });
+
+    it("include assessments created juste before two days ago", async () => {
+      const assessment = new AssessmentDtoBuilder()
+        .withConventionId(validatedConventionEnded5DaysAgo.id)
+        .withCreatedAt(subMilliseconds(twoDaysAgo, 1).toISOString())
+        .build();
+
+      await conventionRepository.save(validatedConventionEnded5DaysAgo);
+      await assessmentRepo.save(
+        createAssessmentEntity(assessment, validatedConventionEnded5DaysAgo),
+      );
+
+      const result =
+        await conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
+          {
+            userAgencyIds: [agencyIdA],
+            pagination: { page: 1, perPage: 10 },
+            now,
+          },
+        );
+
+      expectToEqual(result.data, [
+        {
+          assessment: {
+            createdAt: assessment.createdAt,
+            endedWithAJob: assessment.endedWithAJob,
+            signedAt: assessment.signedAt,
+            status: assessment.status,
+          },
+          beneficiary: {
+            firstname:
+              validatedConventionEnded5DaysAgo.signatories.beneficiary
+                .firstName,
+            lastname:
+              validatedConventionEnded5DaysAgo.signatories.beneficiary.lastName,
+          },
+          dateEnd: validatedConventionEnded5DaysAgo.dateEnd,
+          id: validatedConventionEnded5DaysAgo.id,
+        },
+      ]);
     });
 
     it("excludes assessments already signed (finalized)", async () => {

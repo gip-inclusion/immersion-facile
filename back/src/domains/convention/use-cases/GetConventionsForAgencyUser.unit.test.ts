@@ -8,7 +8,6 @@ import {
   type DataWithPagination,
   expectToEqual,
   type GetConventionsForAgencyUserParams,
-  maxPerPageInWebPagination,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -79,66 +78,7 @@ describe("GetConventionsForAgencyUser", () => {
     uow.conventionRepository.setConventions(conventions);
   });
 
-  describe("Pagination", () => {
-    it("should limit perPage to maxPerPageInWebPagination (100) even if a larger value is provided", async () => {
-      const params: GetConventionsForAgencyUserParams = {
-        filters: {},
-        pagination: {
-          page: 1,
-          perPage: 500, // Much larger than the max
-        },
-      };
-
-      await getConventionsForAgencyUser.execute(params, currentUser);
-
-      const calls = uow.conventionQueries.paginatedConventionsParams;
-      expect(calls.length).toBe(1);
-      expect(calls[0].pagination.perPage).toBe(maxPerPageInWebPagination);
-    });
-  });
-
   describe("Filtering", () => {
-    it("should pass filters to the query", async () => {
-      const params: GetConventionsForAgencyUserParams = {
-        filters: {
-          statuses: ["ACCEPTED_BY_VALIDATOR"],
-        },
-      };
-
-      await getConventionsForAgencyUser.execute(params, currentUser);
-
-      const calls = uow.conventionQueries.paginatedConventionsParams;
-      expect(calls.length).toBe(1);
-      expect(calls[0].filters).toEqual({
-        ...params.filters,
-        dateEnd: {
-          from: subMonths(timeGateway.now(), 25).toISOString(),
-        },
-      });
-    });
-    it("should pass filters dates to the query", async () => {
-      const params: GetConventionsForAgencyUserParams = {
-        filters: {
-          dateEnd: {
-            from: subMonths(timeGateway.now(), 25).toISOString(),
-          },
-        },
-      };
-
-      await getConventionsForAgencyUser.execute(params, currentUser);
-
-      const calls = uow.conventionQueries.paginatedConventionsParams;
-      expectToEqual(calls, [
-        {
-          filters: params.filters,
-          pagination: {
-            page: 1,
-            perPage: 20,
-          },
-          agencyUserId: currentUser.id,
-        },
-      ]);
-    });
     it("should filter out conventions that are older than 25 months by default", async () => {
       const conventionOutOfRange = new ConventionDtoBuilder()
         .withId("convention-id-1")

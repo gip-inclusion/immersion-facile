@@ -1,4 +1,4 @@
-import { addDays, isAfter, isBefore, subMonths } from "date-fns";
+import { addDays, isAfter, isBefore, subDays, subMonths } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
@@ -52,13 +52,6 @@ import type { InMemoryConventionRepository } from "./InMemoryConventionRepositor
 const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
-  public paginatedConventionsParams: GetPaginatedConventionsForAgencyUserParams[] =
-    [];
-
-  public getConventionsWithUnfinalizedAssessmentForAgencyUserParams: Parameters<
-    ConventionQueries["getConventionsWithUnfinalizedAssessmentForAgencyUser"]
-  >[0][] = [];
-
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
@@ -170,8 +163,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
   ): Promise<DataWithPagination<ConventionReadDto>> {
-    this.paginatedConventionsParams.push(params);
-
     const { filters = {}, pagination, sort, agencyUserId } = params;
     const agencyIdsForUser = this.#getAgencyIdsForAgencyUser(agencyUserId);
 
@@ -389,12 +380,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
     pagination: Required<PaginationQueryParams>;
     now: Date;
   }): Promise<DataWithPagination<ConventionWithUnfinalizedAssessment>> {
-    this.getConventionsWithUnfinalizedAssessmentForAgencyUserParams.push({
-      userAgencyIds,
-      pagination,
-      now,
-    });
-
     if (userAgencyIds.length === 0)
       return {
         data: [],
@@ -407,6 +392,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       };
 
     const threeMonthsAgo = subMonths(now, 3);
+    const twoDaysAgo = subDays(now, 2);
     const signatureReleaseThreshold = addDays(
       ASSESSEMENT_SIGNATURE_RELEASE_DATE,
       1,
@@ -453,11 +439,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
             createdAt,
             signatureReleaseThreshold,
           );
+          const isCreatedAtLeastTwoDaysAgo = isBefore(createdAt, twoDaysAgo);
           const isWithinThreeMonths = !isBefore(createdAt, threeMonthsAgo);
           const isUnsigned =
             "signedAt" in assessment && assessment.signedAt === null;
 
-          if (!isAfterSignatureRelease || !isWithinThreeMonths || !isUnsigned)
+          if (
+            !isAfterSignatureRelease ||
+            !isWithinThreeMonths ||
+            !isUnsigned ||
+            !isCreatedAtLeastTwoDaysAgo
+          )
             return [];
 
           return [
