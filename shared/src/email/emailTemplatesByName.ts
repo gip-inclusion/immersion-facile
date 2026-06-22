@@ -2994,7 +2994,7 @@ L'équipe d'Immersion Facilitée`,
               content: `
               Un imprévu ?
 
-              Si l’immersion ne peut pas aller à son terme (abandon, arrêt anticipé, etc.), merci de nous le signaler dès que possible en <a href="${assessmentMagicLink}">déclarant un abandon</a> , pour assurer un bon suivi.`,
+              Si l’immersion ne peut pas aller à son terme (abandon, arrêt anticipé, etc.), merci de nous le signaler dès que possible en <a href="${assessmentMagicLink}">déclarant une fin anticipée</a> , pour assurer un bon suivi.`,
             }
           : undefined,
         agencyLogoUrl,
