@@ -522,3 +522,5 @@ export const makeRouteAbsoluteUrl = ({
   route: Route<typeof frontRoutes>;
   baseUrl: AbsoluteUrl;
 }): AbsoluteUrl => `${baseUrl}${route.href}`;
+
+export const removeAllParamsFromUrl = (url: string) => url.split("?")[0];

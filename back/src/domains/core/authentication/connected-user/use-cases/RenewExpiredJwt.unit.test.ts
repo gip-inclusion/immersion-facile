@@ -225,6 +225,29 @@ describe("RenewExpiredJwt use case", () => {
 
         expect(uow.outboxRepository.events).toHaveLength(1);
       });
+
+      it("Also work when having mixed up params in the url", async () => {
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+          "shortLink1",
+          "shortLink2",
+        ]);
+        const expiredPayload = createConventionMagicLinkPayload({
+          id: validConvention.id,
+          role: "beneficiary",
+          email: validConvention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+        });
+
+        await useCase.execute({
+          kind: "convention",
+          originalUrl: encodeURIComponent(
+            "http://immersionfacile.fr/verifier-et-signer?mtm_campaign=test&jwt=toto",
+          ),
+          expiredJwt: generateConventionJwt(expiredPayload),
+        });
+
+        expect(uow.outboxRepository.events).toHaveLength(1);
+      });
     });
 
     describe("Wrong paths", () => {
