@@ -204,10 +204,8 @@ describe("RenewExpiredJwt use case", () => {
       });
 
       it("Also work when using encoded Url", async () => {
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([
-          "shortLink1",
-          "shortLink2",
-        ]);
+        const shortLinkId = "shortLink1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
         const expiredPayload = createConventionMagicLinkPayload({
           id: validConvention.id,
           role: "beneficiary",
@@ -223,14 +221,24 @@ describe("RenewExpiredJwt use case", () => {
           expiredJwt: generateConventionJwt(expiredPayload),
         });
 
-        expect(uow.outboxRepository.events).toHaveLength(1);
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "MAGIC_LINK_RENEWAL",
+              params: {
+                conventionId: validConvention.id,
+                internshipKind: validConvention.internshipKind,
+                magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+              },
+              recipients: [validConvention.signatories.beneficiary.email],
+            },
+          ],
+        });
       });
 
       it("Also work when having mixed up params in the url", async () => {
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([
-          "shortLink1",
-          "shortLink2",
-        ]);
+        const shortLinkId = "shortLink1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
         const expiredPayload = createConventionMagicLinkPayload({
           id: validConvention.id,
           role: "beneficiary",
@@ -245,8 +253,19 @@ describe("RenewExpiredJwt use case", () => {
           ),
           expiredJwt: generateConventionJwt(expiredPayload),
         });
-
-        expect(uow.outboxRepository.events).toHaveLength(1);
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "MAGIC_LINK_RENEWAL",
+              params: {
+                conventionId: validConvention.id,
+                internshipKind: validConvention.internshipKind,
+                magicLink: `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`,
+              },
+              recipients: [validConvention.signatories.beneficiary.email],
+            },
+          ],
+        });
       });
     });
 
