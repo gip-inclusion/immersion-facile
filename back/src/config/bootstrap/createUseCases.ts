@@ -16,6 +16,7 @@ import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/Li
 import { makeNotifyAgencyHasBeenPutOnHold } from "../../domains/agency/use-cases/NotifyAgencyHasBeenPutOnHold";
 import { makeNotifyDelegationConventionReminder } from "../../domains/agency/use-cases/notifications/NotifyDelegationConventionReminder";
 import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
+import { makeRemoveUserFromAgency } from "../../domains/agency/use-cases/RemoveUserFromAgency";
 import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
 import { makeUpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
@@ -27,7 +28,6 @@ import { makeGetConnectedUsers } from "../../domains/connected-users/use-cases/G
 import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
 import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
-import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
 import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { makeAddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
