@@ -11,6 +11,7 @@ import {
   type MagicLinkRenewalParams,
   type OAuthState,
   type RenewExpiredJwtRequestDto,
+  removeAllParamsFromUrl,
   renewExpiredJwtRequestSchema,
   type ShortLinkId,
 } from "shared";
@@ -298,7 +299,7 @@ export class RenewExpiredJwt extends TransactionalUseCase<
     const supportedRouteToRenew = keys(supportedRenewRoutesByRouteName).find(
       (routeName) =>
         decodeURIComponent(originalUrl).includes(
-          supportedRenewRoutesByRouteName[routeName],
+          removeAllParamsFromUrl(supportedRenewRoutesByRouteName[routeName]),
         ),
     );
 

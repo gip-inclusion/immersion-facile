@@ -575,7 +575,7 @@ export const errors = {
     }) =>
       new BadRequestError(
         `Lien non supporté, le lien doit faire partie des liens supportés suivants: ${supportedRenewRoutes
-          .map((route) => `/${route}`)
+          .map((route) => `${route}`)
           .join(", ")}. Lien fourni : ${originalUrl}`,
       ),
     forbiddenReminder: ({
