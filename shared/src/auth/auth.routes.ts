@@ -1,10 +1,10 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import z from "zod";
-import { ftConnect } from "..";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withUserFiltersSchema } from "../admin/admin.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { ftConnect } from "../routes/routes";
 import { renewExpiredJwtRequestSchema } from "../tokens/jwt.schema";
 import {
   connectedUserSchema,
