@@ -17,10 +17,13 @@ import {
 import { type AbsoluteUrl, domElementIds, frontRoutes } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
-import { makeStyles, useStyles } from "tss-react/dsfr";
-import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
-import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";
-import plateformeInclusionLogoUrl from "../../../assets/img/plateforme-inclusion-logo.svg";
+import { useStyles } from "tss-react/dsfr";
+import lesEntrepriseSengagentLight from "../../../assets/img/les-entreprises-s-engagent.svg";
+import lesEntrepriseSengagentDark from "../../../assets/img/les-entreprises-s-engagent-dark.svg";
+import franceTravailLogoLight from "../../../assets/img/logo-france-travail.svg";
+import franceTravailLogoDark from "../../../assets/img/logo-france-travail-dark.svg";
+import logoPDILight from "../../../assets/img/logo-pdi.svg";
+import logoPDIDark from "../../../assets/img/logo-pdi-dark.svg";
 
 const {
   bottomLinks: bottomsLinksIds,
@@ -32,11 +35,15 @@ const {
 const PartnersLogos = () => {
   const { cx } = useStyles();
   const darkModeState = useIsDark();
-  const { classes } = makeStyles({ name: LayoutFooter.displayName })(() => ({
-    partnerLogo: {
-      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
-    },
-  }))();
+
+  const franceTravailLogo = darkModeState.isDark
+    ? franceTravailLogoDark
+    : franceTravailLogoLight;
+  const lesEntrepriseSengagent = darkModeState.isDark
+    ? lesEntrepriseSengagentDark
+    : lesEntrepriseSengagentLight;
+  const logoPDI = darkModeState.isDark ? logoPDIDark : logoPDILight;
+
   return (
     <ul>
       <li>
@@ -49,43 +56,24 @@ const PartnersLogos = () => {
           className={cx(
             fr.cx("fr-footer__logo", "fr-mx-md-1w"),
             FooterStyles.default.logo,
-            classes.partnerLogo,
           )}
+        />
+      </li>
+      <li>
+        <img
+          src={logoPDI}
+          alt="Plateforme De l'Inclusion"
+          className={cx(fr.cx("fr-footer__logo"), FooterStyles.default.logo)}
         />
       </li>
       <li>
         <img
           src={lesEntrepriseSengagent}
           alt="Les entreprises s'engagent"
-          className={cx(
-            fr.cx("fr-footer__logo"),
-            FooterStyles.default.logo,
-            classes.partnerLogo,
-          )}
+          className={cx(fr.cx("fr-footer__logo"), FooterStyles.default.logo)}
         />
       </li>
     </ul>
-  );
-};
-
-export const PlateformeInclusionLogo = () => {
-  const { cx } = useStyles();
-  const darkModeState = useIsDark();
-  const { classes } = makeStyles()(() => ({
-    partnerLogo: {
-      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
-    },
-  }))();
-  return (
-    <img
-      src={plateformeInclusionLogoUrl}
-      alt="Plateforme de l'Inclusion"
-      className={cx(
-        fr.cx("fr-footer__logo", "fr-m-2w", "fr-m-md-0", "fr-mr-md-2w"),
-        classes.partnerLogo,
-        FooterStyles.default.logo,
-      )}
-    />
   );
 };
 
@@ -283,7 +271,6 @@ export const LayoutFooter = () => (
       links={links}
       partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}
-      plateformeInclusionLogo={<PlateformeInclusionLogo />}
     />
     <Display />
   </>
