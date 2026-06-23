@@ -3,44 +3,50 @@
 .im-footer {
   &__body {
     justify-content: center;
+
     @include for-screen-min($bp-sm) {
       justify-content: end;
     }
   }
+
   &__content {
     flex-basis: auto;
   }
-  &__partners-main {
-    flex-direction: column;
-  }
+
   &__brand {
     flex-direction: column;
+
     @include for-screen-min($bp-sm) {
       flex-direction: row;
     }
   }
+
   &__brand-text {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     max-width: 20rem;
+
     @include for-screen-min($bp-sm) {
       align-items: start;
       text-align: start;
     }
   }
+
   &__partners-sub {
-    & > ul {
+    &>ul {
       align-items: center;
       flex-direction: row;
       flex-wrap: nowrap;
     }
   }
+
   &__logo {
     max-height: 5.75rem;
     max-width: 90%;
     box-shadow: none !important; // overriding DSFR border
+
     @include for-screen-min($bp-sm) {
       max-width: 100%;
     }

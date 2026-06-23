@@ -27,7 +27,6 @@ export type FooterProps = {
   navTopGroupLinks?: NavTopGroupLinks[];
   bottomLinks?: (NavLink | FooterPropsDsfr.BottomItem.Button)[];
   partnersLogos?: ReactNode;
-  plateformeInclusionLogo?: ReactNode;
 };
 
 const TopLink = ({ link }: { link: NavLink }) => {
@@ -86,7 +85,6 @@ export const Footer = ({
   navTopGroupLinks,
   bottomLinks,
   partnersLogos,
-  plateformeInclusionLogo,
 }: FooterProps) => {
   const { cx } = useStyles();
   return (
@@ -139,36 +137,7 @@ export const Footer = ({
           <div className={fr.cx("fr-footer__partners-logos")}>
             <div
               className={cx(
-                fr.cx("fr-footer__partners-main"),
-                FooterStyles.partnersMain,
-              )}
-            >
-              <span className={cx(FooterStyles.brandText)}>
-                Ce service fait partie de la{" "}
-              </span>
-              <div
-                className={cx(fr.cx("fr-footer__brand"), FooterStyles.brand)}
-              >
-                {plateformeInclusionLogo}
-                <p className={cx(fr.cx("fr-mb-0"), FooterStyles.brandText)}>
-                  Découvrez les outils qui portent l'inclusion au cœur de leur
-                  service. À chaque service, son objectif.
-                  <a
-                    className={fr.cx(
-                      "fr-footer__content-link",
-                      "fr-icon-external-link-line",
-                      "fr-link--icon-right",
-                    )}
-                    href={"https://inclusion.beta.gouv.fr/"}
-                  >
-                    Découvrez nos services
-                  </a>
-                </p>
-              </div>
-            </div>
-            <div
-              className={cx(
-                fr.cx("fr-footer__partners-sub"),
+                fr.cx("fr-footer__partners-sub", "fr-mb-4w"),
                 FooterStyles.partnersSub,
               )}
             >
