@@ -14,6 +14,8 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import type { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../../core/authentication/ft-connect/dto/FtConnectUserDto";
 import {
   makeSaveNotificationAndRelatedEvent,
   type SaveNotificationAndRelatedEvent,
@@ -483,7 +485,52 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     });
 
     it("sends email only to FT advisor when present", async () => {
-      uow.conventionRepository.setConventions([validatedConvention]);
+      const ftConnectedBeneficiary: FtConnectUserDto = {
+        firstName: "Jean",
+        lastName: "Bénéficiaire",
+        isJobseeker: true,
+        peExternalId: "beneficiary-external-id",
+        email: "jean@beneficiaire.com",
+        birthdate: "2000-02-02",
+      };
+      const ftConnectImmersionAdvisor: FtConnectImmersionAdvisorDto = {
+        email: "jean@advisor.com",
+        firstName: "Jean",
+        lastName: "Advisor",
+        type: "PLACEMENT",
+      };
+
+      const conventionWithFtConnectUsers: ConventionDto = {
+        ...validatedConvention,
+        internshipKind: "immersion",
+        signatories: {
+          ...validatedConvention.signatories,
+          beneficiary: {
+            ...validatedConvention.signatories.beneficiary,
+            ...ftConnectedBeneficiary,
+          },
+        },
+        validators: {
+          ...validatedConvention.validators,
+          agencyCounsellor: {
+            firstname: ftConnectImmersionAdvisor.firstName,
+            lastname: ftConnectImmersionAdvisor.lastName,
+          },
+        },
+      };
+
+      uow.conventionRepository.setConventions([conventionWithFtConnectUsers]);
+      uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers = {
+        [ftConnectedBeneficiary.peExternalId]: {
+          advisor: ftConnectImmersionAdvisor,
+          user: ftConnectedBeneficiary,
+        },
+      };
+      uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers =
+        {
+          [conventionWithFtConnectUsers.id]:
+            ftConnectedBeneficiary.peExternalId,
+        };
 
       await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
         { siret },
@@ -503,22 +550,19 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
           },
           {
             kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
-            recipients: [agency.contactEmail],
+            recipients: [ftConnectImmersionAdvisor.email],
             params: {
               businessName,
-              conventionId: validatedConvention.id,
+              conventionId: conventionWithFtConnectUsers.id,
               beneficiaryFirstName:
-                validatedConvention.signatories.beneficiary.firstName,
+                conventionWithFtConnectUsers.signatories.beneficiary.firstName,
               beneficiaryLastName:
-                validatedConvention.signatories.beneficiary.lastName,
+                conventionWithFtConnectUsers.signatories.beneficiary.lastName,
               immersionBaseUrl,
             },
           },
         ],
       });
-      throw new Error(
-        "Use repo when conventionFranceTravailAdvisorRepository is updated",
-      );
     });
 
     it("sends email to agency validators when convention is validated and agency has no refersToAgency", async () => {
