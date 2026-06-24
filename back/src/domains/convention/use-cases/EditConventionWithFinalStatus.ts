@@ -1,10 +1,13 @@
+import { equals, keys } from "ramda";
 import {
+  type AgencyId,
   allowedRolesToEditConventionWithFinalStatus,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   conventionSchema,
   conventionStatuses,
   conventionStatusesAllowedForModification,
+  type EditConventionWithFinalStatusBeneficiaryUpdate,
   type EditConventionWithFinalStatusRequestDto,
   editConventionWithFinalStatusRequestSchema,
   errors,
@@ -71,7 +74,8 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       await throwIfNotAllowedToEditBeneficiary({
         uow,
         jwtPayload,
-        hasBeneficiaryUpdate: !!inputParams.beneficiary,
+        updatedBeneficiary: inputParams.beneficiary,
+        agencyId: convention.agencyId,
       });
     }
 
@@ -182,18 +186,36 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
 const throwIfNotAllowedToEditBeneficiary = async ({
   uow,
   jwtPayload,
-  hasBeneficiaryUpdate,
+  updatedBeneficiary,
+  agencyId,
 }: {
   uow: UnitOfWork;
   jwtPayload: ConventionRelatedJwtPayload;
-  hasBeneficiaryUpdate: boolean;
-}) => {
-  if (!hasBeneficiaryUpdate) return;
+  updatedBeneficiary: EditConventionWithFinalStatusBeneficiaryUpdate;
+  agencyId: AgencyId;
+}): Promise<void> => {
+  if (!updatedBeneficiary) return;
 
   if (!("userId" in jwtPayload))
     throw errors.convention.unsupportedRole({ role: jwtPayload.role });
 
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+  const isUserWithAgencyAllowedRoles =
+    userWithRights.agencyRights
+      .find((agencyRight) => agencyRight.agency.id === agencyId)
+      ?.roles.some((role) =>
+        [
+          ...allowedRolesToEditConventionWithFinalStatus,
+          "agency-admin",
+        ].includes(role),
+      ) ?? false;
+
+  const isAllowedToUpdateBeneficiaryBirthDateOnly =
+    isUserWithAgencyAllowedRoles &&
+    equals(keys(updatedBeneficiary), ["updatedBeneficiaryBirthDate"]);
+
+  if (isAllowedToUpdateBeneficiaryBirthDateOnly) return;
 
   throwIfNotAdmin(userWithRights);
 };

@@ -62,6 +62,7 @@ export const agencyModifierRoles = ["counsellor", "validator"] as const;
 
 export const allowedRolesToEditConventionWithFinalStatus = [
   ...agencyModifierRoles,
+  "agency-admin",
   "establishment-representative",
   "back-office",
 ] as const;
