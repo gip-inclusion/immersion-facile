@@ -10,6 +10,7 @@ import {
   withSiretSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -187,6 +188,34 @@ const notifyValidatorsAndPreValidators = async (
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const ftUserAdvisor: ConventionFtUserAdvisorEntity | undefined =
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+
+    if (ftUserAdvisor?.advisor) {
+      await saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR",
+          recipients: [ftUserAdvisor.advisor.email],
+          params: {
+            businessName: bannedEstablishment.establishment.name,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            immersionBaseUrl: immersionBaseUrl,
+            conventionId: convention.id,
+          },
+        },
+        followedIds: {
+          establishmentSiret: bannedEstablishment.establishment.siret,
+          conventionId: convention.id,
+        },
+      });
+
+      return;
+    }
 
     const agencyWithUserEmailNotificationActivated =
       await agencyWithRightToAgencyDto(uow, agency);
