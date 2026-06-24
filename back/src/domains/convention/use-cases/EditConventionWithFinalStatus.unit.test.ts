@@ -1,11 +1,14 @@
 import {
   AgencyDtoBuilder,
+  type AgencyRole,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   conventionStatusesAllowedForModification,
+  type EditConventionWithFinalStatusBeneficiaryUpdate,
   type EditConventionWithFinalStatusRequestDto,
   errors,
   expectArraysToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   UserBuilder,
@@ -160,7 +163,7 @@ describe("EditConventionWithFinalStatus", () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [counsellorUser.id]: {
-            roles: ["counsellor"],
+            roles: ["to-review"],
             isNotifiedByEmail: true,
           },
         }),
@@ -236,11 +239,136 @@ describe("EditConventionWithFinalStatus", () => {
         }),
       );
     });
+
+    it.each([
+      {
+        role: "counsellor",
+        beneficiary: {
+          firstname: "updated firstname",
+          lastname: "updated lastname",
+        },
+      },
+      {
+        role: "validator",
+        beneficiary: { lastname: "updated lastname" },
+      },
+      {
+        role: "agency-admin",
+        beneficiary: { firstname: "updated firstname" },
+      },
+    ] satisfies {
+      role: AgencyRole;
+      beneficiary: EditConventionWithFinalStatusBeneficiaryUpdate;
+    }[])("throws when $role is not allowed to edit beneficiary info except birthdate", async ({
+      role,
+      beneficiary,
+    }) => {
+      const user = new ConnectedUserBuilder()
+        .withId("bcc5c20e-6dd2-45cf-affe-927358005277")
+        .withEmail("user@mail.com")
+        .withIsAdmin(false)
+        .build();
+
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [user];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [user.id]: {
+            roles: [role],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
+            beneficiary,
+          },
+          { userId: user.id },
+        ),
+        errors.user.forbidden({ userId: user.id }),
+      );
+    });
+
+    it("throws when establishment-representative is not allowed is not allowed to edit beneficiary", async () => {
+      const user = new ConnectedUserBuilder()
+        .withId("bcc5c20e-6dd2-45cf-affe-927358005277")
+        .withEmail(convention.signatories.establishmentRepresentative.email)
+        .withIsAdmin(false)
+        .build();
+
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [user];
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId,
+            beneficiary: {
+              firstname: "updated firstname",
+              lastname: "updated lastname",
+            },
+          },
+          { userId: user.id },
+        ),
+        errors.user.forbidden({ userId: user.id }),
+      );
+    });
   });
 
   describe("Right path", () => {
     beforeEach(() => {
       uow.conventionRepository.setConventions([convention]);
+    });
+
+    it.each([
+      "counsellor",
+      "validator",
+      "agency-admin",
+    ] satisfies AgencyRole[])("%s can edit beneficiary birthdate", async (role) => {
+      const user = new ConnectedUserBuilder()
+        .withId("bcc5c20e-6dd2-45cf-affe-927358005277")
+        .withEmail("user@mail.com")
+        .withIsAdmin(false)
+        .build();
+
+      uow.userRepository.users = [user];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [user.id]: {
+            roles: [role],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+
+      await usecase.execute(
+        {
+          conventionId,
+          beneficiary: { updatedBeneficiaryBirthDate: newBirthdate },
+        },
+        { userId: user.id },
+      );
+
+      const expectedConvention = new ConventionDtoBuilder(convention)
+        .withBeneficiaryBirthdate(newBirthdate)
+        .build();
+      expectToEqual(uow.conventionRepository.conventions, [expectedConvention]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "ConventionWithFinalStatusEdited",
+          payload: {
+            convention: expectedConvention,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: user.id,
+            },
+          },
+        },
+      ]);
     });
 
     it("does nothing when no field is provided to update", async () => {

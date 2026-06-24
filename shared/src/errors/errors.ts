@@ -365,7 +365,7 @@ export const errors = {
 
     editConventionWithFinalStatusNotAuthorizedForRole: () =>
       new ForbiddenError(
-        "Seuls les conseillers, les validateurs et le représentant légal de l'entreprise sont autorisés à modifier la convention lorsqu'elle est finalisée.",
+        "Seuls les conseillers, les validateurs, administrateurs d'agence et le représentant légal de l'entreprise sont autorisés à modifier la convention lorsqu'elle est finalisée.",
       ),
     editConventionWithFinalStatusNotAllowedForStatus: ({
       status,
