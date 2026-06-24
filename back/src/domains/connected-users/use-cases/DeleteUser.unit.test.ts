@@ -484,7 +484,7 @@ describe("DeleteUser", () => {
         ]);
       });
 
-      it("case P3 BIS - with last validator and no admins - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
+      it("case P3 BIS - with last validator and no admins - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenClosed", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [validator1.id]: {
@@ -514,7 +514,7 @@ describe("DeleteUser", () => {
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(
-            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            new AgencyDtoBuilder(agency).withStatus("closed").build(),
             {
               [readOnlyAndCounsellor.id]: {
                 isNotifiedByEmail: false,
@@ -645,7 +645,7 @@ describe("DeleteUser", () => {
           },
         ]);
       });
-      it("case P5 ALT - with last admin + validator and another user with counsellor/readonly - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold ", async () => {
+      it("case P5 ALT - with last admin + validator and another user with counsellor/readonly - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenClosed ", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [admin1.id]: {
@@ -675,7 +675,7 @@ describe("DeleteUser", () => {
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(
-            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            new AgencyDtoBuilder(agency).withStatus("closed").build(),
             {
               [readOnlyAndCounsellor.id]: {
                 isNotifiedByEmail: false,

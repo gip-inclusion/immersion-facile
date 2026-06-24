@@ -224,7 +224,7 @@ const updateAgency =
     return {
       ...agency,
       ...(!remainingValidators.length && !remainingAdmins.length
-        ? { status: remainingRightsList.length ? "needsReview" : "closed" }
+        ? { status: "closed" }
         : {}),
       usersRights: remainingRightsList.reduce<AgencyUsersRights>(
         (acc, { userId, ...agencyRight }) => ({
