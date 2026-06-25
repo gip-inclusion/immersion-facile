@@ -4,22 +4,23 @@
   &__form {
     display: flex;
     align-items: flex-end;
+
     &--v2 {
       max-width: 100% !important;
     }
   }
+
   &__results-summary {
     text-align: right;
   }
+
   &__search-filters {
     display: flex;
     gap: .8rem;
     flex-direction: column;
+
     @include for-screen-min($bp-sm) {
-     flex-direction: row; 
-    }
-    button {
-      width: 100%;
+      flex-direction: row;
     }
   }
 }
