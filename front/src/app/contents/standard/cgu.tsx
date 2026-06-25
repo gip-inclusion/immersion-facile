@@ -448,7 +448,6 @@ const Version20241119CguContent = () => (
   </>
 );
 
-
 const Version20260319CguContent = () => (
   <>
     <p>
@@ -1109,9 +1108,9 @@ const Version20260624CguContent = () => (
       par les administrateurs d’Immersion Facilitée . Le contrôle s’opère par le
       nom de domaine du mail (courriel professionnel). L'inscription peut se
       faire également par invitation par l'administrateur de la structure
-      d'accompagnement ou de prescription. Il a la responsabilité
-      d’ajouter et de valider les personnes et de leur donner les droits
-      afférents à leur fonction.
+      d'accompagnement ou de prescription. Il a la responsabilité d’ajouter et
+      de valider les personnes et de leur donner les droits afférents à leur
+      fonction.
     </p>
     <SubSubSectionTitle>Entreprises</SubSubSectionTitle>
     <p>
