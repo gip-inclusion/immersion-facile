@@ -546,9 +546,11 @@ export type EditConventionWithFinalStatusFormValues = WithConventionId & {
     email: Email;
     phone: PhoneNumber;
   };
-  beneficiary?: WithFirstnameAndLastname & {
-    updatedBeneficiaryBirthDate: DateString;
-  };
+  beneficiary?: Partial<
+    WithFirstnameAndLastname & {
+      updatedBeneficiaryBirthDate: DateString;
+    }
+  >;
 };
 
 export type UpdateConventionRequestDto = {

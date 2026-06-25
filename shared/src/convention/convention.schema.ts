@@ -289,9 +289,9 @@ const editConventionWithFinalStatusFormEstablishmentTutorSchema = z.object({
 });
 
 const editConventionWithFinalStatusFormBeneficiarySchema = z.object({
-  updatedBeneficiaryBirthDate: makeDateStringSchema(),
-  firstname: firstnameMandatorySchema,
-  lastname: lastnameMandatorySchema,
+  updatedBeneficiaryBirthDate: makeDateStringSchema().optional(),
+  firstname: firstnameMandatorySchema.optional(),
+  lastname: lastnameMandatorySchema.optional(),
 });
 
 export const editConventionWithFinalStatusFormSchema: ZodSchemaWithInputMatchingOutput<EditConventionWithFinalStatusFormValues> =

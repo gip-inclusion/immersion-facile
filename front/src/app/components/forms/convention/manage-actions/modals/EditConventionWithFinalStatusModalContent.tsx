@@ -9,6 +9,7 @@ import {
   type EditConventionWithFinalStatusFormValues,
   type EditConventionWithFinalStatusRequestDto,
   editConventionWithFinalStatusFormSchema,
+  hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus,
   toDateUTCString,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -49,20 +50,41 @@ const buildPartialEditConventionWithFinalStatusRequest = ({
     ["phone", formTutor.phone, originalTutor.phone],
   ]);
 
-  const beneficiary =
-    canEditBeneficiary && formBeneficiary
-      ? pickChangedFields([
+  const updatedBeneficiaryBirthDateField =
+    formBeneficiary?.updatedBeneficiaryBirthDate === undefined
+      ? []
+      : [
           [
             "updatedBeneficiaryBirthDate",
             formBeneficiary.updatedBeneficiaryBirthDate,
             originalBeneficiary.birthdate,
-          ],
+          ] as const,
+        ];
+
+  const beneficiaryFirstnameField =
+    formBeneficiary?.firstname === undefined
+      ? []
+      : [
           [
             "firstname",
             formBeneficiary.firstname,
             originalBeneficiary.firstName,
-          ],
+          ] as const,
+        ];
+
+  const beneficiaryLastnameField =
+    formBeneficiary?.lastname === undefined
+      ? []
+      : ([
           ["lastname", formBeneficiary.lastname, originalBeneficiary.lastName],
+        ] as const);
+
+  const beneficiary =
+    canEditBeneficiary && formBeneficiary
+      ? pickChangedFields([
+          ...updatedBeneficiaryBirthDateField,
+          ...beneficiaryFirstnameField,
+          ...beneficiaryLastnameField,
         ])
       : {};
 
@@ -75,7 +97,7 @@ const buildPartialEditConventionWithFinalStatusRequest = ({
       establishmentTutor: establishmentTutor,
     }),
     ...(isNonEmptyObject(beneficiary) && {
-      beneficiary: beneficiary,
+      beneficiary,
     }),
   };
 };
@@ -93,7 +115,13 @@ export const EditConventionWithFinalStatusModalContent = ({
   const establishmentTutor = convention.establishmentTutor;
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
-  const canEditBeneficiary = currentUser?.isBackofficeAdmin ?? false;
+  const isBackofficeAdmin = currentUser?.isBackofficeAdmin ?? false;
+  const canEditBeneficiaryBirthdate =
+    hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus({
+      agencyRights: currentUser?.agencyRights ?? [],
+      agencyId: convention.agencyId,
+    });
+  const canEditBeneficiary = isBackofficeAdmin || canEditBeneficiaryBirthdate;
 
   const { register, handleSubmit, formState } =
     useForm<EditConventionWithFinalStatusFormValues>({
@@ -111,8 +139,12 @@ export const EditConventionWithFinalStatusModalContent = ({
         ...(canEditBeneficiary && {
           beneficiary: {
             updatedBeneficiaryBirthDate: beneficiary.birthdate,
-            firstname: beneficiary.firstName,
-            lastname: beneficiary.lastName,
+            ...(isBackofficeAdmin
+              ? {
+                  firstname: beneficiary.firstName,
+                  lastname: beneficiary.lastName,
+                }
+              : {}),
           },
         }),
       },
@@ -149,36 +181,42 @@ export const EditConventionWithFinalStatusModalContent = ({
       {canEditBeneficiary && (
         <div className={fr.cx("fr-card", "fr-p-2w", "fr-mb-3w")}>
           <h3 className={fr.cx("fr-h6", "fr-mb-2w")}>Personne en immersion</h3>
-          <Input
-            label="Date de naissance"
-            nativeInputProps={{
-              ...register("beneficiary.updatedBeneficiaryBirthDate"),
-              id: domElementIds.manageConvention
-                .editConventionWithFinalStatusModalNewDateInput,
-              type: "date",
-              max: toDateUTCString(new Date()),
-            }}
-            {...getFieldError("beneficiary.updatedBeneficiaryBirthDate")}
-          />
+          {canEditBeneficiaryBirthdate && (
+            <Input
+              label="Date de naissance"
+              nativeInputProps={{
+                ...register("beneficiary.updatedBeneficiaryBirthDate"),
+                id: domElementIds.manageConvention
+                  .editConventionWithFinalStatusModalNewDateInput,
+                type: "date",
+                max: toDateUTCString(new Date()),
+              }}
+              {...getFieldError("beneficiary.updatedBeneficiaryBirthDate")}
+            />
+          )}
 
-          <Input
-            label="Prénom"
-            nativeInputProps={{
-              ...register("beneficiary.firstname"),
-              id: domElementIds.manageConvention
-                .editConventionWithFinalStatusModalNewFirstNameInput,
-            }}
-            {...getFieldError("beneficiary.firstname")}
-          />
-          <Input
-            label="Nom de famille"
-            nativeInputProps={{
-              ...register("beneficiary.lastname"),
-              id: domElementIds.manageConvention
-                .editConventionWithFinalStatusModalNewLastNameInput,
-            }}
-            {...getFieldError("beneficiary.lastname")}
-          />
+          {isBackofficeAdmin && (
+            <>
+              <Input
+                label="Prénom"
+                nativeInputProps={{
+                  ...register("beneficiary.firstname"),
+                  id: domElementIds.manageConvention
+                    .editConventionWithFinalStatusModalNewFirstNameInput,
+                }}
+                {...getFieldError("beneficiary.firstname")}
+              />
+              <Input
+                label="Nom de famille"
+                nativeInputProps={{
+                  ...register("beneficiary.lastname"),
+                  id: domElementIds.manageConvention
+                    .editConventionWithFinalStatusModalNewLastNameInput,
+                }}
+                {...getFieldError("beneficiary.lastname")}
+              />
+            </>
+          )}
         </div>
       )}
 
