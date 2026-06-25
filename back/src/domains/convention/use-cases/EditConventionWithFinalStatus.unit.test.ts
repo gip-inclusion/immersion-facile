@@ -292,7 +292,7 @@ describe("EditConventionWithFinalStatus", () => {
       );
     });
 
-    it("throws when establishment-representative is not allowed is not allowed to edit beneficiary", async () => {
+    it("throws when establishment-representative is not allowed to edit beneficiary", async () => {
       const user = new ConnectedUserBuilder()
         .withId("bcc5c20e-6dd2-45cf-affe-927358005277")
         .withEmail(convention.signatories.establishmentRepresentative.email)

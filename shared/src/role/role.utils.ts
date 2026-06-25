@@ -1,8 +1,10 @@
 import { intersection } from "ramda";
+import type { AgencyId, AgencyRight } from "../agency/agency.dto";
 import type { AssessmentMode } from "../assessment/assessment.dto";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "../convention/convention";
 import type { ConventionDto, Signatories } from "../convention/convention.dto";
 import {
+  agencyModifierRoles,
   allModifierRoles,
   allowedRolesToAccessAssessment,
   allowedRolesToCreateAssessment,
@@ -73,3 +75,20 @@ export const hasAllowedRolesToEditConvention = (
 
   return userRolesOnConvention.length > 0 && hasAllowedRoleToEditConvention;
 };
+
+export const hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus =
+  ({
+    agencyRights,
+    agencyId,
+  }: {
+    agencyRights: AgencyRight[];
+    agencyId: AgencyId;
+  }): boolean => {
+    return (
+      agencyRights
+        .find((agencyRight) => agencyRight.agency.id === agencyId)
+        ?.roles.some((role) =>
+          [...agencyModifierRoles, "agency-admin"].includes(role),
+        ) ?? false
+    );
+  };

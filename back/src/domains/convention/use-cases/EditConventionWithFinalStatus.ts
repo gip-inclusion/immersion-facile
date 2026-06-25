@@ -11,6 +11,7 @@ import {
   type EditConventionWithFinalStatusRequestDto,
   editConventionWithFinalStatusRequestSchema,
   errors,
+  hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus,
 } from "shared";
 import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import {
@@ -202,14 +203,10 @@ const throwIfNotAllowedToEditBeneficiary = async ({
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
 
   const isUserWithAgencyAllowedRoles =
-    userWithRights.agencyRights
-      .find((agencyRight) => agencyRight.agency.id === agencyId)
-      ?.roles.some((role) =>
-        [
-          ...allowedRolesToEditConventionWithFinalStatus,
-          "agency-admin",
-        ].includes(role),
-      ) ?? false;
+    hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus({
+      agencyRights: userWithRights.agencyRights,
+      agencyId,
+    });
 
   const isAllowedToUpdateBeneficiaryBirthDateOnly =
     isUserWithAgencyAllowedRoles &&
