@@ -1,6 +1,7 @@
 import {
   type AgencyDto,
   AgencyDtoBuilder,
+  type AgencyRole,
   ConnectedUserBuilder,
   errors,
   expectArraysToMatch,
@@ -279,152 +280,162 @@ describe("RemoveUserFromAgency", () => {
     });
   });
 
-  it("User to-review can remove himself", async () => {
-    const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
-    const otherUserWithRightOnAgencies: User = {
-      ...notAdmin,
-      id: "other-user-id",
-    };
+  describe("Right paths", () => {
+    describe("user can remove himself from agency", () => {
+      it.each([
+        "to-review",
+        "agency-viewer",
+        "counsellor",
+        "validator",
+        "agency-admin",
+      ] satisfies AgencyRole[])("with right %s", async (role) => {
+        const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
+        const otherUserWithRightOnAgencies: User = {
+          ...notAdmin,
+          id: "other-user-id",
+        };
 
-    uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(agency, {
-        [notAdminUser.id]: {
-          roles: ["to-review"],
-          isNotifiedByEmail: false,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-      toAgencyWithRights(agency2, {
-        [notAdminUser.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ];
+        uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notAdminUser.id]: {
+              roles: [role],
+              isNotifiedByEmail: false,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
 
-    const inputParams: WithAgencyIdAndUserId = {
-      agencyId: agency.id,
-      userId: notAdminUser.id,
-    };
-    await removeUserFromAgency.execute(inputParams, notAdmin);
+        const inputParams: WithAgencyIdAndUserId = {
+          agencyId: agency.id,
+          userId: notAdminUser.id,
+        };
+        await removeUserFromAgency.execute(inputParams, notAdmin);
 
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(agency, {
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-      toAgencyWithRights(agency2, {
-        [notAdminUser.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ]);
-    expectArraysToMatch(uow.outboxRepository.events, [
-      {
-        topic: "ConnectedUserAgencyRightChanged",
-        payload: {
-          ...inputParams,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: notAdmin.id,
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ]);
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConnectedUserAgencyRightChanged",
+            payload: {
+              ...inputParams,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: notAdmin.id,
+              },
+            },
           },
-        },
-      },
-    ]);
-  });
+        ]);
+      });
+    });
 
-  it.each([
-    {
-      triggeredByRole: "backoffice-admin",
-      triggeredByUser: connectedAdmin,
-    },
-    {
-      triggeredByRole: "agency-admin",
-      triggeredByUser: agencyAdminUser,
-    },
-  ])("$triggeredByRole can remove user from agency", async ({
-    triggeredByUser,
-  }) => {
-    const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
-    const otherUserWithRightOnAgencies: User = {
-      ...notAdmin,
-      id: "other-user-id",
-    };
+    describe("can remove another user from agency", () => {
+      it.each([
+        {
+          triggeredByRole: "backoffice-admin",
+          triggeredByUser: connectedAdmin,
+        },
+        {
+          triggeredByRole: "agency-admin",
+          triggeredByUser: agencyAdminUser,
+        },
+      ])("when user has $triggeredByRole role", async ({ triggeredByUser }) => {
+        const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
+        const otherUserWithRightOnAgencies: User = {
+          ...notAdmin,
+          id: "other-user-id",
+        };
 
-    uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(agency, {
-        [notAdminUser.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-      toAgencyWithRights(agency2, {
-        [notAdminUser.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ];
+        uow.userRepository.users = [notAdminUser, otherUserWithRightOnAgencies];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
 
-    const inputParams: WithAgencyIdAndUserId = {
-      agencyId: agency.id,
-      userId: notAdminUser.id,
-    };
-    await removeUserFromAgency.execute(inputParams, triggeredByUser);
+        const inputParams: WithAgencyIdAndUserId = {
+          agencyId: agency.id,
+          userId: notAdminUser.id,
+        };
+        await removeUserFromAgency.execute(inputParams, triggeredByUser);
 
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(agency, {
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-      toAgencyWithRights(agency2, {
-        [notAdminUser.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-        [otherUserWithRightOnAgencies.id]: {
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ]);
-    expectArraysToMatch(uow.outboxRepository.events, [
-      {
-        topic: "ConnectedUserAgencyRightChanged",
-        payload: {
-          ...inputParams,
-          triggeredBy: {
-            kind: "connected-user",
-            userId: triggeredByUser.id,
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+            [otherUserWithRightOnAgencies.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ]);
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConnectedUserAgencyRightChanged",
+            payload: {
+              ...inputParams,
+              triggeredBy: {
+                kind: "connected-user",
+                userId: triggeredByUser.id,
+              },
+            },
           },
-        },
-      },
-    ]);
+        ]);
+      });
+    });
   });
 });
