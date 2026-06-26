@@ -26,6 +26,7 @@ on:
 
 jobs:
   validation:
+    if: ${{ !github.event.pull_request.draft }}
     name: ""
     runs-on: ubuntu-latest
     strategy:
