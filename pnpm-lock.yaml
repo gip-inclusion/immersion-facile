@@ -5,90 +5,73 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@babel/preset-env@< 7.29.5': 7.29.5
-  '@babel/core@<7.29.0': 7.29.0
-  '@isaacs/brace-expansion@<= 5.0.0': 5.0.1
+  '@babel/core@<=7.29.0': '>=7.29.6'
+  '@babel/preset-env@<7.29.5': 7.29.5
+  '@grpc/grpc-js@>=1.14.0 <1.14.4': '>=1.14.4'
+  '@isaacs/brace-expansion@<=5.0.0': 5.0.1
+  '@opentelemetry/core@<2.8.0': '>=2.8.0'
   '@vitejs/plugin-react@<4.3.2': 4.3.2
   ajv@<8.18.0: ^8.18.0
-  axios@< 1.16.0: 1.16.0
-  brace-expansion@< 1.1.13: 1.1.13
-  brace-expansion@>= 2.0.0 < 2.0.3: 2.0.3
-  brace-expansion@>= 4.0.0 < 5.0.6: 5.0.6
-  braces@< 3.0.3: 3.0.3
-  cookie@< 0.7.0: ^0.7.0
-  cookiejar@< 2.1.4: ^2.1.4
-  cross-spawn@>= 7.0.0 < 7.0.5: ^7.0.5
+  axios@<1.16.0: 1.16.0
+  brace-expansion@<1.1.13: 1.1.13
+  brace-expansion@>=2.0.0 <2.0.3: 2.0.3
+  brace-expansion@>=4.0.0 <5.0.6: 5.0.6
+  braces@<3.0.3: 3.0.3
+  cookie@<0.7.0: ^0.7.0
+  cookiejar@<2.1.4: ^2.1.4
+  cross-spawn@>=7.0.0 <7.0.5: ^7.0.5
   defu@<=6.1.4: 6.1.5
   diff@>=4.0.0 <4.0.4: 4.0.4
   diff@>=5.0.0 <5.2.2: 5.2.2
-  dompurify@<=3.3.1: ^3.3.2
-  esbuild@<= 0.24.2: ^0.25.0
-  fast-uri@<3.1.2: 3.1.2
-  follow-redirects@< 1.16.0: ^1.16.0
-  form-data@< 2.5.4: ^2.5.4
-  form-data@>= 4.0.0 < 4.0.4: ^4.0.4
-  glob@>= 10.2.0 < 10.5.0: ^10.5.0
-  handlebars@>= 4.0.0 <= 4.7.8: 4.7.9
-  immutable@< 4.3.8: 4.3.8
-  immutable@>= 5.0.0 < 5.1.5: ^5.1.5
-  ip@< 1.1.9: ^1.1.9
-  js-yaml@< 3.14.2: 3.14.2
-  js-yaml@>= 4.0.0 < 4.1.1: 4.1.1
-  jws@< 3.2.3: 3.2.3
-  lodash@>= 4.0.0 <= 4.17.23: 4.18.0
-  markdown-to-jsx@< 7.4.0: ^7.4.0
-  micromatch@< 4.0.8: ^4.0.8
-  minimatch@< 3.1.4: 3.1.4
-  minimatch@>= 5.0.0 < 5.1.8: 5.1.8
-  minimatch@>= 9.0.0 < 9.0.7: 9.0.7
-  minimatch@>= 10.0.0 < 10.2.3: 10.2.3
-  on-headers@< 1.1.0: 1.1.0
-  path-to-regexp@< 0.1.13: ^0.1.13
-  picomatch@< 2.3.2: 2.3.2
-  picomatch@>= 4.0.0 < 4.0.4: 4.0.4
-  prismjs@< 1.30.0: 1.30.0
-  qs@< 6.15.2: 6.15.2
-  rollup@< 2.80.0: ^2.80.0
-  rollup@>= 3.0.0 < 3.30.0: ^3.30.0
-  rollup@>= 4.0.0 < 4.59.0: ^4.59.0
-  serialize-javascript@< 7.0.5: 7.0.5
-  store2@< 2.14.4: ^2.14.4
-  tar@<= 7.5.10: 7.5.11
-  tar-fs@>= 2.0.0 < 2.1.4: ^2.1.4
-  uuid@< 14.0.0: 14.0.0
-  xml2js@< 0.5.0: ^0.5.0
-  vite@< 6.4.2: 6.4.2
-  vite@>= 7.0.0 < 7.3.2: 7.3.2
-  webpack@>= 5.49.0 <= 5.104.0: 5.104.1
-  ws@>= 6.0.0 < 6.2.3: ^6.2.3
-  ws@>= 8.0.0 < 8.20.1: ^8.20.1
-  yaml@>= 1.0.0 < 1.10.3: 1.10.3
-  yaml@>= 2.0.0 < 2.8.3: 2.8.3
-  playwright@<1.55.1: '>=1.55.1'
-  protobufjs@<=7.5.7: '>=7.5.8'
-  '@grpc/grpc-js@>=1.14.0 <1.14.4': '>=1.14.4'
-  tmp@<0.2.6: '>=0.2.6'
+  dompurify@<3.4.11: '>=3.4.11'
+  esbuild@<=0.24.2: ^0.25.0
   esbuild@>=0.27.3 <0.28.1: '>=0.28.1'
-  ws@>=6.0.0 <6.2.4: '>=6.2.4'
-  protobufjs@<=7.6.2: '>=7.6.3'
-  form-data@>=4.0.0 <4.0.6: '>=4.0.6'
+  fast-uri@<3.1.2: 3.1.2
+  follow-redirects@<1.16.0: ^1.16.0
   form-data@<2.5.6: '>=2.5.6'
-  tar@<=7.5.15: '>=7.5.16'
-  vite@<=6.4.2: '>=6.4.3'
+  form-data@>=4.0.0 <4.0.6: '>=4.0.6'
+  glob@>=10.2.0 <10.5.0: ^10.5.0
+  handlebars@>=4.0.0 <=4.7.8: 4.7.9
+  immutable@<4.3.8: 4.3.8
+  immutable@>=5.0.0 <5.1.5: ^5.1.5
+  ip@<1.1.9: ^1.1.9
+  js-yaml@<3.14.2: 3.14.2
   js-yaml@<=4.1.1: '>=4.2.0'
-  '@babel/core@<=7.29.0': '>=7.29.6'
-  protobufjs@<=7.6.0: '>=7.6.1'
-  dompurify@<3.4.7: '>=3.4.7'
-  dompurify@<=3.4.5: '>=3.4.6'
-  dompurify@<3.4.9: '>=3.4.9'
-  dompurify@>=3.0.0 <=3.4.7: '>=3.4.8'
-  dompurify@<=3.4.6: '>=3.4.7'
-  '@opentelemetry/core@<2.8.0': '>=2.8.0'
+  jws@<3.2.3: 3.2.3
+  lodash@>=4.0.0 <=4.17.23: 4.18.0
+  markdown-to-jsx@<7.4.0: ^7.4.0
+  micromatch@<4.0.8: ^4.0.8
+  minimatch@<3.1.4: 3.1.4
+  minimatch@>=5.0.0 <5.1.8: 5.1.8
+  minimatch@>=9.0.0 <9.0.7: 9.0.7
+  minimatch@>=10.0.0 <10.2.3: 10.2.3
   multer@>=1.0.0 <2.2.0: '>=2.2.0'
-  multer@>=2.0.0-alpha.1 <2.2.0: '>=2.2.0'
-  undici@>=7.23.0 <7.28.0: '>=7.28.0'
-  dompurify@<=3.4.10: '>=3.4.11'
+  on-headers@<1.1.0: 1.1.0
+  path-to-regexp@<0.1.13: ^0.1.13
+  picomatch@<2.3.2: 2.3.2
+  picomatch@>=4.0.0 <4.0.4: 4.0.4
+  playwright@<1.55.1: '>=1.55.1'
+  prismjs@<1.30.0: 1.30.0
+  protobufjs@<=7.6.2: '>=7.6.3'
+  qs@<6.15.2: 6.15.2
+  rollup@<2.80.0: ^2.80.0
+  rollup@>=3.0.0 <3.30.0: ^3.30.0
+  rollup@>=4.0.0 <4.59.0: ^4.59.0
+  serialize-javascript@<7.0.5: 7.0.5
+  store2@<2.14.4: ^2.14.4
+  tar@<=7.5.15: '>=7.5.16'
+  tar-fs@>=2.0.0 <2.1.4: ^2.1.4
+  tmp@<0.2.6: '>=0.2.6'
   undici@>=7.0.0 <7.28.0: '>=7.28.0'
+  uuid@<14.0.0: 14.0.0
+  vite@<=6.4.2: '>=6.4.3'
+  vite@>=7.0.0 <7.3.2: 7.3.2
+  webpack@>=5.49.0 <=5.104.0: 5.104.1
+  ws@>=6.0.0 <6.2.4: '>=6.2.4'
+  ws@>=8.0.0 <8.20.1: ^8.20.1
+  xml2js@<0.5.0: ^0.5.0
+  yaml@>=1.0.0 <1.10.3: 1.10.3
+  yaml@>=2.0.0 <2.8.3: 2.8.3
 
 importers:
 
@@ -146,8 +129,8 @@ importers:
         specifier: ^4.21.0
         version: 4.21.2
       express-ipfilter:
-        specifier: ^1.3.2
-        version: 1.3.2
+        specifier: ^1.4.0
+        version: 1.4.0
       html-templates:
         specifier: workspace:*
         version: link:../libs/html-templates
@@ -272,9 +255,6 @@ importers:
       '@types/ramda':
         specifier: ^0.30.2
         version: 0.30.2
-      '@types/request':
-        specifier: ^2.48.8
-        version: 2.48.8
       '@types/supertest':
         specifier: ^2.0.12
         version: 2.0.12
@@ -4141,9 +4121,6 @@ packages:
   '@types/body-parser@1.19.2':
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
 
-  '@types/caseless@0.12.2':
-    resolution: {integrity: sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==}
-
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
@@ -4354,9 +4331,6 @@ packages:
   '@types/react@18.3.18':
     resolution: {integrity: sha512-t4yC+vtgnkYjNSKlFx1jkAhH8LgTo2N/7Qvi83kdEaUtMDiwpbLAktKDaAMlRcJ5eSxZkH74eEGt1ky31d7kfQ==}
 
-  '@types/request@2.48.8':
-    resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==}
-
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
@@ -4401,9 +4375,6 @@ packages:
 
   '@types/tedious@4.0.14':
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
-
-  '@types/tough-cookie@4.0.2':
-    resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -5835,8 +5806,8 @@ packages:
     resolution: {integrity: sha512-u/feCi0GPsI+988gU2FLcsHyAHTU0MX1Wg68NhAnN7z/+C5wqG+CY8J53N9ioe8RXgaoz0nBR/TYMf3AycUuPw==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  express-ipfilter@1.3.2:
-    resolution: {integrity: sha512-yMzCWGuVMnR8CFlsIC2spHWoQYp9vtyZXUgS/JdV5GOJgrz6zmKOEZsA4eF1XrxkOIVzaVk6yzTBk65pBhliNw==}
+  express-ipfilter@1.4.0:
+    resolution: {integrity: sha512-Q6+ufo30/gLk7DTe3HEPTkx1LGNyWAt8I5wN8w3W4OIhhzoyNokBp5U4SSjFFcyVZ4USYvMeFNs49v4gBV9U/A==}
     engines: {node: '>=8.9.0'}
 
   express@4.21.2:
@@ -5968,10 +5939,6 @@ packages:
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
-
-  form-data@4.0.5:
-    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
-    engines: {node: '>= 6'}
 
   form-data@4.0.6:
     resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
@@ -6345,9 +6312,6 @@ packages:
   ip6@0.2.11:
     resolution: {integrity: sha512-OmTP7FyIp+ZoNvZ7Xr97bWrCgypa3BeuYuRFNTOPT8Y11cxMW1pW1VC70kHZP1onSHHMotADcjdg5QyECiIMUw==}
     hasBin: true
-
-  ip@2.0.1:
-    resolution: {integrity: sha512-lJUL9imLTNi1ZfXT+DU6rBBdbiKGBuay9B6xGSPVjUeQwaH1RIGqef8RZkUtHioLmSNpPR5M4HVKJGm1j8FWVQ==}
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -7462,6 +7426,9 @@ packages:
 
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+
+  neoip@2.1.0:
+    resolution: {integrity: sha512-4zQ8eVAmbBNV3Fmpm3Li2tNPnrU6UobMXpO1OZsY/Eg2AGOB+H8dZfAabMVrh7Xl9xAVIDcEIlUVA057Fi7QdA==}
 
   neotraverse@0.6.18:
     resolution: {integrity: sha512-Z4SmBUweYa09+o6pG+eASabEpP6QkQ70yHj351pQoEXIs8uHbaU2DWVmzBANKgflPa47A50PtB2+NgRpQvr7vA==}
@@ -9360,7 +9327,7 @@ packages:
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0
-      vite: 6.4.2
+      vite: '>=6.4.3'
       workbox-build: ^7.4.0
       workbox-window: ^7.4.0
     peerDependenciesMeta:
@@ -13950,8 +13917,6 @@ snapshots:
       '@types/connect': 3.4.38
       '@types/node': 24.12.0
 
-  '@types/caseless@0.12.2': {}
-
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 24.12.0
@@ -14191,13 +14156,6 @@ snapshots:
       '@types/prop-types': 15.7.5
       csstype: 3.1.2
 
-  '@types/request@2.48.8':
-    dependencies:
-      '@types/caseless': 0.12.2
-      '@types/node': 24.12.0
-      '@types/tough-cookie': 4.0.2
-      form-data: 4.0.5
-
   '@types/resolve@1.20.2': {}
 
   '@types/resolve@1.20.6': {}
@@ -14249,8 +14207,6 @@ snapshots:
   '@types/tedious@4.0.14':
     dependencies:
       '@types/node': 24.12.0
-
-  '@types/tough-cookie@4.0.2': {}
 
   '@types/trusted-types@2.0.7': {}
 
@@ -15579,7 +15535,7 @@ snapshots:
       has-property-descriptors: 1.0.2
       has-proto: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.3
+      hasown: 2.0.4
       internal-slot: 1.1.0
       is-array-buffer: 3.0.5
       is-callable: 1.2.7
@@ -15810,10 +15766,9 @@ snapshots:
       jest-mock: 30.2.0
       jest-util: 30.2.0
 
-  express-ipfilter@1.3.2:
+  express-ipfilter@1.4.0:
     dependencies:
-      ip: 2.0.1
-      lodash: 4.18.0
+      neoip: 2.1.0
       proxy-addr: 2.0.7
       range_check: 2.0.4
 
@@ -15996,14 +15951,6 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  form-data@4.0.5:
-    dependencies:
-      asynckit: 0.4.0
-      combined-stream: 1.0.8
-      es-set-tostringtag: 2.1.0
-      hasown: 2.0.3
-      mime-types: 2.1.35
-
   form-data@4.0.6:
     dependencies:
       asynckit: 0.4.0
@@ -16068,7 +16015,7 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       functions-have-names: 1.2.3
-      hasown: 2.0.3
+      hasown: 2.0.4
       is-callable: 1.2.7
 
   functions-have-names@1.2.3: {}
@@ -16386,7 +16333,7 @@ snapshots:
   internal-slot@1.1.0:
     dependencies:
       es-errors: 1.3.0
-      hasown: 2.0.3
+      hasown: 2.0.4
       side-channel: 1.1.0
 
   invariant@2.2.4:
@@ -16394,8 +16341,6 @@ snapshots:
       loose-envify: 1.4.0
 
   ip6@0.2.11: {}
-
-  ip@2.0.1: {}
 
   ipaddr.js@1.9.1: {}
 
@@ -17917,6 +17862,8 @@ snapshots:
   negotiator@0.6.4: {}
 
   neo-async@2.6.2: {}
+
+  neoip@2.1.0: {}
 
   neotraverse@0.6.18: {}
 
