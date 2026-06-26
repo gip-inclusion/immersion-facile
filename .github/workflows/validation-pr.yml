@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   fullcheck:
+    if: ${{ github.event.pull_request.draft == false }}
     uses: ./.github/workflows/fullcheck.yml
     secrets:
       API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
