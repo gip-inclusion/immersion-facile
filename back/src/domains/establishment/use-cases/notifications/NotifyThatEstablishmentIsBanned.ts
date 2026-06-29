@@ -24,54 +24,52 @@ const conventionStatusesBeforeValidation: ConventionStatus[] = [
   "ACCEPTED_BY_COUNSELLOR",
 ];
 
-export type NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned =
-  ReturnType<
-    typeof makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned
-  >;
+export type NotifyThatEstablishmentIsBanned = ReturnType<
+  typeof makeNotifyThatEstablishmentIsBanned
+>;
 
-export const makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned =
-  useCaseBuilder(
-    "NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned",
-  )
-    .withInput<WithSiretDto>(withSiretSchema)
-    .withDeps<{
-      saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-      immersionBaseUrl: AbsoluteUrl;
-      timeGateway: TimeGateway;
-    }>()
-    .build(async ({ uow, inputParams, deps }) => {
-      const { siret } = inputParams;
+export const makeNotifyThatEstablishmentIsBanned = useCaseBuilder(
+  "NotifyThatEstablishmentIsBanned",
+)
+  .withInput<WithSiretDto>(withSiretSchema)
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    immersionBaseUrl: AbsoluteUrl;
+    timeGateway: TimeGateway;
+  }>()
+  .build(async ({ uow, inputParams, deps }) => {
+    const { siret } = inputParams;
 
-      const establishment =
-        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          siret,
-        );
-
-      if (!establishment) throw errors.establishment.notFound({ siret });
-      if (!establishment.establishment.isEstablishmentBanned)
-        throw errors.establishment.establishmentNotBanned({ siret });
-
-      await notifyEstablishmentUsers(
-        uow,
-        deps.saveNotificationAndRelatedEvent,
-        establishment,
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
       );
 
-      await notifyBeneficiaries(
-        uow,
-        deps.saveNotificationAndRelatedEvent,
-        deps.immersionBaseUrl,
-        establishment,
-      );
+    if (!establishment) throw errors.establishment.notFound({ siret });
+    if (!establishment.establishment.isEstablishmentBanned)
+      throw errors.establishment.establishmentNotBanned({ siret });
 
-      await notifyValidatorsAndPreValidators(
-        uow,
-        deps.timeGateway,
-        deps.saveNotificationAndRelatedEvent,
-        deps.immersionBaseUrl,
-        establishment,
-      );
-    });
+    await notifyEstablishmentUsers(
+      uow,
+      deps.saveNotificationAndRelatedEvent,
+      establishment,
+    );
+
+    await notifyBeneficiaries(
+      uow,
+      deps.saveNotificationAndRelatedEvent,
+      deps.immersionBaseUrl,
+      establishment,
+    );
+
+    await notifyValidatorsAndCounsellors(
+      uow,
+      deps.timeGateway,
+      deps.saveNotificationAndRelatedEvent,
+      deps.immersionBaseUrl,
+      establishment,
+    );
+  });
 
 const notifyEstablishmentUsers = async (
   uow: UnitOfWork,
@@ -168,7 +166,7 @@ const notifyBeneficiaries = async (
   );
 };
 
-const notifyValidatorsAndPreValidators = async (
+const notifyValidatorsAndCounsellors = async (
   uow: UnitOfWork,
   timeGateway: TimeGateway,
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
