@@ -73,7 +73,7 @@ export const insertSpecificAgenciesWithUserRight = async ({
 }): Promise<Record<AgencyKind, AgencyId[]>> => {
   const peAgency = new AgencyDtoBuilder()
     .withId(SEED_FT_AGENCY_ID)
-    .withName("PE Paris")
+    .withName("Agence France Travail Paris")
     .withSignature("PE agency signature")
     .withKind("pole-emploi")
     .withStatus("active")
@@ -116,7 +116,7 @@ export const insertSpecificAgenciesWithUserRight = async ({
     .withAddress(seedAddresses[1])
     .withRefersToAgencyInfo({
       refersToAgencyId: SEED_FT_AGENCY_ID,
-      refersToAgencyName: "PE Paris",
+      refersToAgencyName: "Agence France Travail Paris",
       refersToAgencyContactEmail: "osef",
     })
     .build();

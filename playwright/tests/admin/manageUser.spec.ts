@@ -79,7 +79,7 @@ test.describe("Manage users in admin", () => {
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
-      value: "PE Paris",
+      value: "Agence France Travail Paris",
     });
     await expect(
       page.locator(`#${domElementIds.admin.agencyTab.agencyUsersTable}`),
