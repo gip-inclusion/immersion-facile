@@ -45,6 +45,7 @@ const topics = [
   "agency-for-dashboard",
   "agency-user-for-dashboard",
   "agency-user",
+  "agency-user-right-self",
   "api-consumer-global",
   "api-consumer-names",
   "api-consumer-renew",
@@ -514,6 +515,20 @@ export const feedbacks: Record<
       action: establishmentBatchSlice.actions.addEstablishmentBatchSucceeded,
       title: "Le groupe d'entreprises a bien été créé",
       message: "L'import en masse a réussi, voici le détail :",
+    },
+  },
+  "agency-user-right-self": {
+    "delete.success": {
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
+      title: "Détachement effectué avec succès",
+      message:
+        "Vous avez bien été détaché de l'organisme. Vous n'avez désormais plus accès à ses conventions, bilans et statistiques.",
+    },
+    "delete.error": {
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencyFailed,
+      title: "Une erreur est survenue",
+      message:
+        "Impossible de procéder à votre détachement pour le moment. Veuillez réessayer ultérieurement ou contacter le support.",
     },
   },
   user: {

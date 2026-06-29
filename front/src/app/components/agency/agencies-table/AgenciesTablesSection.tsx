@@ -13,6 +13,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { Feedback } from "../../feedback/Feedback";
+import { SelfRemoveUserAgencyRightFeedback } from "../removeUserAgencyRights";
 import { AgencyRightsTable } from "./AgencyRightsTable";
 
 export const AgenciesTablesSection = ({
@@ -58,6 +59,7 @@ export const AgenciesTablesSection = ({
   return (
     <>
       <Feedback topics={["user"]} closable />
+      <SelfRemoveUserAgencyRightFeedback />
 
       {toReviewAgencyRights.length > 0 && (
         <>

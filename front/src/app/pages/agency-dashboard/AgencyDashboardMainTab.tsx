@@ -6,6 +6,7 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { type AgencyRight, distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
+import { SelfRemoveUserAgencyRightFeedback } from "src/app/components/agency/removeUserAgencyRights";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoutePage";
@@ -43,6 +44,7 @@ export const AgencyDashboardMainTab = ({
       <h1>Mon espace prescripteur</h1>
       {isLoading && <Loader />}
       <Feedback topics={[feedbackTopic]} />
+      <SelfRemoveUserAgencyRightFeedback />
 
       {match({ currentUser })
         .with(

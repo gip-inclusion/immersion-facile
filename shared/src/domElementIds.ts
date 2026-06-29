@@ -931,6 +931,8 @@ export const domElementIds = {
     adminAgencyLink: "im-profile__admin-agency-link",
     adminEstablishmentLink: "im-profile__admin-establishment-link",
     cancelRegistrationButton: "im-profile__cancel-registration-button",
+    removeAgencyRightButton: "im-profile__remove-agency-right-button",
+    removeAgencyRightModal: "im-profile__remove-agency-right-modal",
     updateOwnInfosLink: "im-profile__update-own-infos-link",
     editAgencyUserEmail: "im-profile-edit-agency-user__email",
     editAgencyManageUserCheckbox:
