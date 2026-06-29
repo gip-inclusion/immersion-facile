@@ -74,6 +74,7 @@ import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/
 import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { makeMarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
+import { makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail } from "../../domains/convention/use-cases/RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { makeRequestOldConventionDraftsDeletion } from "../../domains/convention/use-cases/RequestOldConventionDraftsDeletion";
 import { makeSaveConventionDraft } from "../../domains/convention/use-cases/SaveConventionDraft";
@@ -1076,6 +1077,10 @@ export const createUseCases = ({
       uowPerformer,
       deps: { createNewEvent },
     }),
+    removeConventionFTAdvisorIfAgencyIsNotFranceTravail:
+      makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail({
+        uowPerformer,
+      }),
     editConventionCounsellorName: makeEditConventionCounsellorName({
       uowPerformer,
       deps: { createNewEvent },

@@ -154,6 +154,7 @@ const getUseCasesByTopics = (
     ),
   ],
   ConventionTransferredToAgency: [
+    useCases.removeConventionFTAdvisorIfAgencyIsNotFranceTravail,
     useCases.notifyAllActorsThatConventionHasBeenTransferred,
     extractConventionIdAndPreviousAgencyFromTransfer(
       useCases.broadcastToFranceTravailOnConventionUpdates,
