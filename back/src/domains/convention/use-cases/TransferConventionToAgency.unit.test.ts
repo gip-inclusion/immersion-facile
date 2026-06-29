@@ -701,7 +701,7 @@ describe("TransferConventionToAgency", () => {
           ]);
         });
 
-        it("should clear federated identity if new agency is not france-travail", async () => {
+        it("should keep federated identity if new agency is not france-travail", async () => {
           const transferredToAgency: AgencyDto = {
             ...otherAgency,
             kind: "mission-locale",
@@ -731,11 +731,17 @@ describe("TransferConventionToAgency", () => {
           );
 
           expectToEqual(transferredConvention.agencyId, otherAgency.id);
-          expect(
+          expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
             ),
-          ).toBeUndefined();
+            {
+              conventionId,
+              advisor: ftAdvisor,
+              peExternalId: userFtExternalId,
+              _entityName: "ConventionFranceTravailAdvisor",
+            },
+          );
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
@@ -1028,7 +1034,7 @@ describe("TransferConventionToAgency", () => {
           ]);
         });
 
-        it("should clear federated identity if new agency is not france-travail", async () => {
+        it("should keep federated identity if new agency is not france-travail", async () => {
           const transferredToAgency: AgencyDto = {
             ...otherAgency,
             kind: "mission-locale",
@@ -1065,11 +1071,17 @@ describe("TransferConventionToAgency", () => {
           );
 
           expectToEqual(transferredConvention.agencyId, otherAgency.id);
-          expect(
+          expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
             ),
-          ).toBeUndefined();
+            {
+              conventionId,
+              advisor: ftAdvisor,
+              peExternalId: userFtExternalId,
+              _entityName: "ConventionFranceTravailAdvisor",
+            },
+          );
           expectArraysToMatch(uow.outboxRepository.events, [
             {
               topic: "ConventionTransferredToAgency",
