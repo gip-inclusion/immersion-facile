@@ -1,7 +1,6 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { colors, fr } from "@codegouvfr/react-dsfr";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
 import {
@@ -52,6 +51,11 @@ import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
+import Accordion, {
+  type AccordionProps,
+} from "@codegouvfr/react-dsfr/Accordion";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-centered.png";
 import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import Styles from "./SearchPage.styles";
@@ -226,6 +230,7 @@ export const SearchPage = ({
     lon !== 0 &&
     distanceKm !== 0;
   routeParams.appellationCodes && routeParams.appellationCodes.length > 0;
+  const [isFiltersOpened, setIsFiltersOpened] = useState(false);
 
   const setTempValuesAsFormValues = useCallback(
     (values: Partial<SearchPageParams>) => {
@@ -490,252 +495,261 @@ export const SearchPage = ({
               )}
               id={domElementIds[route.name].searchForm}
             >
-              <RichDropdown
-                defaultValue="Tous les métiers"
-                iconId="fr-icon-briefcase-fill"
-                id={domElementIds[route.name].appellationFilterTag}
-                values={[displayAppellationsOrNaf()]}
-                onReset={() => {
-                  const updatedValues = {
-                    ...tempValue,
-                    appellations: undefined,
-                    appellationCodes: undefined,
-                  };
-                  onSearchFormSubmit(updatedValues);
+              <section
+                style={{
+                  maxWidth: 365,
+                  position: "fixed",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  zIndex: 1000,
+                  boxShadow: "0 0 5px 0 rgba(0,0,0,0.5)",
+                  backgroundColor:
+                    colors.decisions.background.default.grey.default,
+                  marginLeft: isFiltersOpened ? 0 : -370,
+                  transition: "margin-left ease .2s",
                 }}
-                submenu={{
-                  title: "Quel métier ou secteur souhaitez-vous découvrir ?",
-                  content: (
-                    <>
-                      <AppellationAutocomplete
-                        locator="search-form-appellation"
-                        className={fr.cx("fr-mb-2w")}
-                        label={appellationInputLabel}
-                        hintText={appellationHintText(
-                          useNaturalLanguageForAppellations,
-                        )}
-                        onAppellationSelected={(appellationMatch) => {
-                          clearErrors("appellations");
-                          setTempValue({
-                            ...tempValue,
-                            appellations: [appellationMatch.appellation],
-                            appellationCodes: [
-                              appellationMatch.appellation.appellationCode,
-                            ],
-                          });
-                        }}
-                        onAppellationClear={() => {
-                          setTempValue({
-                            ...tempValue,
-                            appellations: undefined,
-                            appellationCodes: undefined,
-                          });
-                        }}
-                        selectProps={{
-                          inputId:
-                            domElementIds[route.name].appellationAutocomplete,
-                          placeholder: appellationPlaceholder(
-                            useNaturalLanguageForAppellations,
-                          ),
-                          defaultInputValue:
-                            formValues.appellations?.[0]?.appellationLabel,
-                        }}
-                        state={errors.appellations ? "error" : undefined}
-                        stateRelatedMessage={errors.appellations?.message}
-                      />
-                      {tempValue.appellations?.length && (
-                        <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
-                          <strong>
-                            Les résultats seront étendus aux autres métiers du
-                            secteur "{tempValue.appellations[0].romeLabel}"
-                          </strong>
-                          , c’est pour cela que vous pourrez voir des métiers
-                          proches mais ne correspondant pas précisément à votre
-                          recherche dans les résultats.
-                        </p>
+                className={fr.cx("fr-pt-6w", "fr-px-2w", "fr-pb-2w")}
+              >
+                <Button
+                  style={{ position: "absolute", top: 0, right: 0 }}
+                  className={fr.cx("fr-btn--close", "fr-mt-1w", "fr-mr-1w")}
+                  title="Fermer"
+                  aria-controls="shareLink"
+                  type="button"
+                  data-fr-js-modal-button="true"
+                  onClick={() => setIsFiltersOpened(false)}
+                >
+                  Fermer
+                </Button>
+                <h3 className={fr.cx("fr-h5")}>Affiner la recherche</h3>
+                <div className={fr.cx("fr-accordions-group")}>
+                  <MyAccordion
+                    label="Métier ou secteur d'activité"
+                    values={[displayAppellationsOrNaf()]}
+                    onReset={() => {
+                      const updatedValues = {
+                        ...tempValue,
+                        appellations: undefined,
+                        appellationCodes: undefined,
+                      };
+                      onSearchFormSubmit(updatedValues);
+                    }}
+                  >
+                    <AppellationAutocomplete
+                      locator="search-form-appellation"
+                      className={fr.cx("fr-mb-2w")}
+                      label={appellationInputLabel}
+                      hintText={appellationHintText(
+                        useNaturalLanguageForAppellations,
                       )}
-                      <NafAutocomplete
-                        locator="searchNaf"
-                        label="Et / ou un secteur d'activité"
-                        onNafSelected={(nafSectionSuggestion) => {
-                          setTempValue({
-                            ...tempValue,
-                            nafCodes: nafSectionSuggestion.nafCodes,
-                            nafLabel: nafSectionSuggestion.label,
-                          });
-                        }}
-                        onNafClear={() => {
-                          setTempValue({
-                            ...tempValue,
-                            nafCodes: initialValues.nafCodes,
-                            nafLabel: initialValues.nafLabel,
-                          });
-                        }}
-                        selectProps={{
-                          inputId: domElementIds[route.name].nafAutocomplete,
-                        }}
-                        className={fr.cx("fr-mt-2w")}
-                        initialValue={
-                          formValues.nafLabel && formValues.nafCodes
-                            ? {
-                                label: formValues.nafLabel,
-                                nafCodes: formValues.nafCodes,
-                              }
-                            : undefined
-                        }
-                      />
-                    </>
-                  ),
-                }}
-              />
-              <RichDropdown
-                defaultValue="France entière"
-                id={domElementIds[route.name].locationFilterTag}
-                iconId="fr-icon-map-pin-2-fill"
-                values={place ? [`${place} (${distanceKm}km)`] : []}
-                onReset={() => {
-                  const updatedValues: SearchPageParams =
-                    tempValue.sortBy === "distance"
-                      ? {
+                      onAppellationSelected={(appellationMatch) => {
+                        clearErrors("appellations");
+                        setTempValue({
                           ...tempValue,
-                          place: initialValues.place,
-                          latitude: 0,
-                          longitude: 0,
-                          distanceKm: 0,
-                        }
-                      : {
+                          appellations: [appellationMatch.appellation],
+                          appellationCodes: [
+                            appellationMatch.appellation.appellationCode,
+                          ],
+                        });
+                      }}
+                      onAppellationClear={() => {
+                        setTempValue({
                           ...tempValue,
-                          place: initialValues.place,
-                          latitude: initialValues.latitude,
-                          longitude: initialValues.longitude,
-                          distanceKm: undefined,
-                        };
-                  onSearchFormSubmit(updatedValues);
-                }}
-                submenu={{
-                  title: "Où souhaitez-vous faire votre immersion ?",
-                  content: (
-                    <>
-                      <PlaceAutocomplete
-                        locator="search-form-place"
-                        label={placeInputLabel}
-                        hintText={placeHintText}
-                        onPlaceSelected={(lookupSearchResult) => {
-                          clearErrors("place");
-                          if (!lookupSearchResult) return;
-                          const newValues = {
-                            place: lookupSearchResult.label,
-                            latitude: lookupSearchResult.position.lat,
-                            longitude: lookupSearchResult.position.lon,
-                          };
-                          setTempValue({
-                            ...tempValue,
-                            ...newValues,
-                            distanceKm:
-                              tempValue.distanceKm || DEFAULT_DISTANCE_KM,
-                          });
-                        }}
-                        onPlaceClear={() => {
-                          const updatedInitialValues: SearchPageParams =
-                            tempValue.sortBy === "distance"
-                              ? {
-                                  ...tempValue,
-                                  place: initialValues.place,
-                                  latitude: 0,
-                                  longitude: 0,
-                                  distanceKm: 0,
-                                }
-                              : {
-                                  ...tempValue,
-                                  place: initialValues.place,
-                                  latitude: initialValues.latitude,
-                                  longitude: initialValues.longitude,
-                                  distanceKm: undefined,
-                                };
-                          setTempValue(updatedInitialValues);
-
-                          if (formValues.sortBy === "distance") {
-                            setTempValue({
+                          appellations: undefined,
+                          appellationCodes: undefined,
+                        });
+                      }}
+                      selectProps={{
+                        inputId:
+                          domElementIds[route.name].appellationAutocomplete,
+                        placeholder: appellationPlaceholder(
+                          useNaturalLanguageForAppellations,
+                        ),
+                        defaultInputValue:
+                          formValues.appellations?.[0]?.appellationLabel,
+                      }}
+                      state={errors.appellations ? "error" : undefined}
+                      stateRelatedMessage={errors.appellations?.message}
+                    />
+                    {tempValue.appellations?.length && (
+                      <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
+                        <strong>
+                          Les résultats seront étendus aux autres métiers du
+                          secteur "{tempValue.appellations[0].romeLabel}"
+                        </strong>
+                        , c’est pour cela que vous pourrez voir des métiers
+                        proches mais ne correspondant pas précisément à votre
+                        recherche dans les résultats.
+                      </p>
+                    )}
+                    <NafAutocomplete
+                      locator="searchNaf"
+                      label="Et / ou un secteur d'activité"
+                      onNafSelected={(nafSectionSuggestion) => {
+                        setTempValue({
+                          ...tempValue,
+                          nafCodes: nafSectionSuggestion.nafCodes,
+                          nafLabel: nafSectionSuggestion.label,
+                        });
+                      }}
+                      onNafClear={() => {
+                        setTempValue({
+                          ...tempValue,
+                          nafCodes: initialValues.nafCodes,
+                          nafLabel: initialValues.nafLabel,
+                        });
+                      }}
+                      selectProps={{
+                        inputId: domElementIds[route.name].nafAutocomplete,
+                      }}
+                      className={fr.cx("fr-mt-2w")}
+                      initialValue={
+                        formValues.nafLabel && formValues.nafCodes
+                          ? {
+                              label: formValues.nafLabel,
+                              nafCodes: formValues.nafCodes,
+                            }
+                          : undefined
+                      }
+                    />
+                  </MyAccordion>
+                  <MyAccordion
+                    label="Localisation"
+                    values={place ? [`${place} (${distanceKm}km)`] : []}
+                    onReset={() => {
+                      const updatedValues: SearchPageParams =
+                        tempValue.sortBy === "distance"
+                          ? {
                               ...tempValue,
-                              sortBy: "date",
-                            });
-                          }
-                        }}
-                        className={fr.cx("fr-mt-2w")}
-                        initialInputValue={place}
-                        selectProps={{
-                          inputId:
-                            domElementIds[route.name].placeAutocompleteInput,
-                        }}
-                        state={errors.place ? "error" : undefined}
-                        stateRelatedMessage={errors.place?.message}
-                      />
+                              place: initialValues.place,
+                              latitude: 0,
+                              longitude: 0,
+                              distanceKm: 0,
+                            }
+                          : {
+                              ...tempValue,
+                              place: initialValues.place,
+                              latitude: initialValues.latitude,
+                              longitude: initialValues.longitude,
+                              distanceKm: undefined,
+                            };
+                      onSearchFormSubmit(updatedValues);
+                    }}
+                  >
+                    <PlaceAutocomplete
+                      locator="search-form-place"
+                      label={placeInputLabel}
+                      hintText={placeHintText}
+                      onPlaceSelected={(lookupSearchResult) => {
+                        clearErrors("place");
+                        if (!lookupSearchResult) return;
+                        const newValues = {
+                          place: lookupSearchResult.label,
+                          latitude: lookupSearchResult.position.lat,
+                          longitude: lookupSearchResult.position.lon,
+                        };
+                        setTempValue({
+                          ...tempValue,
+                          ...newValues,
+                          distanceKm:
+                            tempValue.distanceKm || DEFAULT_DISTANCE_KM,
+                        });
+                      }}
+                      onPlaceClear={() => {
+                        const updatedInitialValues: SearchPageParams =
+                          tempValue.sortBy === "distance"
+                            ? {
+                                ...tempValue,
+                                place: initialValues.place,
+                                latitude: 0,
+                                longitude: 0,
+                                distanceKm: 0,
+                              }
+                            : {
+                                ...tempValue,
+                                place: initialValues.place,
+                                latitude: initialValues.latitude,
+                                longitude: initialValues.longitude,
+                                distanceKm: undefined,
+                              };
+                        setTempValue(updatedInitialValues);
 
-                      <Select
-                        label="Dans un rayon de :"
-                        options={radiusOptions}
-                        disabled={!tempValue.latitude || !tempValue.longitude}
-                        hint={radiusHintText}
-                        nativeSelectProps={{
-                          ...register("distanceKm"),
-                          title:
-                            !tempValue.latitude || !tempValue.longitude
-                              ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
-                              : undefined,
-                          id: domElementIds[route.name].distanceSelect,
-                          value: `${tempValue.distanceKm || ""}`,
-                          onChange: (event) => {
-                            const value = Number.parseInt(
-                              event.currentTarget.value,
-                              10,
-                            );
+                        if (formValues.sortBy === "distance") {
+                          setTempValue({
+                            ...tempValue,
+                            sortBy: "date",
+                          });
+                        }
+                      }}
+                      className={fr.cx("fr-mt-2w")}
+                      initialInputValue={place}
+                      selectProps={{
+                        inputId:
+                          domElementIds[route.name].placeAutocompleteInput,
+                      }}
+                      state={errors.place ? "error" : undefined}
+                      stateRelatedMessage={errors.place?.message}
+                    />
+
+                    <Select
+                      label="Dans un rayon de :"
+                      options={radiusOptions}
+                      disabled={!tempValue.latitude || !tempValue.longitude}
+                      hint={radiusHintText}
+                      nativeSelectProps={{
+                        ...register("distanceKm"),
+                        title:
+                          !tempValue.latitude || !tempValue.longitude
+                            ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
+                            : undefined,
+                        id: domElementIds[route.name].distanceSelect,
+                        value: `${tempValue.distanceKm || ""}`,
+                        onChange: (event) => {
+                          const value = Number.parseInt(
+                            event.currentTarget.value,
+                            10,
+                          );
+                          setTempValue({
+                            ...tempValue,
+                            distanceKm: value,
+                          });
+                          if (!value) {
                             setTempValue({
                               ...tempValue,
                               distanceKm: value,
                             });
-                            if (!value) {
-                              setTempValue({
-                                ...tempValue,
-                                distanceKm: value,
-                              });
-                            }
+                          }
+                        },
+                      }}
+                    />
+                    <p className={fr.cx("fr-text--bold", "fr-mt-2w")}>
+                      Quelle(s) offre(s) souhaitez-vous voir ?
+                    </p>
+                    <Checkbox
+                      options={remoteWorkModes.map((mode) => ({
+                        label: remoteWorkModeLabels[mode].label,
+                        nativeInputProps: {
+                          checked: tempValue.remoteWorkModes?.includes(mode),
+                          onChange: () => {
+                            const remoteWorkModesArray =
+                              tempValue.remoteWorkModes || [];
+                            setTempValue({
+                              ...tempValue,
+                              remoteWorkModes:
+                                tempValue.remoteWorkModes?.includes(mode)
+                                  ? remoteWorkModesArray.filter(
+                                      (m) => m !== mode,
+                                    )
+                                  : [...remoteWorkModesArray, mode],
+                            });
                           },
-                        }}
-                      />
-                      <p className={fr.cx("fr-text--bold", "fr-mt-2w")}>
-                        Quelle(s) offre(s) souhaitez-vous voir ?
-                      </p>
-                      <Checkbox
-                        options={remoteWorkModes.map((mode) => ({
-                          label: remoteWorkModeLabels[mode].label,
-                          nativeInputProps: {
-                            checked: tempValue.remoteWorkModes?.includes(mode),
-                            onChange: () => {
-                              const remoteWorkModesArray =
-                                tempValue.remoteWorkModes || [];
-                              setTempValue({
-                                ...tempValue,
-                                remoteWorkModes:
-                                  tempValue.remoteWorkModes?.includes(mode)
-                                    ? remoteWorkModesArray.filter(
-                                        (m) => m !== mode,
-                                      )
-                                    : [...remoteWorkModesArray, mode],
-                              });
-                            },
-                          },
-                        }))}
-                      />
-                    </>
-                  ),
-                }}
-              />
-              {!isExternal && (
-                <>
-                  <RichDropdown
-                    defaultValue="Toutes les entreprises"
-                    iconId="fr-icon-equalizer-fill"
-                    id={domElementIds[route.name].fitForDisableWorkersFilterTag}
+                        },
+                      }))}
+                    />
+                  </MyAccordion>
+                  <MyAccordion
+                    label="Caractéristiques de l'entreprise"
                     values={formValues.fitForDisabledWorkers ? [rqthLabel] : []}
                     onReset={() => {
                       const updatedValues = {
@@ -744,119 +758,116 @@ export const SearchPage = ({
                       };
                       onSearchFormSubmit(updatedValues);
                     }}
-                    submenu={{
-                      title: "Plus de critères",
-                      content: (
-                        <>
-                          <p className={fr.cx("fr-mb-2w")}>
-                            Afficher uniquement les entreprises&nbsp;:
-                          </p>
-                          <Checkbox
-                            className={fr.cx("fr-mb-2w")}
-                            options={[
-                              {
-                                label: rqthLabel,
-                                nativeInputProps: {
-                                  checked:
-                                    tempValue.fitForDisabledWorkers?.some(
-                                      (fitForDisabledWorker) =>
-                                        fitForDisabledWorker ===
-                                          "yes-declared-only" ||
-                                        fitForDisabledWorker ===
-                                          "yes-ft-certified",
-                                    ) ?? false,
-                                  onChange: (event) => {
-                                    setTempValue({
-                                      ...tempValue,
-                                      fitForDisabledWorkers: event.currentTarget
-                                        .checked
-                                        ? [
-                                            "yes-declared-only",
-                                            "yes-ft-certified",
-                                          ]
-                                        : ["no"],
-                                    });
-                                  },
-                                },
-                              },
-                            ]}
-                          />
-                          <Checkbox
-                            className={fr.cx("fr-mb-2w")}
-                            options={[
-                              {
-                                label: "Mises en relation disponibles",
-                                nativeInputProps: {
-                                  checked: tempValue.showOnlyAvailableOffers,
-                                  onChange: (event) => {
-                                    setTempValue({
-                                      ...tempValue,
-                                      showOnlyAvailableOffers:
-                                        event.currentTarget.checked,
-                                    });
-                                  },
-                                },
-                              },
-                            ]}
-                          />
-                        </>
-                      ),
-                    }}
-                  />
-
-                  <RichDropdown
-                    defaultValue="Trier par pertinence"
-                    iconId="fr-icon-arrow-down-line"
-                    id={domElementIds[route.name].sortFilterTag}
-                    values={
-                      formValues.sortBy
-                        ? [sortedByOptionsLabel[formValues.sortBy]]
-                        : []
-                    }
-                    submenu={{
-                      title: "Ordre d’affichage",
-                      content: (
-                        <RadioButtons
-                          id={domElementIds[route.name].sortRadioButtons}
-                          options={filteredSortOptions.map((option) => ({
-                            ...option,
-                            nativeInputProps: {
-                              name: register("sortBy").name,
-                              value: option.value,
-                              disabled: option.disabled,
-                              checked: tempValue
-                                ? option.value === tempValue.sortBy
-                                : false,
-                              onClick: (event) => {
-                                const updatedSortedBy = isSearchSortedBy(
-                                  event.currentTarget.value,
-                                )
-                                  ? event.currentTarget.value
-                                  : "score";
-                                if (
-                                  updatedSortedBy === "distance" &&
-                                  areValidGeoParams(tempValue)
-                                ) {
-                                  setTempValue({
-                                    ...tempValue,
-                                    sortBy: "distance",
-                                  });
-                                }
-                                if (updatedSortedBy !== "distance") {
-                                  setTempValue({
-                                    ...tempValue,
-                                    sortBy: updatedSortedBy,
-                                  });
-                                }
-                              },
+                  >
+                    <p className={fr.cx("fr-mb-2w")}>
+                      Afficher uniquement les entreprises&nbsp;:
+                    </p>
+                    <Checkbox
+                      className={fr.cx("fr-mb-2w")}
+                      options={[
+                        {
+                          label: rqthLabel,
+                          nativeInputProps: {
+                            checked:
+                              tempValue.fitForDisabledWorkers?.some(
+                                (fitForDisabledWorker) =>
+                                  fitForDisabledWorker ===
+                                    "yes-declared-only" ||
+                                  fitForDisabledWorker === "yes-ft-certified",
+                              ) ?? false,
+                            onChange: (event) => {
+                              setTempValue({
+                                ...tempValue,
+                                fitForDisabledWorkers: event.currentTarget
+                                  .checked
+                                  ? ["yes-declared-only", "yes-ft-certified"]
+                                  : ["no"],
+                              });
                             },
-                          }))}
-                        />
-                      ),
-                    }}
-                  />
-                </>
-              )}
+                          },
+                        },
+                      ]}
+                    />
+                    <Checkbox
+                      className={fr.cx("fr-mb-2w")}
+                      options={[
+                        {
+                          label: "Mises en relation disponibles",
+                          nativeInputProps: {
+                            checked: tempValue.showOnlyAvailableOffers,
+                            onChange: (event) => {
+                              setTempValue({
+                                ...tempValue,
+                                showOnlyAvailableOffers:
+                                  event.currentTarget.checked,
+                              });
+                            },
+                          },
+                        },
+                      ]}
+                    />
+                  </MyAccordion>
+                </div>
+              </section>
+              <Button
+                type="button"
+                priority="secondary"
+                iconId="fr-icon-settings-5-line"
+                onClick={() => setIsFiltersOpened(true)}
+              >
+                Filtrer
+              </Button>
+              <RichDropdown
+                defaultValue="Trier par pertinence"
+                iconId="fr-icon-arrow-down-line"
+                id={domElementIds[route.name].sortFilterTag}
+                values={
+                  formValues.sortBy
+                    ? [sortedByOptionsLabel[formValues.sortBy]]
+                    : []
+                }
+                submenu={{
+                  title: "Ordre d’affichage",
+                  content: (
+                    <RadioButtons
+                      id={domElementIds[route.name].sortRadioButtons}
+                      options={filteredSortOptions.map((option) => ({
+                        ...option,
+                        nativeInputProps: {
+                          name: register("sortBy").name,
+                          value: option.value,
+                          disabled: option.disabled,
+                          checked: tempValue
+                            ? option.value === tempValue.sortBy
+                            : false,
+                          onClick: (event) => {
+                            const updatedSortedBy = isSearchSortedBy(
+                              event.currentTarget.value,
+                            )
+                              ? event.currentTarget.value
+                              : "score";
+                            if (
+                              updatedSortedBy === "distance" &&
+                              areValidGeoParams(tempValue)
+                            ) {
+                              setTempValue({
+                                ...tempValue,
+                                sortBy: "distance",
+                              });
+                            }
+                            if (updatedSortedBy !== "distance") {
+                              setTempValue({
+                                ...tempValue,
+                                sortBy: updatedSortedBy,
+                              });
+                            }
+                          },
+                        },
+                      }))}
+                    />
+                  ),
+                }}
+              />
             </form>
 
             <div ref={searchResultsWrapper}>
@@ -905,6 +916,7 @@ export const SearchPage = ({
             </div>
           </>
         )}
+        ;
       </MainWrapper>
     </HeaderFooterLayout>
   );
@@ -973,3 +985,57 @@ const isSearchSortedBy = (value: string): value is SearchSortedBy =>
   searchSortedByOptions.includes(value as SearchSortedBy);
 
 const rqthLabel = "Personnes en situation de handicap bienvenues";
+
+type MyAccordionProps = AccordionProps & {
+  onReset?: () => void;
+  values: string[];
+};
+
+const MyAccordion = ({
+  children,
+  onReset,
+  values,
+  ...accordionProps
+}: MyAccordionProps) => {
+  const hasValue = values && values.length > 0;
+
+  const buttons: [ButtonProps, ...ButtonProps[]] = [
+    {
+      children: "Annuler",
+      type: "button",
+      priority: "secondary",
+      className: fr.cx("fr-mb-0"),
+      id: `${accordionProps.id}-cancel-button`,
+    },
+    {
+      children: "Appliquer",
+      type: "submit",
+      className: fr.cx("fr-mb-0"),
+      id: `${accordionProps.id}-submit-button`,
+    },
+  ];
+  if (onReset) {
+    buttons.unshift({
+      children: "Réinitialiser",
+      type: "button",
+      priority: "tertiary",
+      onClick: () => {
+        onReset();
+      },
+      className: fr.cx("fr-mb-0"),
+      disabled: !hasValue,
+      id: `${accordionProps.id}-reset-button`,
+    });
+  }
+  return (
+    <Accordion {...(accordionProps as AccordionProps)}>
+      {children}{" "}
+      <ButtonsGroup
+        className={fr.cx("fr-hr", "fr-pt-2w", "fr-pb-0")}
+        inlineLayoutWhen="always"
+        alignment="right"
+        buttons={buttons}
+      />
+    </Accordion>
+  );
+};
