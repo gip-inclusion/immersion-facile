@@ -428,13 +428,13 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
           if (
             assessment.status === "FINISHED" ||
-            assessment.status === "ABANDONED"
+            assessment.status === "ABANDONED" ||
+            assessment.status === "DID_NOT_SHOW"
           )
             return [];
 
-          if (assessment.status === "DID_NOT_SHOW") return [];
-
           const createdAt = new Date(assessment.createdAt);
+
           const isAfterSignatureRelease = isAfter(
             createdAt,
             signatureReleaseThreshold,

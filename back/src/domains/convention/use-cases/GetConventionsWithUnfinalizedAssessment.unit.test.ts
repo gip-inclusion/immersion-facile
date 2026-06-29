@@ -16,7 +16,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createAssessmentEntity } from "../entities/AssessmentEntity";
-import { makeGetConventionsWithUnfinalizedAssessment } from "./GetConventionsWithUnfinalizedAssessment";
+import {
+  type GetConventionsWithUnfinalizedAssessment,
+  makeGetConventionsWithUnfinalizedAssessment,
+} from "./GetConventionsWithUnfinalizedAssessment";
 
 describe("GetConventionsWithUnfinalizedAssessment", () => {
   const now = new Date();
@@ -26,31 +29,54 @@ describe("GetConventionsWithUnfinalizedAssessment", () => {
     .withName("Test Agency")
     .withKind("pole-emploi")
     .build();
+  const agency2 = new AgencyDtoBuilder()
+    .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab")
+    .withName("Test Agency 2")
+    .withKind("pole-emploi")
+    .build();
 
   const validatedConvention = new ConventionDtoBuilder()
+    .withId("convention1")
     .withAgencyId(agency.id)
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .build();
+
   const assessment = new AssessmentDtoBuilder()
     .withConventionId(validatedConvention.id)
     .withCreatedAt(subDays(now, 10).toISOString())
     .build();
 
+  const validatedConvention2 = new ConventionDtoBuilder()
+    .withId("convention2")
+    .withAgencyId(agency2.id)
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .build();
+
+  const assessment2 = new AssessmentDtoBuilder()
+    .withConventionId(validatedConvention2.id)
+    .withCreatedAt(subDays(now, 10).toISOString())
+    .build();
+
   let uow: InMemoryUnitOfWork;
-  let useCase: ReturnType<typeof makeGetConventionsWithUnfinalizedAssessment>;
+  let getConventionsWithUnfinalizedAssessment: GetConventionsWithUnfinalizedAssessment;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway(now);
-    useCase = makeGetConventionsWithUnfinalizedAssessment({
-      uowPerformer: new InMemoryUowPerformer(uow),
-      deps: { timeGateway },
-    });
+    getConventionsWithUnfinalizedAssessment =
+      makeGetConventionsWithUnfinalizedAssessment({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: { timeGateway },
+      });
 
-    uow.conventionRepository.setConventions([validatedConvention]);
+    uow.conventionRepository.setConventions([
+      validatedConvention,
+      validatedConvention2,
+    ]);
     uow.assessmentRepository.assessments = [
       createAssessmentEntity(assessment, validatedConvention),
+      createAssessmentEntity(assessment2, validatedConvention2),
     ];
   });
 
@@ -62,11 +88,16 @@ describe("GetConventionsWithUnfinalizedAssessment", () => {
           roles: ["validator"],
           isNotifiedByEmail: true,
         },
+        {
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
       ])
       .build();
 
     expectToEqual(
-      await useCase.execute(
+      await getConventionsWithUnfinalizedAssessment.execute(
         { page: 1, perPage: 10 },
         currentUserWithValidAgencyRight,
       ),
@@ -86,18 +117,32 @@ describe("GetConventionsWithUnfinalizedAssessment", () => {
             dateEnd: validatedConvention.dateEnd,
             id: validatedConvention.id,
           },
+          {
+            assessment: {
+              createdAt: assessment2.createdAt,
+              endedWithAJob: assessment2.endedWithAJob,
+              signedAt: assessment2.signedAt,
+              status: assessment2.status,
+            },
+            beneficiary: {
+              firstname: validatedConvention2.signatories.beneficiary.firstName,
+              lastname: validatedConvention2.signatories.beneficiary.lastName,
+            },
+            dateEnd: validatedConvention2.dateEnd,
+            id: validatedConvention2.id,
+          },
         ],
         pagination: {
           currentPage: 1,
           numberPerPage: 10,
           totalPages: 1,
-          totalRecords: 1,
+          totalRecords: 2,
         },
       },
     );
   });
 
-  it("throws when user have not the right agency role", async () => {
+  it("throws when user does not have the right agency role", async () => {
     const currentUserWithToReviewAgencyRight = new ConnectedUserBuilder()
       .withAgencyRights([
         {
@@ -109,7 +154,7 @@ describe("GetConventionsWithUnfinalizedAssessment", () => {
       .build();
 
     await expectPromiseToFailWithError(
-      useCase.execute(
+      getConventionsWithUnfinalizedAssessment.execute(
         { page: 1, perPage: 10 },
         currentUserWithToReviewAgencyRight,
       ),
@@ -117,13 +162,13 @@ describe("GetConventionsWithUnfinalizedAssessment", () => {
     );
   });
 
-  it("throws when user have no agency rights", async () => {
+  it("throws when user has no agency rights", async () => {
     const currentUserWithToReviewAgencyRight = new ConnectedUserBuilder()
       .withAgencyRights([])
       .build();
 
     await expectPromiseToFailWithError(
-      useCase.execute(
+      getConventionsWithUnfinalizedAssessment.execute(
         { page: 1, perPage: 10 },
         currentUserWithToReviewAgencyRight,
       ),

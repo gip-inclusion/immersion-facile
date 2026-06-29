@@ -4023,7 +4023,7 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(result.data, []);
     });
 
-    it("include assessments created juste before two days ago", async () => {
+    it("include assessments created just before two days ago", async () => {
       const assessment = new AssessmentDtoBuilder()
         .withConventionId(validatedConventionEnded5DaysAgo.id)
         .withCreatedAt(subMilliseconds(twoDaysAgo, 1).toISOString())
