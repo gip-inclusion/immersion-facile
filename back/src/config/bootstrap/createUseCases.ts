@@ -169,8 +169,8 @@ import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/
 import { makeNotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { makeNotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { makeNotifyEstablishmentAdminsThatUserRightIsPending } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentAdminsThatUserRightIsPending";
-import { makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned";
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { makeNotifyThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyThatEstablishmentIsBanned";
 import { makeRegisterUserOnEstablishment } from "../../domains/establishment/use-cases/RegisterUserOnEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
@@ -510,15 +510,14 @@ export const createUseCases = ({
           config,
         },
       }),
-    notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned:
-      makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned({
-        uowPerformer,
-        deps: {
-          saveNotificationAndRelatedEvent,
-          immersionBaseUrl: config.immersionFacileBaseUrl,
-          timeGateway: gateways.timeGateway,
-        },
-      }),
+    notifyThatEstablishmentIsBanned: makeNotifyThatEstablishmentIsBanned({
+      uowPerformer,
+      deps: {
+        saveNotificationAndRelatedEvent,
+        immersionBaseUrl: config.immersionFacileBaseUrl,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
     addExchangeToDiscussion: makeAddExchangeToDiscussion({
       deps: {
         createNewEvent,
