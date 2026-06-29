@@ -18,7 +18,6 @@ import {
   type UserId,
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
-  type WithAgencyIdAndUserId,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -204,26 +203,6 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: 201 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
-
-  public removeUserFromAgency$(
-    params: WithAgencyIdAndUserId,
-    token: string,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .removeUserFromAgency({
-          headers: { authorization: token },
-          urlParams: params,
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

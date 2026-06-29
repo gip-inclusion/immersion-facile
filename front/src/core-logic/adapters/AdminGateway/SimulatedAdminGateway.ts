@@ -20,7 +20,6 @@ import {
   type UserId,
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
-  type WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -123,13 +122,6 @@ export class SimulatedAdminGateway implements AdminGateway {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of(undefined);
-  }
-
-  public removeUserFromAgency$(
-    _params: WithAgencyIdAndUserId,
-    _token: string,
-  ): Observable<void> {
-    return of(undefined);
   }
 
   public listUsers$(

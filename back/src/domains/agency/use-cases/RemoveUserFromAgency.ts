@@ -4,13 +4,13 @@ import {
   type WithAgencyIdAndUserId,
   withAgencyIdAndUserIdSchema,
 } from "shared";
-import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
-} from "../helpers/agencyRights.helper";
-import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
+} from "../../connected-users/helpers/agencyRights.helper";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../connected-users/helpers/authorization.helper";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 

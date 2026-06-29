@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { partition, values } from "ramda";
 import { Fragment, useMemo, useState } from "react";
@@ -22,7 +21,6 @@ import {
   connectedUsersAdminSlice,
 } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
-import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
@@ -45,9 +43,6 @@ export const AgencyUsers = ({
   const manageUserModalId = isLocationAdmin
     ? domElementIds.admin.agencyTab.editAgencyManageUserModal
     : domElementIds.agencyDashboard.agencyDetails.editAgencyManageUserModal;
-  const removeUserModalId = isLocationAdmin
-    ? domElementIds.admin.agencyTab.editAgencyRemoveUserModal
-    : domElementIds.agencyDashboard.agencyDetails.editAgencyRemoveUserModal;
   const manageUserModal = useMemo(
     () =>
       createModal({
@@ -57,21 +52,13 @@ export const AgencyUsers = ({
     [manageUserModalId],
   );
 
-  const removeUserModal = useMemo(
-    () =>
-      createModal({
-        isOpenedByDefault: false,
-        id: removeUserModalId,
-      }),
-    [removeUserModalId],
-  );
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
     (UserParamsForAgency & { isIcUser: boolean }) | null
   >(null);
 
-  const [mode, setMode] = useState<"add" | "update" | "delete" | null>(null);
+  const [mode, setMode] = useState<"add" | "update" | null>(null);
 
   const onModifyClicked = (
     agencyUser: ConnectedUserWithNormalizedAgencyRights,
@@ -87,22 +74,6 @@ export const AgencyUsers = ({
       isIcUser: !!agencyUser.proConnect,
     });
     manageUserModal.open();
-  };
-
-  const onDeleteClicked = (
-    agencyUser: ConnectedUserWithNormalizedAgencyRights,
-  ) => {
-    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    setMode("delete");
-    setSelectedUserData({
-      agencyId: agency.id,
-      userId: agencyUser.id,
-      roles: agencyUser.agencyRights[agency.id].roles,
-      email: agencyUser.email,
-      isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-      isIcUser: !!agencyUser.proConnect,
-    });
-    removeUserModal.open();
   };
 
   const agencyRefersToOtherAgency = agency.refersToAgencyId !== null;
@@ -151,28 +122,6 @@ export const AgencyUsers = ({
             feedbackTopic: "agency-user-for-dashboard",
           }),
         );
-  };
-
-  const onUserRemoveSubmitted = () => {
-    if (!selectedUserData) return;
-
-    isLocationAdmin
-      ? dispatch(
-          connectedUsersAdminSlice.actions.removeUserFromAgencyRequested({
-            userId: selectedUserData.userId,
-            agencyId: agency.id,
-            feedbackTopic: "agency-user",
-          }),
-        )
-      : dispatch(
-          removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
-            userId: selectedUserData.userId,
-            agencyId: agency.id,
-            feedbackTopic: "agency-user-for-dashboard",
-          }),
-        );
-
-    removeUserModal.close();
   };
 
   return (
@@ -226,7 +175,6 @@ export const AgencyUsers = ({
         agencyUsers={agencyUsers}
         agency={agency}
         onModifyClicked={onModifyClicked}
-        onDeleteClicked={onDeleteClicked}
         routeName={routeName}
       />
 
@@ -243,7 +191,6 @@ export const AgencyUsers = ({
             agencyUsers={agencyUsersInOtherAgency}
             agency={agency}
             onModifyClicked={onModifyClicked}
-            onDeleteClicked={onDeleteClicked}
             routeName={routeName}
           />
         </>
@@ -288,36 +235,6 @@ export const AgencyUsers = ({
             )}
           </Fragment>
         </manageUserModal.Component>,
-        document.body,
-      )}
-
-      {createPortal(
-        <removeUserModal.Component title="Confirmer la suppression">
-          <p>
-            Vous êtes sur le point de supprimer le rattachement de{" "}
-            {selectedUserData?.email} à l'agence "{agency.name}".
-          </p>
-          <p>Souhaitez-vous continuer ?</p>
-          <ButtonsGroup
-            inlineLayoutWhen="always"
-            buttons={[
-              {
-                priority: "secondary",
-                children: "Annuler",
-                onClick: () => {
-                  removeUserModal.close();
-                },
-              },
-              {
-                id: domElementIds.admin.agencyTab
-                  .editAgencyRemoveUserConfirmationButton,
-                priority: "primary",
-                children: "Supprimer le rattachement",
-                onClick: () => onUserRemoveSubmitted(),
-              },
-            ]}
-          />
-        </removeUserModal.Component>,
         document.body,
       )}
     </>

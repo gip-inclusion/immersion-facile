@@ -106,12 +106,14 @@ export const AgencyRightsTable = ({
             return a.agency.name.localeCompare(b.agency.name);
           })
           .map((agencyRight) =>
-            AgencyRightLine(
+            AgencyRightLine({
               agencyRight,
-              onUserUpdateRequested && onUpdateClicked,
-              onUserRegistrationCancelledRequested,
+              user,
+              onUpdateClicked: onUserUpdateRequested && onUpdateClicked,
+              onRegistrationCancelledClicked:
+                onUserRegistrationCancelledRequested,
               isBackofficeAdmin,
-            ),
+            }),
           )}
       />
       {onUserUpdateRequested &&
@@ -159,12 +161,19 @@ export const AgencyRightsTable = ({
   );
 };
 
-const AgencyRightLine = (
-  agencyRight: AgencyRight,
-  onUpdateClicked?: (agencyRight: AgencyRight) => void,
-  onRegistrationCancelledClicked?: (agencyRight: AgencyRight) => void,
-  isBackofficeAdmin?: boolean,
-) => [
+const AgencyRightLine = ({
+  agencyRight,
+  user,
+  onUpdateClicked,
+  onRegistrationCancelledClicked,
+  isBackofficeAdmin,
+}: {
+  agencyRight: AgencyRight;
+  user: User;
+  onUpdateClicked?: (agencyRight: AgencyRight) => void;
+  onRegistrationCancelledClicked?: (agencyRight: AgencyRight) => void;
+  isBackofficeAdmin?: boolean;
+}) => [
   <Fragment key={`${agencyRight.agency.id}-agency-infos`}>
     <AgencyTag refersToAgencyName={agencyRight.agency.refersToAgencyName} />
     <AgencyStatusBadge status={agencyRight.agency.status} />
@@ -211,6 +220,7 @@ const AgencyRightLine = (
       agencyRight={agencyRight}
       onUpdateClicked={onUpdateClicked}
       onRegistrationCancelledClicked={onRegistrationCancelledClicked}
+      user={user}
       isBackofficeAdmin={isBackofficeAdmin}
     />
   </Fragment>,

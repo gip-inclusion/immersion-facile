@@ -17,7 +17,6 @@ import type {
   UserId,
   UserParamsForAgency,
   UserWithNumberOfAgenciesAndEstablishments,
-  WithAgencyIdAndUserId,
 } from "shared";
 
 export interface AdminGateway {
@@ -49,11 +48,6 @@ export interface AdminGateway {
 
   updateUserRoleForAgency$(
     params: UserParamsForAgency,
-    token: ConnectedUserJwt,
-  ): Observable<void>;
-
-  removeUserFromAgency$(
-    params: WithAgencyIdAndUserId,
     token: ConnectedUserJwt,
   ): Observable<void>;
 
