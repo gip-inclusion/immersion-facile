@@ -33,7 +33,9 @@ import {
 import { SendReminderModal } from "src/app/components/convention/SendReminderModal";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
-const shouldDisplayDefaultAgencyBadge = (convention: ConventionReadDto) =>
+const shouldDisplayAgencyValidationStatusBadge = (
+  convention: ConventionReadDto,
+): boolean =>
   convention.status === "IN_REVIEW" ||
   convention.status === "ACCEPTED_BY_COUNSELLOR";
 
@@ -49,7 +51,7 @@ const getAgencyApprovalStatusBadge = (
     };
 
   if (
-    shouldDisplayDefaultAgencyBadge(convention) &&
+    shouldDisplayAgencyValidationStatusBadge(convention) &&
     convention.agencyRefersTo &&
     !convention.dateApproval
   )
@@ -72,7 +74,10 @@ const getAgencyValidationStatusBadge = (
       severity: "success",
     };
 
-  if (shouldDisplayDefaultAgencyBadge(convention) && !convention.dateValidation)
+  if (
+    shouldDisplayAgencyValidationStatusBadge(convention) &&
+    !convention.dateValidation
+  )
     return {
       children: "Validation en attente",
       severity: "warning",
@@ -84,7 +89,7 @@ const getAgencyValidationStatusBadge = (
 export const makeAgencySubSection = (
   convention: ConventionReadDto,
 ): AgencySubSection => {
-  const prescriberStructureName = convention.agencyRefersTo
+  const prescriberAgencyName = convention.agencyRefersTo
     ? convention.agencyRefersTo.name
     : convention.agencyName;
 
@@ -117,11 +122,11 @@ export const makeAgencySubSection = (
       : {}),
     agency: {
       title: convention.agencyRefersTo ? "Prescripteur lié" : "Prescripteur",
-      structureName: prescriberStructureName,
+      structureName: prescriberAgencyName,
       structureCopyButton: (
         <CopyButton
           withIcon={true}
-          textToCopy={prescriberStructureName}
+          textToCopy={prescriberAgencyName}
           label="Copier le prescripteur"
           iconOnly
           className="fr-ml-1v"

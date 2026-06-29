@@ -1,6 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { agencySubSectionForConventionSummaryStory } from "../convention-agency-sub-section/ConventionAgencySubSection.fixtures";
 import {
+  type AgencySubSection,
   ConventionSummary,
   type ConventionSummaryProperties,
 } from "./ConventionSummary";
@@ -16,6 +16,25 @@ Affiche un élément section ayant une bordure et contenant un titre.
 import { ConventionSummary } from "react-design-system";
 \`\`\`
 `;
+
+const agencySubSectionForConventionSummaryStory: AgencySubSection = {
+  agencyReferent: { fullName: "Martin DUBOIS" },
+  refersToAgency: {
+    structureName: "INSERSUD",
+    statusBadge: {
+      children: "Pré-validation en attente",
+      severity: "warning",
+    },
+  },
+  agency: {
+    title: "Prescripteur lié",
+    structureName: "Agence France Travail AMBERIEU EN BUGEY",
+    statusBadge: {
+      children: "Validation en attente",
+      severity: "warning",
+    },
+  },
+};
 
 export default {
   title: "ConventionSummary",
