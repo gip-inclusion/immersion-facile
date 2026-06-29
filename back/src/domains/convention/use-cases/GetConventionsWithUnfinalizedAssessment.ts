@@ -36,11 +36,13 @@ export const makeGetConventionsWithUnfinalizedAssessment = useCaseBuilder(
     if (!allowedAgencyRights.length)
       throw errors.agencies.noAgencyRights(currentUser.id);
 
+    const userAgencyIds = allowedAgencyRights.map(
+      (agencyRight) => agencyRight.agency.id,
+    );
+
     return uow.conventionQueries.getConventionsWithUnfinalizedAssessmentForAgencyUser(
       {
-        userAgencyIds: allowedAgencyRights.map(
-          (agencyRight) => agencyRight.agency.id,
-        ),
+        userAgencyIds,
         pagination: getPaginationParamsForWeb(inputParams),
         now: deps.timeGateway.now(),
       },
