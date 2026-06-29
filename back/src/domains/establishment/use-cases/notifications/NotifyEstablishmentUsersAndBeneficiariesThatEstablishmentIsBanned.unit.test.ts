@@ -29,17 +29,17 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned,
-  type NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned,
-} from "./NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned";
+  makeNotifyThatEstablishmentIsBanned,
+  type NotifyThatEstablishmentIsBanned,
+} from "./NotifyThatEstablishmentIsBanned";
 
 const immersionBaseUrl = "https://immersion-facile.beta.gouv.fr";
 
-describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", () => {
+describe("NotifyEstablishmentIsBanned", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  let notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned: NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned;
+  let notifyThatEstablishmentIsBanned: NotifyThatEstablishmentIsBanned;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   const adminUser = new UserBuilder()
@@ -186,15 +186,14 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned =
-      makeNotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned({
-        uowPerformer: new InMemoryUowPerformer(uow),
-        deps: {
-          saveNotificationAndRelatedEvent,
-          immersionBaseUrl,
-          timeGateway,
-        },
-      });
+    notifyThatEstablishmentIsBanned = makeNotifyThatEstablishmentIsBanned({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+        immersionBaseUrl,
+        timeGateway,
+      },
+    });
 
     validatedConvention = new ConventionDtoBuilder()
       .withId("eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee")
@@ -247,9 +246,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
   describe("Wrong path", () => {
     it("throws when establishment is not found", async () => {
       await expectPromiseToFailWithError(
-        notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-          { siret: "00000000000000" },
-        ),
+        notifyThatEstablishmentIsBanned.execute({ siret: "00000000000000" }),
         errors.establishment.notFound({ siret: "00000000000000" }),
       );
     });
@@ -266,9 +263,9 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
       ];
 
       await expectPromiseToFailWithError(
-        notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-          { siret: notBannedEstablishment.establishment.siret },
-        ),
+        notifyThatEstablishmentIsBanned.execute({
+          siret: notBannedEstablishment.establishment.siret,
+        }),
         errors.establishment.establishmentNotBanned({
           siret: notBannedEstablishment.establishment.siret,
         }),
@@ -278,9 +275,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
 
   describe("Right path", () => {
     it("sends emails to accepted admin and contact users only", async () => {
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -311,9 +306,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
         acceptedDiscussion,
       ];
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -344,9 +337,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     });
 
     it("sends no discussion beneficiary email when there are no pending discussions", async () => {
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -386,11 +377,9 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     }) => {
       uow.conventionRepository.setConventions([convention]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        {
-          siret: bannedEstablishmentAggregate.establishment.siret,
-        },
-      );
+      await notifyThatEstablishmentIsBanned.execute({
+        siret: bannedEstablishmentAggregate.establishment.siret,
+      });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -420,18 +409,16 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     });
 
     it("sends emails to convention beneficiaries in affected statuses only", async () => {
-      const concelledConvention: ConventionDto = {
+      const cancelledConvention: ConventionDto = {
         ...validatedConvention,
         status: "CANCELLED",
       };
       uow.conventionRepository.setConventions([
         readyToSignConvention,
-        concelledConvention,
+        cancelledConvention,
       ]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -464,9 +451,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     it("sends no convention email when there are no conventions in affected statuses", async () => {
       uow.conventionRepository.setConventions([]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -532,9 +517,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
             ftConnectedBeneficiary.peExternalId,
         };
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -568,9 +551,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
     it("sends email to agency validators when convention is validated and agency has no refersToAgency", async () => {
       uow.conventionRepository.setConventions([validatedConvention]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -607,9 +588,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
         validatedConventionWithRefersToAgency,
       ]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -664,9 +643,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
 
       uow.conventionRepository.setConventions([endedConvention]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
@@ -691,9 +668,7 @@ describe("NotifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned", ()
         validatedConvention,
       ]);
 
-      await notifyEstablishmentUsersAndBeneficiariesThatEstablishmentIsBanned.execute(
-        { siret },
-      );
+      await notifyThatEstablishmentIsBanned.execute({ siret });
 
       expectSavedNotificationsAndEvents({
         emails: [
