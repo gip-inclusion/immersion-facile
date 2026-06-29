@@ -67,7 +67,7 @@ const signedAssessment: Extract<
 
 describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted", () => {
   let uow: InMemoryUnitOfWork;
-  let usecase: NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted;
+  let notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted: NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
   let config: AppConfig;
@@ -77,7 +77,7 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
 
     timeGateway = new CustomTimeGateway();
     config = new AppConfigBuilder().build();
-    usecase =
+    notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted =
       makeNotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted(
         {
           uowPerformer: new InMemoryUowPerformer(uow),
@@ -99,7 +99,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
 
   it("Throw when no convention were found", async () => {
     await expectPromiseToFailWithError(
-      usecase.execute({ assessment: signedAssessment }),
+      notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+        { assessment: signedAssessment },
+      ),
       errors.convention.notFound({
         conventionId: signedAssessment.conventionId,
       }),
@@ -114,7 +116,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
     await uow.conventionRepository.save(convention);
 
     await expectPromiseToFailWithError(
-      usecase.execute({ assessment: signedAssessment }),
+      notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+        { assessment: signedAssessment },
+      ),
       errors.agency.notFound({ agencyId: convention.agencyId }),
     );
 
@@ -143,7 +147,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
       createAssessmentEntity(signedAssessment, convention),
     );
 
-    await usecase.execute({ assessment: signedAssessment });
+    await notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+      { assessment: signedAssessment },
+    );
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -224,7 +230,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
       signedAt: null,
       beneficiaryAgreement: null,
     };
-    await usecase.execute({ assessment: assessmentNotSigned });
+    await notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+      { assessment: assessmentNotSigned },
+    );
     expectSavedNotificationsAndEvents({
       emails: [],
     });
@@ -250,7 +258,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
       createdAt: new Date("2025-01-01").toISOString(),
     };
 
-    await usecase.execute({ assessment: assessmentDidNotShow });
+    await notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+      { assessment: assessmentDidNotShow },
+    );
 
     expectSavedNotificationsAndEvents({
       emails: [],
@@ -295,7 +305,9 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
         createAssessmentEntity(signedAssessment, convention),
       );
 
-      await usecase.execute({ assessment: signedAssessment });
+      await notifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompleted.execute(
+        { assessment: signedAssessment },
+      );
 
       expectSavedNotificationsAndEvents({
         emails: [
