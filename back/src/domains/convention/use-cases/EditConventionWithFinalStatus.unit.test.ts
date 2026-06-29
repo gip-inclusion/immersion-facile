@@ -157,7 +157,7 @@ describe("EditConventionWithFinalStatus", () => {
       );
     });
 
-    it("throws when non-admin sends beneficiary update", async () => {
+    it("throws when user with missing rights sends beneficiary update", async () => {
       uow.conventionRepository.setConventions([convention]);
       uow.userRepository.users = [counsellorUser];
       uow.agencyRepository.agencies = [
