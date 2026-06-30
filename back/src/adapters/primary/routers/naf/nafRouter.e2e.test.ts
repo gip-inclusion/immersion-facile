@@ -3,7 +3,6 @@ import {
   expectHttpResponseToEqual,
   type NafRoutes,
   type NafSectionSuggestion,
-  type NafSectionSuggestionsParams,
   nafRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -41,41 +40,21 @@ describe("naf Router", () => {
     ];
   });
 
-  describe(`${displayRouteName(nafRoutes.nafSectionSuggestions)}`, () => {
-    it("200 - One result with 'Agri'", async () => {
-      const response = await httpClient.nafSectionSuggestions({
-        queryParams: { searchText: "Agri" },
-      });
+  describe(`${displayRouteName(nafRoutes.getAllNafSections)}`, () => {
+    it("200 - returns all NAF sections", async () => {
+      const response = await httpClient.getAllNafSections();
       expectHttpResponseToEqual(response, {
-        body: [agricultureSection],
-        status: 200,
-      });
-    });
-
-    it("200 - Multiple results with 'Indus'", async () => {
-      const response = await httpClient.nafSectionSuggestions({
-        queryParams: { searchText: "Indus" },
-      });
-      expectHttpResponseToEqual(response, {
-        body: [industrieManufacturiereSection, industriesExtractiveSection],
-        status: 200,
-      });
-    });
-
-    it("200 - No results with 'dsklfsdmlf'", async () => {
-      const response = await httpClient.nafSectionSuggestions({
-        queryParams: { searchText: "dsklfsdmlf" },
-      });
-      expectHttpResponseToEqual(response, {
-        body: [],
+        body: [
+          agricultureSection,
+          industriesExtractiveSection,
+          industrieManufacturiereSection,
+        ],
         status: 200,
       });
     });
 
     it("400 - Bad Schema", async () => {
-      const response = await httpClient.nafSectionSuggestions({
-        queryParams: {} as NafSectionSuggestionsParams,
-      });
+      const response = await httpClient.getAllNafSections();
       expectHttpResponseToEqual(response, {
         body: {
           message:

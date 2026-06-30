@@ -41,22 +41,17 @@ describe("NafSuggestions", () => {
   });
 
   it("One result", async () => {
-    expectToEqual(await getNafSuggestions.execute({ searchText: "Agri" }), [
-      agricultureSection,
-    ]);
+    expectToEqual(await getNafSuggestions.execute(), [agricultureSection]);
   });
 
   it("Multiple result with lowercase", async () => {
-    expectToEqual(await getNafSuggestions.execute({ searchText: "inDus " }), [
+    expectToEqual(await getNafSuggestions.execute(), [
       industrieManufacturiereSection,
       industriesExtractiveSection,
     ]);
   });
 
   it("No result", async () => {
-    expectToEqual(
-      await getNafSuggestions.execute({ searchText: "Missing" }),
-      [],
-    );
+    expectToEqual(await getNafSuggestions.execute(), []);
   });
 });

@@ -9,10 +9,8 @@ export const createNafRouter = (deps: AppDependencies) => {
 
   const nafRouter = createExpressSharedRouter(nafRoutes, expressNafRouter);
 
-  nafRouter.nafSectionSuggestions((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.nafSuggestions.execute(req.query),
-    ),
+  nafRouter.getAllNafSections((req, res) =>
+    sendHttpResponse(req, res, () => deps.useCases.nafSuggestions.execute()),
   );
 
   return expressNafRouter;
