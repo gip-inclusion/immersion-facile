@@ -121,7 +121,14 @@ export const AgencyTasks = ({
       {conventionsToManagePagination?.totalRecords === 0 &&
         conventionsWithAssessmentIssuePagination?.totalRecords === 0 &&
         conventionsWithErroredBroadcastFeedbackPagination.pagination
-          .totalRecords === 0 && <p>Aucune tâche à traiter.</p>}
+          .totalRecords === 0 && (
+          <p>
+            Tout est à jour ! 🎉 Vous n’avez aucune action urgente à effectuer
+            pour le moment. <br />
+            Pensez à consulter le tableau des conventions pour suivre leur
+            avancement ou préparer vos prochaines démarches.
+          </p>
+        )}
       <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
         {conventionsToManagePagination?.totalRecords !== undefined &&
           conventionsToManagePagination.totalRecords > 0 && (
