@@ -26,7 +26,9 @@ const LatestAccessibilityContent = () => (
       France Travail s’engage à rendre ses services accessibles, conformément à
       l’article 47 de la loi n° 2005-102 du 11 février 2005.
     </p>
-    <p>À cette fin, nous mettons en œuvre la stratégie et les actions suivantes :</p>
+    <p>
+      À cette fin, nous mettons en œuvre la stratégie et les actions suivantes :
+    </p>
     <ul>
       <li>
         <a
@@ -38,20 +40,12 @@ const LatestAccessibilityContent = () => (
         </a>
       </li>
       <li>
-        <a
-          target="_blank"
-          href={planActionAccessibilite2025Url}
-          rel="noopener"
-        >
+        <a target="_blank" href={planActionAccessibilite2025Url} rel="noopener">
           Plan d&apos;action 2025 (pdf 169 Ko)
         </a>
       </li>
       <li>
-        <a
-          target="_blank"
-          href={planActionAccessibilite2026Url}
-          rel="noopener"
-        >
+        <a target="_blank" href={planActionAccessibilite2026Url} rel="noopener">
           Plan d&apos;action 2026 (pdf 173 Ko)
         </a>
       </li>
