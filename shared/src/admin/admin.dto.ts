@@ -1,8 +1,4 @@
-import type {
-  ActiveOrRejectedStatus,
-  AgencyId,
-  WithAgencyId,
-} from "../agency/agency.dto";
+import type { AgencyId, WithAgencyId } from "../agency/agency.dto";
 import type { ConventionId } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
 import type { AgencyRole } from "../role/role.dto";
@@ -48,19 +44,6 @@ export type ManageEstablishmentAdminForm = {
 export type BanEstablishmentAdminForm = {
   establishmentBannishmentJustification: string;
 };
-
-export type UpdateAgencyStatusParams = {
-  id: AgencyId;
-} & UpdateAgencyStatusParamsWithoutId;
-
-export type UpdateAgencyStatusParamsWithoutId =
-  | {
-      status: Extract<ActiveOrRejectedStatus, "active">;
-    }
-  | {
-      status: Extract<ActiveOrRejectedStatus, "rejected">;
-      statusJustification: string;
-    };
 
 export type GetUsersFilters = {
   emailContains: string;

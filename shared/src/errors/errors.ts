@@ -881,6 +881,16 @@ export const errors = {
       new NotFoundError(
         `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
       ),
+    routeIdMismatch: ({
+      routeAgencyId,
+      bodyAgencyId,
+    }: {
+      routeAgencyId: AgencyId;
+      bodyAgencyId: AgencyId;
+    }) =>
+      new BadRequestError(
+        `L'identifiant d'agence dans l'URL (${routeAgencyId}) ne correspond pas à celui du corps de requête (${bodyAgencyId}).`,
+      ),
     forbiddenDelegationConventionReminder: ({
       agencyId,
     }: {
@@ -927,6 +937,20 @@ export const errors = {
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
+      ),
+    cannotActivateWithoutAdmin: ({ agencyId }: { agencyId: AgencyId }) =>
+      new BadRequestError(
+        `L'agence ${agencyId} ne peut pas être activée sans administrateur d'agence.`,
+      ),
+    cannotUpdateToStatus: ({
+      agencyId,
+      status,
+    }: {
+      agencyId: AgencyId;
+      status: AgencyStatus;
+    }) =>
+      new BadRequestError(
+        `Le statut « ${status} » de l'agence ${agencyId} ne peut pas être défini via la mise à jour de l'agence.`,
       ),
     notRejected: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),

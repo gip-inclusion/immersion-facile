@@ -1,5 +1,4 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
@@ -41,7 +40,6 @@ type FeedbackWithActionName = {
 
 const topics = [
   "agency-admin",
-  "agency-admin-needing-review",
   "agency-for-dashboard",
   "agency-user-for-dashboard",
   "agency-user",
@@ -446,29 +444,6 @@ export const feedbacks: Record<
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
         "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
-    },
-  },
-  "agency-admin-needing-review": {
-    "fetch.error": {
-      action: agencyNeedingReviewSlice.actions.fetchAgencyNeedingReviewFailed,
-      title:
-        "Problème rencontré lors de la récupération des données de l'agence à valider",
-      message:
-        "Une erreur est survenue lors de la récupération des données de cette agence",
-    },
-    "update.success": {
-      action:
-        agencyNeedingReviewSlice.actions
-          .updateAgencyNeedingReviewStatusSucceeded,
-      title: "Statut de l'agence mis à jour",
-      message: "L'agence a été activée ou rejetée avec succès.",
-    },
-    "update.error": {
-      action:
-        agencyNeedingReviewSlice.actions.updateAgencyNeedingReviewStatusFailed,
-      title: "Problème lors de la mise à jour du statut de l'agence",
-      message:
-        "Une erreur est survenue lors de l'activation ou du rejet de l'agence",
     },
   },
   "agency-admin": {

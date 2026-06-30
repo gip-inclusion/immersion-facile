@@ -1,7 +1,6 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import type { AgencyDto } from "shared";
-import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { RegisterUsersToAgencies } from "src/app/components/agency/RegisterUsersToAgencies";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -17,11 +16,7 @@ export const AgencyTab = () => {
     <>
       <Feedback
         className="fr-mb-2w"
-        topics={[
-          "close-agency-and-transfer-conventions",
-          "agency-admin",
-          "agency-admin-needing-review",
-        ]}
+        topics={["close-agency-and-transfer-conventions", "agency-admin"]}
         closable
       />
       <EditAgency />
@@ -35,7 +30,6 @@ export const AgencyTab = () => {
       ) : (
         <MetabaseView title="Consulter les agences" url={url} />
       )}
-      <ActivateAgency />
     </>
   );
 };

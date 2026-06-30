@@ -52,10 +52,26 @@ const kindOptions = Object.entries(agencyKindToLabel).map(([value, label]) => ({
   value: value,
 }));
 
-const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
-  value: agencyStatus,
-  label: agencyStatusToLabel[agencyStatus],
-}));
+// A backoffice admin may only set these statuses through the edit form.
+// Closing an agency must go through the dedicated "close & transfer conventions"
+// flow, and "needsReview" is set by the agency creation flow.
+const settableAgencyStatuses: AgencyStatus[] = [
+  "active",
+  "from-api-PE",
+  "rejected",
+];
+
+const getStatusListOfOptions = (currentStatus: AgencyStatus) =>
+  allAgencyStatuses
+    .filter(
+      (agencyStatus) =>
+        agencyStatus === currentStatus ||
+        settableAgencyStatuses.includes(agencyStatus),
+    )
+    .map((agencyStatus) => ({
+      value: agencyStatus,
+      label: agencyStatusToLabel[agencyStatus],
+    }));
 
 const delegationAgencyKindOptions = delegationAgencyKindList.map((kind) => ({
   value: kind,
@@ -143,8 +159,8 @@ export const EditAgencyForm = ({
               />
 
               <Select
-                label="!Statut de l'agence !"
-                options={statusListOfOptions}
+                label="Statut de l'agence"
+                options={getStatusListOfOptions(agency.status)}
                 placeholder="Sélectionner un statut"
                 nativeSelectProps={{
                   id: adminAgencyIds.editAgencyFormStatusSelector,
@@ -165,7 +181,7 @@ export const EditAgencyForm = ({
               {closedOrRejectedAgencyStatuses.includes(formValues.status) && (
                 <Input
                   textArea
-                  label="!Justification du statut !"
+                  label="Justification du statut"
                   nativeTextAreaProps={{
                     ...register("statusJustification"),
                     id: adminAgencyIds.editAgencyFormStatusJustificationInput,
