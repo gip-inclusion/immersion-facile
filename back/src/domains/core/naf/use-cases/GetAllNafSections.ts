@@ -6,9 +6,9 @@ import { useCaseBuilder } from "../../useCaseBuilder";
 const nafSuggestionsCacheKey = "naf_suggestions_all";
 const nafSuggestionsCacheDurationInHours = 24;
 
-export type GetNafSuggestions = ReturnType<typeof makeGetNafSuggestions>;
+export type GetAllNafSections = ReturnType<typeof makeGetAllNafSections>;
 
-export const makeGetNafSuggestions = useCaseBuilder("NafSuggestions")
+export const makeGetAllNafSections = useCaseBuilder("GetAllNafSections")
   .withOutput<NafSectionSuggestion[]>()
   .withDeps<{ withCache: WithCache; uowPerformer: UnitOfWorkPerformer }>()
   .notTransactional()
