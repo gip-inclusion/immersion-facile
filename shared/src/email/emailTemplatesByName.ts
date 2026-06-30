@@ -451,15 +451,7 @@ export const emailTemplatesByName =
         ${
           refersToOtherAgency &&
           `Elles seront ensuite validée par ${agencyReferdToName}.`
-        }
- 
-        Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
-
-        Au programme :
-          • Le moteur de recherche pour trouver une entreprise accueillante
-          • Comment compléter une convention d'immersion
-          • Découvrir l'espace prescripteur - piloter les conventions
-        `,
+        }`,
         buttons: [
           {
             label: "Accèder à mon espace",
