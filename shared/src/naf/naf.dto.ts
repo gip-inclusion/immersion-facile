@@ -1,4 +1,3 @@
-import type { SearchTextAlpha } from "../search/searchText.schema";
 import type { Flavor } from "../typeFlavors";
 
 export const nafSectorCodes = [
@@ -76,8 +75,4 @@ export const fromNafSubClassToNafClass = (nafSubClass: string): string => {
 export type NafSectionSuggestion = {
   label: NafSectionLabel;
   nafCodes: NafCode[];
-};
-
-export type NafSectionSuggestionsParams = {
-  searchText: SearchTextAlpha;
 };

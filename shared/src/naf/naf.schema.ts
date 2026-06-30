@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { searchTextAlphaSchema } from "../search/searchText.schema";
 import {
   makeHardenedStringSchema,
   stringWithMaxLength255,
@@ -11,7 +10,6 @@ import type {
   NafDto,
   NafNomenclature,
   NafSectionSuggestion,
-  NafSectionSuggestionsParams,
   NafSousClasseLabel,
   WithNafCodes,
 } from "./naf.dto";
@@ -54,8 +52,3 @@ export const nafSectionSuggestionSchema: ZodSchemaWithInputMatchingOutput<NafSec
 export const nafSectionSuggestionsSchema: ZodSchemaWithInputMatchingOutput<
   NafSectionSuggestion[]
 > = z.array(nafSectionSuggestionSchema);
-
-export const nafSectionSuggestionsParamsSchema: ZodSchemaWithInputMatchingOutput<NafSectionSuggestionsParams> =
-  z.object({
-    searchText: searchTextAlphaSchema,
-  });
