@@ -1,5 +1,8 @@
 import {
+  type AgencyId,
+  type ConventionDto,
   keys,
+  type WithAgencyId,
   type WithConventionDraftId,
   type WithConventionDto,
   type WithConventionId,
@@ -93,6 +96,9 @@ const getUseCasesByTopics = (
   ],
 
   ConventionSubmittedAfterModification: [
+    extractConventionIdAndAgencyIdFromTransfer(
+      useCases.removeConventionFTAdvisorIfAgencyIsNotFranceTravail,
+    ),
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
     extractConventionIdFromConvention(
       useCases.broadcastToFranceTravailOnConventionUpdates,
@@ -102,6 +108,9 @@ const getUseCasesByTopics = (
     ),
   ],
   ConventionModifiedAndSigned: [
+    extractConventionIdAndAgencyIdFromTransfer(
+      useCases.removeConventionFTAdvisorIfAgencyIsNotFranceTravail,
+    ),
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
     extractConventionIdFromConvention(
@@ -154,7 +163,9 @@ const getUseCasesByTopics = (
     ),
   ],
   ConventionTransferredToAgency: [
-    useCases.removeConventionFTAdvisorIfAgencyIsNotFranceTravail,
+    extractConventionIdAndAgencyIdFromTransfer(
+      useCases.removeConventionFTAdvisorIfAgencyIsNotFranceTravail,
+    ),
     useCases.notifyAllActorsThatConventionHasBeenTransferred,
     extractConventionIdAndPreviousAgencyFromTransfer(
       useCases.broadcastToFranceTravailOnConventionUpdates,
@@ -368,6 +379,23 @@ const extractConventionIdAndPreviousAgencyFromTransfer = <
     useCase.execute({
       conventionId: params.convention.id,
       previousAgencyId: params.previousAgencyId,
+    }),
+});
+
+const extractConventionIdAndAgencyIdFromTransfer = <
+  UC extends InstantiatedUseCase<WithConventionId & WithAgencyId, void, any>,
+>(
+  useCase: UC,
+): InstantiatedUseCase<
+  { convention: ConventionDto; agencyId: AgencyId } & { triggeredBy: unknown },
+  void,
+  any
+> => ({
+  useCaseName: useCase.useCaseName,
+  execute: (params) =>
+    useCase.execute({
+      conventionId: params.convention.id,
+      agencyId: params.agencyId,
     }),
 });
 

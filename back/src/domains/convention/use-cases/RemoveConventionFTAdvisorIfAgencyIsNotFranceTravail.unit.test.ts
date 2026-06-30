@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  ConventionDtoBuilder,
   type ConventionId,
   errors,
   expectPromiseToFailWithError,
@@ -28,10 +27,6 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
   const missionLocaleAgency = new AgencyDtoBuilder()
     .withId("ml-agency-id")
     .withKind("mission-locale")
-    .build();
-  const convention = new ConventionDtoBuilder()
-    .withId(conventionId)
-    .withAgencyId(missionLocaleAgency.id)
     .build();
   const userFtExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
   const ftConnectUser: FtConnectUserDto = {
@@ -64,10 +59,7 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
       await expectPromiseToFailWithError(
         usecase.execute({
           agencyId: missionLocaleAgency.id,
-          convention,
-          justification: "change of agency",
-          previousAgencyId: ftAgency.id,
-          shouldNotifyActors: true,
+          conventionId,
         }),
         errors.agency.notFound({ agencyId: missionLocaleAgency.id }),
       );
@@ -75,7 +67,7 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
   });
 
   describe("Right paths", () => {
-    it("removes convention France Travail advisor when requested agency is not France Travail", async () => {
+    it("removes convention France Travail advisor when new agency is not France Travail", async () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(missionLocaleAgency, {}),
       ];
@@ -87,10 +79,7 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
 
       await usecase.execute({
         agencyId: missionLocaleAgency.id,
-        convention,
-        justification: "change of agency",
-        previousAgencyId: ftAgency.id,
-        shouldNotifyActors: true,
+        conventionId,
       });
 
       expect(
@@ -99,12 +88,8 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
       ).toBeUndefined();
     });
 
-    it("keeps convention France Travail advisor when requested agency is France Travail", async () => {
-      const anotherFTAgency = new AgencyDtoBuilder()
-        .withId("another-ft-agency-id")
-        .withKind("pole-emploi")
-        .build();
-      uow.agencyRepository.agencies = [toAgencyWithRights(anotherFTAgency, {})];
+    it("keeps convention France Travail advisor when new agency is France Travail", async () => {
+      uow.agencyRepository.agencies = [toAgencyWithRights(ftAgency, {})];
       saveConventionFranceTravailAdvisor({
         advisor: ftAdvisor,
         user: ftConnectUser,
@@ -112,11 +97,8 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
       });
 
       await usecase.execute({
-        agencyId: anotherFTAgency.id,
-        convention,
-        justification: "change of FT agency",
-        previousAgencyId: ftAgency.id,
-        shouldNotifyActors: true,
+        agencyId: ftAgency.id,
+        conventionId,
       });
 
       expectToEqual(
