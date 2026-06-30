@@ -1,6 +1,10 @@
-import { errors } from "shared";
-import type { TransferConventionToAgencyPayload } from "../../core/events/eventPayload.dto";
-import { transferConventionToAgencyPayloadSchema } from "../../core/events/eventPayload.schema";
+import {
+  errors,
+  type WithAgencyId,
+  type WithConventionId,
+  withAgencyIdSchema,
+  withConventionIdSchema,
+} from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail = ReturnType<
@@ -9,8 +13,8 @@ export type RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail = ReturnType<
 
 export const makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail =
   useCaseBuilder("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail")
-    .withInput<TransferConventionToAgencyPayload>(
-      transferConventionToAgencyPayloadSchema,
+    .withInput<WithAgencyId & WithConventionId>(
+      withConventionIdSchema.and(withAgencyIdSchema),
     )
     .withOutput<void>()
     .withCurrentUser<void>()
@@ -24,6 +28,6 @@ export const makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail =
 
       if (agency.kind !== "pole-emploi")
         await uow.conventionFranceTravailAdvisorRepository.deleteByConventionId(
-          inputParams.convention.id,
+          inputParams.conventionId,
         );
     });
