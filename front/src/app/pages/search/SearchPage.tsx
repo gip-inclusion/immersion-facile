@@ -34,7 +34,6 @@ import {
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import { NafAutocomplete } from "src/app/components/forms/autocomplete/NafAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
@@ -46,14 +45,14 @@ import {
   type SearchRoute,
   useSearch,
 } from "src/app/hooks/search.hooks";
+import labonneboiteLogoUrl from "src/assets/img/logo-lbb-centered.png";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
+import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-
+import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
-import labonneboiteLogoUrl from "src/assets/img/logo-lbb-centered.png";
-import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import Styles from "./SearchPage.styles";
 
 const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
@@ -210,6 +209,8 @@ export const SearchPage = ({
   });
 
   const searchHasBeenMade = searchMade !== null;
+
+  const nafOptions = useAppSelector(nafSelectors.currentNafSections);
 
   const internalSearchIsAvailableForInitialSearchRequest =
     !isExternal &&
@@ -554,35 +555,15 @@ export const SearchPage = ({
                           recherche dans les résultats.
                         </p>
                       )}
-                      <NafAutocomplete
-                        locator="searchNaf"
+                      <Select
                         label="Et / ou un secteur d'activité"
-                        onNafSelected={(nafSectionSuggestion) => {
-                          setTempValue({
-                            ...tempValue,
-                            nafCodes: nafSectionSuggestion.nafCodes,
-                            nafLabel: nafSectionSuggestion.label,
-                          });
+                        options={nafOptions.map((option) => ({
+                          label: option.label,
+                          value: option.nafCodes.join(", "),
+                        }))}
+                        nativeSelectProps={{
+                          id: domElementIds[route.name].nafAutocomplete,
                         }}
-                        onNafClear={() => {
-                          setTempValue({
-                            ...tempValue,
-                            nafCodes: initialValues.nafCodes,
-                            nafLabel: initialValues.nafLabel,
-                          });
-                        }}
-                        selectProps={{
-                          inputId: domElementIds[route.name].nafAutocomplete,
-                        }}
-                        className={fr.cx("fr-mt-2w")}
-                        initialValue={
-                          formValues.nafLabel && formValues.nafCodes
-                            ? {
-                                label: formValues.nafLabel,
-                                nafCodes: formValues.nafCodes,
-                              }
-                            : undefined
-                        }
                       />
                     </>
                   ),
