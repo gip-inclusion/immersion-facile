@@ -10,7 +10,6 @@ import type {
   ConnectedUserJwt,
   CreateAgencyDto,
   ListAgencyOptionsRequestDto,
-  UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
   WithAgencyIdAndUserId,
@@ -147,7 +146,10 @@ export class HttpAgencyGateway implements AgencyGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, logBodyAndThrow)
             .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
             .with({ status: 409 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
@@ -214,26 +216,6 @@ export class HttpAgencyGateway implements AgencyGateway {
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
-    );
-  }
-
-  public async validateOrRejectAgency(
-    adminToken: ConnectedUserJwt,
-    { id, ...rest }: UpdateAgencyStatusParams,
-  ): Promise<void> {
-    await this.httpClient.updateAgencyStatus({
-      body: rest,
-      headers: { authorization: adminToken },
-      urlParams: { agencyId: id },
-    });
-  }
-
-  public validateOrRejectAgency$(
-    adminToken: ConnectedUserJwt,
-    updateAgencyStatusParams: UpdateAgencyStatusParams,
-  ): Observable<void> {
-    return from(
-      this.validateOrRejectAgency(adminToken, updateAgencyStatusParams),
     );
   }
 

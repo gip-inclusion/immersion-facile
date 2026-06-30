@@ -2,10 +2,6 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema, departmentCodeSchema } from "../address/address.schema";
-import type {
-  UpdateAgencyStatusParams,
-  UpdateAgencyStatusParamsWithoutId,
-} from "../admin/admin.dto";
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
@@ -271,21 +267,6 @@ export const privateListAgenciesRequestSchema: ZodSchemaWithInputMatchingOutput<
   z.object({
     status: agencyStatusSchema.optional(),
   });
-
-export const updateAgencyStatusParamsWithoutIdSchema: ZodSchemaWithInputMatchingOutput<UpdateAgencyStatusParamsWithoutId> =
-  z
-    .object({
-      status: z.literal("active"),
-    })
-    .or(
-      z.object({
-        status: z.literal("rejected"),
-        statusJustification: zStringMinLength1Max1024,
-      }),
-    );
-
-export const updateAgencyStatusParamsSchema: ZodSchemaWithInputMatchingOutput<UpdateAgencyStatusParams> =
-  updateAgencyStatusParamsWithoutIdSchema.and(z.object({ id: agencyIdSchema }));
 
 export const closeAgencyAndTransferConventionsRequestSchema: ZodSchemaWithInputMatchingOutput<CloseAgencyAndTransferConventionsRequestDto> =
   z.object({

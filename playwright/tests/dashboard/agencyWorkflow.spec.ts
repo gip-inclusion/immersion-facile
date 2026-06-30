@@ -10,7 +10,7 @@ import {
   goToDashboard,
   initiateConvention,
 } from "../../utils/dashboard";
-import { test } from "../../utils/utils";
+import { fillAutocomplete, test } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -39,23 +39,47 @@ test.describe("Agency dashboard workflow", () => {
       if (!agencyId) throw new Error("Agency ID is null");
       await page.goto("/");
       await goToAdminTab(page, "adminAgencies");
+      await fillAutocomplete({
+        page,
+        locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
+        value: "34792240300030",
+      });
+
+      // An agency cannot be activated without an agency-admin, so we add one first.
       await page
-        .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
-        .fill(agencyId);
+        .locator(`#${domElementIds.admin.agencyTab.openManageUserModalButton}`)
+        .click();
+      await expect(
+        page.locator(
+          `#${domElementIds.admin.agencyTab.editAgencyManageUserModal}`,
+        ),
+      ).toBeVisible();
+      await page
+        .locator(`#${domElementIds.admin.agencyTab.editAgencyUserEmail}`)
+        .fill(faker.internet.email());
+      await page
+        .locator(
+          `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-0"]`,
+        )
+        .click();
+      await page
+        .locator(
+          `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
+        )
+        .click();
+      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
 
-      const reviewButton = page.locator(
-        `#${domElementIds.admin.agencyTab.agencyToReviewButton}`,
+      const statusSelector = page.locator(
+        `#${domElementIds.admin.agencyTab.editAgencyFormStatusSelector}`,
       );
-      await expect(reviewButton).toBeVisible();
-      await expect(reviewButton).toBeEnabled();
-      await reviewButton.click();
+      await expect(statusSelector).toBeVisible();
+      await statusSelector.selectOption("active");
 
-      const activateButton = page.locator(
-        `#${domElementIds.admin.agencyTab.agencyToReviewActivateButton}`,
-      );
-      await expect(activateButton).toBeVisible({ timeout: 15_000 });
-      await expect(activateButton).toBeEnabled();
-      await activateButton.click();
+      await page
+        .locator(
+          `#${domElementIds.admin.agencyTab.editAgencyFormEditSubmitButton}`,
+        )
+        .click();
 
       await expect(page.locator(".fr-alert--success").first()).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);

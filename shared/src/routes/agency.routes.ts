@@ -8,7 +8,6 @@ import {
   closeAgencyAndTransferConventionsRequestSchema,
   createAgencySchema,
   listAgencyOptionsRequestSchema,
-  updateAgencyStatusParamsWithoutIdSchema,
   withAgencyIdSchema,
 } from "../agency/agency.schema";
 import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
@@ -75,18 +74,10 @@ export const agencyRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
+      400: httpErrorSchema,
       401: httpErrorSchema,
-      409: httpErrorSchema,
-    },
-  }),
-
-  updateAgencyStatus: defineRoute({
-    method: "patch",
-    url: "/admin/agencies/:agencyId",
-    requestBodySchema: updateAgencyStatusParamsWithoutIdSchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
       409: httpErrorSchema,
     },
   }),

@@ -57,17 +57,6 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     ),
   );
 
-  sharedAgencyRouter.updateAgency(
-    deps.connectedUserAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgency.execute(
-          req.body,
-          getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
-  );
-
   sharedAgencyRouter.updateUserRoleForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
