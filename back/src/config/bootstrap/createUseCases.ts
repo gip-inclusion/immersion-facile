@@ -117,7 +117,7 @@ import type {
   GenerateEmailAuthCodeJwt,
   VerifyJwtFn,
 } from "../../domains/core/jwt";
-import { makeGetNafSuggestions } from "../../domains/core/naf/use-cases/GetNafSuggestions";
+import { makeGetAllNafSections } from "../../domains/core/naf/use-cases/GetAllNafSections";
 import {
   makeSaveNotificationAndRelatedEvent,
   makeSaveNotificationsBatchAndRelatedEvent,
@@ -1020,7 +1020,7 @@ export const createUseCases = ({
       },
       uowPerformer,
     }),
-    nafSuggestions: makeGetNafSuggestions({
+    getAllNafSections: makeGetAllNafSections({
       deps: {
         withCache: gateways.withCache,
         uowPerformer,

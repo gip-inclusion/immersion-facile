@@ -6,12 +6,12 @@ import {
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type GetNafSuggestions,
-  makeGetNafSuggestions,
-} from "./GetNafSuggestions";
+  type GetAllNafSections,
+  makeGetAllNafSections,
+} from "./GetAllNafSections";
 
 describe("NafSuggestions", () => {
-  let getNafSuggestions: GetNafSuggestions;
+  let getNafSuggestions: GetAllNafSections;
   let uow: InMemoryUnitOfWork;
 
   const agricultureSection: NafSectionSuggestion = {
@@ -31,7 +31,7 @@ describe("NafSuggestions", () => {
 
   beforeEach(async () => {
     uow = createInMemoryUow();
-    getNafSuggestions = makeGetNafSuggestions({
+    getNafSuggestions = makeGetAllNafSections({
       deps: {
         withCache: withNoCache,
         uowPerformer: new InMemoryUowPerformer(uow),
