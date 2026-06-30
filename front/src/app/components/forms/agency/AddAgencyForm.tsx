@@ -250,9 +250,6 @@ const AgencyForm = ({
         })}
         id={domElementIds.addAgency.form}
       >
-        <p className={fr.cx("fr-text--xs")}>
-          Tous les champs marqués d'une astérisque (*) sont obligatoires.
-        </p>
         {refersToOtherAgency && (
           <>
             <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
@@ -260,6 +257,7 @@ const AgencyForm = ({
               d'accompagnement ?
             </h2>
             <p>Il sera le validateur final des conventions</p>
+            <AgencyFormMandatoryWarning />
             <AgencySelector
               fields={{
                 agencyDepartmentField: {
@@ -288,9 +286,10 @@ const AgencyForm = ({
             />
           </>
         )}
-        <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+        <h2 className={fr.cx("fr-text--lead", "fr-mb-1w")}>
           {refersToOtherAgency ? "Votre structure" : "Prescripteur"}
         </h2>
+        <AgencyFormMandatoryWarning />
         <Select
           label={formContents.kind.label}
           hint={formContents.kind.hintText}
@@ -493,3 +492,9 @@ const isAgencyKindAllowedToAdd = (
   kind: AllowedAgencyKindToAdd | "",
 ): kind is AllowedAgencyKindToAdd =>
   kind !== "" && allAgencyKindsAllowedToAdd.includes(kind);
+
+const AgencyFormMandatoryWarning = () => (
+  <p className={fr.cx("fr-text--xs", "fr-mb-1w")}>
+    Tous les champs marqués d'une astérisque (*) sont obligatoires.
+  </p>
+);
