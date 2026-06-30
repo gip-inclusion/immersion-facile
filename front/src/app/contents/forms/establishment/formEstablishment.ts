@@ -27,7 +27,7 @@ export const formEstablishmentFieldsLabels = (
   mode: Mode,
 ): FormEstablishmentFieldsLabels => ({
   siret: {
-    label: "Indiquez le SIRET de la structure d'accueil",
+    label: "Indiquez le SIRET de votre établissement",
     id: domElementIds.formEstablishment[mode].siret,
     hintText: "Format attendu : 123 456 789 01234",
     required: true,
@@ -40,7 +40,7 @@ export const formEstablishmentFieldsLabels = (
   },
   businessNameCustomized: {
     label:
-      "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
+      "Indiquez le nom de l'enseigne de l'établissement, si elle diffère de la raison sociale",
     id: domElementIds.formEstablishment[mode].businessNameCustomized,
     autoComplete: "organization",
     hintText:
