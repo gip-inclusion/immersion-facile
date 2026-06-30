@@ -1,4 +1,5 @@
 import { expectToEqual, type NafSectionSuggestion } from "shared";
+import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
 import {
   createInMemoryUow,
   type InMemoryUnitOfWork,
@@ -31,7 +32,10 @@ describe("NafSuggestions", () => {
   beforeEach(async () => {
     uow = createInMemoryUow();
     getNafSuggestions = makeGetNafSuggestions({
-      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        withCache: withNoCache,
+        uowPerformer: new InMemoryUowPerformer(uow),
+      },
     });
     uow.nafRepository.nafSuggestions = [
       agricultureSection,
