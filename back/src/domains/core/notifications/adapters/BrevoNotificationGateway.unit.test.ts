@@ -208,14 +208,7 @@ describe("BrevoNotificationGateway unit", () => {
       <br/>
       <br/>Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
       <br/>
-      <br/>false
-      <br/>
-      <br/>Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
-      <br/>
-      <br/>Au programme :
-      <br/>• Le moteur de recherche pour trouver une entreprise accueillante
-      <br/>• Comment compléter une convention d'immersion
-      <br/>• Découvrir l'espace prescripteur - piloter les conventions</p>
+      <br/>false</p>
       </td>
       </tr>
       </table>
