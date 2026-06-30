@@ -126,10 +126,10 @@ export type DomainEvent =
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & Partial<WithDiscussionId> & Partial<WithConventionDraftId> & WithTriggeredBy>
-  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithAgencyId & WithTriggeredBy>
   | GenericEvent<"ConventionPartiallySigned", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionFullySigned", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionModifiedAndSigned", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionModifiedAndSigned", WithConventionDto & WithAgencyId & WithTriggeredBy>
   | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>

@@ -10,7 +10,6 @@ import {
   ConventionDtoBuilder,
   type ConventionRole,
   type ConventionStatus,
-  conventionSignatoryRoleBySignatoryKey,
   conventionStatuses,
   type EstablishmentTutor,
   errors,
@@ -18,6 +17,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   type Role,
+  type SignatoryRole,
   statusTransitionConfigs,
   UserBuilder,
 } from "shared";
@@ -384,6 +384,14 @@ describe("Update Convention", () => {
           counsellorUser,
           validatorUser,
         ).beneficiary,
+        makeExpectedUpdatedConvention: (
+          updatedConvention: ConventionDto,
+          signedAt: string,
+        ) =>
+          new ConventionDtoBuilder(updatedConvention)
+            .withStatus("PARTIALLY_SIGNED")
+            .signedByBeneficiary(signedAt)
+            .build(),
       },
       {
         applicationId: convention.id,
@@ -393,6 +401,24 @@ describe("Update Convention", () => {
           counsellorUser,
           validatorUser,
         )["beneficiary-current-employer"],
+        makeExpectedUpdatedConvention: (
+          updatedConvention: ConventionDto,
+          signedAt: string,
+        ) => {
+          const beneficiaryCurrentEmployer =
+            updatedConvention.signatories.beneficiaryCurrentEmployer;
+          if (!beneficiaryCurrentEmployer)
+            throw new Error(
+              "Expected convention to have a beneficiary current employer.",
+            );
+          return new ConventionDtoBuilder(updatedConvention)
+            .withStatus("PARTIALLY_SIGNED")
+            .withBeneficiaryCurrentEmployer({
+              ...beneficiaryCurrentEmployer,
+              signedAt,
+            })
+            .build();
+        },
       },
       {
         applicationId: convention.id,
@@ -402,6 +428,14 @@ describe("Update Convention", () => {
           counsellorUser,
           validatorUser,
         )["beneficiary-representative"],
+        makeExpectedUpdatedConvention: (
+          updatedConvention: ConventionDto,
+          signedAt: string,
+        ) =>
+          new ConventionDtoBuilder(updatedConvention)
+            .withStatus("PARTIALLY_SIGNED")
+            .signedByBeneficiaryRepresentative(signedAt)
+            .build(),
       },
       {
         applicationId: convention.id,
@@ -411,8 +445,22 @@ describe("Update Convention", () => {
           counsellorUser,
           validatorUser,
         )["establishment-representative"],
+        makeExpectedUpdatedConvention: (
+          updatedConvention: ConventionDto,
+          signedAt: string,
+        ) =>
+          new ConventionDtoBuilder(updatedConvention)
+            .withStatus("PARTIALLY_SIGNED")
+            .signedByEstablishmentRepresentative(signedAt)
+            .build(),
       },
-    ] as ConventionDomainJwtPayload[])("updates the Convention in the repository when updated by signatories user", async (payload) => {
+    ] satisfies (ConventionDomainJwtPayload & {
+      role: SignatoryRole;
+      makeExpectedUpdatedConvention: (
+        updatedConvention: ConventionDto,
+        signedAt: string,
+      ) => ConventionDto;
+    })[])("updates the Convention in the repository when updated by signatories user", async (payload) => {
       uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
       uow.conventionRepository.setConventions([convention]);
 
@@ -420,39 +468,28 @@ describe("Update Convention", () => {
         .withStatus("READY_TO_SIGN")
         .withBeneficiaryEmail("new@email.fr")
         .withStatusJustification("justif")
-
         .build();
 
       await updateConvention.execute(
         { convention: updatedConvention },
         payload,
       );
-      const expectedUpdatedConventionInRepo = {
-        ...updatedConvention,
-        status: "PARTIALLY_SIGNED",
-        signatories: {
-          ...updatedConvention.signatories,
-          [conventionSignatoryRoleBySignatoryKey[
-            payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
-          ]]: {
-            ...updatedConvention.signatories[
-              conventionSignatoryRoleBySignatoryKey[
-                payload.role as keyof typeof conventionSignatoryRoleBySignatoryKey
-              ]
-            ],
-            signedAt: timeGateway.now().toISOString(),
-          },
-        },
-      };
+
+      const signedAt = timeGateway.now().toISOString();
+      const expectedUpdatedConvention = payload.makeExpectedUpdatedConvention(
+        updatedConvention,
+        signedAt,
+      );
 
       expectToEqual(uow.conventionRepository.conventions, [
-        expectedUpdatedConventionInRepo,
+        expectedUpdatedConvention,
       ]);
       expectArraysToMatch(uow.outboxRepository.events, [
         createNewEvent({
           topic: "ConventionModifiedAndSigned",
           payload: {
-            convention: expectedUpdatedConventionInRepo as ConventionDto,
+            convention: expectedUpdatedConvention,
+            agencyId: agency.id,
             triggeredBy: {
               kind: "convention-magic-link",
               role: payload.role,
@@ -523,6 +560,7 @@ describe("Update Convention", () => {
           topic: "ConventionSubmittedAfterModification",
           payload: {
             convention: updatedConvention,
+            agencyId: agency.id,
             triggeredBy: {
               ...("userId" in payload
                 ? {
