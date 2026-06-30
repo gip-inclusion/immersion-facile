@@ -18,10 +18,6 @@ export default {
     title: "Conditions générales d'utilisation d'Immersion Facilitée",
     content: () => <Version20260319CguContent />,
   },
-  "2026-06-24": {
-    title: "Conditions générales d'utilisation d'Immersion Facilitée",
-    content: () => <Version20260624CguContent />,
-  },
   latest: {
     title: "Conditions générales d'utilisation d'Immersion Facilitée",
     content: () => <Version20260624CguContent />,
