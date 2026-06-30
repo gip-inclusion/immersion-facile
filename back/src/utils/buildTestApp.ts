@@ -7,6 +7,7 @@ import type { InMemoryAddressGateway } from "../domains/core/address/adapters/In
 import type { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import type { InMemoryProConnectOAuthGateway } from "../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
+import type { WithCache } from "../domains/core/caching-gateway/port/WithCache";
 import type { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import type { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import type { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
@@ -32,6 +33,7 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {
   disconnectCache: () => Promise<void>;
+  withCache: WithCache;
   notification: InMemoryNotificationGateway;
   ftConnectGateway: InMemoryFtConnectGateway;
   siret: InMemorySiretGateway;

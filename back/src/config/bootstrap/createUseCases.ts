@@ -1020,7 +1020,12 @@ export const createUseCases = ({
       },
       uowPerformer,
     }),
-    nafSuggestions: makeGetNafSuggestions({ uowPerformer }),
+    nafSuggestions: makeGetNafSuggestions({
+      deps: {
+        withCache: gateways.withCache,
+        uowPerformer,
+      },
+    }),
     sendTicketToCrisp: makeSendSupportTicketToCrisp({
       uowPerformer,
       deps: { crispApi: gateways.crispGateway },
