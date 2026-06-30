@@ -22,11 +22,7 @@ export class SimulatedNafGateway implements NafGateway {
     },
   ];
 
-  getNafSuggestions$(searchTerm: string): Observable<NafSectionSuggestion[]> {
-    return of(
-      this.#simulatedResponse.filter((suggestion) =>
-        suggestion.label.includes(searchTerm),
-      ),
-    ).pipe(delay(this.simulatedLatency));
+  getAllNafSections$(): Observable<NafSectionSuggestion[]> {
+    return of(this.#simulatedResponse).pipe(delay(this.simulatedLatency));
   }
 }

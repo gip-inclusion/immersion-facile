@@ -38,7 +38,7 @@ const searchSectionsEpic: AppEpic<NafAction> = (
 ) =>
   action$.pipe(
     filter(nafSlice.actions.searchSectionsRequested.match),
-    switchMap((action) => nafGateway.getNafSuggestions$(action.payload)),
+    switchMap(() => nafGateway.getAllNafSections$()),
     map((suggestions) => nafSlice.actions.searchSectionsSucceeded(suggestions)),
     catchEpicError((_error) => nafSlice.actions.searchSectionsFailed(null)),
   );

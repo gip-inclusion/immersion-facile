@@ -11,20 +11,14 @@ import { match } from "ts-pattern";
 export class HttpNafGateway implements NafGateway {
   constructor(private readonly httpClient: HttpClient<NafRoutes>) {}
 
-  getNafSuggestions$(searchText: string): Observable<NafSectionSuggestion[]> {
+  getAllNafSections$(): Observable<NafSectionSuggestion[]> {
     return from(
-      this.httpClient
-        .getAllNafSections({
-          queryParams: {
-            searchText,
-          },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .otherwise(otherwiseThrow),
-        ),
+      this.httpClient.getAllNafSections().then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+          .otherwise(otherwiseThrow),
+      ),
     );
   }
 }
