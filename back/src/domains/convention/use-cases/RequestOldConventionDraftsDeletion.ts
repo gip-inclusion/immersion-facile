@@ -22,7 +22,7 @@ export const makeRequestOldConventionDraftsDeletion = useCaseBuilder(
 
     const events = oldConventionDraftIds.map((oldConventionDraftId) =>
       deps.createNewEvent({
-        topic: "ConventionDrafToDelete",
+        topic: "ConventionDraftToDelete",
         payload: {
           conventionDraftId: oldConventionDraftId,
           triggeredBy: {

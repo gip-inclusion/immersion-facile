@@ -72,11 +72,11 @@ describe("RequestOldConventionDraftsDeletion", () => {
     expectToEqual(numberOfOldConventionDraftIds, 1);
     expectObjectInArrayToMatch(uow.outboxRepository.events, [
       {
-        topic: "ConventionDrafToDelete" as const,
+        topic: "ConventionDraftToDelete",
         payload: {
           conventionDraftId: oldConventionDraft.id,
           triggeredBy: {
-            kind: "crawler" as const,
+            kind: "crawler",
           },
         },
       },
@@ -148,11 +148,11 @@ describe("RequestOldConventionDraftsDeletion", () => {
     expectObjectInArrayToMatch(
       uow.outboxRepository.events,
       expectedOldConventionDraftIds.map((oldConventionDraftId) => ({
-        topic: "ConventionDrafToDelete" as const,
+        topic: "ConventionDraftToDelete",
         payload: {
           conventionDraftId: oldConventionDraftId,
           triggeredBy: {
-            kind: "crawler" as const,
+            kind: "crawler",
           },
         },
       })),

@@ -203,7 +203,7 @@ const getUseCasesByTopics = (
   ],
   ConventionSignatureLinkManuallySent: [],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
-  ConventionDrafToDelete: [useCases.deleteConventionDraft],
+  ConventionDraftToDelete: [useCases.deleteConventionDraft],
 
   // Establishment form related
   UpdatedEstablishmentAggregateInsertedFromForm: [
