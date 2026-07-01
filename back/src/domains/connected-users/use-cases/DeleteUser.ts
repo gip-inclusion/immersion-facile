@@ -1,9 +1,12 @@
 import { keys, toPairs, uniq, values } from "ramda";
 import {
+  type AgencyId,
   type AgencyRole,
+  type AgencyStatus,
   type AgencyUserRight,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
+  type ExtractFromExisting,
   errors,
   executeInSequence,
   isNotEmptyArray,
@@ -224,7 +227,11 @@ const updateAgency =
     return {
       ...agency,
       ...(!remainingValidators.length && !remainingAdmins.length
-        ? { status: remainingRightsList.length ? "needsReview" : "closed" }
+        ? await getAgencyStatusWhenNoRemainingAdminOrValidator({
+            uow,
+            agencyId: agency.id,
+            remainingRightsList,
+          })
         : {}),
       usersRights: remainingRightsList.reduce<AgencyUsersRights>(
         (acc, { userId, ...agencyRight }) => ({
@@ -239,6 +246,39 @@ const updateAgency =
       ),
     };
   };
+
+const getAgencyStatusWhenNoRemainingAdminOrValidator = async ({
+  uow,
+  agencyId,
+  remainingRightsList,
+}: {
+  uow: UnitOfWork;
+  agencyId: AgencyId;
+  remainingRightsList: AgencyRightList;
+}): Promise<{
+  status: ExtractFromExisting<AgencyStatus, "closed" | "rejected">;
+  statusJustification: string;
+}> => {
+  if (!remainingRightsList.length) {
+    return {
+      status: "closed",
+      statusJustification: "Aucun utilisateur actif",
+    };
+  }
+
+  const acceptedConventions = await uow.conventionQueries.getConventions({
+    filters: {
+      agencyIds: [agencyId],
+      withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+    },
+    sortBy: "dateStart",
+  });
+
+  return {
+    status: acceptedConventions.length ? "closed" : "rejected",
+    statusJustification: "Aucun utilisateur actif",
+  };
+};
 
 const getMostActiveUserId = (
   uow: UnitOfWork,
