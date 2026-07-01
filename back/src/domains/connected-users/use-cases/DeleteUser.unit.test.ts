@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  ConventionDtoBuilder,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -484,7 +485,7 @@ describe("DeleteUser", () => {
         ]);
       });
 
-      it("case P3 BIS - with last validator and no admins - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
+      it("case P3 BIS - with last validator and no admins and no convention - remove agency right  + user deleted + agency rejected + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [validator1.id]: {
@@ -514,7 +515,10 @@ describe("DeleteUser", () => {
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(
-            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            new AgencyDtoBuilder(agency)
+              .withStatus("rejected")
+              .withStatusJustification("Aucun utilisateur actif")
+              .build(),
             {
               [readOnlyAndCounsellor.id]: {
                 isNotifiedByEmail: false,
@@ -645,7 +649,7 @@ describe("DeleteUser", () => {
           },
         ]);
       });
-      it("case P5 ALT - with last admin + validator and another user with counsellor/readonly - remove agency right  + user deleted + agency to review + event UserDeleted + event AgencyHasBeenPutOnHold ", async () => {
+      it("case P5 ALT - with last admin + validator and another user with counsellor/readonly + no convention - remove agency right  + user deleted + agency rejected + event UserDeleted + event AgencyHasBeenPutOnHold ", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [admin1.id]: {
@@ -675,7 +679,10 @@ describe("DeleteUser", () => {
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(
-            new AgencyDtoBuilder(agency).withStatus("needsReview").build(),
+            new AgencyDtoBuilder(agency)
+              .withStatus("rejected")
+              .withStatusJustification("Aucun utilisateur actif")
+              .build(),
             {
               [readOnlyAndCounsellor.id]: {
                 isNotifiedByEmail: false,
@@ -729,7 +736,10 @@ describe("DeleteUser", () => {
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(
-            new AgencyDtoBuilder(agency).withStatus("closed").build(),
+            new AgencyDtoBuilder(agency)
+              .withStatus("closed")
+              .withStatusJustification("Aucun utilisateur actif")
+              .build(),
             {},
           ),
         ]);
@@ -740,6 +750,73 @@ describe("DeleteUser", () => {
             payload: {
               triggeredBy: { kind: "crawler" },
               userId: admin1.id,
+            },
+          },
+        ]);
+      });
+
+      it("case P7 - with last admin + validator, another user and validated convention - remove agency right + user deleted + agency closed + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [admin1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+            [readOnlyAndCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          }),
+        ];
+        uow.conventionRepository.setConventions([
+          new ConventionDtoBuilder()
+            .withAgencyId(agency.id)
+            .withStatus("ACCEPTED_BY_VALIDATOR")
+            .build(),
+        ]);
+
+        await deleteUser.execute({
+          userId: admin1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator1,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            new AgencyDtoBuilder(agency)
+              .withStatus("closed")
+              .withStatusJustification("Aucun utilisateur actif")
+              .build(),
+            {
+              [readOnlyAndCounsellor.id]: {
+                isNotifiedByEmail: false,
+                roles: ["counsellor"],
+              },
+            },
+          ),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: admin1.id,
+            },
+          },
+          {
+            topic: "AgencyHasBeenPutOnHold",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              agencyId: agency.id,
             },
           },
         ]);
