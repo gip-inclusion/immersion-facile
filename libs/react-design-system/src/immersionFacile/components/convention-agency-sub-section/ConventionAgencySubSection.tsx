@@ -20,8 +20,6 @@ export type AgencySubSection = {
   };
 };
 
-const EMPTY_VALUE = "";
-
 export const ConventionAgencySubSection = ({
   agencyReferent,
   refersToAgency,
@@ -67,10 +65,16 @@ export const ConventionAgencySubSection = ({
               {structure.structureName}
               {structure.structureCopyButton}
             </dd>
-            <dt className={fr.cx("fr-text--xs", "fr-m-0")}>Représentée par</dt>
-            <dd className={fr.cx("fr-text--sm", "fr-text--bold", "fr-m-0")}>
-              {structure.representedBy || EMPTY_VALUE}
-            </dd>
+            {structure.representedBy && (
+              <>
+                <dt className={fr.cx("fr-text--xs", "fr-m-0")}>
+                  Représentée par
+                </dt>
+                <dd className={fr.cx("fr-text--sm", "fr-text--bold", "fr-m-0")}>
+                  {structure.representedBy}
+                </dd>
+              </>
+            )}
           </dl>
         </div>
       </div>
