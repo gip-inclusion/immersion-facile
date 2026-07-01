@@ -481,6 +481,13 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryLastName: "Kornac'h",
     immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
   },
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR: {
+    conventionId: "CONVENTION_ID",
+    businessName: "Ker Anna",
+    beneficiaryFirstName: "Gwenola",
+    beneficiaryLastName: "Kornac'h",
+    immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
+  },
   ESTABLISHMENT_DELETED: {
     businessAddresses: [
       addressDtoToString({

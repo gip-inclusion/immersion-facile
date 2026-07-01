@@ -359,6 +359,13 @@ export type EmailParamsByEmailType = {
     businessName: string;
     immersionBaseUrl: AbsoluteUrl;
   };
+  ESTABLISHMENT_BANNED_NOTIFICATION_TO_VALIDATOR_AND_PREVALIDATOR: {
+    conventionId: ConventionId;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    immersionBaseUrl: AbsoluteUrl;
+  };
   ESTABLISHMENT_DELETED: {
     businessName: string;
     siret: SiretDto;
