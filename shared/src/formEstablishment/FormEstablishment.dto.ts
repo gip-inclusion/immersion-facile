@@ -118,9 +118,14 @@ export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
 export type FitForDisableWorkerOption =
   (typeof fitForDisabledWorkersOptions)[number];
-export const fitForDisabledWorkersOptions = [
+
+export const fitForDisabledWorkersPositiveOptions = [
   "yes-ft-certified",
   "yes-declared-only",
+] as const;
+
+export const fitForDisabledWorkersOptions = [
+  ...fitForDisabledWorkersPositiveOptions,
   "no",
 ] as const;
 
