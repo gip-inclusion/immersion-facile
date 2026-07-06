@@ -7,7 +7,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { includes, keys } from "ramda";
+import { equals, includes, keys } from "ramda";
 import {
   type ElementRef,
   type ReactNode,
@@ -25,6 +25,7 @@ import {
   SectionAccordion,
   SectionHighlight,
   SectionTextEmbed,
+  useLayout,
   useScrollTo,
 } from "react-design-system";
 import {
@@ -36,8 +37,11 @@ import {
 import { useDispatch } from "react-redux";
 import {
   domElementIds,
+  type FitForDisableWorkerOption,
+  fitForDisabledWorkersPositiveOptions,
   type LatLonDistance,
   type NafSectionSuggestion,
+  type RemoteWorkMode,
   remoteWorkModeLabels,
   remoteWorkModes,
   type SearchSortedBy,
@@ -300,6 +304,21 @@ export const SearchPage = ({
     dispatch(nafSlice.actions.getAllSectionsRequested());
   }, [dispatch]);
 
+  const displayTotalFiltersLength = (formValues: SearchPageParams): string => {
+    const currentFiltersLength = [
+      ...getAppellationAndNafValues(
+        formValues.appellationCodes,
+        formValues.nafCodes,
+      ),
+      ...getEstablishmentAdditionalValues(
+        formValues.fitForDisabledWorkers,
+        formValues.showOnlyAvailableOffers,
+      ),
+      ...getLocalisationValues(formValues.place, formValues.remoteWorkModes),
+    ].length;
+    return currentFiltersLength > 0 ? `(${currentFiltersLength})` : "";
+  };
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -517,60 +536,63 @@ export const SearchPage = ({
                     size="small"
                     onClick={() => setIsPanelOpened(true)}
                   >
-                    Filtrer
+                    Filtrer {displayTotalFiltersLength(formValues)}
                   </Button>
-                  <RichDropdown
-                    defaultValue="Trier par pertinence"
-                    iconId="fr-icon-arrow-down-line"
-                    id={domElementIds[route.name].sortFilterTag}
-                    values={
-                      formValues.sortBy
-                        ? [sortedByOptionsLabel[formValues.sortBy]]
-                        : []
-                    }
-                    className={fr.cx("fr-ml-2w")}
-                    submenu={{
-                      title: "Ordre d’affichage",
-                      content: (
-                        <RadioButtons
-                          id={domElementIds[route.name].sortRadioButtons}
-                          options={filteredSortOptions.map((option) => ({
-                            ...option,
-                            nativeInputProps: {
-                              name: register("sortBy").name,
-                              value: option.value,
-                              disabled: option.disabled,
-                              checked: tempValue
-                                ? option.value === tempValue.sortBy
-                                : false,
-                              onClick: (event) => {
-                                const updatedSortedBy = isSearchSortedBy(
-                                  event.currentTarget.value,
-                                )
-                                  ? event.currentTarget.value
-                                  : "score";
-                                if (
-                                  updatedSortedBy === "distance" &&
-                                  areValidGeoParams(tempValue)
-                                ) {
-                                  setTempValue({
-                                    ...tempValue,
-                                    sortBy: "distance",
-                                  });
-                                }
-                                if (updatedSortedBy !== "distance") {
-                                  setTempValue({
-                                    ...tempValue,
-                                    sortBy: updatedSortedBy,
-                                  });
-                                }
+                  <div className={fr.cx("fr-hidden", "fr-unhidden-lg")}>
+                    <RichDropdown
+                      defaultValue="Trier par pertinence"
+                      iconId="fr-icon-arrow-down-line"
+                      id={domElementIds[route.name].sortFilterTag}
+                      values={
+                        formValues.sortBy
+                          ? [sortedByOptionsLabel[formValues.sortBy]]
+                          : []
+                      }
+                      className={fr.cx("fr-ml-2w")}
+                      submenu={{
+                        title: "Ordre d’affichage",
+                        content: (
+                          <RadioButtons
+                            id={domElementIds[route.name].sortRadioButtons}
+                            options={filteredSortOptions.map((option) => ({
+                              ...option,
+                              nativeInputProps: {
+                                name: register("sortBy").name,
+                                value: option.value,
+                                disabled: option.disabled,
+                                checked: tempValue
+                                  ? option.value === tempValue.sortBy
+                                  : false,
+                                onClick: (event) => {
+                                  const updatedSortedBy = isSearchSortedBy(
+                                    event.currentTarget.value,
+                                  )
+                                    ? event.currentTarget.value
+                                    : "score";
+                                  if (
+                                    updatedSortedBy === "distance" &&
+                                    areValidGeoParams(tempValue)
+                                  ) {
+                                    setTempValue({
+                                      ...tempValue,
+                                      sortBy: "distance",
+                                    });
+                                  }
+                                  if (updatedSortedBy !== "distance") {
+                                    setTempValue({
+                                      ...tempValue,
+                                      sortBy: updatedSortedBy,
+                                    });
+                                  }
+                                },
                               },
-                            },
-                          }))}
-                        />
-                      ),
-                    }}
-                  />
+                            }))}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
+
                   <div
                     className={cx(fr.cx("fr-ml-auto"), Styles.resultsSummary)}
                   >
@@ -707,6 +729,34 @@ type SearchFilterPanelProps = {
   nafOptions: NafSectionSuggestion[];
 };
 
+const getLocalisationValues = (
+  place?: string,
+  currentRemoteWorkModes?: RemoteWorkMode[],
+): string[] => [
+  ...(place ? [place] : []),
+  ...((currentRemoteWorkModes || []).length === remoteWorkModes.length
+    ? []
+    : currentRemoteWorkModes || []),
+];
+
+const getEstablishmentAdditionalValues = (
+  fitForDisabledWorkers?: FitForDisableWorkerOption[],
+  showOnlyAvailableOffers?: boolean,
+): string[] => [
+  ...(equals(fitForDisabledWorkers, [...fitForDisabledWorkersPositiveOptions])
+    ? [(fitForDisabledWorkers || []).join(", ")]
+    : []),
+  ...(showOnlyAvailableOffers ? [showOnlyAvailableOffers.toString()] : []),
+];
+
+const getAppellationAndNafValues = (
+  appellationCodes?: string[],
+  nafCodes?: string[],
+): string[] => [
+  ...(appellationCodes ? [appellationCodes.join(", ")] : []),
+  ...(nafCodes ? [nafCodes.join(", ")] : []),
+];
+
 const SearchFilterPanel = ({
   initialValues,
   tempValue,
@@ -727,24 +777,11 @@ const SearchFilterPanel = ({
     formState: { errors },
     watch,
   } = useFormContext<SearchPageParams>();
+  const { isLayoutDesktop } = useLayout();
   const formValues = getValues();
-  const [distanceKm, place] = watch(["distanceKm", "place"]);
+  const [place] = watch(["place"]);
   const wrapperElementRef = useRef<HTMLDivElement>(null);
-  const filtersSectionMaxWidth = 420;
-
-  const displayAppellationsOrNaf = (): string => {
-    const appellationDisplayed = formValues.appellations?.length
-      ? formValues.appellations.map(
-          (appellation) => appellation.appellationLabel,
-        )
-      : [];
-    const appellationsToDisplay = appellationDisplayed.length
-      ? appellationDisplayed.join(" - ")
-      : "Tous les métiers";
-    return [appellationsToDisplay, formValues.nafLabel]
-      .filter(Boolean)
-      .join(" - ");
-  };
+  const filtersSectionMaxWidth = isLayoutDesktop ? 420 : "100%";
 
   useLayoutEffect(() => {
     const frHeader = document.getElementById("fr-header");
@@ -760,9 +797,11 @@ const SearchFilterPanel = ({
 
     refreshTopOffset();
     window.addEventListener("scroll", refreshTopOffset);
+    window.addEventListener("resize", refreshTopOffset);
 
     return () => {
       window.removeEventListener("scroll", refreshTopOffset);
+      window.removeEventListener("resize", refreshTopOffset);
     };
   }, []);
 
@@ -774,12 +813,13 @@ const SearchFilterPanel = ({
         position: "fixed",
         left: 0,
         top: 0,
+        ...(isLayoutDesktop ? {} : { right: 0 }),
         bottom: 0,
         zIndex: 1000,
         boxShadow: "0 5px 5px 0 rgba(0,0,0,0.5)",
         backgroundColor: colors.decisions.background.default.grey.default,
-        marginLeft: isPanelOpened ? 0 : -(filtersSectionMaxWidth + 5),
-        transition: "margin-left ease .2s",
+        transform: `translateX(${isPanelOpened ? 0 : -100}%)`,
+        transition: "transform ease .2s",
       }}
       className={fr.cx("fr-pt-6w", "fr-px-2w", "fr-pb-2w")}
     >
@@ -798,7 +838,11 @@ const SearchFilterPanel = ({
       <div className={fr.cx("fr-accordions-group")}>
         <FilterAccordion
           label="Métier ou secteur d'activité"
-          values={[displayAppellationsOrNaf()]}
+          values={getAppellationAndNafValues(
+            formValues.appellationCodes,
+            formValues.nafCodes,
+          )}
+          defaultExpanded={true}
           onReset={() => {
             const updatedValues = {
               ...tempValue,
@@ -835,7 +879,15 @@ const SearchFilterPanel = ({
               placeholder: appellationPlaceholder(
                 useNaturalLanguageForAppellations,
               ),
-              defaultInputValue: formValues.appellations?.[0]?.appellationLabel,
+              defaultValue: formValues.appellations?.[0]
+                ? {
+                    label: formValues.appellations?.[0]?.appellationLabel,
+                    value: {
+                      appellation: formValues.appellations?.[0],
+                      matchRanges: [],
+                    },
+                  }
+                : undefined,
             }}
             state={errors.appellations ? "error" : undefined}
             stateRelatedMessage={errors.appellations?.message}
@@ -891,7 +943,10 @@ const SearchFilterPanel = ({
         </FilterAccordion>
         <FilterAccordion
           label="Localisation"
-          values={place ? [`${place} (${distanceKm}km)`] : []}
+          values={getLocalisationValues(
+            formValues.place,
+            formValues.remoteWorkModes,
+          )}
           onReset={() => {
             const updatedValues: SearchPageParams =
               tempValue.sortBy === "distance"
@@ -960,6 +1015,19 @@ const SearchFilterPanel = ({
             initialInputValue={place}
             selectProps={{
               inputId: domElementIds[routeName].placeAutocompleteInput,
+              defaultValue:
+                place && formValues.latitude && formValues.longitude
+                  ? {
+                      label: place,
+                      value: {
+                        label: place,
+                        position: {
+                          lat: formValues.latitude,
+                          lon: formValues.longitude,
+                        },
+                      },
+                    }
+                  : undefined,
             }}
             state={errors.place ? "error" : undefined}
             stateRelatedMessage={errors.place?.message}
@@ -1016,7 +1084,10 @@ const SearchFilterPanel = ({
         </FilterAccordion>
         <FilterAccordion
           label="Caractéristiques de l'entreprise"
-          values={formValues.fitForDisabledWorkers ? [rqthLabel] : []}
+          values={getEstablishmentAdditionalValues(
+            formValues.fitForDisabledWorkers,
+            formValues.showOnlyAvailableOffers,
+          )}
           onReset={() => {
             const updatedValues = {
               ...tempValue,
@@ -1044,7 +1115,7 @@ const SearchFilterPanel = ({
                     setTempValue({
                       ...tempValue,
                       fitForDisabledWorkers: event.currentTarget.checked
-                        ? ["yes-declared-only", "yes-ft-certified"]
+                        ? [...fitForDisabledWorkersPositiveOptions]
                         : ["no"],
                     });
                   },
@@ -1081,7 +1152,8 @@ const FilterAccordion = ({
   values,
   ...accordionProps
 }: FilterAccordionProps) => {
-  const hasValue = values && values.length > 0;
+  const countValues = values?.length || 0;
+  const hasValue = countValues > 0;
 
   const buttons: [ButtonProps, ...ButtonProps[]] = [
     {
@@ -1105,8 +1177,11 @@ const FilterAccordion = ({
     });
   }
   return (
-    <Accordion {...(accordionProps as AccordionProps)}>
-      {children}{" "}
+    <Accordion
+      {...accordionProps}
+      label={accordionProps.label + (countValues ? ` (${countValues})` : "")}
+    >
+      {children}
       <ButtonsGroup
         className={fr.cx("fr-hr", "fr-pt-2w", "fr-pb-0")}
         inlineLayoutWhen="always"

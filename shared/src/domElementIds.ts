@@ -160,6 +160,8 @@ export const domElementIds = {
     locationFilterTag: "im-search-page__location-filter-tag",
     nafAutocomplete: "im-search-page__naf-autocomplete",
     noResultsLbbButton: "im-search-page__no-results-lbb-button",
+    noResultsAvailabilityButton:
+      "im-search-page__no-results-availability-button",
     noResultsLbbCard: "im-search-page__no-results-lbb-card",
     placeAutocompleteInput: "im-search-page__address-autocomplete",
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",

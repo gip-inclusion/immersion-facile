@@ -1,10 +1,13 @@
 import { useState } from "react";
 import {
+  type OptionType,
   RSAutocomplete,
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
+import type { PropsValue } from "react-select";
 import type { LookupSearchResult } from "shared";
+import { isSingleOption } from "src/app/components/forms/autocomplete/autocomplete.utils";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { makeGeosearchLocatorSelector } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import {
@@ -17,6 +20,19 @@ export type PlaceAutocompleteProps = RSAutocompleteComponentProps<
   LookupSearchResult,
   GeosearchLocator
 >;
+
+const getAutocompleteValue = (
+  value?: LookupSearchResult | null,
+  defaultValue?: PropsValue<OptionType<LookupSearchResult>>,
+): OptionType<LookupSearchResult> | undefined => {
+  if (value)
+    return {
+      label: value.label,
+      value: value,
+    };
+  if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
+  return undefined;
+};
 
 export const PlaceAutocomplete = ({
   onPlaceSelected,
@@ -45,6 +61,10 @@ export const PlaceAutocomplete = ({
         loadingMessage: () => <>Recherche de ville en cours... 🔎</>,
         inputValue: searchTerm,
         placeholder: "Ex : Saint-Denis, La Réunion, France",
+        value: getAutocompleteValue(
+          geosearchLocatorSelector?.value,
+          props.selectProps?.defaultValue,
+        ),
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||

@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Card from "@codegouvfr/react-dsfr/Card";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
@@ -26,7 +27,6 @@ import { filterParamsForRoute } from "src/app/utils/url.utils";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-on-left.png";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-
 import type { Link } from "type-route";
 import { SearchResult } from "./SearchResult";
 
@@ -111,87 +111,77 @@ export const SearchListResults = ({
                 </p>
               </div>
             )}
-            {!hasResults &&
-              !isExternal &&
-              isSearchWithAppellationAndGeoParams && (
-                <div className={cx(fr.cx("fr-p-6w"), classes["text-centered"])}>
-                  <p className={fr.cx("fr-h6")}>
-                    Nous n'avons pas trouvé d'entreprises actuellement
-                    disponibles correspondant à votre recherche 🥺
-                  </p>
+            {!hasResults && !isExternal && (
+              <div className={cx(fr.cx("fr-p-6w"), classes["text-centered"])}>
+                <p className={fr.cx("fr-h6")}>
+                  Nous n'avons pas trouvé d'entreprises actuellement disponibles
+                  correspondant à votre recherche 🥺
+                </p>
 
-                  {searchParams.showOnlyAvailableOffers ? (
-                    <>
-                      <p>
-                        Certaines entreprises peuvent être temporairement
-                        masquées lorsqu’elles ont déjà reçu le maximum de
-                        candidatures qu’elles peuvent traiter.
-                      </p>
-                      <p>
-                        Vous pouvez afficher toutes les entreprises et revenir
-                        dans quelques semaines, lorsque de nouvelles places
-                        seront disponibles ou découvrir d’autres opportunités à
-                        votre potentiel d’embauche grâce à notre partenaire La
-                        Bonne Boîte.
-                      </p>
-                      <ul
-                        className={fr.cx(
-                          "fr-btns-group",
-                          "fr-btns-group--inline-md",
-                          "fr-btns-group--center",
-                        )}
-                      >
-                        <li>
-                          <Button
-                            id={domElementIds.search.noResultsLbbButton}
-                            priority="secondary"
-                            onClick={() => {
-                              onSearchFormSubmit({
-                                ...searchParams,
-                                showOnlyAvailableOffers: false,
-                              });
-                            }}
-                          >
-                            Afficher toutes les entreprises
-                          </Button>
-                        </li>
-                        <li>
-                          <Button
-                            id={domElementIds.search.noResultsLbbButton}
-                            linkProps={
-                              frontRoutes.externalSearch(
-                                getFilteredSearchParamsForLBB(searchParams),
-                              ).link
-                            }
-                            priority="primary"
-                          >
-                            Rechercher sur La Bonne Boîte
-                          </Button>
-                        </li>
-                      </ul>
-                    </>
-                  ) : (
-                    <>
-                      <p>
-                        Découvrez d'autres opportunités d'entreprise à fort
-                        potentiel d'embauche grâce à notre partenaire La Bonne
-                        Boîte !
-                      </p>
-                      <Button
-                        id={domElementIds.search.noResultsLbbButton}
-                        linkProps={
-                          frontRoutes.externalSearch(
-                            getFilteredSearchParamsForLBB(searchParams),
-                          ).link
-                        }
-                        priority="primary"
-                      >
-                        Rechercher sur La Bonne Boîte
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
+                {searchParams.showOnlyAvailableOffers ? (
+                  <>
+                    <p>
+                      Certaines entreprises peuvent être temporairement masquées
+                      lorsqu’elles ont déjà reçu le maximum de candidatures
+                      qu’elles peuvent traiter.
+                    </p>
+                    <p>
+                      Vous pouvez afficher toutes les entreprises et revenir
+                      dans quelques semaines, lorsque de nouvelles places seront
+                      disponibles ou découvrir d’autres opportunités à votre
+                      potentiel d’embauche grâce à notre partenaire La Bonne
+                      Boîte.
+                    </p>
+                    <ButtonsGroup
+                      inlineLayoutWhen="always"
+                      alignment="center"
+                      buttons={[
+                        {
+                          children: "Afficher toutes les entreprises",
+                          priority: "secondary",
+                          id: domElementIds.search.noResultsAvailabilityButton,
+                          onClick: () => {
+                            onSearchFormSubmit({
+                              ...searchParams,
+                              showOnlyAvailableOffers: false,
+                            });
+                          },
+                        },
+                        {
+                          children: "Rechercher sur La Bonne Boite",
+                          id: domElementIds.search.noResultsLbbButton,
+                          onClick: () => {
+                            onSearchFormSubmit({
+                              ...searchParams,
+                              showOnlyAvailableOffers: false,
+                            });
+                          },
+                        },
+                      ]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      Découvrez d'autres opportunités d'entreprise à fort
+                      potentiel d'embauche grâce à notre partenaire La Bonne
+                      Boîte !
+                    </p>
+                    <Button
+                      id={domElementIds.search.noResultsLbbButton}
+                      linkProps={
+                        frontRoutes.externalSearch(
+                          getFilteredSearchParamsForLBB(searchParams),
+                        ).link
+                      }
+                      priority="primary"
+                    >
+                      Rechercher sur La Bonne Boîte
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
             {hasResults &&
               searchResults.map((searchResult, index) => {
                 const appellations = searchResult.appellations;
