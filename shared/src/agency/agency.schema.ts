@@ -27,6 +27,7 @@ import {
   type AgencyIdResponse,
   type AgencyKind,
   type AgencyOption,
+  type AgencyStatus,
   activeAgencyStatuses,
   agencyKindFilters,
   allAgencyStatuses,
@@ -129,6 +130,11 @@ const delegationAgencyInfoSchema: ZodSchemaWithInputMatchingOutput<DelegationAge
 
 const withEmails = {
   counsellorEmails: z.array(emailSchema),
+  validatorEmails: z.array(emailSchema),
+};
+
+const withRequiredValidatorEmails = {
+  counsellorEmails: z.array(emailSchema),
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
@@ -152,11 +158,20 @@ const commonAgencyShape = {
   phoneNumber: phoneNumberSchema,
 };
 
+const mustHaveValidatorEmailsIfActiveOrNeedsReview = ({
+  status,
+  validatorEmails,
+}: {
+  status: AgencyStatus;
+  validatorEmails: Email[];
+}): boolean =>
+  closedOrRejectedAgencyStatuses.includes(status) || validatorEmails.length > 0;
+
 export const createAgencySchema: z.ZodType<
   CreateAgencyDto,
   CreateAgencyInitialValues
 > = z
-  .object({ ...commonAgencyShape, ...withEmails })
+  .object({ ...commonAgencyShape, ...withRequiredValidatorEmails })
   .and(
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
@@ -178,7 +193,18 @@ export const createAgencySchema: z.ZodType<
           "Une structure d'accompagnement doit avoir au moins un email de conseiller pour examen préabable",
       });
     }
-  });
+  })
+  .refine(
+    ({ validatorEmails }) =>
+      mustHaveValidatorEmailsIfActiveOrNeedsReview({
+        status: "needsReview",
+        validatorEmails,
+      }),
+    {
+      message: localization.atLeastOneEmail,
+      path: ["validatorEmails"],
+    },
+  );
 
 const mustHaveStatutJustificationIfClosedOrRejected = (
   agency: AgencyDto,
@@ -217,6 +243,10 @@ export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .refine(mustHaveStatutJustificationIfClosedOrRejected, {
     message: "Une agence inactive doit avoir une justification",
     path: ["statusJustification"],
+  })
+  .refine(mustHaveValidatorEmailsIfActiveOrNeedsReview, {
+    message: localization.atLeastOneEmail,
+    path: ["validatorEmails"],
   });
 
 const withAdminEmailsSchema: ZodSchemaWithInputMatchingOutput<{
@@ -261,6 +291,10 @@ export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
   .refine(mustHaveStatutJustificationIfClosedOrRejected, {
     message: "Une agence inactive doit avoir une justification",
     path: ["statusJustification"],
+  })
+  .refine(mustHaveValidatorEmailsIfActiveOrNeedsReview, {
+    message: localization.atLeastOneEmail,
+    path: ["validatorEmails"],
   });
 
 export const privateListAgenciesRequestSchema: ZodSchemaWithInputMatchingOutput<PrivateListAgenciesRequestDto> =

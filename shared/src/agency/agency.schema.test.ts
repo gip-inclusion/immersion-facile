@@ -11,7 +11,7 @@ describe("agencySchema", () => {
     it.each([
       ...activeAgencyStatuses,
       "needsReview",
-    ] as AgencyStatus[])("is null if the agency is %s", (status) => {
+    ] satisfies AgencyStatus[])("is null if the agency is %s", (status) => {
       const agency = new AgencyDtoBuilder()
         .withValidatorEmails(["validator@mail.com"])
         .withStatus(status)
@@ -43,6 +43,34 @@ describe("agencySchema", () => {
         statusJustification: "test",
       });
       expect(retryResult.success).toBe(true);
+    });
+  });
+
+  describe("validatorEmails", () => {
+    it.each([
+      ...activeAgencyStatuses,
+      "needsReview",
+    ] satisfies AgencyStatus[])("should have at least one validator email if the agency is %s", (status) => {
+      const agency = new AgencyDtoBuilder()
+        .withValidatorEmails(["validator@mail.com"])
+        .withStatus(status)
+        .build();
+
+      const result = agencySchema.safeParse(agency);
+      expect(result.success).toBe(true);
+    });
+
+    it.each(
+      closedOrRejectedAgencyStatuses,
+    )("can have no validator email if the agency is %s", (status) => {
+      const agency = new AgencyDtoBuilder()
+        .withValidatorEmails([])
+        .withStatus(status)
+        .withStatusJustification("test")
+        .build();
+
+      const result = agencySchema.safeParse(agency);
+      expect(result.success).toBe(true);
     });
   });
 });

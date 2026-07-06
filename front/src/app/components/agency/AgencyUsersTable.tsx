@@ -62,31 +62,35 @@ export const AgencyUsersTable = ({
 
   return (
     <>
-      <Table
-        fixed
-        id={tableId}
-        headers={[
-          "Utilisateurs",
-          "Préférence de communication",
-          "Rôles",
-          "Actions",
-        ]}
-        data={agencyUsers.map((agencyUser, index) =>
-          TableLine({
-            agency,
-            agencyUser,
-            currentUser,
-            index,
-            isLocationAdmin,
-            onDeleteClicked: (userRightToRemove) => {
-              setUserRightToRemove(userRightToRemove);
-              dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-              removeUserModal.open();
-            },
-            onModifyClicked,
-          }),
-        )}
-      />
+      {agencyUsers.length > 0 ? (
+        <Table
+          fixed
+          id={tableId}
+          headers={[
+            "Utilisateurs",
+            "Préférence de communication",
+            "Rôles",
+            "Actions",
+          ]}
+          data={agencyUsers.map((agencyUser, index) =>
+            TableLine({
+              agency,
+              agencyUser,
+              currentUser,index,
+              isLocationAdmin,
+              onDeleteClicked: (userRightToRemove) => {
+                setUserRightToRemove(userRightToRemove);
+                dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                removeUserModal.open();
+              },
+              onModifyClicked,
+
+            }),
+          )}
+        />
+      ) : (
+        <p>Aucun utilisateur trouvé</p>
+      )}
       {createPortal(
         <removeUserModal.Component
           {...(userRightToRemove
