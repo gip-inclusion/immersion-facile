@@ -15,6 +15,7 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { removeUserFromAgencySlice } from "../remove-user-from-agency/removeUserFromAgency.slice";
 
 export type FetchAgencyAction = ActionOfSlice<typeof fetchAgencySlice>;
 
@@ -26,6 +27,9 @@ const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
       (action) =>
         fetchAgencySlice.actions.fetchAgencyRequested.match(action) ||
         connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(
+          action,
+        ) ||
+        removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded.match(
           action,
         ) ||
         connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
