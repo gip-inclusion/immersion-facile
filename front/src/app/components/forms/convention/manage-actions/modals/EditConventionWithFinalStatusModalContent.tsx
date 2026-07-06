@@ -120,7 +120,7 @@ export const EditConventionWithFinalStatusModalContent = ({
     hasAgencyAllowedRolesToUpdateBeneficiaryBirthdateWithFinalStatus({
       agencyRights: currentUser?.agencyRights ?? [],
       agencyId: convention.agencyId,
-    });
+    }) || isBackofficeAdmin;
   const canEditBeneficiary = isBackofficeAdmin || canEditBeneficiaryBirthdate;
 
   const { register, handleSubmit, formState } =
