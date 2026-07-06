@@ -871,6 +871,10 @@ export const errors = {
       new ForbiddenError(`L'utilisateur ${userId} n'a pas de droit d'agence.`),
   },
   agency: {
+    registerNotFtUserForbidden: (userId: UserId) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' ne peut pas être ajouté à une agence France Travail.`,
+      ),
     missingParamAgencyId: () =>
       new BadRequestError(
         "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",

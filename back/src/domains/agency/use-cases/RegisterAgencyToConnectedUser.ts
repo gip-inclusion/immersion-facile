@@ -6,6 +6,7 @@ import {
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+import { isFTUser } from "../entities/Agency";
 
 export type RegisterAgencyToConnectedUser = ReturnType<
   typeof makeRegisterAgencyToConnectedUser
@@ -30,6 +31,12 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
     }
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
+
+    if (
+      agencies.some((agency) => agency.kind === "pole-emploi") &&
+      !isFTUser(currentUser)
+    )
+      throw errors.agency.registerNotFtUserForbidden(currentUser.id);
 
     await executeInSequence(agencies, ({ id, status, usersRights }) =>
       uow.agencyRepository.update({

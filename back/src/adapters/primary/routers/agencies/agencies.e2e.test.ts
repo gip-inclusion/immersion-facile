@@ -302,10 +302,10 @@ describe("Agency routes", () => {
     });
 
     describe("/inclusion-connected/register-agency", () => {
-      const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-      const agencyUser: User = {
+      const agencyFt = new AgencyDtoBuilder().withKind("pole-emploi").build();
+      const agencyFtUser: User = {
         id: "123",
-        email: "joe@mail.com",
+        email: "joe@francetravail.fr",
         firstName: "Joe",
         lastName: "Doe",
         proConnect: defaultProConnectInfos,
@@ -314,17 +314,17 @@ describe("Agency routes", () => {
       it(`${displayRouteName(
         agencyRoutes.registerAgenciesToUser,
       )} 200 add an agency as registered to a connected user`, async () => {
-        inMemoryUow.userRepository.users = [agencyUser];
-        inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+        inMemoryUow.userRepository.users = [agencyFtUser];
+        inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agencyFt)];
 
         const response = await httpClient.registerAgenciesToUser({
           headers: {
             authorization: generateConnectedUserJwt({
-              userId: agencyUser.id,
+              userId: agencyFtUser.id,
               version: currentJwtVersions.connectedUser,
             }),
           },
-          body: [agency.id],
+          body: [agencyFt.id],
         });
 
         expectHttpResponseToEqual(response, {
@@ -332,10 +332,10 @@ describe("Agency routes", () => {
           status: 200,
         });
 
-        expectToEqual(inMemoryUow.userRepository.users, [agencyUser]);
+        expectToEqual(inMemoryUow.userRepository.users, [agencyFtUser]);
         expectToEqual(inMemoryUow.agencyRepository.agencies, [
-          toAgencyWithRights(agency, {
-            [agencyUser.id]: {
+          toAgencyWithRights(agencyFt, {
+            [agencyFtUser.id]: {
               isNotifiedByEmail: false,
               roles: ["to-review"],
             },
