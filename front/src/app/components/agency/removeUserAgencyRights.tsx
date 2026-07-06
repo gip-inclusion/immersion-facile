@@ -79,33 +79,7 @@ export const makeRemoveUserAgencyRightsModalProps = ({
         : "Confirmer la suppression",
     children: (
       <>
-        {userRightToRemove.isSelfRemoval ? (
-          userRightToRemove.agencyRight.roles.includes("agency-admin") ? (
-            <>
-              <p>
-                Vous êtes sur le point de vous détacher de cet organisme. En
-                tant qu'administrateur, vous perdrez tous vos droits de gestion
-                ainsi que l'accès aux données qui y sont liés.
-              </p>
-              <p>Êtes-vous sûr de vouloir continuer ?</p>
-            </>
-          ) : (
-            <p>
-              Êtes-vous sûr de vouloir quitter cet organisme ? Vous perdrez
-              immédiatement l'accès à l'ensemble des conventions, bilans,
-              statistiques et fonctionnalités qui y sont liés.
-            </p>
-          )
-        ) : (
-          <>
-            <p>
-              Vous êtes sur le point de supprimer le rattachement de{" "}
-              {userRightToRemove.userEmail} à l'agence "
-              {userRightToRemove.agencyRight.agency.name}".
-            </p>
-            <p>Souhaitez-vous continuer ?</p>
-          </>
-        )}
+        {makeDescriptionFromUserRightToRemove(userRightToRemove)}
 
         <ButtonsGroup
           inlineLayoutWhen="always"
@@ -129,4 +103,37 @@ export const makeRemoveUserAgencyRightsModalProps = ({
       </>
     ),
   };
+};
+
+const makeDescriptionFromUserRightToRemove = (
+  userRightToRemove: UserRightToRemove,
+): React.JSX.Element => {
+  if (!userRightToRemove.isSelfRemoval)
+    return (
+      <>
+        <p>
+          Vous êtes sur le point de supprimer le rattachement de{" "}
+          {userRightToRemove.userEmail} à l'agence "
+          {userRightToRemove.agencyRight.agency.name}".
+        </p>
+        <p>Souhaitez-vous continuer ?</p>
+      </>
+    );
+
+  return userRightToRemove.agencyRight.roles.includes("agency-admin") ? (
+    <>
+      <p>
+        Vous êtes sur le point de vous détacher de cet organisme. En tant
+        qu'administrateur, vous perdrez tous vos droits de gestion ainsi que
+        l'accès aux données qui y sont liés.
+      </p>
+      <p>Êtes-vous sûr de vouloir continuer ?</p>
+    </>
+  ) : (
+    <p>
+      Êtes-vous sûr de vouloir quitter cet organisme ? Vous perdrez
+      immédiatement l'accès à l'ensemble des conventions, bilans, statistiques
+      et fonctionnalités qui y sont liés.
+    </p>
+  );
 };

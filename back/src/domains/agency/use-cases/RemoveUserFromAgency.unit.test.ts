@@ -7,6 +7,7 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type Role,
   toAgencyDtoForAgencyUsersAndAdmins,
   type User,
   type WithAgencyIdAndUserId,
@@ -361,14 +362,17 @@ describe("RemoveUserFromAgency", () => {
     describe("can remove another user from agency", () => {
       it.each([
         {
-          triggeredByRole: "backoffice-admin",
-          triggeredByUser: connectedAdmin,
+          userRole: "back-office",
+          user: connectedAdmin,
         },
         {
-          triggeredByRole: "agency-admin",
-          triggeredByUser: agencyAdminUser,
+          userRole: "agency-admin",
+          user: agencyAdminUser,
         },
-      ])("when user has $triggeredByRole role", async ({ triggeredByUser }) => {
+      ] satisfies {
+        userRole: Role;
+        user: User;
+      }[])("when user has $userRole role", async ({ user }) => {
         const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
         const otherUserWithRightOnAgencies: User = {
           ...notAdmin,
@@ -403,7 +407,7 @@ describe("RemoveUserFromAgency", () => {
           agencyId: agency.id,
           userId: notAdminUser.id,
         };
-        await removeUserFromAgency.execute(inputParams, triggeredByUser);
+        await removeUserFromAgency.execute(inputParams, user);
 
         expectToEqual(uow.agencyRepository.agencies, [
           toAgencyWithRights(agency, {
@@ -430,7 +434,7 @@ describe("RemoveUserFromAgency", () => {
               ...inputParams,
               triggeredBy: {
                 kind: "connected-user",
-                userId: triggeredByUser.id,
+                userId: user.id,
               },
             },
           },
