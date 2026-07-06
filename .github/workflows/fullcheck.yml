@@ -198,7 +198,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: ./playwright/playwright-report/
+          path: ./playwright-e2e/playwright-report/
           retention-days: 7
       - name: Upload app logs
         if: failure()

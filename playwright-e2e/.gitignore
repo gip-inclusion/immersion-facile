@@ -2,6 +2,6 @@ node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
-/playwright/.cache/
+/playwright-e2e/.cache/
 /.auth/
 .container-state.json

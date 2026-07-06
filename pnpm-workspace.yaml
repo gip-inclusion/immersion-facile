@@ -3,4 +3,4 @@ packages:
   - "back"
   - "shared"
   - "libs/*"
-  - "playwright"
+  - "playwright-e2e"
