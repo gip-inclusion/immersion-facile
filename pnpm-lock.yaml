@@ -633,7 +633,7 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  playwright:
+  playwright-e2e:
     dependencies:
       date-fns:
         specifier: 2.28.0
