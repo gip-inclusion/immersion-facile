@@ -250,27 +250,25 @@ export const broadcastFeedbackErrorMessageMap: Record<
     solution: (isConventionValidated) => (
       <>
         {isConventionValidated ? (
-          <ul>
-            <li>
-              Je contacte le centre d'aide d'Immersion Facilitée{" "}
-              <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ici
-              </a>{" "}
-              pour erreur date de naissance
-            </li>
-            <li>
-              Je communique la date de naissance à modifier et le numéro de
-              convention.
-            </li>
-            <li>
-              Immersion Facilitée procèdera à la modification et l'installation
-              de la convention dans vos applicatifs.
-            </li>
-          </ul>
+          <>
+            <p>
+              Je procède moi-même à la modification de la date de naissance sur
+              la convention.
+            </p>
+            <ul>
+              <li>
+                Depuis la convention : je clique sur « modifier la convention ».
+              </li>
+              <li>
+                Je modifie la convention, puis je clique sur sauvegarder.
+                Automatiquement la convention est installée dans vos
+                applicatifs.
+              </li>
+              <li>
+                J'actualise ma page, pour vérifier que l'erreur a disparu.
+              </li>
+            </ul>
+          </>
         ) : (
           <ul>
             <li>
