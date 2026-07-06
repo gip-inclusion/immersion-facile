@@ -4,6 +4,7 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   ConflictError,
+  type ConnectedUser,
   type UserId,
 } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -42,3 +43,6 @@ export const getUserIdsWithoutRoleFromAgencyRights = ({
     ],
     [],
   );
+
+export const isFTUser = (currentUser: ConnectedUser) =>
+  currentUser.email.includes("@francetravail.fr");

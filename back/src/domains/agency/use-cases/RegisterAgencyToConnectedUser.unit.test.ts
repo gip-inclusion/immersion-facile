@@ -4,7 +4,7 @@ import {
   defaultProConnectInfos,
   errors,
   expectArraysToMatch,
-  expectObjectsToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   noAgencyDashboards,
@@ -25,8 +25,8 @@ import {
 } from "./RegisterAgencyToConnectedUser";
 
 describe("RegisterAgencyToConnectedUser use case", () => {
-  const user: ConnectedUser = {
-    id: "456",
+  const notFtUser: ConnectedUser = {
+    id: "notFtUser",
     email: "john.doe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
@@ -39,8 +39,26 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     },
   };
 
+  const ftUser: ConnectedUser = {
+    id: "ftUser",
+    email: "jean.valideur@francetravail.fr",
+    firstName: "jean",
+    lastName: "valideur",
+    proConnect: defaultProConnectInfos,
+    createdAt: new Date().toISOString(),
+    agencyRights: [],
+    dashboards: {
+      agencies: noAgencyDashboards,
+      establishments: noEstablishmentDashboard,
+    },
+  };
+
   const agency1 = new AgencyDtoBuilder().withId("agency-111").build();
   const agency2 = new AgencyDtoBuilder().withId("agency-222").build();
+  const agencyFt = new AgencyDtoBuilder()
+    .withKind("pole-emploi")
+    .withId("agencyFt")
+    .build();
 
   let registerAgencyToConnectedUser: RegisterAgencyToConnectedUser;
   let uow: InMemoryUnitOfWork;
@@ -60,86 +78,97 @@ describe("RegisterAgencyToConnectedUser use case", () => {
 
   describe("Wrong path", () => {
     it("fails if no agency exist", async () => {
-      uow.userRepository.users = [user];
+      uow.userRepository.users = [notFtUser];
       await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id], user),
+        registerAgencyToConnectedUser.execute([agency1.id], notFtUser),
         errors.agencies.notFound({ missingAgencyIds: [agency1.id] }),
       );
     });
 
     it("fails if user already has agency rights for agency", async () => {
-      uow.userRepository.users = [user];
+      uow.userRepository.users = [notFtUser];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {
-          [user.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
       ];
 
       await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id], user),
-        errors.user.alreadyHaveAgencyRights({ userId: user.id }),
+        registerAgencyToConnectedUser.execute([agency1.id], notFtUser),
+        errors.user.alreadyHaveAgencyRights({ userId: notFtUser.id }),
+      );
+    });
+
+    it("fails if user want to register FT Agency but the user is not FT", async () => {
+      uow.userRepository.users = [notFtUser];
+      uow.agencyRepository.agencies = [toAgencyWithRights(agencyFt, {})];
+
+      await expectPromiseToFailWithError(
+        registerAgencyToConnectedUser.execute([agencyFt.id], notFtUser),
+        errors.agency.registerNotFtUserForbidden(notFtUser.id),
       );
     });
   });
 
   describe("When User and agencies exist", () => {
     beforeEach(() => {
-      uow.userRepository.users = [user];
+      uow.userRepository.users = [notFtUser, ftUser];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {}),
         toAgencyWithRights(agency2, {}),
+        toAgencyWithRights(agencyFt, {}),
       ];
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {
-      await registerAgencyToConnectedUser.execute([agency1.id], user);
+      await registerAgencyToConnectedUser.execute([agency1.id], notFtUser);
 
-      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.userRepository.users, [notFtUser, ftUser]);
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency1, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
         toAgencyWithRights(agency2, {}),
+        toAgencyWithRights(agencyFt, {}),
       ]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "AgencyRegisteredToConnectedUser",
           payload: {
-            userId: user.id,
+            userId: notFtUser.id,
             agencyIds: [agency1.id],
-            triggeredBy: { kind: "connected-user", userId: user.id },
+            triggeredBy: { kind: "connected-user", userId: notFtUser.id },
           },
         },
       ]);
     });
 
     it("can register to another agency", async () => {
-      uow.userRepository.users = [user];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
         toAgencyWithRights(agency2, {}),
       ];
 
-      await registerAgencyToConnectedUser.execute([agency2.id], user);
+      await registerAgencyToConnectedUser.execute([agency2.id], notFtUser);
 
-      expectToEqual(uow.userRepository.users, [user]);
+      expectToEqual(uow.userRepository.users, [notFtUser, ftUser]);
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency1, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
         toAgencyWithRights(agency2, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
       ]);
       expectArraysToMatch(uow.outboxRepository.events, [
         {
           topic: "AgencyRegisteredToConnectedUser",
           payload: {
-            userId: user.id,
+            userId: notFtUser.id,
             agencyIds: [agency2.id],
-            triggeredBy: { kind: "connected-user", userId: user.id },
+            triggeredBy: { kind: "connected-user", userId: notFtUser.id },
           },
         },
       ]);
@@ -148,27 +177,52 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     it("makes the links with all the given agencies, and events has all relevant ids", async () => {
       await registerAgencyToConnectedUser.execute(
         [agency1.id, agency2.id],
-        user,
+        notFtUser,
       );
 
-      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.userRepository.users, [notFtUser, ftUser]);
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency1, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
         toAgencyWithRights(agency2, {
-          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+          [notFtUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agencyFt, {}),
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyRegisteredToConnectedUser",
+          payload: {
+            userId: notFtUser.id,
+            agencyIds: [agency1.id, agency2.id],
+            triggeredBy: { kind: "connected-user", userId: notFtUser.id },
+          },
+        },
+      ]);
+    });
+
+    it("allows FT user to register with FT agency", async () => {
+      await registerAgencyToConnectedUser.execute([agencyFt.id], ftUser);
+
+      expectToEqual(uow.userRepository.users, [notFtUser, ftUser]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency1, {}),
+        toAgencyWithRights(agency2, {}),
+        toAgencyWithRights(agencyFt, {
+          [ftUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         }),
       ]);
-      expect(uow.outboxRepository.events).toHaveLength(1);
-      expectObjectsToMatch(uow.outboxRepository.events[0], {
-        topic: "AgencyRegisteredToConnectedUser",
-        payload: {
-          userId: user.id,
-          agencyIds: [agency1.id, agency2.id],
-          triggeredBy: { kind: "connected-user", userId: user.id },
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyRegisteredToConnectedUser",
+          payload: {
+            userId: ftUser.id,
+            agencyIds: [agencyFt.id],
+            triggeredBy: { kind: "connected-user", userId: ftUser.id },
+          },
         },
-      });
+      ]);
     });
   });
 });
