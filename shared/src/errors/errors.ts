@@ -871,19 +871,11 @@ export const errors = {
       new ForbiddenError(`L'utilisateur ${userId} n'a pas de droit d'agence.`),
   },
   agency: {
-    registerNotFtUserForbidden: (userId: UserId) =>
-      new ForbiddenError(
-        `L'utilisateur '${userId}' ne peut pas être ajouté à une agence France Travail.`,
-      ),
-    missingParamAgencyId: () =>
-      new BadRequestError(
-        "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
-      ),
     alreadyExist: (agencyId: AgencyId) =>
       new ConflictError(`L'agence avec id '${agencyId}' existe déjà.`),
-    notFound: ({ agencyId }: { agencyId: AgencyId }) =>
+    emailNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
       new NotFoundError(
-        `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
+        `Mail not found for agency with id: ${agencyId} on agency repository.`,
       ),
     forbiddenDelegationConventionReminder: ({
       agencyId,
@@ -897,7 +889,28 @@ export const errors = {
       new NotFoundError(
         `Le SIRET que vous avez saisi (${siret}) n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.`,
       ),
-
+    invalidCounsellorRoleForFTAgency: () =>
+      new BadRequestError(
+        "Le rôle pré-valideur n'est pas autorisé pour une agence France Travail",
+      ),
+    invalidRoleUpdateForAgencyWithRefersTo: ({
+      agencyId,
+      role,
+    }: {
+      agencyId: AgencyId;
+      role: AgencyRole;
+    }) =>
+      new BadRequestError(
+        `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
+      ),
+    invalidRoleUpdateForOneStepValidationAgency: ({
+      agencyId,
+    }: {
+      agencyId: AgencyId;
+    }) =>
+      new BadRequestError(
+        `L'agence "${agencyId}" à une seule étape de validation ne peut pas avoir aucun validateur recevant des notifications.`,
+      ),
     invalidStatus: ({
       id,
       actual,
@@ -910,37 +923,35 @@ export const errors = {
       new BadRequestError(
         `L'agence '${id}' n'a pas le bon status. Le status actuel est '${actual}' alors que le status attendu est '${expected}'.`,
       ),
-    emailNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
-      new NotFoundError(
-        `Mail not found for agency with id: ${agencyId} on agency repository.`,
-      ),
-    userAlreadyExist: () =>
+    invalidValidatorEditionWhenAgencyWithRefersTo: (agencyId: AgencyId) =>
       new BadRequestError(
-        "L'utilisateur est déjà rattaché à cette agence. Vous pouvez le modifier depuis la liste des utilisateurs de l'agence.",
+        `L'ajout, la suppression ou l'édition d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car il s'agit d'une structure d'accompagnement. Cette action est autorisée seulement par l'agence prescriptrice à laquelle elle est rattachée.`,
       ),
-    usersNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
-      new NotFoundError(`L'agence ${agencyId} n'a aucun utilisateur rattaché`),
+    missingParamAgencyId: () =>
+      new BadRequestError(
+        "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
+      ),
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un pré-valideur recevant les emails.`,
-      ),
-    noUsers: (agencyId: AgencyId) =>
-      new BadRequestError(
-        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateur.`,
       ),
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
       ),
+    notFound: ({ agencyId }: { agencyId: AgencyId }) =>
+      new NotFoundError(
+        `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
+      ),
     notRejected: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),
-    targetAgencyMustBeActive: ({ agencyId }: { agencyId: AgencyId }) =>
+    noUsers: (agencyId: AgencyId) =>
       new BadRequestError(
-        `L'agence vers laquelle transférer (${agencyId}) doit avoir un statut actif (active ou from-api-PE).`,
+        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateur.`,
       ),
-    targetAgencyMustNotReferToAnother: ({ agencyId }: { agencyId: AgencyId }) =>
-      new BadRequestError(
-        `L'agence vers laquelle transférer (${agencyId}) ne doit pas être une agence qui référence une autre agence.`,
+    registerNotFtUserForbidden: (userId: UserId) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' ne peut pas être ajouté à une agence France Travail.`,
       ),
     sourceAndTargetAgencyMustBeDifferent: ({
       agencyId,
@@ -950,34 +961,20 @@ export const errors = {
       new BadRequestError(
         `L'agence à fermer et l'agence cible doivent être différentes (${agencyId}).`,
       ),
-    invalidCounsellorRoleForFTAgency: () =>
+    targetAgencyMustBeActive: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
-        "Le rôle pré-valideur n'est pas autorisé pour une agence France Travail",
+        `L'agence vers laquelle transférer (${agencyId}) doit avoir un statut actif (active ou from-api-PE).`,
       ),
-    invalidRoleUpdateForOneStepValidationAgency: ({
-      agencyId,
-    }: {
-      agencyId: AgencyId;
-    }) =>
+    targetAgencyMustNotReferToAnother: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
-        `L'agence "${agencyId}" à une seule étape de validation ne peut pas avoir aucun validateur recevant des notifications.`,
+        `L'agence vers laquelle transférer (${agencyId}) ne doit pas être une agence qui référence une autre agence.`,
       ),
-
-    invalidRoleUpdateForAgencyWithRefersTo: ({
-      agencyId,
-      role,
-    }: {
-      agencyId: AgencyId;
-      role: AgencyRole;
-    }) =>
+    userAlreadyExist: () =>
       new BadRequestError(
-        `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
+        "L'utilisateur est déjà rattaché à cette agence. Vous pouvez le modifier depuis la liste des utilisateurs de l'agence.",
       ),
-
-    invalidValidatorEditionWhenAgencyWithRefersTo: (agencyId: AgencyId) =>
-      new BadRequestError(
-        `L'ajout, la suppression ou l'édition d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car il s'agit d'une structure d'accompagnement. Cette action est autorisée seulement par l'agence prescriptrice à laquelle elle est rattachée.`,
-      ),
+    usersNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
+      new NotFoundError(`L'agence ${agencyId} n'a aucun utilisateur rattaché`),
   },
   users: {
     notFound: ({ userIds }: { userIds: UserId[] }) =>
