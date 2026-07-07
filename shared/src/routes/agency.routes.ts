@@ -125,6 +125,7 @@ export const agencyRoutes = defineRoutes({
     requestBodySchema: agencyIdsSchema,
     responses: {
       200: expressEmptyResponseBody,
+      403: httpErrorSchema,
       400: httpErrorSchema.or(httpErrorSchema),
     },
   }),

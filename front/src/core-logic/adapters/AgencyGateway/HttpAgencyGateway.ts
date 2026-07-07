@@ -192,6 +192,7 @@ export class HttpAgencyGateway implements AgencyGateway {
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 403 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
