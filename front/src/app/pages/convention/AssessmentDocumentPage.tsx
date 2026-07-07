@@ -30,6 +30,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -75,6 +77,9 @@ export const AssessmentDocumentPage = ({
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
 
+  const agencyInfo = useAppSelector(agenciesSelectors.details);
+  const isAgencyInfoLoading = useAppSelector(agenciesSelectors.isLoading);
+
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt,
     conventionId,
@@ -90,11 +95,6 @@ export const AssessmentDocumentPage = ({
     signAssessmentFeedback?.level === "success" &&
     signAssessmentFeedback?.on === "create";
   const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
-
-  const logos = [
-    <img key="logo-rf" src={logoRf} alt="Logo RF" />,
-    <img key={"logo-if"} src={logoIf} alt="" />,
-  ];
 
   useEffect(() => {
     dispatch(
@@ -112,8 +112,29 @@ export const AssessmentDocumentPage = ({
     },
     [dispatch],
   );
+  useEffect(() => {
+    if (convention?.agencyId && !agencyInfo) {
+      dispatch(
+        agenciesSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
+      );
+    }
+  }, [convention?.agencyId, dispatch, agencyInfo]);
 
-  if (isConventionLoading || isAssessmentLoading || isPdfLoading)
+  const logos = [
+    <img key="logo-rf" src={logoRf} alt="Logo RF" />,
+    <img
+      key={"logo-if"}
+      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf}
+      alt=""
+    />,
+  ];
+
+  if (
+    isConventionLoading ||
+    isAssessmentLoading ||
+    isPdfLoading ||
+    isAgencyInfoLoading
+  )
     return <Loader />;
 
   if (fetchConventionError)
