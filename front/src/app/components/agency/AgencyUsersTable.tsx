@@ -7,12 +7,14 @@ import { useMemo, useState } from "react";
 import { NotificationIndicator } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import { type AgencyDto, domElementIds } from "shared";
+import { type AgencyDto, type ConnectedUser, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import {
   makeRemoveUserAgencyRightsButtonProps,
@@ -33,6 +35,7 @@ export const AgencyUsersTable = ({
   onModifyClicked,
   routeName,
 }: AgencyUsersTableProps) => {
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const dispatch = useDispatch();
   const [userRightToRemove, setUserRightToRemove] =
     useState<null | UserRightToRemove>(null);
@@ -72,6 +75,7 @@ export const AgencyUsersTable = ({
           TableLine({
             agency,
             agencyUser,
+            currentUser,
             index,
             isLocationAdmin,
             onDeleteClicked: (userRightToRemove) => {
@@ -80,7 +84,6 @@ export const AgencyUsersTable = ({
               removeUserModal.open();
             },
             onModifyClicked,
-            setUserRightToRemove,
           }),
         )}
       />
@@ -114,6 +117,7 @@ export const AgencyUsersTable = ({
 };
 
 const TableLine = ({
+  currentUser,
   isLocationAdmin,
   agency,
   agencyUser,
@@ -121,12 +125,10 @@ const TableLine = ({
   onModifyClicked,
   onDeleteClicked,
 }: {
+  currentUser: ConnectedUser | null;
   isLocationAdmin: boolean;
   agency: AgencyDto;
   agencyUser: ConnectedUserWithNormalizedAgencyRights;
-  setUserRightToRemove: React.Dispatch<
-    React.SetStateAction<UserRightToRemove | null>
-  >;
   index: number;
   onModifyClicked: (user: ConnectedUserWithNormalizedAgencyRights) => void;
   onDeleteClicked: (userRightToRemove: UserRightToRemove) => void;
@@ -140,7 +142,7 @@ const TableLine = ({
     agencyRight: agencyUser.agencyRights[agency.id],
     userEmail: agencyUser.email,
     userId: agencyUser.id,
-    isSelfRemoval: false,
+    isSelfRemoval: currentUser?.id === agencyUser.id,
   };
 
   return [
