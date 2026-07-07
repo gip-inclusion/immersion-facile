@@ -29,6 +29,12 @@ describe("NafSuggestions", () => {
     nafCodes: ["4587C", "9658C"],
   };
 
+  const expectedResult = [
+    agricultureSection,
+    industriesExtractiveSection,
+    industrieManufacturiereSection,
+  ];
+
   beforeEach(async () => {
     uow = createInMemoryUow();
     getNafSuggestions = makeGetAllNafSections({
@@ -44,18 +50,7 @@ describe("NafSuggestions", () => {
     ];
   });
 
-  it("One result", async () => {
-    expectToEqual(await getNafSuggestions.execute(), [agricultureSection]);
-  });
-
-  it("Multiple result with lowercase", async () => {
-    expectToEqual(await getNafSuggestions.execute(), [
-      industrieManufacturiereSection,
-      industriesExtractiveSection,
-    ]);
-  });
-
-  it("No result", async () => {
-    expectToEqual(await getNafSuggestions.execute(), []);
+  it("returns everything in the repository", async () => {
+    expectToEqual(await getNafSuggestions.execute(), expectedResult);
   });
 });
