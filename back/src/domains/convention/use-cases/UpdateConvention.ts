@@ -125,7 +125,6 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
           deps.createNewEvent({
             topic: "ConventionModifiedAndSigned",
             payload: {
-              agencyId: agency.id,
               convention: signedConvention,
               triggeredBy,
             },
@@ -139,7 +138,6 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
           deps.createNewEvent({
             topic: "ConventionSubmittedAfterModification",
             payload: {
-              agencyId: agency.id,
               convention:
                 conventionWithSignatoriesSignedAtAndDateApprovalCleared,
               triggeredBy,

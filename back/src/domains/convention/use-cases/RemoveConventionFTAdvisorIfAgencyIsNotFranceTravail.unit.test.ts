@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  ConventionDtoBuilder,
   type ConventionId,
   errors,
   expectPromiseToFailWithError,
@@ -55,10 +56,25 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws if requested agency is not found", async () => {
+    it("throws if requested convention is not found", async () => {
       await expectPromiseToFailWithError(
         usecase.execute({
-          agencyId: missionLocaleAgency.id,
+          conventionId,
+        }),
+        errors.convention.notFound({ conventionId }),
+      );
+    });
+
+    it("throws if agency is not found", async () => {
+      uow.conventionRepository.setConventions([
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(missionLocaleAgency.id)
+          .build(),
+      ]);
+
+      await expectPromiseToFailWithError(
+        usecase.execute({
           conventionId,
         }),
         errors.agency.notFound({ agencyId: missionLocaleAgency.id }),
@@ -68,6 +84,12 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
 
   describe("Right paths", () => {
     it("removes convention France Travail advisor when new agency is not France Travail", async () => {
+      uow.conventionRepository.setConventions([
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(missionLocaleAgency.id)
+          .build(),
+      ]);
       uow.agencyRepository.agencies = [
         toAgencyWithRights(missionLocaleAgency, {}),
       ];
@@ -78,7 +100,6 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
       });
 
       await usecase.execute({
-        agencyId: missionLocaleAgency.id,
         conventionId,
       });
 
@@ -89,6 +110,12 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
     });
 
     it("keeps convention France Travail advisor when new agency is France Travail", async () => {
+      uow.conventionRepository.setConventions([
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(ftAgency.id)
+          .build(),
+      ]);
       uow.agencyRepository.agencies = [toAgencyWithRights(ftAgency, {})];
       saveConventionFranceTravailAdvisor({
         advisor: ftAdvisor,
@@ -97,7 +124,6 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
       });
 
       await usecase.execute({
-        agencyId: ftAgency.id,
         conventionId,
       });
 

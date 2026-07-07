@@ -489,7 +489,6 @@ describe("Update Convention", () => {
           topic: "ConventionModifiedAndSigned",
           payload: {
             convention: expectedUpdatedConvention,
-            agencyId: agency.id,
             triggeredBy: {
               kind: "convention-magic-link",
               role: payload.role,
@@ -560,7 +559,6 @@ describe("Update Convention", () => {
           topic: "ConventionSubmittedAfterModification",
           payload: {
             convention: updatedConvention,
-            agencyId: agency.id,
             triggeredBy: {
               ...("userId" in payload
                 ? {
