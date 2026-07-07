@@ -104,9 +104,35 @@ export class PgConventionFranceTravailAdvisorRepository
   }
 
   public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
-    await this.transaction
+    const deletedConventionFranceTravailUsers = await this.transaction
       .deleteFrom("conventions__ft_connect_users")
       .where("convention_id", "=", conventionId)
+      .returning("ft_connect_id")
+      .execute();
+
+    const ftExternalIds = deletedConventionFranceTravailUsers.map(
+      ({ ft_connect_id }) => ft_connect_id,
+    );
+
+    if (ftExternalIds.length === 0) return;
+
+    await this.transaction
+      .deleteFrom("ft_connect_users")
+      .where("ft_connect_id", "in", ftExternalIds)
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom("conventions__ft_connect_users")
+              .select("convention_id")
+              .whereRef(
+                "conventions__ft_connect_users.ft_connect_id",
+                "=",
+                "ft_connect_users.ft_connect_id",
+              )
+              .limit(1),
+          ),
+        ),
+      )
       .execute();
   }
 

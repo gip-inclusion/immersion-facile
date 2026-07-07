@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   errors,
+  expectArraysToMatch,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -27,9 +28,13 @@ import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
 import { PgConventionFranceTravailAdvisorRepository } from "./PgConventionFranceTravailAdvisorRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
+const otherConventionId = "970cc531-088d-42e5-8385-48a7fd4e5fa5";
 const userFtExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
+const otherConvention = new ConventionDtoBuilder()
+  .withId(otherConventionId)
+  .build();
 
 const user: FtConnectUserDto = {
   email: "",
@@ -102,6 +107,8 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     );
     await conventionRepository.save(convention);
     await conventionExternalIdRepository.save(convention.id);
+    await conventionRepository.save(otherConvention);
+    await conventionExternalIdRepository.save(otherConvention.id);
   });
 
   afterAll(async () => {
@@ -320,7 +327,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   });
 
   describe("deleteByConventionId", () => {
-    it("should deleted by conventionId", async () => {
+    it("deletes convention France Travail advisor and orphan ft_connect_users", async () => {
       expect(
         (await conventionRepository.getById(conventionId))?.signatories
           .beneficiary.federatedIdentity,
@@ -369,10 +376,53 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           .execute(),
         [],
       );
-      // FT user should still exist
-      expect(
-        (await db.selectFrom("ft_connect_users").selectAll().execute()).length,
-      ).toBe(1);
+      expectToEqual(
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
+        [],
+      );
+    });
+
+    it("keeps ft_connect_users when still linked to another convention", async () => {
+      await conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor(
+        franceTravailFirstUserAdvisor,
+      );
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionId,
+        userFtExternalId,
+      );
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
+        otherConventionId,
+        userFtExternalId,
+      );
+
+      await conventionFranceTravailAdvisorRepository.deleteByConventionId(
+        conventionId,
+      );
+
+      expectArraysToMatch(
+        await db
+          .selectFrom("conventions__ft_connect_users")
+          .selectAll()
+          .execute(),
+        [
+          {
+            convention_id: otherConventionId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+          },
+        ],
+      );
+      expectArraysToMatch(
+        await db.selectFrom("ft_connect_users").selectAll().execute(),
+        [
+          {
+            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            advisor_firstname: placementAdvisor.firstName,
+            advisor_lastname: placementAdvisor.lastName,
+            advisor_email: placementAdvisor.email,
+            advisor_kind: placementAdvisor.type,
+          },
+        ],
+      );
     });
   });
 });
