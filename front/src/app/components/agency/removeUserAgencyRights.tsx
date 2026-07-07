@@ -53,7 +53,7 @@ export const makeRemoveUserAgencyRightsButtonProps = ({
   onDeleteClicked: (userRightToRemove: UserRightToRemove) => void;
   size?: ButtonProps.Common["size"];
 }): ButtonProps => ({
-  children: "Supprimer",
+  children: userRightToRemove.isSelfRemoval ? "Me détacher" : "Supprimer",
   priority: "secondary",
   disabled:
     userRightToRemove.agencyRight.agency.refersToAgencyId !== null &&
