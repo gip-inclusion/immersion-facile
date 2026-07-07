@@ -1,5 +1,9 @@
 import type { LocationId } from "../address/address.dto";
-import type { AgencyId, AgencyStatus } from "../agency/agency.dto";
+import type {
+  AgencyId,
+  AgencyStatus,
+  AgencyWithUsersRights,
+} from "../agency/agency.dto";
 import type {
   ApiConsumerId,
   ApiConsumerRightName,
@@ -47,7 +51,7 @@ import { titleByRole } from "../role/role.utils";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
-import type { UserId } from "../user/user.dto";
+import type { User, UserId } from "../user/user.dto";
 import {
   convertLocaleDateToUtcTimezoneDate,
   type DateRange,
@@ -949,9 +953,15 @@ export const errors = {
       new BadRequestError(
         `L'agence '${agencyId}' ne peut pas avoir aucun utilisateur.`,
       ),
-    registerNotFtUserForbidden: (userId: UserId) =>
+    registerNotFtUserForbidden: ({
+      agency,
+      user,
+    }: {
+      user: User;
+      agency: AgencyWithUsersRights;
+    }) =>
       new ForbiddenError(
-        `L'utilisateur '${userId}' ne peut pas être ajouté à une agence France Travail.`,
+        `Vous ne pouvez pas être rattaché à l'organisme ${agency.name} avec cette adresse email : ${user.email} .`,
       ),
     sourceAndTargetAgencyMustBeDifferent: ({
       agencyId,

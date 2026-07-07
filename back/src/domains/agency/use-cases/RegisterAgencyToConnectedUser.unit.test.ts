@@ -101,11 +101,12 @@ describe("RegisterAgencyToConnectedUser use case", () => {
 
     it("fails if user want to register FT Agency but the user is not FT", async () => {
       uow.userRepository.users = [notFtUser];
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyFt, {})];
+      const agency = toAgencyWithRights(agencyFt, {});
+      uow.agencyRepository.agencies = [agency];
 
       await expectPromiseToFailWithError(
         registerAgencyToConnectedUser.execute([agencyFt.id], notFtUser),
-        errors.agency.registerNotFtUserForbidden(notFtUser.id),
+        errors.agency.registerNotFtUserForbidden({ user: notFtUser, agency }),
       );
     });
   });
