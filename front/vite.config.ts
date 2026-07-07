@@ -72,9 +72,16 @@ export default defineConfig({
       : [],
   ],
   resolve: {
-    alias: {
-      src: resolve(__dirname, "src"),
-    },
+    alias: [
+      { find: "src", replacement: resolve(__dirname, "src") },
+      {
+        find: /^js-yaml$/,
+        replacement: resolve(
+          __dirname,
+          "src/config/shims/jsYamlWithDefault.ts",
+        ),
+      },
+    ],
   },
   build: {
     rollupOptions: {
@@ -85,10 +92,10 @@ export default defineConfig({
     sourcemap: true,
   },
   css: {
-    preprocessorOptions: {
-      scss: {
-        api: "modern-compiler",
-      },
+    lightningcss: {
+      // Some third-party CSS still contains legacy IE hacks (e.g. min-width: 0\0).
+      // Allow Lightning CSS to recover by stripping invalid rules instead of failing the build.
+      errorRecovery: true,
     },
   },
   optimizeDeps: {
