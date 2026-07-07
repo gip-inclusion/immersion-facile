@@ -15,6 +15,7 @@ import type {
   MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   Role,
+  SubscriberErrorFeedback,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -53,6 +54,7 @@ type VerificationActionModalParams = {
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
+  broadcastErrorFeedback?: SubscriberErrorFeedback | null;
   modalTitle: string;
 };
 
@@ -291,6 +293,7 @@ export const getVerificationActionProps = (
       currentSignatoryRoles,
       initialStatus,
       onCloseValidatorModalWithoutValidatorInfo,
+      broadcastErrorFeedback,
       modalTitle,
       buttonId,
       iconId,
@@ -324,6 +327,7 @@ export const getVerificationActionProps = (
         currentSignatoryRoles: currentSignatoryRoles,
         onCloseValidatorModalWithoutValidatorInfo:
           onCloseValidatorModalWithoutValidatorInfo,
+        broadcastErrorFeedback,
         isSubmitDisabled: disabled,
       },
     };

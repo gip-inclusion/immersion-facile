@@ -468,6 +468,10 @@ export const domElementIds = {
     deprecatedModalSubmitButton: "im-deprecated-modal__submit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
+    validatorModalSyncErrorWarningConfirmButton:
+      "im-validator-modal__sync-error-warning-confirm-button",
+    validatorModalSyncErrorWarningCloseButton:
+      "im-validator-modal__sync-error-warning-close-button",
     validatorModalForm: "im-validator-modal__form",
     counsellorModal: "im-counsellor-modal",
     counsellorModalForm: "im-counsellor-modal__form",
