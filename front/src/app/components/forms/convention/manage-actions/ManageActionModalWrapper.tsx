@@ -1,3 +1,4 @@
+import type { ModalProps } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
@@ -8,12 +9,14 @@ import {
   conventionStatusesWithValidator,
   type DeleteAssessmentRequestDto,
   doesStatusNeedsValidators,
+  domElementIds,
   type EditConventionCounsellorNameRequestDto,
   type EditConventionWithFinalStatusRequestDto,
   isUnvalidatedConventionStatus,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
   type Role,
+  type SubscriberErrorFeedback,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
   unvalidatedConventionStatuses,
@@ -58,6 +61,7 @@ export type ModalWrapperProps = {
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
+  broadcastErrorFeedback?: SubscriberErrorFeedback | null;
   currentUser?: ConnectedUser;
   isSubmitDisabled?: boolean;
 };
@@ -69,11 +73,18 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     initialStatus,
     onSubmit,
     onCloseValidatorModalWithoutValidatorInfo,
+    broadcastErrorFeedback,
     currentUser,
   } = props;
   const modalObject = modalByAction(verificationAction);
   const { createModalParams } = modalObject;
-  const isModalOpen = useIsModalOpen(createModalParams);
+  const [
+    hasSeenSyncErrorWarningBeforeValidation,
+    setHasSeenSyncErrorWarningBeforeValidation,
+  ] = useState(false);
+  const isModalOpen = useIsModalOpen(createModalParams, {
+    onConceal: () => setHasSeenSyncErrorWarningBeforeValidation(false),
+  });
   const [modalProps] = useState<ModalWrapperProps>(props);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const showTransferModal = verificationAction === "TRANSFER";
@@ -117,6 +128,11 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
       initialStatus,
       newStatusByVerificationAction[verificationAction],
     );
+  const showValidatorSyncErrorWarningBeforeValidation =
+    showValidatorModal &&
+    verificationAction === "ACCEPT_VALIDATOR" &&
+    !!broadcastErrorFeedback &&
+    !hasSeenSyncErrorWarningBeforeValidation;
 
   if (
     !showTransferModal &&
@@ -247,6 +263,10 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
               closeModal={closeModal}
               newStatus={newStatus}
               convention={convention}
+              showSyncErrorWarningStep={
+                showValidatorSyncErrorWarningBeforeValidation
+              }
+              syncErrorMessage={broadcastErrorFeedback?.message}
               onCloseValidatorModalWithoutValidatorInfo={
                 onCloseValidatorModalWithoutValidatorInfo
               }
@@ -365,9 +385,61 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   );
 
   const Modal = modalObject.modal;
+  const modalTitle = showValidatorSyncErrorWarningBeforeValidation
+    ? "Attention : Erreur de synchronisation"
+    : modalProps.title;
+  const getValidatorModalButtons = (): ModalProps["buttons"] => {
+    if (!showValidatorModal || verificationAction !== "ACCEPT_VALIDATOR")
+      return undefined;
+
+    if (showValidatorSyncErrorWarningBeforeValidation)
+      return [
+        {
+          children: "Valider quand même",
+          type: "button",
+          priority: "secondary",
+          iconId: "fr-icon-arrow-right-line",
+          iconPosition: "right",
+          id: domElementIds.manageConvention
+            .validatorModalSyncErrorWarningConfirmButton,
+          doClosesModal: false,
+          onClick: () => setHasSeenSyncErrorWarningBeforeValidation(true),
+        },
+        {
+          children: "Fermer et corriger l'erreur",
+          type: "button",
+          priority: "primary",
+          id: domElementIds.manageConvention
+            .validatorModalSyncErrorWarningCloseButton,
+          onClick: closeModal,
+        },
+      ];
+
+    return [
+      {
+        children: "Annuler",
+        type: "button",
+        priority: "secondary",
+        id: domElementIds.manageConvention.validatorModalCancelButton,
+        onClick: closeModal,
+      },
+      {
+        children: "Valider la demande",
+        type: "submit",
+        priority: "primary",
+        id: domElementIds.manageConvention.validatorModalSubmitButton,
+      },
+    ];
+  };
+  const validatorModalButtons = getValidatorModalButtons();
 
   return createPortal(
-    <Modal {...modalProps} isSubmitDisabled={props.isSubmitDisabled}>
+    <Modal
+      {...modalProps}
+      isSubmitDisabled={props.isSubmitDisabled}
+      title={modalTitle}
+      buttons={validatorModalButtons}
+    >
       {modalContent}
     </Modal>,
     document.body,

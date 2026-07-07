@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pick } from "ramda";
-import { type Dispatch, type SetStateAction, useEffect } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionReadDto,
@@ -23,18 +23,23 @@ export const ValidatorModalContent = ({
   closeModal,
   newStatus,
   convention,
+  showSyncErrorWarningStep = false,
+  syncErrorMessage,
   onCloseValidatorModalWithoutValidatorInfo,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithValidator;
   convention: ConventionReadDto;
+  showSyncErrorWarningStep?: boolean;
+  syncErrorMessage?: string;
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const { modalOnCancelCallback, formId } = useFormModal();
+  const [isValidatorFormSubmit, setIsValidatorFormSubmit] = useState(false);
   const currentUserName =
     currentUser?.firstName && currentUser?.lastName
       ? pick(["firstname", "lastname"], {
@@ -53,6 +58,7 @@ export const ValidatorModalContent = ({
     firstname,
     lastname,
   }) => {
+    setIsValidatorFormSubmit(true);
     onSubmit({
       status: newStatus,
       conventionId: convention.id,
@@ -65,6 +71,7 @@ export const ValidatorModalContent = ({
 
   useEffect(() => {
     return modalOnCancelCallback(() => {
+      if (isValidatorFormSubmit) return;
       if (onCloseValidatorModalWithoutValidatorInfo) {
         onCloseValidatorModalWithoutValidatorInfo(
           warningMessagesByConventionStatus[newStatus],
@@ -75,7 +82,37 @@ export const ValidatorModalContent = ({
     modalOnCancelCallback,
     onCloseValidatorModalWithoutValidatorInfo,
     newStatus,
+    isValidatorFormSubmit,
   ]);
+
+  if (showSyncErrorWarningStep)
+    return (
+      <>
+        <p>
+          Vous êtes sur le point de valider une convention qui présente une
+          erreur de synchronisation avec{" "}
+          {convention.agencyKind === "mission-locale" ||
+          convention.agencyRefersTo?.kind === "mission-locale"
+            ? "i-Milo"
+            : "France Travail"}
+          .
+        </p>
+        <p>
+          <strong>Motif de l’erreur :</strong>{" "}
+          {syncErrorMessage ?? "Non renseigné"}
+        </p>
+        <p>
+          <strong>Conséquence :</strong> Une fois validée, la convention ne
+          pourra plus être modifiée et les données ne remonteront pas dans votre
+          applicatif.
+        </p>
+        <p>
+          <strong>Corriger l’erreur :</strong> Fermez cette fenêtre et consultez
+          l'encart “Détails des solutions possibles” affiché sur votre page.
+        </p>
+      </>
+    );
+
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} id={formId}>
       {convention.isEstablishmentBanned && (

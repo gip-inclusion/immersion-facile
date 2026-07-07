@@ -606,6 +606,7 @@ const createButtonPropsByVerificationAction = (
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
         onCloseValidatorModalWithoutValidatorInfo: setValidatorWarningMessage,
+        broadcastErrorFeedback,
         buttonId:
           domElementIds.manageConvention.conventionValidationValidateButton,
         iconId: "fr-icon-checkbox-circle-line",

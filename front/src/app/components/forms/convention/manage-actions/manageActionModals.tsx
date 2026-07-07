@@ -121,10 +121,6 @@ const createValidatorModalParams = {
   id: domElementIds.manageConvention.validatorModal,
   isOpenedByDefault: false,
   formId: domElementIds.manageConvention.validatorModalForm,
-  submitButton: {
-    id: domElementIds.manageConvention.validatorModalSubmitButton,
-    children: "Valider la demande",
-  },
 };
 const {
   Component: ValidatorModal,
