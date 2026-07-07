@@ -72,16 +72,9 @@ export default defineConfig({
       : [],
   ],
   resolve: {
-    alias: [
-      { find: "src", replacement: resolve(__dirname, "src") },
-      {
-        find: /^js-yaml$/,
-        replacement: resolve(
-          __dirname,
-          "src/config/shims/jsYamlWithDefault.ts",
-        ),
-      },
-    ],
+    alias: {
+      src: resolve(__dirname, "src"),
+    },
   },
   build: {
     rollupOptions: {
