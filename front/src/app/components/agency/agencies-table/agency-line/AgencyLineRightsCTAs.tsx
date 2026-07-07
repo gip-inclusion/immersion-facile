@@ -61,18 +61,21 @@ export const AgencyLineRightsCTAs = ({
           Modifier
         </Button>
       )}
-      <Button
-        {...makeRemoveUserAgencyRightsButtonProps({
-          onDeleteClicked: () => {
-            dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-            removeUserModal.open();
-          },
-          removeUserButtonId: `${domElementIds.myAccount.removeAgencyRightButton}-${agencyRight.agency.id}-${user.id}`,
-          userRightToRemove,
-          size: "small",
-        })}
-        className={fr.cx("fr-mx-1w")}
-      />
+      {!onRegistrationCancelledClicked && (
+        <Button
+          {...makeRemoveUserAgencyRightsButtonProps({
+            onDeleteClicked: () => {
+              dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+              removeUserModal.open();
+            },
+            removeUserButtonId: `${domElementIds.myAccount.removeAgencyRightButton}-${agencyRight.agency.id}-${user.id}`,
+            userRightToRemove,
+            size: "small",
+          })}
+          className={fr.cx("fr-mx-1w")}
+        />
+      )}
+
       {isBackofficeAdmin && (
         <Button
           priority="tertiary no outline"
