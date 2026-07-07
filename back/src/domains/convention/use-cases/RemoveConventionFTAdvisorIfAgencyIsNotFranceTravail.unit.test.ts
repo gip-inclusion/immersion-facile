@@ -103,10 +103,62 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
         conventionId,
       });
 
-      expect(
+      expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
-          .conventionFranceTravailUsers[conventionId],
+          .conventionFranceTravailUsers,
+        {},
+      );
+      expect(
+        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers[
+          userFtExternalId
+        ],
       ).toBeUndefined();
+    });
+
+    it("keeps ftConnectUser when it is still linked to another convention", async () => {
+      const otherConventionId = "970cc531-088d-42e5-8385-48a7fd4e5fa5";
+      uow.conventionRepository.setConventions([
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(missionLocaleAgency.id)
+          .build(),
+        new ConventionDtoBuilder()
+          .withId(otherConventionId)
+          .withAgencyId(missionLocaleAgency.id)
+          .build(),
+      ]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(missionLocaleAgency, {}),
+      ];
+      saveConventionFranceTravailAdvisor({
+        advisor: ftAdvisor,
+        user: ftConnectUser,
+        conventionId,
+      });
+      uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers[
+        otherConventionId
+      ] = userFtExternalId;
+
+      await usecase.execute({
+        conventionId,
+      });
+
+      expectToEqual(
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsers,
+        {
+          [otherConventionId]: userFtExternalId,
+        },
+      );
+      expectToEqual(
+        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers[
+          userFtExternalId
+        ],
+        {
+          advisor: ftAdvisor,
+          user: ftConnectUser,
+        },
+      );
     });
 
     it("keeps convention France Travail advisor when new agency is France Travail", async () => {

@@ -50,10 +50,23 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   }
 
   public async deleteByConventionId(conventionId: ConventionId): Promise<void> {
-    const { [conventionId]: _deleted, ...conventionFranceTravailUsers } =
-      this.#conventionFranceTravailUsers;
+    const {
+      [conventionId]: userFtExternalId,
+      ...conventionFranceTravailUsers
+    } = this.#conventionFranceTravailUsers;
 
     this.#conventionFranceTravailUsers = conventionFranceTravailUsers;
+
+    const isUserAssociatedToConvention = Object.values(
+      this.#conventionFranceTravailUsers,
+    ).includes(userFtExternalId);
+
+    if (userFtExternalId && !isUserAssociatedToConvention) {
+      const { [userFtExternalId]: _deletedUser, ...ftConnectedUsers } =
+        this.#ftConnectedUsers;
+
+      this.#ftConnectedUsers = ftConnectedUsers;
+    }
   }
 
   public async saveFtUserAndAdvisor(
