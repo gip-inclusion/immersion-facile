@@ -5,6 +5,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { makeTestPgPool } from "../../../../config/pg/pgPool";
+import { expectedAllNafSections } from "./expectedAllNafSections";
 import { PgNafRepository } from "./PgNafRepository";
 
 describe("Pg implementation of NafRepository", () => {
@@ -27,7 +28,10 @@ describe("Pg implementation of NafRepository", () => {
 
   describe("PG implementation of method getAllNafSuggestions", () => {
     it("Returns all NAF sections", async () => {
-      expectToEqual(await nafRepository.getAllNafSuggestions(), []);
+      expectToEqual(
+        await nafRepository.getAllNafSuggestions(),
+        expectedAllNafSections,
+      );
     });
   });
 });
