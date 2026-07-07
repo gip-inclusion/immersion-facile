@@ -32,11 +32,14 @@ export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
-    if (
-      agencies.some((agency) => agency.kind === "pole-emploi") &&
-      !isFTUser(currentUser)
-    )
-      throw errors.agency.registerNotFtUserForbidden(currentUser.id);
+    const agencyWithKindFt = agencies.find(
+      (agency) => agency.kind === "pole-emploi",
+    );
+    if (agencyWithKindFt && !isFTUser(currentUser))
+      throw errors.agency.registerNotFtUserForbidden({
+        user: currentUser,
+        agency: agencyWithKindFt,
+      });
 
     await executeInSequence(agencies, ({ id, status, usersRights }) =>
       uow.agencyRepository.update({
