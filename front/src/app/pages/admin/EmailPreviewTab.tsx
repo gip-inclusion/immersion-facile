@@ -267,8 +267,16 @@ export const defaultEmailValueByEmailKind: {
     immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
     agencies: [
       {
-        agencyName: "AGENCY_NAME",
+        agencyName: "Nom de l'organisme 1",
         numberOfUsersToReview: 1,
+      },
+      {
+        agencyName: "Nom de l'organisme 2",
+        numberOfUsersToReview: 10,
+      },
+      {
+        agencyName: "Nom de l'organisme 3",
+        numberOfUsersToReview: 4,
       },
     ],
   },

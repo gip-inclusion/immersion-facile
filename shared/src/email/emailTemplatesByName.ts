@@ -67,15 +67,11 @@ export const emailTemplatesByName =
         greetings: `Bonjour ${firstName} ${lastName},`,
         content: `Vous avez des utilisateurs en attente de rattachement sur Immersion Facilitée.
         
-        Récapitulatif des demandes en attente :
-
+        <strong>Récapitulatif des demandes en attente</strong> :
         <ul>
-          ${agencies.map((agency) => `<li>${agency.agencyName} : ${agency.numberOfUsersToReview} demande${agency.numberOfUsersToReview > 1 ? "s" : ""}</li>`).join("")}
+          ${agencies.map((agency) => `<li><strong>${agency.agencyName}</strong> : ${agency.numberOfUsersToReview} demande${agency.numberOfUsersToReview > 1 ? "s" : ""}</li>`).join("")}
         </ul>
-
-        En validant ces demandes, vous permettez à vos collaborateurs d’accéder aux conventions et aux statistiques de vos organismes.
-       
-       `,
+        En validant ces demandes, vous permettez à vos collaborateurs d’accéder aux conventions et aux statistiques de vos organismes.`,
         buttons: [
           {
             label: "Accéder à mon espace",
@@ -86,9 +82,9 @@ export const emailTemplatesByName =
           },
         ],
         highlight: {
-          content: `Voici un article d’aide pour vous guider dans la gestion de ces demandes : <a href='${immersionFacileHelpdeskRootUrl}/article/administrateur-comment-gerer-les-acces-a-lespace-prescripteur-de-vos-collaborateurs-1cdg4de/' target='_blank'>Administrateur - Comment gérer les accès à l'espace prescripteur de vos collaborateurs</a>`,
+          content: `Besoin d'aide ? Consultez notre guide : <a href='${immersionFacileHelpdeskRootUrl}/article/administrateur-comment-gerer-les-acces-a-lespace-prescripteur-de-vos-collaborateurs-1cdg4de/' target='_blank'>Administrateur - Comment gérer les accès à l'espace prescripteur de vos collaborateurs</a>`,
         },
-        subContent: `Vous recevrez un rappel d’ici une semaine si des demandes restent en attente.
+        subContent: `Ce récapitulatif vous est envoyé chaque matin tant que des demandes nécessitent votre action.
         ${defaultSignature("immersion")}
         `,
       }),
