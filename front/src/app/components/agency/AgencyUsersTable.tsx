@@ -76,7 +76,8 @@ export const AgencyUsersTable = ({
             TableLine({
               agency,
               agencyUser,
-              currentUser,index,
+              currentUser,
+              index,
               isLocationAdmin,
               onDeleteClicked: (userRightToRemove) => {
                 setUserRightToRemove(userRightToRemove);
@@ -84,7 +85,6 @@ export const AgencyUsersTable = ({
                 removeUserModal.open();
               },
               onModifyClicked,
-
             }),
           )}
         />

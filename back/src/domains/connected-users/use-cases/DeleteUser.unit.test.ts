@@ -821,6 +821,56 @@ describe("DeleteUser", () => {
           },
         ]);
       });
+
+      it("case P8 - with rejected agency, last validator and validated convention - agency stays rejected + user deleted + keep agency rejected + event UserDeleted + event AgencyHasBeenPutOnHold", async () => {
+        const rejectedAgency = new AgencyDtoBuilder(agency)
+          .withStatus("rejected")
+          .withStatusJustification("Doublon détecté")
+          .build();
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(rejectedAgency, {
+            [validator1.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+          }),
+        ];
+
+        await deleteUser.execute({
+          userId: validator1.id,
+          triggeredBy: { kind: "crawler" },
+        });
+
+        expectToEqual(uow.userRepository.users, [
+          admin1,
+          admin2,
+          contactMostActive,
+          contactLessActive,
+          readOnlyAndCounsellor,
+          validator2,
+        ]);
+
+        expectToEqual(uow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            {
+              ...rejectedAgency,
+              statusJustification: "Aucun utilisateur actif",
+            },
+            {},
+          ),
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UserDeleted",
+            payload: {
+              triggeredBy: { kind: "crawler" },
+              userId: validator1.id,
+            },
+          },
+        ]);
+      });
     });
 
     describe("Hybrid cases", () => {

@@ -1,23 +1,24 @@
 import { values } from "ramda";
-import type {
-  AddressDto,
-  AgencyDto,
-  AgencyId,
-  AgencyKind,
-  AgencyPositionFilter,
-  AgencyRight,
-  AgencyStatus,
-  AgencyWithUsersRights,
-  DataWithPagination,
-  DateString,
-  DepartmentCode,
-  OmitFromExistingKeys,
-  PaginationQueryParams,
-  SiretDto,
-  UserId,
-  WithUserFilters,
+import {
+  type AddressDto,
+  type AgencyDto,
+  type AgencyId,
+  type AgencyKind,
+  type AgencyPositionFilter,
+  type AgencyRight,
+  type AgencyStatus,
+  type AgencyWithUsersRights,
+  closedOrRejectedAgencyStatuses,
+  type DataWithPagination,
+  type DateString,
+  type DepartmentCode,
+  errors,
+  type OmitFromExistingKeys,
+  type PaginationQueryParams,
+  type SiretDto,
+  type UserId,
+  type WithUserFilters,
 } from "shared";
-import { errors } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type GetAgenciesFilters = {
@@ -51,12 +52,15 @@ export type AgencyWithNumberOfUsersToReview = {
   numberOfUsersToReview: number;
 };
 
-export const throwIfAgencyHasNoUsersWhileNotClosed = ({
+export const throwIfAgencyHasNoUsersWhileNotClosedOrRejected = ({
   id,
   status,
   usersRights,
 }: Pick<AgencyWithUsersRights, "id" | "status" | "usersRights">): void => {
-  if (!values(usersRights).length && status !== "closed")
+  if (
+    !values(usersRights).length &&
+    !closedOrRejectedAgencyStatuses.includes(status)
+  )
     throw errors.agency.noUsers(id);
 };
 
