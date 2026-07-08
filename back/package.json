@@ -69,6 +69,7 @@
     "trigger-update-legacy-rome-v3": "ts-node src/scripts/triggerUpdateLegacyRomeV3.ts",
     "trigger-deactivate-unresponsive-establishments": "ts-node src/scripts/triggerDeactivateUnresponsiveEstablishments.ts",
     "trigger-verify-and-fix-phones": "ts-node src/scripts/triggerVerifyAndFixPhones.ts",
+    "trigger-update-establishment-marketing-naf-code": "ts-node src/scripts/triggerUpdateEstablishmentMarketingNafCode.ts",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
     "verify-migrations-order": "./src/scripts/verifyDatabaseMigrationsOrder.sh"
