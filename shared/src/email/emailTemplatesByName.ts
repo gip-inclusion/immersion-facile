@@ -1889,7 +1889,7 @@ Tél : ${beneficiaryPhone}`,
         immersionBaseUrl,
       }) => ({
         subject: `Urgent : Entreprise bannie - Convention à revoir pour ${beneficiaryFirstName} ${beneficiaryLastName}`,
-        greetings: `${greetingsWithConventionId(conventionId)} Bonjour${beneficiaryFirstName ? ` ${beneficiaryFirstName}` : ""}${beneficiaryLastName ? ` ${beneficiaryLastName}` : ""},`,
+        greetings: greetingsWithConventionId(conventionId),
         content: `
         Nous vous contactons car une convention d'immersion a été validée pour ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName}.
 
@@ -1899,12 +1899,6 @@ Tél : ${beneficiaryPhone}`,
 
           • <strong>Si l'immersion n'a pas encore commencé :</strong> Nous vous recommandons fortement de procéder à l'annulation de cette convention afin de protéger le bénéficiaire.
           • <strong>Si l'immersion est actuellement en cours :</strong> Nous vous conseillons de contacter le bénéficiaire dans les plus brefs délais pour faire un point sur sa situation au sein de l'établissement. S'il s'avère que les conditions d'accueil ne sont pas respectées, vous pouvez procéder à une rupture anticipée de l’immersion.
-
-        
-        Ne vous découragez pas ! De nombreuses autres entreprises sont prêtes à vous accueillir. Si vous souhaitez toujours réaliser une immersion, vous pouvez :
-
-          • Rechercher d'autres immersions sur notre site.
-          • Contacter votre conseiller pour vous aider dans vos recherches.
         `,
         buttons: [
           {
