@@ -2,16 +2,16 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import DOMPurify from "dompurify";
 import { useEffect } from "react";
 import {
-  ButtonWithSubMenu,
-  DiscussionMeta,
+  BorderedSection,
   ExchangeMessage,
   Loader,
+  SectionHighlight,
 } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,6 @@ import {
   type ConnectedUser,
   type ConventionDraftDto,
   type CreateConventionPresentationInitialValues,
-  createOpaqueEmail,
   type DiscussionId,
   type DiscussionReadDto,
   domElementIds,
@@ -103,7 +102,7 @@ export const DiscussionManageContent = ({
   );
 
   useEffect(() => {
-    if (discussion) {
+    if (discussion && connectedUserJwt) {
       dispatch(
         searchSlice.actions.fetchSearchResultRequested({
           searchResult: {
@@ -166,7 +165,7 @@ const getActivateDraftConventionButtonProps = ({
     redirectUrl: AbsoluteUrl;
   }) => void;
   saveConventionDraftIsLoading: boolean;
-}): ButtonProps => {
+}): ButtonPropsWithId => {
   const internshipKind =
     discussion.kind === "IF" ? "immersion" : "mini-stage-cci";
   const conventionDraft = toConventionDraftDto({
@@ -194,7 +193,7 @@ const getActivateDraftConventionButtonProps = ({
 
   return {
     id: domElementIds.establishmentDashboard.discussion.activateDraftConvention,
-    priority: "tertiary",
+    priority: "primary",
     onClick: () => {
       saveConventionDraftThenRedirectRequested({
         conventionDraft,
@@ -203,69 +202,62 @@ const getActivateDraftConventionButtonProps = ({
         ),
       });
     },
-    children: "Pré-remplir la convention pour cette mise en relation",
+    children: "Pré-remplir une convention ",
     disabled: saveConventionDraftIsLoading,
-  } satisfies ButtonProps;
+  } satisfies ButtonPropsWithId;
 };
 
-const getDiscussionButtons = ({
+const getDiscussionActionsButtons = ({
   discussion,
   connectedUser,
+  viewer,
   makeInitiateConventionDraftButtonProps,
 }: {
   discussion: DiscussionReadDto;
   connectedUser: ConnectedUser;
+  viewer: ExchangeRole;
   makeInitiateConventionDraftButtonProps: (
     props: ActivateConventionDraftButtonProps,
-  ) => ButtonProps;
+  ) => ButtonPropsWithId;
 }): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
-  return [
-    ...(discussion.status === "PENDING" && discussion.kind === "IF"
-      ? [makeInitiateConventionDraftButtonProps({ discussion, connectedUser })]
-      : []),
-    ...(discussion.status === "PENDING"
-      ? [
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .acceptDiscussionOpenModalButton,
-            priority: "secondary",
-            type: "button",
-            onClick: openAcceptDiscussionModal,
-            children: "Marquer comme acceptée",
-          } satisfies ButtonProps,
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectDiscussionOpenModalButton,
-            priority: "secondary",
-            type: "button",
-            onClick: openRejectDiscussionModal,
-            children: "Marquer comme refusée",
-          } satisfies ButtonProps,
-        ]
-      : []),
-    {
-      id: domElementIds.establishmentDashboard.discussion
-        .replyToCandidateByEmail,
-      priority: "primary",
-      linkProps: {
-        style: { backgroundImage: "none" }, // this is to avoid the underline in the list
-        href: `mailto:${createOpaqueEmail({
-          discussionId: discussion.id,
-          recipient: {
-            kind: "potentialBeneficiary",
-            firstname: discussion.potentialBeneficiary.firstName,
-            lastname: discussion.potentialBeneficiary.lastName,
-          },
-          replyDomain: `reply.${window.location.hostname}`,
-        })}?subject=${encodeURI(
-          connectedUser.firstName && connectedUser.lastName
-            ? `Réponse de ${connectedUser.firstName} ${connectedUser.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`
-            : `Réponse de l'entreprise ${discussion.businessName} - Immersion potentielle en tant que ${discussion.appellation.appellationLabel}`,
-        )}`,
-      },
-      children: "Répondre au candidat par email",
-    } satisfies ButtonProps,
-  ] as unknown as [ButtonPropsWithId, ...ButtonPropsWithId[]];
+  const acceptButton = {
+    id: domElementIds.establishmentDashboard.discussion
+      .acceptDiscussionOpenModalButton,
+    priority: "secondary",
+    type: "button",
+    onClick: openAcceptDiscussionModal,
+    children: "Marquer comme acceptée",
+  } satisfies ButtonPropsWithId;
+
+  const rejectButton = {
+    id: domElementIds.establishmentDashboard.discussion
+      .rejectDiscussionOpenModalButton,
+    priority: "tertiary",
+    type: "button",
+    onClick: openRejectDiscussionModal,
+    children: "Marquer comme refusée",
+  } satisfies ButtonPropsWithId;
+
+  return match(viewer)
+    .with(
+      "potentialBeneficiary",
+      (): [ButtonPropsWithId, ...ButtonPropsWithId[]] => [
+        makeInitiateConventionDraftButtonProps({ discussion, connectedUser }),
+      ],
+    )
+    .with("establishment", (): [ButtonPropsWithId, ...ButtonPropsWithId[]] =>
+      discussion.kind === "IF"
+        ? [
+            makeInitiateConventionDraftButtonProps({
+              discussion,
+              connectedUser,
+            }),
+            acceptButton,
+            rejectButton,
+          ]
+        : [acceptButton, rejectButton],
+    )
+    .exhaustive();
 };
 
 const getDiscussionStatusUpdatedFeedbackMessage = (
@@ -307,7 +299,7 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const { discussion, viewer } = props;
+  const { discussion, connectedUser, viewer } = props;
   const saveConventionDraftIsLoading = useAppSelector(
     conventionDraftSelectors.isLoading,
   );
@@ -358,112 +350,173 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         >
           Retour
         </Button>
-        <div
-          className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
-        >
-          <div className={fr.cx("fr-col-12", "fr-col-lg")}>
-            <h1>
-              Discussion avec{" "}
-              {viewer === "establishment"
-                ? getFormattedFirstnameAndLastname({
-                    firstname: discussion.potentialBeneficiary.firstName,
-                    lastname: discussion.potentialBeneficiary.lastName,
-                  })
-                : discussion.businessName}
+        <SectionHighlight>
+          {viewer === "establishment" ? (
+            <h1 className={fr.cx("fr-h1")}>
+              Candidature de {discussion.potentialBeneficiary.firstName}{" "}
+              {discussion.potentialBeneficiary.lastName.toUpperCase()}
             </h1>
-          </div>
-          {(discussion.status === "ACCEPTED" &&
-            discussion.candidateWarnedMethod !== null &&
-            discussion.conventionId === undefined) ||
-            (viewer === "potentialBeneficiary" && (
-              <Button
-                {...getActivateDraftConventionButtonProps({
-                  ...props,
-                  saveConventionDraftThenRedirectRequested,
-                  saveConventionDraftIsLoading,
-                })}
-                priority="primary"
-              >
-                Pré-remplir la convention
-              </Button>
-            ))}
-          {discussion.status === "PENDING" && viewer === "establishment" && (
-            <ButtonWithSubMenu
-              priority="primary"
-              id={
-                domElementIds.establishmentDashboard.discussion
-                  .handleDiscussionButton
-              }
-              buttonLabel={"Gérer la candidature"}
-              buttonIconId="fr-icon-arrow-down-s-line"
-              iconPosition="right"
-              navItems={getDiscussionButtons({
-                ...props,
-                makeInitiateConventionDraftButtonProps: (discussionProps) =>
-                  getActivateDraftConventionButtonProps({
-                    ...discussionProps,
-                    saveConventionDraftThenRedirectRequested,
-                    saveConventionDraftIsLoading,
-                  }),
-              })}
-              className={fr.cx("fr-ml-md-auto")}
-            />
+          ) : (
+            <h1 className={fr.cx("fr-h1")}>
+              Candidature pour {discussion.businessName}
+            </h1>
           )}
-        </div>
-        <DiscussionMeta>
-          <DiscussionStatusBadge discussion={discussion} viewer={viewer} />
-          {discussion.potentialBeneficiary.immersionObjective}
-          {discussion.appellation.appellationLabel}
-          {discussion.kind === "IF" &&
-            discussion.potentialBeneficiary.resumeLink &&
-            viewer === "establishment" && (
-              <a
-                href={discussion.potentialBeneficiary.resumeLink}
-                title={"CV du candidat"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                CV
-              </a>
-            )}
-          {discussion.kind === "IF" &&
-            viewer === "potentialBeneficiary" &&
-            relatedOffer &&
-            relatedOffer.website && (
-              <a
-                href={relatedOffer.website}
-                title={"Site web de l'entreprise"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Site web de l'entreprise
-              </a>
-            )}
-          {discussion.kind === "IF" && viewer === "potentialBeneficiary" && (
-            <a
-              title="Offre d'immersion"
-              target="_blank"
-              rel="noreferrer"
-              href={
-                frontRoutes.searchResult({
-                  appellationCode: [discussion.appellation.appellationCode],
-                  siret: discussion.siret,
-                  location: discussion.locationId,
-                }).href
-              }
+          {/*puce   */}
+          <p>
+            {discussion.appellation.appellationLabel}
+            {"  "}•{"  "}
+            {discussion.potentialBeneficiary.immersionObjective}
+          </p>
+          <div className={fr.cx("fr-grid-row")}>
+            <Badge
+              id={domElementIds.establishmentDashboard.discussion.merBadge}
+              severity="success"
+              small
+              className={fr.cx("fr-mr-2w", "fr-badge")}
             >
-              Voir l'offre
-            </a>
-          )}
-        </DiscussionMeta>
+              {match(discussion.contactMode)
+                .with("EMAIL", () => "MISE EN RELATION PAR MAIL")
+                .with("PHONE", () => "MISE EN RELATION PAR TÉLÉPHONE")
+                .with("IN_PERSON", () => "RENDEZ-VOUS SUR PLACE")
+                .exhaustive()}
+            </Badge>
+            <DiscussionStatusBadge discussion={discussion} viewer={viewer} />
+          </div>
+        </SectionHighlight>
       </header>
 
-      <DiscussionExchangeMessageForm
-        discussionId={discussion.id}
-        viewer={viewer}
-      />
+      <div
+        className={fr.cx(
+          "fr-grid-row",
+          "fr-grid-row--top",
+          "fr-grid-row--gutters",
+          "fr-my-2w",
+        )}
+      >
+        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+          <BorderedSection>
+            <DiscussionExchangeMessageForm
+              discussionId={discussion.id}
+              viewer={viewer}
+            />
+          </BorderedSection>
+          {match(discussion.contactMode)
+            .with("EMAIL", () => (
+              <BorderedSection className={fr.cx("fr-mt-2w")}>
+                <DiscussionExchangesList
+                  discussion={discussion}
+                  viewer={viewer}
+                />
+              </BorderedSection>
+            ))
+            .with("PHONE", () => (
+              <BorderedSection className={fr.cx("fr-mt-2w")}>
+                <PhoneContactInfo discussion={discussion} viewer={viewer} />
+              </BorderedSection>
+            ))
+            .with("IN_PERSON", () => (
+              <BorderedSection className={fr.cx("fr-mt-2w")}>
+                <p>test</p>
+              </BorderedSection>
+            ))
+            .exhaustive()}
+        </div>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+          {discussion.kind === "IF" &&
+            (viewer === "potentialBeneficiary" ||
+              discussion.potentialBeneficiary.resumeLink) && (
+              <BorderedSection className={fr.cx("fr-p-2w", "fr-mb-2w")}>
+                {viewer === "potentialBeneficiary" ? (
+                  <>
+                    <h3 className={fr.cx("fr-h6")}>Entreprise</h3>
 
-      <DiscussionExchangesList discussion={discussion} viewer={viewer} />
+                    {relatedOffer?.website && (
+                      <a
+                        href={relatedOffer.website}
+                        title="Site web de l'entreprise"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Site web de l'entreprise
+                      </a>
+                    )}
+
+                    <a
+                      title="Offre d'immersion"
+                      target="_blank"
+                      rel="noreferrer"
+                      href={
+                        frontRoutes.searchResult({
+                          appellationCode: [
+                            discussion.appellation.appellationCode,
+                          ],
+                          siret: discussion.siret,
+                          location: discussion.locationId,
+                        }).href
+                      }
+                    >
+                      Voir l'offre
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <h3 className={fr.cx("fr-h6")}>Profil du candidat</h3>
+
+                    <a
+                      href={discussion.potentialBeneficiary.resumeLink}
+                      title="CV du candidat"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      CV
+                    </a>
+                  </>
+                )}
+              </BorderedSection>
+            )}
+          {discussion.status === "PENDING" && viewer === "establishment" && (
+            <BorderedSection>
+              <h3 className={fr.cx("fr-h6")}>Actions</h3>
+              <ButtonsGroup
+                buttons={getDiscussionActionsButtons({
+                  discussion,
+                  connectedUser,
+                  viewer,
+                  makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                    getActivateDraftConventionButtonProps({
+                      ...discussionProps,
+                      saveConventionDraftThenRedirectRequested,
+                      saveConventionDraftIsLoading,
+                    }),
+                })}
+              />
+            </BorderedSection>
+          )}
+          {viewer === "potentialBeneficiary" &&
+            !(
+              discussion.status === "ACCEPTED" &&
+              discussion.candidateWarnedMethod !== null &&
+              discussion.conventionId === undefined
+            ) && (
+              <BorderedSection className={fr.cx("fr-p-2w", "fr-mt-2w")}>
+                <h3 className={fr.cx("fr-h6")}>Actions</h3>
+                <ButtonsGroup
+                  buttons={getDiscussionActionsButtons({
+                    discussion,
+                    connectedUser,
+                    viewer,
+                    makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                      getActivateDraftConventionButtonProps({
+                        ...discussionProps,
+                        saveConventionDraftThenRedirectRequested,
+                        saveConventionDraftIsLoading,
+                      }),
+                  })}
+                />
+              </BorderedSection>
+            )}
+        </div>
+      </div>
 
       {createPortal(
         <RejectDiscussionModal discussion={discussion} />,
@@ -478,6 +531,22 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   );
 };
 
+const PhoneContactInfo = ({
+  discussion,
+  viewer,
+}: {
+  discussion: DiscussionReadDto;
+  viewer: ExchangeRole;
+}) => (
+  <BorderedSection>
+    <h5 className={fr.cx("fr-h5")}>
+      {viewer === "establishment"
+        ? "Information du candidat"
+        : "Coordonnées de l'entreprise"}
+    </h5>
+  </BorderedSection>
+);
+
 const DiscussionExchangesList = ({
   discussion,
   viewer,
@@ -490,7 +559,6 @@ const DiscussionExchangesList = ({
   );
   return (
     <section>
-      <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
       {sortedExchangesBySentAtDesc.map((exchange) => {
         const currentMessage = addLineBreakOnNewLines(
           convertHtmlToText(exchange.message),
@@ -501,9 +569,9 @@ const DiscussionExchangesList = ({
         );
         return (
           <ExchangeMessage
+            key={exchange.sentAt}
             viewer={viewer}
             sender={exchange.sender}
-            key={`${exchange.sender}-${exchange.sentAt}`}
           >
             <header
               className={fr.cx(
@@ -515,7 +583,7 @@ const DiscussionExchangesList = ({
               <div>
                 <h2 className={fr.cx("fr-mb-0", "fr-mb-1v")}>
                   {exchange.sender === "establishment"
-                    ? `${discussion.businessName} - ${exchange.firstname} ${exchange.lastname}`
+                    ? `${exchange.firstname} ${exchange.lastname}`
                     : getFormattedFirstnameAndLastname({
                         firstname: discussion.potentialBeneficiary.firstName,
                         lastname: discussion.potentialBeneficiary.lastName,
@@ -525,11 +593,14 @@ const DiscussionExchangesList = ({
               <div className={fr.cx("fr-ml-auto")}>
                 <div className={fr.cx("fr-mb-2w")}>
                   <Badge
-                    className={`fr-badge--${
-                      exchange.sender === "establishment"
-                        ? "blue-cumulus"
-                        : "green-archipel"
-                    }`}
+                    className={fr.cx(
+                      "fr-badge",
+                      `fr-badge--${
+                        exchange.sender === "establishment"
+                          ? "blue-cumulus"
+                          : "green-archipel"
+                      }`,
+                    )}
                   >
                     {exchange.sender === "establishment"
                       ? "Entreprise"
@@ -654,7 +725,7 @@ const DiscussionExchangeMessageForm = ({
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Feedback
         topics={[
           "establishment-dashboard-discussion-send-message",
@@ -681,7 +752,7 @@ const DiscussionExchangeMessageForm = ({
         }}
         {...getFieldError("message")}
       />
-      <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
+      <div className={fr.cx("fr-mt-2w")}>
         <Button
           id={
             domElementIds.establishmentDashboard.discussion
