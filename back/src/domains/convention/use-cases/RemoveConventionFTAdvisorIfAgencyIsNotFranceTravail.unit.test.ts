@@ -108,11 +108,10 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
           .conventionFranceTravailUsers,
         {},
       );
-      expect(
-        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers[
-          userFtExternalId
-        ],
-      ).toBeUndefined();
+      expectToEqual(
+        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers,
+        {},
+      );
     });
 
     it("keeps ftConnectUser when it is still linked to another convention", async () => {
@@ -151,12 +150,12 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
         },
       );
       expectToEqual(
-        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers[
-          userFtExternalId
-        ],
+        uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers,
         {
-          advisor: ftAdvisor,
-          user: ftConnectUser,
+          [userFtExternalId]: {
+            advisor: ftAdvisor,
+            user: ftConnectUser,
+          },
         },
       );
     });
@@ -181,8 +180,10 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
 
       expectToEqual(
         uow.conventionFranceTravailAdvisorRepository
-          .conventionFranceTravailUsers[conventionId],
-        ftConnectUser.peExternalId,
+          .conventionFranceTravailUsers,
+        {
+          [conventionId]: ftConnectUser.peExternalId,
+        },
       );
     });
   });
