@@ -43,7 +43,7 @@ import {
   type AgencyWithNumberOfUsersToReview,
   type GetAgenciesFilters,
   type PartialAgencyWithUsersRights,
-  throwIfAgencyHasNoUsersWhileNotClosed,
+  throwIfAgencyHasNoUsersWhileNotClosedOrRejected,
 } from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
@@ -607,7 +607,8 @@ export class PgAgencyRepository implements AgencyRepository {
       )
       .filter(isTruthy);
 
-    if (!newRights.length) throwIfAgencyHasNoUsersWhileNotClosed(agency);
+    if (!newRights.length)
+      throwIfAgencyHasNoUsersWhileNotClosedOrRejected(agency);
 
     await this.#deleteAgencyRights(agency.id);
 

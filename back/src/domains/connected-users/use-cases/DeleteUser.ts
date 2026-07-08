@@ -230,6 +230,7 @@ const updateAgency =
         ? await getAgencyStatusWhenNoRemainingAdminOrValidator({
             uow,
             agencyId: agency.id,
+            agencyStatus: agency.status,
             remainingRightsList,
           })
         : {}),
@@ -250,15 +251,24 @@ const updateAgency =
 const getAgencyStatusWhenNoRemainingAdminOrValidator = async ({
   uow,
   agencyId,
+  agencyStatus,
   remainingRightsList,
 }: {
   uow: UnitOfWork;
   agencyId: AgencyId;
+  agencyStatus: AgencyStatus;
   remainingRightsList: AgencyRightList;
 }): Promise<{
   status: ExtractFromExisting<AgencyStatus, "closed" | "rejected">;
   statusJustification: string;
 }> => {
+  if (agencyStatus === "rejected") {
+    return {
+      status: "rejected",
+      statusJustification: "Aucun utilisateur actif",
+    };
+  }
+
   if (!remainingRightsList.length) {
     return {
       status: "closed",

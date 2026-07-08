@@ -32,7 +32,7 @@ import {
   type AgencyWithNumberOfUsersToReview,
   type GetAgenciesFilters,
   type PartialAgencyWithUsersRights,
-  throwIfAgencyHasNoUsersWhileNotClosed,
+  throwIfAgencyHasNoUsersWhileNotClosedOrRejected,
 } from "../ports/AgencyRepository";
 
 type AgencyById = Partial<Record<AgencyId, AgencyWithUsersRights>>;
@@ -72,7 +72,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     _updatedAt?: DateString,
   ): Promise<void> {
     if (this.#agencies[agency.id]) throw errors.agency.alreadyExist(agency.id);
-    throwIfAgencyHasNoUsersWhileNotClosed(agency);
+    throwIfAgencyHasNoUsersWhileNotClosedOrRejected(agency);
     this.#agencies[agency.id] = agency;
   }
 
@@ -84,7 +84,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 
     const updatedAgency = { ...agencyToUdpate, ...agency };
     if (agency.usersRights !== undefined)
-      throwIfAgencyHasNoUsersWhileNotClosed(updatedAgency);
+      throwIfAgencyHasNoUsersWhileNotClosedOrRejected(updatedAgency);
     this.#agencies[agency.id] = updatedAgency;
   }
 
