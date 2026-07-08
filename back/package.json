@@ -94,7 +94,7 @@
     "jsonwebtoken": "^9.0.2",
     "kysely": "^0.28.17",
     "kysely-codegen": "^0.10.1",
-    "libphonenumber-js": "^1.11.1",
+    "libphonenumber-js": "^1.13.8",
     "multer": "^2.1.1",
     "nanoid": "^3.3.8",
     "node-pg-migrate": "^6.2.1",
