@@ -1893,7 +1893,7 @@ Tél : ${beneficiaryPhone}`,
         content: `
         Nous vous contactons car une convention d'immersion a été validée pour ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l'entreprise ${businessName}.
 
-        Nous vous informons que cette entreprise a été bannie de notre plateforme suite à des signalements, car elle ne respectait pas la législation ou le cadre bienveillant exigé en matière d'immersion.
+        Nous vous informons que <strong>cette entreprise a été bannie de notre plateforme</strong> suite à des signalements, car elle ne respectait pas la législation ou le cadre bienveillant exigé en matière d'immersion.
 
         <strong>Que pouvez-vous faire ?</strong>
 
@@ -1915,7 +1915,8 @@ Tél : ${beneficiaryPhone}`,
         Le bénéficiaire a également reçu un email l'informant que l'entreprise a été bannie de notre site et lui demandant de se rapprocher de vous pour annuler sa démarche.
         Nous restons à votre entière disposition si vous avez des questions concernant cette situation exceptionnelle.
 
-        ${defaultSignature("immersion")}
+        Bien cordialement,
+        L'équipe Immersion Facilitée
         `,
       }),
     },
