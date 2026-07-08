@@ -1915,8 +1915,7 @@ Tél : ${beneficiaryPhone}`,
         Le bénéficiaire a également reçu un email l'informant que l'entreprise a été bannie de notre site et lui demandant de se rapprocher de vous pour annuler sa démarche.
         Nous restons à votre entière disposition si vous avez des questions concernant cette situation exceptionnelle.
 
-        Bien cordialement,
-        L'équipe Immersion Facilitée
+        ${defaultSignature("immersion")}
         `,
       }),
     },
