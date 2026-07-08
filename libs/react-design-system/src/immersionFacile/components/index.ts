@@ -1,3 +1,4 @@
+export * from "./bordered-section";
 export * from "./button-with-submenu";
 export * from "./convention-agency-sub-section";
 export * from "./convention-form-layout";
