@@ -25,7 +25,7 @@ export const ExchangeMessage = ({
   return (
     <section
       className={cx(
-        fr.cx("fr-mt-4w", "fr-p-4w"),
+        fr.cx("fr-mb-2w", "fr-p-4w"),
         Styles.root,
         Styles[sender],
         Styles[forViewer(viewer)],
