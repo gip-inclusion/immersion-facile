@@ -623,7 +623,7 @@ describe("PgAgencyRepository", () => {
       );
     });
 
-    it("returns all agencies with number of number to review", async () => {
+    it("returns all agencies with number of user to review > 0", async () => {
       await Promise.all([
         agencyRepository.insert(agency1),
         agencyRepository.insert(agency2),
