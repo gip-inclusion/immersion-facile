@@ -281,7 +281,6 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           () => (
             <BroadcastAgainModalContent
               conventionId={convention.id}
-              closeModal={closeModal}
               onSubmit={(params) => onSubmit(verificationAction, params)}
             />
           ),
