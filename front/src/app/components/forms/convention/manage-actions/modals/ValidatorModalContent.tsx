@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { pick } from "ramda";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionReadDto,
@@ -39,7 +39,6 @@ export const ValidatorModalContent = ({
 }) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const { modalOnCancelCallback, formId } = useFormModal();
-  const [isValidatorFormSubmit, setIsValidatorFormSubmit] = useState(false);
   const currentUserName =
     currentUser?.firstName && currentUser?.lastName
       ? pick(["firstname", "lastname"], {
@@ -58,7 +57,6 @@ export const ValidatorModalContent = ({
     firstname,
     lastname,
   }) => {
-    setIsValidatorFormSubmit(true);
     onSubmit({
       status: newStatus,
       conventionId: convention.id,
@@ -70,8 +68,8 @@ export const ValidatorModalContent = ({
   const getFieldError = makeFieldError(formState);
 
   useEffect(() => {
+    if (showSyncErrorWarningStep) return;
     return modalOnCancelCallback(() => {
-      if (isValidatorFormSubmit) return;
       if (onCloseValidatorModalWithoutValidatorInfo) {
         onCloseValidatorModalWithoutValidatorInfo(
           warningMessagesByConventionStatus[newStatus],
@@ -82,7 +80,7 @@ export const ValidatorModalContent = ({
     modalOnCancelCallback,
     onCloseValidatorModalWithoutValidatorInfo,
     newStatus,
-    isValidatorFormSubmit,
+    showSyncErrorWarningStep,
   ]);
 
   if (showSyncErrorWarningStep)
