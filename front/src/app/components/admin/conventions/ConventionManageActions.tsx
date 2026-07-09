@@ -29,11 +29,13 @@ import type { VerificationAction } from "src/app/components/forms/convention/man
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { getConventionSubStatus } from "src/app/utils/conventionSubStatus";
+import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import type { Feedback as FeedbackType } from "src/core-logic/domain/feedback/feedback.slice";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selectors";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
@@ -65,12 +67,15 @@ const mobileManageConventionModal = createModal({
 });
 
 const getDisabledButtons = (
-  params: Partial<Record<VerificationAction, FeedbackType | undefined>>,
-): Partial<Record<VerificationAction, boolean>> => {
-  const hasFeedback = (feedback: FeedbackType | undefined) =>
-    feedback !== undefined;
-  return mapObjIndexed(hasFeedback, params);
-};
+  params: Partial<
+    Record<VerificationAction, FeedbackType | boolean | undefined>
+  >,
+): Partial<Record<VerificationAction, boolean>> =>
+  mapObjIndexed(
+    (feedback) =>
+      typeof feedback === "boolean" ? feedback : feedback !== undefined,
+    params,
+  );
 
 export const ConventionManageActions = ({
   convention,
@@ -85,6 +90,21 @@ export const ConventionManageActions = ({
   const broadcastErrorFeedback = useAppSelector(
     partnersErroredConventionSelectors.lastBroadcastFeedback,
   )?.subscriberErrorFeedback;
+
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const consumerNames = useAppSelector(apiConsumerSelectors.apiConsumerNames);
+  const isLoadingApiConsumer = useAppSelector(apiConsumerSelectors.isLoading);
+  const isBroadcasting = useAppSelector(
+    conventionActionSelectors.isBroadcasting,
+  );
+  const hasBroadcastErrorFeedback =
+    feedbacks["broadcast-convention-again"]?.level === "error";
+
+  const isBroadcastAgainDisabled =
+    isBroadcasting ||
+    hasBroadcastErrorFeedback ||
+    isLoadingApiConsumer ||
+    consumerNames.length === 0;
 
   const disabledButtons: Partial<Record<VerificationAction, boolean>> =
     getDisabledButtons({
@@ -102,7 +122,7 @@ export const ConventionManageActions = ({
         "convention-action-edit-counsellor-name",
       ),
       TRANSFER: useFeedbackTopic("transfer-convention-to-agency"),
-      BROADCAST_AGAIN: useFeedbackTopic("broadcast-convention-again"),
+      BROADCAST_AGAIN: isBroadcastAgainDisabled,
       SIGN: useFeedbackTopic("convention-action-sign"),
     });
 

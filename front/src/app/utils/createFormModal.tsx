@@ -51,7 +51,7 @@ type FormModal = {
   close: () => void;
 };
 
-type CreateFormModalParams = Parameters<typeof createModal>[0] & {
+export type CreateFormModalParams = Parameters<typeof createModal>[0] & {
   formId: string;
   submitButton?: Pick<ButtonProps, "id" | "children">;
   cancelButton?: Pick<ButtonProps, "id" | "children">;
