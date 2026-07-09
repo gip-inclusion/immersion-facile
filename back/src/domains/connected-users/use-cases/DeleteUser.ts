@@ -227,12 +227,15 @@ const updateAgency =
     return {
       ...agency,
       ...(!remainingValidators.length && !remainingAdmins.length
-        ? await getAgencyStatusWhenNoRemainingAdminOrValidator({
-            uow,
-            agencyId: agency.id,
-            agencyStatus: agency.status,
-            remainingRightsList,
-          })
+        ? {
+            status: await getAgencyStatusWhenNoRemainingAdminOrValidator({
+              uow,
+              agencyId: agency.id,
+              agencyStatus: agency.status,
+              remainingRightsList,
+            }),
+            statusJustification: "Aucun utilisateur actif",
+          }
         : {}),
       usersRights: remainingRightsList.reduce<AgencyUsersRights>(
         (acc, { userId, ...agencyRight }) => ({
@@ -258,22 +261,13 @@ const getAgencyStatusWhenNoRemainingAdminOrValidator = async ({
   agencyId: AgencyId;
   agencyStatus: AgencyStatus;
   remainingRightsList: AgencyRightList;
-}): Promise<{
-  status: ExtractFromExisting<AgencyStatus, "closed" | "rejected">;
-  statusJustification: string;
-}> => {
+}): Promise<ExtractFromExisting<AgencyStatus, "closed" | "rejected">> => {
   if (agencyStatus === "rejected") {
-    return {
-      status: "rejected",
-      statusJustification: "Aucun utilisateur actif",
-    };
+    return "rejected";
   }
 
   if (!remainingRightsList.length) {
-    return {
-      status: "closed",
-      statusJustification: "Aucun utilisateur actif",
-    };
+    return "closed";
   }
 
   const acceptedConventions = await uow.conventionQueries.getConventions({
@@ -284,10 +278,7 @@ const getAgencyStatusWhenNoRemainingAdminOrValidator = async ({
     sortBy: "dateStart",
   });
 
-  return {
-    status: acceptedConventions.length ? "closed" : "rejected",
-    statusJustification: "Aucun utilisateur actif",
-  };
+  return acceptedConventions.length ? "closed" : "rejected";
 };
 
 const getMostActiveUserId = (
