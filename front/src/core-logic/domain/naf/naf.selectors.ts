@@ -5,15 +5,9 @@ const nafState = createRootSelector((state) => state.naf);
 
 const isLoading = createSelector(nafState, (state) => state.isLoading);
 
-const currentNafSections = createSelector(
-  nafState,
-  (state) => state.currentNafSections,
-);
-
-const isDebouncing = createSelector(nafState, (state) => state.isDebouncing);
+const allSections = createSelector(nafState, (state) => state.allSections);
 
 export const nafSelectors = {
   isLoading,
-  currentNafSections,
-  isDebouncing,
+  allSections,
 };

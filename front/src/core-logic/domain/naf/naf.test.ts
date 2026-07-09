@@ -33,86 +33,44 @@ describe("naf slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("should fetch naf sections and update the state", () => {
+  it("should fetch all naf sections and update the state", () => {
     expectToMatchSelectors(initialState);
-    store.dispatch(nafSlice.actions.queryHasChanged("query"));
+    store.dispatch(nafSlice.actions.getAllSectionsRequested());
     expectToMatchSelectors({
-      currentNafSections: [],
-      isLoading: false,
-      isDebouncing: true,
+      allSections: [],
+      isLoading: true,
     });
     dependencies.scheduler.flush();
     expectToMatchSelectors({
-      currentNafSections: [],
+      allSections: [],
       isLoading: true,
-      isDebouncing: false,
     });
     // feed gateway
     dependencies.nafGateway.nafSuggestions$.next(expectedResults);
     expectToMatchSelectors({
-      currentNafSections: expectedResults,
+      allSections: expectedResults,
       isLoading: false,
-      isDebouncing: false,
     });
   });
 
   it("should return to initial state when the request fails", () => {
     expectToMatchSelectors(initialState);
-    store.dispatch(nafSlice.actions.queryHasChanged("query"));
+    store.dispatch(nafSlice.actions.getAllSectionsRequested());
     dependencies.scheduler.flush();
     expectToMatchSelectors({
-      currentNafSections: [],
+      allSections: [],
       isLoading: true,
-      isDebouncing: false,
     });
     dependencies.nafGateway.nafSuggestions$.error(new Error("test"));
     expectToMatchSelectors(initialState);
   });
 
-  it("shouldn't trigger a new request to the gateway when query < threshold", () => {
-    expectToMatchSelectors(initialState);
-    store.dispatch(nafSlice.actions.queryHasChanged("query"));
-    dependencies.scheduler.flush();
-    dependencies.nafGateway.nafSuggestions$.next(expectedResults);
-    expectToMatchSelectors({
-      currentNafSections: expectedResults,
-      isLoading: false,
-      isDebouncing: false,
-    });
-    store.dispatch(nafSlice.actions.queryHasChanged("qu"));
-    dependencies.scheduler.flush();
-    expectToMatchSelectors({
-      ...initialState,
-      isDebouncing: true,
-    });
-  });
-
-  it("should clear the current state when the query is emptied", () => {
-    expectToMatchSelectors(initialState);
-    store.dispatch(nafSlice.actions.queryHasChanged("query"));
-    dependencies.scheduler.flush();
-    dependencies.nafGateway.nafSuggestions$.next(expectedResults);
-    expectToMatchSelectors({
-      currentNafSections: expectedResults,
-      isLoading: false,
-      isDebouncing: false,
-    });
-    store.dispatch(nafSlice.actions.queryWasEmptied());
-    dependencies.scheduler.flush();
-    expectToMatchSelectors(initialState);
-  });
-
   const expectToMatchSelectors = ({
-    currentNafSections: expectedResults,
+    allSections: expectedResults,
     isLoading: expectedLoading,
-    isDebouncing: expectedDebouncing,
   }: NafState) => {
     const state = store.getState();
     expectToEqual(nafSelectors.isLoading(state), expectedLoading);
-    expectToEqual(nafSelectors.isDebouncing(state), expectedDebouncing);
-    expectArraysToEqual(
-      nafSelectors.currentNafSections(state),
-      expectedResults,
-    );
+    expectArraysToEqual(nafSelectors.allSections(state), expectedResults);
   };
 });

@@ -53,6 +53,7 @@ import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
+import { nafSlice } from "src/core-logic/domain/naf/naf.slice";
 import Styles from "./SearchPage.styles";
 
 const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
@@ -210,7 +211,7 @@ export const SearchPage = ({
 
   const searchHasBeenMade = searchMade !== null;
 
-  const nafOptions = useAppSelector(nafSelectors.currentNafSections);
+  const nafOptions = useAppSelector(nafSelectors.allSections);
 
   const internalSearchIsAvailableForInitialSearchRequest =
     !isExternal &&
@@ -227,6 +228,35 @@ export const SearchPage = ({
     lon !== 0 &&
     distanceKm !== 0;
   routeParams.appellationCodes && routeParams.appellationCodes.length > 0;
+
+  const filteredSortOptions = getSortedByOptions(
+    areValidGeoParams(formValues),
+    enableSearchByScore.isActive,
+  );
+
+  const appellationInputLabel = (
+    <>
+      {useNaturalLanguageForAppellations
+        ? "Que souhaitez-vous faire ou découvrir ?"
+        : "Je recherche le métier..."}
+    </>
+  );
+
+  const placeInputLabel = <>Dans quelle ville ?</>;
+
+  const displayAppellationsOrNaf = (): string => {
+    const appellationDisplayed = formValues.appellations?.length
+      ? formValues.appellations.map(
+          (appellation) => appellation.appellationLabel,
+        )
+      : [];
+    const appellationsToDisplay = appellationDisplayed.length
+      ? appellationDisplayed.join(" - ")
+      : "Tous les métiers";
+    return [appellationsToDisplay, formValues.nafLabel]
+      .filter(Boolean)
+      .join(" - ");
+  };
 
   const setTempValuesAsFormValues = useCallback(
     (values: Partial<SearchPageParams>) => {
@@ -275,33 +305,9 @@ export const SearchPage = ({
     };
   }, [dispatch]);
 
-  const filteredSortOptions = getSortedByOptions(
-    areValidGeoParams(formValues),
-    enableSearchByScore.isActive,
-  );
-
-  const appellationInputLabel = (
-    <>
-      {useNaturalLanguageForAppellations
-        ? "Que souhaitez-vous faire ou découvrir ?"
-        : "Je recherche le métier..."}
-    </>
-  );
-
-  const placeInputLabel = <>Dans quelle ville ?</>;
-  const displayAppellationsOrNaf = (): string => {
-    const appellationDisplayed = formValues.appellations?.length
-      ? formValues.appellations.map(
-          (appellation) => appellation.appellationLabel,
-        )
-      : [];
-    const appellationsToDisplay = appellationDisplayed.length
-      ? appellationDisplayed.join(" - ")
-      : "Tous les métiers";
-    return [appellationsToDisplay, formValues.nafLabel]
-      .filter(Boolean)
-      .join(" - ");
-  };
+  useEffect(() => {
+    dispatch(nafSlice.actions.getAllSectionsRequested());
+  }, [dispatch]);
 
   return (
     <HeaderFooterLayout>
@@ -559,10 +565,37 @@ export const SearchPage = ({
                         label="Et / ou un secteur d'activité"
                         options={nafOptions.map((option) => ({
                           label: option.label,
-                          value: option.nafCodes.join(", "),
+                          value: JSON.stringify({
+                            nafLabel: option.label,
+                            nafCodes: option.nafCodes,
+                          }),
                         }))}
                         nativeSelectProps={{
                           id: domElementIds[route.name].nafAutocomplete,
+                          value:
+                            tempValue.nafLabel && tempValue.nafCodes
+                              ? JSON.stringify({
+                                  nafLabel: tempValue.nafLabel,
+                                  nafCodes: tempValue.nafCodes,
+                                })
+                              : "",
+                          onChange: (event) => {
+                            const value = event.currentTarget.value;
+                            if (!value) {
+                              setTempValue({
+                                ...tempValue,
+                                nafCodes: undefined,
+                                nafLabel: undefined,
+                              });
+                              return;
+                            }
+                            const { nafLabel, nafCodes } = JSON.parse(value);
+                            setTempValue({
+                              ...tempValue,
+                              nafCodes,
+                              nafLabel,
+                            });
+                          },
                         }}
                       />
                     </>
