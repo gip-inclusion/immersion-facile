@@ -29,6 +29,14 @@ export const closedOrRejectedAgencyStatuses: AgencyStatus[] = [
   "closed",
   "rejected",
 ];
+// Statuses a backoffice admin may set through UpdateAgency.
+// Closing an agency must go through the dedicated "close & transfer conventions"
+// flow, and "needsReview" is set by the agency creation flow.
+export const settableAgencyStatusesThroughUpdate: AgencyStatus[] = [
+  "active",
+  "from-api-PE",
+  "rejected",
+];
 
 export type CreateAgencyDto = {
   id: AgencyId;

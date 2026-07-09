@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { delay, from, type Observable, of, Subject, throwError } from "rxjs";
+import { delay, type Observable, of, Subject, throwError } from "rxjs";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
@@ -14,7 +14,6 @@ import {
   noAgencyDashboards,
   noEstablishmentDashboard,
   toAgencyPublicDisplayDto,
-  type UpdateAgencyStatusParams,
   type UserParamsForAgency,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
@@ -177,22 +176,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     _token: string,
   ): Observable<void> {
     return of(undefined);
-  }
-
-  public validateOrRejectAgency$(
-    adminToken: ConnectedUserJwt,
-    updateAgencyStatusParams: UpdateAgencyStatusParams,
-  ): Observable<void> {
-    return from(
-      this.#validateOrRejectAgency(adminToken, updateAgencyStatusParams.id),
-    );
-  }
-
-  async #validateOrRejectAgency(
-    _: ConnectedUserJwt,
-    agencyId: AgencyId,
-  ): Promise<void> {
-    this.#agencies[agencyId].status = "active";
   }
 
   public registerAgenciesToCurrentUser$(

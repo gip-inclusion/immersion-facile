@@ -186,29 +186,21 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
-  sharedAgencyRouter.updateAgencyStatus(
-    deps.connectedUserAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgencyStatus.execute(
-          {
-            ...req.body,
-            id: req.params.agencyId,
-          },
-          getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
-  );
-
   sharedAgencyRouter.updateAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgency.execute(
+      sendHttpResponse(req, res, () => {
+        if (req.body.id !== req.params.agencyId)
+          throw errors.agency.routeIdMismatch({
+            routeAgencyId: req.params.agencyId,
+            bodyAgencyId: req.body.id,
+          });
+
+        return deps.useCases.updateAgency.execute(
           req.body,
           getGenericAuthOrThrow(req.payloads?.currentUser),
-        ),
-      ),
+        );
+      }),
   );
 
   sharedAgencyRouter.closeAgencyAndTransfertConventions(

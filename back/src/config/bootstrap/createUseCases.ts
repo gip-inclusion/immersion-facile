@@ -19,7 +19,6 @@ import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-case
 import { makeRemoveUserFromAgency } from "../../domains/agency/use-cases/RemoveUserFromAgency";
 import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
-import { makeUpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { throwIfNotAdmin } from "../../domains/connected-users/helpers/authorization.helper";
 import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
 import { makeDeleteUser } from "../../domains/connected-users/use-cases/DeleteUser";
@@ -784,13 +783,6 @@ export const createUseCases = ({
       }),
 
     rejectUserForAgency: makeRejectUserForAgency({
-      uowPerformer,
-      deps: {
-        createNewEvent,
-      },
-    }),
-
-    updateAgencyStatus: makeUpdateAgencyStatus({
       uowPerformer,
       deps: {
         createNewEvent,

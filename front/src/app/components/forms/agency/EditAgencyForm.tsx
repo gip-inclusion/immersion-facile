@@ -23,6 +23,7 @@ import {
   delegationAgencyKindList,
   domElementIds,
   editAgencySchema,
+  settableAgencyStatusesThroughUpdate,
 } from "shared";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
@@ -52,10 +53,17 @@ const kindOptions = Object.entries(agencyKindToLabel).map(([value, label]) => ({
   value: value,
 }));
 
-const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
-  value: agencyStatus,
-  label: agencyStatusToLabel[agencyStatus],
-}));
+const getStatusListOfOptions = (currentStatus: AgencyStatus) =>
+  allAgencyStatuses
+    .filter(
+      (agencyStatus) =>
+        agencyStatus === currentStatus ||
+        settableAgencyStatusesThroughUpdate.includes(agencyStatus),
+    )
+    .map((agencyStatus) => ({
+      value: agencyStatus,
+      label: agencyStatusToLabel[agencyStatus],
+    }));
 
 const delegationAgencyKindOptions = delegationAgencyKindList.map((kind) => ({
   value: kind,
@@ -143,8 +151,8 @@ export const EditAgencyForm = ({
               />
 
               <Select
-                label="!Statut de l'agence !"
-                options={statusListOfOptions}
+                label="Statut de l'agence"
+                options={getStatusListOfOptions(agency.status)}
                 placeholder="Sélectionner un statut"
                 nativeSelectProps={{
                   id: adminAgencyIds.editAgencyFormStatusSelector,
@@ -165,7 +173,7 @@ export const EditAgencyForm = ({
               {closedOrRejectedAgencyStatuses.includes(formValues.status) && (
                 <Input
                   textArea
-                  label="!Justification du statut !"
+                  label="Justification du statut"
                   nativeTextAreaProps={{
                     ...register("statusJustification"),
                     id: adminAgencyIds.editAgencyFormStatusJustificationInput,

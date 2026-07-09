@@ -9,7 +9,6 @@ import type {
   ConnectedUserJwt,
   CreateAgencyDto,
   ListAgencyOptionsRequestDto,
-  UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
   WithAgencyIdAndUserId,
@@ -30,8 +29,6 @@ export class TestAgencyGateway implements AgencyGateway {
   public fetchedAgency$ = new Subject<AgencyDto>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
-
-  public validateOrRejectAgencyResponse$ = new Subject<void>();
 
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
 
@@ -87,13 +84,6 @@ export class TestAgencyGateway implements AgencyGateway {
     _token: string,
   ): Observable<void> {
     return this.removeUserFromAgencyResponse$;
-  }
-
-  public validateOrRejectAgency$(
-    _: ConnectedUserJwt,
-    _updateAgencyStatusParams: UpdateAgencyStatusParams,
-  ): Observable<void> {
-    return this.validateOrRejectAgencyResponse$;
   }
 
   public registerAgenciesToCurrentUser$(
