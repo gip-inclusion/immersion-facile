@@ -487,40 +487,6 @@ describe("Agency routes", () => {
 
   describe("Private routes (for backoffice admin)", () => {
     describe(`${displayRouteName(
-      agencyRoutes.updateAgencyStatus,
-    )} to update an agency status`, () => {
-      it("Updates the agency status, sends an email to validators and returns code 200", async () => {
-        // Prepare
-        inMemoryUow.agencyRepository.agencies = [
-          toAgencyWithRights(agency4NeedsReview, {
-            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-          }),
-        ];
-        inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
-
-        const response = await httpClient.updateAgencyStatus({
-          headers: { authorization: backofficeAdminToken },
-          body: { status: "active" },
-          urlParams: { agencyId: agency4NeedsReview.id },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: "",
-        });
-
-        expect(
-          (await inMemoryUow.agencyRepository.getByIds(["test-agency-4"]))[0]
-            ?.status,
-        ).toBe("active");
-        expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
-
-        await processEventsForEmailToBeSent(eventCrawler);
-        expect(gateways.notification.getSentEmails()).toHaveLength(1);
-      });
-    });
-
-    describe(`${displayRouteName(
       agencyRoutes.closeAgencyAndTransfertConventions,
     )} to close an agency and transfer its conventions`, () => {
       const agencyToClose = AgencyDtoBuilder.create("agency-to-close-id")
@@ -712,7 +678,33 @@ describe("Agency routes", () => {
         });
       });
 
-      it("Updates the agency and returns code 200", async () => {
+      it("rejects update when route agency id and body agency id differ", async () => {
+        const routeAgencyId = "route-agency-id";
+        const response = await httpClient.updateAgency({
+          headers: { authorization: backofficeAdminToken },
+          urlParams: { agencyId: routeAgencyId },
+          body: {
+            ...new AgencyDtoBuilder()
+              .withId(agency4NeedsReview.id)
+              .withStatus("needsReview")
+              .build(),
+            validatorEmails: ["this-is-a-new-validator@mail.com"],
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 400,
+          body: {
+            status: 400,
+            message: errors.agency.routeIdMismatch({
+              routeAgencyId,
+              bodyAgencyId: agency4NeedsReview.id,
+            }).message,
+          },
+        });
+      });
+
+      it("Updates the agency data without changing status and returns code 200", async () => {
         // Prepare
         inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency4NeedsReview, {
@@ -726,6 +718,7 @@ describe("Agency routes", () => {
           body: {
             ...new AgencyDtoBuilder()
               .withId(agency4NeedsReview.id)
+              .withStatus("needsReview")
               .withCodeSafir("1234")
               .build(),
             validatorEmails: ["this-is-a-new-validator@mail.com"],
@@ -741,6 +734,7 @@ describe("Agency routes", () => {
           toAgencyWithRights(
             new AgencyDtoBuilder()
               .withId(agency4NeedsReview.id)
+              .withStatus("needsReview")
               .withCodeSafir("1234")
               .build(),
             {
@@ -753,6 +747,48 @@ describe("Agency routes", () => {
         ]);
 
         expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+
+        await processEventsForEmailToBeSent(eventCrawler);
+        expect(gateways.notification.getSentEmails()).toHaveLength(0);
+      });
+
+      it("Activating the agency through update sends notifications and returns code 200", async () => {
+        // Prepare
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agency4NeedsReview, {
+            [validator.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator", "agency-admin"],
+            },
+          }),
+        ];
+        inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
+
+        const response = await httpClient.updateAgency({
+          headers: { authorization: backofficeAdminToken },
+          urlParams: { agencyId: agency4NeedsReview.id },
+          body: {
+            ...new AgencyDtoBuilder()
+              .withId(agency4NeedsReview.id)
+              .withStatus("active")
+              .build(),
+            validatorEmails: ["this-is-a-new-validator@mail.com"],
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: "",
+        });
+
+        expect(
+          (await inMemoryUow.agencyRepository.getByIds(["test-agency-4"]))[0]
+            ?.status,
+        ).toBe("active");
+        expect(inMemoryUow.outboxRepository.events).toHaveLength(2);
+
+        await processEventsForEmailToBeSent(eventCrawler);
+        expect(gateways.notification.getSentEmails()).toHaveLength(1);
       });
     });
   });

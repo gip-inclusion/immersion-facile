@@ -9,7 +9,6 @@ import type {
   ConnectedUserJwt,
   CreateAgencyDto,
   ListAgencyOptionsRequestDto,
-  UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
   WithAgencyIdAndUserId,
@@ -46,10 +45,6 @@ export interface AgencyGateway {
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,
     token: ConnectedUserJwt,
-  ): Observable<void>;
-  validateOrRejectAgency$(
-    adminToken: ConnectedUserJwt,
-    updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void>;
   closeAgencyAndTransfertConventions$(
     payload: CloseAgencyAndTransferConventionsRequestDto,

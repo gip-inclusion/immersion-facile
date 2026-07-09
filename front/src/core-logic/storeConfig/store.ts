@@ -7,8 +7,6 @@ import {
 } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";
-import { agencyNeedingReviewEpics } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.epics";
-import { agencyNeedingReviewSlice } from "src/core-logic/domain/admin/agenciesAdmin/agency-needing-review/agencyNeedingReview.slice";
 import { agenciesAdminEpics } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.epics";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.slice";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
@@ -94,7 +92,6 @@ import type { AppEpic } from "./redux.helpers";
 
 const allEpics: AppEpic<any>[] = [
   ...agenciesAdminEpics,
-  ...agencyNeedingReviewEpics,
   ...agenciesEpics,
   ...closeAgencyAndTransfertConventionsEpics,
   ...apiConsumerEpics,
@@ -139,7 +136,6 @@ const allEpics: AppEpic<any>[] = [
 const appReducer = combineReducers({
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
-    [agencyNeedingReviewSlice.name]: agencyNeedingReviewSlice.reducer,
     [connectedUsersAdminSlice.name]: connectedUsersAdminSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { expect, type Page } from "@playwright/test";
 import { type AgencyId, addressRoutes, domElementIds } from "shared";
 import { goToAdminTab } from "./admin";
-import { expectLocatorToBeVisibleAndEnabled, fillAutocomplete } from "./utils";
+import { fillAutocomplete } from "./utils";
 
 export const fillAndSubmitBasicAgencyForm = async (
   page: Page,
@@ -86,48 +86,32 @@ export const fillAndSubmitBasicAgencyForm = async (
   return agencyId;
 };
 
-export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
+export const rejectAgencyInAdmin = async (page: Page, agencyName: string) => {
   await page.goto("/");
   await goToAdminTab(page, "adminAgencies");
-  await page
-    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
-    .click();
-  await page
-    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
-    .fill(agencyId);
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
+    value: agencyName,
+  });
 
-  await expectLocatorToBeVisibleAndEnabled(
-    page.locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`),
+  const statusSelector = page.locator(
+    `#${domElementIds.admin.agencyTab.editAgencyFormStatusSelector}`,
   );
-
-  await page
-    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`)
-    .click();
-
-  await expectLocatorToBeVisibleAndEnabled(
-    page.locator(
-      `#${domElementIds.admin.agencyTab.agencyToReviewRejectButton}`,
-    ),
-  );
-  await page
-    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewRejectButton}`)
-    .click();
+  await expect(statusSelector).toBeVisible();
+  await statusSelector.selectOption("rejected");
 
   await page
     .locator(
-      `#${domElementIds.admin.agencyTab.rejectAgencyModalJustificationInput}`,
-    )
-    .click();
-  await page
-    .locator(
-      `#${domElementIds.admin.agencyTab.rejectAgencyModalJustificationInput}`,
+      `#${domElementIds.admin.agencyTab.editAgencyFormStatusJustificationInput}`,
     )
     .fill("This is a justification");
+
   await page
-    .locator(`#${domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton}`)
+    .locator(`#${domElementIds.admin.agencyTab.editAgencyFormEditSubmitButton}`)
     .click();
 
-  await expect(page.locator(".fr-alert--success")).toBeVisible();
+  await expect(page.locator(".fr-alert--success").first()).toBeVisible();
 };
 
 export const addUserToAgency = async (page: Page, agencyName: string) => {

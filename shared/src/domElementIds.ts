@@ -859,7 +859,6 @@ export const domElementIds = {
         "im-form-edit-agency__users-submit-button",
       editAgencyManageUserCheckbox: "im-form-edit-agency__manage-user-checkbox",
       editAgencyForm: "im-form-edit-agency",
-      activateAgencySelector: "agency-selector",
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
       editAgencyFormStatusJustificationInput:
         "im-form-edit-agency__status-justification-input",
@@ -870,18 +869,8 @@ export const domElementIds = {
       editAgencyUserIsNotifiedByEmail:
         "im-edit-agency-user__is-notified-by-email-toggle",
       editAgencyUserTooltip: "im-edit-agency-user__tooltip",
-      rejectAgencyModal: "im-reject-agency-modal",
-      rejectAgencyModalForm: "im-reject-agency-modal__form",
-      agencyToReviewInput: "im-agency-to-review__input",
-      agencyToReviewButton: "im-agency-to-review__review-button",
-      agencyToReviewActivateButton: "im-agency-to-review__activate-button",
-      agencyToReviewRejectButton: "im-agency-to-review__reject-button",
       selectIcUserToReview: "im-agency-user-review__select-ic-user",
       registerIcUserToAgencyButton: "im-agency-user-review__register-button",
-      rejectAgencyModalJustificationInput:
-        "im-reject-agency-modal__justification-input",
-      rejectAgencyModalSubmitButton: "im-reject-agency-modal__submit-button",
-      rejectAgencyModalCancelButton: "im-reject-agency-modal__cancel-button",
       userRegistrationToAgencyModal:
         "im-register-user-to-agency__user-registration-modal",
       closeAgencyAndTransferConventionsModal:
