@@ -327,6 +327,21 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
   });
 
   describe("deleteByConventionId", () => {
+    it("do nothing if no convention France Travail advisor is present", async () => {
+      await conventionFranceTravailAdvisorRepository.deleteByConventionId(
+        conventionId,
+      );
+
+      expect(
+        (
+          await db
+            .selectFrom("conventions__ft_connect_users")
+            .selectAll()
+            .execute()
+        ).length,
+      ).toBe(0);
+    });
+
     it("deletes convention France Travail advisor and orphan ft_connect_users", async () => {
       expect(
         (await conventionRepository.getById(conventionId))?.signatories
