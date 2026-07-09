@@ -3,42 +3,31 @@ import type { NafSectionSuggestion } from "shared";
 
 export type NafState = {
   isLoading: boolean;
-  isDebouncing: boolean;
-  currentNafSections: NafSectionSuggestion[];
+  allSections: NafSectionSuggestion[];
 };
 
 export const initialState: NafState = {
   isLoading: false,
-  isDebouncing: false,
-  currentNafSections: [],
+  allSections: [],
 };
 
 export const nafSlice = createSlice({
   name: "naf",
   initialState,
   reducers: {
-    queryHasChanged: (state, _action: PayloadAction<string>) => {
-      state.currentNafSections = [];
-      state.isDebouncing = true;
-    },
-    queryWasEmptied: (state) => {
-      state.isLoading = false;
-      state.currentNafSections = [];
-    },
-    searchSectionsRequested: (state, _action: PayloadAction<string>) => {
+    getAllSectionsRequested: (state) => {
       state.isLoading = true;
-      state.isDebouncing = false;
     },
-    searchSectionsSucceeded: (
+    getAllSectionsSucceeded: (
       state,
       action: PayloadAction<NafSectionSuggestion[]>,
     ) => {
-      state.currentNafSections = action.payload;
+      state.allSections = action.payload;
       state.isLoading = false;
     },
-    searchSectionsFailed: (state, _action: PayloadAction<null>) => {
+    getAllSectionsFailed: (state, _action: PayloadAction<null>) => {
       state.isLoading = false;
-      state.currentNafSections = [];
+      state.allSections = [];
     },
   },
 });
