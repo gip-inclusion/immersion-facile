@@ -102,6 +102,7 @@ describe("toInternationalPhoneNumber", () => {
     ["0612345678", "IT", "+390612345678"], // IT
     ["0986185807", "FR", "+33986185807"], // FR
     ["0699160058", "FR", "+33699160058"], // FR
+    ["0696190095", "FR", "+596696190095"], // MQ
   ])("should assign the right prefix to the phone number %s", async (phone, countryCode, expected) => {
     const result = toInternationalPhoneNumber(phone, countryCode);
     expect(result).toBe(expected);
