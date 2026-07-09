@@ -4,7 +4,7 @@
 
 ## Description
 
-Confirmer à tout moment que le comportement de toutes les implémentations d'un port ( architecture port/adapter ) aient un comportement identique pour le métier qui les consomment.
+Confirmer à tout moment que le comportement de toutes les implémentations d'un port ( architecture port/adapter ) aient un comportement identique pour le métier qui les consomme.
 
 
 
@@ -22,8 +22,8 @@ Un exemple/démo a été fait en mars pour expérimenter la pratique sur UserRep
 Cette démo consiste à jouer les mêmes tests d'intégration du repo PG mais sur le repo InMemory.
 Rappel : les tests d'intégration valident le comportement des méthodes du port consommé par le métier.
 
-Si un ecart est constaté, il est important de se poser la question de quel comportement conserver : InMemory ou PG ?
-Tout en sachant que le comportement de production est le comportement PG et le comportement de validation des scénario de conception métier (spec fonctionnelle) utilisent le comportement InMemory.
+Si un écart est constaté, il est important de se poser la question de quel comportement conserver : InMemory ou PG ? 
+Tout en sachant que le comportement de production est le comportement PG et le comportement de validation des scénarios de conception métier (spec fonctionnelle) utilisent le comportement InMemory.
 
 ### Proposition
 
@@ -50,10 +50,12 @@ Si on le fait :
 ## Decision
 
 Le gain apporté est reconnu et souhaité sur le long terme donc il est entendu que ce sera appliqué sur l'ensemble des repos.
-Etant donné le côut, il faudrait idéalement le faire par IA du moins pour l'amorce et ne pas rattraper tout d'un coup.
+Étant donné le coût, il faudrait idéalement le faire par IA du moins pour l'amorce et ne pas rattraper tout d'un coup.
+ 
+Il n'y a pas d'action pour appliquer la pratique partout en une fois. Ce sera fait au fil de l'eau.  
 
 Les repos à faire par priorité sont:
-- les repos simples car rapide à faire (pas de couplage inter repo akka jointures)
+- les repos simples car rapide à faire (pas de couplage inter repo aka jointures)
 - les repos qui sont liés à des bugs / remontés support / forte suspicion
 
-Dans tout les cas, ce sera proposé au travers d'une tâche TECH
+Dans tout les cas, si on constate le besoin de tester les repos en double pendant un dev classique, il faudra proposer ce travail de test double au travers d'une tâche TECH.
