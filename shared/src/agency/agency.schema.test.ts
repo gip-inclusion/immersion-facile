@@ -60,6 +60,19 @@ describe("agencySchema", () => {
       expect(result.success).toBe(true);
     });
 
+    it.each([
+      ...activeAgencyStatuses,
+      "needsReview",
+    ] satisfies AgencyStatus[])("should throw an error if the agency is %s and has no validator email", (status) => {
+      const agency = new AgencyDtoBuilder()
+        .withValidatorEmails([])
+        .withStatus(status)
+        .build();
+
+      const result = agencySchema.safeParse(agency);
+      expect(result.success).toBe(false);
+    });
+
     it.each(
       closedOrRejectedAgencyStatuses,
     )("can have no validator email if the agency is %s", (status) => {

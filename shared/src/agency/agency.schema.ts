@@ -128,17 +128,17 @@ const delegationAgencyInfoSchema: ZodSchemaWithInputMatchingOutput<DelegationAge
     delegationAgencyKind: delegationAgencyKindSchema.nullable(),
   });
 
-const withEmails = {
+const withCounsellorsAndValidatorsEmailsSchema = z.object({
   counsellorEmails: z.array(emailSchema),
   validatorEmails: z.array(emailSchema),
-};
+});
 
-const withRequiredValidatorEmails = {
+const withCounsellorsAndRequiredValidatorEmailsSchema = z.object({
   counsellorEmails: z.array(emailSchema),
   validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
-};
+});
 
 export const agencyNameSchema: ZodSchemaWithInputMatchingOutput<string> =
   stringWithMaxLength255;
@@ -171,7 +171,8 @@ export const createAgencySchema: z.ZodType<
   CreateAgencyDto,
   CreateAgencyInitialValues
 > = z
-  .object({ ...commonAgencyShape, ...withRequiredValidatorEmails })
+  .object(commonAgencyShape)
+  .and(withCounsellorsAndRequiredValidatorEmailsSchema)
   .and(
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
@@ -227,7 +228,8 @@ const mustHaveStatutJustificationIfClosedOrRejected = (
 };
 
 export const editAgencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
-  .object({ ...commonAgencyShape, ...withEmails })
+  .object(commonAgencyShape)
+  .and(withCounsellorsAndValidatorsEmailsSchema)
   .and(
     z.object({
       status: agencyStatusSchema,
@@ -274,19 +276,18 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: ZodSchemaWithInputMatchingO
     .and(withAdminEmailsSchema);
 
 export const agencySchema: ZodSchemaWithInputMatchingOutput<AgencyDto> = z
-  .object({ ...commonAgencyShape, ...withEmails })
-  .merge(
-    z.object({
-      agencySiret: siretSchema,
-      status: agencyStatusSchema,
-      codeSafir: zStringMinLength1Max1024.or(z.null()),
-      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-      refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
-      refersToAgencyContactEmail: emailSchema.or(z.null()),
-      statusJustification: zStringMinLength1Max1024.or(z.null()),
-      delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
-    }),
-  )
+  .object(commonAgencyShape)
+  .extend({
+    agencySiret: siretSchema,
+    status: agencyStatusSchema,
+    codeSafir: zStringMinLength1Max1024.or(z.null()),
+    refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+    refersToAgencyName: zStringMinLength1Max1024.or(z.null()),
+    refersToAgencyContactEmail: emailSchema.or(z.null()),
+    statusJustification: zStringMinLength1Max1024.or(z.null()),
+    delegationAgencyInfo: delegationAgencyInfoSchema.or(z.null()),
+  })
+  .and(withCounsellorsAndValidatorsEmailsSchema)
   .and(withAcquisitionSchema)
   .refine(mustHaveStatutJustificationIfClosedOrRejected, {
     message: "Une agence inactive doit avoir une justification",
