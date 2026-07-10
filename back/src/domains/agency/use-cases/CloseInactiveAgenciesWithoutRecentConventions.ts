@@ -183,6 +183,26 @@ const getNotificationsForClosedAgencies = async (
     .filter(isTruthy);
 };
 
+const hasRecentConventionForAgencies = (
+  uow: UnitOfWork,
+  agencyIds: AgencyWithUsersRights["id"][],
+  noConventionSince: Date,
+) =>
+  uow.conventionQueries.getConventionIdsByFilters({
+    filters: {
+      withAgencyIds: agencyIds,
+      withStatuses: [
+        "ACCEPTED_BY_VALIDATOR",
+        "IN_REVIEW",
+        "PARTIALLY_SIGNED",
+        "ACCEPTED_BY_COUNSELLOR",
+        "READY_TO_SIGN",
+      ],
+      withDateSubmissionSince: noConventionSince,
+    },
+    limit: 1,
+  });
+
 const getAgenciesToClose = async (
   agencies: AgencyWithUsersRights[],
   uow: UnitOfWork,
@@ -191,47 +211,26 @@ const getAgenciesToClose = async (
   const agenciesToCloseResults = await executeInSequence(
     agencies,
     async (agency): Promise<AgencyWithUsersRights | null> => {
-      const agencyConventions =
-        await uow.conventionQueries.getConventionsByScope({
-          scope: { agencyIds: [agency.id] },
-          limit: 10,
-          filters: {
-            withStatuses: [
-              "ACCEPTED_BY_VALIDATOR",
-              "IN_REVIEW",
-              "PARTIALLY_SIGNED",
-              "ACCEPTED_BY_COUNSELLOR",
-              "READY_TO_SIGN",
-            ],
-            dateSubmissionSince: noConventionSince,
-          },
-        });
+      const agencyConventionIds = await hasRecentConventionForAgencies(
+        uow,
+        [agency.id],
+        noConventionSince,
+      );
 
-      if (agencyConventions.length === 0) {
+      if (agencyConventionIds.length === 0) {
         const referringAgencies =
           await uow.agencyRepository.getAgenciesRelatedToAgency(agency.id);
 
         if (referringAgencies.length === 0) return agency;
 
-        const referringAgenciesConventions =
-          await uow.conventionQueries.getConventionsByScope({
-            scope: {
-              agencyIds: referringAgencies.map((a) => a.id),
-            },
-            limit: 10,
-            filters: {
-              withStatuses: [
-                "ACCEPTED_BY_VALIDATOR",
-                "IN_REVIEW",
-                "PARTIALLY_SIGNED",
-                "ACCEPTED_BY_COUNSELLOR",
-                "READY_TO_SIGN",
-              ],
-              dateSubmissionSince: noConventionSince,
-            },
-          });
+        const referringAgenciesConventionIds =
+          await hasRecentConventionForAgencies(
+            uow,
+            referringAgencies.map((referringAgency) => referringAgency.id),
+            noConventionSince,
+          );
 
-        if (referringAgenciesConventions.length === 0) return agency;
+        if (referringAgenciesConventionIds.length === 0) return agency;
       }
 
       return null;

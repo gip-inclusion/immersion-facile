@@ -50,8 +50,10 @@ export type GetPaginatedConventionsForAgencyUserParams =
 
 export type GetConventionIdsParams = {
   filters: {
+    withAgencyIds?: AgencyId[];
     withAppelationCodes?: AppellationCode[];
     withDateStart?: OptionalDateRange;
+    withDateSubmissionSince?: Date;
     withEndDate?: OptionalDateRange;
     withUpdateDate?: OptionalDateRange;
     withSirets?: SiretDto[];

@@ -105,7 +105,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .filter(makeApplyFiltersToGetConventionIds(params.filters))
       .map((convention) => convention.id);
 
-    return params.limit ? results.slice(0, params.limit - 1) : results;
+    return params.limit ? results.slice(0, params.limit) : results;
   }
 
   public async getConventionById(
@@ -596,9 +596,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
 const makeApplyFiltersToGetConventionIds =
   ({
+    withAgencyIds,
     withAppelationCodes,
     withBeneficiary,
     withDateStart,
+    withDateSubmissionSince,
     withEndDate,
     withUpdateDate,
     withEstablishmentRepresentative,
@@ -609,6 +611,15 @@ const makeApplyFiltersToGetConventionIds =
   (convention: ConventionDto) =>
     (
       [
+        ({ agencyId }) =>
+          withAgencyIds && withAgencyIds.length > 0
+            ? withAgencyIds.includes(agencyId)
+            : true,
+        ({ dateSubmission }) =>
+          withDateSubmissionSince
+            ? new Date(dateSubmission).getTime() >=
+              withDateSubmissionSince.getTime()
+            : true,
         ({ dateStart }) =>
           withDateStart?.to ? dateStart <= withDateStart : true,
         ({ dateStart }) =>

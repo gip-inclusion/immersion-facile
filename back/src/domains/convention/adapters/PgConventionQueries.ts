@@ -139,9 +139,11 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getConventionIdsByFilters({
     filters: {
+      withAgencyIds,
       withAppelationCodes,
       withBeneficiary,
       withDateStart,
+      withDateSubmissionSince,
       withEndDate,
       withUpdateDate,
       withEstablishmentRepresentative,
@@ -156,6 +158,18 @@ export class PgConventionQueries implements ConventionQueries {
         .selectFrom("conventions")
         .select("conventions.id")
         .orderBy("conventions.date_start", "desc"),
+      (qb) =>
+        withAgencyIds && withAgencyIds.length > 0
+          ? qb.where("conventions.agency_id", "in", withAgencyIds)
+          : qb,
+      (qb) =>
+        withDateSubmissionSince
+          ? qb.where(
+              "conventions.date_submission",
+              ">=",
+              withDateSubmissionSince,
+            )
+          : qb,
       addDateFilters({ withDateStart, withEndDate, withUpdateDate }),
       (qb) =>
         withAppelationCodes
