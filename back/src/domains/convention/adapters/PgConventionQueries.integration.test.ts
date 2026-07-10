@@ -935,6 +935,111 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    describe("withAgencyIds filter", () => {
+      const otherAgency = AgencyDtoBuilder.create(uuid())
+        .withName("Other agency")
+        .build();
+
+      const conventionOnAgency = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(agency.id)
+        .withDateStart("2026-02-01")
+        .build();
+
+      const conventionOnOtherAgency = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(otherAgency.id)
+        .withDateStart("2026-02-02")
+        .build();
+
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(otherAgency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+        await conventionRepository.save(conventionOnAgency);
+        await conventionRepository.save(conventionOnOtherAgency);
+      });
+
+      it("returns conventions matching a single agency id", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: { withAgencyIds: [agency.id] },
+          }),
+          [conventionOnAgency.id],
+        );
+      });
+
+      it("returns conventions matching multiple agency ids", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: { withAgencyIds: [agency.id, otherAgency.id] },
+          }),
+          [conventionOnOtherAgency.id, conventionOnAgency.id],
+        );
+      });
+
+      it("returns empty when no convention matches agency ids", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: { withAgencyIds: [uuid()] },
+          }),
+          [],
+        );
+      });
+    });
+
+    describe("withDateSubmissionSince filter", () => {
+      const submissionSince = new Date("2026-01-15T00:00:00.000Z");
+
+      const recentConvention = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(agency.id)
+        .withDateSubmission("2026-01-20T10:00:00.000Z")
+        .withDateStart("2026-02-01")
+        .build();
+
+      const oldConvention = new ConventionDtoBuilder()
+        .withId(uuid())
+        .withAgencyId(agency.id)
+        .withDateSubmission("2026-01-10T10:00:00.000Z")
+        .withDateStart("2026-01-12")
+        .build();
+
+      beforeEach(async () => {
+        await conventionRepository.save(recentConvention);
+        await conventionRepository.save(oldConvention);
+      });
+
+      it("returns conventions submitted on or after the given date", async () => {
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: { withDateSubmissionSince: submissionSince },
+          }),
+          [recentConvention.id],
+        );
+      });
+
+      it("includes conventions submitted exactly on the given date", async () => {
+        const conventionSubmittedOnSinceDate = new ConventionDtoBuilder()
+          .withId(uuid())
+          .withAgencyId(agency.id)
+          .withDateSubmission("2026-01-15T08:00:00.000Z")
+          .withDateStart("2026-01-20")
+          .build();
+
+        await conventionRepository.save(conventionSubmittedOnSinceDate);
+
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: { withDateSubmissionSince: submissionSince },
+          }),
+          [recentConvention.id, conventionSubmittedOnSinceDate.id],
+        );
+      });
+    });
+
     describe("limit", () => {
       const convention1 = new ConventionDtoBuilder()
         .withId(uuid())
