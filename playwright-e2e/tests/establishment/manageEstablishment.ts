@@ -151,9 +151,9 @@ const checkEstablishment = async (
     (
       await page
         .locator(
-          `#${domElementIds.formEstablishment.admin.businessAddresses}-0-wrapper .im-select__single-value`,
+          `#${domElementIds.formEstablishment.admin.businessAddresses}-0`,
         )
-        .innerText()
+        .inputValue()
     ).toLowerCase(),
   ).toContain(businessAddress.rawAddress.toLowerCase());
 
