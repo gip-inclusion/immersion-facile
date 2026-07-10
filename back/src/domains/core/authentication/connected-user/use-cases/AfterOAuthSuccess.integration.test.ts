@@ -84,7 +84,7 @@ describe("AfterOAuthSuccess use case", () => {
     });
 
     it("saves the user as Authenticated user", async () => {
-      const { accessToken, initialOngoingOAuth } =
+      const { accessToken, initialOngoingOAuth, idToken } =
         await makeSuccessfulAuthenticationConditions(
           `${immersionBaseUrl}/agencyDashboard`,
         );
@@ -103,6 +103,7 @@ describe("AfterOAuthSuccess use case", () => {
         usedAt: expect.any(Date),
         userId: expect.any(String),
         accessToken,
+        idToken,
         externalId: defaultExpectedIcIdTokenPayload.sub,
       });
 
@@ -182,6 +183,7 @@ describe("AfterOAuthSuccess use case", () => {
       nonce: "nounce", // matches the one in the payload of the token
       usedAt: null,
       fromUri,
+      idToken: null,
     };
     await uow.ongoingOAuthRepository.save(initialOngoingOAuth);
 
@@ -198,6 +200,7 @@ describe("AfterOAuthSuccess use case", () => {
     return {
       accessToken,
       initialOngoingOAuth,
+      idToken,
     };
   };
 });

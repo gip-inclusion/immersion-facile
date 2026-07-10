@@ -75,23 +75,9 @@ describe("InclusionConnected", () => {
   };
 
   const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
-    email: connectedUser.email,
-    firstName: connectedUser.firstName,
-    lastName: connectedUser.lastName,
     provider: "proConnect",
     token: "fake-token",
     idToken: "inclusion-connect-id-token",
-    birthdate: "",
-  };
-
-  const peConnectFederatedIdentity: FederatedIdentityWithUser = {
-    email: "",
-    firstName: "",
-    lastName: "",
-    provider: "peConnect",
-    token: "fake-token",
-    idToken: "fake-id-token",
-    birthdate: "",
   };
 
   beforeEach(() => {
@@ -100,7 +86,7 @@ describe("InclusionConnected", () => {
 
   describe("authSlice.actions.federatedIdentityFoundInDevice", () => {
     it("fetches the current IC user when inclusion connect federated identity is found in device", () => {
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
       store.dispatch(
         authSlice.actions.federatedIdentityFoundInDevice({
@@ -109,33 +95,18 @@ describe("InclusionConnected", () => {
         }),
       );
 
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
 
       dependencies.authGateway.currentUser$.next(connectedUser);
 
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
-    });
-
-    it("do nothing when other federated identity is found in device", () => {
-      expectIsLoadingToBe(false);
-      expectCurrentUserToBe(null);
-
-      store.dispatch(
-        authSlice.actions.federatedIdentityFoundInDevice({
-          federatedIdentityWithUser: peConnectFederatedIdentity,
-          feedbackTopic: "auth-global",
-        }),
-      );
-
-      expectIsLoadingToBe(false);
-      expectCurrentUserToBe(null);
     });
   });
 
   describe("authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded", () => {
     it("fetches the current IC user when inclusion connect federated identity is successfully stored in device", () => {
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
 
       store.dispatch(
@@ -145,33 +116,18 @@ describe("InclusionConnected", () => {
         }),
       );
 
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
 
       dependencies.authGateway.currentUser$.next(connectedUser);
 
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
-    });
-
-    it("do nothing when other federated identity is successfully stored in device", () => {
-      expectIsLoadingToBe(false);
-      expectCurrentUserToBe(null);
-
-      store.dispatch(
-        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded({
-          federatedIdentityWithUser: peConnectFederatedIdentity,
-          feedbackTopic: "auth-global",
-        }),
-      );
-
-      expectIsLoadingToBe(false);
-      expectCurrentUserToBe(null);
     });
   });
 
   describe("inclusionConnectedSlice.actions.currentUserFetchRequested", () => {
     it("fetches the current IC user", () => {
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
 
       store.dispatch(
@@ -180,11 +136,11 @@ describe("InclusionConnected", () => {
         }),
       );
 
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
 
       dependencies.authGateway.currentUser$.next(connectedUser);
 
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
     });
 
@@ -195,11 +151,7 @@ describe("InclusionConnected", () => {
           federatedIdentityWithUser: {
             token: "some-existing-token",
             provider: "proConnect",
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@mail.com",
             idToken: "inclusion-connect-id-token",
-            birthdate: "",
           },
           isLoading: true,
           isRequestingRenewExpiredJwt: false,
@@ -212,7 +164,7 @@ describe("InclusionConnected", () => {
           feedbackTopic: "auth-global",
         }),
       );
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
 
       const errorMessage = `Something went wrong : ${authExpiredMessage()} blah blah`;
       dependencies.authGateway.currentUser$.error(new Error(errorMessage));
@@ -221,18 +173,18 @@ describe("InclusionConnected", () => {
     });
 
     it("stores error on failure when trying to fetch current IC user", () => {
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
       store.dispatch(
         connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "dashboard-agency-register-user",
         }),
       );
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
 
       const errorMessage = "Something went wrong";
       dependencies.authGateway.currentUser$.error(new Error(errorMessage));
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-agency-register-user": {
@@ -258,11 +210,11 @@ describe("InclusionConnected", () => {
           feedbackTopic: "dashboard-agency-register-user",
         }),
       );
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
       dependencies.agencyGateway.registerAgenciesToCurrentUserResponse$.next(
         undefined,
       );
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-agency-register-user": {
           on: "create",
@@ -275,7 +227,7 @@ describe("InclusionConnected", () => {
     });
 
     it("fetches the current IC user when registration succeed", () => {
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
 
       store.dispatch(
@@ -287,7 +239,7 @@ describe("InclusionConnected", () => {
 
       dependencies.authGateway.currentUser$.next(connectedUser);
 
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
     });
 
@@ -302,7 +254,7 @@ describe("InclusionConnected", () => {
           feedbackTopic: "dashboard-agency-register-user",
         }),
       );
-      expectIsLoadingToBe(true);
+      expectConnectedUserSelectorIsLoadingToBe(true);
       dependencies.agencyGateway.registerAgenciesToCurrentUserResponse$.error(
         new Error(errorMessage),
       );
@@ -314,7 +266,7 @@ describe("InclusionConnected", () => {
           message: errorMessage,
         },
       });
-      expectIsLoadingToBe(false);
+      expectConnectedUserSelectorIsLoadingToBe(false);
     });
   });
 
@@ -854,7 +806,7 @@ describe("InclusionConnected", () => {
       });
     });
   });
-  const expectIsLoadingToBe = (expected: boolean) => {
+  const expectConnectedUserSelectorIsLoadingToBe = (expected: boolean) => {
     expect(connectedUserSelectors.isLoading(store.getState())).toBe(expected);
   };
 

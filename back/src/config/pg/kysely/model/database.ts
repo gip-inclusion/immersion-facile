@@ -478,6 +478,7 @@ interface OngoingOauths {
   user_id: string | null;
   external_id: string | null;
   access_token: string | null;
+  id_token: string | null;
   email: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;

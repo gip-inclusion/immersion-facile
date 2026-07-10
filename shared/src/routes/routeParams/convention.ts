@@ -1,13 +1,10 @@
 import { addDays, startOfToday } from "date-fns";
 
 import { v4 as uuidV4 } from "uuid";
-import {
-  type ConventionDraftDto,
-  type FederatedIdentity,
-  type FtConnectIdentity,
-  type IdToken,
-  isFtConnectIdentity,
-  type PhoneNumber,
+import type {
+  ConventionDraftDto,
+  FederatedIdentity,
+  FtConnectIdentity,
 } from "../..";
 import type { AgencyKind } from "../../agency/agency.dto";
 import type {
@@ -30,14 +27,7 @@ import { reasonableSchedule } from "../../schedule/ScheduleUtils";
 import type { SiretDto } from "../../siret/siret";
 import { type DateString, toDateUTCString } from "../../utils/date";
 
-export type FederatedIdentityWithUser = FederatedIdentity & {
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthdate?: DateString;
-  phone?: PhoneNumber;
-  idToken: IdToken;
-};
+export type FederatedIdentityWithUser = FederatedIdentity;
 
 export const makeEmptyConventionInitialValues = ({
   internshipKind,
@@ -49,7 +39,6 @@ export const makeEmptyConventionInitialValues = ({
   siret,
   immersionAppellation,
   immersionAddress,
-  federatedIdentity,
 }: {
   internshipKind: InternshipKind;
   agencyDepartment?: string;
@@ -60,7 +49,6 @@ export const makeEmptyConventionInitialValues = ({
   siret?: SiretDto;
   immersionAppellation?: AppellationAndRomeDto;
   immersionAddress?: string;
-  federatedIdentity?: FederatedIdentityWithUser;
 }): CreateConventionPresentationInitialValues => {
   const dateStart = new Date();
   const dateEnd = addDays(dateStart, 1);
@@ -106,10 +94,6 @@ export const makeEmptyConventionInitialValues = ({
         financiaryHelp: "",
         birthdate: "",
         isRqth: false,
-        federatedIdentity:
-          federatedIdentity && isFtConnectIdentity(federatedIdentity)
-            ? federatedIdentity
-            : undefined,
       },
       establishmentRepresentative: {
         role: "establishment-representative",

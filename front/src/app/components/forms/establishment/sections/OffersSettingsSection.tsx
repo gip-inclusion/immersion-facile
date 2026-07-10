@@ -43,6 +43,7 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { type Mode, useEstablishmentRoute } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
@@ -717,6 +718,7 @@ const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
   const { getValues, setValue, formState } =
     useFormContext<FormEstablishmentDto>();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const defaultUserToContact = getValues("userRights.0");
   const contactMode = getValues("contactMode");
   const establishment = useAppSelector(
@@ -759,9 +761,10 @@ const UserToContact = ({ mode }: { mode: Mode }): React.ReactNode => {
         {defaultUserToContact.phone &&
           toDisplayedPhoneNumber(defaultUserToContact.phone)}{" "}
         {federatedIdentity?.provider === "proConnect" &&
+          currentUser &&
           `(${getFormattedFirstnameAndLastname({
-            firstname: federatedIdentity.firstName,
-            lastname: federatedIdentity.lastName,
+            firstname: currentUser.firstName,
+            lastname: currentUser.lastName,
           })})`}
       </div>
     ))

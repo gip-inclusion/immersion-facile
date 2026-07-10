@@ -1,15 +1,11 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
-import { useDispatch } from "react-redux";
 import { type frontRoutes, keys } from "shared";
 import {
   type ConventionFormMode,
   ConventionFormWrapper,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { Route } from "type-route";
 
 export type ConventionMiniStagePageRoute = Route<
@@ -23,8 +19,6 @@ type ConventionMiniStagePageProps = {
 export const ConventionMiniStagePage = ({
   route,
 }: ConventionMiniStagePageProps) => {
-  const dispatch = useDispatch();
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const t = useConventionTexts("mini-stage-cci");
   const initialRouteParams = useRef(route.params).current;
   const { jwt: _, ...routeParamsWithoutJwt } = initialRouteParams;
@@ -32,7 +26,6 @@ export const ConventionMiniStagePage = ({
     () => keys(routeParamsWithoutJwt).length > 0,
     [routeParamsWithoutJwt],
   );
-  const isFTConnected = federatedIdentity?.provider === "peConnect";
 
   const getMode = (): ConventionFormMode => {
     if ("jwt" in initialRouteParams) return "edit-convention";
@@ -40,17 +33,6 @@ export const ConventionMiniStagePage = ({
     return "create-convention-from-scratch";
   };
   const mode = getMode();
-
-  useEffect(() => {
-    if (isFTConnected) {
-      dispatch(
-        authSlice.actions.fetchLogoutUrlRequested({
-          mode: "device-and-oauth",
-          feedbackTopic: "auth-global",
-        }),
-      );
-    }
-  }, [dispatch, isFTConnected]);
 
   return (
     <MainWrapper

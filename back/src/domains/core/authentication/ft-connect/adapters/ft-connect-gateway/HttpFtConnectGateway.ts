@@ -6,7 +6,6 @@ import {
   HTTP_STATUS,
   queryParamsAsString,
   TooManyRequestApiError,
-  type WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
@@ -25,6 +24,7 @@ import type {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,
+  GetLogoutUrlParams,
 } from "../../../connected-user/port/OAuthGateway";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate } from "../../dto/FtConnect.dto";
@@ -244,7 +244,10 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       : undefined;
   }
 
-  public async getLogoutUrl({ idToken }: WithIdToken): Promise<AbsoluteUrl> {
+  public async getLogoutUrl({
+    idToken,
+    state: _,
+  }: GetLogoutUrlParams): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl = `${this.ftConnectConfig.providerBaseUri}/compte/deconnexion`;
     const postLogoutRedirectUri =
       this.ftConnectConfig.immersionRedirectUri.afterLogout;

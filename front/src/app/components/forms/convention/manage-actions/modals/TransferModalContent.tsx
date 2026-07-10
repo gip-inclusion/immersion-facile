@@ -59,9 +59,8 @@ export const TransferModalContent = ({
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           filterKind: makeListAgencyOptionsKindFilter({
-            internshipKind: convention.internshipKind,
+            convention,
             shouldListAll: false,
-            federatedIdentity: null,
           }),
           departmentCode,
         }),

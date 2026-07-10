@@ -45,7 +45,6 @@ import {
   errors as errorMessage,
   establishmentFormOfferSchema,
   frontRoutes,
-  type ftConnectParams,
   type InternshipKind,
   isBeneficiaryMinor,
   isConventionTemplateFromRoute,
@@ -64,6 +63,7 @@ import {
   toConventionTemplate,
   type UserWithRights,
   undefinedIfEmptyString,
+  type WithFirstnameAndLastname,
 } from "shared";
 import { AddressAutocompleteWithCountrySelect } from "src/app/components/forms/autocomplete/AddressAutocompleteWithCountrySelect";
 import {
@@ -140,7 +140,6 @@ type ConventionRouteParams = Pick<
   | "immersionAppellation"
 >;
 type ConventionParamKey = keyof ConventionRouteParams;
-type FtConnectParamKey = keyof typeof ftConnectParams;
 
 const shouldPrefillAgencyReferentFromConnectedUser = (
   user: UserWithRights,
@@ -173,7 +172,6 @@ export const ConventionForm = ({
   );
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const acquisitionParams = useGetAcquisitionParams();
 
   const currentUserAgencyReferentName =
@@ -187,17 +185,14 @@ export const ConventionForm = ({
           lastname: "",
         };
 
-  const agencyReferentName = federatedIdentity?.payload?.advisor
-    ? {
-        firstname: federatedIdentity.payload.advisor.firstName,
-        lastname: federatedIdentity.payload.advisor.lastName,
-      }
-    : currentUserAgencyReferentName;
+  const agencyReferentName = getAgencyReferentName(
+    fetchedConvention,
+    currentUserAgencyReferentName,
+  );
 
   const initialValues = useRef<CreateConventionPresentationInitialValues>({
     ...makeEmptyConventionInitialValues({
       internshipKind,
-      federatedIdentity: federatedIdentity ?? undefined,
     }),
     ...acquisitionParams,
     ...(mode === "create-convention-from-scratch"
@@ -271,10 +266,7 @@ export const ConventionForm = ({
       conventionFromTemplate ||
       initialValues;
 
-    const hasRouteParam = <
-      TKey extends ConventionParamKey | FtConnectParamKey,
-      TValue,
-    >(
+    const hasRouteParam = <TKey extends ConventionParamKey, TValue>(
       params: object,
       key: TKey,
     ): params is Record<TKey, TValue> => key in params;
@@ -288,25 +280,6 @@ export const ConventionForm = ({
         return route.params[key];
 
       return convention[key];
-    };
-
-    const pickBeneficiaryValueFromRouteParams = <
-      TKey extends Extract<
-        FtConnectParamKey,
-        "birthdate" | "firstName" | "lastName" | "email" | "phone"
-      >,
-    >(
-      key: TKey,
-    ): ConventionReadDto["signatories"]["beneficiary"][TKey] => {
-      if (
-        hasRouteParam<
-          TKey,
-          ConventionReadDto["signatories"]["beneficiary"][TKey]
-        >(route.params, key)
-      )
-        return route.params[key];
-
-      return convention.signatories?.beneficiary?.[key];
     };
 
     const immersionAppellationFromRoute = pickConventionValueFromRouteParams(
@@ -341,17 +314,6 @@ export const ConventionForm = ({
       remoteWorkMode: parsedEstablishmentOffer.success
         ? parsedEstablishmentOffer.data.remoteWorkMode
         : convention.remoteWorkMode,
-      signatories: {
-        ...convention.signatories,
-        beneficiary: {
-          ...convention.signatories?.beneficiary,
-          birthdate: pickBeneficiaryValueFromRouteParams("birthdate"),
-          firstName: pickBeneficiaryValueFromRouteParams("firstName"),
-          lastName: pickBeneficiaryValueFromRouteParams("lastName"),
-          email: pickBeneficiaryValueFromRouteParams("email"),
-          phone: pickBeneficiaryValueFromRouteParams("phone"),
-        },
-      },
     };
 
     return conventionDefaultValues;
@@ -392,9 +354,8 @@ const ConventionFormContent = ({
   const dispatch = useDispatch();
   const route = useConventionRoute();
   const fromPeConnectedUser =
-    "fedIdProvider" in route.params
-      ? route.params.fedIdProvider === "peConnect"
-      : undefined;
+    defaultValues.signatories?.beneficiary?.federatedIdentity?.provider ===
+    "peConnect";
 
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
@@ -583,9 +544,8 @@ const ConventionFormContent = ({
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           filterKind: makeListAgencyOptionsKindFilter({
-            internshipKind: conventionValues.internshipKind,
+            convention: conventionValues,
             shouldListAll: false,
-            federatedIdentity,
           }),
           departmentCode,
         }),
@@ -1161,3 +1121,19 @@ const SectionTitle = ({
     </>
   );
 };
+
+const getAgencyReferentName = (
+  fetchedConvention: ConventionReadDto | null,
+  currentUserAgencyReferentName: { firstname: string; lastname: string },
+): WithFirstnameAndLastname =>
+  !fetchedConvention?.signatories.beneficiary.federatedIdentity?.payload
+    ?.advisor
+    ? currentUserAgencyReferentName
+    : {
+        firstname:
+          fetchedConvention.signatories.beneficiary.federatedIdentity.payload
+            .advisor.firstName,
+        lastname:
+          fetchedConvention.signatories.beneficiary.federatedIdentity.payload
+            .advisor.lastName,
+      };

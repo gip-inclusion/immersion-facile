@@ -2,7 +2,6 @@ import { subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   allowedLoginSources,
-  authFailed,
   type ExternalId,
   errors,
   expectObjectInArrayToMatch,
@@ -131,7 +130,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         });
 
         it("updates ongoingOAuth with userId, accessToken and externalId", async () => {
-          const { accessToken, initialOngoingOAuth, userId } =
+          const { accessToken, initialOngoingOAuth, userId, idToken } =
             makeSuccessfulAuthenticationConditions("admin");
 
           await afterOAuthSuccessRedirection.execute({
@@ -144,6 +143,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
               ...initialOngoingOAuth,
               usedAt: timeGateway.now(),
               accessToken,
+              idToken,
               userId,
               externalId: defaultExpectedProConnectIcIdTokenPayload.sub,
             },
@@ -395,7 +395,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
           expectToEqual(response, {
             provider: "proConnect",
-            redirectUri: `http://fake-connected-user${fromUri}&token=${userId}&firstName=John&lastName=Doe&email=john.doe@mail.com&idToken=id-token&provider=proConnect`,
+            redirectUri: `http://fake-connected-user${fromUri}&token=jwt-${userId}&idToken=id-token&provider=proConnect`,
           });
         });
       });
@@ -435,6 +435,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           state: "my-state",
           nonce: existingNonce,
           usedAt: null,
+          idToken: null,
         };
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
@@ -501,6 +502,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       state,
       nonce: "nounce",
       usedAt: null,
+      idToken: null,
     };
 
     describe("right paths", () => {
@@ -531,7 +533,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           state,
         });
         expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+          {
+            ...defaultFtOngoingOAuth,
+            provider: "peConnect",
+            accessToken,
+            idToken,
+            usedAt: timeGateway.now(),
+          },
         ]);
         expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
           {
@@ -593,7 +601,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         });
 
         expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+          {
+            ...defaultFtOngoingOAuth,
+            accessToken,
+            idToken,
+            usedAt: timeGateway.now(),
+          },
         ]);
         expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
           {
@@ -659,7 +672,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         });
 
         expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-          { ...defaultFtOngoingOAuth, accessToken, usedAt: timeGateway.now() },
+          {
+            ...defaultFtOngoingOAuth,
+            accessToken,
+            idToken,
+            usedAt: timeGateway.now(),
+          },
         ]);
         expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
           {
@@ -759,11 +777,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         expectToEqual(response, {
           provider: "peConnect",
           redirectUri: makeRouteAbsoluteUrl({
-            route: frontRoutes.conventionImmersion({
-              fedId: authFailed,
-              fedIdToken: idToken,
-              fedIdProvider: "peConnect",
-            }),
+            route: frontRoutes.conventionImmersion({}),
             baseUrl: immersionFacileBaseUrl,
           }),
         });
@@ -795,7 +809,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         });
         expectToEqual(result, {
           provider: "email",
-          redirectUri: `http://fake-connected-user/admin?token=${userId}&firstName=&lastName=&email=my-email@mail.com&idToken=&provider=email`,
+          redirectUri: `http://fake-connected-user/admin?token=jwt-${userId}&idToken=&provider=email`,
         });
       });
 
@@ -899,7 +913,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         expectToEqual(redirectedUrl, {
           provider: "email",
-          redirectUri: `http://fake-connected-user/${page}?discussionId=discussion0&token=${userId}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+          redirectUri: `http://fake-connected-user/${page}?discussionId=discussion0&token=jwt-${userId}&idToken=&provider=email`,
         });
       });
     });
@@ -936,6 +950,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         state: "my-state",
         nonce: "nounce", // matches the one in the payload of the token
         usedAt: new Date(),
+        idToken: null,
       };
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
@@ -971,6 +986,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       state: "my-state",
       nonce: "nounce", // matches the one in the payload of the token
       usedAt: null,
+      idToken: null,
     };
     uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
@@ -992,6 +1008,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       accessToken,
       initialOngoingOAuth: { ...initialOngoingOAuth },
       userId,
+      idToken,
     };
   };
 

@@ -134,16 +134,13 @@ const getLogoutUrl$ = (
   const { federatedIdentityWithUser } = authState;
   if (!federatedIdentityWithUser)
     return throwError(() => errors.auth.missingOAuth({}));
-  const { provider } = federatedIdentityWithUser;
-  if (action.payload.mode === "device-and-oauth") {
-    const { idToken } = federatedIdentityWithUser;
-    return authGateway.getLogoutUrl$({
-      idToken: authState.federatedIdentityWithUser ? idToken : "",
-      authToken: authState.federatedIdentityWithUser?.token ?? "",
-      provider,
-    });
-  }
-  return of(undefined);
+  return action.payload.mode === "device-and-oauth"
+    ? authGateway.getLogoutUrl$({
+        idToken: federatedIdentityWithUser.idToken,
+        authToken: federatedIdentityWithUser.token,
+        provider: federatedIdentityWithUser.provider,
+      })
+    : of(undefined);
 };
 
 const logoutEpic: AuthEpic = (

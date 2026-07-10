@@ -104,7 +104,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       mode === "create"
         ? [
             {
-              email: federatedIdentity?.email ?? "",
+              email: currentUser?.email ?? "",
               job: "",
               status: "ACCEPTED",
               phone: "",

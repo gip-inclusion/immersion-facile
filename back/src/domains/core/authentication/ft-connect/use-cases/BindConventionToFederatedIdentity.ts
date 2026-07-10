@@ -2,7 +2,6 @@ import {
   authFailed,
   type ConventionDto,
   type FtConnectIdentity,
-  isFtConnectIdentity,
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
@@ -32,8 +31,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
     const federatedIdentity =
       convention.signatories.beneficiary.federatedIdentity;
 
-    return isFtConnectIdentity(federatedIdentity) &&
-      federatedIdentity.token !== authFailed
+    return federatedIdentity && federatedIdentity?.token !== authFailed
       ? this.#associateConventionToFederatedIdentity(
           convention,
           federatedIdentity,

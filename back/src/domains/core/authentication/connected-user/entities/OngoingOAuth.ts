@@ -4,6 +4,7 @@ import type {
   ExtractFromExisting,
   FederatedIdentityProvider,
   Flavor,
+  IdToken,
   OAuthState,
 } from "shared";
 
@@ -33,11 +34,13 @@ export type ProConnectOngoingAuth = OngoingAuthCommon & {
   provider: ExtractFromExisting<FederatedIdentityProvider, "proConnect">;
   externalId?: ExternalId;
   accessToken?: OAuthJwt; //TODO Pourquoi on le stocke en DB (on ne fait que le save)
+  idToken: IdToken | null;
 };
 export type FTConnectOngoingAuth = OngoingAuthCommon & {
   provider: ExtractFromExisting<FederatedIdentityProvider, "peConnect">;
   externalId?: ExternalId;
   accessToken?: OAuthJwt;
+  idToken: IdToken | null;
 };
 
 export type OngoingOAuth =

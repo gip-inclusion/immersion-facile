@@ -19,6 +19,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUsersList } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
 import type { Mode } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { match, P } from "ts-pattern";
 import type { OnStepChange, Step } from "../EstablishmentForm";
@@ -178,6 +179,7 @@ const EstablishmentAdminInfos = () => {
   const methods = useFormContext<FormEstablishmentDto>();
   const { register } = methods;
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const formContents = getFormContents(
     formEstablishmentFieldsLabels("create"),
   ).getFormFields();
@@ -205,7 +207,7 @@ const EstablishmentAdminInfos = () => {
             }
             disabled
             nativeInputProps={{
-              value: federatedIdentity?.firstName,
+              value: currentUser?.firstName,
               id: domElementIds.formEstablishment.create.businessContact
                 .firstName,
             }}
@@ -217,7 +219,7 @@ const EstablishmentAdminInfos = () => {
             }
             disabled
             nativeInputProps={{
-              value: federatedIdentity?.lastName,
+              value: currentUser?.lastName,
               id: domElementIds.formEstablishment.create.businessContact
                 .lastName,
             }}
@@ -230,7 +232,7 @@ const EstablishmentAdminInfos = () => {
         hintText={formContents["userRights.0.email"].hintText}
         disabled
         nativeInputProps={{
-          value: federatedIdentity?.email,
+          value: currentUser?.email,
           id: domElementIds.formEstablishment.create.businessContact.email,
         }}
       />

@@ -162,24 +162,19 @@ export const ConnectedPrivateRoutePage = ({
   );
 
   useEffect(() => {
-    const {
-      token,
-      provider,
-      email = "",
-      firstName = "",
-      lastName = "",
-      idToken = "",
-    } = route.params;
+    const { token, provider, idToken = "" } = route.params;
 
-    if (token && provider && isFederatedIdentityProvider(provider)) {
+    if (
+      token &&
+      provider &&
+      isFederatedIdentityProvider(provider) &&
+      provider !== "peConnect"
+    ) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
           federatedIdentityWithUser: {
             provider,
             token,
-            email,
-            lastName,
-            firstName,
             idToken,
           },
           feedbackTopic: "auth-global",
