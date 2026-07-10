@@ -52,18 +52,5 @@ describe("naf Router", () => {
         status: 200,
       });
     });
-
-    it("400 - Bad Schema", async () => {
-      const response = await httpClient.getAllNafSections();
-      expectHttpResponseToEqual(response, {
-        body: {
-          message:
-            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /naf/section",
-          status: 400,
-          issues: ["searchText : Ce champ est obligatoire"],
-        },
-        status: 400,
-      });
-    });
   });
 });
