@@ -59,6 +59,7 @@ export type ModalWrapperProps = {
     SetStateAction<string | null>
   >;
   currentUser?: ConnectedUser;
+  isSubmitDisabled?: boolean;
 };
 
 export const ModalWrapper = (props: ModalWrapperProps) => {
@@ -364,8 +365,11 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   );
 
   const Modal = modalObject.modal;
+
   return createPortal(
-    <Modal {...modalProps}>{modalContent}</Modal>,
+    <Modal {...modalProps} isSubmitDisabled={props.isSubmitDisabled}>
+      {modalContent}
+    </Modal>,
     document.body,
   );
 };

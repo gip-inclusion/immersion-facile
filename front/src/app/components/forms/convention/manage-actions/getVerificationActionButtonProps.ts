@@ -324,6 +324,7 @@ export const getVerificationActionProps = (
         currentSignatoryRoles: currentSignatoryRoles,
         onCloseValidatorModalWithoutValidatorInfo:
           onCloseValidatorModalWithoutValidatorInfo,
+        isSubmitDisabled: disabled,
       },
     };
   }

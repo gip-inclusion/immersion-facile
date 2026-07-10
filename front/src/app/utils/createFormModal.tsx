@@ -43,6 +43,7 @@ export const useFormModal = (): FormModalContextValue => {
 
 export type FormModalProps = ModalProps & {
   doSubmitClosesModal?: boolean;
+  isSubmitDisabled?: boolean;
 };
 
 type FormModal = {
@@ -66,6 +67,7 @@ export const createFormModal = (params: CreateFormModalParams): FormModal => {
     buttons,
     title,
     doSubmitClosesModal,
+    isSubmitDisabled,
     ...modalProps
   }: FormModalProps) => {
     const onCancelCallbacksRef = useRef<Set<() => void>>(new Set());
@@ -126,6 +128,7 @@ export const createFormModal = (params: CreateFormModalParams): FormModal => {
       if (button.type === "submit") {
         return {
           ...button,
+          disabled: isSubmitDisabled ?? button.disabled,
           doClosesModal: doSubmitClosesModal ?? params.doSubmitClosesModal,
           nativeButtonProps: {
             ...button.nativeButtonProps,
