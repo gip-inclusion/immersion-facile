@@ -62,6 +62,7 @@ export const MultipleAddressInput = ({
                 selectProps={{
                   inputId: `${id}-${index}`,
                 }}
+                initialInputValue={currentAddresses[index].rawAddress}
                 onAddressSelected={(addressAndPosition) => {
                   onAddressAdded(addressAndPosition.address, index);
                 }}
