@@ -207,7 +207,7 @@ describe("Update agency", () => {
   describe("Status change", () => {
     const usersRightsWithAdmin = {
       "agency-admin-user": {
-        roles: ["agency-admin"],
+        roles: ["agency-admin", "validator"],
         isNotifiedByEmail: true,
       },
     } satisfies AgencyUsersRights;
@@ -374,6 +374,35 @@ describe("Update agency", () => {
           connectedAdmin,
         ),
         errors.agency.cannotActivateWithoutAdmin({
+          agencyId: activatedAgency.id,
+        }),
+      );
+      expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    it("throws notEnoughValidators when activating an agency without a notified validator", async () => {
+      const needsReviewAgency = new AgencyDtoBuilder()
+        .withStatus("needsReview")
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(needsReviewAgency, {
+          "agency-admin-user": {
+            roles: ["agency-admin"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      const activatedAgency = new AgencyDtoBuilder(needsReviewAgency)
+        .withStatus("active")
+        .build();
+
+      await expectPromiseToFailWithError(
+        updateAgency.execute(
+          { ...activatedAgency, validatorEmails: ["validator@mail.com"] },
+          connectedAdmin,
+        ),
+        errors.agency.notEnoughValidators({
           agencyId: activatedAgency.id,
         }),
       );

@@ -8,6 +8,7 @@ import {
   errors,
   settableAgencyStatusesThroughUpdate,
 } from "shared";
+import { validateAgencyRights } from "../../connected-users/helpers/agencyRights.helper";
 import {
   throwIfNotAdmin,
   throwIfNotAgencyAdminOrBackofficeAdmin,
@@ -78,14 +79,16 @@ export const makeUpdateAgency = useCaseBuilder("UpdateAgency")
         status: agency.status,
       });
 
-    // We check the persisted rights (not the incoming payload) on purpose:
-    // status changes and users rights are edited through separate flows, so an
-    // activation never carries a freshly added admin in the same request.
-    if (
-      statusChangedEventTopic === "AgencyActivated" &&
-      !hasAgencyAdmin(existingAgency.usersRights)
-    )
-      throw errors.agency.cannotActivateWithoutAdmin({ agencyId: agency.id });
+    if (statusChangedEventTopic === "AgencyActivated") {
+      if (!hasAgencyAdmin(existingAgency.usersRights))
+        throw errors.agency.cannotActivateWithoutAdmin({ agencyId: agency.id });
+
+      validateAgencyRights(
+        agency.id,
+        existingAgency.usersRights,
+        existingAgency.refersToAgencyId,
+      );
+    }
 
     await uow.agencyRepository.update(toAgencyForRepositoryUpdate(agency));
 
