@@ -53,7 +53,6 @@ export const LayoutHeader = () => {
   const isConnectedUser = useAppSelector(authSelectors.isConnectedUser);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
-  const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const logoutFeedback = useAppSelector(feedbacksSelectors.feedbacks)[
     "auth-global"
@@ -107,10 +106,10 @@ export const LayoutHeader = () => {
     />,
   ];
 
-  if (isPeConnected || isConnectedUser) {
+  if (isConnectedUser) {
     tools.push({
       iconId: "fr-icon-lock-line",
-      text: isPeConnected ? "Se déconnecter (FT Connect)" : "Se déconnecter",
+      text: "Se déconnecter",
       buttonProps: {
         onClick: () => {
           dispatch(
@@ -122,16 +121,6 @@ export const LayoutHeader = () => {
               feedbackTopic: "auth-global",
             }),
           );
-          if (isPeConnected && currentRoute.name === "conventionImmersion") {
-            const {
-              fedId: _1,
-              fedIdProvider: _2,
-              fedIdToken: _3,
-              ...rest
-            } = currentRoute.params;
-            frontRoutes.conventionImmersion(rest).replace();
-            return;
-          }
           frontRoutes.home().push();
         },
       },

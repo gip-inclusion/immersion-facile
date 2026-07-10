@@ -16,6 +16,7 @@ type PersistenceOngoingOAuth = {
   user_id: string | null;
   external_id: string | null;
   access_token: string | null;
+  id_token: string | null;
   email: string | null;
   used_at: Date | null;
 };
@@ -61,6 +62,9 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
             access_token: ongoingOAuth.accessToken,
           };
 
+    const idToken =
+      ongoingOAuth.provider !== "email" ? ongoingOAuth.idToken : null;
+
     if (await this.findByState(state)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
@@ -71,6 +75,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           used_at: usedAt,
           ...providerSpecificColumns,
           updated_at: updatedAt ? sql`${updatedAt}` : sql`now()`,
+          id_token: idToken,
         })
         .where("state", "=", state)
         .execute();
@@ -85,6 +90,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           user_id: userId,
           ...providerSpecificColumns,
           used_at: usedAt,
+          id_token: idToken,
         })
         .execute();
     }
@@ -105,6 +111,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
         accessToken: optional(raw.access_token),
         externalId: optional(raw.external_id),
         usedAt,
+        idToken: raw.id_token,
       };
 
     if (!raw.email)

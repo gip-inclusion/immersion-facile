@@ -30,6 +30,7 @@ describe("PgOngoingOAuthRepository", () => {
     nonce: "123",
     provider: "proConnect",
     usedAt: null,
+    idToken: null,
   };
   const user: User = {
     id: "22222222-2222-2222-2222-222222222222",

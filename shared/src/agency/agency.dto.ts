@@ -2,10 +2,8 @@ import { keys, omit } from "ramda";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
-import type { InternshipKind } from "../convention/convention.dto";
+import type { ConventionFormInitialValues } from "../convention/conventionPresentation.dto";
 import type { Email } from "../email/email.dto";
-import type { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type { AgencyRole } from "../role/role.dto";
 import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
@@ -263,17 +261,16 @@ export const toAgencyDtoForAgencyUsersAndAdmins = (
 });
 
 export const makeListAgencyOptionsKindFilter = ({
-  internshipKind,
   shouldListAll,
-  federatedIdentity,
+  convention,
 }: {
-  internshipKind: InternshipKind;
   shouldListAll: boolean;
-  federatedIdentity: FederatedIdentity | null;
+  convention: ConventionFormInitialValues;
 }): AgencyKindFilter => {
-  if (internshipKind === "mini-stage-cci") return "miniStageOnly";
+  if (convention.internshipKind === "mini-stage-cci") return "miniStageOnly";
   if (shouldListAll) return "miniStageExcluded";
-  return federatedIdentity && isFtConnectIdentity(federatedIdentity)
+  return convention.signatories?.beneficiary?.federatedIdentity?.provider ===
+    "peConnect"
     ? "immersionPeOnly"
     : "miniStageExcluded";
 };

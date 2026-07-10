@@ -195,6 +195,7 @@ describe("auth router", () => {
               usedAt: gateways.timeGateway.now(),
               externalId: "osef",
               accessToken: proConnectToken,
+              idToken,
               fromUri: redirectUri,
             },
           ]);
@@ -373,9 +374,6 @@ describe("auth router", () => {
 
           expectToEqual(params, {
             token: expect.any(String),
-            firstName: "",
-            lastName: "",
-            email,
             idToken: "",
             provider: "email",
           });
@@ -453,6 +451,7 @@ describe("auth router", () => {
               nonce,
               state,
               usedAt: null,
+              idToken: null,
               fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
             },
           ]);
@@ -468,6 +467,7 @@ describe("auth router", () => {
               nonce,
               state,
               usedAt: null,
+              idToken: null,
               fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
             },
           ];
@@ -516,6 +516,7 @@ describe("auth router", () => {
               state,
               usedAt: now,
               accessToken: ftConnectAccessToken,
+              idToken: ftConnectIdToken,
               fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
             },
           ]);
@@ -556,6 +557,7 @@ describe("auth router", () => {
               nonce,
               state,
               usedAt: null,
+              idToken: null,
               fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
             },
           ];
@@ -588,6 +590,7 @@ describe("auth router", () => {
               nonce,
               state,
               usedAt: null,
+              idToken: null,
               fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
             },
           ];
@@ -672,6 +675,7 @@ describe("auth router", () => {
               nonce: "fake-nonce",
               externalId: user.proConnect?.externalId,
               usedAt: null,
+              idToken: null,
             },
           ];
 

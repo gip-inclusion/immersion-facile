@@ -65,6 +65,7 @@ describe("InitiateLoginByOAuth usecase", () => {
           externalId: undefined,
           accessToken: undefined,
           usedAt: null,
+          idToken: null,
         },
       ]);
     });

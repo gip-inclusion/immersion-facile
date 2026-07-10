@@ -1,13 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
-import { useDispatch } from "react-redux";
 import {
   authRoutes,
   domElementIds,
-  frontRoutes,
+  type frontRoutes,
   legacyFrontRoutes,
   makeUrlWithQueryParams,
 } from "shared";
@@ -22,8 +21,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { match } from "ts-pattern";
 import type { Route } from "type-route";
@@ -45,13 +42,7 @@ const checkIsSharedConvention = (
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
 ) => {
-  const {
-    fedId: _1,
-    fedIdProvider: _2,
-    fedIdToken: _3,
-    jwt: _4,
-    conventionDraftId,
-  } = routeParams;
+  const { conventionDraftId } = routeParams;
 
   if (!conventionDraftId) return;
 
@@ -81,9 +72,6 @@ export const ConventionImmersionPage = ({
 
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
-  const isPeConnected = useAppSelector(authSelectors.isPeConnected);
-
-  useFederatedIdentityFromUrl(route);
 
   const isSharedConvention = checkIsSharedConvention(
     routeParamsWithoutJwtAndTrackers,
@@ -91,7 +79,7 @@ export const ConventionImmersionPage = ({
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
-    useState(isSharedConvention && !isPeConnected && !skipIntro);
+    useState(isSharedConvention && !skipIntro);
 
   const getPageHeaderTitle = (
     jwt: string | undefined,
@@ -102,10 +90,6 @@ export const ConventionImmersionPage = ({
       : t.intro.conventionTitle;
     return showSummary ? t.intro.conventionSummaryTitle : createOrEditTitle;
   };
-
-  useEffect(() => {
-    if (isPeConnected) setDisplaySharedConventionMessage(false);
-  }, [isPeConnected]);
 
   return (
     <HeaderFooterLayout>
@@ -171,43 +155,6 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       <ConventionFormWrapper internshipKind="immersion" mode={mode} />
     ))
     .exhaustive();
-};
-
-const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
-  const dispatch = useDispatch();
-  const initialRouteParams = useRef(route.params).current;
-
-  useEffect(() => {
-    if (
-      initialRouteParams.fedId &&
-      initialRouteParams.fedIdProvider &&
-      initialRouteParams.fedIdToken
-    ) {
-      const {
-        fedId: _,
-        fedIdProvider: __,
-        fedIdToken: ___,
-        ...paramsWithoutFederatedIdentity
-      } = initialRouteParams;
-      if (initialRouteParams.fedIdProvider === "peConnect")
-        dispatch(
-          authSlice.actions.federatedIdentityProvided({
-            federatedIdentityWithUser: {
-              provider: initialRouteParams.fedIdProvider,
-              token: initialRouteParams.fedId,
-              idToken: initialRouteParams.fedIdToken,
-              email: initialRouteParams.email ?? "",
-              firstName: initialRouteParams.firstName ?? "",
-              lastName: initialRouteParams.lastName ?? "",
-              birthdate: initialRouteParams.birthdate ?? "",
-              phone: initialRouteParams.phone ?? "",
-            },
-            feedbackTopic: "auth-global",
-          }),
-        );
-      frontRoutes.conventionImmersion(paramsWithoutFederatedIdentity).replace();
-    }
-  }, [initialRouteParams, dispatch]);
 };
 
 const SharedConventionMessage = ({

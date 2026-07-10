@@ -1,9 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import {
-  authFailed,
-  type ConnectedUserJwt,
-  type FederatedIdentityWithUser,
-} from "shared";
+import type { ConnectedUserJwt } from "shared";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 import { connectedUserSelectors } from "../connected-user/connectedUser.selectors";
 
@@ -33,13 +29,6 @@ const requestedEmail = createSelector(
   (auth) => auth.requestedEmail,
 );
 
-const isPeConnected = createSelector(
-  currentFederatedIdentity,
-  (federatedIdentity) =>
-    federatedIdentity?.provider === "peConnect" &&
-    federatedIdentity.token !== authFailed,
-);
-
 const isConnectedUser = createSelector(
   currentFederatedIdentity,
   (federatedIdentity) =>
@@ -63,30 +52,11 @@ const isAdminConnected = createSelector(
     (isConnectedUser && user?.isBackofficeAdmin) ?? false,
 );
 
-const userIsDefined = (
-  federatedIdentity: FederatedIdentityWithUser | null,
-): federatedIdentity is FederatedIdentityWithUser => {
-  if (!federatedIdentity) return false;
-  const { email } = federatedIdentity;
-  return email !== "";
-};
-
-const connectedUser = createSelector(
-  currentFederatedIdentity,
-  (federatedIdentity) => {
-    if (!userIsDefined(federatedIdentity)) return;
-    const { email, firstName, lastName, birthdate, phone } = federatedIdentity;
-    return { email, firstName, lastName, birthdate, phone };
-  },
-);
-
 export const authSelectors = {
   federatedIdentity: currentFederatedIdentity,
   isAdminConnected,
-  isPeConnected,
   isConnectedUser,
   connectedUserJwt,
-  connectedUser,
   afterLoginRedirectionUrl,
   isLoading,
   isRequestingLoginByEmail,

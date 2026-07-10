@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { HeadingSection, SectionHighlight } from "react-design-system";
+import { HeadingSection, Loader, SectionHighlight } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
@@ -21,6 +21,7 @@ import { SearchResultPreview } from "src/app/components/forms/establishment/Sear
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { Mode } from "src/app/routes/routes.hooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 
 export const SummarySection = ({
   mode,
@@ -38,6 +39,7 @@ export const SummarySection = ({
   } = useFormContext<FormEstablishmentDto>();
   const formValues = getValues();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
   const buttons: [ButtonProps, ...ButtonProps[]] = [
     {
@@ -63,6 +65,13 @@ export const SummarySection = ({
     },
   ];
 
+  if (!currentUser) return <Loader />;
+
+  const formatedUserName = getFormattedFirstnameAndLastname({
+    firstname: currentUser.firstName,
+    lastname: currentUser.lastName,
+  });
+
   return (
     <>
       <p>
@@ -75,10 +84,7 @@ export const SummarySection = ({
         <strong>
           {federatedIdentity?.provider === "proConnect" && (
             <span id={domElementIds.formEstablishment.create.summaryAdminName}>
-              {getFormattedFirstnameAndLastname({
-                firstname: federatedIdentity.firstName,
-                lastname: federatedIdentity.lastName,
-              })}
+              {formatedUserName}
               {" - "}
             </span>
           )}
@@ -143,6 +149,7 @@ export const SummarySection = ({
           <DisplayContactModeValue
             contactMode={formValues.contactMode}
             federatedIdentity={federatedIdentity}
+            formatedUserName={formatedUserName}
           />
         </SectionHighlight>
       </HeadingSection>
@@ -178,9 +185,11 @@ const DisplaySearchableByValue = ({
 const DisplayContactModeValue = ({
   contactMode,
   federatedIdentity,
+  formatedUserName,
 }: {
   contactMode: ContactMode;
   federatedIdentity: FederatedIdentityWithUser | null;
+  formatedUserName: string;
 }) => {
   const { getValues } = useFormContext<FormEstablishmentDto>();
   const formValues = getValues();
@@ -202,13 +211,7 @@ const DisplayContactModeValue = ({
             <br />
             {formValues.userRights[0].isMainContactInPerson &&
               federatedIdentity?.provider === "proConnect" && (
-                <>
-                  Contact principal en présentiel :{" "}
-                  {getFormattedFirstnameAndLastname({
-                    firstname: federatedIdentity.firstName,
-                    lastname: federatedIdentity.lastName,
-                  })}
-                </>
+                <>Contact principal en présentiel : {formatedUserName}</>
               )}
           </p>
         )}
@@ -217,10 +220,7 @@ const DisplayContactModeValue = ({
           Contact principal par téléphone :{" "}
           {`${formValues.userRights[0].phone ? toDisplayedPhoneNumber(formValues.userRights[0].phone) : ""}${
             federatedIdentity?.provider === "proConnect"
-              ? ` (${getFormattedFirstnameAndLastname({
-                  firstname: federatedIdentity.firstName,
-                  lastname: federatedIdentity.lastName,
-                })})`
+              ? ` (${formatedUserName})`
               : ""
           }`}
         </p>
@@ -238,10 +238,7 @@ const DisplayContactModeValue = ({
                     : ""
                 }${
                   federatedIdentity?.provider === "proConnect"
-                    ? ` (${getFormattedFirstnameAndLastname({
-                        firstname: federatedIdentity.firstName,
-                        lastname: federatedIdentity.lastName,
-                      })})`
+                    ? ` (${formatedUserName})`
                     : ""
                 }`
               : "le candidat ne peut pas contacter l'entreprise"}

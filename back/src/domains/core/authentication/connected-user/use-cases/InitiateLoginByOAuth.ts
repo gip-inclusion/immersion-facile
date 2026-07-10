@@ -41,6 +41,7 @@ export class InitiateLoginByOAuth extends TransactionalUseCase<
       nonce,
       state,
       provider: params.provider,
+      idToken: null,
       usedAt: null,
     });
 

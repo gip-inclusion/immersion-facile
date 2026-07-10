@@ -23,12 +23,13 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
     async ({
       inputParams,
       uow,
-      deps: { proConnectOAuthGateway: oAuthGateway, ftConnectGateway },
+      deps: { proConnectOAuthGateway, ftConnectGateway },
       currentUser,
     }) => {
       if (inputParams.provider === "peConnect") {
         return ftConnectGateway.getLogoutUrl({
           idToken: inputParams.idToken,
+          state: "NOT NECESSARY",
         });
       }
 
@@ -38,7 +39,7 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
         currentUser.id,
       );
       if (!ongoingOAuth) throw errors.auth.missingOAuth({});
-      return oAuthGateway.getLogoutUrl({
+      return proConnectOAuthGateway.getLogoutUrl({
         idToken: inputParams.idToken,
         state: ongoingOAuth.state,
       });

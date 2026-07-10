@@ -90,9 +90,6 @@ type AcquisitionParamsKeys = keyof typeof acquisitionParams;
 
 const connectedUserParams = {
   token: param.query.optional.string,
-  firstName: param.query.optional.string,
-  lastName: param.query.optional.string,
-  email: param.query.optional.string,
   idToken: param.query.optional.string,
   provider: param.query.optional.string,
   alreadyUsedAuthentication: param.query.optional.string,
@@ -104,19 +101,6 @@ const connectedUserParams = {
 export const acquisitionParams = {
   mtm_campaign: param.query.optional.string,
   mtm_kwd: param.query.optional.string,
-};
-
-export const ftConnectParams = {
-  fedId: param.query.optional.string,
-  fedIdProvider: param.query.optional.string,
-  fedIdToken: param.query.optional.string,
-
-  // TODO temporary FT Connect params (to remove after FT Connect login refacto to save nounce and state)
-  birthdate: param.query.optional.string,
-  firstName: param.query.optional.string,
-  lastName: param.query.optional.string,
-  email: param.query.optional.string,
-  phone: param.query.optional.string,
 };
 
 const agencyParamsForConventionForm = {
@@ -353,7 +337,6 @@ export const {
       discussionId: param.query.optional.string,
       ...agencyParamsForConventionForm,
       ...establishmentParamsForConventionForm,
-      ...ftConnectParams,
       ...acquisitionParams,
     },
     () => `/${legacyFrontRoutes.conventionImmersion}`,
@@ -363,7 +346,6 @@ export const {
       discussionId: param.query.optional.string,
       ...agencyParamsForConventionForm,
       ...establishmentParamsForConventionForm,
-      ...ftConnectParams,
       ...acquisitionParams,
       ...conventionForExternalParams,
     },

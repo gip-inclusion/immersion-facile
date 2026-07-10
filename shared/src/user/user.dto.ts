@@ -2,7 +2,7 @@ import type {
   WithAgencyDashboards,
   WithAgencyRights,
 } from "../agency/agency.dto";
-import type { IdentityProvider } from "../auth/auth.dto";
+import type { IdentityProvider, WithIdToken } from "../auth/auth.dto";
 import type { ProConnectInfos } from "../auth/proConnect/proConnect.dto";
 import type { Email } from "../email/email.dto";
 import type {
@@ -59,6 +59,5 @@ export type ConnectedUser = UserWithRights & WithDashboards;
 
 export type ConnectedUserQueryParams = {
   token: ConnectedUserJwt;
-  idToken: string;
   provider: IdentityProvider;
-} & Pick<User, "email" | "firstName" | "lastName">;
+} & WithIdToken;

@@ -1,7 +1,6 @@
 import {
   type AbsoluteUrl,
   type AfterOAuthSuccessRedirectionResponse,
-  authFailed,
   type ConventionDraftDto,
   errors,
   executeInSequence,
@@ -234,11 +233,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
       return {
         provider: updatedOngoingOAuth.provider,
         redirectUri: makeRouteAbsoluteUrl({
-          route: frontRoutes.conventionImmersion({
-            fedId: authFailed,
-            fedIdToken: accessToken.idToken,
-            fedIdProvider: "peConnect",
-          }),
+          route: frontRoutes.conventionImmersion(),
           baseUrl: this.#immersionFacileBaseUrl,
         }),
       };
@@ -334,6 +329,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
         usedAt: this.#timeGateway.now(),
         externalId: newOrUpdatedUser.proConnect?.externalId,
         accessToken: accessToken.accessToken,
+        idToken: accessToken.idToken,
       },
       accessToken,
     };
@@ -358,6 +354,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
         ...ongoingOAuth,
         usedAt: this.#timeGateway.now(),
         accessToken: accessToken.accessToken,
+        idToken: accessToken.idToken,
       },
       accessToken,
     };

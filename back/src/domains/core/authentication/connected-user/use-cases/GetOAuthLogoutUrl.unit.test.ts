@@ -66,6 +66,8 @@ describe("GetOAuthLogoutUrl", () => {
       });
 
       it("returns the oAuth logout url from %s", async () => {
+        const idToken = "fake-id-token";
+
         const ongoingOAuth: OngoingOAuth = {
           fromUri: "/uri",
           state: "some-state",
@@ -75,9 +77,9 @@ describe("GetOAuthLogoutUrl", () => {
           externalId: user.proConnect?.externalId,
           accessToken: "fake-access-token",
           usedAt: null,
+          idToken,
         };
         uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
-        const idToken = "fake-id-token";
         expectToEqual(
           await getOAuthLogoutUrl.execute(
             { idToken, provider: "proConnect" },

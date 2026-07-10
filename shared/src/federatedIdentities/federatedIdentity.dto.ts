@@ -53,14 +53,10 @@ export type FtConnectIdentity = GenericFederatedIdentity<
   FtConnectToken,
   FtConnectAdvisorForBeneficiary
 >;
-export const isFtConnectIdentity = (
-  federatedIdentity: FederatedIdentity | undefined,
-): federatedIdentity is FtConnectIdentity =>
-  federatedIdentity?.provider === "peConnect";
 
 type ConnectedUserIdentity = GenericFederatedIdentity<
   "proConnect" | "email",
   ConnectedUserJwt
 >;
 
-export type FederatedIdentity = ConnectedUserIdentity | FtConnectIdentity;
+export type FederatedIdentity = ConnectedUserIdentity;

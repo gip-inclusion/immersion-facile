@@ -1,4 +1,4 @@
-import { ConnectedUserBuilder, expectToEqual } from "shared";
+import { expectToEqual } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
@@ -48,16 +48,11 @@ describe("rootApp epic", () => {
   });
 
   it("should dispatch appIsReady action", () => {
-    const user = new ConnectedUserBuilder().build();
     const token = "my-super-token";
     dependencies.localDeviceRepository.set("federatedIdentityWithUser", {
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
       provider: "proConnect",
       token,
       idToken: "id-token",
-      birthdate: "1990-01-01",
     });
 
     expect(store.getState().auth.federatedIdentityWithUser).toBeNull();

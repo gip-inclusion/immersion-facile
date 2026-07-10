@@ -61,10 +61,7 @@ export const fakeGenerateConnectedUserUrlFn: GenerateConnectedUserLoginUrl = ({
   return `http://fake-connected-user${uriWithoutParams}?${queryParamsAsString<ConnectedUserQueryParams>(
     {
       ...params,
-      token: user.id as ConnectedUserJwt,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
+      token: `jwt-${user.id}` as ConnectedUserJwt,
       idToken: accessToken?.idToken ?? "",
       provider: ongoingOAuth.provider,
     },

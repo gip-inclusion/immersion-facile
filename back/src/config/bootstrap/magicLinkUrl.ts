@@ -113,9 +113,6 @@ export const makeGenerateConnectedUserLoginUrl =
     const queryParams = queryParamsAsString<ConnectedUserQueryParams>({
       ...params,
       token: jwt,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
       idToken: accessToken?.idToken ?? "",
       provider: ongoingOAuth.provider,
     });

@@ -690,6 +690,7 @@ describe("RenewExpiredJwt use case", () => {
       it("with ongoingOAuth that have a unsupported provider : ProConnect", () => {
         const unsupportedOngoingOAuth: OngoingOAuth = {
           ...emailUsedOnGoingOAuth,
+          idToken: null,
           provider: "proConnect",
         };
 
@@ -823,6 +824,7 @@ describe("RenewExpiredJwt use case", () => {
         uow.ongoingOAuthRepository.ongoingOAuths = [
           {
             ...emailUnusedOnGoingOAuth,
+            idToken: null,
             provider: "proConnect",
           },
         ];

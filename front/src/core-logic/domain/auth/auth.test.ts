@@ -30,24 +30,10 @@ import { feedbacksSelectors } from "../feedback/feedback.selectors";
 import type { PayloadWithFeedbackTopic } from "../feedback/feedback.slice";
 
 describe("Auth slice", () => {
-  const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
-    provider: "peConnect",
-    token: "123",
-    email: "john.doe@mail.com",
-    firstName: "John",
-    lastName: "Doe",
-    idToken: "pe-connect-id-token",
-    birthdate: "1990-01-01",
-  };
-
   const connectedUserFederatedIdentity: FederatedIdentityWithUser = {
     provider: "proConnect",
     token: "123",
-    email: "john.doe@mail.com",
-    firstName: "John",
-    lastName: "Doe",
     idToken: "id-token",
-    birthdate: "1990-01-01",
   };
 
   let store: ReduxStore;
@@ -69,25 +55,25 @@ describe("Auth slice", () => {
 
     store.dispatch(
       authSlice.actions.federatedIdentityProvided({
-        federatedIdentityWithUser: peConnectedFederatedIdentity,
+        federatedIdentityWithUser: connectedUserFederatedIdentity,
         feedbackTopic: "auth-global",
       }),
     );
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
       requestedEmail: null,
     });
 
-    expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
+    expectFederatedIdentityInDevice(connectedUserFederatedIdentity);
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -100,7 +86,6 @@ describe("Auth slice", () => {
       provider: "proConnect",
       federatedIdentity: connectedUserFederatedIdentity,
     },
-    { provider: "peConnect", federatedIdentity: peConnectedFederatedIdentity },
   ])("when provider = '$provider', deletes federatedIdentity & partialConventionInUrl stored in device and in store, then redirects to provider logout page", ({
     federatedIdentity,
   }) => {
@@ -206,7 +191,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: peConnectedFederatedIdentity,
+        federatedIdentityWithUser: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         isRequestingRenewExpiredJwt: false,
@@ -220,7 +205,7 @@ describe("Auth slice", () => {
     }));
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      peConnectedFederatedIdentity,
+      connectedUserFederatedIdentity,
     );
 
     store.dispatch(
@@ -257,7 +242,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: peConnectedFederatedIdentity,
+        federatedIdentityWithUser: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         isRequestingRenewExpiredJwt: false,
@@ -271,7 +256,7 @@ describe("Auth slice", () => {
     }));
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      peConnectedFederatedIdentity,
+      connectedUserFederatedIdentity,
     );
 
     store.dispatch(
@@ -333,9 +318,9 @@ describe("Auth slice", () => {
     expectFederatedIdentityInDevice(connectedUserFederatedIdentity);
     const user: ConnectedUser = {
       id: "123",
-      email: connectedUserFederatedIdentity.email,
-      firstName: connectedUserFederatedIdentity.firstName,
-      lastName: connectedUserFederatedIdentity.lastName,
+      email: "mail@mail.com",
+      firstName: "billy",
+      lastName: "idol",
       agencyRights: [],
       dashboards: {
         agencies: noAgencyDashboards,

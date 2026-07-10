@@ -1,9 +1,8 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import { keys } from "ramda";
 import { useCallback, useEffect, useState } from "react";
-import { type Path, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
@@ -34,7 +33,6 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
@@ -62,9 +60,6 @@ export const BeneficiaryFormSection = ({
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
-  const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
-  const connectedUser = useAppSelector(authSelectors.connectedUser);
-  const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
   const { register, getValues, setValue, formState } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
@@ -92,21 +87,6 @@ export const BeneficiaryFormSection = ({
     values.signatories.beneficiaryRepresentative,
     isMinorOrProtected,
   ]);
-
-  useEffect(() => {
-    if (userFieldsAreFilled) {
-      const { firstName, lastName, email, birthdate, phone } = connectedUser;
-      const valuesToUpdate: Partial<Record<Path<ConventionReadDto>, string>> = {
-        "signatories.beneficiary.firstName": firstName,
-        "signatories.beneficiary.lastName": lastName,
-        "signatories.beneficiary.email": email,
-        ...(birthdate && { "signatories.beneficiary.birthdate": birthdate }),
-        ...(phone && { "signatories.beneficiary.phone": phone }),
-      };
-
-      keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
-    }
-  }, [userFieldsAreFilled, connectedUser, setValue]);
 
   useEffect(() => {
     if (
@@ -163,9 +143,6 @@ export const BeneficiaryFormSection = ({
         nativeInputProps={{
           ...formContents["signatories.beneficiary.firstName"],
           ...register("signatories.beneficiary.firstName"),
-          ...(userFieldsAreFilled
-            ? { value: values.signatories.beneficiary.firstName }
-            : {}),
         }}
         disabled={fromPeConnectedUser}
         {...getFieldError("signatories.beneficiary.firstName")}
@@ -176,9 +153,6 @@ export const BeneficiaryFormSection = ({
         nativeInputProps={{
           ...formContents["signatories.beneficiary.lastName"],
           ...register("signatories.beneficiary.lastName"),
-          ...(userFieldsAreFilled
-            ? { value: values.signatories.beneficiary.lastName }
-            : {}),
         }}
         disabled={fromPeConnectedUser}
         {...getFieldError("signatories.beneficiary.lastName")}
@@ -211,7 +185,6 @@ export const BeneficiaryFormSection = ({
           ...register("signatories.beneficiary.email", {
             setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
           }),
-          ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
           onBlur: (event) => {
             setValue(
               "signatories.beneficiary.email",
