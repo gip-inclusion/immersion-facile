@@ -705,7 +705,6 @@ describe("Agency routes", () => {
       });
 
       it("Updates the agency data without changing status and returns code 200", async () => {
-        // Prepare
         inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency4NeedsReview, {
             [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
@@ -753,7 +752,6 @@ describe("Agency routes", () => {
       });
 
       it("Activating the agency through update sends notifications and returns code 200", async () => {
-        // Prepare
         inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency4NeedsReview, {
             [validator.id]: {

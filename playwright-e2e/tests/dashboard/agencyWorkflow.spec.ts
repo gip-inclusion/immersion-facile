@@ -45,7 +45,6 @@ test.describe("Agency dashboard workflow", () => {
         value: "34792240300030",
       });
 
-      // An agency cannot be activated without an agency-admin, so we add one first.
       await page
         .locator(`#${domElementIds.admin.agencyTab.openManageUserModalButton}`)
         .click();
