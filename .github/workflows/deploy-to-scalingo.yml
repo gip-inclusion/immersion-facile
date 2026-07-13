@@ -51,9 +51,11 @@ jobs:
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
         run: |
+          # TODO: remove - forced crash to test the failure notification
+          exit 1
           # first attempt
           scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }} || deploy_failed=true
-          
+
           # If first attempt fails, retry once
           if [ "$deploy_failed" = true ]; then
             echo "Back deployment failed! Retrying in 5 seconds..."
@@ -142,3 +144,24 @@ jobs:
             ]
           }
           EOF
+      - name: Send Slack failure notification
+        if: failure()
+        run: |
+          jq -n \
+            --arg channel "${{ inputs.slackChannel }}" \
+            --arg header "❌ Échec du déploiement - ${{ inputs.tag }} - ${{ inputs.environment }}" \
+            --arg text "@if-devs @if-produit Le déploiement a échoué." \
+            --arg workflow "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}" \
+            '{
+              channel: $channel,
+              blocks: [
+                { type: "header", text: { type: "plain_text", text: $header } },
+                { type: "section", text: { type: "plain_text", text: $text } },
+                {
+                  type: "actions",
+                  elements: [
+                    { type: "button", style: "danger", text: { type: "plain_text", text: "Voir le workflow échoué" }, url: $workflow }
+                  ]
+                }
+              ]
+            }' | curl --location "https://slack.com/api/chat.postMessage" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" -d @-
