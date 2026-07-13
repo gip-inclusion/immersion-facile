@@ -51,8 +51,6 @@ jobs:
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
         run: |
-          # TODO: remove - forced crash to test the failure notification
-          exit 1
           # first attempt
           scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }} || deploy_failed=true
 
