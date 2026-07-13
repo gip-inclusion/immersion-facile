@@ -110,6 +110,14 @@ export class HttpAddressGateway implements AddressGateway {
                 language,
                 limit: "10",
                 q: cachedQuery,
+                _type: [
+                  "city",
+                  "town",
+                  "village",
+                  "municipality",
+                  "hamlet",
+                  "locality",
+                ],
               },
             });
           })

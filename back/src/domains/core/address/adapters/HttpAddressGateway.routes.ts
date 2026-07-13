@@ -23,11 +23,42 @@ const geoCodingQueryParamsSchema: ZodSchemaWithInputMatchingOutput<GeoCodingQuer
     limit: z.string().optional(),
   });
 
+const geoSearchTypes = [
+  "aerodrome",
+  "archipelago",
+  "base",
+  "borough",
+  "city",
+  "civil_parish",
+  "county",
+  "district",
+  "hamlet",
+  "harbour",
+  "island",
+  "locality",
+  "municipality",
+  "neighbourhood",
+  "postcode",
+  "province",
+  "quarter",
+  "region",
+  "square",
+  "state",
+  "subdistrict",
+  "subdivision",
+  "suburb",
+  "town",
+  "village",
+] as const; // documenté par Opencage https://github.com/OpenCageData/geosearch/blob/master/geosearch_type-values.md
+
+type GeoSearchType = (typeof geoSearchTypes)[number];
+
 type GeoSearchQueryParams = {
   q: string;
   language?: string;
   countrycode?: string;
   limit?: string;
+  _type?: GeoSearchType[];
 };
 
 const geoSearchQueryParamsSchema: ZodSchemaWithInputMatchingOutput<GeoSearchQueryParams> =
@@ -36,6 +67,7 @@ const geoSearchQueryParamsSchema: ZodSchemaWithInputMatchingOutput<GeoSearchQuer
     language: z.string().optional(),
     countrycode: z.string().optional(),
     limit: z.string().optional(),
+    _type: z.array(z.enum(geoSearchTypes)).optional(),
   });
 
 type GeoSearchHeaders = {
