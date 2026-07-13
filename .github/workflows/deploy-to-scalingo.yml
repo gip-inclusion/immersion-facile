@@ -150,13 +150,13 @@ jobs:
           jq -n \
             --arg channel "${{ inputs.slackChannel }}" \
             --arg header "❌ Échec du déploiement - ${{ inputs.tag }} - ${{ inputs.environment }}" \
-            --arg text "@if-devs @if-produit Le déploiement a échoué." \
+            --arg text "<!subteam^S089GE2GKEH|@if-devs> <!subteam^S089CMF4TL6|@if-produit> Le déploiement a échoué." \
             --arg workflow "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}" \
             '{
               channel: $channel,
               blocks: [
                 { type: "header", text: { type: "plain_text", text: $header } },
-                { type: "section", text: { type: "plain_text", text: $text } },
+                { type: "section", text: { type: "mrkdwn", text: $text } },
                 {
                   type: "actions",
                   elements: [
