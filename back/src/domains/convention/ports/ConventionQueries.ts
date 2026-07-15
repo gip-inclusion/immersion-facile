@@ -53,7 +53,7 @@ export type GetConventionIdsParams = {
     withAgencyIds?: AgencyId[];
     withAppelationCodes?: AppellationCode[];
     withDateStart?: OptionalDateRange;
-    withDateSubmissionSince?: Date;
+    withDateSubmission?: OptionalDateRange;
     withEndDate?: OptionalDateRange;
     withUpdateDate?: OptionalDateRange;
     withSirets?: SiretDto[];

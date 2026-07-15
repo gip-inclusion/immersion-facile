@@ -143,7 +143,7 @@ export class PgConventionQueries implements ConventionQueries {
       withAppelationCodes,
       withBeneficiary,
       withDateStart,
-      withDateSubmissionSince,
+      withDateSubmission,
       withEndDate,
       withUpdateDate,
       withEstablishmentRepresentative,
@@ -162,15 +162,12 @@ export class PgConventionQueries implements ConventionQueries {
         withAgencyIds && withAgencyIds.length > 0
           ? qb.where("conventions.agency_id", "in", withAgencyIds)
           : qb,
-      (qb) =>
-        withDateSubmissionSince
-          ? qb.where(
-              "conventions.date_submission",
-              ">=",
-              withDateSubmissionSince,
-            )
-          : qb,
-      addDateFilters({ withDateStart, withEndDate, withUpdateDate }),
+      addDateFilters({
+        withDateStart,
+        withDateSubmission,
+        withEndDate,
+        withUpdateDate,
+      }),
       (qb) =>
         withAppelationCodes
           ? qb.where(
@@ -1085,10 +1082,15 @@ type DateFilterableBuilder<TBuilder> = {
 const addDateFilters =
   <TBuilder extends DateFilterableBuilder<TBuilder>>({
     withDateStart,
+    withDateSubmission,
     withEndDate,
     withUpdateDate,
   }: {
     withDateStart?: {
+      from?: Date | string;
+      to?: Date | string;
+    };
+    withDateSubmission?: {
       from?: Date | string;
       to?: Date | string;
     };
@@ -1111,6 +1113,18 @@ const addDateFilters =
       (b) =>
         withDateStart?.from
           ? b.where("conventions.date_start", ">=", withDateStart.from)
+          : b,
+      (b) =>
+        withDateSubmission?.from
+          ? b.where(
+              "conventions.date_submission",
+              ">=",
+              withDateSubmission.from,
+            )
+          : b,
+      (b) =>
+        withDateSubmission?.to
+          ? b.where("conventions.date_submission", "<=", withDateSubmission.to)
           : b,
       (b) =>
         withEndDate?.from
