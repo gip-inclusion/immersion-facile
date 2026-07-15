@@ -117,6 +117,7 @@ export const CreateDiscussionForm = ({
       transcientDataForScope,
       acquisitionParams,
       route.name,
+      contactMode,
     ],
   );
 

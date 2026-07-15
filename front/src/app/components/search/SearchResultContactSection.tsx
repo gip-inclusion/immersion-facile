@@ -68,6 +68,7 @@ export const SearchResultContactSection = ({
         },
         ({ contactMode }) => (
           <CreateDiscussionForm
+            key={currentSearchResult.siret}
             appellations={currentSearchResult.appellations}
             onSubmitSuccess={onFormSubmitSuccess}
             contactMode={contactMode}
