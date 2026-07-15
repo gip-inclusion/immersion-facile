@@ -600,7 +600,7 @@ const makeApplyFiltersToGetConventionIds =
     withAppelationCodes,
     withBeneficiary,
     withDateStart,
-    withDateSubmissionSince,
+    withDateSubmission,
     withEndDate,
     withUpdateDate,
     withEstablishmentRepresentative,
@@ -616,9 +616,12 @@ const makeApplyFiltersToGetConventionIds =
             ? withAgencyIds.includes(agencyId)
             : true,
         ({ dateSubmission }) =>
-          withDateSubmissionSince
-            ? new Date(dateSubmission).getTime() >=
-              withDateSubmissionSince.getTime()
+          withDateSubmission?.from
+            ? new Date(dateSubmission) >= withDateSubmission.from
+            : true,
+        ({ dateSubmission }) =>
+          withDateSubmission?.to
+            ? new Date(dateSubmission) <= withDateSubmission.to
             : true,
         ({ dateStart }) =>
           withDateStart?.to ? dateStart <= withDateStart : true,

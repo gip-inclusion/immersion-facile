@@ -4,6 +4,7 @@ import {
   type AgencyKind,
   type AgencyStatus,
   type AgencyWithUsersRights,
+  type ConventionStatus,
   executeInSequence,
   isTruthy,
   type UserId,
@@ -183,25 +184,13 @@ const getNotificationsForClosedAgencies = async (
     .filter(isTruthy);
 };
 
-const hasRecentConventionForAgencies = (
-  uow: UnitOfWork,
-  agencyIds: AgencyWithUsersRights["id"][],
-  noConventionSince: Date,
-) =>
-  uow.conventionQueries.getConventionIdsByFilters({
-    filters: {
-      withAgencyIds: agencyIds,
-      withStatuses: [
-        "ACCEPTED_BY_VALIDATOR",
-        "IN_REVIEW",
-        "PARTIALLY_SIGNED",
-        "ACCEPTED_BY_COUNSELLOR",
-        "READY_TO_SIGN",
-      ],
-      withDateSubmissionSince: noConventionSince,
-    },
-    limit: 1,
-  });
+const validConventionStatuses: ConventionStatus[] = [
+  "ACCEPTED_BY_VALIDATOR",
+  "IN_REVIEW",
+  "PARTIALLY_SIGNED",
+  "ACCEPTED_BY_COUNSELLOR",
+  "READY_TO_SIGN",
+];
 
 const getAgenciesToClose = async (
   agencies: AgencyWithUsersRights[],
@@ -211,11 +200,15 @@ const getAgenciesToClose = async (
   const agenciesToCloseResults = await executeInSequence(
     agencies,
     async (agency): Promise<AgencyWithUsersRights | null> => {
-      const agencyConventionIds = await hasRecentConventionForAgencies(
-        uow,
-        [agency.id],
-        noConventionSince,
-      );
+      const agencyConventionIds =
+        await uow.conventionQueries.getConventionIdsByFilters({
+          filters: {
+            withAgencyIds: [agency.id],
+            withStatuses: [...validConventionStatuses],
+            withDateSubmission: { from: noConventionSince },
+          },
+          limit: 1,
+        });
 
       if (agencyConventionIds.length === 0) {
         const referringAgencies =
@@ -224,11 +217,16 @@ const getAgenciesToClose = async (
         if (referringAgencies.length === 0) return agency;
 
         const referringAgenciesConventionIds =
-          await hasRecentConventionForAgencies(
-            uow,
-            referringAgencies.map((referringAgency) => referringAgency.id),
-            noConventionSince,
-          );
+          await uow.conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withAgencyIds: referringAgencies.map(
+                (referringAgency) => referringAgency.id,
+              ),
+              withStatuses: [...validConventionStatuses],
+              withDateSubmission: { from: noConventionSince },
+            },
+            limit: 1,
+          });
 
         if (referringAgenciesConventionIds.length === 0) return agency;
       }

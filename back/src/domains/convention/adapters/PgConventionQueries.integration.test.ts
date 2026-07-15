@@ -990,8 +990,8 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
-    describe("withDateSubmissionSince filter", () => {
-      const submissionSince = new Date("2026-01-15T00:00:00.000Z");
+    describe("withDateSubmission filter", () => {
+      const submissionFrom = new Date("2026-01-15T00:00:00.000Z");
 
       const recentConvention = new ConventionDtoBuilder()
         .withId(uuid())
@@ -1012,30 +1012,53 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionRepository.save(oldConvention);
       });
 
-      it("returns conventions submitted on or after the given date", async () => {
+      it("returns conventions submitted on or after from", async () => {
         expectToEqual(
           await conventionQueries.getConventionIdsByFilters({
-            filters: { withDateSubmissionSince: submissionSince },
+            filters: { withDateSubmission: { from: submissionFrom } },
           }),
           [recentConvention.id],
         );
       });
 
-      it("includes conventions submitted exactly on the given date", async () => {
-        const conventionSubmittedOnSinceDate = new ConventionDtoBuilder()
+      it("includes conventions submitted exactly on from", async () => {
+        const conventionSubmittedOnFromDate = new ConventionDtoBuilder()
           .withId(uuid())
           .withAgencyId(agency.id)
           .withDateSubmission("2026-01-15T08:00:00.000Z")
           .withDateStart("2026-01-20")
           .build();
 
-        await conventionRepository.save(conventionSubmittedOnSinceDate);
+        await conventionRepository.save(conventionSubmittedOnFromDate);
 
         expectToEqual(
           await conventionQueries.getConventionIdsByFilters({
-            filters: { withDateSubmissionSince: submissionSince },
+            filters: { withDateSubmission: { from: submissionFrom } },
           }),
-          [recentConvention.id, conventionSubmittedOnSinceDate.id],
+          [recentConvention.id, conventionSubmittedOnFromDate.id],
+        );
+      });
+
+      it("filters by withDateSubmission range", async () => {
+        const midConvention = new ConventionDtoBuilder()
+          .withId(uuid())
+          .withAgencyId(agency.id)
+          .withDateSubmission("2026-01-16T10:00:00.000Z")
+          .withDateStart("2026-01-25")
+          .build();
+
+        await conventionRepository.save(midConvention);
+
+        expectToEqual(
+          await conventionQueries.getConventionIdsByFilters({
+            filters: {
+              withDateSubmission: {
+                from: new Date("2026-01-12T00:00:00.000Z"),
+                to: new Date("2026-01-18T00:00:00.000Z"),
+              },
+            },
+          }),
+          [midConvention.id],
         );
       });
     });
