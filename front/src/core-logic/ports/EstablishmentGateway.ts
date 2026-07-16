@@ -1,9 +1,11 @@
 import type { Observable } from "rxjs";
 import type {
+  AdditionalEstablishmentInformation,
   ConnectedUserJwt,
   ConventionSupportedJwt,
   DataWithPagination,
   DiscussionExchangeForbiddenParams,
+  DiscussionId,
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
@@ -45,6 +47,10 @@ export interface EstablishmentGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
+  getAdditionalEstablishmentInformation$(
+    discussionId: DiscussionId,
+    jwt: ConnectedUserJwt,
+  ): Observable<AdditionalEstablishmentInformation>;
   getEstablishmentPublicOptions$(
     filters: GetEstablishmentPublicOptionsByFiltersInput,
     jwt: ConnectedUserJwt,

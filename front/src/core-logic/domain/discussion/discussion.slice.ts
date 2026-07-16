@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  type AdditionalEstablishmentInformation,
   type ConnectedUserJwt,
   type DataWithPagination,
   type DiscussionId,
@@ -45,6 +46,7 @@ export type DiscussionState = {
   discussionsWithPagination: DataWithPagination<DiscussionInList> & {
     filters: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray;
   };
+  additionalEstablishmentInformation: AdditionalEstablishmentInformation | null;
 };
 
 export type SendExchangeRequestedPayload = {
@@ -77,6 +79,7 @@ const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
   discussionsWithPagination: initialDiscussionsWithPagination,
+  additionalEstablishmentInformation: null,
 };
 
 export const discussionSlice = createSlice({
@@ -182,5 +185,24 @@ export const discussionSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+    fetchAdditionalEstablishmentInformationRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<FetchDiscussionRequestedPayload>,
+    ) => {
+      state.additionalEstablishmentInformation = null;
+    },
+    fetchAdditionalEstablishmentInformationSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        additionalEstablishmentInformation: AdditionalEstablishmentInformation;
+      }>,
+    ) => {
+      state.additionalEstablishmentInformation =
+        action.payload.additionalEstablishmentInformation;
+    },
+    fetchAdditionalEstablishmentInformationFailed: (
+      _state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {},
   },
 });

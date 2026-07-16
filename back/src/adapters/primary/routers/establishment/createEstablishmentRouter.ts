@@ -102,6 +102,17 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       ),
   );
 
+  establishmentSharedRouter.getAdditionalEstablishmentInformation(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getAdditionalEstablishmentInformation.execute(
+          req.params.discussionId,
+          getGenericAuthOrThrow(req.payloads?.connectedUser),
+        ),
+      ),
+  );
+
   establishmentSharedRouter.getDiscussions(
     deps.connectedUserAuthMiddleware,
     (req, res) =>

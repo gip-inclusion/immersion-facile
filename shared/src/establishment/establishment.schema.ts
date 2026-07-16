@@ -1,7 +1,13 @@
 import z from "zod";
+import { addressAndPositionSchema } from "../address/address.schema";
 import { emailSchema } from "../email/email.schema";
 import { formEstablishmentPendingUserRightSchema } from "../formEstablishment/FormEstablishment.schema";
+import { phoneNumberSchema } from "../phone/phone.schema";
 import { siretSchema } from "../siret/siret.schema";
+import {
+  firstnameMandatorySchema,
+  lastnameMandatorySchema,
+} from "../user/user.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import { withBannedEstablishmentInformationSchema } from "./bannedEstablishmentInformations.schema";
@@ -10,6 +16,8 @@ import {
   businessNameSchema,
 } from "./businessComponents.schema";
 import type {
+  AdditionalEstablishmentInformation,
+  EstablishmentMainContact,
   EstablishmentNameAndAdmins,
   EstablishmentPublicOption,
   GetEstablishmentPublicOptionsByFiltersInput,
@@ -26,6 +34,20 @@ export const establishmentNameAndAdminsSchema: ZodSchemaWithInputMatchingOutput<
   z.object({
     name: zStringMinLength1Max1024,
     adminEmails: z.array(emailSchema),
+  });
+
+const establishmentMainContactSchema: ZodSchemaWithInputMatchingOutput<EstablishmentMainContact> =
+  z.object({
+    firstName: firstnameMandatorySchema,
+    lastName: lastnameMandatorySchema,
+    phone: phoneNumberSchema,
+  });
+
+export const additionalEstablishmentInformationSchema: ZodSchemaWithInputMatchingOutput<AdditionalEstablishmentInformation> =
+  z.object({
+    siret: siretSchema,
+    potentialBeneficiaryWelcomeAddress: addressAndPositionSchema.optional(),
+    mainContact: establishmentMainContactSchema,
   });
 
 export const getEstablishmentPublicOptionsByFiltersSchema: ZodSchemaWithInputMatchingOutput<GetEstablishmentPublicOptionsByFiltersInput> =
