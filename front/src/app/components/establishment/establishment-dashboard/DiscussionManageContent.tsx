@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
@@ -18,9 +19,11 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AbsoluteUrl,
+  type AdditionalEstablishmentInformation,
   absoluteUrlSchema,
   addressDtoToString,
   type ConnectedUser,
+  type ContactMode,
   type ConventionDraftDto,
   type CreateConventionPresentationInitialValues,
   type DiscussionId,
@@ -33,6 +36,7 @@ import {
   exchangeMessageFromDashboardSchema,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  getFormattedLocalPhoneNumber,
   makeEmptyConventionInitialValues,
   splitTextOnFirstSeparator,
   toConventionDraftDto,
@@ -60,6 +64,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
+import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -67,6 +72,7 @@ import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
+import { contactModeToBadgeOptions } from "../../immersion-offer/CreateDiscussionForm";
 
 type DiscussionManageContentProps = WithDiscussionId & {
   viewer: ExchangeRole;
@@ -115,6 +121,25 @@ export const DiscussionManageContent = ({
       );
     }
   }, [discussion, dispatch]);
+
+  useEffect(() => {
+    if (
+      discussion &&
+      connectedUserJwt &&
+      (discussion.contactMode === "PHONE" ||
+        discussion.contactMode === "IN_PERSON")
+    ) {
+      dispatch(
+        discussionSlice.actions.fetchAdditionalEstablishmentInformationRequested(
+          {
+            discussionId,
+            jwt: connectedUserJwt,
+            feedbackTopic: "dashboard-discussion",
+          },
+        ),
+      );
+    }
+  }, [discussion, connectedUserJwt, discussionId, dispatch]);
 
   useEffect(
     () => () => {
@@ -303,6 +328,9 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const saveConventionDraftIsLoading = useAppSelector(
     conventionDraftSelectors.isLoading,
   );
+  const additionalEstablishmentInformation = useAppSelector(
+    discussionSelectors.additionalEstablishmentInformation,
+  );
   const relatedOffer = useAppSelector(searchSelectors.currentSearchResult);
   const saveConventionDraftThenRedirectRequested = ({
     conventionDraft,
@@ -368,23 +396,28 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             {discussion.potentialBeneficiary.immersionObjective}
           </p>
           <div className={fr.cx("fr-grid-row")}>
-            <Badge
-              id={domElementIds.establishmentDashboard.discussion.merBadge}
-              severity="success"
-              small
-              className={fr.cx("fr-mr-2w", "fr-badge")}
-            >
-              {match(discussion.contactMode)
-                .with("EMAIL", () => "MISE EN RELATION PAR MAIL")
-                .with("PHONE", () => "MISE EN RELATION PAR TÉLÉPHONE")
-                .with("IN_PERSON", () => "RENDEZ-VOUS SUR PLACE")
-                .exhaustive()}
-            </Badge>
+            <p
+              {...contactModeToBadgeOptions[discussion.contactMode]}
+              className={`${contactModeToBadgeOptions[discussion.contactMode].className} ${fr.cx("fr-mr-2w")}`}
+            />
             <DiscussionStatusBadge discussion={discussion} viewer={viewer} />
           </div>
         </SectionHighlight>
+        {viewer === "establishment" &&
+          (discussion.contactMode === "PHONE" ||
+            discussion.contactMode === "IN_PERSON") && (
+            <Alert
+              severity="info"
+              description={
+                discussion.contactMode === "PHONE"
+                  ? "Un email a été envoyé au candidat avec vos coordonnées. Vous pouvez quand même lui envoyer un message ici si vous souhaitez lui donner des infos supplémentaires sur l'immersion."
+                  : "Un email a été envoyé au candidat avec l’adresse de l’entreprise et la personne à contacter sur place. Vous pouvez quand même lui envoyer un message ici si vous souhaitez lui donner des infos supplémentaires sur l'immersion."
+              }
+              small
+              className={fr.cx("fr-mt-2w")}
+            />
+          )}
       </header>
-
       <div
         className={fr.cx(
           "fr-grid-row",
@@ -394,12 +427,14 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         )}
       >
         <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
-          <BorderedSection>
-            <DiscussionExchangeMessageForm
-              discussionId={discussion.id}
-              viewer={viewer}
-            />
-          </BorderedSection>
+          {discussion.contactMode === "EMAIL" && (
+            <BorderedSection>
+              <DiscussionExchangeMessageForm
+                discussionId={discussion.id}
+                viewer={viewer}
+              />
+            </BorderedSection>
+          )}
           {match(discussion.contactMode)
             .with("EMAIL", () => (
               <BorderedSection className={fr.cx("fr-mt-2w")}>
@@ -409,16 +444,54 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 />
               </BorderedSection>
             ))
-            .with("PHONE", () => (
-              <BorderedSection className={fr.cx("fr-mt-2w")}>
-                <PhoneContactInfo discussion={discussion} viewer={viewer} />
-              </BorderedSection>
-            ))
-            .with("IN_PERSON", () => (
-              <BorderedSection className={fr.cx("fr-mt-2w")}>
-                <p>test</p>
-              </BorderedSection>
-            ))
+            .with("PHONE", (contactMode) =>
+              viewer === "potentialBeneficiary" ? (
+                <>
+                  <BorderedSection>
+                    <EstablishmentContactInformation
+                      additionalEstablishmentInformation={
+                        additionalEstablishmentInformation
+                      }
+                      contactMode={contactMode}
+                    />
+                  </BorderedSection>
+                  <BorderedSection className={fr.cx("fr-mt-2w")}>
+                    <BeneficiaryGuideInformation contactMode="PHONE" />
+                  </BorderedSection>
+                </>
+              ) : (
+                <BorderedSection>
+                  <DiscussionExchangeMessageForm
+                    viewer="establishment"
+                    discussionId={discussion.id}
+                  />
+                </BorderedSection>
+              ),
+            )
+            .with("IN_PERSON", (contactMode) =>
+              viewer === "potentialBeneficiary" ? (
+                <>
+                  <BorderedSection>
+                    <EstablishmentContactInformation
+                      additionalEstablishmentInformation={
+                        additionalEstablishmentInformation
+                      }
+                      contactMode={contactMode}
+                    />
+                  </BorderedSection>
+                  <BorderedSection className={fr.cx("fr-mt-2w")}>
+                    <BeneficiaryGuideInformation contactMode="IN_PERSON" />
+                  </BorderedSection>{" "}
+                </>
+              ) : (
+                <BorderedSection>
+                  <DiscussionExchangeMessageForm
+                    viewer="establishment"
+                    discussionId={discussion.id}
+                  />
+                </BorderedSection>
+              ),
+            )
             .exhaustive()}
         </div>
         <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
@@ -430,33 +503,41 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                   <>
                     <h3 className={fr.cx("fr-h6")}>Entreprise</h3>
 
-                    {relatedOffer?.website && (
-                      <a
-                        href={relatedOffer.website}
-                        title="Site web de l'entreprise"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Site web de l'entreprise
-                      </a>
-                    )}
+                    <ul className={fr.cx("fr-raw-list")}>
+                      {relatedOffer?.website && (
+                        <li className={fr.cx("fr-mb-1w")}>
+                          <a
+                            href={relatedOffer.website}
+                            title="Site web de l'entreprise"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Site web de l'entreprise
+                          </a>
+                        </li>
+                      )}
 
-                    <a
-                      title="Offre d'immersion"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={
-                        frontRoutes.searchResult({
-                          appellationCode: [
-                            discussion.appellation.appellationCode,
-                          ],
-                          siret: discussion.siret,
-                          location: discussion.locationId,
-                        }).href
-                      }
-                    >
-                      Voir l'offre
-                    </a>
+                      <li>{discussion.businessName}</li>
+
+                      <li className={fr.cx("fr-mt-1w")}>
+                        <a
+                          title="Offre d'immersion"
+                          target="_blank"
+                          rel="noreferrer"
+                          href={
+                            frontRoutes.searchResult({
+                              appellationCode: [
+                                discussion.appellation.appellationCode,
+                              ],
+                              siret: discussion.siret,
+                              location: discussion.locationId,
+                            }).href
+                          }
+                        >
+                          Voir l'offre
+                        </a>
+                      </li>
+                    </ul>
                   </>
                 ) : (
                   <>
@@ -531,21 +612,119 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   );
 };
 
-const PhoneContactInfo = ({
-  discussion,
-  viewer,
+const BeneficiaryGuideInformation = ({
+  contactMode,
 }: {
-  discussion: DiscussionReadDto;
-  viewer: ExchangeRole;
+  contactMode: Extract<ContactMode, "IN_PERSON" | "PHONE">;
 }) => (
-  <BorderedSection>
-    <h5 className={fr.cx("fr-h5")}>
-      {viewer === "establishment"
-        ? "Information du candidat"
-        : "Coordonnées de l'entreprise"}
-    </h5>
-  </BorderedSection>
+  <>
+    <h5 className={fr.cx("fr-h5")}>Comment procéder ?</h5>
+    <div className={fr.cx("fr-accordions-group")}>
+      <Accordion
+        label={
+          contactMode === "IN_PERSON"
+            ? "Avant de vous présenter sur place"
+            : "Avant d'appeler"
+        }
+      >
+        <ul>
+          <li>Préparez votre présentation en 30 secondes</li>
+          <li>Notez les dates/semaines qui vous conviennent</li>
+          <li>Ayez votre projet clair en tête</li>
+          {contactMode === "IN_PERSON" && (
+            <li>Notez l'adresse et le nom de la personne à contacter</li>
+          )}
+        </ul>
+      </Accordion>
+      {contactMode === "PHONE" && (
+        <Accordion label="Pendant l'appel">
+          <ul>
+            <li>
+              Présentez-vous et expliquez que vous avez obtenu le contact via
+              Immersion Facilitée.
+            </li>
+            <li>
+              Décrivez votre projet professionnel et l'objectif que vous
+              recherchez en effectuant cette immersion.
+            </li>
+            <li>
+              Mentionnez que l'immersion est encadrée par une convention
+              d'Immersion Facilitée.
+            </li>
+            <li>
+              Proposez une période et une durée souhaitées pour l'immersion, en
+              expliquant pourquoi elles vous conviennent.
+            </li>
+            <li>
+              Concluez en demandant un rendez-vous afin d'échanger sur votre
+              demande.
+            </li>
+          </ul>
+        </Accordion>
+      )}
+      <Accordion label="À savoir">
+        <ul>
+          <li>
+            L'immersion est un stage d'observation strictement encadré d'un
+            point de vue juridique.
+          </li>
+          <li>Une immersion peut durer de 1 à 30 jours.</li>
+          <li>Vous conservez votre statut et votre indemnité habituelle.</li>
+          {contactMode !== "PHONE" && (
+            <li>
+              Une convention encadre l'immersion (vous pourrez la compléter lors
+              du rendez-vous).
+            </li>
+          )}
+        </ul>
+      </Accordion>
+    </div>
+  </>
 );
+
+const EstablishmentContactInformation = ({
+  additionalEstablishmentInformation,
+  contactMode,
+}: {
+  additionalEstablishmentInformation: AdditionalEstablishmentInformation | null;
+  contactMode: Extract<ContactMode, "IN_PERSON" | "PHONE">;
+}) => {
+  const contactDetail =
+    contactMode === "IN_PERSON"
+      ? ((additionalEstablishmentInformation?.potentialBeneficiaryWelcomeAddress &&
+          addressDtoToString(
+            additionalEstablishmentInformation
+              .potentialBeneficiaryWelcomeAddress.address,
+          )) ??
+        "Un mail avec l'adresse de l'entreprise et la personne a contacter sur place vous a été envoyé")
+      : additionalEstablishmentInformation &&
+        getFormattedLocalPhoneNumber(
+          additionalEstablishmentInformation.mainContact.phone,
+        );
+
+  return (
+    <>
+      <h5 className={fr.cx("fr-h5")}>Coordonnées de l'entreprise</h5>
+      {additionalEstablishmentInformation && contactDetail ? (
+        <ul className={fr.cx("fr-raw-list")}>
+          <li className={fr.cx("fr-mb-1w")}>
+            <strong>
+              {getFormattedFirstnameAndLastname({
+                firstname:
+                  additionalEstablishmentInformation.mainContact.firstName,
+                lastname:
+                  additionalEstablishmentInformation.mainContact.lastName,
+              })}
+            </strong>
+          </li>
+          <li>{contactDetail}</li>
+        </ul>
+      ) : (
+        "Aucune information trouvée"
+      )}
+    </>
+  );
+};
 
 const DiscussionExchangesList = ({
   discussion,
