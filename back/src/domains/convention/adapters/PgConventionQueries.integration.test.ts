@@ -16,12 +16,14 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
+  type ConventionLastReminders,
   type ConventionReadDto,
   type ConventionStatus,
   DATE_START,
   type DateString,
   type Email,
   expectToEqual,
+  makeEmptyLastReminders,
   reasonableSchedule,
   type SearchTextAlphaNumeric,
   type SiretDto,
@@ -64,6 +66,205 @@ describe("Pg implementation of ConventionQueries", () => {
     .withId(uuid())
     .buildUser();
 
+  const insertEmailReminder = async ({
+    conventionId,
+    emailKind,
+    recipientEmail,
+    createdAt,
+  }: {
+    conventionId: ConventionId;
+    emailKind: string;
+    recipientEmail: Email;
+    createdAt: Date;
+  }) => {
+    const emailId = uuid();
+    await db
+      .insertInto("notifications_email")
+      .values({
+        id: emailId,
+        email_kind: emailKind,
+        convention_id: conventionId,
+        created_at: createdAt.toISOString(),
+      })
+      .execute();
+    await db
+      .insertInto("notifications_email_recipients")
+      .values({
+        notifications_email_id: emailId,
+        email: recipientEmail,
+        recipient_type: "to",
+      })
+      .execute();
+  };
+
+  const insertSmsReminder = async ({
+    conventionId,
+    smsKind,
+    recipientPhone,
+    createdAt,
+  }: {
+    conventionId: ConventionId;
+    smsKind: string;
+    recipientPhone: string;
+    createdAt: Date;
+  }) =>
+    db
+      .insertInto("notifications_sms")
+      .values({
+        id: uuid(),
+        sms_kind: smsKind,
+        convention_id: conventionId,
+        recipient_phone: recipientPhone,
+        created_at: createdAt.toISOString(),
+      })
+      .execute();
+
+  const insertAgencyAndConvention = async ({
+    conventionId,
+    agencyId,
+    agencyContactEmail,
+    agencyName,
+    agencyDepartment,
+    agencyKind,
+    agencySiret,
+    withRefersToAgency,
+    conventionStartDate = DATE_START,
+    conventionStatus = "READY_TO_SIGN",
+    conventionUpdatedAt,
+    validatorUser,
+    assessment,
+    withBannedEstablishmentInformations,
+    withLastReminders,
+  }: {
+    conventionId: ConventionId;
+    agencyId: string;
+    agencyContactEmail: Email;
+    agencyName: string;
+    agencyDepartment: string;
+    agencyKind: AgencyKind;
+    agencySiret: SiretDto;
+    withRefersToAgency?: AgencyDto;
+    conventionStartDate?: string;
+    conventionStatus?: ConventionStatus;
+    conventionUpdatedAt: DateString;
+    validatorUser: UserWithAdminRights;
+    assessment?: AssessmentEntity;
+    withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
+    withLastReminders?: ConventionLastReminders;
+  }): Promise<ConventionReadDto> => {
+    const convention = new ConventionDtoBuilder()
+      .withAgencyId(agencyId)
+      .withId(conventionId)
+      .withStatus(conventionStatus)
+      .withStatusJustification("JUSTIF...")
+      .notSigned()
+      .withBeneficiary({
+        firstName: "benef",
+        lastName: "beneficiary",
+        email: "benef@r.com",
+        phone: "+33112233440",
+        role: "beneficiary",
+        birthdate: "1990-02-21T00:00:00.000Z",
+        emergencyContact: "Billy",
+        emergencyContactPhone: "+33112233445",
+        emergencyContactEmail: "billy@emergencycontact.com",
+        signedAt: new Date().toISOString(),
+        isRqth: false,
+      })
+      .withBeneficiaryCurrentEmployer({
+        firstName: "a",
+        lastName: "a",
+        businessName: "business",
+        businessSiret: "01234567890123",
+        email: "a@a.com",
+        job: "job",
+        phone: "+33112233441",
+        role: "beneficiary-current-employer",
+        signedAt: new Date().toISOString(),
+        businessAddress: "Rue des Bouchers 67065 Strasbourg",
+      })
+      .withBeneficiaryRepresentative({
+        email: "rep@rep.com",
+        firstName: "beneficiary",
+        lastName: "Rep",
+        phone: "+33112233442",
+        role: "beneficiary-representative",
+        signedAt: new Date().toISOString(),
+      })
+      .withEstablishmentRepresentative({
+        email: "est@rep.com",
+        firstName: "Establishment",
+        lastName: "Rep",
+        phone: "+33112233443",
+        role: "establishment-representative",
+        signedAt: new Date().toISOString(),
+      })
+      .withDateStart(conventionStartDate)
+      .withDateEnd(addDays(new Date(conventionStartDate), 5).toISOString())
+      .build();
+
+    const agency = AgencyDtoBuilder.create()
+      .withId(agencyId)
+      .withName(agencyName)
+      .withAddress({
+        city: "Paris",
+        departmentCode: agencyDepartment,
+        postcode: "75017",
+        streetNumberAndAddress: "Avenue des champs Elysées",
+      })
+      .withAgencySiret(agencySiret)
+      .withKind(agencyKind)
+      .withAgencyContactEmail(agencyContactEmail)
+      .withRefersToAgencyInfo(
+        withRefersToAgency
+          ? {
+              refersToAgencyId: withRefersToAgency.id,
+              refersToAgencyName: withRefersToAgency.name,
+              refersToAgencyContactEmail: withRefersToAgency.contactEmail,
+            }
+          : null,
+      )
+      .build();
+
+    if (withRefersToAgency)
+      await agencyRepo.insert(
+        toAgencyWithRights(withRefersToAgency, {
+          [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+    await agencyRepo.insert(
+      toAgencyWithRights(agency, {
+        [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+
+    await conventionRepository.save(convention, conventionUpdatedAt);
+
+    if (assessment) await assessmentRepo.save(assessment);
+
+    return {
+      ...convention,
+      agencyName,
+      agencyDepartment,
+      agencyContactEmail,
+      agencyKind,
+      agencySiret,
+      agencyRefersTo: withRefersToAgency && {
+        id: withRefersToAgency.id,
+        name: withRefersToAgency.name,
+        contactEmail: withRefersToAgency.contactEmail,
+        kind: withRefersToAgency.kind,
+        siret: withRefersToAgency.agencySiret,
+      },
+      agencyValidationSteps: "validator-only",
+      updatedAt: conventionUpdatedAt,
+      ...assesmentEntityToConventionAssessmentFields(assessment),
+      ...withBannedEstablishmentInformations,
+      lastReminders: withLastReminders ?? makeEmptyLastReminders(),
+    } satisfies ConventionReadDto;
+  };
+
   let pool: Pool;
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
@@ -90,6 +291,7 @@ describe("Pg implementation of ConventionQueries", () => {
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("notifications_email_recipients").execute();
     await db.deleteFrom("notifications_email").execute();
+    await db.deleteFrom("notifications_sms").execute();
     await db.deleteFrom("immersion_assessments").execute();
     await db.deleteFrom("users").execute();
 
@@ -195,6 +397,212 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const result = await conventionQueries.getConventionById(conventionIdA);
       expectToEqual(result, expectedConventionRead);
+    });
+
+    describe("lastReminders", () => {
+      beforeEach(async () => {
+        await insertAgencyAndConvention({
+          conventionId: conventionIdA,
+          agencyId: conventionIdA,
+          agencyContactEmail: "agency-a-contact@mail.com",
+          agencyName: "agency A",
+          agencyDepartment: "75",
+          agencyKind: "autre",
+          agencySiret: "11112222000033",
+          conventionUpdatedAt: anyConventionUpdatedAt,
+          validatorUser: validator,
+          withBannedEstablishmentInformations: { isEstablishmentBanned: false },
+        });
+      });
+
+      it("returns empty last reminders when no reminder notifications exist", async () => {
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders, makeEmptyLastReminders());
+      });
+
+      it("returns the latest signature email reminder for a signatory", async () => {
+        const olderDate = new Date("2025-01-01T10:00:00.000Z");
+        const newerDate = new Date("2025-01-02T10:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "benef@r.com",
+          createdAt: olderDate,
+        });
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "benef@r.com",
+          createdAt: newerDate,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.conventionSignatures.beneficiary, {
+          email: newerDate.toISOString(),
+          sms: null,
+        });
+      });
+
+      it("returns signature reminders for each signatory role", async () => {
+        const establishmentRepDate = new Date("2025-01-02T12:00:00.000Z");
+        const beneficiaryRepDate = new Date("2025-01-02T13:00:00.000Z");
+        const currentEmployerDate = new Date("2025-01-02T14:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "est@rep.com",
+          createdAt: establishmentRepDate,
+        });
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "rep@rep.com",
+          createdAt: beneficiaryRepDate,
+        });
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForSignatories",
+          recipientPhone: "+33112233441",
+          createdAt: currentEmployerDate,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.conventionSignatures, {
+          beneficiary: { email: null, sms: null },
+          "establishment-representative": {
+            email: establishmentRepDate.toISOString(),
+            sms: null,
+          },
+          "beneficiary-representative": {
+            email: beneficiaryRepDate.toISOString(),
+            sms: null,
+          },
+          "beneficiary-current-employer": {
+            email: null,
+            sms: currentEmployerDate.toISOString(),
+          },
+        });
+      });
+
+      it("returns signature sms reminder for a signatory", async () => {
+        const sentAt = new Date("2025-01-03T14:00:00.000Z");
+
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForSignatories",
+          recipientPhone: "+33112233440",
+          createdAt: sentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.conventionSignatures.beneficiary, {
+          email: null,
+          sms: sentAt.toISOString(),
+        });
+      });
+
+      it("returns email and sms signature reminders together for a signatory", async () => {
+        const emailSentAt = new Date("2025-01-03T10:00:00.000Z");
+        const smsSentAt = new Date("2025-01-03T11:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "benef@r.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForSignatories",
+          recipientPhone: "+33112233440",
+          createdAt: smsSentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.conventionSignatures.beneficiary, {
+          email: emailSentAt.toISOString(),
+          sms: smsSentAt.toISOString(),
+        });
+      });
+
+      it("returns assessment link email reminder for establishment tutor", async () => {
+        const sentAt = new Date("2025-01-04T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+          recipientEmail: "establishment@example.com",
+          createdAt: sentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.assessmentCompletion, {
+          email: sentAt.toISOString(),
+          sms: null,
+        });
+      });
+
+      it("returns assessment link sms reminder for establishment tutor", async () => {
+        const sentAt = new Date("2025-01-04T10:00:00.000Z");
+
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForAssessment",
+          recipientPhone: "+33601010101",
+          createdAt: sentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.assessmentCompletion, {
+          email: null,
+          sms: sentAt.toISOString(),
+        });
+      });
+
+      it("returns assessment signature reminder for beneficiary", async () => {
+        const sentAt = new Date("2025-01-05T11:30:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+          recipientEmail: "benef@r.com",
+          createdAt: sentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.assessmentSignature, {
+          email: sentAt.toISOString(),
+          sms: null,
+        });
+      });
+
+      it("returns assessment signature sms reminder for beneficiary", async () => {
+        const sentAt = new Date("2025-01-05T12:00:00.000Z");
+
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForAssessmentSignature",
+          recipientPhone: "+33112233440",
+          createdAt: sentAt,
+        });
+
+        const result = await conventionQueries.getConventionById(conventionIdA);
+
+        expectToEqual(result?.lastReminders.assessmentSignature, {
+          email: null,
+          sms: sentAt.toISOString(),
+        });
+      });
     });
   });
 
@@ -337,6 +745,147 @@ describe("Pg implementation of ConventionQueries", () => {
       });
 
       expectToEqual(result, [cciConvention]);
+    });
+
+    describe("lastReminders", () => {
+      it("returns last signature reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-06T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-06T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "benef@r.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionIdB,
+          smsKind: "ReminderForSignatories",
+          recipientPhone: "+33112233440",
+          createdAt: smsSentAt,
+        });
+
+        const result = await conventionQueries.getConventionsByScope({
+          scope: { agencyKinds: ["pole-emploi", "cci"] },
+          limit: 5,
+          filters: {},
+        });
+
+        expectToEqual(result, [
+          {
+            ...cciConvention,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: smsSentAt.toISOString() },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: { email: null, sms: null },
+            },
+          },
+          {
+            ...franceTravailConvention,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: emailSentAt.toISOString(), sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: { email: null, sms: null },
+            },
+          },
+        ]);
+      });
+
+      it("returns last assessment completion reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-07T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-07T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+          recipientEmail: "establishment@example.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForAssessment",
+          recipientPhone: "+33601010101",
+          createdAt: smsSentAt,
+        });
+
+        const result = await conventionQueries.getConventionsByScope({
+          scope: { agencyKinds: ["pole-emploi"] },
+          limit: 5,
+          filters: {},
+        });
+
+        expectToEqual(result, [
+          {
+            ...franceTravailConvention,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: {
+                email: emailSentAt.toISOString(),
+                sms: smsSentAt.toISOString(),
+              },
+              assessmentSignature: { email: null, sms: null },
+            },
+          },
+        ]);
+      });
+
+      it("returns last assessment signature reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-08T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-08T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionIdA,
+          emailKind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+          recipientEmail: "benef@r.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionIdA,
+          smsKind: "ReminderForAssessmentSignature",
+          recipientPhone: "+33112233440",
+          createdAt: smsSentAt,
+        });
+
+        const result = await conventionQueries.getConventionsByScope({
+          scope: { agencyKinds: ["pole-emploi"] },
+          limit: 5,
+          filters: {},
+        });
+
+        expectToEqual(result, [
+          {
+            ...franceTravailConvention,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: {
+                email: emailSentAt.toISOString(),
+                sms: smsSentAt.toISOString(),
+              },
+            },
+          },
+        ]);
+      });
     });
   });
 
@@ -1099,149 +1648,6 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  const insertAgencyAndConvention = async ({
-    conventionId,
-    agencyId,
-    agencyContactEmail,
-    agencyName,
-    agencyDepartment,
-    agencyKind,
-    agencySiret,
-    withRefersToAgency,
-    conventionStartDate = DATE_START,
-    conventionStatus = "READY_TO_SIGN",
-    conventionUpdatedAt,
-    validatorUser,
-    assessment,
-    withBannedEstablishmentInformations,
-  }: {
-    conventionId: ConventionId;
-    agencyId: string;
-    agencyContactEmail: Email;
-    agencyName: string;
-    agencyDepartment: string;
-    agencyKind: AgencyKind;
-    agencySiret: SiretDto;
-    withRefersToAgency?: AgencyDto;
-    conventionStartDate?: string;
-    conventionStatus?: ConventionStatus;
-    conventionUpdatedAt: DateString;
-    validatorUser: UserWithAdminRights;
-    assessment?: AssessmentEntity;
-    withBannedEstablishmentInformations: WithBannedEstablishmentInformations;
-  }): Promise<ConventionReadDto> => {
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(agencyId)
-      .withId(conventionId)
-      .withStatus(conventionStatus)
-      .withStatusJustification("JUSTIF...")
-      .notSigned()
-      .withBeneficiary({
-        firstName: "benef",
-        lastName: "beneficiary",
-        email: "benef@r.com",
-        phone: "+33112233445",
-        role: "beneficiary",
-        birthdate: "1990-02-21T00:00:00.000Z",
-        emergencyContact: "Billy",
-        emergencyContactPhone: "+33112233445",
-        emergencyContactEmail: "billy@emergencycontact.com",
-        signedAt: new Date().toISOString(),
-        isRqth: false,
-      })
-      .withBeneficiaryCurrentEmployer({
-        firstName: "a",
-        lastName: "a",
-        businessName: "business",
-        businessSiret: "01234567890123",
-        email: "a@a.com",
-        job: "job",
-        phone: "+33112233445",
-        role: "beneficiary-current-employer",
-        signedAt: new Date().toISOString(),
-        businessAddress: "Rue des Bouchers 67065 Strasbourg",
-      })
-      .withBeneficiaryRepresentative({
-        email: "rep@rep.com",
-        firstName: "beneficiary",
-        lastName: "Rep",
-        phone: "+33112233445",
-        role: "beneficiary-representative",
-        signedAt: new Date().toISOString(),
-      })
-      .withEstablishmentRepresentative({
-        email: "est@rep.com",
-        firstName: "Establishment",
-        lastName: "Rep",
-        phone: "+33112233445",
-        role: "establishment-representative",
-        signedAt: new Date().toISOString(),
-      })
-      .withDateStart(conventionStartDate)
-      .withDateEnd(addDays(new Date(conventionStartDate), 5).toISOString())
-      .build();
-
-    const agency = AgencyDtoBuilder.create()
-      .withId(agencyId)
-      .withName(agencyName)
-      .withAddress({
-        city: "Paris",
-        departmentCode: agencyDepartment,
-        postcode: "75017",
-        streetNumberAndAddress: "Avenue des champs Elysées",
-      })
-      .withAgencySiret(agencySiret)
-      .withKind(agencyKind)
-      .withAgencyContactEmail(agencyContactEmail)
-      .withRefersToAgencyInfo(
-        withRefersToAgency
-          ? {
-              refersToAgencyId: withRefersToAgency.id,
-              refersToAgencyName: withRefersToAgency.name,
-              refersToAgencyContactEmail: withRefersToAgency.contactEmail,
-            }
-          : null,
-      )
-      .build();
-
-    if (withRefersToAgency)
-      await agencyRepo.insert(
-        toAgencyWithRights(withRefersToAgency, {
-          [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-      );
-
-    await agencyRepo.insert(
-      toAgencyWithRights(agency, {
-        [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
-    );
-
-    await conventionRepository.save(convention, conventionUpdatedAt);
-
-    if (assessment) await assessmentRepo.save(assessment);
-
-    return {
-      ...convention,
-      agencyName,
-      agencyDepartment,
-      agencyContactEmail,
-      agencyKind,
-      agencySiret,
-      agencyRefersTo: withRefersToAgency && {
-        id: withRefersToAgency.id,
-        name: withRefersToAgency.name,
-        contactEmail: withRefersToAgency.contactEmail,
-        kind: withRefersToAgency.kind,
-        siret: withRefersToAgency.agencySiret,
-      },
-      agencyValidationSteps: "validator-only",
-      updatedAt: conventionUpdatedAt,
-      ...assesmentEntityToConventionAssessmentFields(assessment),
-      ...withBannedEstablishmentInformations,
-    } satisfies ConventionReadDto;
-  };
-
   describe("getPaginatedConventionsForAgencyUser", () => {
     const agencyId = "cccccc99-9c0b-1bbb-bb6d-6bb9bd38cccc";
     const agency = new AgencyDtoBuilder()
@@ -1416,6 +1822,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -1428,6 +1835,7 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1448,12 +1856,14 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1482,6 +1892,7 @@ describe("Pg implementation of ConventionQueries", () => {
             ...conventionB,
             ...agencyFields,
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         ],
@@ -1512,6 +1923,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -1519,6 +1931,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1574,6 +1987,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1595,6 +2009,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1618,6 +2033,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1656,6 +2072,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1678,6 +2095,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1700,6 +2118,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1733,12 +2152,14 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -1764,6 +2185,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -1776,9 +2198,187 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
+    });
+
+    describe("lastReminders", () => {
+      it("returns last signature reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-07T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-07T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionA.id,
+          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipientEmail: "beneficiary@convention-a.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionB.id,
+          smsKind: "ReminderForSignatories",
+          recipientPhone: conventionB.signatories.beneficiary.phone,
+          createdAt: smsSentAt,
+        });
+
+        const result =
+          await conventionQueries.getPaginatedConventionsForAgencyUser({
+            agencyUserId: validator.id,
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId],
+              statuses: ["READY_TO_SIGN", "IN_REVIEW"],
+            },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+        expectToEqual(result.data, [
+          {
+            ...conventionB,
+            ...agencyFields,
+            assessment: null,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: smsSentAt.toISOString() },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: { email: null, sms: null },
+            },
+            isEstablishmentBanned: false,
+          },
+          {
+            ...conventionA,
+            ...agencyFields,
+            assessment: null,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: emailSentAt.toISOString(), sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: { email: null, sms: null },
+            },
+            isEstablishmentBanned: false,
+          },
+        ]);
+      });
+
+      it("returns last assessment completion reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-08T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-08T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionC.id,
+          emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+          recipientEmail: conventionC.establishmentTutor.email,
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionC.id,
+          smsKind: "ReminderForAssessment",
+          recipientPhone: conventionC.establishmentTutor.phone,
+          createdAt: smsSentAt,
+        });
+
+        const result =
+          await conventionQueries.getPaginatedConventionsForAgencyUser({
+            agencyUserId: validator.id,
+            pagination: { page: 1, perPage: 10 },
+            filters: { statuses: ["ACCEPTED_BY_VALIDATOR"] },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+        expectToEqual(result.data, [
+          {
+            ...conventionC,
+            ...agencyFields,
+            agencyValidationSteps: "validator-only",
+            assessment: {
+              status: "COMPLETED",
+              endedWithAJob: false,
+              signedAt: null,
+              createdAt: completedAssessment.createdAt,
+            },
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: {
+                email: emailSentAt.toISOString(),
+                sms: smsSentAt.toISOString(),
+              },
+              assessmentSignature: { email: null, sms: null },
+            },
+            isEstablishmentBanned: false,
+          },
+        ]);
+      });
+
+      it("returns last assessment signature reminder dates when notifications exist", async () => {
+        const emailSentAt = new Date("2025-01-09T08:00:00.000Z");
+        const smsSentAt = new Date("2025-01-09T09:00:00.000Z");
+
+        await insertEmailReminder({
+          conventionId: conventionA.id,
+          emailKind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+          recipientEmail: "beneficiary@convention-a.com",
+          createdAt: emailSentAt,
+        });
+        await insertSmsReminder({
+          conventionId: conventionA.id,
+          smsKind: "ReminderForAssessmentSignature",
+          recipientPhone: conventionA.signatories.beneficiary.phone,
+          createdAt: smsSentAt,
+        });
+
+        const result =
+          await conventionQueries.getPaginatedConventionsForAgencyUser({
+            agencyUserId: validator.id,
+            pagination: { page: 1, perPage: 10 },
+            filters: { search: "John D" },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+        expectToEqual(result.data, [
+          {
+            ...conventionA,
+            ...agencyFields,
+            assessment: null,
+            lastReminders: {
+              conventionSignatures: {
+                beneficiary: { email: null, sms: null },
+                "establishment-representative": { email: null, sms: null },
+                "beneficiary-representative": { email: null, sms: null },
+                "beneficiary-current-employer": { email: null, sms: null },
+              },
+              assessmentCompletion: { email: null, sms: null },
+              assessmentSignature: {
+                email: emailSentAt.toISOString(),
+                sms: smsSentAt.toISOString(),
+              },
+            },
+            isEstablishmentBanned: false,
+          },
+        ]);
+      });
     });
 
     describe("assessment completion status filter", () => {
@@ -1834,6 +2434,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: oldAssessmentWithoutSignature.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -1883,6 +2484,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 ).toISOString(),
                 createdAt: completedAssessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -1937,6 +2539,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -1985,12 +2588,14 @@ describe("Pg implementation of ConventionQueries", () => {
               ...recentConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
             {
               ...oldConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -2085,6 +2690,7 @@ describe("Pg implementation of ConventionQueries", () => {
               ...conventionWithAssessmentToComplete,
               ...agencyFields,
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -2124,6 +2730,7 @@ describe("Pg implementation of ConventionQueries", () => {
               ...conventionEndingWithinOneDay,
               ...agencyFields,
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -2165,12 +2772,14 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
             {
               ...validatedConventionWithoutAssessment,
               ...agencyFields,
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -2226,6 +2835,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt: null,
                 createdAt: completedAssessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
             {
@@ -2237,6 +2847,7 @@ describe("Pg implementation of ConventionQueries", () => {
                 signedAt,
                 createdAt: signedAssessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           ]);
@@ -2288,6 +2899,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2295,6 +2907,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2302,6 +2915,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2314,12 +2928,14 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2342,6 +2958,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2354,6 +2971,7 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2384,6 +3002,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2410,18 +3029,21 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2499,18 +3121,21 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionB,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2540,6 +3165,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionD,
           ...differentAgencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2552,6 +3178,7 @@ describe("Pg implementation of ConventionQueries", () => {
             signedAt: null,
             createdAt: completedAssessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2559,6 +3186,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         {
@@ -2566,6 +3194,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...agencyFields,
           agencyValidationSteps: "counsellor-and-validator",
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);
@@ -2592,6 +3221,7 @@ describe("Pg implementation of ConventionQueries", () => {
           ...conventionA,
           ...agencyFields,
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       ]);

@@ -63,6 +63,7 @@ import {
   createConventionsWithErroredBroadcastFeedbackBuilder,
   getAssessmentFieldsByConventionId,
   getConventionAgencyFieldsForAgencies,
+  getLastRemindersFieldsByConventions,
   getReadConventionById,
   wrapInMaterializedCteWithEnrichment,
 } from "./pgConventionSql";
@@ -326,6 +327,11 @@ export class PgConventionQueries implements ConventionQueries {
       },
       {} as Record<ConventionId, ConventionAssessmentFields>,
     );
+    const lastRemindersByConventionId =
+      await getLastRemindersFieldsByConventions({
+        transaction: this.transaction,
+        conventions: conventions.map(({ dto }) => dto),
+      });
 
     return conventions.map((pgResult) => {
       const agencyFields = agencyFieldsByAgencyIds[pgResult.dto.agencyId];
@@ -342,6 +348,7 @@ export class PgConventionQueries implements ConventionQueries {
           ...pgResult.dto,
           ...agencyFields,
           ...assessmentFields,
+          lastReminders: lastRemindersByConventionId[pgResult.dto.id],
         },
         logger,
       });
@@ -446,6 +453,11 @@ export class PgConventionQueries implements ConventionQueries {
       },
       {} as Record<string, ConventionAssessmentFields>,
     );
+    const lastRemindersByConventionId =
+      await getLastRemindersFieldsByConventions({
+        transaction: this.transaction,
+        conventions: data.map(({ dto }) => dto),
+      });
 
     const conventionsReadDto = data.map(({ dto }) => {
       const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
@@ -462,6 +474,7 @@ export class PgConventionQueries implements ConventionQueries {
           ...dto,
           ...agencyFields,
           ...assessmentFields,
+          lastReminders: lastRemindersByConventionId[dto.id],
         },
         logger,
       });

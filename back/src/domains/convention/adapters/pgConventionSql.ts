@@ -12,11 +12,15 @@ import {
   type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
+  type ConventionLastReminders,
   type ConventionReadDto,
   conventionReadSchema,
   type DateString,
   type DateTimeIsoString,
   type Email,
+  isTruthy,
+  type LastReminderDateByNotificationKind,
+  makeEmptyLastReminders,
   type OmitFromExistingKeys,
   pipeWithValue,
   type RomeCode,
@@ -624,6 +628,10 @@ export const getReadConventionById = async (
     transaction,
     pgConvention.dto.id,
   );
+  const lastReminders = await getLastRemindersFieldsByConventionId(
+    transaction,
+    pgConvention.dto,
+  );
 
   return validateAndParseZodSchema({
     schemaName: "conventionReadSchema",
@@ -632,6 +640,7 @@ export const getReadConventionById = async (
       ...pgConvention.dto,
       ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
       ...assessmentFields,
+      lastReminders,
     },
     id:
       pgConvention.dto &&
@@ -686,6 +695,137 @@ const getUsersWithAgencyRole = async (
           "users__agencies.is_notified_by_email as isNotifiedByEmail",
         ])
         .execute();
+
+const reminderKinds = {
+  conventionSignature: {
+    email: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+    sms: "ReminderForSignatories",
+  },
+  assessmentCompletion: {
+    email: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+    sms: "ReminderForAssessment",
+  },
+  assessmentSignature: {
+    email: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+    sms: "ReminderForAssessmentSignature",
+  },
+} as const;
+
+type ReminderKind = keyof typeof reminderKinds;
+
+export const getLastReminderDatesForRecipient = async ({
+  transaction,
+  conventionId,
+  reminderKind,
+  recipientEmail,
+  recipientPhone,
+}: {
+  transaction: KyselyDb;
+  conventionId: ConventionId;
+  reminderKind: ReminderKind;
+  recipientEmail: Email;
+  recipientPhone: string;
+}): Promise<LastReminderDateByNotificationKind> => {
+  const { email: emailKind, sms: smsKind } = reminderKinds[reminderKind];
+
+  const [emailResult, smsResult] = await Promise.all([
+    transaction
+      .selectFrom("notifications_email as e")
+      .innerJoin(
+        "notifications_email_recipients as r",
+        "r.notifications_email_id",
+        "e.id",
+      )
+      .select(
+        sql<DateTimeIsoString>`date_to_iso(MAX(e.created_at))`.as("createdAt"),
+      )
+      .where("e.convention_id", "=", conventionId)
+      .where("e.email_kind", "=", emailKind)
+      .where("r.email", "=", recipientEmail)
+      .executeTakeFirst(),
+    transaction
+      .selectFrom("notifications_sms as s")
+      .select(
+        sql<DateTimeIsoString>`date_to_iso(MAX(s.created_at))`.as("createdAt"),
+      )
+      .where("s.convention_id", "=", conventionId)
+      .where("s.sms_kind", "=", smsKind)
+      .where("s.recipient_phone", "=", recipientPhone)
+      .executeTakeFirst(),
+  ]);
+
+  return {
+    email: emailResult?.createdAt ?? null,
+    sms: smsResult?.createdAt ?? null,
+  };
+};
+
+export const getLastRemindersFieldsByConventionId = async (
+  transaction: KyselyDb,
+  convention: ConventionDto,
+): Promise<ConventionLastReminders> => {
+  const [
+    conventionSignatureReminders,
+    assessmentCompletion,
+    assessmentSignature,
+  ] = await Promise.all([
+    Promise.all(
+      Object.values(convention.signatories)
+        .filter(isTruthy)
+        .map(async (signatory) => ({
+          role: signatory.role,
+          dates: await getLastReminderDatesForRecipient({
+            transaction,
+            conventionId: convention.id,
+            reminderKind: "conventionSignature",
+            recipientEmail: signatory.email,
+            recipientPhone: signatory.phone,
+          }),
+        })),
+    ),
+    getLastReminderDatesForRecipient({
+      transaction,
+      conventionId: convention.id,
+      reminderKind: "assessmentCompletion",
+      recipientEmail: convention.establishmentTutor.email,
+      recipientPhone: convention.establishmentTutor.phone,
+    }),
+    getLastReminderDatesForRecipient({
+      transaction,
+      conventionId: convention.id,
+      reminderKind: "assessmentSignature",
+      recipientEmail: convention.signatories.beneficiary.email,
+      recipientPhone: convention.signatories.beneficiary.phone,
+    }),
+  ]);
+
+  return {
+    conventionSignatures: {
+      ...makeEmptyLastReminders().conventionSignatures,
+      ...Object.fromEntries(
+        conventionSignatureReminders.map(({ role, dates }) => [role, dates]),
+      ),
+    },
+    assessmentCompletion,
+    assessmentSignature,
+  };
+};
+
+export const getLastRemindersFieldsByConventions = async ({
+  transaction,
+  conventions,
+}: {
+  transaction: KyselyDb;
+  conventions: ConventionDto[];
+}): Promise<Record<ConventionId, ConventionLastReminders>> =>
+  Object.fromEntries(
+    await Promise.all(
+      conventions.map(async (convention) => [
+        convention.id,
+        await getLastRemindersFieldsByConventionId(transaction, convention),
+      ]),
+    ),
+  );
 
 export const getAssessmentFieldsByConventionId = async (
   transaction: KyselyDb,
