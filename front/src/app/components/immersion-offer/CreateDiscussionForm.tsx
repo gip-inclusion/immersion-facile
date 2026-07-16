@@ -416,7 +416,7 @@ const commonBadgeClassName: FrCxArg = [
   "fr-badge--icon-left",
   "fr-badge--green-archipel",
 ];
-const contactModeToBadgeOptions: Record<ContactMode, BadgeProps> = {
+export const contactModeToBadgeOptions: Record<ContactMode, BadgeProps> = {
   EMAIL: {
     children: "Mise en relation par mail",
     className: fr.cx(...commonBadgeClassName, "fr-icon-mail-line"),

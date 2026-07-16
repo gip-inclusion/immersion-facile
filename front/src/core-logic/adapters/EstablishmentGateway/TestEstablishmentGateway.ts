@@ -1,7 +1,9 @@
 import { type Observable, Subject } from "rxjs";
 import type {
+  AdditionalEstablishmentInformation,
   ConnectedUserJwt,
   DataWithPagination,
+  DiscussionId,
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
@@ -40,6 +42,9 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public discussions$ = new Subject<DataWithPagination<DiscussionInList>>();
 
   public discussion$ = new Subject<DiscussionReadDto | undefined>();
+
+  public additionalEstablishmentInformation$ =
+    new Subject<AdditionalEstablishmentInformation>();
 
   public sendMessageResponse$ = new Subject<ExchangeRead>();
 
@@ -98,6 +103,13 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined> {
     return this.discussion$;
+  }
+
+  public getAdditionalEstablishmentInformation$(
+    _discussionId: DiscussionId,
+    _jwt: ConnectedUserJwt,
+  ): Observable<AdditionalEstablishmentInformation> {
+    return this.additionalEstablishmentInformation$;
   }
   public getDiscussions$(
     _payload: FetchDiscussionListRequestedPayload,

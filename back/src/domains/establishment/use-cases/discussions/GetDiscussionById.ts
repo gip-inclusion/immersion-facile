@@ -63,7 +63,7 @@ const makeDiscussionRead = async (
   });
 };
 
-const hasUserRightToAccessDiscussion = async (
+export const hasUserRightToAccessDiscussion = async (
   uow: UnitOfWork,
   user: User,
   discussion: DiscussionDto,
