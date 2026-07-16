@@ -25,7 +25,10 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
+import {
+  makeRetrieveFormEstablishmentFromAggregates,
+  type RetrieveFormEstablishmentFromAggregates,
+} from "./RetrieveFormEstablishmentFromAggregates";
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const adminBuilder = new ConnectedUserBuilder()
@@ -87,9 +90,9 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    useCase = new RetrieveFormEstablishmentFromAggregates(
-      new InMemoryUowPerformer(uow),
-    );
+    useCase = makeRetrieveFormEstablishmentFromAggregates({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
 
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
@@ -103,13 +106,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   });
 
   describe("Wrong paths", () => {
-    it("throws an error if there is no jwt", async () => {
-      await expectPromiseToFailWithError(
-        useCase.execute(siret),
-        errors.user.noJwtProvided(),
-      );
-    });
-
     it("throws an error if there is no establishment with this siret", async () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
