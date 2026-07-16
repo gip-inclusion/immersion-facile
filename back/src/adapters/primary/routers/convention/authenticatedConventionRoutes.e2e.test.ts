@@ -18,6 +18,7 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
+  makeEmptyLastReminders,
   type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -381,6 +382,7 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -388,6 +390,7 @@ describe("authenticatedConventionRoutes", () => {
         ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -442,6 +445,7 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -528,6 +532,7 @@ describe("authenticatedConventionRoutes", () => {
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -535,6 +540,7 @@ describe("authenticatedConventionRoutes", () => {
         ...conventionWithoutAssessment,
         ...agencyFields,
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 

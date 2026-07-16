@@ -56,6 +56,7 @@ import {
   makeConventionPresentationSchemaWithNormalizedInput,
   makeConventionTemplatePresentationFromConventionTemplate,
   makeEmptyConventionInitialValues,
+  makeEmptyLastReminders,
   makeListAgencyOptionsKindFilter,
   remoteWorkModeLabels,
   remoteWorkModes,
@@ -454,6 +455,7 @@ const ConventionFormContent = ({
       agencyContactEmail: "",
       agencyValidationSteps: "validator-only",
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
     dispatch(

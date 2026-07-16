@@ -2,6 +2,7 @@ import {
   ConventionDtoBuilder,
   type ConventionReadDto,
   type ConventionStatus,
+  makeEmptyLastReminders,
   type Role,
 } from "shared";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
@@ -15,6 +16,7 @@ const convention: ConventionReadDto = {
   agencyName: "Agence de cap emploi",
   agencyDepartment: "75",
   assessment: null,
+  lastReminders: makeEmptyLastReminders(),
   isEstablishmentBanned: false,
 };
 

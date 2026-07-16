@@ -23,6 +23,7 @@ import {
   type FindSimilarConventionsParams,
   type FlatGetConventionsForAgencyUserParams,
   type MarkPartnersErroredConventionAsHandledRequest,
+  makeEmptyLastReminders,
   type PaginationQueryParams,
   type RenewConventionParams,
   type SaveConventionDraftDto,
@@ -262,6 +263,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencySiret: "22220000222200",
       agencyValidationSteps: "validator-only",
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
   }

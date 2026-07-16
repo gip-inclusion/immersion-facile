@@ -13,6 +13,7 @@ import {
   establishmentsRoles,
   expectPromiseToFailWithError,
   expectToEqual,
+  makeEmptyLastReminders,
   type Role,
   type User,
 } from "shared";
@@ -462,6 +463,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         );
@@ -490,6 +492,7 @@ describe("Get Convention", () => {
                 signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           );
@@ -512,6 +515,7 @@ describe("Get Convention", () => {
               agencySiret: agency.agencySiret,
               agencyValidationSteps: "validator-only",
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           );
@@ -561,6 +565,7 @@ describe("Get Convention", () => {
                 signedAt: assessment.signedAt,
                 createdAt: assessment.createdAt,
               },
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             },
           );
@@ -589,6 +594,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         );
@@ -653,6 +659,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         );
@@ -714,6 +721,7 @@ describe("Get Convention", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         );
@@ -738,6 +746,7 @@ describe("Get Convention", () => {
             agencySiret: agency.agencySiret,
             agencyValidationSteps: "counsellor-and-validator",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         );
@@ -769,6 +778,7 @@ describe("Get Convention", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         });
       });
@@ -797,6 +807,7 @@ describe("Get Convention", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         });
       });

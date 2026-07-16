@@ -24,6 +24,7 @@ import {
   isConventionEndingInOneDayOrMore,
   isFunctionalBroadcastFeedbackError,
   isUnvalidatedConventionStatus,
+  makeEmptyLastReminders,
   NotFoundError,
   type PaginationQueryParams,
   type SiretDto,
@@ -367,6 +368,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           }
         : undefined,
       ...assesmentEntityToConventionAssessmentFields(assessment),
+      lastReminders: makeEmptyLastReminders(),
       ...withBannedEstablishmentInformations,
     };
   };
