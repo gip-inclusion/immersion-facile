@@ -31,10 +31,10 @@ export const getDiscussionDisplayStatus = ({
           ? "needs-urgent-answer"
           : "new";
 
-      if (lastExchange.sender === viewer) return "answered";
-
       if (count === 1 && !isNowUrgent({ now, from: lastExchange.sentAt }))
         return "new";
+
+      if (lastExchange.sender === viewer) return "answered";
 
       if (isNowUrgent({ now, from: lastExchange.sentAt }))
         return "needs-urgent-answer";

@@ -97,6 +97,23 @@ describe("Discussions", () => {
       },
       {
         message:
+          "candidate has sent the first message without being answered since 14 days",
+        viewer: "potentialBeneficiary",
+        expectedDisplayStatus: "new",
+        discussion: new DiscussionBuilder()
+          .withStatus({ status: "PENDING" })
+          .withExchanges([
+            createExchange({
+              sentAt: subDays(now, 14),
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
+            }),
+          ])
+          .buildRead(),
+      },
+      {
+        message:
           "candidate has sent the last message without being answered (but it is not the first message)",
         viewer: "establishment",
         expectedDisplayStatus: "needs-answer",
