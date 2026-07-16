@@ -1,10 +1,13 @@
 import { delay, type Observable, of } from "rxjs";
 import {
+  type AdditionalEstablishmentInformation,
   type ConnectedUserJwt,
   type DataWithPagination,
   DiscussionBuilder,
+  type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
+  defaultAddress,
   type EstablishmentNameAndAdmins,
   type EstablishmentPublicOption,
   type Exchange,
@@ -112,6 +115,30 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     _payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined> {
     return of(new DiscussionBuilder().buildRead()).pipe(delay(this.delay));
+  }
+
+  getAdditionalEstablishmentInformation$(
+    _discussionId: DiscussionId,
+    _jwt: ConnectedUserJwt,
+  ): Observable<AdditionalEstablishmentInformation> {
+    const establishment = this.establishments[0];
+    const adminRights =
+      establishment?.userRights.filter(
+        (right) => right.role === "establishment-admin",
+      ) ?? [];
+    const mainContactRight =
+      adminRights.find((right) => right.isMainContactByPhone) ?? adminRights[0];
+    return of({
+      siret: establishment?.siret ?? "00000000000000",
+      potentialBeneficiaryWelcomeAddress:
+        establishment?.potentialBeneficiaryWelcomeAddress ??
+        defaultAddress.addressAndPosition,
+      mainContact: {
+        firstName: mainContactRight.firstName ?? "Prénom",
+        lastName: mainContactRight.lastName ?? "Nom",
+        phone: mainContactRight.phone,
+      },
+    }).pipe(delay(this.delay));
   }
 
   public updateDiscussionStatus$(
