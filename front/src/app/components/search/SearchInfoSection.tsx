@@ -13,8 +13,8 @@ export const SearchInfoSection = () => (
   >
     <div className={fr.cx("fr-col-lg-8", "fr-col-12", "fr-pr-4w")}>
       <h2>
-        Expliquez votre projet dans votre candidature : vous augmentez vos
-        chances d’avoir un retour.
+        Le saviez-vous ? La majorité des candidats obtiennent une réponse après
+        4 candidatures à des offres différentes. Ne vous découragez pas !
       </h2>
       <p>
         Les entreprises ne répondent pas à 100% des sollicitations, cela n’a
