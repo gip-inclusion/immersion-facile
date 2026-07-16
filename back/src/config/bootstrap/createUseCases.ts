@@ -173,7 +173,7 @@ import { makeNotifyEstablishmentAdminsThatUserRightIsPending } from "../../domai
 import { makeNotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { makeNotifyThatEstablishmentIsBanned } from "../../domains/establishment/use-cases/notifications/NotifyThatEstablishmentIsBanned";
 import { makeRegisterUserOnEstablishment } from "../../domains/establishment/use-cases/RegisterUserOnEstablishment";
-import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
+import { makeRetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { makeUpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
@@ -322,9 +322,6 @@ export const createUseCases = ({
       getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
         uowPerformer,
       ),
-
-      retrieveFormEstablishmentFromAggregates:
-        new RetrieveFormEstablishmentFromAggregates(uowPerformer),
 
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
@@ -654,6 +651,8 @@ export const createUseCases = ({
           siret,
         ),
       )({ uowPerformer }),
+    retrieveFormEstablishmentFromAggregates:
+      makeRetrieveFormEstablishmentFromAggregates({ uowPerformer }),
 
     getImmersionFacileAgencyIdByKind: useCaseBuilder(
       "GetImmersionFacileAgencyIdByKind",

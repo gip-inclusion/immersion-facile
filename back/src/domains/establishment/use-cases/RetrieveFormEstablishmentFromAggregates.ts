@@ -1,44 +1,40 @@
 import {
   addressDtoToString,
   type ConnectedUserDomainJwtPayload,
-  type ConnectedUserJwtPayload,
   errors,
   type FormEstablishmentDto,
   type FormEstablishmentUserRight,
   populatePropIfDefined,
-  type SiretDto,
   siretSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
 
-export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
-  SiretDto,
-  FormEstablishmentDto,
-  ConnectedUserDomainJwtPayload
-> {
-  protected inputSchema = siretSchema;
+export type RetrieveFormEstablishmentFromAggregates = ReturnType<
+  typeof makeRetrieveFormEstablishmentFromAggregates
+>;
 
-  protected async _execute(
-    siret: SiretDto,
-    uow: UnitOfWork,
-    jwtPayload?: ConnectedUserJwtPayload,
-  ) {
-    if (!jwtPayload) throw errors.user.noJwtProvided();
-
+export const makeRetrieveFormEstablishmentFromAggregates = useCaseBuilder(
+  "RetrieveFormEstablishmentFromAggregates",
+)
+  .withInput(siretSchema)
+  .withOutput<FormEstablishmentDto>()
+  .withCurrentUser<ConnectedUserDomainJwtPayload>()
+  .build(async ({ inputParams, uow, currentUser: jwtPayload }) => {
     const currentUser = await uow.userRepository.getById(jwtPayload.userId);
     if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-        siret,
+        inputParams,
       );
 
-    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
+    if (!establishmentAggregate)
+      throw errors.establishment.notFound({ siret: inputParams });
 
     if (
       establishmentAggregate.userRights.some(
@@ -47,16 +43,17 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       ) ||
       currentUser.isBackofficeAdmin
     )
-      return this.#makeFormEstablishement(uow, establishmentAggregate);
+      return makeFormEstablishement(uow, establishmentAggregate);
 
     throw errors.user.unauthorized();
-  }
+  });
 
-  async #makeFormEstablishement(
-    uow: UnitOfWork,
-    establishmentAggregate: EstablishmentAggregate,
-  ): Promise<FormEstablishmentDto> {
-    return {
+const makeFormEstablishement = async (
+  uow: UnitOfWork,
+  establishmentAggregate: EstablishmentAggregate,
+): Promise<FormEstablishmentDto> =>
+  makeFormUserRights(uow, establishmentAggregate.userRights).then(
+    (userRights) => ({
       siret: establishmentAggregate.establishment.siret,
       source: "immersion-facile",
       website: establishmentAggregate.establishment.website,
@@ -78,10 +75,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       offers: establishmentAggregate.offers.map(
         ({ createdAt, ...offer }) => offer,
       ),
-      userRights: await this.#makeFormUserRights(
-        uow,
-        establishmentAggregate.userRights,
-      ),
+      userRights,
       contactMode: establishmentAggregate.establishment.contactMode,
       maxContactsPerMonth:
         establishmentAggregate.establishment.maxContactsPerMonth,
@@ -105,38 +99,50 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
                 .potentialBeneficiaryWelcomeAddress,
           }
         : {}),
-    };
-  }
+    }),
+  );
 
-  async #makeFormUserRights(
-    uow: UnitOfWork,
-    userRights: EstablishmentUserRight[],
-  ): Promise<FormEstablishmentUserRight[]> {
-    const users = await uow.userRepository.getByIds(
-      userRights.map(({ userId }) => userId),
-    );
+const makeFormUserRights = async (
+  uow: UnitOfWork,
+  userRights: EstablishmentUserRight[],
+): Promise<FormEstablishmentUserRight[]> =>
+  uow.userRepository
+    .getByIds(userRights.map(({ userId }) => userId))
+    .then((users) =>
+      userRights.map(
+        ({
+          role,
+          status,
+          userId,
+          job,
+          phone,
+          shouldReceiveDiscussionNotifications,
+          isMainContactByPhone,
+          isMainContactInPerson,
+        }) => {
+          const user = users.find(({ id }) => id === userId);
+          if (!user) throw errors.user.notFound({ userId });
 
-    return userRights.map(
-      ({
-        role,
-        status,
-        userId,
-        job,
-        phone,
-        shouldReceiveDiscussionNotifications,
-        isMainContactByPhone,
-        isMainContactInPerson,
-      }) => {
-        const user = users.find(({ id }) => id === userId);
-        if (!user) throw errors.user.notFound({ userId });
+          const nameProps = {
+            ...populatePropIfDefined("firstName", user.firstName || undefined),
+            ...populatePropIfDefined("lastName", user.lastName || undefined),
+          };
 
-        const nameProps = {
-          ...populatePropIfDefined("firstName", user.firstName || undefined),
-          ...populatePropIfDefined("lastName", user.lastName || undefined),
-        };
+          if (role === "establishment-admin") {
+            return {
+              role,
+              status,
+              email: user.email,
+              ...nameProps,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications,
+              isMainContactByPhone,
+              isMainContactInPerson,
+            };
+          }
 
-        if (role === "establishment-admin") {
-          return {
+          const baseContact = {
             role,
             status,
             email: user.email,
@@ -144,30 +150,16 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
             job,
             phone,
             shouldReceiveDiscussionNotifications,
-            isMainContactByPhone,
             isMainContactInPerson,
           };
-        }
 
-        const baseContact = {
-          role,
-          status,
-          email: user.email,
-          ...nameProps,
-          job,
-          phone,
-          shouldReceiveDiscussionNotifications,
-          isMainContactInPerson,
-        };
-
-        return phone && isMainContactByPhone !== undefined
-          ? {
-              ...baseContact,
-              isMainContactByPhone,
-              isMainContactInPerson,
-            }
-          : baseContact;
-      },
+          return phone && isMainContactByPhone !== undefined
+            ? {
+                ...baseContact,
+                isMainContactByPhone,
+                isMainContactInPerson,
+              }
+            : baseContact;
+        },
+      ),
     );
-  }
-}
