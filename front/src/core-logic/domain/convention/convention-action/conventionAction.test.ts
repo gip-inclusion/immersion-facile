@@ -5,6 +5,7 @@ import {
   type ConventionReadDto,
   expectObjectsToMatch,
   expectToEqual,
+  makeEmptyLastReminders,
   ScheduleDtoBuilder,
 } from "shared";
 import {
@@ -38,6 +39,7 @@ const convention: ConventionReadDto = {
   ...agencyFields,
   ...new ConventionDtoBuilder().notSigned().build(),
   assessment: null,
+  lastReminders: makeEmptyLastReminders(),
   isEstablishmentBanned: false,
 };
 
@@ -106,6 +108,7 @@ describe("convention action slice", () => {
             .withStatus("CANCELLED")
             .build(),
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         };
 
@@ -208,6 +211,7 @@ describe("convention action slice", () => {
             .withStatus("DEPRECATED")
             .build(),
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         };
 
@@ -309,6 +313,7 @@ describe("convention action slice", () => {
             .withStatus("REJECTED")
             .build(),
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -410,6 +415,7 @@ describe("convention action slice", () => {
             .withStatus("ACCEPTED_BY_VALIDATOR")
             .build(),
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -512,6 +518,7 @@ describe("convention action slice", () => {
             .withStatus("ACCEPTED_BY_COUNSELLOR")
             .build(),
           assessment: null,
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         };
         feedGatewayWithConvention(conventionwithStatusChanged);
@@ -627,6 +634,7 @@ describe("convention action slice", () => {
           .withAgencyId("agency-transferred-id")
           .build(),
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
       feedGatewayWithConvention(conventionWithAgencyChanged);
@@ -735,6 +743,7 @@ describe("convention action slice", () => {
           .withAgencyReferent({ firstname: "jean", lastname: "pierre" })
           .build(),
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -985,6 +994,7 @@ describe("convention action slice", () => {
           .signedByEstablishmentRepresentative(new Date().toISOString())
           .build(),
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 

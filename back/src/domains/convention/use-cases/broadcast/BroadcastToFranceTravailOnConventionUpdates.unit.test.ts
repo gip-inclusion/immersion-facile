@@ -11,6 +11,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   type FeatureFlags,
+  makeEmptyLastReminders,
   reasonableSchedule,
   UserBuilder,
 } from "shared";
@@ -873,6 +874,7 @@ describe("BroadcastToFranceTravailOnConventionUpdates", () => {
           createdAt: assessment.createdAt,
         }
       : null,
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false,
   });
 });

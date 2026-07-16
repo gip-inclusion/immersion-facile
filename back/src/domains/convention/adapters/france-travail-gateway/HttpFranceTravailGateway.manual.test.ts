@@ -5,6 +5,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  makeEmptyLastReminders,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
@@ -50,6 +51,7 @@ const broadcastParams = (): NotifyFranceTravailOnConventionUpdatedParams => {
       agencyValidationSteps: "validator-only",
       agencyRefersTo: undefined,
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
       agencyValidatorEmails: ["email@email.com"],
     },

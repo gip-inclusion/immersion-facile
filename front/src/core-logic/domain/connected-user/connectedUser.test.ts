@@ -13,6 +13,7 @@ import {
   type FederatedIdentity,
   FormEstablishmentDtoBuilder,
   type FormEstablishmentUserRight,
+  makeEmptyLastReminders,
   noAgencyDashboards,
   noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -280,6 +281,7 @@ describe("InclusionConnected", () => {
       agencySiret: "11112222000033",
       agencyValidationSteps: "validator-only",
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
 

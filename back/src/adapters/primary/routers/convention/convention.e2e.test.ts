@@ -23,6 +23,7 @@ import {
   expectToEqual,
   expiredJwtErrorMessage,
   frontRoutes,
+  makeEmptyLastReminders,
   makeRouteAbsoluteUrl,
   type TechnicalRoutes,
   technicalRoutes,
@@ -425,6 +426,7 @@ describe("convention e2e", () => {
             signedAt: null,
             createdAt: new Date("2025-01-01").toISOString(),
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       });
@@ -679,6 +681,7 @@ describe("convention e2e", () => {
             agencyValidationSteps: "validator-only",
             agencyRefersTo: undefined,
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         },

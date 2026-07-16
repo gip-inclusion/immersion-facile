@@ -4,6 +4,7 @@ import {
   type CreateWebhookSubscription,
   conventionReadSchema,
   localization,
+  makeEmptyLastReminders,
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
@@ -101,6 +102,7 @@ const conventionExample: ConventionReadDto = {
     createdAt: new Date("2025-01-01").toISOString(),
   },
   isEstablishmentBanned: false,
+  lastReminders: makeEmptyLastReminders(),
 };
 
 const callbackBodySchema: ZodSchemaWithInputMatchingOutput<ConventionUpdatedSubscriptionCallbackBody> =

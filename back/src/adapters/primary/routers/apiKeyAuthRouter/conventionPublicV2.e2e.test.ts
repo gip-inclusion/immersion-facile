@@ -7,6 +7,7 @@ import {
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
+  makeEmptyLastReminders,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -185,6 +186,7 @@ describe("Convention routes", () => {
             signedAt: assessment.signedAt,
             createdAt: assessment.createdAt,
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
         status: 200,
@@ -282,6 +284,7 @@ describe("Convention routes", () => {
               signedAt: assessment.signedAt,
               createdAt: assessment.createdAt,
             },
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         ],
@@ -315,6 +318,7 @@ describe("Convention routes", () => {
               agencySiret: agency.agencySiret,
               agencyValidationSteps: "validator-only",
               assessment: null,
+              lastReminders: makeEmptyLastReminders(),
               isEstablishmentBanned: false,
             } satisfies ConventionReadDto,
           ],

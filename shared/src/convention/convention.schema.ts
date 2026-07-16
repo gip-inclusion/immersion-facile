@@ -27,7 +27,7 @@ import {
 } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
 import { remoteWorkModeSchema } from "../remoteWorkMode/remoteWorkMode.schema";
-import { allRoles } from "../role/role.dto";
+import { allRoles, allSignatoryRoles } from "../role/role.dto";
 import {
   appellationAndRomeDtoSchema,
   appellationCodeSchema,
@@ -91,6 +91,7 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionInternshipKindSpecific,
+  type ConventionLastReminders,
   type ConventionReadDto,
   type ConventionValidatorInputNames,
   conventionObjectiveOptions,
@@ -580,6 +581,21 @@ export const conventionAssessmentFieldsSchema = z
   ])
   .nullable();
 
+const lastReminderDateByNotificationKindSchema = z.object({
+  email: dateTimeIsoStringSchema.nullable(),
+  sms: dateTimeIsoStringSchema.nullable(),
+});
+
+export const conventionLastRemindersSchema: ZodSchemaWithInputMatchingOutput<ConventionLastReminders> =
+  z.object({
+    conventionSignatures: z.record(
+      z.enum(allSignatoryRoles),
+      lastReminderDateByNotificationKindSchema,
+    ),
+    assessmentCompletion: lastReminderDateByNotificationKindSchema,
+    assessmentSignature: lastReminderDateByNotificationKindSchema,
+  });
+
 export const agencyValidationStepSchema: ZodSchemaWithInputMatchingOutput<AgencyValidationStep> =
   z.enum(agencyValidationSteps);
 
@@ -603,6 +619,7 @@ export const conventionReadSchema: ZodSchemaWithInputMatchingOutput<ConventionRe
           })
           .optional(),
         assessment: conventionAssessmentFieldsSchema,
+        lastReminders: conventionLastRemindersSchema,
       })
       .and(withBannedEstablishmentInformationSchema),
   );
