@@ -1,6 +1,9 @@
 import { ZodError } from "zod";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
-import type { ConventionReadDto } from "../convention/convention.dto";
+import {
+  type ConventionReadDto,
+  makeEmptyLastReminders,
+} from "../convention/convention.dto";
 import { expectToEqual } from "../test.helpers";
 import { type DateRange, withDateRangeSchema } from "../utils/date";
 import type { AssessmentDto } from "./assessment.dto";
@@ -154,6 +157,7 @@ describe("Assessment form schema", () => {
     agencySiret: "77567187800032",
     agencyValidationSteps: "validator-only",
     assessment: null,
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false,
   };
 

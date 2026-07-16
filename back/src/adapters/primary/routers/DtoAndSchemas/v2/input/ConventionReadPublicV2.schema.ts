@@ -2,6 +2,7 @@ import {
   agencyKindSchema,
   agencyValidationSteps,
   assessmentStatuses,
+  conventionLastRemindersSchema,
   conventionSchema,
   dateTimeIsoStringSchema,
   emailSchema,
@@ -46,6 +47,7 @@ export const conventionReadPublicV2Schema: ZodSchemaWithInputMatchingOutput<Conv
             }),
           ])
           .nullable(),
+        lastReminders: conventionLastRemindersSchema,
       }),
     )
     .and(withBannedEstablishmentInformationSchema);

@@ -7,6 +7,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  makeEmptyLastReminders,
   UserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -77,6 +78,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       signedAt: assessment.signedAt,
       createdAt: assessment.createdAt,
     },
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false,
   };
 
@@ -140,6 +142,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
       agencyDepartment: agency.address.departmentCode,
       agencyValidationSteps: "validator-only",
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
 
@@ -206,6 +209,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
             status: "FINISHED",
             createdAt: new Date("2023-03-11").toISOString(),
           },
+          lastReminders: makeEmptyLastReminders(),
           isEstablishmentBanned: false,
         },
       },

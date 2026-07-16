@@ -36,6 +36,7 @@ import {
   type EditConventionWithFinalStatusFormValues,
   type EstablishmentRepresentative,
   type InternshipKind,
+  makeEmptyLastReminders,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 import {
@@ -222,6 +223,7 @@ describe("conventionDtoSchema", () => {
           signedAt: null,
           createdAt: new Date().toISOString(),
         },
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
       expect(() =>
@@ -245,6 +247,7 @@ describe("conventionDtoSchema", () => {
           signedAt: null,
           createdAt: new Date().toISOString(),
         },
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: true,
         establishmentBannishmentJustification:
           "Achète du Coca-Cola au lieu du Breizh-Cola",

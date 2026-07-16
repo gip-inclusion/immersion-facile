@@ -5,6 +5,7 @@ import {
   type ConventionWithUnfinalizedAssessment,
   type DataWithPagination,
   expectToEqual,
+  makeEmptyLastReminders,
 } from "shared";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
@@ -56,6 +57,7 @@ describe("ConnectedUserConventionsToManage", () => {
       ...new ConventionDtoBuilder().build(),
       ...agencyFields,
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
 

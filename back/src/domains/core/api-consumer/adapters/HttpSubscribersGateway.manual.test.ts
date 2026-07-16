@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   type ConventionReadDto,
   expectToEqual,
+  makeEmptyLastReminders,
   type SubscriptionParams,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -27,6 +28,7 @@ describe("HttpSubscribersGateway", () => {
     agencyRefersTo: undefined,
     assessment: null,
     isEstablishmentBanned: false,
+    lastReminders: makeEmptyLastReminders(),
   };
 
   const subscriptionBody: ConventionUpdatedSubscriptionCallbackBody = {
