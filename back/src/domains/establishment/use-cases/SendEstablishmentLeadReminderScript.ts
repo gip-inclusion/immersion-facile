@@ -20,9 +20,8 @@ import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/h
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { makeShortLink } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   type EstablishmentLeadEventKind,
   establishmentLeadEventKind,
@@ -40,52 +39,34 @@ export type EstablishmentLeadReminderParams = {
   beforeDate?: Date;
 };
 
-export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
-  EstablishmentLeadReminderParams,
-  SendEstablishmentLeadReminderOutput
-> {
-  protected inputSchema = z.object({
-    kind: z.enum(establishmentLeadEventKind, {
-      error: localization.invalidEnum,
+export type SendEstablishmentLeadReminderScript = ReturnType<
+  typeof makeSendEstablishmentLeadReminderScript
+>;
+
+type Deps = {
+  saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  createNewEvent: CreateNewEvent;
+  shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  config: AppConfig;
+  generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  timeGateway: TimeGateway;
+};
+
+export const makeSendEstablishmentLeadReminderScript = useCaseBuilder(
+  "SendEstablishmentLeadReminderScript",
+)
+  .withInput(
+    z.object({
+      kind: z.enum(establishmentLeadEventKind, {
+        error: localization.invalidEnum,
+      }),
+      beforeDate: z.date().optional(),
     }),
-    beforeDate: z.date().optional(),
-  });
-
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  readonly #createNewEvent: CreateNewEvent;
-
-  readonly #timeGateway: TimeGateway;
-
-  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-
-  readonly #config: AppConfig;
-
-  readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    createNewEvent: CreateNewEvent,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
-    config: AppConfig,
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
-    timeGateway: TimeGateway,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
-    this.#config = config;
-    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
-    this.#timeGateway = timeGateway;
-  }
-
-  protected async _execute(
-    { kind, beforeDate }: EstablishmentLeadReminderParams,
-    uow: UnitOfWork,
-  ): Promise<SendEstablishmentLeadReminderOutput> {
-    const tenDaysAgo = subDays(this.#timeGateway.now(), 10);
+  )
+  .withOutput<SendEstablishmentLeadReminderOutput>()
+  .withDeps<Deps>()
+  .build(async ({ deps, inputParams: { kind, beforeDate }, uow }) => {
+    const tenDaysAgo = subDays(deps.timeGateway.now(), 10);
     const conventions =
       await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
         conventionEndDateGreater: tenDaysAgo,
@@ -97,97 +78,108 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
     logger.info({ message: `processing ${conventions.length} conventions` });
 
     const errors: Record<ConventionId, Error> = {};
-    await executeInSequence(conventions, async (convention) => {
-      await this.#sendOneEmailWithEstablishmentLeadReminder(
+
+    await executeInSequence(conventions, async (convention) =>
+      sendOneEmailWithEstablishmentLeadReminder({
         uow,
-        this.#config,
+        deps,
         convention,
-      ).catch((error) => {
+      }).catch((error) => {
         errors[convention.id] = castError(error);
-      });
-    });
+      }),
+    );
 
     return {
       establishmentsReminded: conventions.map(({ siret }) => siret),
       errors,
     };
-  }
+  });
 
-  async #sendOneEmailWithEstablishmentLeadReminder(
-    uow: UnitOfWork,
-    config: AppConfig,
-    convention: ConventionDto,
-  ) {
-    const now = this.#timeGateway.now();
+const sendOneEmailWithEstablishmentLeadReminder = async ({
+  uow,
+  convention,
+  deps: {
+    config,
+    generateConventionMagicLinkUrl,
+    createNewEvent,
+    saveNotificationAndRelatedEvent,
+    shortLinkIdGeneratorGateway,
+    timeGateway,
+  },
+}: {
+  uow: UnitOfWork;
+  deps: Deps;
+  convention: ConventionDto;
+}): Promise<void> => {
+  const now = timeGateway.now();
 
-    const registerEstablishmentShortLink = await makeShortLink({
-      uow,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      config: this.#config,
-      longLink: generateAddEstablishmentFormLink({
-        config,
-        convention,
-        acquisitionCampaign: "transactionnel-etablissement-rappel-inscription",
-      }),
-    });
+  const registerEstablishmentShortLink = await makeShortLink({
+    uow,
+    shortLinkIdGeneratorGateway,
+    config,
+    longLink: generateAddEstablishmentFormLink({
+      config,
+      convention,
+      acquisitionCampaign: "transactionnel-etablissement-rappel-inscription",
+    }),
+  });
 
-    const unsubscribeToEmailShortLink = await makeShortLink({
-      uow,
-      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-      config: this.#config,
-      longLink: this.#generateConventionMagicLinkUrl({
-        id: convention.id,
-        email: convention.signatories.establishmentRepresentative.email,
-        role: "establishment-representative",
-        targetRoute: "unregisterEstablishmentLead",
-        now,
-      }),
-    });
+  const unsubscribeToEmailShortLink = await makeShortLink({
+    uow,
+    shortLinkIdGeneratorGateway,
+    config,
+    longLink: generateConventionMagicLinkUrl({
+      id: convention.id,
+      email: convention.signatories.establishmentRepresentative.email,
+      role: "establishment-representative",
+      targetRoute: "unregisterEstablishmentLead",
+      now,
+    }),
+  });
 
-    const notification = await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "ESTABLISHMENT_LEAD_REMINDER",
-        recipients: [convention.signatories.establishmentRepresentative.email],
-        sender: immersionFacileNoReplyEmailSender,
-        params: {
-          businessName: convention.businessName,
-          registerEstablishmentShortLink,
-          unsubscribeToEmailShortLink,
+  const notification = await saveNotificationAndRelatedEvent(uow, {
+    kind: "email",
+    templatedContent: {
+      kind: "ESTABLISHMENT_LEAD_REMINDER",
+      recipients: [convention.signatories.establishmentRepresentative.email],
+      sender: immersionFacileNoReplyEmailSender,
+      params: {
+        businessName: convention.businessName,
+        registerEstablishmentShortLink,
+        unsubscribeToEmailShortLink,
+      },
+    },
+    followedIds: {
+      conventionId: convention.id,
+      establishmentSiret: convention.siret,
+    },
+  });
+
+  const establishmentLead = await uow.establishmentLeadRepository.getBySiret(
+    convention.siret,
+  );
+
+  if (establishmentLead) {
+    await uow.establishmentLeadRepository.save({
+      ...establishmentLead,
+      events: [
+        ...establishmentLead.events,
+        {
+          kind: "reminder-sent",
+          occurredAt: now,
+          notification: { kind: notification.kind, id: notification.id },
         },
-      },
-      followedIds: {
-        conventionId: convention.id,
-        establishmentSiret: convention.siret,
-      },
+      ],
     });
-
-    const establishmentLead = await uow.establishmentLeadRepository.getBySiret(
-      convention.siret,
-    );
-
-    if (establishmentLead) {
-      await uow.establishmentLeadRepository.save({
-        ...establishmentLead,
-        events: [
-          ...establishmentLead.events,
-          {
-            kind: "reminder-sent",
-            occurredAt: now,
-            notification: { kind: notification.kind, id: notification.id },
-          },
-        ],
-      });
-    }
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "EstablishmentLeadReminderSent",
-        payload: { id: convention.id },
-      }),
-    );
   }
-}
+
+  await uow.outboxRepository.save(
+    createNewEvent({
+      topic: "EstablishmentLeadReminderSent",
+      payload: { id: convention.id },
+    }),
+  );
+};
 
 const generateAddEstablishmentFormLink = ({
   config,

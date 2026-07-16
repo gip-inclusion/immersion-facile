@@ -1,4 +1,3 @@
-import "./instrumentSentryCron";
 import { subDays } from "date-fns";
 import { keys } from "ramda";
 import type { SiretDto } from "shared";
@@ -13,11 +12,12 @@ import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeG
 import { createDbRelatedSystems } from "../domains/core/unit-of-work/adapters/createDbRelatedSystems";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
+  makeSendEstablishmentLeadReminderScript,
   type SendEstablishmentLeadReminderOutput,
-  SendEstablishmentLeadReminderScript,
 } from "../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
+import "./instrumentSentryCron";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -42,18 +42,23 @@ const establishmentLeadReminders = async () => {
   const shortLinkIdGeneratorGateway = new NanoIdShortLinkIdGeneratorGateway();
 
   const sendEstablishmentLeadReminderScript =
-    new SendEstablishmentLeadReminderScript(
+    makeSendEstablishmentLeadReminderScript({
       uowPerformer,
-      saveNotificationAndRelatedEvent,
-      makeCreateNewEvent({
+      deps: {
+        config,
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator: new UuidV4Generator(),
+        }),
+        generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
+          config,
+          generateConventionJwt,
+        ),
+        saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway,
         timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-      shortLinkIdGeneratorGateway,
-      config,
-      makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
-      timeGateway,
-    );
+      },
+    });
 
   const firstReminderResult = await sendEstablishmentLeadReminderScript.execute(
     { kind: "to-be-reminded" },

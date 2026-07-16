@@ -24,7 +24,10 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { SendEstablishmentLeadReminderScript } from "./SendEstablishmentLeadReminderScript";
+import {
+  makeSendEstablishmentLeadReminderScript,
+  type SendEstablishmentLeadReminderScript,
+} from "./SendEstablishmentLeadReminderScript";
 
 const now = new Date("2021-05-15T08:00:00.000Z");
 const establishmentLeadAccepted: EstablishmentLead = {
@@ -127,18 +130,23 @@ describe("SendEstablishmentLeadReminder", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    sendEstablishmentLeadReminder = new SendEstablishmentLeadReminderScript(
-      new InMemoryUowPerformer(uow),
-      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      makeCreateNewEvent({
+    sendEstablishmentLeadReminder = makeSendEstablishmentLeadReminderScript({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        config,
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator: new UuidV4Generator(),
+        }),
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        shortLinkIdGeneratorGateway,
         timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-      shortLinkIdGeneratorGateway,
-      config,
-      fakeGenerateMagicLinkUrlFn,
-      timeGateway,
-    );
+      },
+    });
   });
 
   describe("Send first reminder", () => {
