@@ -1,5 +1,6 @@
 import { subDays } from "date-fns";
 import {
+  type Beneficiary,
   type ConventionDraftDto,
   errors,
   expectObjectInArrayToMatch,
@@ -150,6 +151,56 @@ describe("SaveConventionDraft", () => {
           details: messageContent,
           recipientEmail: null,
         },
+      },
+    ]);
+  });
+
+  it("save draft without FT Connect infos", async () => {
+    const beneficiaryBasicInfos: Beneficiary<"immersion"> = {
+      role: "beneficiary",
+      firstName: "Billy",
+      lastName: "Idol",
+      birthdate: new Date().toISOString(),
+      email: "mail@mail.com",
+      phone: "+33600000000",
+    };
+
+    const conventionDraftWithFtConnectInfos: ConventionDraftDto = {
+      id: uuid(),
+      internshipKind,
+      signatories: {
+        beneficiary: {
+          ...beneficiaryBasicInfos,
+          federatedIdentity: {
+            payload: {
+              advisor: {
+                email: "conseiller@mail.com",
+                firstName: "Jean",
+                lastName: "Conseiller",
+                type: "PLACEMENT",
+              },
+            },
+            provider: "peConnect",
+            token: "token",
+          },
+        },
+      },
+    };
+
+    await usecase.execute({
+      conventionDraft: conventionDraftWithFtConnectInfos,
+      senderEmail: email,
+      details: messageContent,
+    });
+
+    expectToEqual(uow.conventionDraftRepository.conventionDrafts, [
+      {
+        ...conventionDraftWithFtConnectInfos,
+        signatories: {
+          ...conventionDraftWithFtConnectInfos.signatories,
+          beneficiary: beneficiaryBasicInfos,
+        },
+        updatedAt: timeGateway.now().toISOString(),
       },
     ]);
   });
