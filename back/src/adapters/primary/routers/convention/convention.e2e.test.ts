@@ -4,6 +4,7 @@ import {
   type AddConventionInput,
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
+  CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
   ConnectedUserBuilder,
   type ConnectedUserJwtPayload,
   type ConventionDraftId,
@@ -37,7 +38,6 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
 import { v4 as uuid } from "uuid";
 import { createAssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
-import { MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER } from "../../../../domains/convention/use-cases/SendAssessmentSignatureReminder";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type {
   GenerateConnectedUserJwt,
@@ -1250,7 +1250,7 @@ describe("convention e2e", () => {
           message: errors.assessment.assessmentLinkAlreadySent({
             notificationKind: "email",
             minHoursBetweenReminder:
-              MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+              CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
             timeRemaining: "22h00",
           }).message,
         },
