@@ -13,7 +13,7 @@ import {
   fakeProviderConfig,
   InMemoryProConnectOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { InitiateLoginByOAuth } from "./InitiateLoginByOAuth";
+import { makeInitiateLoginByOAuth } from "./InitiateLoginByOAuth";
 
 describe("InitiateLoginByOAuth usecase", () => {
   describe.each(
@@ -26,14 +26,16 @@ describe("InitiateLoginByOAuth usecase", () => {
       const nonce = "my-nonce";
       const uow = createInMemoryUow();
       const uuidGenerator = new TestUuidGenerator();
-      const useCase = new InitiateLoginByOAuth(
-        new InMemoryUowPerformer(uow),
-        uuidGenerator,
-        {
-          proConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
-          peConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+      const useCase = makeInitiateLoginByOAuth({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          uuidGenerator,
+          oAuthGateways: {
+            proConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+            peConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+          },
         },
-      );
+      });
 
       uuidGenerator.setNextUuids([nonce, state]);
 
