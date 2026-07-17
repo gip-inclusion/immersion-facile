@@ -42,7 +42,10 @@ import type {
   FTConnectGetAccessTokenPayload,
   ProConnectGetAccessTokenPayload,
 } from "../port/OAuthGateway";
-import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
+import {
+  type AfterOAuthSuccess,
+  makeAfterOAuthSuccess,
+} from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccessRedirection use case", () => {
   const immersionFacileBaseUrl = "http://baseUrl";
@@ -85,19 +88,21 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     timeGateway = new CustomTimeGateway();
     const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
 
-    afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+    afterOAuthSuccessRedirection = makeAfterOAuthSuccess({
       uowPerformer: new InMemoryUowPerformer(uow),
-      createNewEvent: makeCreateNewEvent({
-        timeGateway: timeGateway,
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway: timeGateway,
+          uuidGenerator,
+        }),
+        proConnectOAuthGateway: proConnectOAuthGateway,
+        ftConnectGateway,
         uuidGenerator,
-      }),
-      proConnectOAuthGateway: proConnectOAuthGateway,
-      ftConnectGateway,
-      uuidGenerator,
-      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
-      verifyEmailAuthCodeJwt: verifyEmailAuthCode,
-      immersionFacileBaseUrl,
-      timeGateway,
+        generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+        verifyEmailAuthCodeJwt: verifyEmailAuthCode,
+        immersionFacileBaseUrl,
+        timeGateway,
+      },
     });
   });
 
@@ -818,19 +823,21 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         const verifyEmailAuthCode =
           makeVerifyJwtES256<"emailAuthCode">(otherPrivateKey);
 
-        afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+        afterOAuthSuccessRedirection = makeAfterOAuthSuccess({
           uowPerformer: new InMemoryUowPerformer(uow),
-          createNewEvent: makeCreateNewEvent({
-            timeGateway: timeGateway,
+          deps: {
+            createNewEvent: makeCreateNewEvent({
+              timeGateway: timeGateway,
+              uuidGenerator,
+            }),
+            proConnectOAuthGateway: proConnectOAuthGateway,
+            ftConnectGateway,
             uuidGenerator,
-          }),
-          proConnectOAuthGateway: proConnectOAuthGateway,
-          ftConnectGateway,
-          uuidGenerator,
-          generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
-          verifyEmailAuthCodeJwt: verifyEmailAuthCode,
-          immersionFacileBaseUrl,
-          timeGateway,
+            generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+            verifyEmailAuthCodeJwt: verifyEmailAuthCode,
+            immersionFacileBaseUrl,
+            timeGateway,
+          },
         });
 
         await expectPromiseToFailWithError(

@@ -22,7 +22,10 @@ import {
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { ProConnectGetAccessTokenPayload } from "../port/OAuthGateway";
-import { AfterOAuthSuccess } from "./AfterOAuthSuccess";
+import {
+  type AfterOAuthSuccess,
+  makeAfterOAuthSuccess,
+} from "./AfterOAuthSuccess";
 
 describe("AfterOAuthSuccess use case", () => {
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
@@ -53,21 +56,23 @@ describe("AfterOAuthSuccess use case", () => {
     );
     ftConnectGateway = new InMemoryFtConnectGateway();
     timeGateway = new CustomTimeGateway();
-    afterOAuthSuccessRedirection = new AfterOAuthSuccess({
+    afterOAuthSuccessRedirection = makeAfterOAuthSuccess({
       uowPerformer: new PgUowPerformer(db, createPgUow),
-      createNewEvent: makeCreateNewEvent({
-        timeGateway,
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+        proConnectOAuthGateway,
+        ftConnectGateway,
         uuidGenerator,
-      }),
-      proConnectOAuthGateway,
-      ftConnectGateway,
-      uuidGenerator,
-      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
-      verifyEmailAuthCodeJwt: makeVerifyJwtES256<"emailAuthCode">(
-        generateES256KeyPair().publicKey,
-      ),
-      immersionFacileBaseUrl: immersionBaseUrl,
-      timeGateway,
+        generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+        verifyEmailAuthCodeJwt: makeVerifyJwtES256<"emailAuthCode">(
+          generateES256KeyPair().publicKey,
+        ),
+        immersionFacileBaseUrl: immersionBaseUrl,
+        timeGateway,
+      },
     });
   });
 
