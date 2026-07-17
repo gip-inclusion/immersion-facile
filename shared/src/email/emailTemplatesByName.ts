@@ -19,6 +19,7 @@ import { titleByRole } from "../role/role.utils";
 import { frontRoutes, makeRouteAbsoluteUrl } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { displayDuration, oneMinuteInSeconds } from "../utils/durations";
+import { joinWithCommasAnd } from "../utils/string";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
@@ -417,6 +418,57 @@ export const emailTemplatesByName =
         },
         subContent: defaultSignature("immersion"),
       }),
+    },
+    AGENCY_REGISTRATION_REQUEST_CONFIRMATION: {
+      niceName:
+        "Espace prescripteur - Prescripteurs - Confirmation Demande Rattachement",
+      tags: [
+        "template:confirmationDemandeRattachement",
+        "theme:espacePrescripteur",
+        "acteur:prescripteur",
+        "role:utilisateurInitiateur",
+      ],
+      createEmailVariables: ({ agencies, immersionBaseUrl }) => {
+        const isPlural = agencies.length > 1;
+        const agenciesList = agencies
+          .map(({ agencyName, adminEmails }) => {
+            const agencyStatus =
+              adminEmails.length > 0
+                ? `demande transmise à : ${joinWithCommasAnd(adminEmails)}`
+                : `aucun administrateur n'a été défini pour cet organisme, veuillez <a href=${immersionFacileHelpdeskRootUrl} target="_blank">contacter le support</a>.`;
+            return `• <strong>${agencyName}</strong> : ${agencyStatus}`;
+          })
+          .join("\n\n");
+
+        return {
+          subject: "Confirmation de votre demande de rattachement",
+          greetings: "Bonjour,",
+          content: `Nous vous confirmons que votre demande de rattachement à ${
+            isPlural ? "de nouveaux organismes" : "un nouvel organisme"
+          } a bien été enregistrée.
+
+        Votre demande va être étudiée prochainement par les administrateurs concernés.
+
+        <strong>Pour votre information, voici les personnes en charge de valider vos accès :</strong>
+
+        ${agenciesList}
+
+        Vous recevrez un e-mail dès qu'une décision sera prise pour ${
+          isPlural ? "chacune de vos demandes" : "votre demande"
+        }.`,
+          buttons: [
+            {
+              label: isPlural ? "Suivre mes demandes" : "Suivre ma demande",
+              url: makeRouteAbsoluteUrl({
+                route: frontRoutes.myAccountAgencies(),
+                baseUrl: immersionBaseUrl,
+              }),
+            },
+          ],
+          subContent: `Pour toute question n'hésitez pas à nous contacter via le <a href=${immersionFacileHelpdeskRootUrl} target="_blank">support d’Immersion Facilitée</a>.
+        ${defaultSignature("immersion")}`,
+        };
+      },
     },
     AGENCY_WAS_ACTIVATED: {
       niceName: "Espace prescripteur - Admin agence - Agence activée",
