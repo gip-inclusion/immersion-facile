@@ -246,7 +246,9 @@ const getUseCasesByTopics = (
   AgencyActivated: [useCases.sendEmailsWhenAgencyIsActivated],
   AgencyUpdated: [useCases.updateAgencyReferringToUpdatedAgency],
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
-  AgencyRegisteredToConnectedUser: [],
+  AgencyRegisteredToConnectedUser: [
+    useCases.notifyUserThatAgencyRegistrationRequestWasReceived,
+  ],
   AgencyHasBeenPutOnHold: [useCases.notifyAgencyHasBeenPutOnHold],
   DelegationConventionReminderRequired: [
     useCases.notifyDelegationConventionReminder,
