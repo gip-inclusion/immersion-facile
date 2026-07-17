@@ -162,6 +162,8 @@ export const getDaysBetween = (from: Date, to: Date) =>
     convertLocaleDateToUtcTimezoneDate(from),
   );
 
+export const CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS = 24;
+
 export const isWithinHoursCooldown = ({
   lastActionAt,
   minHours,

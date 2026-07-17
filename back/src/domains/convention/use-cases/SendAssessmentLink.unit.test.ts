@@ -2,6 +2,7 @@ import { addDays, subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyRole,
+  CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
   ConnectedUserBuilder,
   type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
@@ -34,7 +35,6 @@ import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryU
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import {
-  MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
   makeSendAssessmentLink,
   type SendAssessmentLink,
 } from "./SendAssessmentLink";
@@ -420,7 +420,7 @@ describe("SendAssessmentLink", () => {
         );
       });
 
-      it(`throws too many requests if there was already a assessment link sent less than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours before`, async () => {
+      it(`throws too many requests if there was already a assessment link sent less than ${CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS} hours before`, async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [notConnectedUser.id]: {
@@ -460,13 +460,14 @@ describe("SendAssessmentLink", () => {
           ),
           errors.assessment.assessmentLinkAlreadySent({
             notificationKind: "sms",
-            minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+            minHoursBetweenReminder:
+              CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
             timeRemaining: "22h00",
           }),
         );
       });
 
-      it(`throws too many requests if there was already an assessment email sent less than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours before`, async () => {
+      it(`throws too many requests if there was already an assessment email sent less than ${CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS} hours before`, async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [notConnectedUser.id]: {
@@ -518,7 +519,8 @@ describe("SendAssessmentLink", () => {
           ),
           errors.assessment.assessmentLinkAlreadySent({
             notificationKind: "email",
-            minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+            minHoursBetweenReminder:
+              CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
             timeRemaining: "22h00",
           }),
         );
@@ -813,7 +815,7 @@ describe("SendAssessmentLink", () => {
       ]);
     });
 
-    it(`send signature link if last signature link was sent more than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours ago`, async () => {
+    it(`send signature link if last signature link was sent more than ${CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS} hours ago`, async () => {
       const pastSmsNotification: Notification = {
         id: "past-notification-id",
         createdAt: subDays(timeGateway.now(), 2).toISOString(),
