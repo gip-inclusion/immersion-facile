@@ -123,7 +123,7 @@ import {
   makeSaveNotificationsBatchAndRelatedEvent,
 } from "../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
-import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
+import { makeSendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
 import { makeAppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
@@ -278,10 +278,6 @@ export const createUseCases = ({
         gateways.timeGateway,
         createNewEvent,
       ),
-      sendNotificationsInBatch: new SendNotificationInBatch(
-        uowPerformer,
-        gateways.notification,
-      ),
 
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
@@ -297,6 +293,13 @@ export const createUseCases = ({
 
       // agencies
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
+    }),
+
+    sendNotificationsInBatch: makeSendNotificationInBatch({
+      uowPerformer,
+      deps: {
+        notificationGateway: gateways.notification,
+      },
     }),
 
     markPartnersErroredConventionAsHandled:
