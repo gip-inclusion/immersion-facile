@@ -28,7 +28,10 @@ import {
   sendSmsError400PhoneNumber,
   sendSmsError555PhoneNumber,
 } from "../adapters/InMemoryNotificationGateway";
-import { SendNotification } from "./SendNotification";
+import {
+  makeSendNotification,
+  type SendNotification,
+} from "./SendNotification";
 
 const someDate = new Date("2023-01-01").toISOString();
 
@@ -42,21 +45,22 @@ describe("SendNotification UseCase", () => {
   beforeEach(() => {
     notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
-    const uowPerformer = new InMemoryUowPerformer(uow);
-    const uuidGenerator = new TestUuidGenerator();
+
     const timeGateway = new CustomTimeGateway();
     timeGateway.setNextDate(now);
 
     createNewEvent = makeCreateNewEvent({
       timeGateway: timeGateway,
-      uuidGenerator: uuidGenerator,
+      uuidGenerator: new TestUuidGenerator(),
     });
-    sendNotification = new SendNotification(
-      uowPerformer,
-      notificationGateway,
-      timeGateway,
-      createNewEvent,
-    );
+    sendNotification = makeSendNotification({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        notificationGateway,
+        timeGateway,
+        createNewEvent,
+      },
+    });
   });
 
   describe("Wrong paths", () => {
