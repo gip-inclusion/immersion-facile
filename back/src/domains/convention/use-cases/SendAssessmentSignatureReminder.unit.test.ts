@@ -5,6 +5,7 @@ import {
   type AssessmentDto,
   type AssessmentSignatureReminderAuthorizedRole,
   assessmentSignatureReminderAuthorizedRoles,
+  CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
   type ConventionRelatedJwtPayload,
@@ -35,7 +36,6 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { createAssessmentEntity } from "../entities/AssessmentEntity";
 import {
-  MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
   makeSendAssessmentSignatureReminder,
   type SendAssessmentSignatureReminder,
 } from "./SendAssessmentSignatureReminder";
@@ -300,8 +300,7 @@ describe("SendAssessmentSignatureReminder", () => {
       ),
       errors.assessment.assessmentLinkAlreadySent({
         notificationKind: "email",
-        minHoursBetweenReminder:
-          MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+        minHoursBetweenReminder: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
         timeRemaining: "22h00",
       }),
     );
@@ -335,8 +334,7 @@ describe("SendAssessmentSignatureReminder", () => {
       ),
       errors.assessment.assessmentLinkAlreadySent({
         notificationKind: "sms",
-        minHoursBetweenReminder:
-          MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+        minHoursBetweenReminder: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
         timeRemaining: "22h00",
       }),
     );
