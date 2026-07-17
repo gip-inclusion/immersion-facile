@@ -290,15 +290,18 @@ export const ConventionValidation = ({
       />
 
       <SendSignatureLinkModalWrapper
+        convention={convention}
         signatory={signatoryToSendSignatureLink ?? undefined}
         onConfirm={onSubmitSendSignatureLink}
       />
       <SendAssessmentLinkModalWrapper
+        convention={convention}
         phone={convention.establishmentTutor.phone}
         email={convention.establishmentTutor.email}
         onConfirm={onSubmitSendAssessmentLink}
       />
       <SendAssessmentSignatureReminderModalWrapper
+        convention={convention}
         phone={convention.signatories.beneficiary.phone}
         email={convention.signatories.beneficiary.email}
         beneficiaryFirstName={convention.signatories.beneficiary.firstName}

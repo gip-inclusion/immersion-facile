@@ -262,6 +262,7 @@ export const ConventionSignForm = ({
         </FormProvider>
       )}
       <SendSignatureLinkModalWrapper
+        convention={convention}
         signatory={signatoryToSendSignatureLink ?? undefined}
         onConfirm={onSendSignatureLinkSubmit}
       />
