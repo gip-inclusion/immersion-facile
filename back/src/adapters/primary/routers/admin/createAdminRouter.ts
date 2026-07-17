@@ -52,7 +52,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.setFeatureFlag.execute(
           req.body,
-          req.payloads?.currentUser,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
