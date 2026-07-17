@@ -122,7 +122,7 @@ import {
   makeSaveNotificationAndRelatedEvent,
   makeSaveNotificationsBatchAndRelatedEvent,
 } from "../../domains/core/notifications/helpers/Notification";
-import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
+import { makeSendNotification } from "../../domains/core/notifications/useCases/SendNotification";
 import { makeSendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
@@ -273,13 +273,6 @@ export const createUseCases = ({
 
   return {
     ...instantiatedUseCasesFromClasses({
-      sendNotification: new SendNotification(
-        uowPerformer,
-        gateways.notification,
-        gateways.timeGateway,
-        createNewEvent,
-      ),
-
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
@@ -295,7 +288,14 @@ export const createUseCases = ({
       // agencies
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
-
+    sendNotification: makeSendNotification({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        notificationGateway: gateways.notification,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
     sendNotificationsInBatch: makeSendNotificationInBatch({
       uowPerformer,
       deps: {

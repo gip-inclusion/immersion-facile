@@ -1,6 +1,5 @@
 import {
   errors,
-  exhaustiveCheck,
   type Notification,
   type NotificationErrored,
   type ZodSchemaWithInputMatchingOutput,
@@ -9,9 +8,7 @@ import { match, P } from "ts-pattern";
 import { z } from "zod";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../UseCase";
-import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { WithNotificationIdAndKind } from "../helpers/Notification";
 import type { NotificationGateway } from "../ports/NotificationGateway";
 
@@ -21,22 +18,18 @@ const withNotificationIdAndKind: ZodSchemaWithInputMatchingOutput<WithNotificati
     kind: z.union([z.literal("email"), z.literal("sms")]),
   });
 
-export class SendNotification extends TransactionalUseCase<WithNotificationIdAndKind> {
-  protected inputSchema = withNotificationIdAndKind;
+export type SendNotification = ReturnType<typeof makeSendNotification>;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
-    private readonly timeGateway: TimeGateway,
-    private readonly createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-  }
+type Deps = {
+  notificationGateway: NotificationGateway;
+  timeGateway: TimeGateway;
+  createNewEvent: CreateNewEvent;
+};
 
-  protected async _execute(
-    { id, kind }: WithNotificationIdAndKind,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeSendNotification = useCaseBuilder("SendNotification")
+  .withInput(withNotificationIdAndKind)
+  .withDeps<Deps>()
+  .build(async ({ inputParams: { id, kind }, uow, deps }) => {
     const notification = await uow.notificationRepository.getByIdAndKind(
       id,
       kind,
@@ -44,20 +37,23 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     if (!notification) throw errors.notification.notFound({ id, kind });
 
-    const result = await this.#sendNotification(notification);
+    const result = await sendNotification(
+      notification,
+      deps.notificationGateway,
+    );
 
     await match(result)
-      .with({ isOk: true }, async ({ messageIds }) => {
-        await uow.notificationRepository.updateState({
+      .with({ isOk: true }, async ({ messageIds }) =>
+        uow.notificationRepository.updateState({
           notificationId: notification.id,
           notificationKind: notification.kind,
           state: {
             status: "accepted",
-            occurredAt: this.timeGateway.now().toISOString(),
+            occurredAt: deps.timeGateway.now().toISOString(),
             messageIds,
           },
-        });
-      })
+        }),
+      )
       .with(
         { isOk: false, error: { httpStatus: P.number.gte(500) } },
         async ({ error }) => {
@@ -71,7 +67,7 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
       .with({ isOk: false }, async ({ error }) => {
         const notificationState: NotificationErrored = {
           status: "errored",
-          occurredAt: this.timeGateway.now().toISOString(),
+          occurredAt: deps.timeGateway.now().toISOString(),
           httpStatus: error.httpStatus,
           message: error.message,
         };
@@ -87,7 +83,7 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
           notification.state?.status !== "errored"
         ) {
           await uow.outboxRepository.save(
-            this.createNewEvent({
+            deps.createNewEvent({
               topic: "DiscussionExchangeDeliveryFailed",
               payload: {
                 notificationId: notification.id,
@@ -99,25 +95,23 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
         }
       })
       .exhaustive();
-  }
+  });
 
-  #sendNotification(notification: Notification) {
-    switch (notification.kind) {
-      case "email":
-        return this.notificationGateway.sendEmail(
-          notification.templatedContent,
-          notification.id,
-        );
-      case "sms":
-        return this.notificationGateway.sendSms(
-          notification.templatedContent,
-          notification.id,
-        );
-      default:
-        return exhaustiveCheck(notification, {
-          variableName: "notification",
-          throwIfReached: true,
-        });
-    }
-  }
-}
+const sendNotification = async (
+  notification: Notification,
+  notificationGateway: NotificationGateway,
+) =>
+  match(notification)
+    .with({ kind: "email" }, (notification) =>
+      notificationGateway.sendEmail(
+        notification.templatedContent,
+        notification.id,
+      ),
+    )
+    .with({ kind: "sms" }, (notification) =>
+      notificationGateway.sendSms(
+        notification.templatedContent,
+        notification.id,
+      ),
+    )
+    .exhaustive();
