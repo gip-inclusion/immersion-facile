@@ -162,7 +162,7 @@ import { makeGetExternalOffers } from "../../domains/establishment/use-cases/Get
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
 import { makeGetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { makeGetOffers } from "../../domains/establishment/use-cases/GetOffers";
-import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
+import { makeGetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { makeInsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { makeMarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { makeMarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
@@ -318,10 +318,6 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
         createNewEvent,
       }),
-
-      getSearchResultBySearchQuery: new GetSearchResultBySearchQuery(
-        uowPerformer,
-      ),
 
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
@@ -1016,6 +1012,9 @@ export const createUseCases = ({
       deps: {
         laBonneBoiteGateway: gateways.laBonneBoiteGateway,
       },
+      uowPerformer,
+    }),
+    getSearchResultBySearchQuery: makeGetSearchResultBySearchQuery({
       uowPerformer,
     }),
     getAllNafSections: makeGetAllNafSections({
