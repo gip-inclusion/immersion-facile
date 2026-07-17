@@ -10,7 +10,7 @@ import {
   type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
-import { SetFeatureFlag } from "./SetFeatureFlag";
+import { makeSetFeatureFlag, type SetFeatureFlag } from "./SetFeatureFlag";
 
 const setEnableMaintenanceParams = {
   flagName: "enableMaintenance",
@@ -46,14 +46,7 @@ describe("SetFeatureFlag use case", () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
 
-    setFeatureFlag = new SetFeatureFlag(uowPerformer);
-  });
-
-  it("throws Unauthorized if no currentUser is provided", async () => {
-    await expectPromiseToFailWithError(
-      setFeatureFlag.execute(setEnableMaintenanceParams),
-      errors.user.unauthorized(),
-    );
+    setFeatureFlag = makeSetFeatureFlag({ uowPerformer });
   });
 
   it("throws Forbidden if currentUser user is not admin", async () => {

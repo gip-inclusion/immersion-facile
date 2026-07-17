@@ -108,7 +108,7 @@ import type { DashboardGateway } from "../../domains/core/dashboard/port/Dashboa
 import { makeGetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { makeValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
-import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
+import { makeSetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
 import { makeUploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
 import type {
   GenerateApiConsumerJwt,
@@ -283,10 +283,8 @@ export const createUseCases = ({
         immersionFacileBaseUrl: config.immersionFacileBaseUrl,
         timeGateway: gateways.timeGateway,
       }),
-
-      // agencies
-      setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
+    setFeatureFlag: makeSetFeatureFlag({ uowPerformer }),
     sendNotification: makeSendNotification({
       uowPerformer,
       deps: {

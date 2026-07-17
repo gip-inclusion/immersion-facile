@@ -1,25 +1,13 @@
-import {
-  type ConnectedUser,
-  type SetFeatureFlagParam,
-  setFeatureFlagSchema,
-} from "shared";
+import { type ConnectedUser, setFeatureFlagSchema } from "shared";
 import { throwIfNotAdmin } from "../../../connected-users/helpers/authorization.helper";
-import { TransactionalUseCase } from "../../UseCase";
-import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../useCaseBuilder";
 
-export class SetFeatureFlag extends TransactionalUseCase<
-  SetFeatureFlagParam,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = setFeatureFlagSchema;
+export type SetFeatureFlag = ReturnType<typeof makeSetFeatureFlag>;
 
-  public async _execute(
-    params: SetFeatureFlagParam,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ) {
+export const makeSetFeatureFlag = useCaseBuilder("SetFeatureFlag")
+  .withInput(setFeatureFlagSchema)
+  .withCurrentUser<ConnectedUser>()
+  .build(async ({ inputParams, uow, currentUser }) => {
     throwIfNotAdmin(currentUser);
-    await uow.featureFlagRepository.update(params);
-  }
-}
+    await uow.featureFlagRepository.update(inputParams);
+  });
