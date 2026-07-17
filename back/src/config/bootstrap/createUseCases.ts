@@ -100,7 +100,7 @@ import { makeSubscribeToWebhook } from "../../domains/core/api-consumer/use-case
 import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
-import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
+import { makeInitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
 import { makeRenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { makeNotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
@@ -282,14 +282,7 @@ export const createUseCases = ({
         uowPerformer,
         gateways.notification,
       ),
-      initiateLoginByOAuth: new InitiateLoginByOAuth(
-        uowPerformer,
-        uuidGenerator,
-        {
-          proConnect: gateways.proConnectOAuthGateway,
-          peConnect: gateways.ftConnectGateway,
-        },
-      ),
+
       afterOAuthSuccessRedirection: new AfterOAuthSuccess({
         uowPerformer,
         createNewEvent,
@@ -851,6 +844,16 @@ export const createUseCases = ({
         generateEmailAuthCodeUrl,
         saveNotificationAndRelatedEvent,
         createNewEvent,
+      },
+    }),
+    initiateLoginByOAuth: makeInitiateLoginByOAuth({
+      uowPerformer,
+      deps: {
+        oAuthGateways: {
+          proConnect: gateways.proConnectOAuthGateway,
+          peConnect: gateways.ftConnectGateway,
+        },
+        uuidGenerator,
       },
     }),
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({

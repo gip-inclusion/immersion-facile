@@ -1,12 +1,9 @@
 import {
   type AbsoluteUrl,
-  type InitiateLoginByOAuthParams,
   initiateLoginByOAuthParamsSchema,
   type OAuthProviderForLogin,
 } from "shared";
-import { TransactionalUseCase } from "../../../UseCase";
-import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../useCaseBuilder";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 import type { OAuthGateway } from "../port/OAuthGateway";
 
@@ -15,39 +12,32 @@ export type OAuthGatewayByProvider = Record<
   OAuthGateway
 >;
 
-export class InitiateLoginByOAuth extends TransactionalUseCase<
-  InitiateLoginByOAuthParams,
-  AbsoluteUrl
-> {
-  protected inputSchema = initiateLoginByOAuthParamsSchema;
+export type InitiateLoginByOAuth = ReturnType<typeof makeInitiateLoginByOAuth>;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private uuidGenerator: UuidGenerator,
-    private oAuthGateways: OAuthGatewayByProvider,
-  ) {
-    super(uowPerformer);
-  }
+type Deps = {
+  uuidGenerator: UuidGenerator;
+  oAuthGateways: OAuthGatewayByProvider;
+};
 
-  protected async _execute(
-    params: InitiateLoginByOAuthParams,
-    uow: UnitOfWork,
-  ): Promise<AbsoluteUrl> {
-    const nonce = this.uuidGenerator.new();
-    const state = this.uuidGenerator.new();
+export const makeInitiateLoginByOAuth = useCaseBuilder("InitiateLoginByOAuth")
+  .withInput(initiateLoginByOAuthParamsSchema)
+  .withOutput<AbsoluteUrl>()
+  .withDeps<Deps>()
+  .build(async ({ inputParams, uow, deps }) => {
+    const nonce = deps.uuidGenerator.new();
+    const state = deps.uuidGenerator.new();
 
     await uow.ongoingOAuthRepository.save({
-      fromUri: params.redirectUri,
+      fromUri: inputParams.redirectUri,
       nonce,
       state,
-      provider: params.provider,
+      provider: inputParams.provider,
       idToken: null,
       usedAt: null,
     });
 
-    return this.oAuthGateways[params.provider].getLoginUrl({
+    return deps.oAuthGateways[inputParams.provider].getLoginUrl({
       nonce,
       state,
     });
-  }
-}
+  });
