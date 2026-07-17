@@ -3,8 +3,10 @@ import { concatMap, filter, map, switchMap } from "rxjs";
 import type { ConventionReadDto } from "shared";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { editConventionWithFinalStatusSlice } from "src/core-logic/domain/convention/edit-convention-with-final-status/editConventionWithFinalStatus.slice";
+import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -133,6 +135,15 @@ const getConventionEpic: ConventionEpic = (
           action,
         ) ||
         conventionActionSlice.actions.editCounsellorNameSucceeded.match(
+          action,
+        ) ||
+        sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded.match(
+          action,
+        ) ||
+        sendAssessmentLinkSlice.actions.sendAssessmentLinkSucceeded.match(
+          action,
+        ) ||
+        sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderSucceeded.match(
           action,
         ) ||
         assessmentSlice.actions.deleteAssessmentSucceeded.match(action) ||
