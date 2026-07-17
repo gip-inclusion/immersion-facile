@@ -185,9 +185,12 @@ export const formatHoursCooldownTimeRemaining = ({
 }): string => {
   const nextAllowedTime = addHours(lastActionAt, minHours);
   const timeRemainingMs = nextAllowedTime.getTime() - now.getTime();
-  const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
-  const minutesRemaining = Math.ceil(
-    (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
+  const totalMinutesRemaining = Math.max(
+    0,
+    Math.ceil(timeRemainingMs / (1000 * 60)),
   );
+  const hoursRemaining = Math.floor(totalMinutesRemaining / 60);
+  const minutesRemaining = totalMinutesRemaining % 60;
+
   return `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
 };

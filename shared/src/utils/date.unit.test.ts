@@ -77,6 +77,20 @@ describe("Date utils tests - hours cooldown", () => {
       formatHoursCooldownTimeRemaining({ lastActionAt, minHours, now }),
     ).toBe("22h00");
   });
+
+  it("formats 24h00 right after action", () => {
+    expect(
+      formatHoursCooldownTimeRemaining({ lastActionAt: now, minHours, now }),
+    ).toBe("24h00");
+  });
+
+  it("does not format minutes as 60", () => {
+    const lastActionAt = new Date(now.getTime() - 1000);
+
+    expect(
+      formatHoursCooldownTimeRemaining({ lastActionAt, minHours, now }),
+    ).toBe("24h00");
+  });
 });
 
 describe("Date utils tests - makeDateStringSchema", () => {
