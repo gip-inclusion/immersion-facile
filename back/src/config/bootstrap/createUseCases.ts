@@ -1,5 +1,4 @@
 import { addDays, subDays } from "date-fns";
-import { keys } from "ramda";
 import {
   type ConnectedUser,
   type ConventionId,
@@ -134,10 +133,8 @@ import { makeGetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cas
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
-import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
 import type { OutOfTransactionQueries } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
-import type { UseCaseIdentityPayload } from "../../domains/core/useCase.helpers";
 import { useCaseBuilder } from "../../domains/core/useCaseBuilder";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { makeAddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
@@ -271,7 +268,6 @@ export const createUseCases = ({
     });
 
   return {
-    ...instantiatedUseCasesFromClasses({}),
     setFeatureFlag: makeSetFeatureFlag({ uowPerformer }),
     sendNotification: makeSendNotification({
       uowPerformer,
@@ -1312,42 +1308,3 @@ export type InstantiatedUseCase<
   useCaseName: string;
   execute: (param: Input, jwtPayload?: JwtPayload) => Promise<Output>;
 };
-
-const instantiatedUseCaseFromClass = <
-  Input,
-  Output,
-  Payload extends UseCaseIdentityPayload,
->(
-  useCase:
-    | TransactionalUseCase<Input, Output, Payload>
-    | UseCase<Input, Output, Payload>,
-): InstantiatedUseCase<Input, Output, Payload> => ({
-  execute: (p, jwtPayload) => useCase.execute(p, jwtPayload),
-  useCaseName: useCase.constructor.name,
-});
-
-const instantiatedUseCasesFromClasses = <
-  T extends Record<
-    string,
-    TransactionalUseCase<any, any, any> | UseCase<any, any, any>
-  >,
->(
-  useCases: T,
-): {
-  [K in keyof T]: T[K] extends TransactionalUseCase<
-    infer Input,
-    infer Output,
-    infer JwtPayload
-  >
-    ? InstantiatedUseCase<Input, Output, JwtPayload>
-    : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
-      ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
-      : never;
-} =>
-  keys(useCases).reduce(
-    (acc, useCaseKey) => ({
-      ...acc,
-      [useCaseKey]: instantiatedUseCaseFromClass(useCases[useCaseKey]),
-    }),
-    {} as any,
-  );
