@@ -2,74 +2,70 @@ import {
   authFailed,
   type ConventionDto,
   type FtConnectIdentity,
-  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
-import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../../useCaseBuilder";
 
-export class BindConventionToFederatedIdentity extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type BindConventionToFederatedIdentity = ReturnType<
+  typeof makeBindConventionToFederatedIdentity
+>;
 
-  readonly #createNewEvent: CreateNewEvent;
+export const makeBindConventionToFederatedIdentity = useCaseBuilder(
+  "BindConventionToFederatedIdentity",
+)
+  .withInput(withConventionSchema)
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(
+    async ({ inputParams: { convention }, uow, deps: { createNewEvent } }) => {
+      const federatedIdentity =
+        convention.signatories.beneficiary.federatedIdentity;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
+      return federatedIdentity &&
+        federatedIdentity.provider === "peConnect" &&
+        federatedIdentity.token !== authFailed
+        ? associateConventionToFederatedIdentity({
+            convention,
+            federatedIdentity,
+            uow,
+            createNewEvent,
+          })
+        : uow.outboxRepository.save(
+            createNewEvent({
+              topic: "FederatedIdentityNotBoundToConvention",
+              payload: { convention, triggeredBy: null },
+            }),
+          );
+    },
+  );
 
-    this.#createNewEvent = createNewEvent;
-  }
-
-  protected async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const federatedIdentity =
-      convention.signatories.beneficiary.federatedIdentity;
-
-    return federatedIdentity &&
-      federatedIdentity.provider === "peConnect" &&
-      federatedIdentity.token !== authFailed
-      ? this.#associateConventionToFederatedIdentity(
-          convention,
-          federatedIdentity,
-          uow,
-        )
-      : uow.outboxRepository.save(
-          this.#createNewEvent({
-            topic: "FederatedIdentityNotBoundToConvention",
-            payload: { convention, triggeredBy: null },
-          }),
-        );
-  }
-
-  async #associateConventionToFederatedIdentity(
-    convention: ConventionDto,
-    federatedIdentity: FtConnectIdentity,
-    uow: UnitOfWork,
-  ): Promise<void> {
-    try {
-      await uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
-        convention.id,
-        federatedIdentity.token,
-      );
-      await uow.outboxRepository.save(
-        this.#createNewEvent({
+const associateConventionToFederatedIdentity = async ({
+  convention,
+  federatedIdentity,
+  uow,
+  createNewEvent,
+}: {
+  convention: ConventionDto;
+  federatedIdentity: FtConnectIdentity;
+  uow: UnitOfWork;
+  createNewEvent: CreateNewEvent;
+}): Promise<void> =>
+  uow.conventionFranceTravailAdvisorRepository
+    .associateConventionAndUserAdvisor(convention.id, federatedIdentity.token)
+    .then(() =>
+      uow.outboxRepository.save(
+        createNewEvent({
           topic: "FederatedIdentityBoundToConvention",
           payload: { convention, triggeredBy: null },
         }),
-      );
-    } catch (_error) {
-      await uow.outboxRepository.save(
-        this.#createNewEvent({
+      ),
+    )
+    .catch((_) =>
+      uow.outboxRepository.save(
+        createNewEvent({
           topic: "FederatedIdentityNotBoundToConvention",
           payload: { convention, triggeredBy: null },
         }),
-      );
-    }
-  }
-}
+      ),
+    );

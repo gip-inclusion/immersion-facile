@@ -15,7 +15,10 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { InMemoryConventionFranceTravailAdvisorRepository } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
-import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
+import {
+  type BindConventionToFederatedIdentity,
+  makeBindConventionToFederatedIdentity,
+} from "./BindConventionToFederatedIdentity";
 
 describe("AssociateFtConnectFederatedIdentity", () => {
   let associateFtConnectFederatedIdentity: BindConventionToFederatedIdentity;
@@ -36,9 +39,13 @@ describe("AssociateFtConnectFederatedIdentity", () => {
       uuidGenerator,
     });
 
-    associateFtConnectFederatedIdentity = new BindConventionToFederatedIdentity(
-      uowPerformer,
-      createNewEvent,
+    associateFtConnectFederatedIdentity = makeBindConventionToFederatedIdentity(
+      {
+        uowPerformer,
+        deps: {
+          createNewEvent,
+        },
+      },
     );
   });
 
