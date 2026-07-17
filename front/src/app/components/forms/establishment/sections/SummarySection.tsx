@@ -7,7 +7,7 @@ import {
   addressDtoToString,
   type ContactMode,
   domElementIds,
-  type FederatedIdentityWithUser,
+  type FederatedIdentity,
   type FormEstablishmentDto,
   getFormattedFirstnameAndLastname,
   remoteWorkModeLabels,
@@ -188,7 +188,7 @@ const DisplayContactModeValue = ({
   formatedUserName,
 }: {
   contactMode: ContactMode;
-  federatedIdentity: FederatedIdentityWithUser | null;
+  federatedIdentity: FederatedIdentity | null;
   formatedUserName: string;
 }) => {
   const { getValues } = useFormContext<FormEstablishmentDto>();

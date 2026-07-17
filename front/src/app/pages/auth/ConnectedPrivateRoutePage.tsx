@@ -172,7 +172,7 @@ export const ConnectedPrivateRoutePage = ({
     ) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
-          federatedIdentityWithUser: {
+          federatedIdentity: {
             provider,
             token,
             idToken,

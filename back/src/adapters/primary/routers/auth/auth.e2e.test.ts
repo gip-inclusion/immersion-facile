@@ -505,7 +505,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.conventionImmersion}?conventionDraftId=${conventionDraftId}`,
+              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.conventionImmersion}?conventionDraftId=${conventionDraftId}&skipIntro=true`,
             },
           });
 

@@ -7,7 +7,7 @@ const rootAuthSelector = createRootSelector((state) => state.auth);
 
 const currentFederatedIdentity = createSelector(
   rootAuthSelector,
-  (auth) => auth.federatedIdentityWithUser,
+  (auth) => auth.federatedIdentity,
 );
 
 const afterLoginRedirectionUrl = createSelector(

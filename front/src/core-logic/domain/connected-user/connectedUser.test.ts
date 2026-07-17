@@ -10,7 +10,7 @@ import {
   type EstablishmentAdminPrivateData,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
-  type FederatedIdentityWithUser,
+  type FederatedIdentity,
   FormEstablishmentDtoBuilder,
   type FormEstablishmentUserRight,
   noAgencyDashboards,
@@ -74,7 +74,7 @@ describe("InclusionConnected", () => {
     createdAt: new Date().toISOString(),
   };
 
-  const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
+  const inclusionConnectedFederatedIdentity: FederatedIdentity = {
     provider: "proConnect",
     token: "fake-token",
     idToken: "inclusion-connect-id-token",
@@ -90,7 +90,7 @@ describe("InclusionConnected", () => {
       expectCurrentUserToBe(null);
       store.dispatch(
         authSlice.actions.federatedIdentityFoundInDevice({
-          federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+          federatedIdentity: inclusionConnectedFederatedIdentity,
           feedbackTopic: "auth-global",
         }),
       );
@@ -111,7 +111,7 @@ describe("InclusionConnected", () => {
 
       store.dispatch(
         authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded({
-          federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+          federatedIdentity: inclusionConnectedFederatedIdentity,
           feedbackTopic: "auth-global",
         }),
       );
@@ -148,7 +148,7 @@ describe("InclusionConnected", () => {
       ({ store, dependencies } = createTestStore({
         auth: {
           isRequestingLoginByEmail: false,
-          federatedIdentityWithUser: {
+          federatedIdentity: {
             token: "some-existing-token",
             provider: "proConnect",
             idToken: "inclusion-connect-id-token",

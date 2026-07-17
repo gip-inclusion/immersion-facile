@@ -6,7 +6,7 @@ import type {
   ConventionJwt,
   Email,
   EmailAuthCodeJwt,
-  FederatedIdentityWithUser,
+  FederatedIdentity,
   OAuthState,
   ShortLinkId,
   WithRedirectUri,
@@ -32,7 +32,7 @@ export interface AuthState {
   isRequestingLoginByEmail: boolean;
   isRequestingRenewExpiredJwt: boolean;
   requestedEmail: Email | null;
-  federatedIdentityWithUser: FederatedIdentityWithUser | null;
+  federatedIdentity: FederatedIdentity | null;
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
@@ -40,7 +40,7 @@ export const initialAuthState: AuthState = {
   isLoading: true,
   isRequestingLoginByEmail: false,
   isRequestingRenewExpiredJwt: false,
-  federatedIdentityWithUser: null,
+  federatedIdentity: null,
   afterLoginRedirectionUrl: null,
   requestedEmail: null,
 };
@@ -48,11 +48,11 @@ export const initialAuthState: AuthState = {
 const onFederatedIdentityReceived = (
   state: AuthState,
   action: PayloadActionWithFeedbackTopic<{
-    federatedIdentityWithUser: FederatedIdentityWithUser | null;
+    federatedIdentity: FederatedIdentity | null;
   }>,
 ) => {
   state.isLoading = false;
-  state.federatedIdentityWithUser = action.payload.federatedIdentityWithUser;
+  state.federatedIdentity = action.payload.federatedIdentity;
 };
 
 export const authSlice = createSlice({
@@ -88,7 +88,7 @@ export const authSlice = createSlice({
     federatedIdentityFromStoreToDeviceStorageSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
-        federatedIdentityWithUser: FederatedIdentityWithUser;
+        federatedIdentity: FederatedIdentity;
       }>,
     ) => state,
     federatedIdentityNotFoundInDevice: (state) => {
@@ -105,14 +105,14 @@ export const authSlice = createSlice({
       _action: PayloadActionWithFeedbackTopic<{ url: AbsoluteUrl | undefined }>,
     ) => state,
     fetchLogoutUrlFailed: (state, _action: PayloadActionWithFeedbackTopic) => {
-      state.federatedIdentityWithUser = null;
+      state.federatedIdentity = null;
     },
     redirectAfterLogoutSucceeded: (state) => state,
     federatedIdentityInDeviceDeletionSucceeded: (
       state,
       _action: PayloadAction<AbsoluteUrl | undefined>,
     ) => {
-      state.federatedIdentityWithUser = null;
+      state.federatedIdentity = null;
     },
     loginByEmailRequested: (
       state,

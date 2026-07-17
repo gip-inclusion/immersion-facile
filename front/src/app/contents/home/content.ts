@@ -138,7 +138,7 @@ export const heroHeaderNavCards: (
             event.preventDefault();
             storeDispatch(
               authSlice.actions.federatedIdentityProvided({
-                federatedIdentityWithUser: null,
+                federatedIdentity: null,
                 feedbackTopic: "auth-global",
               }),
             );
@@ -177,7 +177,7 @@ export const heroHeaderNavCards: (
             event.preventDefault();
             storeDispatch(
               authSlice.actions.federatedIdentityProvided({
-                federatedIdentityWithUser: null,
+                federatedIdentity: null,
                 feedbackTopic: "auth-global",
               }),
             );

@@ -584,7 +584,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         );
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
 
@@ -646,7 +646,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         ]);
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
 
@@ -712,7 +712,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         ]);
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}`,
+          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
     });

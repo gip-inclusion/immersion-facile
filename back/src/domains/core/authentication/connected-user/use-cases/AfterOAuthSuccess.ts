@@ -290,7 +290,7 @@ export class AfterOAuthSuccess extends TransactionalUseCase<
     return {
       provider: updatedOngoingOAuth.provider,
       redirectUri:
-        `${this.#immersionFacileBaseUrl}${updatedOngoingOAuth.fromUri}?conventionDraftId=${conventionDraft.id}` satisfies AbsoluteUrl,
+        `${this.#immersionFacileBaseUrl}${updatedOngoingOAuth.fromUri}?conventionDraftId=${conventionDraft.id}&skipIntro=true` satisfies AbsoluteUrl,
     };
   }
 
