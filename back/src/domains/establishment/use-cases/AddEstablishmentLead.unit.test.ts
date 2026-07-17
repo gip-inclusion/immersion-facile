@@ -16,7 +16,10 @@ import type { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEs
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { AddEstablishmentLead } from "./AddEstablishmentLead";
+import {
+  type AddEstablishmentLead,
+  makeAddEstablishmentLead,
+} from "./AddEstablishmentLead";
 
 describe("Add EstablishmentLead", () => {
   let uow: InMemoryUnitOfWork;
@@ -28,10 +31,12 @@ describe("Add EstablishmentLead", () => {
     uow = createInMemoryUow();
 
     timeGateway = new CustomTimeGateway();
-    addEstablishmentLead = new AddEstablishmentLead(
-      new InMemoryUowPerformer(uow),
-      timeGateway,
-    );
+    addEstablishmentLead = makeAddEstablishmentLead({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+      },
+    });
     establishmentLeadRepository = uow.establishmentLeadRepository;
   });
 
