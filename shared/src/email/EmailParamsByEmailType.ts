@@ -91,6 +91,13 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
+  AGENCY_REGISTRATION_REQUEST_CONFIRMATION: {
+    immersionBaseUrl: AbsoluteUrl;
+    agencies: {
+      agencyName: string;
+      adminEmails: Email[];
+    }[];
+  };
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;

@@ -250,6 +250,19 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
   },
+  AGENCY_REGISTRATION_REQUEST_CONFIRMATION: {
+    immersionBaseUrl: "https://immersion-facile.beta.gouv.fr",
+    agencies: [
+      {
+        agencyName: "Nom de l'organisme 1",
+        adminEmails: ["admin1@organisme.fr", "admin2@organisme.fr"],
+      },
+      {
+        agencyName: "Nom de l'organisme 2",
+        adminEmails: [],
+      },
+    ],
+  },
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: "ACCOMPANYING_AGENCY_NAME",
     refersToAgencyName: "REFERS_TO_AGENCY_NAME",
