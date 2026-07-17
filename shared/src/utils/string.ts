@@ -5,6 +5,13 @@ import { errors } from "../errors/errors";
 export const capitalize = (str: string): string =>
   str && str.length > 0 ? str[0].toUpperCase() + str.slice(1) : str;
 
+export const joinWithCommasAnd = (items: string[]): string => {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} et ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} et ${items.at(-1)}`;
+};
+
 export const cleanStringToHTMLAttribute = (
   string: string,
   prefix: string | number | null = null,
