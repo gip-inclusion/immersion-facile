@@ -3,9 +3,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../UseCase";
-import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { WithNotificationIdAndKind } from "../helpers/Notification";
 import type { NotificationGateway } from "../ports/NotificationGateway";
 
@@ -20,27 +18,22 @@ const withNotificationIdAndKindArray: ZodSchemaWithInputMatchingOutput<
 
 // Careful, this use case is transactional,
 // but it should only do queries and NEVER write anything to the DB.
-export class SendNotificationInBatch extends TransactionalUseCase<
-  WithNotificationIdAndKind[]
-> {
-  protected inputSchema = withNotificationIdAndKindArray;
 
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
-  ) {
-    super(uowPerformer);
-  }
+export type SendNotificationInBatch = ReturnType<
+  typeof makeSendNotificationInBatch
+>;
 
-  protected async _execute(
-    notificationIdAndKinds: WithNotificationIdAndKind[],
-    uow: UnitOfWork,
-  ): Promise<void> {
-    const emailNotificationIds = notificationIdAndKinds
+export const makeSendNotificationInBatch = useCaseBuilder(
+  "SendNotificationInBatch",
+)
+  .withInput(withNotificationIdAndKindArray)
+  .withDeps<{ notificationGateway: NotificationGateway }>()
+  .build(async ({ inputParams, uow, deps }) => {
+    const emailNotificationIds = inputParams
       .filter(({ kind }) => kind === "email")
       .map(({ id }) => id);
 
-    const smsNotificationIds = notificationIdAndKinds
+    const smsNotificationIds = inputParams
       .filter(({ kind }) => kind === "sms")
       .map(({ id }) => id);
 
@@ -52,19 +45,18 @@ export class SendNotificationInBatch extends TransactionalUseCase<
 
     await Promise.all([
       executeInSequence(smsNotifications, (notification) =>
-        this.notificationGateway
+        deps.notificationGateway
           .sendSms(notification.templatedContent, notification.id)
           .then(() => {
             /* do nothing */
           }),
       ),
       executeInSequence(emailNotifications, (notification) =>
-        this.notificationGateway
+        deps.notificationGateway
           .sendEmail(notification.templatedContent, notification.id)
           .then(() => {
             /* do nothing */
           }),
       ),
     ]);
-  }
-}
+  });
