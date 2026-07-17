@@ -2,14 +2,19 @@ import {
   type AgencyDto,
   type ConventionAssessmentFields,
   type ConventionDto,
+  type ConventionLastReminders,
   type ConventionReadDto,
   type ConventionRole,
   type ConventionStatus,
+  conventionLastRemindersSchema,
   type Email,
   errors,
+  isTruthy,
+  makeEmptyLastReminders,
   type WithBannedEstablishmentInformations,
 } from "shared";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
+import type { NotificationRepository } from "../domains/core/notifications/ports/NotificationRepository";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import type { BannedEstablishment } from "../domains/establishment/ports/BannedEstablishmentRepository";
 import {
@@ -78,6 +83,10 @@ export const conventionDtoToConventionReadDto = async (
   const assessment = await uow.assessmentRepository.getByConventionId(
     conventionDto.id,
   );
+  const lastReminders = await getConventionLastRemindersFields(
+    conventionDto,
+    uow.notificationRepository,
+  );
 
   return {
     ...conventionDto,
@@ -90,6 +99,7 @@ export const conventionDtoToConventionReadDto = async (
     ),
     ...assesmentEntityToConventionAssessmentFields(assessment),
     ...withBannedEstablishmentInformations,
+    lastReminders,
   };
 };
 
@@ -115,6 +125,83 @@ export const assesmentEntityToConventionAssessmentFields = (
           createdAt: assessmentEntity.createdAt,
         },
       };
+};
+
+const getConventionLastRemindersFields = async (
+  convention: ConventionDto,
+  notificationRepository: NotificationRepository,
+): Promise<ConventionLastReminders> => {
+  const [
+    conventionSignatureReminders,
+    assessmentCompletionEmail,
+    assessmentCompletionSms,
+    assessmentSignatureEmail,
+    assessmentSignatureSms,
+  ] = await Promise.all([
+    Promise.all(
+      Object.values(convention.signatories)
+        .filter(isTruthy)
+        .map(async ({ role, email, phone }) => {
+          const [emailNotification, smsNotification] = await Promise.all([
+            notificationRepository.getLastEmailNotificationByFilter({
+              conventionId: convention.id,
+              emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+              recipientEmail: email,
+            }),
+            notificationRepository.getLastSmsNotificationByFilter({
+              conventionId: convention.id,
+              smsKind: "ReminderForSignatories",
+              recipientPhoneNumber: phone,
+            }),
+          ]);
+          return {
+            role,
+            email: emailNotification?.createdAt ?? null,
+            sms: smsNotification?.createdAt ?? null,
+          };
+        }),
+    ),
+    notificationRepository.getLastEmailNotificationByFilter({
+      conventionId: convention.id,
+      emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      recipientEmail: convention.establishmentTutor.email,
+    }),
+    notificationRepository.getLastSmsNotificationByFilter({
+      conventionId: convention.id,
+      smsKind: "ReminderForAssessment",
+      recipientPhoneNumber: convention.establishmentTutor.phone,
+    }),
+    notificationRepository.getLastEmailNotificationByFilter({
+      conventionId: convention.id,
+      emailKind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
+      recipientEmail: convention.signatories.beneficiary.email,
+    }),
+    notificationRepository.getLastSmsNotificationByFilter({
+      conventionId: convention.id,
+      smsKind: "ReminderForAssessmentSignature",
+      recipientPhoneNumber: convention.signatories.beneficiary.phone,
+    }),
+  ]);
+
+  return conventionLastRemindersSchema.parse({
+    conventionSignatures: {
+      ...makeEmptyLastReminders().conventionSignatures,
+      ...Object.fromEntries(
+        conventionSignatureReminders.map(({ role, email, sms }) => [
+          role,
+          { email, sms },
+        ]),
+      ),
+    },
+    assessmentCompletion: {
+      email: assessmentCompletionEmail?.createdAt ?? null,
+      sms: assessmentCompletionSms?.createdAt ?? null,
+    },
+    assessmentSignature: {
+      email: assessmentSignatureEmail?.createdAt ?? null,
+      sms: assessmentSignatureSms?.createdAt ?? null,
+    },
+  });
 };
 
 export const throwErrorIfConventionStatusNotAllowed = (
