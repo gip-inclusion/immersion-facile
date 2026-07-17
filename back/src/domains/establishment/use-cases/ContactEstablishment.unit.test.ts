@@ -35,7 +35,10 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { ContactEstablishment } from "./ContactEstablishment";
+import {
+  type ContactEstablishment,
+  makeContactEstablishment,
+} from "./ContactEstablishment";
 
 describe("ContactEstablishment", () => {
   const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
@@ -137,17 +140,19 @@ describe("ContactEstablishment", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway(new Date("2022-01-10T12:00:00.000"));
     uuidGenerator = new TestUuidGenerator();
-    contactEstablishment = new ContactEstablishment(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
+    contactEstablishment = makeContactEstablishment({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+        immersionFacileBaseUrl: "http://if.fr",
+        minimumNumberOfDaysBetweenSimilarContactRequests,
         timeGateway,
         uuidGenerator,
-      }),
-      uuidGenerator,
-      timeGateway,
-      minimumNumberOfDaysBetweenSimilarContactRequests,
-      "http://if.fr",
-    );
+      },
+    });
 
     uow.romeRepository.appellations = [
       {

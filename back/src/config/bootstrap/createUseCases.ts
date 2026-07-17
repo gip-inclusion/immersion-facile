@@ -143,7 +143,7 @@ import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/Uuid
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { makeBanEstablishment } from "../../domains/establishment/use-cases/BanEstablishment";
-import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
+import { makeContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { makeDeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
@@ -322,17 +322,7 @@ export const createUseCases = ({
         uowPerformer,
         gateways.timeGateway,
       ),
-      contactEstablishment: new ContactEstablishment(
-        uowPerformer,
-        createNewEvent,
-        uuidGenerator,
-        gateways.timeGateway,
-        config.minimumNumberOfDaysBetweenSimilarContactRequests,
-        config.immersionFacileBaseUrl,
-      ),
-
       // agencies
-
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
 
@@ -1010,6 +1000,17 @@ export const createUseCases = ({
     }),
     getSearchResultBySearchQuery: makeGetSearchResultBySearchQuery({
       uowPerformer,
+    }),
+    contactEstablishment: makeContactEstablishment({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        uuidGenerator,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+        timeGateway: gateways.timeGateway,
+        minimumNumberOfDaysBetweenSimilarContactRequests:
+          config.minimumNumberOfDaysBetweenSimilarContactRequests,
+      },
     }),
     getAllNafSections: makeGetAllNafSections({
       deps: {
