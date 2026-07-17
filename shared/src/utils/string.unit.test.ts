@@ -8,6 +8,7 @@ import {
   cleanStringToHTMLAttribute,
   doesStringContainsHTML,
   getFormattedFirstnameAndLastname,
+  joinWithCommasAnd,
   looksLikeSiret,
   removeDiacritics,
   sliceTextUpToBytesLimit,
@@ -25,6 +26,18 @@ import {
 } from "./string.schema";
 
 describe("string utils", () => {
+  describe("joinWithCommasAnd", () => {
+    it.each([
+      { items: [], expected: "" },
+      { items: ["a"], expected: "a" },
+      { items: ["a", "b"], expected: "a et b" },
+      { items: ["a", "b", "c"], expected: "a, b et c" },
+      { items: ["a", "b", "c", "d"], expected: "a, b, c et d" },
+    ])("joins $items as '$expected'", ({ items, expected }) => {
+      expectToEqual(joinWithCommasAnd(items), expected);
+    });
+  });
+
   describe("cleanStringToHTMLAttribute", () => {
     it.each([
       [
