@@ -31,7 +31,9 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
     const federatedIdentity =
       convention.signatories.beneficiary.federatedIdentity;
 
-    return federatedIdentity && federatedIdentity?.token !== authFailed
+    return federatedIdentity &&
+      federatedIdentity.provider === "peConnect" &&
+      federatedIdentity.token !== authFailed
       ? this.#associateConventionToFederatedIdentity(
           convention,
           federatedIdentity,

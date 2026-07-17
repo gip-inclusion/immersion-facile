@@ -1,11 +1,7 @@
 import { addDays, startOfToday } from "date-fns";
 
 import { v4 as uuidV4 } from "uuid";
-import type {
-  ConventionDraftDto,
-  FederatedIdentity,
-  FtConnectIdentity,
-} from "../..";
+import type { ConventionDraftDto, FtConnectIdentity } from "../..";
 import type { AgencyKind } from "../../agency/agency.dto";
 import type {
   BeneficiaryCurrentEmployer,
@@ -26,8 +22,6 @@ import type { ScheduleDto } from "../../schedule/Schedule.dto";
 import { reasonableSchedule } from "../../schedule/ScheduleUtils";
 import type { SiretDto } from "../../siret/siret";
 import { type DateString, toDateUTCString } from "../../utils/date";
-
-export type FederatedIdentityWithUser = FederatedIdentity;
 
 export const makeEmptyConventionInitialValues = ({
   internshipKind,

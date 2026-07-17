@@ -18,8 +18,8 @@ const federatedIdentityFoundInDeviceEpic: ConnectedUserEpic = (action$) =>
     filter(authSlice.actions.federatedIdentityFoundInDevice.match),
     filter(
       (action) =>
-        action.payload?.federatedIdentityWithUser?.provider === "proConnect" ||
-        action.payload?.federatedIdentityWithUser?.provider === "email",
+        action.payload?.federatedIdentity?.provider === "proConnect" ||
+        action.payload?.federatedIdentity?.provider === "email",
     ),
     map((action) =>
       connectedUserSlice.actions.currentUserFetchRequested({
@@ -37,8 +37,8 @@ const federatedIdentityFromStoreToDeviceStorageSucceededEpic: ConnectedUserEpic 
       ),
       filter(
         (action) =>
-          action.payload?.federatedIdentityWithUser.provider === "proConnect" ||
-          action.payload?.federatedIdentityWithUser.provider === "email",
+          action.payload?.federatedIdentity.provider === "proConnect" ||
+          action.payload?.federatedIdentity.provider === "email",
       ),
       map((action) =>
         connectedUserSlice.actions.currentUserFetchRequested({
@@ -61,9 +61,7 @@ const getCurrentUserEpic: ConnectedUserEpic = (
     ),
     switchMap(({ payload }) =>
       authGateway
-        .getCurrentUser$(
-          state$.value.auth.federatedIdentityWithUser?.token ?? "",
-        )
+        .getCurrentUser$(state$.value.auth.federatedIdentity?.token ?? "")
         .pipe(
           map(connectedUserSlice.actions.currentUserFetchSucceeded),
           catchEpicError((error) =>
@@ -92,7 +90,7 @@ const registerAgenciesEpic: ConnectedUserEpic = (
       agencyGateway
         .registerAgenciesToCurrentUser$(
           action.payload.agencies,
-          state$.value.auth.federatedIdentityWithUser?.token ?? "",
+          state$.value.auth.federatedIdentity?.token ?? "",
         )
         .pipe(
           map(() =>

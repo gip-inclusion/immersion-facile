@@ -66,19 +66,19 @@ const storeFederatedIdentityInDevice: AuthEpic = (
   action$.pipe(
     filter(authSlice.actions.federatedIdentityProvided.match),
     tap(() => {
-      if (state$.value.auth.federatedIdentityWithUser)
+      if (state$.value.auth.federatedIdentity)
         localDeviceRepository.set(
-          "federatedIdentityWithUser",
-          state$.value.auth.federatedIdentityWithUser,
+          "federatedIdentity",
+          state$.value.auth.federatedIdentity,
         );
-      return state$.value.auth.federatedIdentityWithUser;
+      return state$.value.auth.federatedIdentity;
     }),
     map(({ payload }) => {
-      if (!payload.federatedIdentityWithUser)
+      if (!payload.federatedIdentity)
         return authSlice.actions.federatedIdentityNotFoundInDevice();
       return authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
         {
-          federatedIdentityWithUser: payload.federatedIdentityWithUser,
+          federatedIdentity: payload.federatedIdentity,
           feedbackTopic: "auth-global",
         },
       );
@@ -105,7 +105,7 @@ const removeFederatedIdentityFromDevice = ({
 }: {
   localDeviceRepository: DeviceRepository<LocalStoragePair>;
 }) => {
-  localDeviceRepository.delete("federatedIdentityWithUser");
+  localDeviceRepository.delete("federatedIdentity");
   localDeviceRepository.delete("conventionDraftId");
 };
 
@@ -131,14 +131,13 @@ const getLogoutUrl$ = (
   authState: AuthState,
   authGateway: AuthGateway,
 ): Observable<AbsoluteUrl | undefined> => {
-  const { federatedIdentityWithUser } = authState;
-  if (!federatedIdentityWithUser)
-    return throwError(() => errors.auth.missingOAuth({}));
+  const { federatedIdentity } = authState;
+  if (!federatedIdentity) return throwError(() => errors.auth.missingOAuth({}));
   return action.payload.mode === "device-and-oauth"
     ? authGateway.getLogoutUrl$({
-        idToken: federatedIdentityWithUser.idToken,
-        authToken: federatedIdentityWithUser.token,
-        provider: federatedIdentityWithUser.provider,
+        idToken: federatedIdentity.idToken,
+        authToken: federatedIdentity.token,
+        provider: federatedIdentity.provider,
       })
     : of(undefined);
 };
@@ -176,12 +175,10 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
   action$.pipe(
     filter(rootAppSlice.actions.appIsReady.match),
     map(() => {
-      const federatedIdentity = localDeviceRepository.get(
-        "federatedIdentityWithUser",
-      );
+      const federatedIdentity = localDeviceRepository.get("federatedIdentity");
       return federatedIdentity
         ? authSlice.actions.federatedIdentityFoundInDevice({
-            federatedIdentityWithUser: federatedIdentity,
+            federatedIdentity: federatedIdentity,
             feedbackTopic: "auth-global",
           })
         : authSlice.actions.federatedIdentityNotFoundInDevice();

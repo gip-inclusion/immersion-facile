@@ -23,7 +23,7 @@ describe("rootApp epic", () => {
         isLoading: false,
         isRequestingRenewExpiredJwt: false,
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         requestedEmail: null,
       },
     };
@@ -49,16 +49,16 @@ describe("rootApp epic", () => {
 
   it("should dispatch appIsReady action", () => {
     const token = "my-super-token";
-    dependencies.localDeviceRepository.set("federatedIdentityWithUser", {
+    dependencies.localDeviceRepository.set("federatedIdentity", {
       provider: "proConnect",
       token,
       idToken: "id-token",
     });
 
-    expect(store.getState().auth.federatedIdentityWithUser).toBeNull();
+    expect(store.getState().auth.federatedIdentity).toBeNull();
 
     store.dispatch(rootAppSlice.actions.appResetRequested());
 
-    expect(store.getState().auth.federatedIdentityWithUser?.token).toBe(token);
+    expect(store.getState().auth.federatedIdentity?.token).toBe(token);
   });
 });

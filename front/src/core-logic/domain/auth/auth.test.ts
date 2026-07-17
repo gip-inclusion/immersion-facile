@@ -7,7 +7,6 @@ import {
   errors,
   expectToEqual,
   type FederatedIdentity,
-  type FederatedIdentityWithUser,
   noAgencyDashboards,
   noEstablishmentDashboard,
 } from "shared";
@@ -30,7 +29,7 @@ import { feedbacksSelectors } from "../feedback/feedback.selectors";
 import type { PayloadWithFeedbackTopic } from "../feedback/feedback.slice";
 
 describe("Auth slice", () => {
-  const connectedUserFederatedIdentity: FederatedIdentityWithUser = {
+  const connectedUserFederatedIdentity: FederatedIdentity = {
     provider: "proConnect",
     token: "123",
     idToken: "id-token",
@@ -46,7 +45,7 @@ describe("Auth slice", () => {
   it("stores the federated identity when someones connects (in store and in device)", () => {
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -55,14 +54,14 @@ describe("Auth slice", () => {
 
     store.dispatch(
       authSlice.actions.federatedIdentityProvided({
-        federatedIdentityWithUser: connectedUserFederatedIdentity,
+        federatedIdentity: connectedUserFederatedIdentity,
         feedbackTopic: "auth-global",
       }),
     );
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: connectedUserFederatedIdentity,
+      federatedIdentity: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -73,7 +72,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: connectedUserFederatedIdentity,
+      federatedIdentity: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -93,7 +92,7 @@ describe("Auth slice", () => {
       auth: {
         isRequestingLoginByEmail: false,
         isRequestingRenewExpiredJwt: false,
-        federatedIdentityWithUser: federatedIdentity,
+        federatedIdentity: federatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         requestedEmail: null,
@@ -105,7 +104,7 @@ describe("Auth slice", () => {
       },
     }));
     dependencies.localDeviceRepository.set(
-      "federatedIdentityWithUser",
+      "federatedIdentity",
       federatedIdentity,
     );
 
@@ -122,7 +121,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -141,7 +140,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: connectedUserFederatedIdentity,
+        federatedIdentity: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         isRequestingRenewExpiredJwt: false,
@@ -154,7 +153,7 @@ describe("Auth slice", () => {
       },
     }));
     dependencies.localDeviceRepository.set(
-      "federatedIdentityWithUser",
+      "federatedIdentity",
       connectedUserFederatedIdentity,
     );
     store.dispatch(
@@ -166,7 +165,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -178,7 +177,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -191,7 +190,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: connectedUserFederatedIdentity,
+        federatedIdentity: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         isRequestingRenewExpiredJwt: false,
@@ -204,7 +203,7 @@ describe("Auth slice", () => {
       },
     }));
     dependencies.localDeviceRepository.set(
-      "federatedIdentityWithUser",
+      "federatedIdentity",
       connectedUserFederatedIdentity,
     );
 
@@ -217,7 +216,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -229,7 +228,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -242,7 +241,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: connectedUserFederatedIdentity,
+        federatedIdentity: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         isRequestingRenewExpiredJwt: false,
@@ -255,7 +254,7 @@ describe("Auth slice", () => {
       },
     }));
     dependencies.localDeviceRepository.set(
-      "federatedIdentityWithUser",
+      "federatedIdentity",
       connectedUserFederatedIdentity,
     );
 
@@ -270,7 +269,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -293,7 +292,7 @@ describe("Auth slice", () => {
   it("retrieves federatedIdentity if stored in device", () => {
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -301,14 +300,14 @@ describe("Auth slice", () => {
     });
 
     dependencies.localDeviceRepository.set(
-      "federatedIdentityWithUser",
+      "federatedIdentity",
       connectedUserFederatedIdentity,
     );
     store.dispatch(rootAppSlice.actions.appIsReady());
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: connectedUserFederatedIdentity,
+      federatedIdentity: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -337,7 +336,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: connectedUserFederatedIdentity,
+      federatedIdentity: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -346,10 +345,10 @@ describe("Auth slice", () => {
   });
 
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
-    dependencies.localDeviceRepository.delete("federatedIdentityWithUser");
+    dependencies.localDeviceRepository.delete("federatedIdentity");
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: true,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -360,7 +359,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -371,7 +370,7 @@ describe("Auth slice", () => {
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: null,
+      federatedIdentity: null,
       isLoading: false,
       isRequestingLoginByEmail: false,
       isRequestingRenewExpiredJwt: false,
@@ -421,7 +420,7 @@ describe("Auth slice", () => {
     it("should handle login by email successfully", () => {
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
         isRequestingRenewExpiredJwt: false,
@@ -438,7 +437,7 @@ describe("Auth slice", () => {
 
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: true,
         isRequestingRenewExpiredJwt: false,
@@ -449,7 +448,7 @@ describe("Auth slice", () => {
 
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
         isRequestingRenewExpiredJwt: false,
@@ -472,7 +471,7 @@ describe("Auth slice", () => {
     it("should handle login by email failed", () => {
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
         isRequestingRenewExpiredJwt: false,
@@ -489,7 +488,7 @@ describe("Auth slice", () => {
 
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: true,
         isRequestingRenewExpiredJwt: false,
@@ -503,7 +502,7 @@ describe("Auth slice", () => {
 
       expectAuthStateToBe({
         afterLoginRedirectionUrl: null,
-        federatedIdentityWithUser: null,
+        federatedIdentity: null,
         isLoading: true,
         isRequestingLoginByEmail: false,
         isRequestingRenewExpiredJwt: false,
@@ -721,8 +720,8 @@ describe("Auth slice", () => {
   const expectFederatedIdentityInDevice = (
     federatedIdentity: FederatedIdentity | undefined,
   ) => {
-    expect(
-      dependencies.localDeviceRepository.get("federatedIdentityWithUser"),
-    ).toEqual(federatedIdentity);
+    expect(dependencies.localDeviceRepository.get("federatedIdentity")).toEqual(
+      federatedIdentity,
+    );
   };
 });

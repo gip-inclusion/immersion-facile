@@ -2,7 +2,7 @@ import type {
   AbsoluteUrl,
   ConventionDraftId,
   ExternalOfferDto,
-  FederatedIdentityWithUser,
+  FederatedIdentity,
   WithAcquisition,
 } from "shared";
 
@@ -15,7 +15,7 @@ export type GenericStorage = GenericPair<string, unknown>;
 
 export type LocalStoragePair =
   | GenericPair<"adminToken", string>
-  | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>
+  | GenericPair<"federatedIdentity", FederatedIdentity>
   | GenericPair<"searchResultExternal", ExternalOfferDto>
   | GenericPair<"conventionDraftId", ConventionDraftId>;
 
