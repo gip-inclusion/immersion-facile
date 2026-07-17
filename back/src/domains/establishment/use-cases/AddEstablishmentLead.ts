@@ -1,25 +1,14 @@
-import { errors, type WithConventionDto, withConventionSchema } from "shared";
+import { errors, withConventionSchema } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 
-export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto> {
-  protected inputSchema = withConventionSchema;
+export type AddEstablishmentLead = ReturnType<typeof makeAddEstablishmentLead>;
 
-  readonly #timeGateway: TimeGateway;
-
-  constructor(uowPerformer: UnitOfWorkPerformer, timeGateway: TimeGateway) {
-    super(uowPerformer);
-
-    this.#timeGateway = timeGateway;
-  }
-
-  public async _execute(
-    { convention }: WithConventionDto,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export const makeAddEstablishmentLead = useCaseBuilder("AddEstablishmentLead")
+  .withInput(withConventionSchema)
+  .withDeps<{ timeGateway: TimeGateway }>()
+  .build(async ({ inputParams: { convention }, uow, deps }) => {
     if (convention.status !== "ACCEPTED_BY_VALIDATOR")
       throw errors.convention.notValidated({ convention });
 
@@ -39,11 +28,10 @@ export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto
       events: [
         {
           conventionId: convention.id,
-          occurredAt: this.#timeGateway.now(),
+          occurredAt: deps.timeGateway.now(),
           kind: "to-be-reminded",
         },
       ],
     };
     await uow.establishmentLeadRepository.save(establishmentLead);
-  }
-}
+  });

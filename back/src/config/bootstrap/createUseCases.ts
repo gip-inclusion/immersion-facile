@@ -140,7 +140,7 @@ import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/
 import type { UseCaseIdentityPayload } from "../../domains/core/useCase.helpers";
 import { useCaseBuilder } from "../../domains/core/useCaseBuilder";
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
-import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
+import { makeAddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { makeAddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { makeBanEstablishment } from "../../domains/establishment/use-cases/BanEstablishment";
 import { makeContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
@@ -295,10 +295,6 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
       }),
 
-      addEstablishmentLead: new AddEstablishmentLead(
-        uowPerformer,
-        gateways.timeGateway,
-      ),
       // agencies
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
@@ -443,6 +439,10 @@ export const createUseCases = ({
         },
         uowPerformer,
       }),
+    addEstablishmentLead: makeAddEstablishmentLead({
+      uowPerformer,
+      deps: { timeGateway: gateways.timeGateway },
+    }),
 
     // notifications
     notifyFranceTravailUserAdvisorOnConventionFullySigned:
