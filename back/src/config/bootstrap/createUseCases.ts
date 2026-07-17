@@ -97,7 +97,7 @@ import { makeRenewApiConsumerKey } from "../../domains/core/api-consumer/use-cas
 import { makeRevokeApiConsumer } from "../../domains/core/api-consumer/use-cases/RevokeApiConsumer";
 import { makeSaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { makeSubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
-import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
+import { makeAfterOAuthSuccess } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccess";
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
 import { makeInitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
@@ -272,19 +272,7 @@ export const createUseCases = ({
     });
 
   return {
-    ...instantiatedUseCasesFromClasses({
-      afterOAuthSuccessRedirection: new AfterOAuthSuccess({
-        uowPerformer,
-        createNewEvent,
-        proConnectOAuthGateway: gateways.proConnectOAuthGateway,
-        ftConnectGateway: gateways.ftConnectGateway,
-        uuidGenerator,
-        generateConnectedUserLoginUrl,
-        verifyEmailAuthCodeJwt,
-        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
-        timeGateway: gateways.timeGateway,
-      }),
-    }),
+    ...instantiatedUseCasesFromClasses({}),
     setFeatureFlag: makeSetFeatureFlag({ uowPerformer }),
     sendNotification: makeSendNotification({
       uowPerformer,
@@ -863,6 +851,19 @@ export const createUseCases = ({
           peConnect: gateways.ftConnectGateway,
         },
         uuidGenerator,
+      },
+    }),
+    afterOAuthSuccessRedirection: makeAfterOAuthSuccess({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        proConnectOAuthGateway: gateways.proConnectOAuthGateway,
+        ftConnectGateway: gateways.ftConnectGateway,
+        uuidGenerator,
+        generateConnectedUserLoginUrl,
+        verifyEmailAuthCodeJwt,
+        immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+        timeGateway: gateways.timeGateway,
       },
     }),
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
