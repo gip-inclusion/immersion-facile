@@ -101,7 +101,7 @@ import { AfterOAuthSuccess } from "../../domains/core/authentication/connected-u
 import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
 import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
 import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
-import { RenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
+import { makeRenewExpiredJwt } from "../../domains/core/authentication/connected-user/use-cases/RenewExpiredJwt";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { makeNotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
@@ -306,18 +306,6 @@ export const createUseCases = ({
         uowPerformer,
         createNewEvent,
       ),
-
-      renewExpiredJwt: new RenewExpiredJwt({
-        uowPerformer,
-        config,
-        timeGateway: gateways.timeGateway,
-        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
-        generateConnectedUserLoginUrl,
-        generateConventionMagicLinkUrl,
-        generateEmailAuthCodeUrl,
-        saveNotificationAndRelatedEvent,
-        createNewEvent,
-      }),
 
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
@@ -857,6 +845,19 @@ export const createUseCases = ({
       }),
     getAgencyById: makeGetAgencyById({
       uowPerformer,
+    }),
+    renewExpiredJwt: makeRenewExpiredJwt({
+      uowPerformer,
+      deps: {
+        config,
+        timeGateway: gateways.timeGateway,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        generateConnectedUserLoginUrl,
+        generateConventionMagicLinkUrl,
+        generateEmailAuthCodeUrl,
+        saveNotificationAndRelatedEvent,
+        createNewEvent,
+      },
     }),
     getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
       uowPerformer,

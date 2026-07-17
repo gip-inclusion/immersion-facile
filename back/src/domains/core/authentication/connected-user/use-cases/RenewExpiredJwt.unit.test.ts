@@ -48,7 +48,7 @@ import {
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
-import { RenewExpiredJwt } from "./RenewExpiredJwt";
+import { makeRenewExpiredJwt, type RenewExpiredJwt } from "./RenewExpiredJwt";
 
 describe("RenewExpiredJwt use case", () => {
   const validator = new ConnectedUserBuilder()
@@ -106,19 +106,21 @@ describe("RenewExpiredJwt use case", () => {
     );
     createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
-    useCase = new RenewExpiredJwt({
+    useCase = makeRenewExpiredJwt({
       uowPerformer: new InMemoryUowPerformer(uow),
-      generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
-      generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
-      generateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
-      config,
-      timeGateway,
-      shortLinkIdGeneratorGateway,
-      saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-        uuidGenerator,
+      deps: {
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        generateConnectedUserLoginUrl: fakeGenerateConnectedUserUrlFn,
+        generateEmailAuthCodeUrl: fakeGenerateEmailAuthCodeUrlFn,
+        config,
         timeGateway,
-      ),
-      createNewEvent,
+        shortLinkIdGeneratorGateway,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          uuidGenerator,
+          timeGateway,
+        ),
+        createNewEvent,
+      },
     });
 
     uow.agencyRepository.agencies = [
