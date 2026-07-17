@@ -938,9 +938,11 @@ export const sendSignatureLinkModal = createModal({
 });
 
 export const SendSignatureLinkModalWrapper = ({
+  convention,
   signatory,
   onConfirm,
 }: {
+  convention: ConventionReadDto;
   signatory?: Signatory;
   onConfirm: (params: {
     notificationKind: NotificationKind;
@@ -963,6 +965,13 @@ export const SendSignatureLinkModalWrapper = ({
         domElementIds.manageConvention.submitSendSignatureLinkModalButton
       }
       isSubmitDisabled={!signatory}
+      lastReminderDateByNotificationKind={
+        signatory &&
+        convention.lastReminders.conventionSignatures[signatory.role]
+      }
+      recipientFullName={
+        signatory && `${signatory.firstName} ${signatory.lastName}`
+      }
       onCancel={() => dispatch(feedbackSlice.actions.clearFeedbacksTriggered())}
       onConfirm={(notificationKind) =>
         signatory &&
@@ -988,10 +997,12 @@ export const sendAssessmentLinkModal = createModal({
 });
 
 export const SendAssessmentLinkModalWrapper = ({
+  convention,
   phone,
   email,
   onConfirm,
 }: {
+  convention: ConventionReadDto;
   phone: PhoneNumber;
   email: string;
   onConfirm: (notificationKind: NotificationKind) => void;
@@ -1006,6 +1017,10 @@ export const SendAssessmentLinkModalWrapper = ({
     }
     radioGroupName="send-assessment-link-reminder-kind"
     emailOnlyLegend="Le canal disponible pour envoyer une relance."
+    lastReminderDateByNotificationKind={
+      convention.lastReminders.assessmentCompletion
+    }
+    recipientFullName={`${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`}
     onConfirm={onConfirm}
     description={<p>Le tuteur n'a pas encore complété le bilan.</p>}
   />
@@ -1061,12 +1076,14 @@ export const sendAssessmentSignatureReminderModal = createModal({
 });
 
 export const SendAssessmentSignatureReminderModalWrapper = ({
+  convention,
   phone,
   email,
   beneficiaryFirstName,
   beneficiaryLastName,
   onConfirm,
 }: {
+  convention: ConventionReadDto;
   phone: PhoneNumber;
   email: Email;
   beneficiaryFirstName: string;
@@ -1090,6 +1107,10 @@ export const SendAssessmentSignatureReminderModalWrapper = ({
         domElementIds.manageConvention
           .submitSendAssessmentSignatureReminderModalButton
       }
+      lastReminderDateByNotificationKind={
+        convention.lastReminders.assessmentSignature
+      }
+      recipientFullName={`${beneficiaryFirstName} ${beneficiaryLastName}`}
       onCancel={() => dispatch(feedbackSlice.actions.clearFeedbacksTriggered())}
       onConfirm={onConfirm}
       description={
