@@ -71,6 +71,7 @@ import { makeNotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
 import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
+import { makeNotifyUserThatAgencyRegistrationRequestWasReceived } from "../../domains/convention/use-cases/notifications/NotifyUserThatAgencyRegistrationRequestWasReceived";
 import { makeMarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail } from "../../domains/convention/use-cases/RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
@@ -1271,6 +1272,14 @@ export const createUseCases = ({
         saveNotificationAndRelatedEvent,
       },
     }),
+    notifyUserThatAgencyRegistrationRequestWasReceived:
+      makeNotifyUserThatAgencyRegistrationRequestWasReceived({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          immersionBaseUrl: config.immersionFacileBaseUrl,
+        },
+      }),
     subscribeToWebhook: makeSubscribeToWebhook({
       uowPerformer,
       deps: {
