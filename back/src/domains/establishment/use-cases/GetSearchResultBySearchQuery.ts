@@ -2,37 +2,36 @@ import {
   type ApiConsumer,
   errors,
   type InternalOfferDto,
-  type SearchResultQuery,
   searchResultQuerySchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class GetSearchResultBySearchQuery extends TransactionalUseCase<
-  SearchResultQuery,
-  InternalOfferDto,
-  ApiConsumer
-> {
-  protected inputSchema = searchResultQuerySchema;
+export type GetSearchResultBySearchQuery = ReturnType<
+  typeof makeGetSearchResultBySearchQuery
+>;
 
-  public async _execute(
-    { siret, appellationCode, locationId }: SearchResultQuery,
-    uow: UnitOfWork,
-  ): Promise<InternalOfferDto> {
-    const searchResult =
-      await uow.establishmentAggregateRepository.getSearchResultBySearchQuery(
-        siret,
-        appellationCode,
-        locationId,
-      );
+export const makeGetSearchResultBySearchQuery = useCaseBuilder(
+  "GetSearchResultBySearchQuery",
+)
+  .withInput(searchResultQuerySchema)
+  .withOutput<InternalOfferDto>()
+  .withCurrentUser<ApiConsumer | void>()
+  .build(
+    async ({ inputParams: { appellationCode, siret, locationId }, uow }) => {
+      const searchResult =
+        await uow.establishmentAggregateRepository.getSearchResultBySearchQuery(
+          siret,
+          appellationCode,
+          locationId,
+        );
 
-    if (!searchResult)
-      throw errors.establishment.offerMissing({
-        appellationCode,
-        siret,
-        mode: "not found",
-      });
+      if (!searchResult)
+        throw errors.establishment.offerMissing({
+          appellationCode,
+          siret,
+          mode: "not found",
+        });
 
-    return searchResult;
-  }
-}
+      return searchResult;
+    },
+  );
