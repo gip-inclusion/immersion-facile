@@ -335,18 +335,18 @@ const createButtonPropsByVerificationAction = (
 
   const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled(convention) &&
-    isConventionEndingInOneDayOrMore(convention) &&
+    isConventionEndingInOneDayOrMore(convention.dateEnd) &&
     hasAllowedRoleOnAssessment(requesterRoles, "CreateAssessment", convention);
 
   const shouldShowAssessmentFullFillAction =
     canAssessmentBeFilled(convention) &&
-    !isConventionEndingInOneDayOrMore(convention) &&
+    !isConventionEndingInOneDayOrMore(convention.dateEnd) &&
     intersection(requesterRoles, [...allowedRolesToCreateAssessment]).length >
       0;
 
   const shouldShowFillAssessmentInfoButton =
     canAssessmentBeFilled(convention) &&
-    !isConventionEndingInOneDayOrMore(convention) &&
+    !isConventionEndingInOneDayOrMore(convention.dateEnd) &&
     intersection(requesterRoles, [
       ...establishmentsRoles,
       "establishment-representative",
@@ -369,7 +369,7 @@ const createButtonPropsByVerificationAction = (
     convention.status === "ACCEPTED_BY_VALIDATOR";
 
   const shouldShowRenewConventionButton =
-    isConventionValidated(convention) &&
+    isConventionValidated(convention.status) &&
     !isConventionRenewed(convention) &&
     hasAllowedRole({
       allowedRoles: ["counsellor", "validator"],

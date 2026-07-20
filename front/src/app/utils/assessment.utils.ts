@@ -6,7 +6,7 @@ import {
 } from "shared";
 
 export type AssessmentLabelsAndSeverity = {
-  shortLabel: string;
+  shortLabel: { agencyLabel: string; beneficiaryLabel: string };
   longLabel: string;
   description: string;
   severity: BadgeProps["severity"];
@@ -18,7 +18,10 @@ export const getAssessmentLabelsAndSeverityByStatus = ({
   isPlural: boolean;
 }): Record<AssessmentCompletionStatusFilter, AssessmentLabelsAndSeverity> => ({
   finalized: {
-    shortLabel: isPlural ? "Bilan complétés" : "Bilan complété",
+    shortLabel: {
+      agencyLabel: isPlural ? "Bilans complétés" : "Bilan complété",
+      beneficiaryLabel: isPlural ? "Bilans complétés" : "Bilan complété",
+    },
     longLabel: isPlural
       ? "Bilans complétés et signés"
       : "Bilan complété et signé",
@@ -27,7 +30,10 @@ export const getAssessmentLabelsAndSeverityByStatus = ({
     severity: "success",
   },
   "to-sign": {
-    shortLabel: isPlural ? "Bilans à signer" : "Bilan à signer",
+    shortLabel: {
+      agencyLabel: isPlural ? "Bilans à signer" : "Bilan à signer",
+      beneficiaryLabel: isPlural ? "Bilans à signer" : "Bilan à signer",
+    },
     longLabel: isPlural
       ? "Bilans à signer par la personne en immersion"
       : "Bilan à signer par la personne en immersion",
@@ -36,7 +42,10 @@ export const getAssessmentLabelsAndSeverityByStatus = ({
     severity: "warning",
   },
   "to-complete": {
-    shortLabel: isPlural ? "Bilans à compléter" : "Bilan à compléter",
+    shortLabel: {
+      agencyLabel: isPlural ? "Bilans à compléter" : "Bilan à compléter",
+      beneficiaryLabel: isPlural ? "Attente bilans" : "Attente bilan",
+    },
     longLabel: isPlural
       ? "Bilans à compléter par le tuteur"
       : "Bilan à compléter par le tuteur",

@@ -145,7 +145,10 @@ const ConventionSignPageContent = ({
                           labelAndSeverityByStatus[convention.status].color,
                         )}
                       >
-                        {labelAndSeverityByStatus[convention.status].label}
+                        {
+                          labelAndSeverityByStatus[convention.status]
+                            .agencyLabel
+                        }
                       </Badge>
                     )
                   }
