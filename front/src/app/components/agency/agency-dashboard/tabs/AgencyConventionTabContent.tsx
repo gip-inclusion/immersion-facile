@@ -77,7 +77,8 @@ const selectAgencyToInitiateConventionModal = createModal({
   isOpenedByDefault: false,
   id: domElementIds.agencyDashboard.initiateConvention.modal,
 });
-export const ConventionTabContent = ({
+
+export const AgencyConventionTabContent = ({
   activeAgencies,
 }: {
   activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
