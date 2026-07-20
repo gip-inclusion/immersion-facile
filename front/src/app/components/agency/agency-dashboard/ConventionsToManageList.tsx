@@ -115,10 +115,10 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
         {convention.signatories.beneficiary.lastName}{" "}
       </span>
       <Badge
-        className={labelAndSeverityByStatus[convention.status].color}
+        className={fr.cx(labelAndSeverityByStatus[convention.status].color)}
         small
       >
-        {labelAndSeverityByStatus[convention.status].label}
+        {labelAndSeverityByStatus[convention.status].agencyLabel}
       </Badge>
     </>
   );
