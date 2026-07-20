@@ -1,18 +1,31 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
-import { Loader, SectionHighlight } from "react-design-system";
+import { Loader, PageHeader, SectionHighlight } from "react-design-system";
 import { domElementIds, frontRoutes } from "shared";
 import { DiscussionTabContent } from "src/app/components/discussion/DiscussionTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
+import {
+  ConnectedPrivateRoutePage,
+  type FrontBeneficiaryDashboardRoute,
+} from "../auth/ConnectedPrivateRoutePage";
 
-export const BeneficiaryDashboardDiscussionsTab = () => {
+export const BeneficiaryDashboardPage = ({
+  route,
+}: {
+  route: FrontBeneficiaryDashboardRoute;
+}) => {
   const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
   const isLoadingDiscussionList = useAppSelector(discussionSelectors.isLoading);
 
   return (
-    <>
+    <ConnectedPrivateRoutePage
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
+      }
+    >
       {(isLoadingUser || isLoadingDiscussionList) && <Loader />}
       <h1>Mon espace bénéficiaire</h1>
       <SectionHighlight>
@@ -39,6 +52,6 @@ export const BeneficiaryDashboardDiscussionsTab = () => {
           frontRoutes.beneficiaryDashboardDiscussions().push();
         }}
       />
-    </>
+    </ConnectedPrivateRoutePage>
   );
 };
