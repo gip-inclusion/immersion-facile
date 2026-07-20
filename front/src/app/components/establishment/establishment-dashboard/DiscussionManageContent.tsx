@@ -246,8 +246,7 @@ const getDiscussionActionsButtons = ({
   ) => ButtonPropsWithId;
 }): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   const acceptButton = {
-    id: domElementIds.establishmentDashboard.discussion
-      .acceptDiscussionOpenModalButton,
+    id: domElementIds.establishmentDashboard.discussion.acceptDiscussionButton,
     priority: "secondary",
     type: "button",
     onClick: openAcceptDiscussionModal,
@@ -255,8 +254,7 @@ const getDiscussionActionsButtons = ({
   } satisfies ButtonPropsWithId;
 
   const rejectButton = {
-    id: domElementIds.establishmentDashboard.discussion
-      .rejectDiscussionOpenModalButton,
+    id: domElementIds.establishmentDashboard.discussion.rejectDiscussionButton,
     priority: "tertiary",
     type: "button",
     onClick: openRejectDiscussionModal,

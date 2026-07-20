@@ -20,16 +20,17 @@ test.describe("Establishment dashboard workflow", () => {
     }) => {
       await page.goto("/");
       await goToDiscussion(page, "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa");
+
+      const rejectDiscussionButtonLocator = page.locator(
+        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionButton}`,
+      );
+      await expectLocatorToBeVisibleAndEnabled(rejectDiscussionButtonLocator);
+
       const initialMessageCount = await page
         .locator(".im-exchange-message")
         .count();
-      await page.click(
-        `#${domElementIds.establishmentDashboard.discussion.handleDiscussionButton}`,
-      );
 
-      page.click(
-        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionOpenModalButton}`,
-      );
+      await rejectDiscussionButtonLocator.click();
 
       await page
         .locator(
@@ -92,5 +93,4 @@ const goToDiscussion = async (page: Page, discussionId: string) => {
   await page.click(
     `#${domElementIds.establishmentDashboard.manageDiscussion.goToDiscussionButton}--${discussionId}`,
   );
-  await expect(page.locator(".im-discussion-meta")).toBeVisible();
 };
