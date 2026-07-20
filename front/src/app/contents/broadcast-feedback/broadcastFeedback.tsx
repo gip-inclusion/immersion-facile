@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { FunctionalBroadcastFeedbackErrorMessage } from "shared";
+import {
+  type FunctionalBroadcastFeedbackErrorMessage,
+  isFranceTravailBroadcastTemporaryNetworkErrorMessage,
+  isFunctionalBroadcastFeedbackError,
+} from "shared";
 
 type BroadcastFeedbackError = {
   description: string;
@@ -314,3 +318,13 @@ export const franceTravailTemporaryNetworkErrorBroadcastFeedback: BroadcastFeedb
       </>
     ),
   };
+
+export const getBroadcastFeedbackDescription = (errorMessage: string) => {
+  if (isFunctionalBroadcastFeedbackError(errorMessage))
+    return broadcastFeedbackErrorMessageMap[errorMessage].description;
+
+  if (isFranceTravailBroadcastTemporaryNetworkErrorMessage(errorMessage))
+    return franceTravailTemporaryNetworkErrorBroadcastFeedback.description;
+
+  return "Erreur technique : Immersion Facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
+};
