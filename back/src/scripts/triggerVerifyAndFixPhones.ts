@@ -23,6 +23,7 @@ const verifyAndFixPhones = async () => {
     timeGateway,
     uuidGenerator,
   });
+  const defaultBatchSize = 3_000;
 
   const verifyAndRequestInvalidPhonesUpdate =
     makeVerifyAndRequestInvalidPhonesUpdate({
@@ -30,8 +31,12 @@ const verifyAndFixPhones = async () => {
     });
 
   const oneDayAgo = subDays(timeGateway.now(), 1);
+  const batchSize = process.argv.at(2);
   return await verifyAndRequestInvalidPhonesUpdate.execute({
     dateToVerifyBefore: oneDayAgo,
+    ...(batchSize
+      ? { batchSize: Number(batchSize) }
+      : { batchSize: defaultBatchSize }),
   });
 };
 
