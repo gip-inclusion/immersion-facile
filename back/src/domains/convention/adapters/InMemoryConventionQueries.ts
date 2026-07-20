@@ -926,7 +926,7 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       assessment.status !== "DID_NOT_SHOW";
     const isAssessmentToBeCompleted =
       convention.assessment === null &&
-      !isConventionEndingInOneDayOrMore(convention);
+      !isConventionEndingInOneDayOrMore(convention.dateEnd);
 
     return (
       (hasFinalizedFilter && isAssessmentFinalized) ||

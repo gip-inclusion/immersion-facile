@@ -70,7 +70,7 @@ export const isAssessmentDto = (
 export const isAssessmentToSign = (
   assessment: ConventionAssessmentFields["assessment"],
 ): boolean => {
-  if (assessment == null) return false;
+  if (assessment === null) return false;
   if (!("signedAt" in assessment)) return false;
   if (assessment.status === "DID_NOT_SHOW") return false;
   if (assessment.signedAt !== null) return false;

@@ -117,7 +117,7 @@ const AssessmentToCompleteTaskItem = ({
         {
           getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
             assessmentCompletionStatus
-          ].shortLabel
+          ].shortLabel.agencyLabel
         }
       </Badge>
     </>

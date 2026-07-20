@@ -109,7 +109,7 @@ export const ConventionValidation = ({
 
   const shouldShowAssessmentReminderButton =
     canAssessmentBeFilled(convention) &&
-    !isConventionEndingInOneDayOrMore(convention) &&
+    !isConventionEndingInOneDayOrMore(convention.dateEnd) &&
     intersection(roles, [
       ...agencyModifierRoles,
       ...allSignatoryRoles,
@@ -127,8 +127,8 @@ export const ConventionValidation = ({
     currentUser &&
     hasUserRightsOnAgencyBroadcast(currentUser);
   const shouldShowAssessmentBadge =
-    isConventionValidated(convention) &&
-    !isConventionEndingInOneDayOrMore(convention);
+    isConventionValidated(convention.status) &&
+    !isConventionEndingInOneDayOrMore(convention.dateEnd);
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
@@ -185,7 +185,7 @@ export const ConventionValidation = ({
         <Badge
           className={`${fr.cx("fr-mr-2w")} ${labelAndSeverityByStatus[status].color}`}
         >
-          {labelAndSeverityByStatus[status].label}
+          {labelAndSeverityByStatus[status].agencyLabel}
         </Badge>
         {shouldShowConventionLastBroadcastFeedbackErrorInfo && (
           <Badge className={fr.cx("fr-mr-2w")} severity="error">
@@ -204,7 +204,7 @@ export const ConventionValidation = ({
             {
               getAssessmentLabelsAndSeverityByStatus({ isPlural: false })[
                 getAssessmentCompletionStatus(convention.assessment)
-              ].shortLabel
+              ].shortLabel.agencyLabel
             }
           </Badge>
         )}

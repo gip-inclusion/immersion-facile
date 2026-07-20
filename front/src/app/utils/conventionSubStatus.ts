@@ -50,8 +50,9 @@ export const getConventionSubStatus = (
   convention: ConventionReadDto,
   hasBroadcastError: boolean,
 ): ConventionSubStatus => {
-  const isConventionEndingInMoreThanOneDay =
-    isConventionEndingInOneDayOrMore(convention);
+  const isConventionEndingInMoreThanOneDay = isConventionEndingInOneDayOrMore(
+    convention.dateEnd,
+  );
   const isSingleValidation =
     !convention.agencyRefersTo &&
     convention.agencyValidationSteps === "validator-only";
