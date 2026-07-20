@@ -240,6 +240,9 @@ const getPageByRouteName: {
   beneficiaryDashboardDiscussions: (route) => (
     <BeneficiaryDashboardPage route={route} />
   ),
+  beneficiaryDashboardConventions: (route) => (
+    <BeneficiaryDashboardPage route={route} />
+  ),
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
