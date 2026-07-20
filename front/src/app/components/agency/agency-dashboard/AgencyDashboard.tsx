@@ -23,7 +23,7 @@ import type { DashboardTab } from "src/app/utils/dashboard";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { MetabaseView } from "../../MetabaseView";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";
-import { ConventionTabContent } from "./tabs/ConventionTabContent";
+import { AgencyConventionTabContent } from "./tabs/AgencyConventionTabContent";
 
 export const AgencyDashboard = ({
   route,
@@ -113,7 +113,9 @@ const rawAgencyDashboardTabs = ({
             tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
             label: "Tableau de bord",
             content: (
-              <ConventionTabContent activeAgencies={agenciesWithActiveStatus} />
+              <AgencyConventionTabContent
+                activeAgencies={agenciesWithActiveStatus}
+              />
             ),
           },
         ]
