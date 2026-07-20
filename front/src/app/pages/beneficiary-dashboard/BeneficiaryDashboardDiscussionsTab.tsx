@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { Loader, SectionHighlight } from "react-design-system";
 import { domElementIds, frontRoutes } from "shared";
-import { DiscussionTabContent } from "src/app/components/DiscussionTabContent";
+import { DiscussionTabContent } from "src/app/components/discussion/DiscussionTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
