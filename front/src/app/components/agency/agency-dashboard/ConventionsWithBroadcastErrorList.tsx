@@ -23,15 +23,11 @@ import {
   type FlatGetConventionsWithErroredBroadcastFeedbackParams,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
   NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE,
 } from "shared";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
-import {
-  broadcastFeedbackErrorMessageMap,
-  franceTravailTemporaryNetworkErrorBroadcastFeedback,
-} from "src/app/contents/broadcast-feedback/broadcastFeedback";
+import { getBroadcastFeedbackDescription } from "src/app/contents/broadcast-feedback/broadcastFeedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -82,16 +78,6 @@ export const ConventionsWithBroadcastErrorList = ({
       search: filters.search,
     });
   }, [filters.broadcastErrorKind, filters.conventionStatus, filters.search]);
-
-  const getDescription = (errorMessage: string) => {
-    if (isFunctionalBroadcastFeedbackError(errorMessage))
-      return broadcastFeedbackErrorMessageMap[errorMessage].description;
-
-    if (isFranceTravailBroadcastTemporaryNetworkErrorMessage(errorMessage))
-      return franceTravailTemporaryNetworkErrorBroadcastFeedback.description;
-
-    return "Erreur technique : Immersion Facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
-  };
 
   const broadcastErrorKindOptions: RadioButtonsProps["options"] = useMemo(
     () => [
@@ -442,7 +428,7 @@ export const ConventionsWithBroadcastErrorList = ({
                 </Badge>
               </>
             }
-            description={getDescription(
+            description={getBroadcastFeedbackDescription(
               conventionWithBroadcastFeedback.lastBroadcastFeedback
                 ?.subscriberErrorFeedback?.message ?? "",
             )}

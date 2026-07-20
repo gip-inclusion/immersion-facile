@@ -37,6 +37,7 @@ import { RenewConventionModalContent } from "src/app/components/forms/convention
 import { SignConventionModalContent } from "src/app/components/forms/convention/manage-actions/modals/SignConventionModalContent";
 import { TransferModalContent } from "src/app/components/forms/convention/manage-actions/modals/TransferModalContent";
 import { ValidatorModalContent } from "src/app/components/forms/convention/manage-actions/modals/ValidatorModalContent";
+import { getBroadcastFeedbackDescription } from "src/app/contents/broadcast-feedback/broadcastFeedback";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { match, P } from "ts-pattern";
 
@@ -266,7 +267,13 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
               showSyncErrorWarningStep={
                 showValidatorSyncErrorWarningBeforeValidation
               }
-              syncErrorMessage={broadcastErrorFeedback?.message}
+              syncErrorMessage={
+                broadcastErrorFeedback
+                  ? getBroadcastFeedbackDescription(
+                      broadcastErrorFeedback.message,
+                    )
+                  : undefined
+              }
               onCloseValidatorModalWithoutValidatorInfo={
                 onCloseValidatorModalWithoutValidatorInfo
               }
