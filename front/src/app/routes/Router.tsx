@@ -27,7 +27,7 @@ import { AdminPrivateRoutePage } from "src/app/pages/auth/AdminPrivateRoutePage"
 import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { DashboardPrivateRoutePage } from "src/app/pages/auth/DashboardPrivateRoutePage";
 import { MagicLinkInterstitialPage } from "src/app/pages/auth/MagicLinkInterstitialPage";
-import { BeneficiaryDashboardDiscussionsTab } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardDiscussionsTab";
+import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
@@ -238,14 +238,7 @@ const getPageByRouteName: {
     />
   ),
   beneficiaryDashboardDiscussions: (route) => (
-    <ConnectedPrivateRoutePage
-      route={route}
-      oAuthConnectionPageHeader={
-        <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
-      }
-    >
-      <BeneficiaryDashboardDiscussionsTab />
-    </ConnectedPrivateRoutePage>
+    <BeneficiaryDashboardPage route={route} />
   ),
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
