@@ -261,6 +261,16 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
       },
     ],
   },
+  {
+    title: "Outils et démarches",
+    links: [
+      {
+        label: "Accéder à une convention archivée",
+        ...frontRoutes.archivedConventionRequest().link,
+        id: navTopGroupLinksIds.archivedConventionRequest,
+      },
+    ],
+  },
 ];
 
 export const LayoutFooter = () => (
