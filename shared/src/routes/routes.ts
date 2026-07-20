@@ -40,6 +40,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
   beneficiaryDashboardConventions: "tableau-de-bord-beneficiaire/conventions",
+  archivedConventionRequest: "demande-convention-archivee",
 };
 
 export const legacyFrontRoutes = {
@@ -239,7 +240,10 @@ export const {
     { ...connectedUserParams, siret: param.query.optional.string },
     () => `/${legacyFrontRoutes.addAgency}`,
   ),
-
+  archivedConventionRequest: defineRoute(
+    connectedUserParams,
+    () => `/${legacyFrontRoutes.archivedConventionRequest}`,
+  ),
   admin,
   ...restOfAdminRoutes,
   adminConventions,

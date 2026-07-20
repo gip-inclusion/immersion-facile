@@ -21,6 +21,7 @@ export const allowedLoginSources = [
   "beneficiaryDashboard",
   "beneficiaryDashboardDiscussions",
   "beneficiaryDashboardConventions",
+  "archivedConventionRequest",
 ] as const;
 
 export type ExternalId = Flavor<string, "ExternalId">;

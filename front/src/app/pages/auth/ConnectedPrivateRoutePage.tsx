@@ -130,6 +130,7 @@ type ConnectPrivateRoute =
   | Route<typeof frontRoutes.myAccountEstablishments>
   | Route<typeof frontRoutes.myAccountEstablishmentRegistration>
   | Route<typeof frontRoutes.addAgency>
+  | Route<typeof frontRoutes.archivedConventionRequest>
   | Route<typeof frontRoutes.manageConventionConnectedUser>
   | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>;
 
@@ -382,6 +383,8 @@ const getAllowedStartAuthPage = (
     return "establishmentDashboardDiscussions";
   if (routeName === "manageConventionConnectedUser")
     return "manageConventionConnectedUser";
+  if (routeName === "archivedConventionRequest")
+    return "archivedConventionRequest";
   if (
     agencyDashboardRoutes.includes(routeName as AgencyDashboardRouteName) &&
     "isAgencyRegistration" in routeParams &&
@@ -633,6 +636,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       withProConnectLogin: true,
     },
     conventionTemplate: defaultPageContent,
+    archivedConventionRequest: defaultPageContent,
     myAccount: defaultPageContent,
     beneficiaryDashboard: beneficiaryDashboardContent,
     beneficiaryDashboardDiscussions: beneficiaryDashboardContent,

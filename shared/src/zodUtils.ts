@@ -27,6 +27,7 @@ export const localization = {
   invalidValidationFormatDate:
     "Le format de la date de validation est invalide.",
   invalidApprovalFormatDate: "Le format de la date d'approbation est invalide",
+  minCharacters: (min: number) => `Le minimum est de ${min} caractères`,
   maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
   mustBeSignedByEveryone: "La confirmation de votre accord est obligatoire.",
   required: "Ce champ est obligatoire",
