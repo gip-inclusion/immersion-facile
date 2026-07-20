@@ -1287,4 +1287,5 @@ export const domElementIds = {
     homeButton: "im-error__home-button",
     contactUsButton: "im-error__contact-us-button",
   },
+  beneficiaryDashboardConventions: {},
 } satisfies DomElementIds;
