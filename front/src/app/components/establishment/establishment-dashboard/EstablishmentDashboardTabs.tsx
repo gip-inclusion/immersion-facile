@@ -16,7 +16,7 @@ import {
   type UserEstablishmentRightDetails,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
-import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
+import { DiscussionTabContent } from "src/app/components/DiscussionTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
