@@ -37,6 +37,8 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
   const fixedPhoneNumber: PhoneNumber = "+33784423078";
   const unfixablePhoneNumber: PhoneNumber = "+33728661119";
 
+  const defaultBatchSize = 3_000;
+
   beforeEach(() => {
     timeGateway = new CustomTimeGateway();
     now = timeGateway.now();
@@ -77,6 +79,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
 
     const report = await verifyAndRequestInvalidPhonesUpdate.execute({
       dateToVerifyBefore: now,
+      batchSize: defaultBatchSize,
     });
 
     expectToEqual(uow.phoneRepository.phones, [
@@ -149,6 +152,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
 
     const report = await verifyAndRequestInvalidPhonesUpdate.execute({
       dateToVerifyBefore,
+      batchSize: defaultBatchSize,
     });
 
     expectToEqual(uow.phoneRepository.phones, [
@@ -176,6 +180,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
 
     const report = await verifyAndRequestInvalidPhonesUpdate.execute({
       dateToVerifyBefore: now,
+      batchSize: defaultBatchSize,
     });
 
     expectToEqual(uow.phoneRepository.phones, [{ ...phone, verifiedAt: now }]);
@@ -190,6 +195,7 @@ describe("VerifyAndRequestInvalidPhonesUpdate", () => {
   it("Returns empty report and does not affect data when there are no phone numbers in DB", async () => {
     const report = await verifyAndRequestInvalidPhonesUpdate.execute({
       dateToVerifyBefore: now,
+      batchSize: defaultBatchSize,
     });
     expectToEqual(uow.phoneRepository.phones, []);
     expectArraysToMatch(uow.outboxRepository.events, []);

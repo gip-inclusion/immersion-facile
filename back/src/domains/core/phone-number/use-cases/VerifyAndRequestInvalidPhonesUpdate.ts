@@ -40,15 +40,19 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
     createNewEvent: CreateNewEvent;
     uowPerformer: UnitOfWorkPerformer;
   }>()
-  .withInput(z.object({ dateToVerifyBefore: z.date() }))
+  .withInput(
+    z.object({
+      dateToVerifyBefore: z.date(),
+      batchSize: z.number().int().positive(),
+    }),
+  )
   .withOutput<VerifyAndRequestInvalidPhonesUpdateReport>()
   .notTransactional()
   .build(
     async ({
       deps: { timeGateway, createNewEvent, uowPerformer },
-      inputParams,
+      inputParams: { dateToVerifyBefore, batchSize },
     }) => {
-      const batchSize = 10_000;
       const triggeredUseCaseDate = timeGateway.now();
       const report: VerifyAndRequestInvalidPhonesUpdateReport = {
         nbOfCorrectPhones: 0,
@@ -61,8 +65,8 @@ export const makeVerifyAndRequestInvalidPhonesUpdate = useCaseBuilder(
         const batchReport = await uowPerformer.perform(async (uow) => {
           const { phones: phoneNumbersToVerify } =
             await uow.phoneRepository.getPhones({
-              limit: 10_000,
-              verifiedBefore: inputParams.dateToVerifyBefore,
+              limit: batchSize,
+              verifiedBefore: dateToVerifyBefore,
             });
 
           const verifiedPhoneNumbers: {
