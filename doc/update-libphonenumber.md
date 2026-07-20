@@ -6,7 +6,7 @@ Ce guide explique la démarche à suivre pour mettre à jour la lib libphonenumb
 1. A la racine, lancer `pnpm update libphonenumber-js@latest -r`
 
 2. Mettre en prod
-3. Lancer via la scalingo-cli `scalingo --app if-prod-back run pnpm back trigger-verify-and-fix-phones`
+3. Lancer via la scalingo-cli `scalingo --region osc-secnum-fr1 --app if-prod-back run pnpm back trigger-verify-and-fix-phones`
 
 ## ⚠️ Important
 
