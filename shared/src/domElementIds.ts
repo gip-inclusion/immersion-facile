@@ -1193,6 +1193,9 @@ export const domElementIds = {
       goToDiscussionButton: "im-beneficiary-dashboard__go-to-discussion-button",
     },
   },
+  beneficiaryDashboardConventions: {
+    beneficiaryConventionListTable: "im-beneficary-convention-list__table",
+  },
   beneficiaryDashboardDiscussions: {
     login: {
       proConnectButton:
@@ -1287,5 +1290,4 @@ export const domElementIds = {
     homeButton: "im-error__home-button",
     contactUsButton: "im-error__contact-us-button",
   },
-  beneficiaryDashboardConventions: {},
 } satisfies DomElementIds;
