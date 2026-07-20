@@ -63,7 +63,7 @@ export const EstablishmentDashboardTabs = ({
         makeEstablishmentDashboardTabs(currentUser, userHasDiscussions),
         currentTab,
       ),
-    [currentUser, currentTab, route, userHasDiscussions],
+    [currentUser, currentTab, userHasDiscussions],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   const shouldRedirectToMainTab =
