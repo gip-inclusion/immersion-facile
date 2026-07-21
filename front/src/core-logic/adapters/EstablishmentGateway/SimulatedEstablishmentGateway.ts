@@ -1,9 +1,9 @@
 import { delay, type Observable, of } from "rxjs";
 import {
-  type AdditionalEstablishmentInformation,
   type ConnectedUserJwt,
   type DataWithPagination,
   DiscussionBuilder,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
@@ -117,10 +117,10 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     return of(new DiscussionBuilder().buildRead()).pipe(delay(this.delay));
   }
 
-  getAdditionalEstablishmentInformation$(
+  getDiscussionEstablishmentContactInfo$(
     _discussionId: DiscussionId,
     _jwt: ConnectedUserJwt,
-  ): Observable<AdditionalEstablishmentInformation> {
+  ): Observable<DiscussionEstablishmentContactInfo> {
     const establishment = this.establishments[0];
     const adminRights =
       establishment?.userRights.filter(

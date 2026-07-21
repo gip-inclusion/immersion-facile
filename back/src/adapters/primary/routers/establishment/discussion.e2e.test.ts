@@ -234,11 +234,11 @@ describe("discussion e2e", () => {
   });
 
   describe(`${displayRouteName(
-    establishmentRoutes.getAdditionalEstablishmentInformation,
+    establishmentRoutes.getDiscussionEstablishmentContactInfo,
   )} returns the additional establishment information`, () => {
     it("401 - returns 401 if user is not authenticated", async () => {
       expectHttpResponseToEqual(
-        await httpClient.getAdditionalEstablishmentInformation({
+        await httpClient.getDiscussionEstablishmentContactInfo({
           headers: { authorization: "" },
           urlParams: { discussionId: "unrelevant-discussion-id" },
         }),
@@ -257,7 +257,7 @@ describe("discussion e2e", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
 
       expectHttpResponseToEqual(
-        await httpClient.getAdditionalEstablishmentInformation({
+        await httpClient.getDiscussionEstablishmentContactInfo({
           headers: {
             authorization: generateConnectedUserJwt({
               userId: userWithoutEstablishmentNorPotentialBeneficiaryRights.id,
@@ -282,7 +282,7 @@ describe("discussion e2e", () => {
       const nonExistentDiscussionId = "11111111-1111-4111-8111-111111111111";
 
       expectHttpResponseToEqual(
-        await httpClient.getAdditionalEstablishmentInformation({
+        await httpClient.getDiscussionEstablishmentContactInfo({
           headers: {
             authorization: generateConnectedUserJwt({
               userId: establishmentAdminConnectedUser.id,
@@ -311,7 +311,7 @@ describe("discussion e2e", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
 
       expectHttpResponseToEqual(
-        await httpClient.getAdditionalEstablishmentInformation({
+        await httpClient.getDiscussionEstablishmentContactInfo({
           headers: {
             authorization: generateConnectedUserJwt({
               userId: potentialBeneficiaryConnectedUser.id,
@@ -345,7 +345,7 @@ describe("discussion e2e", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
 
       expectHttpResponseToEqual(
-        await httpClient.getAdditionalEstablishmentInformation({
+        await httpClient.getDiscussionEstablishmentContactInfo({
           headers: {
             authorization: generateConnectedUserJwt({
               userId: establishmentAdminConnectedUser.id,

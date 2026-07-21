@@ -145,8 +145,8 @@ import { makeContactEstablishment } from "../../domains/establishment/use-cases/
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { makeDeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
-import { makeGetAdditionalEstablishmentInformation } from "../../domains/establishment/use-cases/discussions/GetAdditionalEstablishmentInformation";
 import { makeGetDiscussionById } from "../../domains/establishment/use-cases/discussions/GetDiscussionById";
+import { makeGetDiscussionEstablishmentContactInfo } from "../../domains/establishment/use-cases/discussions/GetDiscussionEstablishmentContactInfo";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
@@ -522,8 +522,8 @@ export const createUseCases = ({
       uowPerformer,
     }),
 
-    getAdditionalEstablishmentInformation:
-      makeGetAdditionalEstablishmentInformation({
+    getDiscussionEstablishmentContactInfo:
+      makeGetDiscussionEstablishmentContactInfo({
         uowPerformer,
       }),
 

@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  type AdditionalEstablishmentInformation,
   type ConnectedUserJwt,
   type DataWithPagination,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
@@ -46,7 +46,7 @@ export type DiscussionState = {
   discussionsWithPagination: DataWithPagination<DiscussionInList> & {
     filters: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray;
   };
-  additionalEstablishmentInformation: AdditionalEstablishmentInformation | null;
+  discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo | null;
 };
 
 export type SendExchangeRequestedPayload = {
@@ -79,7 +79,7 @@ const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
   discussionsWithPagination: initialDiscussionsWithPagination,
-  additionalEstablishmentInformation: null,
+  discussionEstablishmentContactInfo: null,
 };
 
 export const discussionSlice = createSlice({
@@ -185,22 +185,22 @@ export const discussionSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-    fetchAdditionalEstablishmentInformationRequested: (
+    fetchDiscussionEstablishmentContactInfoRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<FetchDiscussionRequestedPayload>,
     ) => {
-      state.additionalEstablishmentInformation = null;
+      state.discussionEstablishmentContactInfo = null;
     },
-    fetchAdditionalEstablishmentInformationSucceeded: (
+    fetchDiscussionEstablishmentContactInfoSucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<{
-        additionalEstablishmentInformation: AdditionalEstablishmentInformation;
+        discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo;
       }>,
     ) => {
-      state.additionalEstablishmentInformation =
-        action.payload.additionalEstablishmentInformation;
+      state.discussionEstablishmentContactInfo =
+        action.payload.discussionEstablishmentContactInfo;
     },
-    fetchAdditionalEstablishmentInformationFailed: (
+    fetchDiscussionEstablishmentContactInfoFailed: (
       _state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {},
