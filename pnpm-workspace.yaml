@@ -15,6 +15,7 @@ allowBuilds:
   core-js-pure: false
   cpu-features: false
   esbuild: true
+  protobufjs: true
   ssh2: false
   tree-sitter: false
   tree-sitter-json: false
