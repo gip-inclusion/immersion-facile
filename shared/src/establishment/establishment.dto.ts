@@ -29,7 +29,7 @@ export type EstablishmentMainContact = {
   phone: PhoneNumber;
 };
 
-export type AdditionalEstablishmentInformation = {
+export type DiscussionEstablishmentContactInfo = {
   siret: SiretDto;
   potentialBeneficiaryWelcomeAddress?: AddressAndPosition;
   mainContact: EstablishmentMainContact;

@@ -14,11 +14,11 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  type GetAdditionalEstablishmentInformation,
-  makeGetAdditionalEstablishmentInformation,
-} from "./GetAdditionalEstablishmentInformation";
+  type GetDiscussionEstablishmentContactInfo,
+  makeGetDiscussionEstablishmentContactInfo,
+} from "./GetDiscussionEstablishmentContactInfo";
 
-describe("GetAdditionalEstablishmentInformation", () => {
+describe("GetDiscussionEstablishmentContactInfo", () => {
   const establishmentAdmin = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("admin@admin.com")
@@ -37,13 +37,13 @@ describe("GetAdditionalEstablishmentInformation", () => {
     .withEmail("user@useless.com")
     .buildUser();
 
-  let getAdditionalEstablishmentInformation: GetAdditionalEstablishmentInformation;
+  let getDiscussionEstablishmentContactInfo: GetDiscussionEstablishmentContactInfo;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getAdditionalEstablishmentInformation =
-      makeGetAdditionalEstablishmentInformation({
+    getDiscussionEstablishmentContactInfo =
+      makeGetDiscussionEstablishmentContactInfo({
         uowPerformer: new InMemoryUowPerformer(uow),
       });
     uow.userRepository.users = [
@@ -89,7 +89,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
     it("throws when user cannot be found", async () => {
       uow.userRepository.users = [];
       await expectPromiseToFailWithError(
-        getAdditionalEstablishmentInformation.execute(discussion.id, {
+        getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: establishmentAdmin.id,
         }),
         errors.user.notFound({ userId: establishmentAdmin.id }),
@@ -100,7 +100,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
       const missingDiscussionId = uuid();
 
       await expectPromiseToFailWithError(
-        getAdditionalEstablishmentInformation.execute(missingDiscussionId, {
+        getDiscussionEstablishmentContactInfo.execute(missingDiscussionId, {
           userId: establishmentAdmin.id,
         }),
         errors.discussion.notFound({ discussionId: missingDiscussionId }),
@@ -109,7 +109,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
 
     it("throws when user has no establishment right and is not potential beneficiary", async () => {
       await expectPromiseToFailWithError(
-        getAdditionalEstablishmentInformation.execute(discussion.id, {
+        getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: userWithNoRightsAndDiscussion.id,
         }),
         errors.discussion.accessForbidden({
@@ -121,7 +121,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
 
     it("throws when user has pending establishment rights and is not potential beneficiary", async () => {
       await expectPromiseToFailWithError(
-        getAdditionalEstablishmentInformation.execute(discussion.id, {
+        getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: pendingUser.id,
         }),
         errors.discussion.accessForbidden({
@@ -135,7 +135,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
       await expectPromiseToFailWithError(
-        getAdditionalEstablishmentInformation.execute(discussion.id, {
+        getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
         }),
         errors.establishment.notFound({ siret: discussion.siret }),
@@ -146,7 +146,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
   describe("Right paths", () => {
     it("returns establishment additional information for potential beneficiary", async () => {
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
         }),
         {
@@ -163,7 +163,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
 
     it("returns establishment additional information for establishment admin user", async () => {
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: establishmentAdmin.id,
         }),
         {
@@ -199,7 +199,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
       ];
 
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
         }),
         {
@@ -216,7 +216,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
 
     it("returns establishment additional information for establishment contact user", async () => {
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: establishmentContact.id,
         }),
         {
@@ -266,7 +266,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
       ];
 
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
         }),
         {
@@ -316,7 +316,7 @@ describe("GetAdditionalEstablishmentInformation", () => {
       ];
 
       expectToEqual(
-        await getAdditionalEstablishmentInformation.execute(discussion.id, {
+        await getDiscussionEstablishmentContactInfo.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
         }),
         {

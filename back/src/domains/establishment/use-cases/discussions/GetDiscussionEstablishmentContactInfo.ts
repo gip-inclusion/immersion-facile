@@ -1,6 +1,6 @@
 import {
-  type AdditionalEstablishmentInformation,
   type ConnectedUserDomainJwtPayload,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionId,
   discussionIdSchema,
   errors,
@@ -8,15 +8,15 @@ import {
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import { hasUserRightToAccessDiscussion } from "./GetDiscussionById";
 
-export type GetAdditionalEstablishmentInformation = ReturnType<
-  typeof makeGetAdditionalEstablishmentInformation
+export type GetDiscussionEstablishmentContactInfo = ReturnType<
+  typeof makeGetDiscussionEstablishmentContactInfo
 >;
 
-export const makeGetAdditionalEstablishmentInformation = useCaseBuilder(
-  "GetAdditionalEstablishmentInformation",
+export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
+  "GetDiscussionEstablishmentContactInfo",
 )
   .withInput<DiscussionId>(discussionIdSchema)
-  .withOutput<AdditionalEstablishmentInformation>()
+  .withOutput<DiscussionEstablishmentContactInfo>()
   .withCurrentUser<ConnectedUserDomainJwtPayload>()
   .build(async ({ inputParams, uow, currentUser }) => {
     const user = await uow.userRepository.getById(currentUser.userId);
@@ -63,5 +63,5 @@ export const makeGetAdditionalEstablishmentInformation = useCaseBuilder(
         lastName: mainContactUser.lastName,
         phone: mainContactRight.phone,
       },
-    } satisfies AdditionalEstablishmentInformation;
+    } satisfies DiscussionEstablishmentContactInfo;
   });
