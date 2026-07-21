@@ -151,6 +151,10 @@ export const domElementIds = {
   },
 
   search: {
+    openMapButton: "im-search-page__open-map-button",
+    filterAppellationSection: "im-search-page__filter-appellation-section",
+    filterLocationSection: "im-search-page__filter-location-section",
+    filterConditionsSection: "im-search-page__filter-conditions-section",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
     appellationFilterTag: "im-search-page__appellation-filter-tag",
     distanceSelect: "im-search-page__distance-dropdown",

@@ -3,30 +3,49 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Card from "@codegouvfr/react-dsfr/Card";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
 import {
   Tag as ImTag,
+  RichDropdown,
   SearchResultIllustration,
-  SectionHighlight,
+  useLayout,
   useStyleUtils,
 } from "react-design-system";
+import { useFormContext } from "react-hook-form";
 import {
   type AppellationCode,
   domElementIds,
   frontRoutes,
   hasSearchGeoParams,
-  isPhysicalWorkMode,
   isSuperEstablishment,
   type OfferDto,
+  type SearchSortedBy,
+  searchSortedByOptions,
 } from "shared";
+import { SearchFiltersPanel } from "src/app/components/search/SearchFiltersPanel";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { type SearchRoute, useSearch } from "src/app/hooks/search.hooks";
+import {
+  appellationHintText,
+  appellationInputLabel,
+} from "src/app/pages/search/SearchPage";
+import {
+  areValidGeoParams,
+  getAppellationAndNafValues,
+  getEstablishmentAdditionalValues,
+  getLocalisationValues,
+  getSortedByOptions,
+  sortedByOptionsLabel,
+} from "src/app/pages/search/SearchPage.utils";
 import { filterParamsForRoute } from "src/app/utils/url.utils";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-on-left.png";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import type { Link } from "type-route";
 import { SearchResult } from "./SearchResult";
 
@@ -39,20 +58,31 @@ export const SearchListResults = ({
   route,
   isExternal,
   onSearchFormSubmit,
+  useNaturalLanguageForAppellations,
 }: {
+  tempValue: SearchPageParams;
+  setTempValue: (updatedValues: SearchPageParams) => void;
   route: SearchRoute;
   showDistance: boolean;
   isExternal: boolean;
   onSearchFormSubmit: (
     searchParams: ReturnType<typeof searchSelectors.searchParams>,
   ) => void;
+  useNaturalLanguageForAppellations?: boolean;
 }) => {
   const { triggerSearch } = useSearch(route);
   const { data: searchResults, pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
+  const { isLayoutDesktop } = useLayout();
+
+  const { enableSearchByScore } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
+  const { getValues, register } = useFormContext<SearchPageParams>();
+  const formValues = getValues();
   const searchParams = useAppSelector(searchSelectors.searchParams);
-  const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
+  const [isPanelOpened, setIsPanelOpened] = useState(false);
   const { cx, classes } = useStyleUtils();
   const { totalPages, currentPage, numberPerPage } = pagination;
   const hasResults = searchResults.length > 0;
@@ -67,10 +97,29 @@ export const SearchListResults = ({
     hasResults &&
     isLastPage &&
     isSearchWithAppellationAndGeoParams;
-  const isFullRemoteSearch =
-    searchParams.remoteWorkModes?.length === 1 &&
-    !isPhysicalWorkMode(searchParams.remoteWorkModes[0]);
+  const routeParams = route.params as Partial<SearchPageParams>;
+  const displayTotalFiltersLength = (formValues: SearchPageParams): string => {
+    const currentFiltersLength = [
+      ...getAppellationAndNafValues(
+        formValues.appellationCodes,
+        formValues.nafCodes,
+      ),
+      ...getEstablishmentAdditionalValues(
+        formValues.fitForDisabledWorkers,
+        formValues.showOnlyAvailableOffers,
+      ),
+      ...getLocalisationValues(formValues.place, formValues.remoteWorkModes),
+    ].length;
+    return currentFiltersLength > 0 ? `(${currentFiltersLength})` : "";
+  };
+  // const isFullRemoteSearch =
+  //   searchParams.remoteWorkModes?.length === 1 &&
+  //   !isPhysicalWorkMode(searchParams.remoteWorkModes[0]);
   const numberOfColumns = 6;
+  const filteredSortOptions = getSortedByOptions(
+    areValidGeoParams(formValues),
+    enableSearchByScore.isActive,
+  );
 
   return (
     <div className={fr.cx("fr-container", isExternal && "fr-mb-8w")}>
@@ -81,7 +130,117 @@ export const SearchListResults = ({
           !hasResults && "fr-grid-row--center",
         )}
       >
-        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+        <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+          <SearchFiltersPanel
+            initialValues={searchParams}
+            appellationInputLabel={appellationInputLabel(
+              useNaturalLanguageForAppellations,
+            )}
+            routeName={route.name}
+            isPanelOpened={isPanelOpened}
+            setIsPanelOpened={setIsPanelOpened}
+            appellationHintText={appellationHintText(
+              useNaturalLanguageForAppellations,
+            )}
+            onSearchFormSubmit={onSearchFormSubmit}
+          />
+        </div>
+
+        <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+          {!isExternal && isLayoutDesktop && (
+            <div
+              className={cx(fr.cx("fr-mb-2w"), "search-map-results__summary")}
+            >
+              <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
+                <strong>{pagination.totalRecords}</strong> résultat
+                {pagination.totalRecords > 1 ? "s" : ""} trouvé
+                {pagination.totalRecords > 1 ? "s" : ""}
+              </h2>
+              {routeParams.appellations &&
+                routeParams.appellations.length > 0 && (
+                  <span className={cx(fr.cx("fr-text--xs"))}>
+                    pour la recherche{" "}
+                    <a
+                      href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
+                      target="_blank"
+                      className={fr.cx("fr-text--bold")}
+                      rel="noreferrer"
+                    >
+                      {routeParams.appellations[0].appellationLabel}
+                    </a>
+                  </span>
+                )}
+            </div>
+          )}
+          <div className={fr.cx("fr-grid-row", "fr-mb-2w")}>
+            <RichDropdown
+              defaultValue="Trier par pertinence"
+              iconId="fr-icon-arrow-down-line"
+              id={domElementIds[route.name].sortFilterTag}
+              values={
+                formValues.sortBy
+                  ? [sortedByOptionsLabel[formValues.sortBy]]
+                  : []
+              }
+              noButtons
+              submenu={{
+                title: "Ordre d’affichage",
+                content: (
+                  <RadioButtons
+                    id={domElementIds[route.name].sortRadioButtons}
+                    options={filteredSortOptions.map((option) => ({
+                      ...option,
+                      nativeInputProps: {
+                        name: register("sortBy").name,
+                        value: option.value,
+                        disabled: option.disabled,
+                        checked: formValues.sortBy
+                          ? option.value === formValues.sortBy
+                          : false,
+                        onClick: (event) => {
+                          const updatedSortedBy = isSearchSortedBy(
+                            event.currentTarget.value,
+                          )
+                            ? event.currentTarget.value
+                            : "score";
+                          if (
+                            updatedSortedBy === "distance" &&
+                            areValidGeoParams(formValues)
+                          ) {
+                            onSearchFormSubmit({
+                              ...formValues,
+                              sortBy: "distance",
+                            });
+                          }
+                          if (updatedSortedBy !== "distance") {
+                            onSearchFormSubmit({
+                              ...formValues,
+                              sortBy: updatedSortedBy,
+                            });
+                          }
+                        },
+                      },
+                    }))}
+                  />
+                ),
+              }}
+            />
+            {isLayoutDesktop && (
+              <SearchMiniMap kind="list" isExternal={isExternal} />
+            )}
+            <Button
+              iconId="fr-icon-filter-line"
+              priority="secondary"
+              className={fr.cx("fr-hidden-lg", "fr-ml-auto")}
+              size="small"
+              type="button"
+              onClick={() => {
+                setIsPanelOpened(true);
+              }}
+            >
+              Filtrer {displayTotalFiltersLength(formValues)}
+            </Button>
+          </div>
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -243,103 +402,74 @@ export const SearchListResults = ({
               <LaBonneBoiteCallToAction searchParams={searchParams} />
             )}
           </div>
-        </div>
-        {hasResults && (
-          <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
-            {!isFullRemoteSearch && (
-              <div className={fr.cx("fr-mb-2w")}>
-                <SearchMiniMap
-                  kind="list"
-                  activeMarkerKey={activeMarkerKey}
-                  setActiveMarkerKey={setActiveMarkerKey}
-                  isExternal={isExternal}
-                />
-              </div>
-            )}
-            <SectionHighlight className={fr.cx("fr-p-2w")}>
-              <p>
-                <strong>
-                  Certaines entreprises sont temporairement masquées.
-                </strong>
-              </p>
-              <p>
-                Lorsqu’elles ont reçu le nombre maximum de candidatures qu’elles
-                peuvent traiter, les entreprises n’apparaissent plus dans la
-                recherche. Décochez le filtre “Mises en relation disponibles
-                uniquement” dans “Toutes les entreprises” pour les voir. Si
-                l’une d’entre-elles vous intéresse, revenez consulter sa fiche
-                dans les prochaines semaines.
-              </p>
-            </SectionHighlight>
-          </div>
-        )}
-        {!isExternal && (
-          <div className={fr.cx("fr-container", "fr-mb-10w")}>
-            <div
-              className={fr.cx(
-                "fr-grid-row",
-                "fr-grid-row--middle",
-                "fr-mt-4w",
-              )}
-            >
-              <div className={fr.cx("fr-col-10", "fr-grid-row")}>
-                <Pagination
-                  showFirstLast
-                  count={totalPages}
-                  defaultPage={currentPage}
-                  getPageLinkProps={(pageNumber) => ({
-                    title: `Résultats de recherche, page : ${pageNumber}`,
-                    onClick: (event) => {
-                      event.preventDefault();
-                      triggerSearch(
-                        {
-                          ...searchParams,
-                          page: pageNumber,
-                        },
-                        isExternal,
-                      );
-                    },
-                    href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
-                    key: `pagination-link-${pageNumber}`,
-                  })}
-                  className={fr.cx("fr-mt-1w")}
-                />
-              </div>
+          {!isExternal && (
+            <div className={fr.cx("fr-container", "fr-mb-10w")}>
               <div
                 className={fr.cx(
-                  "fr-col-2",
                   "fr-grid-row",
-                  "fr-grid-row--right",
+                  "fr-grid-row--middle",
+                  "fr-mt-4w",
                 )}
               >
-                <Select
-                  label=""
-                  options={[
-                    ...resultsPerPageOptions.map((numberAsString) => ({
-                      label: `${numberAsString} résultats / page`,
-                      value: numberAsString,
-                    })),
-                  ]}
-                  nativeSelectProps={{
-                    id: domElementIds.search.resultPerPageDropdown,
-                    onChange: (event) => {
-                      const value = event.currentTarget.value;
-                      triggerSearch(
-                        {
-                          ...searchParams,
-                          perPage: Number.parseInt(value, 10),
-                        },
-                        isExternal,
-                      );
-                    },
-                    value: numberPerPage.toString() as ResultsPerPageOption,
-                    "aria-label": "Nombre de résultats par page",
-                  }}
-                />
+                <div className={fr.cx("fr-col-9", "fr-grid-row")}>
+                  <Pagination
+                    showFirstLast
+                    count={totalPages}
+                    defaultPage={currentPage}
+                    getPageLinkProps={(pageNumber) => ({
+                      title: `Résultats de recherche, page : ${pageNumber}`,
+                      onClick: (event) => {
+                        event.preventDefault();
+                        triggerSearch(
+                          {
+                            ...searchParams,
+                            page: pageNumber,
+                          },
+                          isExternal,
+                        );
+                      },
+                      href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+                      key: `pagination-link-${pageNumber}`,
+                    })}
+                    className={fr.cx("fr-mt-1w")}
+                  />
+                </div>
+                <div
+                  className={fr.cx(
+                    "fr-col-3",
+                    "fr-grid-row",
+                    "fr-grid-row--right",
+                  )}
+                >
+                  <Select
+                    label=""
+                    options={[
+                      ...resultsPerPageOptions.map((numberAsString) => ({
+                        label: `${numberAsString} / page`,
+                        value: numberAsString,
+                      })),
+                    ]}
+                    nativeSelectProps={{
+                      id: domElementIds.search.resultPerPageDropdown,
+                      onChange: (event) => {
+                        const value = event.currentTarget.value;
+                        triggerSearch(
+                          {
+                            ...searchParams,
+                            perPage: Number.parseInt(value, 10),
+                          },
+                          isExternal,
+                        );
+                      },
+                      value: numberPerPage.toString() as ResultsPerPageOption,
+                      "aria-label": "Nombre de résultats par page",
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -412,3 +542,6 @@ const LaBonneBoiteCallToAction = ({
     </div>
   );
 };
+
+const isSearchSortedBy = (value: string): value is SearchSortedBy =>
+  searchSortedByOptions.includes(value as SearchSortedBy);
