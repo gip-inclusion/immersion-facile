@@ -10,7 +10,6 @@ export * from "./convention-total-hours";
 export * from "./convention-weekly-schedule";
 export * from "./copy-button";
 export * from "./crisp-chat";
-export * from "./discussion-meta";
 export * from "./document";
 export * from "./error-notifications";
 export * from "./exchange-message";
