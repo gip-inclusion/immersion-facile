@@ -36,11 +36,11 @@ import {
   exchangeMessageFromDashboardSchema,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  getFormattedLocalPhoneNumber,
   makeEmptyConventionInitialValues,
   splitTextOnFirstSeparator,
   toConventionDraftDto,
   toDisplayedDate,
+  toDisplayedPhoneNumber,
   type WithDiscussionId,
 } from "shared";
 import {
@@ -696,7 +696,7 @@ const EstablishmentContactInformation = ({
           )) ??
         "Un mail avec l'adresse de l'entreprise et la personne a contacter sur place vous a été envoyé")
       : discussionEstablishmentContactInfo &&
-        getFormattedLocalPhoneNumber(
+        toDisplayedPhoneNumber(
           discussionEstablishmentContactInfo.mainContact.phone,
         );
 

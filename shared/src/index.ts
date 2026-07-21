@@ -106,7 +106,6 @@ export * from "./pagination/pagination";
 export * from "./pagination/pagination.dto";
 export * from "./pagination/pagination.schema";
 export * from "./phone/phone.dto";
-export * from "./phone/phone.helpers";
 export * from "./phone/phone.schema";
 export * from "./pipeWithValue";
 export * from "./ramdaExtensions/notEqual";
