@@ -387,7 +387,6 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               Candidature pour {discussion.businessName}
             </h1>
           )}
-          {/*puce   */}
           <p>
             {discussion.appellation.appellationLabel}
             {"  "}•{"  "}
@@ -425,48 +424,24 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         )}
       >
         <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
-          {discussion.contactMode === "EMAIL" && (
-            <BorderedSection>
-              <DiscussionExchangeMessageForm
-                discussionId={discussion.id}
-                viewer={viewer}
-              />
-            </BorderedSection>
-          )}
           {match(discussion.contactMode)
             .with("EMAIL", () => (
-              <BorderedSection className={fr.cx("fr-mt-2w")}>
-                <DiscussionExchangesList
-                  discussion={discussion}
-                  viewer={viewer}
-                />
-              </BorderedSection>
-            ))
-            .with("PHONE", (contactMode) =>
-              viewer === "potentialBeneficiary" ? (
-                <>
-                  <BorderedSection>
-                    <EstablishmentContactInformation
-                      discussionEstablishmentContactInfo={
-                        discussionEstablishmentContactInfo
-                      }
-                      contactMode={contactMode}
-                    />
-                  </BorderedSection>
-                  <BorderedSection className={fr.cx("fr-mt-2w")}>
-                    <BeneficiaryGuideInformation contactMode="PHONE" />
-                  </BorderedSection>
-                </>
-              ) : (
+              <>
                 <BorderedSection>
                   <DiscussionExchangeMessageForm
-                    viewer="establishment"
                     discussionId={discussion.id}
+                    viewer={viewer}
                   />
                 </BorderedSection>
-              ),
-            )
-            .with("IN_PERSON", (contactMode) =>
+                <BorderedSection className={fr.cx("fr-mt-2w")}>
+                  <DiscussionExchangesList
+                    discussion={discussion}
+                    viewer={viewer}
+                  />
+                </BorderedSection>
+              </>
+            ))
+            .with(P.union("PHONE", "IN_PERSON"), (contactMode) =>
               viewer === "potentialBeneficiary" ? (
                 <>
                   <BorderedSection>
@@ -478,8 +453,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                     />
                   </BorderedSection>
                   <BorderedSection className={fr.cx("fr-mt-2w")}>
-                    <BeneficiaryGuideInformation contactMode="IN_PERSON" />
-                  </BorderedSection>{" "}
+                    <BeneficiaryGuideInformation contactMode={contactMode} />
+                  </BorderedSection>
                 </>
               ) : (
                 <BorderedSection>
