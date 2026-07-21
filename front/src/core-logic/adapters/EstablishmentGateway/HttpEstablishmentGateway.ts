@@ -1,8 +1,8 @@
 import { from, type Observable } from "rxjs";
 import {
-  type AdditionalEstablishmentInformation,
   type ConnectedUserJwt,
   type DataWithPagination,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionExchangeForbiddenParams,
   type DiscussionId,
   type DiscussionInList,
@@ -232,13 +232,13 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     );
   }
 
-  public getAdditionalEstablishmentInformation$(
+  public getDiscussionEstablishmentContactInfo$(
     discussionId: DiscussionId,
     jwt: ConnectedUserJwt,
-  ): Observable<AdditionalEstablishmentInformation> {
+  ): Observable<DiscussionEstablishmentContactInfo> {
     return from(
       this.httpClient
-        .getAdditionalEstablishmentInformation({
+        .getDiscussionEstablishmentContactInfo({
           headers: { authorization: jwt },
           urlParams: { discussionId },
         })

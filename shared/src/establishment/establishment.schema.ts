@@ -16,7 +16,7 @@ import {
   businessNameSchema,
 } from "./businessComponents.schema";
 import type {
-  AdditionalEstablishmentInformation,
+  DiscussionEstablishmentContactInfo,
   EstablishmentMainContact,
   EstablishmentNameAndAdmins,
   EstablishmentPublicOption,
@@ -43,7 +43,7 @@ const establishmentMainContactSchema: ZodSchemaWithInputMatchingOutput<Establish
     phone: phoneNumberSchema,
   });
 
-export const additionalEstablishmentInformationSchema: ZodSchemaWithInputMatchingOutput<AdditionalEstablishmentInformation> =
+export const discussionEstablishmentContactInfoSchema: ZodSchemaWithInputMatchingOutput<DiscussionEstablishmentContactInfo> =
   z.object({
     siret: siretSchema,
     potentialBeneficiaryWelcomeAddress: addressAndPositionSchema.optional(),
