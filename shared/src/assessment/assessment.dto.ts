@@ -51,7 +51,7 @@ export type AssessmentDtoDidNotShow = CommonAssessmentFields & {
 
 export type AssessmentDtoPartiallyCompleted = CommonAssessmentFields & {
   status: "PARTIALLY_COMPLETED";
-  lastDayOfPresence: DateString | undefined;
+  lastDayOfPresence: DateString;
   numberOfMissedHours: number;
 };
 
@@ -94,17 +94,17 @@ export type LegacyAssessmentDto = {
   createdAt: DateTimeIsoString;
 };
 
-export type CreateFormAssessmentInitialValues = {
-  conventionId: ConventionId;
-} & (WithEndedWithAJob | { endedWithAJob: null }) &
-  WithEstablishmentComments & {
-    status: null;
-    beneficiaryAgreement: null;
-    beneficiaryFeedback: null;
-    signedAt: null;
-    createdAt: DateTimeIsoString;
-  };
+export type AssessmentPartialCompletionDetailsFormValues = {
+  lastDayOfPresence: DateString | "";
+  numberOfMissedHours: number | "";
+  numberOfMissedMinutes: number | "";
+};
 
-export type AssessmentFormDto =
-  | AssessmentDto
-  | CreateFormAssessmentInitialValues;
+export type AssessmentFormValues = {
+  conventionId: ConventionId;
+  status: AssessmentStatus | null;
+  partialCompletionDetails: AssessmentPartialCompletionDetailsFormValues;
+  endedWithAJob: boolean | null;
+  typeOfContract: TypeOfContract | "";
+  contractStartDate: DateString | "";
+} & WithEstablishmentComments;
