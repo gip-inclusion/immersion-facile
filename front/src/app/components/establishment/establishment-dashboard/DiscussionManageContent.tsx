@@ -19,13 +19,13 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AbsoluteUrl,
-  type AdditionalEstablishmentInformation,
   absoluteUrlSchema,
   addressDtoToString,
   type ConnectedUser,
   type ContactMode,
   type ConventionDraftDto,
   type CreateConventionPresentationInitialValues,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionId,
   type DiscussionReadDto,
   domElementIds,
@@ -130,7 +130,7 @@ export const DiscussionManageContent = ({
         discussion.contactMode === "IN_PERSON")
     ) {
       dispatch(
-        discussionSlice.actions.fetchAdditionalEstablishmentInformationRequested(
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
           {
             discussionId,
             jwt: connectedUserJwt,
@@ -326,8 +326,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const saveConventionDraftIsLoading = useAppSelector(
     conventionDraftSelectors.isLoading,
   );
-  const additionalEstablishmentInformation = useAppSelector(
-    discussionSelectors.additionalEstablishmentInformation,
+  const discussionEstablishmentContactInfo = useAppSelector(
+    discussionSelectors.discussionEstablishmentContactInfo,
   );
   const relatedOffer = useAppSelector(searchSelectors.currentSearchResult);
   const saveConventionDraftThenRedirectRequested = ({
@@ -447,8 +447,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 <>
                   <BorderedSection>
                     <EstablishmentContactInformation
-                      additionalEstablishmentInformation={
-                        additionalEstablishmentInformation
+                      discussionEstablishmentContactInfo={
+                        discussionEstablishmentContactInfo
                       }
                       contactMode={contactMode}
                     />
@@ -471,8 +471,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 <>
                   <BorderedSection>
                     <EstablishmentContactInformation
-                      additionalEstablishmentInformation={
-                        additionalEstablishmentInformation
+                      discussionEstablishmentContactInfo={
+                        discussionEstablishmentContactInfo
                       }
                       contactMode={contactMode}
                     />
@@ -681,37 +681,37 @@ const BeneficiaryGuideInformation = ({
 );
 
 const EstablishmentContactInformation = ({
-  additionalEstablishmentInformation,
+  discussionEstablishmentContactInfo,
   contactMode,
 }: {
-  additionalEstablishmentInformation: AdditionalEstablishmentInformation | null;
+  discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo | null;
   contactMode: Extract<ContactMode, "IN_PERSON" | "PHONE">;
 }) => {
   const contactDetail =
     contactMode === "IN_PERSON"
-      ? ((additionalEstablishmentInformation?.potentialBeneficiaryWelcomeAddress &&
+      ? ((discussionEstablishmentContactInfo?.potentialBeneficiaryWelcomeAddress &&
           addressDtoToString(
-            additionalEstablishmentInformation
+            discussionEstablishmentContactInfo
               .potentialBeneficiaryWelcomeAddress.address,
           )) ??
         "Un mail avec l'adresse de l'entreprise et la personne a contacter sur place vous a été envoyé")
-      : additionalEstablishmentInformation &&
+      : discussionEstablishmentContactInfo &&
         getFormattedLocalPhoneNumber(
-          additionalEstablishmentInformation.mainContact.phone,
+          discussionEstablishmentContactInfo.mainContact.phone,
         );
 
   return (
     <>
       <h5 className={fr.cx("fr-h5")}>Coordonnées de l'entreprise</h5>
-      {additionalEstablishmentInformation && contactDetail ? (
+      {discussionEstablishmentContactInfo && contactDetail ? (
         <ul className={fr.cx("fr-raw-list")}>
           <li className={fr.cx("fr-mb-1w")}>
             <strong>
               {getFormattedFirstnameAndLastname({
                 firstname:
-                  additionalEstablishmentInformation.mainContact.firstName,
+                  discussionEstablishmentContactInfo.mainContact.firstName,
                 lastname:
-                  additionalEstablishmentInformation.mainContact.lastName,
+                  discussionEstablishmentContactInfo.mainContact.lastName,
               })}
             </strong>
           </li>

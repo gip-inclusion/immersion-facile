@@ -117,33 +117,33 @@ const fetchDiscussionListEpic: DiscussionEpic = (
     ),
   );
 
-const fetchAdditionalEstablishmentInformationEpic: DiscussionEpic = (
+const fetchDiscussionEstablishmentContactInfoEpic: DiscussionEpic = (
   action$,
   _state$,
   { establishmentGateway },
 ) =>
   action$.pipe(
     filter(
-      discussionSlice.actions.fetchAdditionalEstablishmentInformationRequested
+      discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested
         .match,
     ),
     switchMap((action) =>
       establishmentGateway
-        .getAdditionalEstablishmentInformation$(
+        .getDiscussionEstablishmentContactInfo$(
           action.payload.discussionId,
           action.payload.jwt,
         )
         .pipe(
-          map((additionalEstablishmentInformation) =>
-            discussionSlice.actions.fetchAdditionalEstablishmentInformationSucceeded(
+          map((discussionEstablishmentContactInfo) =>
+            discussionSlice.actions.fetchDiscussionEstablishmentContactInfoSucceeded(
               {
-                additionalEstablishmentInformation,
+                discussionEstablishmentContactInfo,
                 feedbackTopic: action.payload.feedbackTopic,
               },
             ),
           ),
           catchEpicError((error) =>
-            discussionSlice.actions.fetchAdditionalEstablishmentInformationFailed(
+            discussionSlice.actions.fetchDiscussionEstablishmentContactInfoFailed(
               {
                 errorMessage: error.message,
                 feedbackTopic: action.payload.feedbackTopic,
@@ -159,5 +159,5 @@ export const discussionEpics = [
   updateDiscussionStatusEpic,
   sendMessageEpic,
   fetchDiscussionListEpic,
-  fetchAdditionalEstablishmentInformationEpic,
+  fetchDiscussionEstablishmentContactInfoEpic,
 ];

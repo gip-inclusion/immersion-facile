@@ -30,7 +30,7 @@ describe("Discussion slice", () => {
     isLoading: false,
     discussion: null,
     discussionsWithPagination: initialDiscussionsWithPagination,
-    additionalEstablishmentInformation: null,
+    discussionEstablishmentContactInfo: null,
   };
   const jwt = "my-jwt";
   const discussion: DiscussionReadDto = new DiscussionBuilder().buildRead();
@@ -61,7 +61,7 @@ describe("Discussion slice", () => {
       isLoading: false,
       discussion: null,
       discussionsWithPagination: initialDiscussionsWithPagination,
-      additionalEstablishmentInformation: null,
+      discussionEstablishmentContactInfo: null,
     });
   });
 

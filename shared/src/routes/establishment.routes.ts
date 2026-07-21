@@ -9,7 +9,7 @@ import {
   withExchangeMessageSchema,
 } from "../discussion/discussion.schema";
 import {
-  additionalEstablishmentInformationSchema,
+  discussionEstablishmentContactInfoSchema,
   establishmentNameAndAdminsSchema,
   establishmentPublicOptionsSchema,
   getEstablishmentPublicOptionsByFiltersSchema,
@@ -115,12 +115,12 @@ export const establishmentRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  getAdditionalEstablishmentInformation: defineRoute({
+  getDiscussionEstablishmentContactInfo: defineRoute({
     method: "get",
     url: "/discussions/:discussionId/additional-establishment-information",
     ...withAuthorizationHeaders,
     responses: {
-      200: additionalEstablishmentInformationSchema,
+      200: discussionEstablishmentContactInfoSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
