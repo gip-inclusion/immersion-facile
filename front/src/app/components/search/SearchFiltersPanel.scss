@@ -1,0 +1,33 @@
+@use "react-design-system/src/config/responsive" as *;
+
+.im-search-filters-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: none;
+
+  &--opened {
+    display: block;
+    overflow-y: auto;
+    background-color: var(--background-default-grey);
+  }
+
+  @include for-screen-min($bp-md) {
+    position: static;
+    display: block;
+  }
+
+  &__close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+
+    @include for-screen-min($bp-md) {
+      display: none;
+    }
+  }
+}

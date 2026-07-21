@@ -26,6 +26,7 @@ export type RichDropdownProps = {
   className?: string;
   id?: string;
   as?: "Tag" | "Button";
+  noButtons?: boolean;
 };
 
 const getElementParentsClasses = (
@@ -50,6 +51,7 @@ export const RichDropdown = ({
   id,
   onReset,
   as = "Tag",
+  noButtons = false,
 }: RichDropdownProps) => {
   const { cx } = useStyles();
   const [isOpened, setIsOpened] = useState<boolean>(false);
@@ -148,12 +150,14 @@ export const RichDropdown = ({
       >
         <p className={fr.cx("fr-text--bold")}>{submenu.title}</p>
         {submenu.content}
-        <ButtonsGroup
-          className={fr.cx("fr-hr", "fr-pt-2w", "fr-pb-0")}
-          inlineLayoutWhen="always"
-          alignment="right"
-          buttons={buttons}
-        />
+        {!noButtons && (
+          <ButtonsGroup
+            className={fr.cx("fr-hr", "fr-pt-2w", "fr-pb-0")}
+            inlineLayoutWhen="always"
+            alignment="right"
+            buttons={buttons}
+          />
+        )}
       </section>
     </div>
   );
