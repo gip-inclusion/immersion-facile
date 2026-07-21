@@ -1,10 +1,14 @@
 import { ZodError } from "zod";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import type { ConventionReadDto } from "../convention/convention.dto";
+import { errors } from "../errors/errors";
+import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { expectToEqual } from "../test.helpers";
 import { type DateRange, withDateRangeSchema } from "../utils/date";
-import type { AssessmentDto } from "./assessment.dto";
+import type { AssessmentDto, AssessmentFormValues } from "./assessment.dto";
 import { assessmentDtoSchema, assessmentFormSchema } from "./assessment.schema";
+
+const createdAt = "2024-01-01T00:00:00.000Z";
 
 describe("Assessment schema date range", () => {
   it("accepts valid date range", () => {
@@ -36,11 +40,14 @@ describe("Assessment schema date range", () => {
       to: new Date("invalid"),
     };
 
-    expectDateRangeToFailWithError(dateRange, ["Invalid date", "Invalid date"]);
+    expectDateRangeToFailWithError(dateRange, [
+      "Invalid input: expected date, received Date",
+      "Invalid input: expected date, received Date",
+    ]);
   });
 });
 
-describe("Assessment schema", () => {
+describe("Assessment DTO schema", () => {
   it("accepts a minimal valid assessment", () => {
     const assessment: AssessmentDto = {
       status: "COMPLETED",
@@ -51,7 +58,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
-      createdAt: "2024-01-01",
+      createdAt,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -71,10 +78,44 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
-      createdAt: "2024-01-01",
+      createdAt,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
+  });
+
+  it("accepts PARTIALLY_COMPLETED with lastDayOfPresence and missed hours", () => {
+    const assessment: AssessmentDto = {
+      status: "PARTIALLY_COMPLETED",
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      lastDayOfPresence: "2024-01-20",
+      numberOfMissedHours: 2,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
+      createdAt,
+    };
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
+    expectToEqual(assessment, parsedAssessment);
+  });
+
+  it("rejects PARTIALLY_COMPLETED without lastDayOfPresence", () => {
+    const assessment = {
+      status: "PARTIALLY_COMPLETED",
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      numberOfMissedHours: 2,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+      beneficiaryAgreement: null,
+      beneficiaryFeedback: null,
+      signedAt: null,
+      createdAt,
+    };
+    expect(() => assessmentDtoSchema.parse(assessment)).toThrow();
   });
 
   it("accepts an assessment of a did not show immersion", () => {
@@ -87,7 +128,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: null,
       beneficiaryFeedback: null,
       signedAt: null,
-      createdAt: "2024-01-01",
+      createdAt,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -103,7 +144,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: true,
       beneficiaryFeedback: "my beneficiary feedback",
       signedAt: "2024-01-01",
-      createdAt: "2024-01-01",
+      createdAt,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -119,7 +160,7 @@ describe("Assessment schema", () => {
       beneficiaryAgreement: true,
       beneficiaryFeedback: null,
       signedAt: "2024-01-01",
-      createdAt: "2024-01-01",
+      createdAt,
     };
     const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
@@ -146,6 +187,7 @@ describe("Assessment form schema", () => {
     ...new ConventionDtoBuilder()
       .withDateStart("2024-01-10")
       .withDateEnd("2024-01-20")
+      .withSchedule(reasonableSchedule)
       .build(),
     agencyName: "My agency",
     agencyDepartment: "75",
@@ -157,73 +199,120 @@ describe("Assessment form schema", () => {
     isEstablishmentBanned: false,
   };
 
-  const validAssessment: AssessmentDto = {
+  const validFormValues: AssessmentFormValues = {
     status: "PARTIALLY_COMPLETED",
     conventionId: "my-convention-id",
     endedWithAJob: true,
     typeOfContract: "CDI",
     contractStartDate: "2024-01-15",
-    lastDayOfPresence: "2024-01-18",
-    numberOfMissedHours: 0,
+    partialCompletionDetails: {
+      lastDayOfPresence: "2024-01-18",
+      numberOfMissedHours: 0,
+      numberOfMissedMinutes: 0,
+    },
     establishmentAdvices: "establishment advices",
     establishmentFeedback: "establishment feedback",
-    beneficiaryAgreement: null,
-    beneficiaryFeedback: null,
-    signedAt: null,
-    createdAt: "2024-01-01T00:00:00.000Z",
   };
 
-  it("accepts a valid form assessment", () => {
-    const parsedAssessment =
-      assessmentFormSchema(convention).parse(validAssessment);
-    expectToEqual(parsedAssessment, validAssessment);
-  });
-
-  it("rejects contractStartDate before convention start date", () => {
-    const invalidAssessment = {
-      ...validAssessment,
-      contractStartDate: "2024-01-09",
+  it("accepts hours-only PARTIALLY_COMPLETED (empty date)", () => {
+    const formValues: AssessmentFormValues = {
+      ...validFormValues,
+      partialCompletionDetails: {
+        lastDayOfPresence: "",
+        numberOfMissedHours: 2,
+        numberOfMissedMinutes: "",
+      },
+      endedWithAJob: false,
+      typeOfContract: "",
+      contractStartDate: "",
     };
 
-    expect(() =>
-      assessmentFormSchema(convention).parse(invalidAssessment),
-    ).toThrow();
+    expectToEqual(
+      assessmentFormSchema(convention).parse(formValues),
+      formValues,
+    );
+  });
 
-    try {
-      assessmentFormSchema(convention).parse(invalidAssessment);
-    } catch (error) {
-      expect(error instanceof ZodError).toBeTruthy();
-      if (error instanceof ZodError) {
-        expectToEqual(error.issues[0].path, ["contractStartDate"]);
-        expect(error.issues[0].message).toContain(
-          "La date début du contrat ne peut pas être antérieure à la date de début d'immersion",
-        );
-      }
-    }
+  it("accepts date-only PARTIALLY_COMPLETED (0h 0min)", () => {
+    const formValues: AssessmentFormValues = {
+      ...validFormValues,
+      partialCompletionDetails: {
+        lastDayOfPresence: "2024-01-18",
+        numberOfMissedHours: 0,
+        numberOfMissedMinutes: 0,
+      },
+      endedWithAJob: false,
+      typeOfContract: "",
+      contractStartDate: "",
+    };
+
+    expectToEqual(
+      assessmentFormSchema(convention).parse(formValues),
+      formValues,
+    );
+  });
+
+  it("rejects PARTIALLY_COMPLETED with empty date and 0h 0min on partialCompletionDetails path", () => {
+    const invalidFormValues: AssessmentFormValues = {
+      ...validFormValues,
+      partialCompletionDetails: {
+        lastDayOfPresence: "",
+        numberOfMissedHours: 0,
+        numberOfMissedMinutes: 0,
+      },
+      endedWithAJob: false,
+      typeOfContract: "",
+      contractStartDate: "",
+    };
+
+    expectFormSchemaToFailWith({
+      convention,
+      formValues: invalidFormValues,
+      path: ["partialCompletionDetails"],
+      message: errors.assessment.partialCompletionDetailsRequired().message,
+    });
   });
 
   it("rejects numberOfMissedHours above planned immersion hours", () => {
-    const invalidAssessment = {
-      ...validAssessment,
-      numberOfMissedHours: 999,
+    const invalidFormValues: AssessmentFormValues = {
+      ...validFormValues,
+      partialCompletionDetails: {
+        ...validFormValues.partialCompletionDetails,
+        numberOfMissedHours: 999,
+        numberOfMissedMinutes: "",
+      },
+      endedWithAJob: false,
+      typeOfContract: "",
+      contractStartDate: "",
     };
 
-    expect(() =>
-      assessmentFormSchema(convention).parse(invalidAssessment),
-    ).toThrow();
+    expectFormSchemaToFailWith({
+      convention,
+      formValues: invalidFormValues,
+      path: ["partialCompletionDetails", "numberOfMissedHours"],
+      message: errors.assessment.numberOfMissedHoursExceedsScheduled().message,
+    });
+  });
 
-    try {
-      assessmentFormSchema(convention).parse(invalidAssessment);
-    } catch (error) {
-      expect(error instanceof ZodError).toBeTruthy();
-      if (error instanceof ZodError) {
-        expectToEqual(error.issues[0].path, ["numberOfMissedHours"]);
-        expectToEqual(
-          error.issues[0].message,
-          "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
-        );
-      }
-    }
+  it("accepts a valid form assessment", () => {
+    const parsedAssessment =
+      assessmentFormSchema(convention).parse(validFormValues);
+    expectToEqual(parsedAssessment, validFormValues);
+  });
+
+  it("rejects contractStartDate before convention start date", () => {
+    const invalidFormValues: AssessmentFormValues = {
+      ...validFormValues,
+      contractStartDate: "2024-01-09",
+    };
+
+    expectFormSchemaToFailWith({
+      convention,
+      formValues: invalidFormValues,
+      path: ["contractStartDate"],
+      messageContains:
+        "La date début du contrat ne peut pas être antérieure à la date de début d'immersion",
+    });
   });
 });
 
@@ -241,6 +330,41 @@ const expectDateRangeToFailWithError = (
         error.issues.map((i) => i.message),
         issueMessages,
       );
+    }
+  }
+};
+
+const expectFormSchemaToFailWith = ({
+  convention,
+  formValues,
+  path,
+  message,
+  messageContains,
+}: {
+  convention: ConventionReadDto;
+  formValues: AssessmentFormValues;
+  path: (string | number)[];
+  message?: string;
+  messageContains?: string;
+}) => {
+  expect(() => assessmentFormSchema(convention).parse(formValues)).toThrow();
+
+  try {
+    assessmentFormSchema(convention).parse(formValues);
+  } catch (error) {
+    expect(error instanceof ZodError).toBeTruthy();
+    if (error instanceof ZodError) {
+      const issue = error.issues.find(
+        (currentIssue) =>
+          currentIssue.path.join(".") === path.join(".") &&
+          (message
+            ? currentIssue.message === message
+            : messageContains
+              ? currentIssue.message.includes(messageContains)
+              : true),
+      );
+      expect(issue).toBeDefined();
+      if (issue) expectToEqual(issue.path, path);
     }
   }
 };

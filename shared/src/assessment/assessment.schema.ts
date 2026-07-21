@@ -17,7 +17,8 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
-  type AssessmentFormDto,
+  type AssessmentFormValues,
+  type AssessmentPartialCompletionDetailsFormValues,
   type DeleteAssessmentRequestDto,
   type LegacyAssessmentDto,
   type SignAssessmentRequestDto,
@@ -26,6 +27,10 @@ import {
   type WithEndedWithAJob,
   type WithEstablishmentComments,
 } from "./assessment.dto";
+import {
+  getAssessmentEffectiveEndDate,
+  hasPartialCompletionDetails,
+} from "./assessment.helpers";
 
 const withAssessmentStatusSchema = z.discriminatedUnion(
   "status",
@@ -75,7 +80,7 @@ const withEndedWithAJobSchema: ZodSchemaWithInputMatchingOutput<WithEndedWithAJo
     { error: "Veuillez sélectionnez une option" },
   );
 
-export const assessmentDtoSchema: z.ZodType<AssessmentDto, AssessmentFormDto> =
+export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =
   z
     .object({
       conventionId: z.string(),
@@ -92,16 +97,114 @@ export const assessmentDtoSchema: z.ZodType<AssessmentDto, AssessmentFormDto> =
       }),
     );
 
+const partialCompletionDetailsFormValuesSchema: ZodSchemaWithInputMatchingOutput<AssessmentPartialCompletionDetailsFormValues> =
+  z.object({
+    lastDayOfPresence: makeDateStringSchema().or(z.literal("")),
+    numberOfMissedHours: z.number().or(z.literal("")),
+    numberOfMissedMinutes: z.number().or(z.literal("")),
+  });
+
+const assessmentFormValuesBaseSchema: ZodSchemaWithInputMatchingOutput<AssessmentFormValues> =
+  z.object({
+    conventionId: z.string(),
+    status: z
+      .enum(["COMPLETED", "PARTIALLY_COMPLETED", "DID_NOT_SHOW"], {
+        error: localization.invalidEnum,
+      })
+      .nullable(),
+    partialCompletionDetails: partialCompletionDetailsFormValuesSchema,
+    endedWithAJob: z.boolean().nullable(),
+    typeOfContract: zEnumValidation(typeOfContracts, localization.required).or(
+      z.literal(""),
+    ),
+    contractStartDate: makeDateStringSchema().or(z.literal("")),
+    establishmentFeedback: zStringMinLength1Max9200,
+    establishmentAdvices: zStringMinLength1Max6000,
+  });
+
+const toFormMissedHours = ({
+  numberOfMissedHours,
+  numberOfMissedMinutes,
+}: AssessmentPartialCompletionDetailsFormValues): number =>
+  (typeof numberOfMissedHours === "number" ? numberOfMissedHours : 0) +
+  (typeof numberOfMissedMinutes === "number" ? numberOfMissedMinutes : 0) / 60;
+
 export const assessmentFormSchema = (
   convention: ConventionReadDto,
-): z.ZodType<AssessmentDto, AssessmentFormDto> =>
-  assessmentDtoSchema
+): ZodSchemaWithInputMatchingOutput<AssessmentFormValues> =>
+  assessmentFormValuesBaseSchema
     .superRefine((formValues, ctx) => {
+      if (formValues.status === null)
+        ctx.addIssue({
+          code: "custom",
+          message: localization.expectRadioButtonSelected,
+          path: ["status"],
+        });
+    })
+    .superRefine((formValues, ctx) => {
+      if (formValues.status !== "PARTIALLY_COMPLETED") return;
+
+      if (!hasPartialCompletionDetails(formValues.partialCompletionDetails))
+        ctx.addIssue({
+          code: "custom",
+          message: errors.assessment.partialCompletionDetailsRequired().message,
+          path: ["partialCompletionDetails"],
+        });
+    })
+    .superRefine((formValues, ctx) => {
+      if (formValues.status !== "PARTIALLY_COMPLETED") return;
+
+      const missedHours = toFormMissedHours(
+        formValues.partialCompletionDetails,
+      );
+      const effectiveEndDate = getAssessmentEffectiveEndDate({
+        lastDayOfPresence:
+          formValues.partialCompletionDetails.lastDayOfPresence,
+        conventionDateEnd: convention.dateEnd,
+      });
+      const scheduledHoursInPresencePeriod =
+        calculateTotalImmersionHoursBetweenDateComplex({
+          complexSchedule: convention.schedule.complexSchedule,
+          dateStart: convention.dateStart,
+          dateEnd: effectiveEndDate,
+        });
+
+      if (missedHours > scheduledHoursInPresencePeriod)
+        ctx.addIssue({
+          code: "custom",
+          message:
+            errors.assessment.numberOfMissedHoursExceedsScheduled().message,
+          path: ["partialCompletionDetails", "numberOfMissedHours"],
+        });
+    })
+    .superRefine((formValues, ctx) => {
+      if (formValues.endedWithAJob === null)
+        ctx.addIssue({
+          code: "custom",
+          message: localization.expectRadioButtonSelected,
+          path: ["endedWithAJob"],
+        });
+
+      if (formValues.endedWithAJob !== true) return;
+
+      if (formValues.typeOfContract === "")
+        ctx.addIssue({
+          code: "custom",
+          message: localization.required,
+          path: ["typeOfContract"],
+        });
+
+      if (formValues.contractStartDate === "")
+        ctx.addIssue({
+          code: "custom",
+          message: localization.required,
+          path: ["contractStartDate"],
+        });
+
       if (
-        formValues.endedWithAJob &&
-        formValues.contractStartDate &&
+        formValues.contractStartDate !== "" &&
         convention.dateStart > formValues.contractStartDate
-      ) {
+      )
         ctx.addIssue({
           code: "custom",
           message: errors.assessment.contractStartDateBeforeImmersionStart({
@@ -109,33 +212,12 @@ export const assessmentFormSchema = (
           }).message,
           path: ["contractStartDate"],
         });
-      }
-    })
-    .superRefine((formValues, ctx) => {
-      if (formValues.status !== "PARTIALLY_COMPLETED") return;
-
-      const scheduledHoursInPresencePeriod =
-        calculateTotalImmersionHoursBetweenDateComplex({
-          complexSchedule: convention.schedule.complexSchedule,
-          dateStart: convention.dateStart,
-          dateEnd: formValues.lastDayOfPresence ?? convention.dateEnd,
-        });
-
-      if (formValues.numberOfMissedHours > scheduledHoursInPresencePeriod)
-        ctx.addIssue({
-          code: "custom",
-          message:
-            errors.assessment.numberOfMissedHoursExceedsScheduled().message,
-          path: ["numberOfMissedHours"],
-        });
     });
 
-export const withAssessmentSchema: z.ZodType<
-  WithAssessmentDto,
-  { assessment: AssessmentFormDto }
-> = z.object({
-  assessment: assessmentDtoSchema,
-});
+export const withAssessmentSchema: ZodSchemaWithInputMatchingOutput<WithAssessmentDto> =
+  z.object({
+    assessment: assessmentDtoSchema,
+  });
 
 export const legacyAssessmentDtoSchema: ZodSchemaWithInputMatchingOutput<LegacyAssessmentDto> =
   z.object({
