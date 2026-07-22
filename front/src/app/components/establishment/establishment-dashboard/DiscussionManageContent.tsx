@@ -120,7 +120,7 @@ export const DiscussionManageContent = ({
         }),
       );
     }
-  }, [discussion, dispatch]);
+  }, [discussion, connectedUserJwt, dispatch]);
 
   useEffect(() => {
     if (
