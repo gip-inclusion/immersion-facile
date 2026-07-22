@@ -331,7 +331,7 @@ describe("Update agency", () => {
       ]);
     });
 
-    it("throws cannotUpdateToStatus when closing an agency through update (must use close & transfer flow)", async () => {
+    it("backoffice admin closing an agency emits AgencyUpdated only", async () => {
       const activeAgency = new AgencyDtoBuilder().withStatus("active").build();
       uow.agencyRepository.agencies = [
         toAgencyWithRights(activeAgency, usersRightsWithAdmin),
@@ -339,21 +339,26 @@ describe("Update agency", () => {
 
       const closedAgency = new AgencyDtoBuilder(activeAgency)
         .withStatus("closed")
-        .withStatusJustification("should not be closeable here")
+        .withStatusJustification("Agence fermée manuellement")
         .build();
 
-      await expectPromiseToFailWithError(
-        updateAgency.execute(
-          { ...closedAgency, validatorEmails: ["validator@mail.com"] },
-          connectedAdmin,
-        ),
-        errors.agency.cannotUpdateToStatus({
-          agencyId: closedAgency.id,
-          status: "closed",
-        }),
+      await updateAgency.execute(
+        { ...closedAgency, validatorEmails: ["validator@mail.com"] },
+        connectedAdmin,
       );
-      expectToEqual(uow.agencyRepository.agencies[0].status, "active");
-      expectToEqual(uow.outboxRepository.events, []);
+
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(closedAgency, usersRightsWithAdmin),
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: closedAgency.id,
+            triggeredBy: triggeredByAdmin,
+          },
+        },
+      ]);
     });
 
     it("throws cannotActivateWithoutAdmin when activating an agency without an agency-admin", async () => {
