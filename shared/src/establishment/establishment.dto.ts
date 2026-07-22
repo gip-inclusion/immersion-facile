@@ -10,6 +10,7 @@ import type { PhoneNumber } from "../phone/phone.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
+import type { Firstname, Lastname } from "../user/user.dto";
 import type { WithBannedEstablishmentInformations } from "./bannedEstablishmentInformations.dto";
 
 export type BusinessAddress = Flavor<string, "BusinessAddress">;
@@ -24,8 +25,8 @@ export type EstablishmentNameAndAdmins = {
 };
 
 export type EstablishmentMainContact = {
-  firstName: string;
-  lastName: string;
+  firstName: Firstname;
+  lastName: Lastname;
   phone: PhoneNumber;
 };
 

@@ -212,7 +212,6 @@ const getActivateDraftConventionButtonProps = ({
           mtm_campaign: "mise_en_relation_activation_convention",
         }).href
       : frontRoutes.conventionMiniStage({
-          // TODO add discussionId as quaryPram for mini-stage. Do we need acquisitionParams ?
           conventionDraftId: conventionDraft.id,
         }).href;
 
