@@ -6,12 +6,12 @@ import {
   discussionIdSchema,
   discussionReadSchema,
   errors,
-  type User,
 } from "shared";
 import { validateAndParseZodSchema } from "../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../utils/logger";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
+import { hasUserRightToAccessDiscussion } from "../../helpers/discussion.utils";
 
 export type GetDiscussionById = ReturnType<typeof makeGetDiscussionById>;
 
@@ -29,7 +29,21 @@ export const makeGetDiscussionById = useCaseBuilder("GetDiscussionById")
     if (!discussion)
       throw errors.discussion.notFound({ discussionId: inputParams });
 
-    if (!(await hasUserRightToAccessDiscussion(uow, user, discussion)))
+    const establishmentAggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        discussion.siret,
+      );
+
+    if (!establishmentAggregate)
+      throw errors.establishment.notFound({ siret: discussion.siret });
+
+    if (
+      !(await hasUserRightToAccessDiscussion(
+        user,
+        discussion,
+        establishmentAggregate.userRights,
+      ))
+    )
       throw errors.discussion.accessForbidden({
         discussionId: inputParams,
         userId: currentUser.userId,
@@ -61,23 +75,4 @@ const makeDiscussionRead = async (
     schemaParsingInput: discussionRead,
     logger: createLogger(__filename),
   });
-};
-
-export const hasUserRightToAccessDiscussion = async (
-  uow: UnitOfWork,
-  user: User,
-  discussion: DiscussionDto,
-): Promise<boolean> => {
-  if (user.email === discussion.potentialBeneficiary.email) return true;
-
-  const establishment =
-    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-      discussion.siret,
-    );
-
-  if (!establishment)
-    throw errors.establishment.notFound({ siret: discussion.siret });
-  return establishment.userRights.some(
-    (right) => right.userId === user.id && right.status === "ACCEPTED",
-  );
 };
