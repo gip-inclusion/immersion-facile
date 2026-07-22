@@ -117,7 +117,7 @@ describe("NotifyUserThatAgencyRegistrationRequestWasReceived", () => {
           roles: ["agency-admin"],
         },
         [admin2.id]: {
-          isNotifiedByEmail: true,
+          isNotifiedByEmail: false,
           roles: ["agency-admin"],
         },
       }),
