@@ -3,6 +3,7 @@ import type {
   AddConventionInput,
   ApiConsumerName,
   AuthenticatedConventionRoutes,
+  BeneficiaryConventionListDto,
   ConnectedUserJwt,
   ConventionDraftDto,
   ConventionDraftId,
@@ -52,6 +53,21 @@ export class HttpConventionGateway implements ConventionGateway {
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
     private readonly authenticatedHttpClient: HttpClient<AuthenticatedConventionRoutes>,
   ) {}
+
+  public getBeneficiaryConventionList$(
+    jwt: string,
+  ): Observable<BeneficiaryConventionListDto> {
+    return from(
+      this.authenticatedHttpClient
+        .getBeneficiaryConventionList({ headers: { authorization: jwt } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, (response) => response.body)
+            .with({ status: P.union(400, 401, 403) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
 
   public markPartnersErroredConventionAsHandled$(
     params: MarkPartnersErroredConventionAsHandledRequest,
