@@ -73,6 +73,7 @@ const topics = [
   "dashboard-agency-register-user",
   "dashboard-discussion-status-updated",
   "dashboard-discussion",
+  "dashboard-discussion-contact-info",
   "beneficiary-dashboard-discussion-send-message",
   "establishment-dashboard-users-rights",
   "establishment-dashboard-discussion-send-message",
@@ -268,6 +269,15 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération des discussions",
       message:
         "Une erreur est survenue lors de la récupération des discussions",
+    },
+  },
+  "dashboard-discussion-contact-info": {
+    "fetch.error": {
+      action:
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoFailed,
+      title: "Problème lors de la récupération des coordonnées de l'entreprise",
+      message:
+        "Une erreur est survenue lors de la récupération des coordonnées de l'entreprise",
     },
   },
   "partner-conventions": {

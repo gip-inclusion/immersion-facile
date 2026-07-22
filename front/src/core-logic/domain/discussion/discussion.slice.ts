@@ -190,6 +190,7 @@ export const discussionSlice = createSlice({
       _action: PayloadActionWithFeedbackTopic<FetchDiscussionRequestedPayload>,
     ) => {
       state.discussionEstablishmentContactInfo = null;
+      state.isLoading = true;
     },
     fetchDiscussionEstablishmentContactInfoSucceeded: (
       state,
@@ -199,10 +200,13 @@ export const discussionSlice = createSlice({
     ) => {
       state.discussionEstablishmentContactInfo =
         action.payload.discussionEstablishmentContactInfo;
+      state.isLoading = false;
     },
     fetchDiscussionEstablishmentContactInfoFailed: (
-      _state,
+      state,
       _action: PayloadActionWithFeedbackTopicError,
-    ) => {},
+    ) => {
+      state.isLoading = false;
+    },
   },
 });
