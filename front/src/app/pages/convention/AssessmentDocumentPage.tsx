@@ -15,7 +15,6 @@ import {
   immersionFacileHelpdeskRootUrl,
   isAssessmentDto,
   isBeforeAssessmentSignatureReleaseDate,
-  isStringDate,
   makeSiretDescriptionLink,
   toDisplayedDate,
 } from "shared";
@@ -379,12 +378,10 @@ export const AssessmentDocumentPage = ({
               </li>
               <li>
                 <strong>Date réelle de fin :</strong>{" "}
-                {isStringDate(assessment.lastDayOfPresence ?? "")
-                  ? toDisplayedDate({
-                      date: new Date(assessment.lastDayOfPresence ?? ""),
-                      withHours: false,
-                    })
-                  : "DATE INVALIDE"}
+                {toDisplayedDate({
+                  date: new Date(assessment.lastDayOfPresence),
+                  withHours: false,
+                })}
               </li>
             </>
           )}
