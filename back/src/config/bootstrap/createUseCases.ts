@@ -43,6 +43,7 @@ import { makeEditConventionWithFinalStatus } from "../../domains/convention/use-
 import { makeGetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
+import { makeGetBeneficiaryConventionList } from "../../domains/convention/use-cases/GetBeneficiaryConventionList";
 import { makeGetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { makeGetConventionDraftById } from "../../domains/convention/use-cases/GetConventionDraftById";
 import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
@@ -302,6 +303,10 @@ export const createUseCases = ({
     //Convention
     addConvention,
     getConvention: makeGetConvention({ uowPerformer }),
+    getBeneficiaryConventionList: makeGetBeneficiaryConventionList({
+      uowPerformer,
+      deps: { timeGateway: gateways.timeGateway },
+    }),
 
     saveConventionDraft: makeSaveConventionDraft({
       uowPerformer,

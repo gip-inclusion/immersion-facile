@@ -824,6 +824,7 @@ const makeApplyFiltersToConventions =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
+    withBeneficiary,
     endDate,
     updateDate,
   }: GetConventionsFilters) =>
@@ -870,6 +871,10 @@ const makeApplyFiltersToConventions =
         ({ siret }) =>
           withSirets && withSirets.length > 0
             ? withSirets.includes(siret)
+            : true,
+        ({ signatories }) =>
+          withBeneficiary?.email
+            ? signatories.beneficiary.email === withBeneficiary.email
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
