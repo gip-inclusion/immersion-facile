@@ -1,25 +1,66 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import Table from "@codegouvfr/react-dsfr/Table";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
+import { Loader } from "react-design-system";
+import { useDispatch, useSelector } from "react-redux";
 import { type BeneficiaryConventionListDto, domElementIds } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionListSelectors } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.selectors";
+import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { ConventionAssessmentStatusBadge } from "../../convention/ConventionAssessmentStatusBadge";
 import { ConventionDatesDisplay } from "../../convention/ConventionDatesDisplay";
 import { ConventionStatusBadge } from "../../convention/ConventionStatusBadge";
+import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
 
 export const BeneficiaryConventionList = (): React.ReactNode => {
+  const feedbackTopic: FeedbackTopic =
+    "connected-user-beneficiaryConventionList";
+  const dispatch = useDispatch();
+  const jwt = useAppSelector(authSelectors.connectedUserJwt);
+  const beneficiaryConventionList = useSelector(
+    conventionListSelectors.beneficiaryConventionList,
+  );
+  const isLoading = useSelector(conventionListSelectors.isLoading);
+
+  useEffect(() => {
+    if (jwt && !isLoading && beneficiaryConventionList === null)
+      dispatch(
+        conventionListSlice.actions.fetchBeneficiaryConventionListRequested({
+          jwt,
+          feedbackTopic,
+        }),
+      );
+  }, [jwt, isLoading, dispatch, beneficiaryConventionList]);
+
+  useEffect(
+    () => () => {
+      dispatch(
+        conventionListSlice.actions.clearBeneficiaryConventionListRequested(),
+      );
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+    [dispatch],
+  );
+
   return (
     <>
+      {isLoading && <Loader />}
       <h1>Conventions</h1>
-
-      <Table
-        id={
-          domElementIds.beneficiaryDashboardConventions
-            .beneficiaryConventionListTable
-        }
-        fixed
-        headers={["Entreprise", "Statut", "Bilan", "Dates", "Actions"]}
-        data={conventionListToTableData(conventionList)}
-      />
+      <WithFeedbackReplacer topic={feedbackTopic} level="error" />
+      {beneficiaryConventionList !== null && (
+        <Table
+          id={
+            domElementIds.beneficiaryDashboardConventions
+              .beneficiaryConventionListTable
+          }
+          fixed
+          headers={["Entreprise", "Statut", "Bilan", "Dates", "Actions"]}
+          data={conventionListToTableData(beneficiaryConventionList)}
+        />
+      )}
     </>
   );
 };
@@ -48,40 +89,3 @@ const conventionListToTableData = (
       Voir la convention
     </Button>,
   ]);
-
-const conventionList: BeneficiaryConventionListDto = [
-  {
-    conventionId: "507c5e95-b97b-41cb-8c01-578e4f97f930",
-    status: "ACCEPTED_BY_VALIDATOR",
-    assessment: null,
-    businessName: "KIKI CORP",
-    dateStart: new Date("2025-01-02").toISOString(),
-    dateEnd: new Date("2025-01-16").toISOString(),
-  },
-  {
-    conventionId: "507c5e95-b97b-41cb-8c01-578e4f97f930",
-    status: "ACCEPTED_BY_VALIDATOR",
-    assessment: {
-      status: "COMPLETED",
-      createdAt: new Date("2026-06-08").toISOString(),
-      endedWithAJob: false,
-      signedAt: null,
-    },
-    businessName: "GROS MICHEL SARL",
-    dateStart: new Date("2026-05-06").toISOString(),
-    dateEnd: new Date("2026-05-30").toISOString(),
-  },
-  {
-    conventionId: "507c5e95-b97b-41cb-8c01-578e4f97f930",
-    status: "ACCEPTED_BY_VALIDATOR",
-    assessment: {
-      status: "COMPLETED",
-      createdAt: new Date("2026-06-08").toISOString(),
-      endedWithAJob: false,
-      signedAt: new Date("2026-06-09").toISOString(),
-    },
-    businessName: "GROS MICHEL SARL",
-    dateStart: new Date("2026-05-06").toISOString(),
-    dateEnd: new Date("2026-05-30").toISOString(),
-  },
-];
