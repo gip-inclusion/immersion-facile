@@ -54,7 +54,7 @@ const parseAssessmentEntitySchema = (assessment: any) =>
     ...(assessment.typeOfContract
       ? { typeOfContract: assessment.typeOfContract }
       : {}),
-    ...(assessment.lastDayOfPresence
+    ...(assessment.status === "PARTIALLY_COMPLETED"
       ? { lastDayOfPresence: assessment.lastDayOfPresence }
       : {}),
     ...(assessment.numberOfMissedHours !== null
