@@ -61,6 +61,14 @@ export type OnStepChange = (
 
 type Step = 1 | 2 | 3;
 
+const partialCompletionDetailsFields = [
+  "partialCompletionDetails",
+  "partialCompletionDetails.lastDayOfPresence",
+  "partialCompletionDetails.numberOfMissedHours",
+] as const satisfies ReadonlyArray<
+  keyof AssessmentFormValues | DotNestedKeys<AssessmentFormValues>
+>;
+
 const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
     title: "Détails de l'immersion",
@@ -86,9 +94,11 @@ export const AssessmentForm = ({
   const initialValues: AssessmentFormValues = {
     conventionId: convention.id,
     status: null,
-    lastDayOfPresence: "",
-    numberOfMissedHours: "",
-    numberOfMissedMinutes: "",
+    partialCompletionDetails: {
+      lastDayOfPresence: "",
+      numberOfMissedHours: "",
+      numberOfMissedMinutes: "",
+    },
     endedWithAJob: null,
     typeOfContract: "",
     contractStartDate: "",
@@ -126,12 +136,8 @@ export const AssessmentForm = ({
       setCurrentStep(step);
       return;
     }
-    const validatedFields = await Promise.all(
-      fieldsToValidate.map(async (key) => trigger(key)),
-    );
-    if (validatedFields.every((validatedField) => validatedField)) {
-      setCurrentStep(step);
-    }
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) setCurrentStep(step);
   };
   useScrollTo(currentStep);
 
@@ -216,14 +222,31 @@ const AssessmentStatusSection = ({
   convention: ConventionDto;
   onStepChange: OnStepChange;
 }) => {
-  const { register, formState, watch, setValue } =
+  const { register, formState, watch, setValue, trigger } =
     useFormContext<AssessmentFormValues>();
+
   const getFieldError = makeFieldError(formState);
+
   const formValues = watch();
+
+  const partialCompletionDetailsFormValue = formValues.partialCompletionDetails;
+
+  const lastDayOfPresenceRegistration = register(
+    "partialCompletionDetails.lastDayOfPresence",
+  );
+
+  const partialCompletionDetailsFieldError = getFieldError(
+    "partialCompletionDetails",
+  );
+
+  const revalidatePartialCompletionDetails = () => {
+    void trigger([...partialCompletionDetailsFields]);
+  };
   const assessmentDto =
     formValues.status === null
       ? undefined
       : assessmentFormValuesToAssessmentDto(formValues, convention);
+
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
@@ -270,92 +293,124 @@ const AssessmentStatusSection = ({
             {...getFieldError("status")}
           />
           {formValues.status === "PARTIALLY_COMPLETED" && (
-            <>
-              <Input
-                label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ? *"
-                hintText={`Date indiquée dans la convention : ${toDisplayedDate(
-                  {
-                    date: convertLocaleDateToUtcTimezoneDate(
-                      new Date(convention.dateEnd),
-                    ),
-                  },
-                )}`}
-                nativeInputProps={{
-                  type: "date",
-                  ...register("lastDayOfPresence"),
-                  id: domElementIds.assessment.lastDayOfPresenceInput,
-                  defaultValue: convention.dateEnd,
-                  min: toDateUTCString(new Date(convention.dateStart)),
-                  max: toDateUTCString(new Date(convention.dateEnd)),
-                }}
-                {...getFieldError("lastDayOfPresence")}
-              />
+            <fieldset
+              id={domElementIds.assessment.partialCompletionDetailsFieldset}
+              className={
+                partialCompletionDetailsFieldError?.state === "error"
+                  ? "fr-fieldset fr-fieldset--error"
+                  : "fr-fieldset"
+              }
+            >
+              <div className={fr.cx("fr-fieldset__content")}>
+                <Input
+                  label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ?"
+                  hintText={`Date indiquée dans la convention : ${toDisplayedDate(
+                    {
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(convention.dateEnd),
+                      ),
+                    },
+                  )}`}
+                  nativeInputProps={{
+                    type: "date",
+                    ...lastDayOfPresenceRegistration,
+                    onChange: (event) => {
+                      lastDayOfPresenceRegistration.onChange(event);
+                      revalidatePartialCompletionDetails();
+                    },
+                    id: domElementIds.assessment.lastDayOfPresenceInput,
+                    min: toDateUTCString(new Date(convention.dateStart)),
+                    max: toDateUTCString(new Date(convention.dateEnd)),
+                  }}
+                  {...getFieldError(
+                    "partialCompletionDetails.lastDayOfPresence",
+                  )}
+                />
 
-              {assessmentDto?.status === "PARTIALLY_COMPLETED" &&
-                assessmentDto.lastDayOfPresence && (
-                  <Alert
-                    className={fr.cx("fr-mb-2w")}
-                    description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
+                {partialCompletionDetailsFormValue.lastDayOfPresence !== "" &&
+                  new Date(
+                    partialCompletionDetailsFormValue.lastDayOfPresence,
+                  ) < new Date(convention.dateEnd) && (
+                    <Alert
+                      className={fr.cx("fr-mb-2w")}
+                      description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
                 prévu. Le total d’heures réalisées a été ajusté automatiquement."
-                    severity="info"
-                    small
+                      severity="info"
+                      small
+                    />
+                  )}
+
+                <p className={fr.cx("fr-mb-2v")}>
+                  Pendant les jours réels de présence, combien d'heures ont été
+                  manquées en raison d’absences ou de retards ?
+                </p>
+
+                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+                  <Input
+                    className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                    label="Heures manquées"
+                    nativeInputProps={{
+                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                        const { value } = event.target;
+                        setValue(
+                          "partialCompletionDetails.numberOfMissedHours",
+                          value === "" ? "" : +value,
+                        );
+                        revalidatePartialCompletionDetails();
+                      },
+                      min: 0,
+                      max: convention.schedule.totalHours,
+                      pattern: "\\d*",
+                      type: "number",
+                      id: domElementIds.assessment.numberOfMissedHoursInput,
+                      value:
+                        partialCompletionDetailsFormValue.numberOfMissedHours ===
+                        ""
+                          ? ""
+                          : partialCompletionDetailsFormValue.numberOfMissedHours,
+                    }}
+                    {...getFieldError(
+                      "partialCompletionDetails.numberOfMissedHours",
+                    )}
                   />
-                )}
-
-              <p className={fr.cx("fr-mb-2v")}>
-                Pendant les jours réels de présence, combien d'heures ont été
-                manquées en raison d’absences ou de retards ?
-              </p>
-
-              <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                <Input
-                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
-                  label="Heures manquées"
-                  nativeInputProps={{
-                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      const { value } = event.target;
-                      setValue(
-                        "numberOfMissedHours",
-                        value === "" ? "" : +value,
-                      );
-                    },
-                    min: 0,
-                    max: convention.schedule.totalHours,
-                    pattern: "\\d*",
-                    type: "number",
-                    id: domElementIds.assessment.numberOfMissedHoursInput,
-                    value:
-                      formValues.numberOfMissedHours === ""
-                        ? ""
-                        : formValues.numberOfMissedHours,
-                  }}
-                  {...getFieldError("numberOfMissedHours")}
-                />
-                <Input
-                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
-                  label="Minutes manquées"
-                  nativeInputProps={{
-                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      const { value } = event.target;
-                      setValue(
-                        "numberOfMissedMinutes",
-                        value === "" ? "" : +value,
-                      );
-                    },
-                    min: 0,
-                    max: 60,
-                    pattern: "\\d*",
-                    type: "number",
-                    id: domElementIds.assessment.numberOfMissedMinutesInput,
-                    value:
-                      formValues.numberOfMissedMinutes === ""
-                        ? ""
-                        : formValues.numberOfMissedMinutes,
-                  }}
-                  {...getFieldError("numberOfMissedHours")}
-                />
+                  <Input
+                    className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                    label="Minutes manquées"
+                    nativeInputProps={{
+                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                        const { value } = event.target;
+                        setValue(
+                          "partialCompletionDetails.numberOfMissedMinutes",
+                          value === "" ? "" : +value,
+                        );
+                        revalidatePartialCompletionDetails();
+                      },
+                      min: 0,
+                      max: 60,
+                      pattern: "\\d*",
+                      type: "number",
+                      id: domElementIds.assessment.numberOfMissedMinutesInput,
+                      value:
+                        partialCompletionDetailsFormValue.numberOfMissedMinutes ===
+                        ""
+                          ? ""
+                          : partialCompletionDetailsFormValue.numberOfMissedMinutes,
+                    }}
+                    {...getFieldError(
+                      "partialCompletionDetails.numberOfMissedHours",
+                    )}
+                  />
+                </div>
               </div>
-            </>
+              {partialCompletionDetailsFieldError?.stateRelatedMessage && (
+                <p
+                  id={domElementIds.assessment.partialCompletionDetailsError}
+                  className={fr.cx("fr-error-text")}
+                >
+                  {partialCompletionDetailsFieldError.stateRelatedMessage}
+                </p>
+              )}
+            </fieldset>
           )}
           {formValues.status !== "DID_NOT_SHOW" && (
             <ConventionTotalHours
@@ -396,11 +451,7 @@ const AssessmentStatusSection = ({
                   onStepChange(2, [
                     "status",
                     ...(formValues.status === "PARTIALLY_COMPLETED"
-                      ? ([
-                          "numberOfMissedHours",
-                          "numberOfMissedMinutes",
-                          "lastDayOfPresence",
-                        ] as const)
+                      ? partialCompletionDetailsFields
                       : []),
                   ]),
                 type: "button",
