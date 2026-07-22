@@ -31,6 +31,7 @@ export const settableAgencyStatusesThroughUpdate: AgencyStatus[] = [
   "active",
   "from-api-PE",
   "rejected",
+  "closed",
 ];
 
 export type CreateAgencyDto = {
