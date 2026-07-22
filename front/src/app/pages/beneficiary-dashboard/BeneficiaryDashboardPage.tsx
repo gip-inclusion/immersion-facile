@@ -52,9 +52,9 @@ export const BeneficiaryDashboardPage = ({
         </h2>
         <p className={fr.cx("fr-text--lg", "fr-mb-2w")}>
           Immersion Facilitée évolue pour simplifier vos démarches. Pour le
-          moment, vous pouvez consulter l'historique de vos candidatures et y
-          répondre. D'autres services arriveront très prochainement pour vous
-          accompagner dans votre parcours.
+          moment, vous pouvez consulter l'historique de vos conventions et gérer
+          vos candidatures. D'autres services arriveront très prochainement pour
+          vous accompagner dans votre parcours.
         </p>
       </SectionHighlight>
       <Tabs
