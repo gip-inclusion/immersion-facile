@@ -134,7 +134,7 @@ export const DiscussionManageContent = ({
           {
             discussionId,
             jwt: connectedUserJwt,
-            feedbackTopic: "dashboard-discussion",
+            feedbackTopic: "dashboard-discussion-contact-info",
           },
         ),
       );
@@ -443,6 +443,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             .with(P.union("PHONE", "IN_PERSON"), (contactMode) =>
               viewer === "potentialBeneficiary" ? (
                 <>
+                  <Feedback
+                    topics={["dashboard-discussion-contact-info"]}
+                    className={fr.cx("fr-mb-2w")}
+                  />
                   <BorderedSection>
                     <EstablishmentContactInformation
                       discussionEstablishmentContactInfo={
