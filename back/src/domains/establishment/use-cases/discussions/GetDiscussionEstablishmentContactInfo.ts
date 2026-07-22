@@ -73,6 +73,7 @@ export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
         firstName: mainContactUser.firstName,
         lastName: mainContactUser.lastName,
         phone: mainContactRight.phone,
+        isMainContactByPhone: mainContactRight.isMainContactByPhone ?? false,
       },
     };
   });

@@ -28,6 +28,7 @@ export type EstablishmentMainContact = {
   firstName: Firstname;
   lastName: Lastname;
   phone: PhoneNumber;
+  isMainContactByPhone: boolean;
 };
 
 export type DiscussionEstablishmentContactInfo = {

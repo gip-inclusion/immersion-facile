@@ -9,7 +9,7 @@ import {
   lastnameMandatorySchema,
 } from "../user/user.schema";
 import { zStringMinLength1Max1024 } from "../utils/string.schema";
-import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
+import { type ZodSchemaWithInputMatchingOutput, zBoolean } from "../zodUtils";
 import { withBannedEstablishmentInformationSchema } from "./bannedEstablishmentInformations.schema";
 import {
   businessCustomizedNameSchema,
@@ -41,6 +41,7 @@ const establishmentMainContactSchema: ZodSchemaWithInputMatchingOutput<Establish
     firstName: firstnameMandatorySchema,
     lastName: lastnameMandatorySchema,
     phone: phoneNumberSchema,
+    isMainContactByPhone: zBoolean,
   });
 
 export const discussionEstablishmentContactInfoSchema: ZodSchemaWithInputMatchingOutput<DiscussionEstablishmentContactInfo> =

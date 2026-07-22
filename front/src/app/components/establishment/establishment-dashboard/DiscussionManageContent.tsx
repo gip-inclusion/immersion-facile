@@ -7,7 +7,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DOMPurify from "dompurify";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BorderedSection,
   ExchangeMessage,
@@ -37,6 +37,7 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   makeEmptyConventionInitialValues,
+  shouldBeReminded,
   splitTextOnFirstSeparator,
   toConventionDraftDto,
   toDisplayedDate,
@@ -123,12 +124,7 @@ export const DiscussionManageContent = ({
   }, [discussion, connectedUserJwt, dispatch]);
 
   useEffect(() => {
-    if (
-      discussion &&
-      connectedUserJwt &&
-      (discussion.contactMode === "PHONE" ||
-        discussion.contactMode === "IN_PERSON")
-    ) {
+    if (discussion && connectedUserJwt) {
       dispatch(
         discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
           {
@@ -329,6 +325,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
     discussionSelectors.discussionEstablishmentContactInfo,
   );
   const relatedOffer = useAppSelector(searchSelectors.currentSearchResult);
+  const [shouldShowContactInfo, setShouldShowContactInfo] =
+    useState<boolean>(false);
   const saveConventionDraftThenRedirectRequested = ({
     conventionDraft,
     redirectUrl,
@@ -414,6 +412,68 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             />
           )}
       </header>
+
+      {discussionEstablishmentContactInfo &&
+        shouldBeReminded(discussion, discussionEstablishmentContactInfo) && (
+          <Alert
+            severity="info"
+            title="Information importante"
+            description={
+              <>
+                <p className={fr.cx("fr-mb-2w")}>
+                  L'entreprise n'ayant pas répondu depuis 15 jours ou plus, vous
+                  pouvez la relancer par téléphone en lui rappelant votre
+                  motivation.
+                </p>
+                {shouldShowContactInfo ? (
+                  <>
+                    <strong>Informations de contact :</strong>
+                    <ul className={fr.cx("fr-ml-2w")}>
+                      {(discussionEstablishmentContactInfo.mainContact
+                        .firstName ||
+                        discussionEstablishmentContactInfo.mainContact
+                          .lastName) && (
+                        <li>
+                          <strong>
+                            {getFormattedFirstnameAndLastname({
+                              firstname:
+                                discussionEstablishmentContactInfo.mainContact
+                                  .firstName,
+                              lastname:
+                                discussionEstablishmentContactInfo.mainContact
+                                  .lastName,
+                            })}
+                          </strong>
+                        </li>
+                      )}
+                      <li>
+                        <strong>
+                          {toDisplayedPhoneNumber(
+                            discussionEstablishmentContactInfo.mainContact
+                              .phone,
+                          )}
+                        </strong>
+                      </li>
+                    </ul>
+                  </>
+                ) : (
+                  <Button
+                    iconId="ri-eye-line"
+                    iconPosition="left"
+                    priority="secondary"
+                    type="button"
+                    onClick={() => setShouldShowContactInfo(true)}
+                    className={fr.cx("fr-my-1w")}
+                  >
+                    Afficher les informations de contact
+                  </Button>
+                )}
+              </>
+            }
+            className={fr.cx("fr-mt-3w")}
+          />
+        )}
+
       <div
         className={fr.cx(
           "fr-grid-row",

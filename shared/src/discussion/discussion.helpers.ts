@@ -1,30 +1,57 @@
 import { subDays } from "date-fns";
 import { match } from "ts-pattern";
 import { emailReplySeparator } from "../email/email.content";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { DateString } from "../utils/date";
 import type {
-  DiscussionDisplayStatus,
+  DiscussionDisplayStatusByRole,
   DiscussionInList,
+  Exchange,
   ExchangeRole,
 } from "./discussion.dto";
 
 const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
   new Date(from) <= subDays(now, 15);
 
-export const getDiscussionDisplayStatus = ({
+export const shouldBeReminded = ({
+  lastExchange,
+  discussionUpdatedAt,
+  contactMode,
+  isMainContactByPhone,
+}: {
+  lastExchange: Exchange;
+  discussionUpdatedAt: DateString;
+  contactMode: ContactMode;
+  isMainContactByPhone: boolean;
+}): boolean => {
+  return (
+    lastExchange &&
+    lastExchange.sender === "potentialBeneficiary" &&
+    new Date(discussionUpdatedAt) < subDays(Date.now(), 15) &&
+    contactMode === "EMAIL" &&
+    isMainContactByPhone
+  );
+};
+
+export const getDiscussionDisplayStatus = <Role extends ExchangeRole>({
   discussion,
+  shouldEstablishmentBeReminded,
   now,
   viewer,
 }: {
   discussion: Pick<DiscussionInList, "status" | "exchangesData" | "createdAt">;
+  shouldEstablishmentBeReminded: boolean;
   now: Date;
-  viewer: ExchangeRole;
-}): DiscussionDisplayStatus => {
-  return match(discussion.status)
-    .with("REJECTED", (): DiscussionDisplayStatus => "rejected")
-    .with("ACCEPTED", (): DiscussionDisplayStatus => "accepted")
-    .with("PENDING", (): DiscussionDisplayStatus => {
+  viewer: Role;
+}): DiscussionDisplayStatusByRole[Role] => {
+  const status: DiscussionDisplayStatusByRole[Role] = match(discussion.status)
+    .with("REJECTED", (): DiscussionDisplayStatusByRole[Role] => "rejected")
+    .with("ACCEPTED", (): DiscussionDisplayStatusByRole[Role] => "accepted")
+    .with("PENDING", (): DiscussionDisplayStatusByRole[Role] => {
       const { lastExchange, count } = discussion.exchangesData;
+
+      if (shouldEstablishmentBeReminded && viewer === "potentialBeneficiary")
+        return "to-remind";
 
       if (!lastExchange)
         return isNowUrgent({ now, from: discussion.createdAt })
@@ -42,6 +69,7 @@ export const getDiscussionDisplayStatus = ({
       return "needs-answer";
     })
     .exhaustive();
+  return status;
 };
 
 export const emailExchangeSplitters = [
