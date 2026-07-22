@@ -54,8 +54,8 @@ export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
       });
 
       const marketingConventionsData = {
-        firstConvention: validatedConventions.at(0),
-        lastConvention: validatedConventions.at(-1),
+        firstConvention: validatedConventions.at(-1),
+        lastConvention: validatedConventions.at(0),
         totalNumberOfConvention: validatedConventions.length,
       };
 

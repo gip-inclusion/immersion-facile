@@ -146,7 +146,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         if (!currentDate) return -1;
 
         return (
-          new Date(previousDate).getTime() - new Date(currentDate).getTime()
+          new Date(currentDate).getTime() - new Date(previousDate).getTime()
         );
       })
       .map((convention) =>
