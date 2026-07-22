@@ -1022,6 +1022,7 @@ const addFiltersToBuilder =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
+    withBeneficiary,
     endDate,
     updateDate,
   }: GetConventionsFilters) =>
@@ -1056,6 +1057,10 @@ const addFiltersToBuilder =
       (b) =>
         withSirets && withSirets.length > 0
           ? b.where((eb) => isInArray(eb, "conventions.siret", withSirets))
+          : b,
+      (b) =>
+        withBeneficiary?.email
+          ? b.where("b.email", "=", withBeneficiary.email)
           : b,
       addDateFilters({
         withEndDate: endDate,
