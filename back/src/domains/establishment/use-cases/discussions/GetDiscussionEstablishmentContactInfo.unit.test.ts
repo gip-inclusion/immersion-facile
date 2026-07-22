@@ -141,6 +141,39 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
         errors.establishment.notFound({ siret: discussion.siret }),
       );
     });
+
+    it("throw when establishment has no accepted admin rights", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(discussion.siret)
+          .withEstablishmentWelcomeAddress(defaultAddress.addressAndPosition)
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              status: "PENDING",
+              job: "",
+              phone: "+33600000001",
+              userId: establishmentAdmin.id,
+              shouldReceiveDiscussionNotifications: false,
+              isMainContactByPhone: false,
+            },
+            {
+              role: "establishment-contact",
+              status: "ACCEPTED",
+              userId: establishmentContact.id,
+              shouldReceiveDiscussionNotifications: false,
+            },
+          ])
+          .build(),
+      ];
+
+      await expectPromiseToFailWithError(
+        getDiscussionEstablishmentContactInfo.execute(discussion.id, {
+          userId: potentialBeneficiaryUser.id,
+        }),
+        errors.establishment.adminNotFound({ siret: discussion.siret }),
+      );
+    });
   });
 
   describe("Right paths", () => {
