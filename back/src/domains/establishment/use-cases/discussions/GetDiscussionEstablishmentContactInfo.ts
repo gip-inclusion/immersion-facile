@@ -6,7 +6,8 @@ import {
   errors,
 } from "shared";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
-import { hasUserRightToAccessDiscussion } from "./GetDiscussionById";
+import type { EstablishmentAdminRight } from "../../entities/EstablishmentAggregate";
+import { hasUserRightToAccessDiscussion } from "../../helpers/discussion.utils";
 
 export type GetDiscussionEstablishmentContactInfo = ReturnType<
   typeof makeGetDiscussionEstablishmentContactInfo
@@ -26,12 +27,6 @@ export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
     if (!discussion)
       throw errors.discussion.notFound({ discussionId: inputParams });
 
-    if (!(await hasUserRightToAccessDiscussion(uow, user, discussion)))
-      throw errors.discussion.accessForbidden({
-        discussionId: inputParams,
-        userId: currentUser.userId,
-      });
-
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         discussion.siret,
@@ -39,14 +34,30 @@ export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
     if (!establishmentAggregate)
       throw errors.establishment.notFound({ siret: discussion.siret });
 
-    const adminRights = establishmentAggregate.userRights.filter(
-      (right) => right.role === "establishment-admin",
-    );
-    if (adminRights.length === 0)
+    if (
+      !(await hasUserRightToAccessDiscussion(
+        user,
+        discussion,
+        establishmentAggregate.userRights,
+      ))
+    )
+      throw errors.discussion.accessForbidden({
+        discussionId: inputParams,
+        userId: currentUser.userId,
+      });
+
+    const adminRightsWithAcceptedStatus: EstablishmentAdminRight[] =
+      establishmentAggregate.userRights.filter(
+        (right): right is EstablishmentAdminRight =>
+          right.role === "establishment-admin" && right.status === "ACCEPTED",
+      );
+    if (adminRightsWithAcceptedStatus.length === 0)
       throw errors.establishment.adminNotFound({ siret: discussion.siret });
 
     const mainContactRight =
-      adminRights.find((right) => right.isMainContactByPhone) ?? adminRights[0];
+      adminRightsWithAcceptedStatus.find(
+        (right) => right.isMainContactByPhone,
+      ) ?? adminRightsWithAcceptedStatus[0];
 
     const mainContactUser = await uow.userRepository.getById(
       mainContactRight.userId,
@@ -63,5 +74,5 @@ export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
         lastName: mainContactUser.lastName,
         phone: mainContactRight.phone,
       },
-    } satisfies DiscussionEstablishmentContactInfo;
+    };
   });
