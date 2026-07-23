@@ -1,4 +1,5 @@
 import {
+  addressDtoToString,
   type CaptureAddressGroupsResult,
   captureAddressGroups,
   inferDepartmentCode,
@@ -26,6 +27,53 @@ describe("address", () => {
       const capturedAddressGroups = captureAddressGroups(address);
       expect(capturedAddressGroups).toStrictEqual(expectedGroups[address]);
     }
+  });
+
+  describe("addressDtoToString", () => {
+    it("formats a complete address", () => {
+      expect(
+        addressDtoToString({
+          streetNumberAndAddress: "1 rue de Rivoli",
+          postcode: "75001",
+          city: "Paris",
+          departmentCode: "75",
+        }),
+      ).toBe("1 rue de Rivoli 75001 Paris");
+    });
+
+    it("omits street when streetNumberAndAddress is empty", () => {
+      expect(
+        addressDtoToString({
+          streetNumberAndAddress: "",
+          postcode: "75001",
+          city: "Paris",
+          departmentCode: "75",
+        }),
+      ).toBe("75001 Paris");
+    });
+
+    it("omits street when streetNumberAndAddress equals city", () => {
+      expect(
+        addressDtoToString({
+          streetNumberAndAddress: "Paris",
+          postcode: "75001",
+          city: "Paris",
+          departmentCode: "75",
+        }),
+      ).toBe("75001 Paris");
+    });
+
+    it("appends country when present", () => {
+      expect(
+        addressDtoToString({
+          streetNumberAndAddress: "1 rue de Rivoli",
+          postcode: "75001",
+          city: "Paris",
+          departmentCode: "75",
+          countryCode: "FR",
+        }),
+      ).toBe("1 rue de Rivoli 75001 Paris, France");
+    });
   });
 });
 

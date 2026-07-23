@@ -57,9 +57,16 @@ export const inferDepartmentCode = (postcode: string): string => {
 export const addressDtoToString = (
   address: AddressDto | AddressDtoWithCountryCode,
 ): string =>
-  address.streetNumberAndAddress === address.city
-    ? `${address.postcode} ${address.city}`
-    : `${address.streetNumberAndAddress} ${address.postcode} ${address.city}${isAddressDtoWithCountryCode(address) ? `, ${countryCodeToCountryName(address.countryCode)}` : ""}`;
+  `${
+    address.streetNumberAndAddress &&
+    address.streetNumberAndAddress !== address.city
+      ? `${address.streetNumberAndAddress} `
+      : ""
+  }${address.postcode} ${address.city}${
+    isAddressDtoWithCountryCode(address)
+      ? `, ${countryCodeToCountryName(address.countryCode)}`
+      : ""
+  }`;
 
 export const addressStringToDto = (address: string): AddressDto => {
   const addressGroups = captureAddressGroups(address);
