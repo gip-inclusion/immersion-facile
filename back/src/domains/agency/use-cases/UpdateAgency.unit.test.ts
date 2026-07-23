@@ -331,7 +331,7 @@ describe("Update agency", () => {
       ]);
     });
 
-    it("backoffice admin closing an agency emits AgencyUpdated only", async () => {
+    it("backoffice admin can close an agency by updating it", async () => {
       const activeAgency = new AgencyDtoBuilder().withStatus("active").build();
       uow.agencyRepository.agencies = [
         toAgencyWithRights(activeAgency, usersRightsWithAdmin),
