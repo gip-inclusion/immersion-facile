@@ -1,10 +1,13 @@
 import { useState } from "react";
 import {
+  type OptionType,
   RSAutocomplete,
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
+import type { PropsValue } from "react-select";
 import type { AppellationMatchDto } from "shared";
+import { isSingleOption } from "src/app/components/forms/autocomplete/autocomplete.utils";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { makeAppellationLocatorSelector } from "src/core-logic/domain/appellation/appellation.selectors";
 import {
@@ -41,15 +44,32 @@ const useAppellationAutocomplete = (
   };
 };
 
+const getAutocompleteValue = (
+  value?: AppellationMatchDto | null,
+  defaultValue?: PropsValue<OptionType<AppellationMatchDto>>,
+  searchTerm?: string,
+): OptionType<AppellationMatchDto> | null => {
+  if (searchTerm === "" && defaultValue === undefined) return null;
+  if (value)
+    return {
+      label: value.appellation.appellationLabel,
+      value: value,
+    };
+  if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
+  return null;
+};
+
 export const AppellationAutocomplete = ({
   onAppellationClear,
   onAppellationSelected,
+  initialInputValue,
   ...props
 }: AppellationAutocompleteProps) => {
   const dispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(initialInputValue ?? "");
   const { value, options, isSearching, isDebouncing } =
     useAppellationAutocomplete(props.locator);
+  const defaultValue = props.selectProps?.defaultValue;
 
   return (
     <RSAutocomplete
@@ -62,12 +82,7 @@ export const AppellationAutocomplete = ({
         inputValue: searchTerm,
         placeholder:
           props.selectProps?.placeholder ?? "Ex : Boulanger, styliste, etc.",
-        value: value
-          ? {
-              label: value.appellation.appellationLabel,
-              value: value,
-            }
-          : undefined,
+        value: getAutocompleteValue(value, defaultValue, searchTerm),
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||

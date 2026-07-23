@@ -39,22 +39,28 @@ const emptySearchResult: DataWithPagination<OfferDto> = {
   },
 };
 
+export const minimalInitialSearchParams: SearchPageParams = {
+  sortBy: "score",
+  sortOrder: "desc",
+  showOnlyAvailableOffers: true,
+};
+
+const initialSearchParams: SearchPageParams = {
+  ...minimalInitialSearchParams,
+  appellationCodes: [],
+  distanceKm: 10,
+  latitude: 0,
+  longitude: 0,
+  fitForDisabledWorkers: undefined,
+  page: 1,
+  perPage: 12,
+};
+
 export const initialState: SearchState = {
   searchResultsWithPagination: emptySearchResult,
   currentSearchResult: null,
   isLoading: false,
-  searchParams: {
-    appellationCodes: [],
-    distanceKm: 10,
-    latitude: 0,
-    longitude: 0,
-    fitForDisabledWorkers: undefined,
-    sortBy: "score",
-    sortOrder: "desc",
-    showOnlyAvailableOffers: true,
-    page: 1,
-    perPage: 12,
-  },
+  searchParams: initialSearchParams,
 };
 
 export const searchSlice = createSlice({

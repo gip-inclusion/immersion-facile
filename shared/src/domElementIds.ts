@@ -151,6 +151,10 @@ export const domElementIds = {
   },
 
   search: {
+    openMapButton: "im-search-page__open-map-button",
+    filterAppellationSection: "im-search-page__filter-appellation-section",
+    filterLocationSection: "im-search-page__filter-location-section",
+    filterConditionsSection: "im-search-page__filter-conditions-section",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
     appellationFilterTag: "im-search-page__appellation-filter-tag",
     distanceSelect: "im-search-page__distance-dropdown",
@@ -160,6 +164,8 @@ export const domElementIds = {
     locationFilterTag: "im-search-page__location-filter-tag",
     nafAutocomplete: "im-search-page__naf-autocomplete",
     noResultsLbbButton: "im-search-page__no-results-lbb-button",
+    noResultsAvailabilityButton:
+      "im-search-page__no-results-availability-button",
     noResultsLbbCard: "im-search-page__no-results-lbb-card",
     placeAutocompleteInput: "im-search-page__address-autocomplete",
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
@@ -170,6 +176,7 @@ export const domElementIds = {
     sortFilter: "im-search-page__sort-filter-select",
     sortFilterTag: "im-search-page__sort-filter-tag",
     sortRadioButtons: "im-search-page__sort-radio-buttons",
+    resetFiltersButton: "im-search-page__reset-filters-button",
   },
   externalSearch: {
     // TODO: add external search specific ids
@@ -190,6 +197,9 @@ export const domElementIds = {
     sortFilter: "im-search-page__sort-filter-select",
     sortFilterTag: "im-search-page__sort-filter-tag",
     sortRadioButtons: "im-search-page__sort-radio-buttons",
+    resetFiltersButton: "im-search-page__reset-filters-button",
+    filterLocationSection: "im-search-page__filter-location-section",
+    filterConditionsSection: "im-search-page__filter-conditions-section",
   },
   searchForStudent: {
     appellationAutocomplete:
@@ -207,6 +217,10 @@ export const domElementIds = {
     searchSubmitButton: "im-search__submit-search-for-students",
     sortFilterTag: "im-search-page__sort-filter-tag--students",
     sortRadioButtons: "im-search-page__sort-radio-buttons--students",
+    resetFiltersButton: "im-search-page__reset-filters-button--students",
+    filterLocationSection: "im-search-page__filter-location-section--students",
+    filterConditionsSection:
+      "im-search-page__filter-conditions-section--students",
   },
   searchResult: {
     contactByMailButton: "im-contact-establishment__contact-email-button",

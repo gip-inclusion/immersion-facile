@@ -16,7 +16,7 @@ export const testConfig = {
     adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
     adminPassword: throwIfNotDefinedOrDefault("PC_ADMIN_PASSWORD"),
   },
-  adminAuthFile: ".auth/admin.json",
-  establishmentAuthFile: ".auth/establishment.json",
-  agencyAuthFile: ".auth/agency.json",
+  adminAuthFile: resolve(__dirname, ".auth/admin.json"),
+  establishmentAuthFile: resolve(__dirname, ".auth/establishment.json"),
+  agencyAuthFile: resolve(__dirname, ".auth/agency.json"),
 };
