@@ -3,6 +3,7 @@ import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupR
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgDelegationContactRepository } from "../../../agency/adapters/PgDelegationContactRepository";
 import { PgAssessmentRepository } from "../../../convention/adapters/PgAssessmentRepository";
+import { PgArchivedConventionRequestRepository } from "../../../convention/adapters/PgArchivedConventionRequestRepository";
 import { PgConventionDraftRepository } from "../../../convention/adapters/PgConventionDraftRepository";
 import { PgConventionExternalIdRepository } from "../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionQueries } from "../../../convention/adapters/PgConventionQueries";
@@ -42,6 +43,8 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     agencyRepository: new PgAgencyRepository(transaction),
     agencyGroupRepository: new PgAgencyGroupRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
+    archivedConventionRequestRepository:
+      new PgArchivedConventionRequestRepository(transaction),
     bannedEstablishmentRepository: new PgBannedEstablishmentRepository(
       transaction,
     ),

@@ -27,6 +27,7 @@ import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
 import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
+import { makeAddArchivedConventionRequest } from "../../domains/convention/use-cases/AddArchivedConventionRequest";
 import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { makeAddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -304,6 +305,13 @@ export const createUseCases = ({
     getConvention: makeGetConvention({ uowPerformer }),
 
     saveConventionDraft: makeSaveConventionDraft({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
+    addArchivedConventionRequest: makeAddArchivedConventionRequest({
       uowPerformer,
       deps: {
         createNewEvent,

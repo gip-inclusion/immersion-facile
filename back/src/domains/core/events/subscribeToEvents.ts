@@ -31,6 +31,7 @@ type UseCaseSubscriptionsByTopics = {
 const getUseCasesByTopics = (
   useCases: UseCases,
 ): UseCaseSubscriptionsByTopics => ({
+  ArchivedConventionRequestCreated: [],
   ConventionDraftSaved: [useCases.notifyConventionDraftSaved],
   UserDeleted: [],
   AllEstablishmentUsersDeleted: [useCases.deleteEstablishment],

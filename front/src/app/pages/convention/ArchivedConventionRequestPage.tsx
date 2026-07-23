@@ -17,15 +17,19 @@ import {
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import type { Route } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 
 type ArchivedConventionRequestPageProps = {
   route: Route<typeof frontRoutes.archivedConventionRequest>;
 };
 
-const initialValues: DefaultValues<ArchivedConventionRequestFormDto> = {
+const initialValues = (
+  id: string,
+): DefaultValues<ArchivedConventionRequestFormDto> => ({
+  id,
   conventionSearchMethod: "withConventionId",
   conventionId: "",
-};
+});
 
 export const ArchivedConventionRequestPage = ({
   route,
@@ -35,7 +39,7 @@ export const ArchivedConventionRequestPage = ({
   const methods = useForm<ArchivedConventionRequestFormDto>({
     resolver: zodResolver(archivedConventionRequestSchema),
     mode: "onTouched",
-    defaultValues: initialValues,
+    defaultValues: initialValues(uuidV4()),
     shouldUnregister: true,
   });
   const {
@@ -71,6 +75,7 @@ export const ArchivedConventionRequestPage = ({
           id={domElementIds.archivedConventionRequest.form}
           onSubmit={handleSubmit(onSubmit)}
         >
+          <input type="hidden" {...register("id")} />
           <h2 className={fr.cx("fr-h6", "fr-mt-4w")}>
             Données de la convention
           </h2>

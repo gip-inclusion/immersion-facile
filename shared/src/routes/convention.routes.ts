@@ -7,6 +7,7 @@ import {
   legacyAssessmentDtoSchema,
   signAssessmentRequestDtoSchema,
 } from "../assessment/assessment.schema";
+import { archivedConventionRequestSchema } from "../archivedConventionRequest/archivedConventionRequest.schema";
 import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {
@@ -252,6 +253,18 @@ export const conventionMagicLinkRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+
+  createArchivedConventionRequest: defineRoute({
+    url: "/auth/archived-convention",
+    method: "post",
+    requestBodySchema: archivedConventionRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      201: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
     },
   }),
 });
