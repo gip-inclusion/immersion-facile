@@ -117,9 +117,47 @@ const fetchDiscussionListEpic: DiscussionEpic = (
     ),
   );
 
+const fetchDiscussionEstablishmentContactInfoEpic: DiscussionEpic = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(
+      discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested
+        .match,
+    ),
+    switchMap((action) =>
+      establishmentGateway
+        .getDiscussionEstablishmentContactInfo$(
+          action.payload.discussionId,
+          action.payload.jwt,
+        )
+        .pipe(
+          map((discussionEstablishmentContactInfo) =>
+            discussionSlice.actions.fetchDiscussionEstablishmentContactInfoSucceeded(
+              {
+                discussionEstablishmentContactInfo,
+                feedbackTopic: action.payload.feedbackTopic,
+              },
+            ),
+          ),
+          catchEpicError((error) =>
+            discussionSlice.actions.fetchDiscussionEstablishmentContactInfoFailed(
+              {
+                errorMessage: error.message,
+                feedbackTopic: action.payload.feedbackTopic,
+              },
+            ),
+          ),
+        ),
+    ),
+  );
+
 export const discussionEpics = [
   fetchDiscussionByIdEpic,
   updateDiscussionStatusEpic,
   sendMessageEpic,
   fetchDiscussionListEpic,
+  fetchDiscussionEstablishmentContactInfoEpic,
 ];

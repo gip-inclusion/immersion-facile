@@ -2,7 +2,9 @@ import { from, type Observable } from "rxjs";
 import {
   type ConnectedUserJwt,
   type DataWithPagination,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionExchangeForbiddenParams,
+  type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
   type EstablishmentNameAndAdmins,
@@ -222,6 +224,28 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
               },
               logBodyAndThrow,
             )
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getDiscussionEstablishmentContactInfo$(
+    discussionId: DiscussionId,
+    jwt: ConnectedUserJwt,
+  ): Observable<DiscussionEstablishmentContactInfo> {
+    return from(
+      this.httpClient
+        .getDiscussionEstablishmentContactInfo({
+          headers: { authorization: jwt },
+          urlParams: { discussionId },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, logBodyAndThrow)
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 403 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)

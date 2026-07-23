@@ -1,5 +1,6 @@
 import {
   DiscussionBuilder,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionInList,
   type DiscussionReadDto,
   discussionToExchangesData,
@@ -30,6 +31,7 @@ describe("Discussion slice", () => {
     isLoading: false,
     discussion: null,
     discussionsWithPagination: initialDiscussionsWithPagination,
+    discussionEstablishmentContactInfo: null,
   };
   const jwt = "my-jwt";
   const discussion: DiscussionReadDto = new DiscussionBuilder().buildRead();
@@ -60,6 +62,7 @@ describe("Discussion slice", () => {
       isLoading: false,
       discussion: null,
       discussionsWithPagination: initialDiscussionsWithPagination,
+      discussionEstablishmentContactInfo: null,
     });
   });
 
@@ -217,6 +220,132 @@ describe("Discussion slice", () => {
           message: discussionFetchErrorMessage,
         },
       });
+    });
+  });
+
+  describe("fetch discussion establishment contact info", () => {
+    const discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo =
+      {
+        siret: "12345678901234",
+        mainContact: {
+          firstName: "Pat",
+          lastName: "La Girafe",
+          phone: "0611223344",
+        },
+      };
+
+    it("fetches discussion establishment contact info successfully", () => {
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        null,
+      );
+
+      store.dispatch(
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
+          {
+            jwt,
+            discussionId: discussion.id,
+            feedbackTopic: "dashboard-discussion-contact-info",
+          },
+        ),
+      );
+
+      expectToEqual(discussionSelectors.isLoading(store.getState()), true);
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        null,
+      );
+
+      dependencies.establishmentGateway.discussionEstablishmentContactInfo$.next(
+        discussionEstablishmentContactInfo,
+      );
+
+      expectToEqual(discussionSelectors.isLoading(store.getState()), false);
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        discussionEstablishmentContactInfo,
+      );
+    });
+
+    it("fails to fetch discussion establishment contact info", () => {
+      store.dispatch(
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
+          {
+            jwt,
+            discussionId: discussion.id,
+            feedbackTopic: "dashboard-discussion-contact-info",
+          },
+        ),
+      );
+
+      expectToEqual(discussionSelectors.isLoading(store.getState()), true);
+
+      dependencies.establishmentGateway.discussionEstablishmentContactInfo$.error(
+        discussionFetchError,
+      );
+
+      expectToEqual(discussionSelectors.isLoading(store.getState()), false);
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        null,
+      );
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-discussion-contact-info": {
+          on: "fetch",
+          level: "error",
+          title:
+            "Problème lors de la récupération des coordonnées de l'entreprise",
+          message: discussionFetchErrorMessage,
+        },
+      });
+    });
+
+    it("resets discussion establishment contact info when a new fetch is requested", () => {
+      store.dispatch(
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
+          {
+            jwt,
+            discussionId: discussion.id,
+            feedbackTopic: "dashboard-discussion-contact-info",
+          },
+        ),
+      );
+
+      dependencies.establishmentGateway.discussionEstablishmentContactInfo$.next(
+        discussionEstablishmentContactInfo,
+      );
+
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        discussionEstablishmentContactInfo,
+      );
+
+      store.dispatch(
+        discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
+          {
+            jwt,
+            discussionId: discussion.id,
+            feedbackTopic: "dashboard-discussion-contact-info",
+          },
+        ),
+      );
+
+      expectToEqual(
+        discussionSelectors.discussionEstablishmentContactInfo(
+          store.getState(),
+        ),
+        null,
+      );
     });
   });
 

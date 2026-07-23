@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   type ConnectedUserJwt,
   type DataWithPagination,
+  type DiscussionEstablishmentContactInfo,
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
@@ -45,6 +46,7 @@ export type DiscussionState = {
   discussionsWithPagination: DataWithPagination<DiscussionInList> & {
     filters: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray;
   };
+  discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo | null;
 };
 
 export type SendExchangeRequestedPayload = {
@@ -77,6 +79,7 @@ const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
   discussionsWithPagination: initialDiscussionsWithPagination,
+  discussionEstablishmentContactInfo: null,
 };
 
 export const discussionSlice = createSlice({
@@ -177,6 +180,29 @@ export const discussionSlice = createSlice({
       }
     },
     sendExchangeFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    fetchDiscussionEstablishmentContactInfoRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<FetchDiscussionRequestedPayload>,
+    ) => {
+      state.discussionEstablishmentContactInfo = null;
+      state.isLoading = true;
+    },
+    fetchDiscussionEstablishmentContactInfoSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo;
+      }>,
+    ) => {
+      state.discussionEstablishmentContactInfo =
+        action.payload.discussionEstablishmentContactInfo;
+      state.isLoading = false;
+    },
+    fetchDiscussionEstablishmentContactInfoFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

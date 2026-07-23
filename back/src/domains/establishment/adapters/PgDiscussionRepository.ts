@@ -25,6 +25,7 @@ import {
   pipeWithValue,
   type RejectionKind,
   type SiretDto,
+  shouldBeReminded,
   type UserId,
   type WithBannedEstablishmentInformations,
   type WithDiscussionStatus,
@@ -1119,6 +1120,8 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
         ref("discussions.siret").as("siret"),
         ref("discussions.kind").as("kind"),
         ref("discussions.status").as("status"),
+        ref("discussions.updated_at").as("updatedAt"),
+        ref("discussions.contact_method").as("contactMethod"),
         ref("discussions.immersion_objective").as("immersionObjective"),
         sql<boolean>`${ref("banned_establishments.siret")} IS NOT NULL`.as(
           "isEstablishmentBanned",
@@ -1153,7 +1156,17 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
       .then((result) => Number(result.count)),
   ]);
 
-  return { data, totalCount };
+  return {
+    data: data.map((discussionInList) => ({
+      ...discussionInList,
+      shouldBeReminded: shouldBeReminded({
+        discussionUpdatedAt: discussionInList.updatedAt,
+        contactMode: discussionInList.contactMethod,
+        isMainContactByPhone,
+      }),
+    })),
+    totalCount,
+  };
 };
 
 const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({

@@ -10,4 +10,9 @@ export const discussionSelectors = {
     discussionState,
     ({ discussionsWithPagination }) => discussionsWithPagination,
   ),
+  discussionEstablishmentContactInfo: createSelector(
+    discussionState,
+    ({ discussionEstablishmentContactInfo }) =>
+      discussionEstablishmentContactInfo,
+  ),
 };

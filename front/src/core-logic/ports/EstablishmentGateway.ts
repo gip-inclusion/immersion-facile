@@ -3,7 +3,9 @@ import type {
   ConnectedUserJwt,
   ConventionSupportedJwt,
   DataWithPagination,
+  DiscussionEstablishmentContactInfo,
   DiscussionExchangeForbiddenParams,
+  DiscussionId,
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
@@ -45,6 +47,10 @@ export interface EstablishmentGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
+  getDiscussionEstablishmentContactInfo$(
+    discussionId: DiscussionId,
+    jwt: ConnectedUserJwt,
+  ): Observable<DiscussionEstablishmentContactInfo>;
   getEstablishmentPublicOptions$(
     filters: GetEstablishmentPublicOptionsByFiltersInput,
     jwt: ConnectedUserJwt,

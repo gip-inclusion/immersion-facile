@@ -316,10 +316,17 @@ export type ExchangeFromDashboard = ExchangeMessageFromDashboard &
 export type DiscussionDisplayStatus =
   | "accepted"
   | "rejected"
+  | "to-remind"
   | "new"
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
+
+export type DiscussionDisplayStatusByRole = {
+  [R in ExchangeRole]: R extends "establishment"
+    ? Exclude<DiscussionDisplayStatus, "to-remind">
+    : DiscussionDisplayStatus;
+};
 
 export type DiscussionInList = Pick<
   DiscussionReadDto,
@@ -343,6 +350,7 @@ export type DiscussionInList = Pick<
     count: number;
     lastExchange: Pick<ExchangeRead, "sender" | "sentAt"> | null;
   };
+  shouldEstablishmentBeReminded: boolean;
 };
 
 export type DiscussionOrderKey = ExtractFromExisting<

@@ -35,6 +35,7 @@ import { zUuidLike } from "../utils/uuid";
 import {
   localization,
   type ZodSchemaWithInputMatchingOutput,
+  zBoolean,
   zToNumber,
 } from "../zodUtils";
 import {
@@ -362,6 +363,7 @@ export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<Discussion
     }),
     immersionObjective: immersionObjectiveSchema.nullable(),
     isEstablishmentBanned: z.boolean(),
+    shouldEstablishmentBeReminded: zBoolean,
   });
 
 export const paginatedDiscussionListSchema = createPaginatedSchema(

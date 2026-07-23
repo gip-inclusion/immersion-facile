@@ -1,6 +1,6 @@
 import { Badge, type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import {
-  type DiscussionDisplayStatus,
+  type DiscussionDisplayStatusByRole,
   type DiscussionInList,
   type DiscussionReadDto,
   discussionToExchangesData,
@@ -21,20 +21,21 @@ export const DiscussionStatusBadge = ({
   id?: string;
   small?: BadgeProps["small"];
 }) => {
-  const statusBadge =
-    statusBadgeData[viewer][
-      getDiscussionDisplayStatus({
-        discussion: {
-          createdAt: discussion.createdAt,
-          status: discussion.status,
-          exchangesData: isDiscussionInList(discussion)
-            ? discussion.exchangesData
-            : discussionToExchangesData(discussion),
-        },
-        now: new Date(),
-        viewer,
-      })
-    ];
+  const statusBadge = getStatusBadgeData(
+    viewer,
+    getDiscussionDisplayStatus({
+      discussion: {
+        createdAt: discussion.createdAt,
+        status: discussion.status,
+        exchangesData: isDiscussionInList(discussion)
+          ? discussion.exchangesData
+          : discussionToExchangesData(discussion),
+      },
+      now: new Date(),
+      viewer,
+    }),
+  );
+
   return (
     <Badge id={id} severity={statusBadge.severity} small={small}>
       {statusBadge.label}
@@ -42,16 +43,25 @@ export const DiscussionStatusBadge = ({
   );
 };
 
-const statusBadgeData: Record<
-  ExchangeRole,
-  Record<
-    DiscussionDisplayStatus,
-    {
-      severity: BadgeProps["severity"];
-      label: string;
-    }
-  >
-> = {
+type StatusBadgeData = {
+  severity: BadgeProps["severity"];
+  label: string;
+};
+
+const getStatusBadgeData = <Role extends ExchangeRole>(
+  viewer: Role,
+  status: DiscussionDisplayStatusByRole[Role],
+): StatusBadgeData => {
+  const badgeDataForRole = statusBadgeData[viewer];
+  return badgeDataForRole[status];
+};
+
+const statusBadgeData: {
+  [Role in ExchangeRole]: Record<
+    DiscussionDisplayStatusByRole[Role],
+    StatusBadgeData
+  >;
+} = {
   establishment: {
     new: {
       severity: "info",
@@ -86,6 +96,10 @@ const statusBadgeData: Record<
     "needs-answer": {
       severity: "warning",
       label: "En cours - À répondre",
+    },
+    "to-remind": {
+      severity: "warning",
+      label: "À relancer",
     },
     "needs-urgent-answer": {
       severity: "error",

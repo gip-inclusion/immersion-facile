@@ -1,13 +1,16 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { AddressAndPosition } from "../address/address.dto";
 import type { Email } from "../email/email.dto";
 import type {
   EstablishmentUserRightStatus,
   FormEstablishmentDto,
   FormEstablishmentPendingUserRight,
 } from "../formEstablishment/FormEstablishment.dto";
+import type { PhoneNumber } from "../phone/phone.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
+import type { Firstname, Lastname } from "../user/user.dto";
 import type { WithBannedEstablishmentInformations } from "./bannedEstablishmentInformations.dto";
 
 export type BusinessAddress = Flavor<string, "BusinessAddress">;
@@ -19,6 +22,19 @@ export type BusinessNameCustomized = Flavor<string, "BusinessNameCustomized">;
 export type EstablishmentNameAndAdmins = {
   name: string;
   adminEmails: Email[];
+};
+
+export type EstablishmentMainContact = {
+  firstName: Firstname;
+  lastName: Lastname;
+  phone: PhoneNumber;
+  isMainContactByPhone: boolean;
+};
+
+export type DiscussionEstablishmentContactInfo = {
+  siret: SiretDto;
+  potentialBeneficiaryWelcomeAddress?: AddressAndPosition;
+  mainContact: EstablishmentMainContact;
 };
 
 export type GetEstablishmentPublicOptionsByFiltersInput = {
