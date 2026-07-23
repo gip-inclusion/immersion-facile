@@ -16,9 +16,13 @@ import {
 } from "../zodUtils";
 import {
   type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestId,
   type ArchivedConventionRequestReasonFields,
   archivedConventionRequestReasons,
 } from "./archivedConventionRequest.dto";
+
+const archivedConventionRequestIdSchema: ZodSchemaWithInputMatchingOutput<ArchivedConventionRequestId> =
+  z.uuid(localization.invalidUuid);
 
 const archivedConventionRequestReasonsWithoutOther =
   archivedConventionRequestReasons.filter((reason) => reason !== "other");
@@ -43,21 +47,19 @@ const archivedConventionRequestReasonSchema: ZodSchemaWithInputMatchingOutput<Ar
   ]);
 
 const archivedConventionRequestWithConventionIdSchema = z.object({
+  id: archivedConventionRequestIdSchema,
   conventionSearchMethod: z.literal("withConventionId"),
   conventionId: conventionIdSchema,
 });
 
 const archivedConventionRequestWithConventionDetailsSchema = z.object({
+  id: archivedConventionRequestIdSchema,
   conventionSearchMethod: z.literal("withConventionDetails"),
   beneficiaryFirstName: firstnameMandatorySchema,
   beneficiaryLastName: lastnameMandatorySchema,
   siret: siretSchema,
   immersionDate: zStringMinLength1Max255,
-  immersionAppellation: appellationAndRomeDtoSchema
-    .optional()
-    .refine((value) => value !== undefined, {
-      message: "Ce champ est obligatoire. Veuillez choisir un métier.",
-    }),
+  immersionAppellation: appellationAndRomeDtoSchema,
 });
 
 export const archivedConventionRequestSchema: ZodSchemaWithInputMatchingOutput<ArchivedConventionRequestFormDto> =
