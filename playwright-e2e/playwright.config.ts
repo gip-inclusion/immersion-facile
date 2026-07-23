@@ -1,5 +1,8 @@
+import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import { backPort, frontPort, makeBackWebServerEnv } from "./e2e-env";
+
+const storageStatePath = resolve(__dirname, "data/storageState.json");
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -22,7 +25,7 @@ export default defineConfig({
       mode: "only-on-failure",
       fullPage: true,
     },
-    storageState: "./data/storageState.json",
+    storageState: storageStatePath,
     trace: "retain-on-failure",
   },
   timeout: process.env.CI ? 60_000 : 30_000,

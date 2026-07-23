@@ -24,14 +24,16 @@ export type PlaceAutocompleteProps = RSAutocompleteComponentProps<
 const getAutocompleteValue = (
   value?: LookupSearchResult | null,
   defaultValue?: PropsValue<OptionType<LookupSearchResult>>,
-): OptionType<LookupSearchResult> | undefined => {
+  searchTerm?: string,
+): OptionType<LookupSearchResult> | null => {
+  if (searchTerm === "" && defaultValue === undefined) return null;
   if (value)
     return {
       label: value.label,
       value: value,
     };
   if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
-  return undefined;
+  return null;
 };
 
 export const PlaceAutocomplete = ({
@@ -64,6 +66,7 @@ export const PlaceAutocomplete = ({
         value: getAutocompleteValue(
           geosearchLocatorSelector?.value,
           props.selectProps?.defaultValue,
+          searchTerm,
         ),
         onChange: (searchResult, actionMeta) => {
           if (
