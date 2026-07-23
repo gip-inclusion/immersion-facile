@@ -62,25 +62,26 @@ test.describe("Search", () => {
       "Trier par proximité",
     ]);
     await expect(
-      page.locator(`#${domElementIds.search.locationFilterTag}`),
+      page.locator(
+        `#${domElementIds.search.placeAutocompleteInput}-wrapper .im-select__single-value`,
+      ),
     ).not.toHaveText(defaultPlaceAutocompleteValue);
     await expect(
-      page.locator(`#${domElementIds.search.appellationFilterTag}`),
+      page.locator(
+        `#${domElementIds.search.appellationAutocomplete}-wrapper .im-select__single-value`,
+      ),
     ).not.toHaveText(defaultAppellationsAutocompleteValue);
-    await page.locator(`#${domElementIds.search.locationFilterTag}`).click();
-    await page
-      .locator(`#${domElementIds.search.locationFilterTag}-reset-button`)
-      .click();
-    await page.locator(`#${domElementIds.search.appellationFilterTag}`).click();
-    await page
-      .locator(`#${domElementIds.search.appellationFilterTag}-reset-button`)
-      .click();
+    await page.locator(`#${domElementIds.search.resetFiltersButton}`).click();
     await expect(
-      page.locator(`#${domElementIds.search.locationFilterTag}`),
-    ).toHaveText(defaultPlaceAutocompleteValue);
+      page.locator(
+        `#${domElementIds.search.placeAutocompleteInput}-wrapper .im-select__single-value`,
+      ),
+    ).toHaveCount(0);
     await expect(
-      page.locator(`#${domElementIds.search.appellationFilterTag}`),
-    ).toHaveText(defaultAppellationsAutocompleteValue);
+      page.locator(
+        `#${domElementIds.search.appellationAutocomplete}-wrapper .im-select__single-value`,
+      ),
+    ).toHaveCount(0);
     await expectSearchToHaveResults(page);
   });
 });

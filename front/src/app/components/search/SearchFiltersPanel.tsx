@@ -116,6 +116,7 @@ export const SearchFiltersPanel = ({
         className={fr.cx("fr-mb-2w")}
         onClick={() => onSearchFormSubmit(minimalInitialSearchParams)}
         size="small"
+        id={domElementIds[routeName].resetFiltersButton}
       >
         Réinitialiser la recherche
       </Button>
@@ -230,7 +231,7 @@ export const SearchFiltersPanel = ({
             />
           </>
         }
-        id={domElementIds.search.filterLocationSection}
+        id={domElementIds[routeName].filterLocationSection}
       >
         <PlaceAutocomplete
           locator="search-form-place"
@@ -362,7 +363,7 @@ export const SearchFiltersPanel = ({
             />
           </>
         }
-        id={domElementIds.search.filterConditionsSection}
+        id={domElementIds[routeName].filterConditionsSection}
       >
         <p className={fr.cx("fr-mb-2w")}>
           Afficher uniquement les entreprises&nbsp;:

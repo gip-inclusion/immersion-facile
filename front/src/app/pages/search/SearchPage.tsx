@@ -284,7 +284,11 @@ export const SearchPage = ({
                   onSearchFormSubmit(filterFormValues(value)),
                 )}
                 className={cx(
-                  fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+                  fr.cx(
+                    "fr-grid-row",
+                    "fr-grid-row--gutters",
+                    "fr-grid-row--bottom",
+                  ),
                   Styles.form,
                   Styles.formV2,
                 )}

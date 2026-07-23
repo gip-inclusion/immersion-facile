@@ -47,14 +47,16 @@ const useAppellationAutocomplete = (
 const getAutocompleteValue = (
   value?: AppellationMatchDto | null,
   defaultValue?: PropsValue<OptionType<AppellationMatchDto>>,
-): OptionType<AppellationMatchDto> | undefined => {
+  searchTerm?: string,
+): OptionType<AppellationMatchDto> | null => {
+  if (searchTerm === "" && defaultValue === undefined) return null;
   if (value)
     return {
       label: value.appellation.appellationLabel,
       value: value,
     };
   if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
-  return undefined;
+  return null;
 };
 
 export const AppellationAutocomplete = ({
@@ -80,7 +82,7 @@ export const AppellationAutocomplete = ({
         inputValue: searchTerm,
         placeholder:
           props.selectProps?.placeholder ?? "Ex : Boulanger, styliste, etc.",
-        value: getAutocompleteValue(value, defaultValue),
+        value: getAutocompleteValue(value, defaultValue, searchTerm),
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||
