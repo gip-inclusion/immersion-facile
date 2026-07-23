@@ -1195,6 +1195,8 @@ export const domElementIds = {
     },
   },
   beneficiaryDashboardConventions: {
+    beneficiaryConventionListHelpdeskNoConventionHint:
+      "im-beneficary-convention-list__no-convention-helpdesk-hint",
     beneficiaryConventionListTable: "im-beneficary-convention-list__table",
   },
   beneficiaryDashboardDiscussions: {
