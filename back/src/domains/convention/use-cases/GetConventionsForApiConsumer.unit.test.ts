@@ -1,4 +1,9 @@
-import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  expectToEqual,
+  makeEmptyLastReminders,
+} from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import {
@@ -98,6 +103,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyFranceTravail.agencySiret,
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         ]);
@@ -131,6 +137,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyFranceTravail.agencySiret,
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         ]);
@@ -183,6 +190,7 @@ describe("Get Conventions for ApiConsumer", () => {
             agencySiret: agencyMissionLocale.agencySiret,
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         ]);

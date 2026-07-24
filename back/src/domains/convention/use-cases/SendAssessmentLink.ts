@@ -3,6 +3,7 @@ import {
   agencyModifierRoles,
   allSignatoryRoles,
   assessmentEmailSender,
+  CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -32,8 +33,6 @@ import {
   retrieveConventionWithAgency,
   throwErrorIfPhoneNumberNotValid,
 } from "../entities/Convention";
-
-export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
 export type SendAssessmentLink = ReturnType<typeof makeSendAssessmentLink>;
 export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
@@ -318,16 +317,16 @@ const throwErrorIfAssessmentLinkAlreadySent = async ({
     lastNotificationCreatedAt &&
     isWithinHoursCooldown({
       lastActionAt: lastNotificationCreatedAt,
-      minHours: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+      minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
       now: timeGateway.now(),
     })
   )
     throw errors.assessment.assessmentLinkAlreadySent({
       notificationKind,
-      minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+      minHoursBetweenReminder: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
       timeRemaining: formatHoursCooldownTimeRemaining({
         lastActionAt: lastNotificationCreatedAt,
-        minHours: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
+        minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
         now: timeGateway.now(),
       }),
     });

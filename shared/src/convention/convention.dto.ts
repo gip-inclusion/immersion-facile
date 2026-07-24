@@ -499,9 +499,39 @@ export type ConventionAssessmentFields = {
     | null;
 };
 
+export type LastReminderDateByNotificationKind = {
+  email: DateTimeIsoString | null;
+  sms: DateTimeIsoString | null;
+};
+
+export type ConventionLastReminders = {
+  conventionSignatures: Record<
+    SignatoryRole,
+    LastReminderDateByNotificationKind
+  >;
+  assessmentCompletion: LastReminderDateByNotificationKind;
+  assessmentSignature: LastReminderDateByNotificationKind;
+};
+
+export type ConventionLastRemindersFields = {
+  lastReminders: ConventionLastReminders;
+};
+
+export const makeEmptyLastReminders = (): ConventionLastReminders => ({
+  conventionSignatures: {
+    beneficiary: { email: null, sms: null },
+    "beneficiary-representative": { email: null, sms: null },
+    "beneficiary-current-employer": { email: null, sms: null },
+    "establishment-representative": { email: null, sms: null },
+  },
+  assessmentCompletion: { email: null, sms: null },
+  assessmentSignature: { email: null, sms: null },
+});
+
 export type ConventionReadDto = ConventionDto &
   ConventionAgencyPublicFields &
   ConventionAssessmentFields &
+  ConventionLastRemindersFields &
   WithBannedEstablishmentInformations;
 
 export type WithConventionIdLegacy = {

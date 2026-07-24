@@ -1,5 +1,6 @@
 import {
   assessmentSignatureReminderAuthorizedRoles,
+  CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
@@ -32,8 +33,6 @@ import {
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
 } from "../entities/Convention";
-
-export const MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER = 24;
 
 export type SendAssessmentSignatureReminder = ReturnType<
   typeof makeSendAssessmentSignatureReminder
@@ -312,16 +311,16 @@ const throwErrorIfAssessmentSignatureReminderAlreadySent = async ({
     lastNotificationCreatedAt &&
     isWithinHoursCooldown({
       lastActionAt: lastNotificationCreatedAt,
-      minHours: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+      minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
       now: timeGateway.now(),
     })
   )
     throw errors.assessment.assessmentLinkAlreadySent({
       notificationKind,
-      minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+      minHoursBetweenReminder: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
       timeRemaining: formatHoursCooldownTimeRemaining({
         lastActionAt: lastNotificationCreatedAt,
-        minHours: MIN_HOURS_BETWEEN_ASSESSMENT_SIGNATURE_REMINDER,
+        minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
         now: timeGateway.now(),
       }),
     });

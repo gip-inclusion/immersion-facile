@@ -582,6 +582,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  lastReminders: {
+    label: "",
+    id: "",
+  },
   "establishmentTutor.role": {
     // to exclude
     label: "",

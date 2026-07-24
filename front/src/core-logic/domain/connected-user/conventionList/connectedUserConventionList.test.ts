@@ -6,6 +6,7 @@ import {
   defaultPerPageInWebPagination,
   expectToEqual,
   type FlatGetConventionsForAgencyUserParams,
+  makeEmptyLastReminders,
 } from "shared";
 import { conventionListSelectors } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.selectors";
 import {
@@ -48,6 +49,7 @@ describe("ConnectedUserConventionList", () => {
       .build(),
     ...agencyFields,
     assessment: null,
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false,
   };
 
@@ -58,6 +60,7 @@ describe("ConnectedUserConventionList", () => {
       .build(),
     ...agencyFields,
     assessment: null,
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false,
   };
 

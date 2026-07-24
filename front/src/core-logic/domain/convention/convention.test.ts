@@ -3,12 +3,14 @@ import {
   type ConventionAgencyPublicFields,
   type ConventionAssessmentFields,
   ConventionDtoBuilder,
+  type ConventionLastRemindersFields,
   type ConventionReadDto,
   type DashboardUrlAndName,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   expectObjectsToMatch,
   expectToEqual,
+  makeEmptyLastReminders,
   type SignatoryRole,
   type WithBannedEstablishmentInformations,
 } from "shared";
@@ -28,6 +30,7 @@ import {
 describe("Convention slice", () => {
   const conventionReadDtoRemainingProps: ConventionAgencyPublicFields &
     ConventionAssessmentFields &
+    ConventionLastRemindersFields &
     WithBannedEstablishmentInformations = {
     agencyDepartment: "75",
     agencyContactEmail: "contact@mail.com",
@@ -36,6 +39,7 @@ describe("Convention slice", () => {
     agencySiret: "11112222000033",
     agencyValidationSteps: "validator-only",
     assessment: null,
+    lastReminders: makeEmptyLastReminders(),
     isEstablishmentBanned: false as const,
   };
   const convention = new ConventionDtoBuilder()
@@ -213,6 +217,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000033",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           },
         }),
@@ -271,6 +276,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000033",
         agencyValidationSteps: "validator-only",
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
       // tester l'état initiale
@@ -324,6 +330,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000033",
         agencyValidationSteps: "validator-only",
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
       expectConventionState({
@@ -389,6 +396,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000044",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -446,6 +454,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -497,6 +506,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -540,6 +550,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -585,6 +596,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -638,6 +650,7 @@ describe("Convention slice", () => {
             agencySiret: "11112222000055",
             agencyValidationSteps: "validator-only",
             assessment: null,
+            lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
           };
           expectConventionState({
@@ -690,6 +703,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000055",
         agencyValidationSteps: "validator-only",
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
       ({ store, dependencies } = createTestStore({
@@ -737,6 +751,7 @@ describe("Convention slice", () => {
         agencySiret: "11112222000066",
         agencyValidationSteps: "validator-only",
         assessment: null,
+        lastReminders: makeEmptyLastReminders(),
         isEstablishmentBanned: false,
       };
 
@@ -961,6 +976,7 @@ describe("Convention slice", () => {
       agencySiret: "11112222000077",
       agencyValidationSteps: "validator-only",
       assessment: null,
+      lastReminders: makeEmptyLastReminders(),
       isEstablishmentBanned: false,
     };
     ({ store } = createTestStore({
