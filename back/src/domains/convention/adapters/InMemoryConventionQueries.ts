@@ -146,7 +146,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         if (!currentDate) return -1;
 
         return (
-          new Date(previousDate).getTime() - new Date(currentDate).getTime()
+          new Date(currentDate).getTime() - new Date(previousDate).getTime()
         );
       })
       .map((convention) =>
@@ -824,6 +824,7 @@ const makeApplyFiltersToConventions =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
+    withBeneficiary,
     endDate,
     updateDate,
   }: GetConventionsFilters) =>
@@ -870,6 +871,10 @@ const makeApplyFiltersToConventions =
         ({ siret }) =>
           withSirets && withSirets.length > 0
             ? withSirets.includes(siret)
+            : true,
+        ({ signatories }) =>
+          withBeneficiary?.email
+            ? signatories.beneficiary.email === withBeneficiary.email
             : true,
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
@@ -921,7 +926,7 @@ const makeApplyAssessmentCompletionStatusFilterConventionsRead =
       assessment.status !== "DID_NOT_SHOW";
     const isAssessmentToBeCompleted =
       convention.assessment === null &&
-      !isConventionEndingInOneDayOrMore(convention);
+      !isConventionEndingInOneDayOrMore(convention.dateEnd);
 
     return (
       (hasFinalizedFilter && isAssessmentFinalized) ||

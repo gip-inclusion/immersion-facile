@@ -84,7 +84,8 @@ export type BeneficiaryDashboardRouteName =
 
 export type FrontBeneficiaryDashboardRoute =
   | Route<typeof frontRoutes.beneficiaryDashboard>
-  | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>;
+  | Route<typeof frontRoutes.beneficiaryDashboardDiscussions>
+  | Route<typeof frontRoutes.beneficiaryDashboardConventions>;
 
 export type EstablishmentDashboardRouteName =
   FrontEstablishmentDashboardRoute["name"];

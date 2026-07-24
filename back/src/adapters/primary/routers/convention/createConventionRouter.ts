@@ -60,6 +60,17 @@ export const createConventionRouter = (deps: AppDependencies) => {
       ),
   );
 
+  authenticatedConventionSharedRouter.getBeneficiaryConventionList(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getBeneficiaryConventionList.execute(
+          undefined,
+          getGenericAuthOrThrow(req.payloads?.currentUser),
+        ),
+      ),
+  );
+
   authenticatedConventionSharedRouter.getConventionsForAgencyUser(
     deps.connectedUserAuthMiddleware,
     (req, res) =>

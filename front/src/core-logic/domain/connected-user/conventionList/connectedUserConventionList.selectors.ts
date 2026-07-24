@@ -5,6 +5,10 @@ const conventionListState = (state: RootState) => state.conventionList;
 
 export const conventionListSelectors = {
   isLoading: createSelector(conventionListState, ({ isLoading }) => isLoading),
+  beneficiaryConventionList: createSelector(
+    conventionListState,
+    ({ beneficiaryConventionList }) => beneficiaryConventionList,
+  ),
   conventionsWithPagination: createSelector(
     conventionListState,
     ({ conventionsWithPagination }) => conventionsWithPagination,

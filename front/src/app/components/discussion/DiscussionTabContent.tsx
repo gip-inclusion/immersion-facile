@@ -19,6 +19,7 @@ export const DiscussionTabContent = ({ viewer }: { viewer: ExchangeRole }) => {
     "establishmentDashboardFormEstablishment",
     "beneficiaryDashboard",
     "beneficiaryDashboardDiscussions",
+    "beneficiaryDashboardConventions",
   ]);
   return (route.name === "establishmentDashboardDiscussions" ||
     route.name === "beneficiaryDashboardDiscussions") &&

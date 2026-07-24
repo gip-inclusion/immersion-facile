@@ -1,6 +1,7 @@
 import {
   type AgencyId,
   type AgencyKind,
+  adminPlaywrightEmail,
   ConventionDtoBuilder,
   conventionSchema,
   getFormattedFirstnameAndLastname,
@@ -9,6 +10,7 @@ import {
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_1_ID,
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_2_ID,
   SEED_ACCEPTED_BY_VALIDATOR_CONVENTION_3_ID,
+  SEED_ADMIN_BENEFICIARY_CONVENTION_ID,
   SEED_AGENCY_WITH_REFERS_TO_ID,
   SEED_FT_AGENCY_ID,
   SEED_IN_REVIEW_CONVENTION_ID,
@@ -259,6 +261,19 @@ const saveConventionsToManageForPlaywrightTest = async (uow: UnitOfWork) => {
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .build();
 
+  const conventionByAdminAsBeneficiary = new ConventionDtoBuilder()
+    .withId(SEED_ADMIN_BENEFICIARY_CONVENTION_ID)
+    .withSiret(franceMerguez.establishment.siret)
+    .withBusinessName(franceMerguez.establishment.name)
+    .withInternshipKind("immersion")
+    .withDateStart(futureStart)
+    .withDateEnd(futureEnd)
+    .withAgencyId(SEED_FT_AGENCY_ID)
+    .withSchedule(reasonableSchedule)
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withBeneficiaryEmail(adminPlaywrightEmail)
+    .build();
+
   await Promise.all([
     uow.conventionRepository.save(readyToSignConvention1),
     uow.conventionRepository.save(readyToSignConvention2),
@@ -268,5 +283,6 @@ const saveConventionsToManageForPlaywrightTest = async (uow: UnitOfWork) => {
     uow.conventionRepository.save(acceptedByValidatorConvention1),
     uow.conventionRepository.save(acceptedByValidatorConvention2),
     uow.conventionRepository.save(acceptedByValidatorConvention3),
+    uow.conventionRepository.save(conventionByAdminAsBeneficiary),
   ]);
 };

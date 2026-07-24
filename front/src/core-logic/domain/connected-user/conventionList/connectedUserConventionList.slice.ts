@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  type BeneficiaryConventionListDto,
   type ConnectedUserJwt,
   type ConventionReadDto,
   type DataWithPagination,
@@ -22,6 +23,7 @@ export type ConventionListState = {
   conventionsWithPagination: DataWithPagination<ConventionReadDto> & {
     filters: FlatGetConventionsForAgencyUserParams;
   };
+  beneficiaryConventionList: BeneficiaryConventionListDto | null;
 };
 
 export const initialConventionWithPagination: DataWithPagination<ConventionReadDto> & {
@@ -45,6 +47,7 @@ export const initialConventionWithPagination: DataWithPagination<ConventionReadD
 const initialConventionListState: ConventionListState = {
   isLoading: false,
   conventionsWithPagination: initialConventionWithPagination,
+  beneficiaryConventionList: null,
 };
 
 export const conventionListSlice = createSlice({
@@ -82,6 +85,34 @@ export const conventionListSlice = createSlice({
 
     clearConventionListFilters: (state) => {
       state.conventionsWithPagination = initialConventionWithPagination;
+    },
+
+    fetchBeneficiaryConventionListRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ jwt: ConnectedUserJwt }>,
+    ) => {
+      state.isLoading = true;
+    },
+    fetchBeneficiaryConventionListSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        beneficiaryConventionList: BeneficiaryConventionListDto;
+      }>,
+    ) => {
+      state.beneficiaryConventionList =
+        action.payload.beneficiaryConventionList;
+      state.isLoading = false;
+    },
+    fetchBeneficiaryConventionListFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.beneficiaryConventionList = [];
+      state.isLoading = false;
+    },
+
+    clearBeneficiaryConventionListRequested: (state) => {
+      state.beneficiaryConventionList = null;
     },
   },
 });

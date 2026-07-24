@@ -37,4 +37,34 @@ const fetchConventionListEpic: ConnectedUserConventionListEpic = (
     ),
   );
 
-export const connectedUserConventionListEpics = [fetchConventionListEpic];
+const fetchBeneficiaryConventionListEpic: ConnectedUserConventionListEpic = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(
+      conventionListSlice.actions.fetchBeneficiaryConventionListRequested.match,
+    ),
+    switchMap((action) =>
+      conventionGateway.getBeneficiaryConventionList$(action.payload.jwt).pipe(
+        map((beneficiaryConventionList) =>
+          conventionListSlice.actions.fetchBeneficiaryConventionListSucceeded({
+            beneficiaryConventionList,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          conventionListSlice.actions.fetchBeneficiaryConventionListFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
+export const connectedUserConventionListEpics = [
+  fetchConventionListEpic,
+  fetchBeneficiaryConventionListEpic,
+];

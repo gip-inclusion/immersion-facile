@@ -298,6 +298,12 @@ export const {
     },
     ({ discussionId }) => `/discussions/${discussionId}`,
   ),
+  beneficiaryDashboardConventions: beneficiaryDashboard.extend(
+    {
+      conventionId: param.path.optional.string,
+    },
+    ({ conventionId }) => `/conventions/${conventionId}`,
+  ),
   conventionConfirmation: defineRoute(
     {
       conventionId: param.path.string,

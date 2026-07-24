@@ -3,6 +3,7 @@ import {
   type AddConventionInput,
   type AgencyOption,
   type ApiConsumerName,
+  type BeneficiaryConventionListDto,
   type ConnectedUserJwt,
   type ConventionDraftDto,
   type ConventionDraftId,
@@ -91,6 +92,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public getConventionsForUserResult$ = new Subject<
     DataWithPagination<ConventionReadDto>
   >();
+  public getBeneficiaryConventionListResult$ =
+    new Subject<BeneficiaryConventionListDto>();
   public getConventionLastBroadcastFeedbackResult$ =
     new Subject<ConventionLastBroadcastFeedbackResponse>();
 
@@ -109,6 +112,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
   };
 
   constructor(private simulatedLatency?: number) {}
+  getBeneficiaryConventionList$(
+    _jwt: string,
+  ): Observable<BeneficiaryConventionListDto> {
+    return this.getBeneficiaryConventionListResult$;
+  }
 
   broadcastConventionAgain$(
     _params: WithConventionId,

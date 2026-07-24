@@ -87,11 +87,13 @@ import {
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  type ConventionAssessmentFields,
   type ConventionCommon,
   type ConventionDto,
   type ConventionId,
   type ConventionInternshipKindSpecific,
   type ConventionReadDto,
+  type ConventionStatus,
   type ConventionValidatorInputNames,
   conventionObjectiveOptions,
   conventionStatuses,
@@ -307,19 +309,27 @@ export const renewedSchema = z.object({
   justification: zStringMinLength1Max3000,
 });
 
+export const conventionStatusSchema: ZodSchemaWithInputMatchingOutput<ConventionStatus> =
+  z.enum(conventionStatuses, {
+    error: localization.invalidEnum,
+  });
+
+export const conventionDateStartSchema: ZodSchemaWithInputMatchingOutput<DateString> =
+  makeDateStringSchema(localization.invalidDateStart);
+export const conventionDateEndSchema: ZodSchemaWithInputMatchingOutput<DateString> =
+  makeDateStringSchema(localization.invalidDateEnd);
+
 export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon> =
   z
     .object({
       id: conventionIdSchema,
-      status: z.enum(conventionStatuses, {
-        error: localization.invalidEnum,
-      }),
+      status: conventionStatusSchema,
       statusJustification: zStringCanBeEmptyMax6000.optional(),
       agencyId: agencyIdSchema,
       updatedAt: makeDateStringSchema().optional(),
       dateSubmission: makeDateStringSchema(),
-      dateStart: makeDateStringSchema(localization.invalidDateStart),
-      dateEnd: makeDateStringSchema(localization.invalidDateEnd),
+      dateStart: conventionDateStartSchema,
+      dateEnd: conventionDateEndSchema,
       dateValidation: makeDateStringSchema(
         localization.invalidValidationFormatDate,
       ).optional(),
@@ -565,7 +575,9 @@ export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
       path: [getConventionFieldName("signatories.beneficiary.address")],
     });
 
-export const conventionAssessmentFieldsSchema = z
+export const conventionAssessmentFieldsSchema: ZodSchemaWithInputMatchingOutput<
+  ConventionAssessmentFields["assessment"]
+> = z
   .union([
     z.object({
       status: z.enum(assessmentStatuses),

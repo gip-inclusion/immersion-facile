@@ -1193,6 +1193,11 @@ export const domElementIds = {
       goToDiscussionButton: "im-beneficiary-dashboard__go-to-discussion-button",
     },
   },
+  beneficiaryDashboardConventions: {
+    beneficiaryConventionListHelpdeskNoConventionHint:
+      "im-beneficary-convention-list__no-convention-helpdesk-hint",
+    beneficiaryConventionListTable: "im-beneficary-convention-list__table",
+  },
   beneficiaryDashboardDiscussions: {
     login: {
       proConnectButton:

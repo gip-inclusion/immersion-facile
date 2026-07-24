@@ -30,6 +30,9 @@ export type GetConventionsFilters = {
   updateDate?: OptionalDateRange;
   withStatuses?: ConventionStatus[];
   withSirets?: SiretDto[];
+  withBeneficiary?: {
+    email?: Email;
+  };
 };
 
 export type GetConventionsSortBy = keyof Pick<
@@ -60,6 +63,7 @@ export type GetConventionIdsParams = {
     withStatuses?: ConventionStatus[];
     withBeneficiary?: {
       birthdate?: DateString;
+      email?: Email;
       lastName?: string;
     };
     withEstablishmentRepresentative?: {

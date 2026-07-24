@@ -352,6 +352,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
       .withSiret("11111111111111")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
+      .withBeneficiaryEmail("other-beneficiary@mail.com")
       .withDateStart(new Date("2023-03-27").toISOString())
       .withDateEnd(new Date("2023-03-28").toISOString())
       .withSchedule(reasonableSchedule)
@@ -363,6 +364,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const conventionReadyToSignAndDateStart20230330 = new ConventionDtoBuilder()
       .withSiret("11111111111112")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
+      .withBeneficiaryEmail("other-beneficiary@mail.com")
       .withDateSubmission(new Date("2023-03-05").toISOString())
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
@@ -375,6 +377,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const firstValidatedConvention = new ConventionDtoBuilder()
       .withSiret("11111111111113")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa03")
+      .withBeneficiaryEmail("beneficiary@mail.com")
       .withDateSubmission(new Date("2024-06-20").toISOString())
       .withDateStart(new Date("2024-07-01").toISOString())
       .withDateEnd(new Date("2024-07-02").toISOString())
@@ -389,6 +392,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const secondValidatedConvention = new ConventionDtoBuilder()
       .withSiret("11111111111114")
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa04")
+      .withBeneficiaryEmail("beneficiary@mail.com")
       .withDateSubmission(new Date("2024-06-21").toISOString())
       .withDateStart(new Date("2024-07-02").toISOString())
       .withDateEnd(new Date("2024-07-03").toISOString())
@@ -510,6 +514,29 @@ describe("Pg implementation of ConventionQueries", () => {
           secondValidatedConvention,
           firstValidatedConvention,
         ],
+      },
+      {
+        testName: "with filter withBeneficiary email",
+        params: {
+          filters: {
+            withBeneficiary: { email: "beneficiary@mail.com" },
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [
+          secondValidatedConvention,
+          firstValidatedConvention,
+        ],
+      },
+      {
+        testName: "with filter withBeneficiary email and no result",
+        params: {
+          filters: {
+            withBeneficiary: { email: "unknown-beneficiary@mail.com" },
+          },
+          sortBy: "dateStart",
+        },
+        expectedConventions: [],
       },
       {
         testName: "with filter endDate",

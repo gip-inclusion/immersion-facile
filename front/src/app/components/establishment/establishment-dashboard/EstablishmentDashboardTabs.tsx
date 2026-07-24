@@ -16,7 +16,6 @@ import {
   type UserEstablishmentRightDetails,
 } from "shared";
 import { ConventionTemplatesList } from "src/app/components/agency/agency-dashboard/ConventionTemplatesList";
-import { DiscussionTabContent } from "src/app/components/DiscussionContentTab";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
@@ -29,6 +28,7 @@ import type { DashboardTab } from "src/app/utils/dashboard";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { initialDiscussionsWithPagination } from "src/core-logic/domain/discussion/discussion.slice";
+import { DiscussionTabContent } from "../../discussion/DiscussionTabContent";
 import { MetabaseView } from "../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 
@@ -63,7 +63,7 @@ export const EstablishmentDashboardTabs = ({
         makeEstablishmentDashboardTabs(currentUser, userHasDiscussions),
         currentTab,
       ),
-    [currentUser, currentTab, route, userHasDiscussions],
+    [currentUser, currentTab, userHasDiscussions],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   const shouldRedirectToMainTab =

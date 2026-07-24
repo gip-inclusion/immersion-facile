@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Checkbox, type CheckboxProps } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -21,19 +20,13 @@ import {
   type FlatGetConventionsForAgencyUserParams,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  isConventionEndingInOneDayOrMore,
-  isConventionValidated,
   isNotEmptyArray,
-  toDisplayedDate,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  getAssessmentCompletionStatus,
-  getAssessmentLabelsAndSeverityByStatus,
-} from "src/app/utils/assessment.utils";
+import { getAssessmentLabelsAndSeverityByStatus } from "src/app/utils/assessment.utils";
 import logoFtSvg from "src/assets/img/logo-ft.svg";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -44,6 +37,9 @@ import {
 } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { match, P } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
+import { ConventionAssessmentStatusBadge } from "../../convention/ConventionAssessmentStatusBadge";
+import { ConventionDatesDisplay } from "../../convention/ConventionDatesDisplay";
+import { ConventionStatusBadge } from "../../convention/ConventionStatusBadge";
 
 type DateFilterType = keyof Pick<
   FlatGetConventionsForAgencyUserParams,
@@ -176,7 +172,7 @@ export const ConventionList = () => {
 
   const statusOptions: CheckboxProps["options"] = useMemo(() => {
     return conventionStatuses.map((status) => ({
-      label: labelAndSeverityByStatus[status].label,
+      label: labelAndSeverityByStatus[status].agencyLabel,
       nativeInputProps: {
         value: status,
         checked: tempFilters.statuses?.includes(status) ?? false,
@@ -356,37 +352,16 @@ export const ConventionList = () => {
                   <Tooltip kind="hover" title={convention.agencyName} />
                 </Fragment>,
                 <Fragment key={`${convention.id}-status`}>
-                  <Badge
-                    className={cx(
-                      labelAndSeverityByStatus[convention.status].color,
-                    )}
-                    small
-                  >
-                    {labelAndSeverityByStatus[convention.status].label}
-                  </Badge>
+                  <ConventionStatusBadge
+                    conventionStatus={convention.status}
+                    userKind="agency"
+                  />
                 </Fragment>,
                 <Fragment key={`${convention.id}-assessment`}>
-                  {isConventionValidated(convention) &&
-                    !isConventionEndingInOneDayOrMore(convention) && (
-                      <Badge
-                        small
-                        severity={
-                          getAssessmentLabelsAndSeverityByStatus({
-                            isPlural: false,
-                          })[
-                            getAssessmentCompletionStatus(convention.assessment)
-                          ].severity
-                        }
-                      >
-                        {
-                          getAssessmentLabelsAndSeverityByStatus({
-                            isPlural: false,
-                          })[
-                            getAssessmentCompletionStatus(convention.assessment)
-                          ].shortLabel
-                        }
-                      </Badge>
-                    )}
+                  <ConventionAssessmentStatusBadge
+                    conventionParams={convention}
+                    userKind="agency"
+                  />
                 </Fragment>,
 
                 <Fragment key={`${convention.id}-beneficiary`}>
@@ -417,17 +392,7 @@ export const ConventionList = () => {
                   <strong>{convention.businessName}</strong>
                 </Fragment>,
                 <Fragment key={`${convention.id}-dates`}>
-                  Du&nbsp;
-                  {toDisplayedDate({
-                    date: new Date(convention.dateStart),
-                    withHours: false,
-                  })}
-                  <br />
-                  Au&nbsp;
-                  {toDisplayedDate({
-                    date: new Date(convention.dateEnd),
-                    withHours: false,
-                  })}
+                  <ConventionDatesDisplay convention={convention} />
                 </Fragment>,
 
                 <Button
@@ -463,7 +428,8 @@ export const ConventionList = () => {
                                 : filters.statuses
                                     .map(
                                       (status) =>
-                                        labelAndSeverityByStatus[status].label,
+                                        labelAndSeverityByStatus[status]
+                                          .agencyLabel,
                                     )
                                     .join(", ")
                             }`,

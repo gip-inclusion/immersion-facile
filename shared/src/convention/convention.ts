@@ -18,7 +18,6 @@ import type {
 import type { DateString } from "../utils/date";
 import type {
   ConventionDto,
-  ConventionReadDto,
   ConventionRenewed,
   ConventionStatus,
   FlatGetConventionsForAgencyUserParams,
@@ -182,8 +181,8 @@ export const isConventionRenewed = (
   return renewedKey in convention;
 };
 
-export const isConventionValidated = (convention: ConventionDto) =>
-  convention.status === "ACCEPTED_BY_VALIDATOR";
+export const isConventionValidated = (conventionStatus: ConventionStatus) =>
+  conventionStatus === "ACCEPTED_BY_VALIDATOR";
 
 export const hasAllowedRole = ({
   allowedRoles,
@@ -321,8 +320,7 @@ export const getConventionManageAllowedRoles = (
   return roles;
 };
 
-export const isConventionEndingInOneDayOrMore = (
-  convention: ConventionReadDto,
-) => isAfter(new Date(convention.dateEnd), addDays(new Date(), 1));
+export const isConventionEndingInOneDayOrMore = (dateEnd: DateString) =>
+  isAfter(new Date(dateEnd), addDays(new Date(), 1));
 
 export const defaultMonthsThresholdForConventionsListing = 25;
