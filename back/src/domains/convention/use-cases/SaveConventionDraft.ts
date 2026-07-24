@@ -1,6 +1,7 @@
 import {
   type ConventionDraftDto,
   errors,
+  type SaveConventionDraftDto,
   saveConventionDraftSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -24,7 +25,10 @@ export const makeSaveConventionDraft = useCaseBuilder("SaveConventionDraft")
       conventionDraftUpdated: inputParams.conventionDraft,
     });
 
-    await uow.conventionDraftRepository.save(inputParams.conventionDraft, now);
+    await uow.conventionDraftRepository.save(
+      removeBeneficiaryFtConnectFederatedIdentityFromConvention(inputParams),
+      now,
+    );
 
     await uow.outboxRepository.save(
       deps.createNewEvent({
@@ -68,3 +72,24 @@ const throwConflictErrorWhenConventionDraftHasBeenUpdatedSinceLastSave =
       });
     }
   };
+
+const removeBeneficiaryFtConnectFederatedIdentityFromConvention = ({
+  conventionDraft,
+}: SaveConventionDraftDto): ConventionDraftDto => {
+  if (
+    conventionDraft.signatories?.beneficiary?.federatedIdentity?.provider !==
+    "peConnect"
+  )
+    return conventionDraft;
+
+  const { federatedIdentity: _, ...beneficiaryWithoutFederatedIdentity } =
+    conventionDraft.signatories.beneficiary;
+
+  return {
+    ...conventionDraft,
+    signatories: {
+      ...conventionDraft.signatories,
+      beneficiary: beneficiaryWithoutFederatedIdentity,
+    },
+  };
+};
