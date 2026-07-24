@@ -39,6 +39,7 @@ import { ImmersionDescription } from "src/app/components/forms/assessment/Immers
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { setValueAsNull } from "src/app/utils/form.utils";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
@@ -311,8 +312,7 @@ const AssessmentStatusSection = ({
                   nativeInputProps={{
                     type: "date",
                     ...register("partialCompletionDetails.lastDayOfPresence", {
-                      setValueAs: (value: string) =>
-                        value === "" ? null : value,
+                      setValueAs: setValueAsNull,
                     }),
                     id: domElementIds.assessment.lastDayOfPresenceInput,
                     min: toDateUTCString(new Date(convention.dateStart)),
@@ -499,7 +499,7 @@ const AssessmentContractSection = ({
               }))}
               nativeSelectProps={{
                 ...register("typeOfContract", {
-                  setValueAs: (value: string) => (value === "" ? null : value),
+                  setValueAs: setValueAsNull,
                 }),
               }}
               {...getFieldError("typeOfContract")}
@@ -509,7 +509,7 @@ const AssessmentContractSection = ({
               label="Date de début du contrat : *"
               nativeInputProps={{
                 ...register("contractStartDate", {
-                  setValueAs: (value: string) => (value === "" ? null : value),
+                  setValueAs: setValueAsNull,
                 }),
                 id: domElementIds.assessment.contractStartDateInput,
                 type: "date",
