@@ -3,6 +3,7 @@ import {
   type AdminTabRouteName,
   adminTabRouteNames,
   adminTabs,
+  type BeneficiaryDashboardTab,
   domElementIds,
   type EmailType,
   type EstablishmentDashboardTab,
@@ -84,8 +85,14 @@ export const getMagicLinkFromEmail = async ({
 };
 
 export const getTabIndexByTabName = (
-  tabList: readonly AdminTabRouteName[] | readonly EstablishmentDashboardTab[],
-  tabName: AdminTabRouteName | EstablishmentDashboardTab,
+  tabList:
+    | readonly AdminTabRouteName[]
+    | readonly EstablishmentDashboardTab[]
+    | readonly BeneficiaryDashboardTab[],
+  tabName:
+    | AdminTabRouteName
+    | EstablishmentDashboardTab
+    | BeneficiaryDashboardTab,
 ) => {
   const index = tabList.findIndex((tab) => tab === tabName);
   if (index === -1) {
