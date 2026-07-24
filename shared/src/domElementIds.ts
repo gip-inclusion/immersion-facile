@@ -98,6 +98,9 @@ export const domElementIds = {
       agencyformConvention: buildFooterNavLinkId(
         "footer-nav-top-agency-form-convention",
       ),
+      archivedConventionRequest: buildFooterNavLinkId(
+        "footer-nav-top-archived-convention-request",
+      ),
       linkedin: buildFooterNavLinkId("footer-nav-top-linkedin"),
     },
     links: {
@@ -1205,6 +1208,35 @@ export const domElementIds = {
         "im-login-form__retry-login-button--beneficiary-dashboard-discussions",
       contactSupport:
         "im-login-form__contact-support-link--beneficiary-dashboard-discussions",
+    },
+  },
+  archivedConventionRequest: {
+    form: "im-archived-convention-request__form",
+    conventionSearchMethod:
+      "im-archived-convention-request__convention-search-method",
+    conventionIdInput: "im-archived-convention-request__convention-id-input",
+    beneficiaryFirstNameInput:
+      "im-archived-convention-request__beneficiary-first-name-input",
+    beneficiaryLastNameInput:
+      "im-archived-convention-request__beneficiary-last-name-input",
+    siretInput: "im-archived-convention-request__siret-input",
+    immersionDateInput: "im-archived-convention-request__immersion-date-input",
+    appellationAutocomplete:
+      "im-archived-convention-request__appellation-autocomplete",
+    reasonSelect: "im-archived-convention-request__reason-select",
+    otherReasonInput: "im-archived-convention-request__other-reason-input",
+    submitButton: "im-archived-convention-request__submit-button",
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--archived-convention-request",
+      byEmailButton:
+        "im-login-form__connect-button--archived-convention-request-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--archived-convention-request",
+      retryButton:
+        "im-login-form__retry-login-button--archived-convention-request",
+      contactSupport:
+        "im-login-form__contact-support-link--archived-convention-request",
     },
   },
   conventionTemplate: {

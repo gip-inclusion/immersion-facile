@@ -16,6 +16,8 @@ export * from "./agency/publicAgency.schema";
 export * from "./agency-group/agencyGroup";
 export * from "./apiConsumer/ApiConsumer";
 export * from "./apiConsumer/apiConsumer.schema";
+export * from "./archivedConventionRequest/archivedConventionRequest.dto";
+export * from "./archivedConventionRequest/archivedConventionRequest.schema";
 export * from "./assertions";
 export * from "./assessment/AssessmentDtoBuilder";
 export * from "./assessment/assessment.dto";

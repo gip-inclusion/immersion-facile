@@ -1,6 +1,7 @@
 import type { AgencyGroupRepository } from "../../../agency/ports/AgencyGroupRepository";
 import type { AgencyRepository } from "../../../agency/ports/AgencyRepository";
 import type { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
+import type { ArchivedConventionRequestRepository } from "../../../convention/ports/ArchivedConventionRequestRepository";
 import type { AssessmentRepository } from "../../../convention/ports/AssessmentRepository";
 import type { ConventionDraftRepository } from "../../../convention/ports/ConventionDraftRepository";
 import type { ConventionExternalIdRepository } from "../../../convention/ports/ConventionExternalIdRepository";
@@ -39,6 +40,7 @@ export type UnitOfWork = {
   agencyGroupRepository: AgencyGroupRepository;
   agencyRepository: AgencyRepository;
   apiConsumerRepository: ApiConsumerRepository;
+  archivedConventionRequestRepository: ArchivedConventionRequestRepository;
   assessmentRepository: AssessmentRepository;
   bannedEstablishmentRepository: BannedEstablishmentRepository;
   conventionDraftRepository: ConventionDraftRepository;

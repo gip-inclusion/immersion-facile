@@ -1,6 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
+import { archivedConventionRequestSchema } from "../archivedConventionRequest/archivedConventionRequest.schema";
 import {
   assessmentDtoSchema,
   deleteAssessmentRequestDtoSchema,
@@ -252,6 +253,18 @@ export const conventionMagicLinkRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+
+  createArchivedConventionRequest: defineRoute({
+    url: "/auth/archived-convention",
+    method: "post",
+    requestBodySchema: archivedConventionRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      201: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
     },
   }),
 });

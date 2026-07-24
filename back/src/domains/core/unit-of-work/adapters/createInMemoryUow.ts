@@ -1,6 +1,7 @@
 import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryDelegationContactRepository } from "../../../agency/adapters/InMemoryDelegationContactRepository";
+import { InMemoryArchivedConventionRequestRepository } from "../../../convention/adapters/InMemoryArchivedConventionRequestRepository";
 import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
 import { InMemoryConventionDraftRepository } from "../../../convention/adapters/InMemoryConventionDraftRepository";
 import { InMemoryConventionExternalIdRepository } from "../../../convention/adapters/InMemoryConventionExternalIdRepository";
@@ -64,6 +65,8 @@ export const createInMemoryUow = () => {
     agencyRepository,
     agencyGroupRepository: new InMemoryAgencyGroupRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
+    archivedConventionRequestRepository:
+      new InMemoryArchivedConventionRequestRepository(),
     userRepository,
     bannedEstablishmentRepository,
     broadcastFeedbacksRepository,

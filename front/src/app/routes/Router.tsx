@@ -28,6 +28,7 @@ import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRo
 import { DashboardPrivateRoutePage } from "src/app/pages/auth/DashboardPrivateRoutePage";
 import { MagicLinkInterstitialPage } from "src/app/pages/auth/MagicLinkInterstitialPage";
 import { BeneficiaryDashboardDiscussionsTab } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardDiscussionsTab";
+import { ArchivedConventionRequestPage } from "src/app/pages/convention/ArchivedConventionRequestPage";
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
@@ -232,6 +233,9 @@ const getPageByRouteName: {
     </DashboardPrivateRoutePage>
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
+  archivedConventionRequest: (route) => (
+    <ArchivedConventionRequestPage route={route} />
+  ),
   beneficiaryDashboard: (route) => (
     <RedirectTo
       route={frontRoutes.beneficiaryDashboardDiscussions(route.params)}

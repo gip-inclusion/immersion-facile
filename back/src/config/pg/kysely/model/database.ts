@@ -25,6 +25,7 @@ export interface Database {
   agency_groups: AgencyGroups;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
   api_consumers: ApiConsumers;
+  archived_convention_requests: ArchivedConventionRequests;
   banned_establishments: BannedEstablishments;
   broadcast_feedbacks: BroadcastFeedbacks;
   convention_external_ids: ConventionExternalIds;
@@ -221,6 +222,20 @@ interface Agencies extends WithAcquisition {
   phone_id: number;
   contact_email: string;
   delegation_info: Json | null;
+}
+
+interface ArchivedConventionRequests {
+  id: string;
+  user_id: string;
+  created_at: Timestamp;
+  convention_id: string | null;
+  beneficiary_first_name: string | null;
+  beneficiary_last_name: string | null;
+  siret: string | null;
+  immersion_date: string | null;
+  immersion_appellation: number | null;
+  reason: string;
+  other_reason: string | null;
 }
 
 interface BannedEstablishments {

@@ -674,6 +674,14 @@ export const errors = {
         `Aucun modèle de convention trouvé avec l'identifiant '${conventionTemplateId}'.`,
       ),
   },
+  archivedConventionRequest: {
+    unknownReason: ({ reason }: { reason: string }) =>
+      new Error(
+        `La raison de demande de convention archivée est inconnue : ${reason}`,
+      ),
+    incomplete: ({ id }: { id: string }) =>
+      new Error(`La demande de convention archivée est incomplète pour ${id}`),
+  },
   establishment: {
     badPagination: ({
       page,
