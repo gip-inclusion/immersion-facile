@@ -1,6 +1,6 @@
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { expectToEqual } from "../test.helpers";
-import type { AssessmentFormValues } from "./assessment.dto";
+import type { AssessmentFormDto } from "./assessment.dto";
 import {
   assessmentFormValuesToAssessmentDto,
   computeTotalHours,
@@ -16,17 +16,17 @@ describe("assessment helpers", () => {
 
   const createdAt = "2024-01-21T00:00:00.000Z";
 
-  const baseFormValues: AssessmentFormValues = {
+  const baseFormValues: AssessmentFormDto = {
     conventionId: convention.id,
     status: "PARTIALLY_COMPLETED",
     partialCompletionDetails: {
-      lastDayOfPresence: "",
-      numberOfMissedHours: "",
-      numberOfMissedMinutes: "",
+      lastDayOfPresence: null,
+      numberOfMissedHours: null,
+      numberOfMissedMinutes: null,
     },
     endedWithAJob: false,
-    typeOfContract: "",
-    contractStartDate: "",
+    typeOfContract: null,
+    contractStartDate: null,
     establishmentFeedback: "feedback",
     establishmentAdvices: "advices",
   };
@@ -35,9 +35,9 @@ describe("assessment helpers", () => {
     it("returns false when hours, minutes and date are empty", () => {
       expect(
         hasPartialCompletionDetails({
-          lastDayOfPresence: "",
-          numberOfMissedHours: "",
-          numberOfMissedMinutes: "",
+          lastDayOfPresence: null,
+          numberOfMissedHours: null,
+          numberOfMissedMinutes: null,
         }),
       ).toBe(false);
     });
@@ -45,7 +45,7 @@ describe("assessment helpers", () => {
     it("returns false when hours and minutes are 0 and date is empty", () => {
       expect(
         hasPartialCompletionDetails({
-          lastDayOfPresence: "",
+          lastDayOfPresence: null,
           numberOfMissedHours: 0,
           numberOfMissedMinutes: 0,
         }),
@@ -56,8 +56,8 @@ describe("assessment helpers", () => {
       expect(
         hasPartialCompletionDetails({
           lastDayOfPresence: "2024-01-18",
-          numberOfMissedHours: "",
-          numberOfMissedMinutes: "",
+          numberOfMissedHours: null,
+          numberOfMissedMinutes: null,
         }),
       ).toBe(true);
     });
@@ -65,9 +65,9 @@ describe("assessment helpers", () => {
     it("returns true when hours > 0", () => {
       expect(
         hasPartialCompletionDetails({
-          lastDayOfPresence: "",
+          lastDayOfPresence: null,
           numberOfMissedHours: 2,
-          numberOfMissedMinutes: "",
+          numberOfMissedMinutes: null,
         }),
       ).toBe(true);
     });
@@ -75,8 +75,8 @@ describe("assessment helpers", () => {
     it("returns true when minutes > 0", () => {
       expect(
         hasPartialCompletionDetails({
-          lastDayOfPresence: "",
-          numberOfMissedHours: "",
+          lastDayOfPresence: null,
+          numberOfMissedHours: null,
           numberOfMissedMinutes: 30,
         }),
       ).toBe(true);
@@ -84,20 +84,10 @@ describe("assessment helpers", () => {
   });
 
   describe("getAssessmentEffectiveEndDate", () => {
-    it("returns convention.dateEnd when form date is empty", () => {
+    it("returns convention.dateEnd when form date is null", () => {
       expectToEqual(
         getAssessmentEffectiveEndDate({
-          lastDayOfPresence: "",
-          conventionDateEnd: convention.dateEnd,
-        }),
-        convention.dateEnd,
-      );
-    });
-
-    it("returns convention.dateEnd when form date is undefined", () => {
-      expectToEqual(
-        getAssessmentEffectiveEndDate({
-          lastDayOfPresence: undefined,
+          lastDayOfPresence: null,
           conventionDateEnd: convention.dateEnd,
         }),
         convention.dateEnd,
@@ -246,7 +236,7 @@ describe("assessment helpers", () => {
 
   describe("computeTotalHours via mapper", () => {
     it("gives the same total for hours-only form as with lastDayOfPresence = convention.dateEnd", () => {
-      const formValues: AssessmentFormValues = {
+      const formValues: AssessmentFormDto = {
         ...baseFormValues,
         partialCompletionDetails: {
           ...baseFormValues.partialCompletionDetails,

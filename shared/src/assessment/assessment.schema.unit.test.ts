@@ -5,7 +5,7 @@ import { errors } from "../errors/errors";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { expectToEqual } from "../test.helpers";
 import { type DateRange, withDateRangeSchema } from "../utils/date";
-import type { AssessmentDto, AssessmentFormValues } from "./assessment.dto";
+import type { AssessmentDto, AssessmentFormDto } from "./assessment.dto";
 import { assessmentDtoSchema, assessmentFormSchema } from "./assessment.schema";
 
 const createdAt = "2024-01-01T00:00:00.000Z";
@@ -199,7 +199,7 @@ describe("Assessment form schema", () => {
     isEstablishmentBanned: false,
   };
 
-  const validFormValues: AssessmentFormValues = {
+  const validFormValues: AssessmentFormDto = {
     status: "PARTIALLY_COMPLETED",
     conventionId: "my-convention-id",
     endedWithAJob: true,
@@ -215,16 +215,16 @@ describe("Assessment form schema", () => {
   };
 
   it("accepts hours-only PARTIALLY_COMPLETED (empty date)", () => {
-    const formValues: AssessmentFormValues = {
+    const formValues: AssessmentFormDto = {
       ...validFormValues,
       partialCompletionDetails: {
-        lastDayOfPresence: "",
+        lastDayOfPresence: null,
         numberOfMissedHours: 2,
-        numberOfMissedMinutes: "",
+        numberOfMissedMinutes: null,
       },
       endedWithAJob: false,
-      typeOfContract: "",
-      contractStartDate: "",
+      typeOfContract: null,
+      contractStartDate: null,
     };
 
     expectToEqual(
@@ -234,7 +234,7 @@ describe("Assessment form schema", () => {
   });
 
   it("accepts date-only PARTIALLY_COMPLETED (0h 0min)", () => {
-    const formValues: AssessmentFormValues = {
+    const formValues: AssessmentFormDto = {
       ...validFormValues,
       partialCompletionDetails: {
         lastDayOfPresence: "2024-01-18",
@@ -242,8 +242,8 @@ describe("Assessment form schema", () => {
         numberOfMissedMinutes: 0,
       },
       endedWithAJob: false,
-      typeOfContract: "",
-      contractStartDate: "",
+      typeOfContract: null,
+      contractStartDate: null,
     };
 
     expectToEqual(
@@ -253,16 +253,16 @@ describe("Assessment form schema", () => {
   });
 
   it("rejects PARTIALLY_COMPLETED with empty date and 0h 0min on partialCompletionDetails path", () => {
-    const invalidFormValues: AssessmentFormValues = {
+    const invalidFormValues: AssessmentFormDto = {
       ...validFormValues,
       partialCompletionDetails: {
-        lastDayOfPresence: "",
+        lastDayOfPresence: null,
         numberOfMissedHours: 0,
         numberOfMissedMinutes: 0,
       },
       endedWithAJob: false,
-      typeOfContract: "",
-      contractStartDate: "",
+      typeOfContract: null,
+      contractStartDate: null,
     };
 
     expectFormSchemaToFailWith({
@@ -274,16 +274,16 @@ describe("Assessment form schema", () => {
   });
 
   it("rejects numberOfMissedHours above planned immersion hours", () => {
-    const invalidFormValues: AssessmentFormValues = {
+    const invalidFormValues: AssessmentFormDto = {
       ...validFormValues,
       partialCompletionDetails: {
         ...validFormValues.partialCompletionDetails,
         numberOfMissedHours: 999,
-        numberOfMissedMinutes: "",
+        numberOfMissedMinutes: null,
       },
       endedWithAJob: false,
-      typeOfContract: "",
-      contractStartDate: "",
+      typeOfContract: null,
+      contractStartDate: null,
     };
 
     expectFormSchemaToFailWith({
@@ -301,7 +301,7 @@ describe("Assessment form schema", () => {
   });
 
   it("rejects contractStartDate before convention start date", () => {
-    const invalidFormValues: AssessmentFormValues = {
+    const invalidFormValues: AssessmentFormDto = {
       ...validFormValues,
       contractStartDate: "2024-01-09",
     };
@@ -342,7 +342,7 @@ const expectFormSchemaToFailWith = ({
   messageContains,
 }: {
   convention: ConventionReadDto;
-  formValues: AssessmentFormValues;
+  formValues: AssessmentFormDto;
   path: (string | number)[];
   message?: string;
   messageContains?: string;

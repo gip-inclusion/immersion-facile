@@ -94,17 +94,17 @@ export type LegacyAssessmentDto = {
   createdAt: DateTimeIsoString;
 };
 
-export type AssessmentPartialCompletionDetailsFormValues = {
-  lastDayOfPresence: DateString | "";
-  numberOfMissedHours: number | "";
-  numberOfMissedMinutes: number | "";
+export type PartiallyCompletedAssessmentDetails = {
+  lastDayOfPresence: DateString | null;
+  numberOfMissedHours: number | null;
+  numberOfMissedMinutes: number | null;
 };
 
-export type AssessmentFormValues = {
+export type AssessmentFormDto = {
   conventionId: ConventionId;
   status: AssessmentStatus | null;
-  partialCompletionDetails: AssessmentPartialCompletionDetailsFormValues;
+  partialCompletionDetails: PartiallyCompletedAssessmentDetails;
   endedWithAJob: boolean | null;
-  typeOfContract: TypeOfContract | "";
-  contractStartDate: DateString | "";
+  typeOfContract: TypeOfContract | null;
+  contractStartDate: DateString | null;
 } & WithEstablishmentComments;

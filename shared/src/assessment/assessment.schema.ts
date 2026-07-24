@@ -17,10 +17,10 @@ import {
 } from "../zodUtils";
 import {
   type AssessmentDto,
-  type AssessmentFormValues,
-  type AssessmentPartialCompletionDetailsFormValues,
+  type AssessmentFormDto,
   type DeleteAssessmentRequestDto,
   type LegacyAssessmentDto,
+  type PartiallyCompletedAssessmentDetails,
   type SignAssessmentRequestDto,
   typeOfContracts,
   type WithAssessmentDto,
@@ -97,14 +97,14 @@ export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto
       }),
     );
 
-const partialCompletionDetailsFormValuesSchema: ZodSchemaWithInputMatchingOutput<AssessmentPartialCompletionDetailsFormValues> =
+const partialCompletionDetailsFormValuesSchema: ZodSchemaWithInputMatchingOutput<PartiallyCompletedAssessmentDetails> =
   z.object({
-    lastDayOfPresence: makeDateStringSchema().or(z.literal("")),
-    numberOfMissedHours: z.number().or(z.literal("")),
-    numberOfMissedMinutes: z.number().or(z.literal("")),
+    lastDayOfPresence: makeDateStringSchema().nullable(),
+    numberOfMissedHours: z.number().nullable(),
+    numberOfMissedMinutes: z.number().nullable(),
   });
 
-const assessmentFormValuesBaseSchema: ZodSchemaWithInputMatchingOutput<AssessmentFormValues> =
+const assessmentFormValuesBaseSchema: ZodSchemaWithInputMatchingOutput<AssessmentFormDto> =
   z.object({
     conventionId: z.string(),
     status: z
@@ -114,10 +114,11 @@ const assessmentFormValuesBaseSchema: ZodSchemaWithInputMatchingOutput<Assessmen
       .nullable(),
     partialCompletionDetails: partialCompletionDetailsFormValuesSchema,
     endedWithAJob: z.boolean().nullable(),
-    typeOfContract: zEnumValidation(typeOfContracts, localization.required).or(
-      z.literal(""),
-    ),
-    contractStartDate: makeDateStringSchema().or(z.literal("")),
+    typeOfContract: zEnumValidation(
+      typeOfContracts,
+      localization.required,
+    ).nullable(),
+    contractStartDate: makeDateStringSchema().nullable(),
     establishmentFeedback: zStringMinLength1Max9200,
     establishmentAdvices: zStringMinLength1Max6000,
   });
@@ -125,13 +126,12 @@ const assessmentFormValuesBaseSchema: ZodSchemaWithInputMatchingOutput<Assessmen
 const toFormMissedHours = ({
   numberOfMissedHours,
   numberOfMissedMinutes,
-}: AssessmentPartialCompletionDetailsFormValues): number =>
-  (typeof numberOfMissedHours === "number" ? numberOfMissedHours : 0) +
-  (typeof numberOfMissedMinutes === "number" ? numberOfMissedMinutes : 0) / 60;
+}: PartiallyCompletedAssessmentDetails): number =>
+  (numberOfMissedHours ?? 0) + (numberOfMissedMinutes ?? 0) / 60;
 
 export const assessmentFormSchema = (
   convention: ConventionReadDto,
-): ZodSchemaWithInputMatchingOutput<AssessmentFormValues> =>
+): ZodSchemaWithInputMatchingOutput<AssessmentFormDto> =>
   assessmentFormValuesBaseSchema
     .superRefine((formValues, ctx) => {
       if (formValues.status === null)
@@ -187,14 +187,14 @@ export const assessmentFormSchema = (
 
       if (formValues.endedWithAJob !== true) return;
 
-      if (formValues.typeOfContract === "")
+      if (formValues.typeOfContract === null)
         ctx.addIssue({
           code: "custom",
           message: localization.required,
           path: ["typeOfContract"],
         });
 
-      if (formValues.contractStartDate === "")
+      if (formValues.contractStartDate === null)
         ctx.addIssue({
           code: "custom",
           message: localization.required,
@@ -202,7 +202,7 @@ export const assessmentFormSchema = (
         });
 
       if (
-        formValues.contractStartDate !== "" &&
+        formValues.contractStartDate !== null &&
         convention.dateStart > formValues.contractStartDate
       )
         ctx.addIssue({
