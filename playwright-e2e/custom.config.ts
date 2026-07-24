@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { makeThrowIfNotDefinedOrDefault } from "shared";
+import { adminPlaywrightEmail, makeThrowIfNotDefinedOrDefault } from "shared";
 import { loadEnvFileWithProcessEnv } from "./e2e-env";
 
 const throwIfNotDefinedOrDefault = makeThrowIfNotDefinedOrDefault(
@@ -13,7 +13,7 @@ export const testConfig = {
     baseUrl: "https://fca.integ01.dev-agentconnect.fr/api/v2",
     username: throwIfNotDefinedOrDefault("PC_USERNAME"),
     password: throwIfNotDefinedOrDefault("PC_PASSWORD"),
-    adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
+    adminUsername: adminPlaywrightEmail,
     adminPassword: throwIfNotDefinedOrDefault("PC_ADMIN_PASSWORD"),
   },
   adminAuthFile: ".auth/admin.json",

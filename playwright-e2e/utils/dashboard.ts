@@ -1,6 +1,8 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import {
+  type BeneficiaryDashboardTab,
+  beneficiaryDashboardTabsList,
   domElementIds,
   type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
@@ -21,15 +23,28 @@ export const goToEstablishmentDashboardTab = async (
   await tabLocator.click({ force: true });
 };
 
-export const goToDashboard = async (
+export const goToBeneficiaryDashboardTab = async (
   page: Page,
-  userKind: "agency" | "establishment",
+  tab: BeneficiaryDashboardTab,
 ) => {
-  const selector =
-    userKind === "agency"
-      ? "#fr-header-main-navigation-button-3"
-      : "#fr-header-main-navigation-button-2";
-  await page.click(selector);
+  await page.waitForSelector(".fr-tabs__list li");
+  const tabLocator = await page
+    .locator(".fr-tabs__list li")
+    .nth(getTabIndexByTabName(beneficiaryDashboardTabsList, tab))
+    .locator(".fr-tabs__tab");
+  await tabLocator.click({ force: true });
+};
+
+type UserKind = "agency" | "establishment" | "candidate";
+
+export const goToDashboard = async (page: Page, userKind: UserKind) => {
+  const selectorsByUserKind: Record<UserKind, string> = {
+    candidate: "#fr-header-main-navigation-button-1",
+    establishment: "#fr-header-main-navigation-button-2",
+    agency: "#fr-header-main-navigation-button-3",
+  };
+
+  await page.click(selectorsByUserKind[userKind]);
   const submenuItemSelector = `#${domElementIds.header.navLinks[userKind].dashboard}`;
   await page.click(submenuItemSelector);
 };
