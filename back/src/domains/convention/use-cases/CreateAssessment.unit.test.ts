@@ -399,6 +399,78 @@ describe("CreateAssessment", () => {
       ]);
     });
 
+    it("should create a partially completed assessment with missed hours only (no early end date)", async () => {
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: validatedConvention.dateEnd,
+        numberOfMissedHours: 2,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+
+      await createAssessment.execute(
+        partiallyCompletedAssessment,
+        tutorPayload,
+      );
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...partiallyCompletedAssessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade:
+            validatedConvention.schedule.totalHours - 2,
+        },
+      ]);
+    });
+
+    it("should create a partially completed assessment with early end date only (no missed hours)", async () => {
+      const conventionDateEnd = new Date("2025-01-24");
+      const convention = new ConventionDtoBuilder(validatedConvention)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(new Date("2025-01-20").toISOString())
+        .withDateEnd(conventionDateEnd.toISOString())
+        .withSchedule(reasonableSchedule)
+        .build();
+
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: subDays(conventionDateEnd, 1).toISOString(),
+        numberOfMissedHours: 0,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+        beneficiaryAgreement: null,
+        beneficiaryFeedback: null,
+        signedAt: null,
+        createdAt: new Date("2025-01-01").toISOString(),
+      };
+
+      uow.conventionRepository.setConventions([convention]);
+
+      await createAssessment.execute(partiallyCompletedAssessment, {
+        ...tutorPayload,
+        role: "establishment-tutor",
+        emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
+          "establishment-tutor"
+        ],
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...partiallyCompletedAssessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: 28,
+        },
+      ]);
+    });
+
     it("should create an assessment with correct duration when partially completed", async () => {
       const convention = new ConventionDtoBuilder(validatedConvention)
         .withStatus("ACCEPTED_BY_VALIDATOR")

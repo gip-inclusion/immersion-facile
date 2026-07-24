@@ -883,7 +883,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         const lastDayOfPresence =
           assessment.status === "COMPLETED"
             ? conventionDateEnd
-            : (assessment.lastDayOfPresence ?? "");
+            : assessment.lastDayOfPresence;
         return {
           subject: `Pour information : évaluation ${
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"

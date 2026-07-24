@@ -764,6 +764,8 @@ export const domElementIds = {
     formSubmitButton: "im-assessment-form__submit-button",
     formDownloadButton: "im-assessment-form__download-button",
     statusInput: "im-assessment-form__status-input",
+    partialCompletionDetailsError:
+      "im-assessment-form__partial-completion-details-error",
     lastDayOfPresenceInput: "im-assessment-form__last-day-of-presence-input",
     numberOfMissedHoursInput:
       "im-assessment-form__number-of-missed-hours-input",

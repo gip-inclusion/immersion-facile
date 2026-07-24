@@ -7,7 +7,7 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { type ChangeEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
@@ -20,6 +20,7 @@ import {
   type AssessmentFormDto,
   type AssessmentStatus,
   assessmentFormSchema,
+  assessmentFormValuesToAssessmentDto,
   assessmentStatuses,
   type ConventionDto,
   type ConventionReadDto,
@@ -38,6 +39,7 @@ import { ImmersionDescription } from "src/app/components/forms/assessment/Immers
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { setValueAsNull } from "src/app/utils/form.utils";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
@@ -52,10 +54,21 @@ type AssessmentFormProperties = {
 
 export type OnStepChange = (
   step: Step,
-  fieldsToValidate: (keyof AssessmentDto | DotNestedKeys<AssessmentDto>)[],
+  fieldsToValidate: (
+    | keyof AssessmentFormDto
+    | DotNestedKeys<AssessmentFormDto>
+  )[],
 ) => void;
 
 type Step = 1 | 2 | 3;
+
+const partialCompletionDetailsFields = [
+  "partialCompletionDetails",
+  "partialCompletionDetails.lastDayOfPresence",
+  "partialCompletionDetails.numberOfMissedHours",
+] as const satisfies ReadonlyArray<
+  keyof AssessmentFormDto | DotNestedKeys<AssessmentFormDto>
+>;
 
 const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
@@ -81,14 +94,17 @@ export const AssessmentForm = ({
 
   const initialValues: AssessmentFormDto = {
     conventionId: convention.id,
+    status: null,
+    partialCompletionDetails: {
+      lastDayOfPresence: null,
+      numberOfMissedHours: null,
+      numberOfMissedMinutes: null,
+    },
+    endedWithAJob: null,
+    typeOfContract: null,
+    contractStartDate: null,
     establishmentFeedback: "",
     establishmentAdvices: "",
-    endedWithAJob: false,
-    status: null,
-    beneficiaryAgreement: null,
-    beneficiaryFeedback: null,
-    signedAt: null,
-    createdAt: new Date().toISOString(),
   };
   const methods = useForm<AssessmentFormDto>({
     resolver: zodResolver(assessmentFormSchema(convention)),
@@ -104,7 +120,7 @@ export const AssessmentForm = ({
       );
     }
 
-    const assessment = assessmentFormDtoToAssessmentDto(values);
+    const assessment = assessmentFormValuesToAssessmentDto(values, convention);
 
     onAssessmentSubmitted?.(assessment);
 
@@ -121,12 +137,8 @@ export const AssessmentForm = ({
       setCurrentStep(step);
       return;
     }
-    const validatedFields = await Promise.all(
-      fieldsToValidate.map(async (key) => trigger(key)),
-    );
-    if (validatedFields.every((validatedField) => validatedField)) {
-      setCurrentStep(step);
-    }
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) setCurrentStep(step);
   };
   useScrollTo(currentStep);
 
@@ -212,39 +224,36 @@ const AssessmentStatusSection = ({
   onStepChange: OnStepChange;
 }) => {
   const { register, formState, watch, setValue } =
-    useFormContext<AssessmentDto>();
+    useFormContext<AssessmentFormDto>();
+
   const getFieldError = makeFieldError(formState);
+
   const formValues = watch();
-  const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
-    useState<number | null>(null);
-  const [numberOfMissedMinutesDisplayed, setNumberOfMissedMinutesDisplayed] =
-    useState<number | null>(null);
-  useEffect(() => {
-    if (
-      formValues.status === "PARTIALLY_COMPLETED" &&
-      formValues.numberOfMissedHours > 0
-    ) {
-      setNumberOfMissedHoursDisplayed(
-        Math.floor(formValues.numberOfMissedHours),
-      );
-      setNumberOfMissedMinutesDisplayed(
-        +(
-          (formValues.numberOfMissedHours -
-            Math.floor(formValues.numberOfMissedHours)) *
-          60
-        ).toFixed(2),
-      );
-    }
-  }, [formValues]);
-  const assessmentDto = assessmentFormDtoToAssessmentDto(formValues);
+
+  const partialCompletionDetailsFormValue = formValues.partialCompletionDetails;
+
+  const hasImmersionEndedEarly =
+    partialCompletionDetailsFormValue.lastDayOfPresence &&
+    new Date(partialCompletionDetailsFormValue.lastDayOfPresence) <
+      new Date(convention.dateEnd);
+
+  const partialCompletionDetailsFieldError = getFieldError(
+    "partialCompletionDetails",
+  );
+
+  const assessmentDto =
+    formValues.status === null
+      ? undefined
+      : assessmentFormValuesToAssessmentDto(formValues, convention);
+
   const totalHours = computeTotalHours({
     convention: convention,
     lastDayOfPresence:
-      assessmentDto.status === "PARTIALLY_COMPLETED"
+      assessmentDto?.status === "PARTIALLY_COMPLETED"
         ? assessmentDto.lastDayOfPresence
-        : "",
+        : undefined,
     numberOfMissedHours:
-      assessmentDto.status === "PARTIALLY_COMPLETED"
+      assessmentDto?.status === "PARTIALLY_COMPLETED"
         ? assessmentDto.numberOfMissedHours
         : 0,
     status: formValues.status,
@@ -271,12 +280,6 @@ const AssessmentStatusSection = ({
                     setValue("establishmentAdvices", "");
                     setValue("establishmentFeedback", "");
                   }
-                  if (
-                    value === "PARTIALLY_COMPLETED" &&
-                    !("numberOfMissedHours" in formValues)
-                  ) {
-                    setValue("numberOfMissedHours", 0);
-                  }
                   if (value === "DID_NOT_SHOW") {
                     setValue("establishmentAdvices", "Non applicable");
                     setValue("establishmentFeedback", "Non applicable");
@@ -289,29 +292,38 @@ const AssessmentStatusSection = ({
             {...getFieldError("status")}
           />
           {formValues.status === "PARTIALLY_COMPLETED" && (
-            <>
-              <Input
-                label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ? *"
-                hintText={`Date indiquée dans la convention : ${toDisplayedDate(
-                  {
-                    date: convertLocaleDateToUtcTimezoneDate(
-                      new Date(convention.dateEnd),
-                    ),
-                  },
-                )}`}
-                nativeInputProps={{
-                  type: "date",
-                  ...register("lastDayOfPresence"),
-                  id: domElementIds.assessment.lastDayOfPresenceInput,
-                  defaultValue: convention.dateEnd,
-                  min: toDateUTCString(new Date(convention.dateStart)),
-                  max: toDateUTCString(new Date(convention.dateEnd)),
-                }}
-                {...getFieldError("lastDayOfPresence")}
-              />
+            <fieldset
+              className={
+                partialCompletionDetailsFieldError?.state === "error"
+                  ? "fr-fieldset fr-fieldset--error"
+                  : "fr-fieldset"
+              }
+            >
+              <div className={fr.cx("fr-fieldset__content")}>
+                <Input
+                  label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ?"
+                  hintText={`Date indiquée dans la convention : ${toDisplayedDate(
+                    {
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(convention.dateEnd),
+                      ),
+                    },
+                  )}`}
+                  nativeInputProps={{
+                    type: "date",
+                    ...register("partialCompletionDetails.lastDayOfPresence", {
+                      setValueAs: setValueAsNull,
+                    }),
+                    id: domElementIds.assessment.lastDayOfPresenceInput,
+                    min: toDateUTCString(new Date(convention.dateStart)),
+                    max: toDateUTCString(new Date(convention.dateEnd)),
+                  }}
+                  {...getFieldError(
+                    "partialCompletionDetails.lastDayOfPresence",
+                  )}
+                />
 
-              {assessmentDto.status === "PARTIALLY_COMPLETED" &&
-                assessmentDto.lastDayOfPresence && (
+                {hasImmersionEndedEarly && (
                   <Alert
                     className={fr.cx("fr-mb-2w")}
                     description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
@@ -321,56 +333,65 @@ const AssessmentStatusSection = ({
                   />
                 )}
 
-              <p className={fr.cx("fr-mb-2v")}>
-                Pendant les jours réels de présence, combien d'heures ont été
-                manquées en raison d’absences ou de retards ?
-              </p>
+                <p className={fr.cx("fr-mb-2v")}>
+                  Pendant les jours réels de présence, combien d'heures ont été
+                  manquées en raison d’absences ou de retards ?
+                </p>
 
-              <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                <Input
-                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
-                  label="Heures manquées"
-                  nativeInputProps={{
-                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      const value = +event.target.value;
-                      setNumberOfMissedHoursDisplayed(value);
-                      setValue(
-                        "numberOfMissedHours",
-                        value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
-                      );
-                    },
-                    min: 0,
-                    max: convention.schedule.totalHours,
-                    pattern: "\\d*",
-                    type: "number",
-                    id: domElementIds.assessment.numberOfMissedHoursInput,
-                    value: numberOfMissedHoursDisplayed || "",
-                  }}
-                  {...getFieldError("numberOfMissedHours")}
-                />
-                <Input
-                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
-                  label="Minutes manquées"
-                  nativeInputProps={{
-                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      const value = +event.target.value;
-                      setNumberOfMissedMinutesDisplayed(value);
-                      setValue(
-                        "numberOfMissedHours",
-                        (numberOfMissedHoursDisplayed ?? 0) + value / 60,
-                      );
-                    },
-                    min: 0,
-                    max: 60,
-                    pattern: "\\d*",
-                    type: "number",
-                    id: domElementIds.assessment.numberOfMissedMinutesInput,
-                    value: numberOfMissedMinutesDisplayed || "",
-                  }}
-                  {...getFieldError("numberOfMissedHours")}
-                />
+                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+                  <Input
+                    className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                    label="Heures manquées"
+                    nativeInputProps={{
+                      ...register(
+                        "partialCompletionDetails.numberOfMissedHours",
+                        {
+                          setValueAs: (value: string) =>
+                            value === "" ? null : +value,
+                        },
+                      ),
+                      min: 0,
+                      max: convention.schedule.totalHours,
+                      pattern: "\\d*",
+                      type: "number",
+                      id: domElementIds.assessment.numberOfMissedHoursInput,
+                    }}
+                    {...getFieldError(
+                      "partialCompletionDetails.numberOfMissedHours",
+                    )}
+                  />
+                  <Input
+                    className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                    label="Minutes manquées"
+                    nativeInputProps={{
+                      ...register(
+                        "partialCompletionDetails.numberOfMissedMinutes",
+                        {
+                          setValueAs: (value: string) =>
+                            value === "" ? null : +value,
+                        },
+                      ),
+                      min: 0,
+                      max: 60,
+                      pattern: "\\d*",
+                      type: "number",
+                      id: domElementIds.assessment.numberOfMissedMinutesInput,
+                    }}
+                    {...getFieldError(
+                      "partialCompletionDetails.numberOfMissedHours",
+                    )}
+                  />
+                </div>
               </div>
-            </>
+              {partialCompletionDetailsFieldError?.stateRelatedMessage && (
+                <p
+                  id={domElementIds.assessment.partialCompletionDetailsError}
+                  className={fr.cx("fr-error-text")}
+                >
+                  {partialCompletionDetailsFieldError.stateRelatedMessage}
+                </p>
+              )}
+            </fieldset>
           )}
           {formValues.status !== "DID_NOT_SHOW" && (
             <ConventionTotalHours
@@ -411,7 +432,7 @@ const AssessmentStatusSection = ({
                   onStepChange(2, [
                     "status",
                     ...(formValues.status === "PARTIALLY_COMPLETED"
-                      ? (["numberOfMissedHours", "lastDayOfPresence"] as const)
+                      ? partialCompletionDetailsFields
                       : []),
                   ]),
                 type: "button",
@@ -434,7 +455,7 @@ const AssessmentContractSection = ({
   convention: ConventionReadDto;
 }) => {
   const { register, watch, setValue, formState } =
-    useFormContext<AssessmentDto>();
+    useFormContext<AssessmentFormDto>();
   const endedWithAJobValue = watch("endedWithAJob");
   const getFieldError = makeFieldError(formState);
   return (
@@ -477,7 +498,9 @@ const AssessmentContractSection = ({
                 value: contractType,
               }))}
               nativeSelectProps={{
-                ...register("typeOfContract"),
+                ...register("typeOfContract", {
+                  setValueAs: setValueAsNull,
+                }),
               }}
               {...getFieldError("typeOfContract")}
             />
@@ -485,7 +508,9 @@ const AssessmentContractSection = ({
             <Input
               label="Date de début du contrat : *"
               nativeInputProps={{
-                ...register("contractStartDate"),
+                ...register("contractStartDate", {
+                  setValueAs: setValueAsNull,
+                }),
                 id: domElementIds.assessment.contractStartDateInput,
                 type: "date",
                 min: toDateUTCString(new Date(convention.dateStart)),
@@ -539,7 +564,7 @@ const AssessmentCommentsSection = ({
   objective: string;
 }) => {
   const isLoading = useAppSelector(assessmentSelectors.isLoading);
-  const { register, formState } = useFormContext<AssessmentDto>();
+  const { register, formState } = useFormContext<AssessmentFormDto>();
   const getFieldError = makeFieldError(formState);
   return (
     <div className={fr.cx("fr-grid-row")}>
@@ -594,59 +619,4 @@ const AssessmentCommentsSection = ({
       </div>
     </div>
   );
-};
-
-export const assessmentFormDtoToAssessmentDto = (
-  formAssessmentDto: AssessmentFormDto,
-): AssessmentDto => {
-  const commonFields = {
-    conventionId: formAssessmentDto.conventionId,
-    establishmentFeedback: formAssessmentDto.establishmentFeedback,
-    establishmentAdvices: formAssessmentDto.establishmentAdvices,
-    beneficiaryAgreement: formAssessmentDto.beneficiaryAgreement,
-    beneficiaryFeedback: formAssessmentDto.beneficiaryFeedback,
-    signedAt: formAssessmentDto.signedAt,
-  };
-
-  let assessmentDto: AssessmentDto = {
-    ...commonFields,
-    status: "COMPLETED",
-    endedWithAJob: false,
-    createdAt: new Date().toISOString(),
-  };
-
-  if (formAssessmentDto.status === "DID_NOT_SHOW") {
-    assessmentDto = {
-      ...assessmentDto,
-      status: "DID_NOT_SHOW",
-    };
-  }
-
-  if (
-    formAssessmentDto.endedWithAJob &&
-    formAssessmentDto.typeOfContract &&
-    formAssessmentDto.contractStartDate
-  ) {
-    assessmentDto = {
-      ...assessmentDto,
-      endedWithAJob: true,
-      typeOfContract: formAssessmentDto.typeOfContract,
-      contractStartDate: formAssessmentDto.contractStartDate,
-    };
-  }
-
-  if (
-    formAssessmentDto.status === "PARTIALLY_COMPLETED" &&
-    formAssessmentDto.lastDayOfPresence &&
-    formAssessmentDto.numberOfMissedHours !== undefined
-  ) {
-    assessmentDto = {
-      ...assessmentDto,
-      status: "PARTIALLY_COMPLETED",
-      lastDayOfPresence: formAssessmentDto.lastDayOfPresence,
-      numberOfMissedHours: formAssessmentDto.numberOfMissedHours,
-    };
-  }
-
-  return assessmentDto;
 };

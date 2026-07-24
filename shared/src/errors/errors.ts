@@ -220,6 +220,10 @@ export const errors = {
       new BadRequestError(
         "Le nombre d'heures manquées ne peut pas dépasser le nombre total d'heures prévues dans la convention.",
       ),
+    partialCompletionDetailsRequired: () =>
+      new BadRequestError(
+        "Vous avez indiqué un changement d'horaires. Pour continuer, merci de préciser au moins une information : la date de fin réelle ou le nombre d'heures manquées.",
+      ),
     contractStartDateBeforeImmersionStart: ({
       immersionDateStart,
     }: {

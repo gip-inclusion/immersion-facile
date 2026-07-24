@@ -12,8 +12,11 @@ import {
 } from "../utils/date";
 import type {
   AssessmentDto,
+  AssessmentFormDto,
   AssessmentStatus,
   LegacyAssessmentDto,
+  PartiallyCompletedAssessmentDetails,
+  TypeOfContract,
 } from "./assessment.dto";
 
 export const ASSESSEMENT_SIGNATURE_RELEASE_DATE = new Date("2026-03-10");
@@ -25,6 +28,90 @@ export const isBeforeAssessmentSignatureReleaseDate = (
     new Date(assessmentCreatedAt),
     addDays(ASSESSEMENT_SIGNATURE_RELEASE_DATE, 1),
   );
+
+export const hasPartialCompletionDetails = ({
+  lastDayOfPresence,
+  numberOfMissedHours,
+  numberOfMissedMinutes,
+}: PartiallyCompletedAssessmentDetails): boolean =>
+  lastDayOfPresence !== null ||
+  (numberOfMissedHours !== null && numberOfMissedHours > 0) ||
+  (numberOfMissedMinutes !== null && numberOfMissedMinutes > 0);
+
+export const getAssessmentEffectiveEndDate = ({
+  lastDayOfPresence,
+  conventionDateEnd,
+}: {
+  lastDayOfPresence: DateString | null;
+  conventionDateEnd: DateString;
+}): DateString => (lastDayOfPresence ? lastDayOfPresence : conventionDateEnd);
+
+const toMissedHours = (
+  numberOfMissedHours: number | null,
+  numberOfMissedMinutes: number | null,
+): number => (numberOfMissedHours ?? 0) + (numberOfMissedMinutes ?? 0) / 60;
+
+export const assessmentFormValuesToAssessmentDto = (
+  values: AssessmentFormDto,
+  convention: Pick<ConventionDto, "dateEnd">,
+  createdAt: DateTimeIsoString = new Date().toISOString(),
+): AssessmentDto => {
+  if (values.status === null)
+    throw new Error("Cannot map assessment form values without a status");
+
+  const commonFields = {
+    conventionId: values.conventionId,
+    establishmentFeedback: values.establishmentFeedback,
+    establishmentAdvices: values.establishmentAdvices,
+    beneficiaryAgreement: null,
+    beneficiaryFeedback: null,
+    signedAt: null,
+    createdAt,
+    ...toEndedWithAJobFields(values),
+  };
+
+  if (values.status === "PARTIALLY_COMPLETED")
+    return {
+      ...commonFields,
+      status: "PARTIALLY_COMPLETED",
+      lastDayOfPresence: getAssessmentEffectiveEndDate({
+        lastDayOfPresence: values.partialCompletionDetails.lastDayOfPresence,
+        conventionDateEnd: convention.dateEnd,
+      }),
+      numberOfMissedHours: toMissedHours(
+        values.partialCompletionDetails.numberOfMissedHours,
+        values.partialCompletionDetails.numberOfMissedMinutes,
+      ),
+    };
+
+  return {
+    ...commonFields,
+    status: values.status,
+  };
+};
+
+const toEndedWithAJobFields = (
+  values: AssessmentFormDto,
+):
+  | { endedWithAJob: false }
+  | {
+      endedWithAJob: true;
+      typeOfContract: TypeOfContract;
+      contractStartDate: DateString;
+    } => {
+  if (
+    values.endedWithAJob === true &&
+    values.typeOfContract !== null &&
+    values.contractStartDate !== null
+  )
+    return {
+      endedWithAJob: true,
+      typeOfContract: values.typeOfContract,
+      contractStartDate: values.contractStartDate,
+    };
+
+  return { endedWithAJob: false };
+};
 
 export const computeTotalHours = ({
   convention,
