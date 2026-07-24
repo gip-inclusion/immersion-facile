@@ -12,10 +12,10 @@ import {
 } from "../utils/date";
 import type {
   AssessmentDto,
-  AssessmentFormValues,
-  AssessmentPartialCompletionDetailsFormValues,
+  AssessmentFormDto,
   AssessmentStatus,
   LegacyAssessmentDto,
+  PartiallyCompletedAssessmentDetails,
   TypeOfContract,
 } from "./assessment.dto";
 
@@ -33,28 +33,26 @@ export const hasPartialCompletionDetails = ({
   lastDayOfPresence,
   numberOfMissedHours,
   numberOfMissedMinutes,
-}: AssessmentPartialCompletionDetailsFormValues): boolean =>
-  lastDayOfPresence !== "" ||
-  (typeof numberOfMissedHours === "number" && numberOfMissedHours > 0) ||
-  (typeof numberOfMissedMinutes === "number" && numberOfMissedMinutes > 0);
+}: PartiallyCompletedAssessmentDetails): boolean =>
+  lastDayOfPresence !== null ||
+  (numberOfMissedHours !== null && numberOfMissedHours > 0) ||
+  (numberOfMissedMinutes !== null && numberOfMissedMinutes > 0);
 
 export const getAssessmentEffectiveEndDate = ({
   lastDayOfPresence,
   conventionDateEnd,
 }: {
-  lastDayOfPresence: DateString | "" | undefined;
+  lastDayOfPresence: DateString | null;
   conventionDateEnd: DateString;
 }): DateString => (lastDayOfPresence ? lastDayOfPresence : conventionDateEnd);
 
 const toMissedHours = (
-  numberOfMissedHours: number | "",
-  numberOfMissedMinutes: number | "",
-): number =>
-  (typeof numberOfMissedHours === "number" ? numberOfMissedHours : 0) +
-  (typeof numberOfMissedMinutes === "number" ? numberOfMissedMinutes : 0) / 60;
+  numberOfMissedHours: number | null,
+  numberOfMissedMinutes: number | null,
+): number => (numberOfMissedHours ?? 0) + (numberOfMissedMinutes ?? 0) / 60;
 
 export const assessmentFormValuesToAssessmentDto = (
-  values: AssessmentFormValues,
+  values: AssessmentFormDto,
   convention: Pick<ConventionDto, "dateEnd">,
   createdAt: DateTimeIsoString = new Date().toISOString(),
 ): AssessmentDto => {
@@ -93,7 +91,7 @@ export const assessmentFormValuesToAssessmentDto = (
 };
 
 const toEndedWithAJobFields = (
-  values: AssessmentFormValues,
+  values: AssessmentFormDto,
 ):
   | { endedWithAJob: false }
   | {
@@ -103,8 +101,8 @@ const toEndedWithAJobFields = (
     } => {
   if (
     values.endedWithAJob === true &&
-    values.typeOfContract !== "" &&
-    values.contractStartDate !== ""
+    values.typeOfContract !== null &&
+    values.contractStartDate !== null
   )
     return {
       endedWithAJob: true,

@@ -7,7 +7,7 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
@@ -17,7 +17,7 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AssessmentDto,
-  type AssessmentFormValues,
+  type AssessmentFormDto,
   type AssessmentStatus,
   assessmentFormSchema,
   assessmentFormValuesToAssessmentDto,
@@ -54,8 +54,8 @@ type AssessmentFormProperties = {
 export type OnStepChange = (
   step: Step,
   fieldsToValidate: (
-    | keyof AssessmentFormValues
-    | DotNestedKeys<AssessmentFormValues>
+    | keyof AssessmentFormDto
+    | DotNestedKeys<AssessmentFormDto>
   )[],
 ) => void;
 
@@ -66,7 +66,7 @@ const partialCompletionDetailsFields = [
   "partialCompletionDetails.lastDayOfPresence",
   "partialCompletionDetails.numberOfMissedHours",
 ] as const satisfies ReadonlyArray<
-  keyof AssessmentFormValues | DotNestedKeys<AssessmentFormValues>
+  keyof AssessmentFormDto | DotNestedKeys<AssessmentFormDto>
 >;
 
 const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
@@ -91,28 +91,28 @@ export const AssessmentForm = ({
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
 
-  const initialValues: AssessmentFormValues = {
+  const initialValues: AssessmentFormDto = {
     conventionId: convention.id,
     status: null,
     partialCompletionDetails: {
-      lastDayOfPresence: "",
-      numberOfMissedHours: "",
-      numberOfMissedMinutes: "",
+      lastDayOfPresence: null,
+      numberOfMissedHours: null,
+      numberOfMissedMinutes: null,
     },
     endedWithAJob: null,
-    typeOfContract: "",
-    contractStartDate: "",
+    typeOfContract: null,
+    contractStartDate: null,
     establishmentFeedback: "",
     establishmentAdvices: "",
   };
-  const methods = useForm<AssessmentFormValues>({
+  const methods = useForm<AssessmentFormDto>({
     resolver: zodResolver(assessmentFormSchema(convention)),
     mode: "onTouched",
     defaultValues: initialValues,
   });
   const { handleSubmit, trigger } = methods;
 
-  const onSubmit = (values: AssessmentFormValues) => {
+  const onSubmit = (values: AssessmentFormDto) => {
     if (values.status === null || values.endedWithAJob === null) {
       throw new Error(
         "Form validation failed: status or endedWithAJob is null",
@@ -222,8 +222,8 @@ const AssessmentStatusSection = ({
   convention: ConventionDto;
   onStepChange: OnStepChange;
 }) => {
-  const { register, formState, watch, setValue, trigger } =
-    useFormContext<AssessmentFormValues>();
+  const { register, formState, watch, setValue } =
+    useFormContext<AssessmentFormDto>();
 
   const getFieldError = makeFieldError(formState);
 
@@ -231,17 +231,15 @@ const AssessmentStatusSection = ({
 
   const partialCompletionDetailsFormValue = formValues.partialCompletionDetails;
 
-  const lastDayOfPresenceRegistration = register(
-    "partialCompletionDetails.lastDayOfPresence",
-  );
+  const hasImmersionEndedEarly =
+    partialCompletionDetailsFormValue.lastDayOfPresence &&
+    new Date(partialCompletionDetailsFormValue.lastDayOfPresence) <
+      new Date(convention.dateEnd);
 
   const partialCompletionDetailsFieldError = getFieldError(
     "partialCompletionDetails",
   );
 
-  const revalidatePartialCompletionDetails = () => {
-    void trigger([...partialCompletionDetailsFields]);
-  };
   const assessmentDto =
     formValues.status === null
       ? undefined
@@ -294,7 +292,6 @@ const AssessmentStatusSection = ({
           />
           {formValues.status === "PARTIALLY_COMPLETED" && (
             <fieldset
-              id={domElementIds.assessment.partialCompletionDetailsFieldset}
               className={
                 partialCompletionDetailsFieldError?.state === "error"
                   ? "fr-fieldset fr-fieldset--error"
@@ -313,11 +310,10 @@ const AssessmentStatusSection = ({
                   )}`}
                   nativeInputProps={{
                     type: "date",
-                    ...lastDayOfPresenceRegistration,
-                    onChange: (event) => {
-                      lastDayOfPresenceRegistration.onChange(event);
-                      revalidatePartialCompletionDetails();
-                    },
+                    ...register("partialCompletionDetails.lastDayOfPresence", {
+                      setValueAs: (value: string) =>
+                        value === "" ? null : value,
+                    }),
                     id: domElementIds.assessment.lastDayOfPresenceInput,
                     min: toDateUTCString(new Date(convention.dateStart)),
                     max: toDateUTCString(new Date(convention.dateEnd)),
@@ -327,18 +323,15 @@ const AssessmentStatusSection = ({
                   )}
                 />
 
-                {partialCompletionDetailsFormValue.lastDayOfPresence !== "" &&
-                  new Date(
-                    partialCompletionDetailsFormValue.lastDayOfPresence,
-                  ) < new Date(convention.dateEnd) && (
-                    <Alert
-                      className={fr.cx("fr-mb-2w")}
-                      description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
+                {hasImmersionEndedEarly && (
+                  <Alert
+                    className={fr.cx("fr-mb-2w")}
+                    description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
                 prévu. Le total d’heures réalisées a été ajusté automatiquement."
-                      severity="info"
-                      small
-                    />
-                  )}
+                    severity="info"
+                    small
+                  />
+                )}
 
                 <p className={fr.cx("fr-mb-2v")}>
                   Pendant les jours réels de présence, combien d'heures ont été
@@ -350,24 +343,18 @@ const AssessmentStatusSection = ({
                     className={fr.cx("fr-col-12", "fr-col-sm-6")}
                     label="Heures manquées"
                     nativeInputProps={{
-                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                        const { value } = event.target;
-                        setValue(
-                          "partialCompletionDetails.numberOfMissedHours",
-                          value === "" ? "" : +value,
-                        );
-                        revalidatePartialCompletionDetails();
-                      },
+                      ...register(
+                        "partialCompletionDetails.numberOfMissedHours",
+                        {
+                          setValueAs: (value: string) =>
+                            value === "" ? null : +value,
+                        },
+                      ),
                       min: 0,
                       max: convention.schedule.totalHours,
                       pattern: "\\d*",
                       type: "number",
                       id: domElementIds.assessment.numberOfMissedHoursInput,
-                      value:
-                        partialCompletionDetailsFormValue.numberOfMissedHours ===
-                        ""
-                          ? ""
-                          : partialCompletionDetailsFormValue.numberOfMissedHours,
                     }}
                     {...getFieldError(
                       "partialCompletionDetails.numberOfMissedHours",
@@ -377,24 +364,18 @@ const AssessmentStatusSection = ({
                     className={fr.cx("fr-col-12", "fr-col-sm-6")}
                     label="Minutes manquées"
                     nativeInputProps={{
-                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                        const { value } = event.target;
-                        setValue(
-                          "partialCompletionDetails.numberOfMissedMinutes",
-                          value === "" ? "" : +value,
-                        );
-                        revalidatePartialCompletionDetails();
-                      },
+                      ...register(
+                        "partialCompletionDetails.numberOfMissedMinutes",
+                        {
+                          setValueAs: (value: string) =>
+                            value === "" ? null : +value,
+                        },
+                      ),
                       min: 0,
                       max: 60,
                       pattern: "\\d*",
                       type: "number",
                       id: domElementIds.assessment.numberOfMissedMinutesInput,
-                      value:
-                        partialCompletionDetailsFormValue.numberOfMissedMinutes ===
-                        ""
-                          ? ""
-                          : partialCompletionDetailsFormValue.numberOfMissedMinutes,
                     }}
                     {...getFieldError(
                       "partialCompletionDetails.numberOfMissedHours",
@@ -474,7 +455,7 @@ const AssessmentContractSection = ({
   convention: ConventionReadDto;
 }) => {
   const { register, watch, setValue, formState } =
-    useFormContext<AssessmentFormValues>();
+    useFormContext<AssessmentFormDto>();
   const endedWithAJobValue = watch("endedWithAJob");
   const getFieldError = makeFieldError(formState);
   return (
@@ -517,7 +498,9 @@ const AssessmentContractSection = ({
                 value: contractType,
               }))}
               nativeSelectProps={{
-                ...register("typeOfContract"),
+                ...register("typeOfContract", {
+                  setValueAs: (value: string) => (value === "" ? null : value),
+                }),
               }}
               {...getFieldError("typeOfContract")}
             />
@@ -525,7 +508,9 @@ const AssessmentContractSection = ({
             <Input
               label="Date de début du contrat : *"
               nativeInputProps={{
-                ...register("contractStartDate"),
+                ...register("contractStartDate", {
+                  setValueAs: (value: string) => (value === "" ? null : value),
+                }),
                 id: domElementIds.assessment.contractStartDateInput,
                 type: "date",
                 min: toDateUTCString(new Date(convention.dateStart)),
@@ -579,7 +564,7 @@ const AssessmentCommentsSection = ({
   objective: string;
 }) => {
   const isLoading = useAppSelector(assessmentSelectors.isLoading);
-  const { register, formState } = useFormContext<AssessmentFormValues>();
+  const { register, formState } = useFormContext<AssessmentFormDto>();
   const getFieldError = makeFieldError(formState);
   return (
     <div className={fr.cx("fr-grid-row")}>
