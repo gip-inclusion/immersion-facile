@@ -1101,16 +1101,14 @@ export const domElementIds = {
         "im-login-form__contact-support-link--establishment-dashboard",
     },
     discussion: {
-      handleDiscussionButton:
-        "im-manage-establishment__handle-discussion-button",
       acceptDiscussionForm: "im-manage-establishment__accept-discussion-form",
       rejectDiscussionForm: "im-manage-establishment__reject-discussion-form",
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
         "im-manage-establishment__reply-to-candidate-by-email",
-      acceptDiscussionModal: "im-manage-establishment__accept-discussion-modal",
-      acceptDiscussionOpenModalButton:
+      acceptDiscussionModal: "im-manage-establishment__accept-discussion",
+      acceptDiscussionButton:
         "im-manage-establishment__accept-discussion-button-open-modal",
       acceptDiscussionSubmitButton:
         "im-manage-establishment__accept-discussion-modal-submit-button",
@@ -1118,11 +1116,11 @@ export const domElementIds = {
         "im-manage-establishment__accept-discussion-cancel-button",
       acceptDiscussionConventionIdInput:
         "im-manage-establishment__accept-discussion-convention-id-input",
-      rejectDiscussionModal: "im-manage-establishment__reject-discussion-modal",
+      rejectDiscussionModal: "im-manage-establishment__reject-discussion",
       rejectDiscussionIsCandidateWarned:
         "im-manage-establishment__reject-discussion-is-candidate-warned",
-      rejectDiscussionOpenModalButton:
-        "im-manage-establishment__reject-discussion-button-open-modal",
+      rejectDiscussionButton:
+        "im-manage-establishment__reject-discussion-button",
       rejectDiscussionJustificationKindInput:
         "im-manage-establishment__reject-discussion-justification-kind-input",
       rejectDiscussionJustificationReasonInput:
@@ -1134,6 +1132,7 @@ export const domElementIds = {
       rejectDiscussionCancelButton:
         "im-manage-establishment__reject-discussion-cancel-button",
       statusBadge: "im-manage-establishment__discussion-status-badge",
+      merBadge: "im-manage-establishment__discussion-mer-badge",
       copyEmailButton: "im-manage-establishment__discussion-copy-email-button",
       sendMessageInput:
         "im-manage-establishment__discussion-send-message-input",

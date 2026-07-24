@@ -1,13 +1,16 @@
 import { renderContent } from "html-templates/src/components/email";
 import {
   type BrevoEmailItem,
+  type DiscussionDto,
   type DiscussionId,
   type Email,
   type ExchangeRole,
   errors,
   immersionFacileContactEmail,
   makeExchangeEmailSchema,
+  type User,
 } from "shared";
+import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 
 const defaultSubject = "Sans objet";
 
@@ -61,4 +64,16 @@ export const processInboundParsingEmailMessage = (item: BrevoEmailItem) => {
 
 export const getSubjectFromEmail = (item: BrevoEmailItem) => {
   return item.Subject || defaultSubject;
+};
+
+export const hasUserRightToAccessDiscussion = async (
+  user: User,
+  discussion: DiscussionDto,
+  estalishmentUserRights: EstablishmentUserRight[],
+): Promise<boolean> => {
+  if (user.email === discussion.potentialBeneficiary.email) return true;
+
+  return estalishmentUserRights.some(
+    (right) => right.userId === user.id && right.status === "ACCEPTED",
+  );
 };

@@ -55,6 +55,7 @@ describe("discussion e2e", () => {
 
   const existingEstablishment = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(formEstablishment.siret)
+    .withEstablishmentWelcomeAddress(updatedAddress1.addressAndPosition)
     .withUserRights([
       {
         role: "establishment-admin",
@@ -227,6 +228,144 @@ describe("discussion e2e", () => {
         {
           status: 200,
           body: new DiscussionBuilder(discussion).buildRead(),
+        },
+      );
+    });
+  });
+
+  describe(`${displayRouteName(
+    establishmentRoutes.getDiscussionEstablishmentContactInfo,
+  )} returns the additional establishment information`, () => {
+    it("401 - returns 401 if user is not authenticated", async () => {
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionEstablishmentContactInfo({
+          headers: { authorization: "" },
+          urlParams: { discussionId: "unrelevant-discussion-id" },
+        }),
+        {
+          status: 401,
+          body: { message: "Veuillez vous authentifier", status: 401 },
+        },
+      );
+    });
+    it("403 - returns 403 if user is not authorized to access the discussion", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail("someone-else@mail.com")
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionEstablishmentContactInfo({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: userWithoutEstablishmentNorPotentialBeneficiaryRights.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 403,
+          body: {
+            message: errors.discussion.accessForbidden({
+              userId: userWithoutEstablishmentNorPotentialBeneficiaryRights.id,
+              discussionId: discussion.id,
+            }).message,
+            status: 403,
+          },
+        },
+      );
+    });
+    it("404 - returns 404 if discussion is not found", async () => {
+      const nonExistentDiscussionId = "11111111-1111-4111-8111-111111111111";
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionEstablishmentContactInfo({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: nonExistentDiscussionId },
+        }),
+        {
+          status: 404,
+          body: {
+            message: errors.discussion.notFound({
+              discussionId: nonExistentDiscussionId,
+            }).message,
+            status: 404,
+          },
+        },
+      );
+    });
+    it("200 - returns the additional establishment information for a user with only potentialBeneficiary rights", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionEstablishmentContactInfo({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 200,
+          body: {
+            siret: existingEstablishment.establishment.siret,
+            potentialBeneficiaryWelcomeAddress:
+              updatedAddress1.addressAndPosition,
+            mainContact: {
+              firstName: establishmentAdminConnectedUser.firstName,
+              lastName: establishmentAdminConnectedUser.lastName,
+              phone: "+33688774455",
+            },
+          },
+        },
+      );
+    });
+
+    it("200 - returns the additional establishment information for a user with only establishment rights", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail("someone-else@mail.com")
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionEstablishmentContactInfo({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 200,
+          body: {
+            siret: existingEstablishment.establishment.siret,
+            potentialBeneficiaryWelcomeAddress:
+              updatedAddress1.addressAndPosition,
+            mainContact: {
+              firstName: establishmentAdminConnectedUser.firstName,
+              lastName: establishmentAdminConnectedUser.lastName,
+              phone: "+33688774455",
+            },
+          },
         },
       );
     });

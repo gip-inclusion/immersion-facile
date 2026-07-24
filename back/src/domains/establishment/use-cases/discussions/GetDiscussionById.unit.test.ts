@@ -130,8 +130,6 @@ describe("GetDiscussionById use case", () => {
 
   describe("Right paths", () => {
     it("returns discussion for potential beneficiary email match", async () => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [];
-
       expectToEqual(
         await getDiscussionById.execute(discussion.id, {
           userId: potentialBeneficiaryUser.id,
