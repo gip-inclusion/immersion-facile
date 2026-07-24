@@ -1,6 +1,7 @@
 import { uniq } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import type { EmailType, TemplatedEmail } from "./email/email";
+import type { Email } from "./email/email.dto";
 import { BadRequestError } from "./errors/httpErrors";
 import type { TemplatedSms } from "./sms/smsTemplateByName";
 
@@ -126,3 +127,6 @@ export const expectObjectInArrayToMatch = <T>(
 
 export const displayRouteName = (route: UnknownSharedRoute): string =>
   `${route.method.toUpperCase()} ${route.url} -`;
+
+export const adminPlaywrightEmail: Email =
+  "admin+playwright@immersion-facile.beta.gouv.fr";
