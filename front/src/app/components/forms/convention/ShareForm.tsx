@@ -20,6 +20,7 @@ import {
   getFormContents,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
+import { setValueAsUndefined } from "src/app/utils/form.utils";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 
 export type ShareFormProps = {
@@ -104,7 +105,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           label="Adresse email du destinataire *"
           nativeInputProps={{
             ...register("recipientEmail", {
-              setValueAs: (v) => (v === "" ? undefined : v),
+              setValueAs: setValueAsUndefined,
             }),
             type: "email",
             placeholder: "nom@exemple.com",
@@ -119,7 +120,7 @@ export const ShareForm = ({ conventionFormData }: ShareFormProps) => {
           label="Votre message (facultatif)"
           nativeTextAreaProps={{
             ...register("details", {
-              setValueAs: (v) => (v === "" ? undefined : v),
+              setValueAs: setValueAsUndefined,
             }),
             id: domElementIds.conventionImmersion.shareConventionDraft
               .shareFormDetailsInput,

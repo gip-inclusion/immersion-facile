@@ -25,6 +25,7 @@ import {
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { setValueAsUndefined } from "src/app/utils/form.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { conventionTemplateSelectors } from "src/core-logic/domain/convention-template/conventionTemplate.selectors";
@@ -338,7 +339,7 @@ export const ConventionTemplatesList = ({
               label="Votre message"
               nativeTextAreaProps={{
                 ...register("details", {
-                  setValueAs: (v) => (v === "" ? undefined : v),
+                  setValueAs: setValueAsUndefined,
                 }),
                 id: domElementIds.conventionTemplate.shareAsConventionDraft
                   .messageInput,
