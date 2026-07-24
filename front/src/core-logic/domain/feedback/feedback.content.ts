@@ -14,6 +14,7 @@ import { connectedUserSlice } from "src/core-logic/domain/connected-user/connect
 import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
+import { archivedConventionRequestSlice } from "src/core-logic/domain/convention/archivedConventionRequest.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
@@ -49,6 +50,7 @@ const topics = [
   "api-consumer-renew",
   "api-consumer-revoke",
   "assessment",
+  "archived-convention-request",
   "delete-assessment",
   "auth-global",
   "broadcast-convention-again",
@@ -868,6 +870,24 @@ export const feedbacks: Record<
       title: "Suppression du modèle de convention du modèle de convention",
       message:
         "Une erreur est survenue lors de la suppression du modèle de convention.",
+    },
+  },
+  "archived-convention-request": {
+    "create.success": {
+      action:
+        archivedConventionRequestSlice.actions
+          .saveArchivedConventionRequestSucceeded,
+      title: "La demande a bien été envoyée",
+      message:
+        "Votre demande d'accès à une convention archivée a bien été envoyée.",
+    },
+    "create.error": {
+      action:
+        archivedConventionRequestSlice.actions
+          .saveArchivedConventionRequestFailed,
+      title: "Problème lors de l'envoi de la demande",
+      message:
+        "Une erreur est survenue lors de l'envoi de votre demande d'accès à une convention archivée.",
     },
   },
   "convention-form": {

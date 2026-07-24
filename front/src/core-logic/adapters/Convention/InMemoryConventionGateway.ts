@@ -3,6 +3,7 @@ import {
   type AddConventionInput,
   type AgencyOption,
   type ApiConsumerName,
+  type ArchivedConventionRequestFormDto,
   type ConnectedUserJwt,
   type ConventionDraftDto,
   type ConventionDraftId,
@@ -44,6 +45,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public addConventionCallCount = 0;
 
   public addConventionResult$ = new Subject<void>();
+
+  public saveArchivedConventionRequestResult$ = new Subject<void>();
 
   // For testing purpose
   public convention$ = new Subject<ConventionReadDto | undefined>();
@@ -120,6 +123,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public createConvention$(_params: AddConventionInput): Observable<void> {
     this.addConventionCallCount++;
     return this.addConventionResult$;
+  }
+
+  public saveArchivedConventionRequest$(
+    _archivedConventionRequest: ArchivedConventionRequestFormDto,
+    _jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return this.saveArchivedConventionRequestResult$;
   }
 
   public editConventionCounsellorName$(

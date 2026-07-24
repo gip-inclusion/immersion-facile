@@ -3,10 +3,7 @@ import type {
   ArchivedConventionRequestReason,
   ArchivedConventionRequestReasonFields,
 } from "shared";
-import {
-  archivedConventionRequestReasons,
-  errors,
-} from "shared";
+import { archivedConventionRequestReasons, errors } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type {
   ArchivedConventionRequestEntity,
@@ -102,7 +99,7 @@ export class PgArchivedConventionRequestRepository
 const isArchivedConventionRequestReason = (
   reason: string,
 ): reason is ArchivedConventionRequestReason =>
-  (archivedConventionRequestReasons).some((value) => value === reason);
+  archivedConventionRequestReasons.some((value) => value === reason);
 
 const toArchivedConventionRequestEntity = (
   row: ArchivedConventionRequestRow,

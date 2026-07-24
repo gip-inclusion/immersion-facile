@@ -1,8 +1,5 @@
 import type { Pool } from "pg";
-import {
-  ConnectedUserBuilder,
-  expectToEqual,
-} from "shared";
+import { ConnectedUserBuilder, expectToEqual } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,

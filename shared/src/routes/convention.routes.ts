@@ -1,13 +1,13 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import z from "zod";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
+import { archivedConventionRequestSchema } from "../archivedConventionRequest/archivedConventionRequest.schema";
 import {
   assessmentDtoSchema,
   deleteAssessmentRequestDtoSchema,
   legacyAssessmentDtoSchema,
   signAssessmentRequestDtoSchema,
 } from "../assessment/assessment.schema";
-import { archivedConventionRequestSchema } from "../archivedConventionRequest/archivedConventionRequest.schema";
 import { broadcastFeedbackSchema } from "../broadcast/broadcastFeedback.schema";
 import { addConventionInputSchema } from "../convention/addConventionInput";
 import {

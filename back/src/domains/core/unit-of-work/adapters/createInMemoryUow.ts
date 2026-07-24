@@ -1,8 +1,8 @@
 import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryDelegationContactRepository } from "../../../agency/adapters/InMemoryDelegationContactRepository";
-import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
 import { InMemoryArchivedConventionRequestRepository } from "../../../convention/adapters/InMemoryArchivedConventionRequestRepository";
+import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
 import { InMemoryConventionDraftRepository } from "../../../convention/adapters/InMemoryConventionDraftRepository";
 import { InMemoryConventionExternalIdRepository } from "../../../convention/adapters/InMemoryConventionExternalIdRepository";
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";

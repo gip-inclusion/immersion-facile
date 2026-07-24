@@ -2,6 +2,7 @@ import { from, type Observable } from "rxjs";
 import type {
   AddConventionInput,
   ApiConsumerName,
+  ArchivedConventionRequestFormDto,
   AuthenticatedConventionRoutes,
   ConnectedUserJwt,
   ConventionDraftDto,
@@ -121,6 +122,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 409 }, logBodyAndThrow)
             .with({ status: 503 }, throwServiceUnavailableWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public saveArchivedConventionRequest$(
+    archivedConventionRequest: ArchivedConventionRequestFormDto,
+    jwt: ConnectedUserJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .createArchivedConventionRequest({
+          body: archivedConventionRequest,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

@@ -4,10 +4,11 @@ import type {
   UserId,
 } from "shared";
 
-export type ArchivedConventionRequestEntity = ArchivedConventionRequestFormDto & {
-  userId: UserId;
-  createdAt: DateString;
-};
+export type ArchivedConventionRequestEntity =
+  ArchivedConventionRequestFormDto & {
+    userId: UserId;
+    createdAt: DateString;
+  };
 
 export interface ArchivedConventionRequestRepository {
   save: (
