@@ -39,6 +39,7 @@ const defaultFlags: FeatureFlags = {
   }),
   enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
   enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+  enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

@@ -158,6 +158,10 @@ const labelsByFeatureFlag: Record<
     enableLabel:
       "Traiter automatiquement les events de suppression (sinon mis en quarantaine)",
   },
+  enableRequestArchivedConvention: {
+    title: "Archivage des conventions",
+    enableLabel: "Activer la demande d'accès à une convention archivée",
+  },
 };
 
 const FeatureFlagTextWithSeverityForm = ({

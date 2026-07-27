@@ -17,6 +17,7 @@ import {
 import { type AbsoluteUrl, domElementIds, frontRoutes } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useStyles } from "tss-react/dsfr";
 import lesEntrepriseSengagentLight from "../../../assets/img/les-entreprises-s-engagent.svg";
 import lesEntrepriseSengagentDark from "../../../assets/img/les-entreprises-s-engagent-dark.svg";
@@ -200,7 +201,9 @@ const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   headerFooterDisplayItem,
 ];
 
-const navTopGroupLinks: NavTopGroupLinks[] = [
+const makeNavTopGroupLinks = (
+  isArchivedConventionRequestEnabled: boolean,
+): NavTopGroupLinks[] => [
   {
     title: "Candidats",
     links: [
@@ -261,29 +264,39 @@ const navTopGroupLinks: NavTopGroupLinks[] = [
       },
     ],
   },
-  {
-    title: "Outils et démarches",
-    links: [
-      {
-        label: "Accéder à une convention archivée",
-        ...frontRoutes.archivedConventionRequest().link,
-        id: navTopGroupLinksIds.archivedConventionRequest,
-      },
-    ],
-  },
+  ...(isArchivedConventionRequestEnabled
+    ? [
+        {
+          title: "Outils et démarches",
+          links: [
+            {
+              label: "Accéder à une convention archivée",
+              ...frontRoutes.archivedConventionRequest().link,
+              id: navTopGroupLinksIds.archivedConventionRequest,
+            },
+          ],
+        },
+      ]
+    : []),
 ];
 
-export const LayoutFooter = () => (
-  <>
-    <OverFooter cols={overFooterCols} />
-    <Footer
-      navTopGroupLinks={navTopGroupLinks}
-      links={links}
-      partnersLogos={<PartnersLogos />}
-      bottomLinks={bottomsLinks}
-    />
-    <Display />
-  </>
-);
+export const LayoutFooter = () => {
+  const { enableRequestArchivedConvention } = useFeatureFlags();
+
+  return (
+    <>
+      <OverFooter cols={overFooterCols} />
+      <Footer
+        navTopGroupLinks={makeNavTopGroupLinks(
+          enableRequestArchivedConvention.isActive,
+        )}
+        links={links}
+        partnersLogos={<PartnersLogos />}
+        bottomLinks={bottomsLinks}
+      />
+      <Display />
+    </>
+  );
+};
 
 LayoutFooter.displayName = "LayoutFooter";

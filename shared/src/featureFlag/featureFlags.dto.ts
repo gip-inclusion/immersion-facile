@@ -17,6 +17,7 @@ export const featureFlagNames = [
   "enableAgencyDashboardHighlight",
   "enableInactiveUsersCleanup",
   "enableInactiveUsersDeletionAutoProcessing",
+  "enableRequestArchivedConvention",
 ] as const;
 
 const _insureAllFeatureFlagsAreInList = (
@@ -88,6 +89,7 @@ export type FeatureFlags = {
   enableAgencyDashboardHighlight: FeatureFlagHighlight;
   enableInactiveUsersCleanup: FeatureFlagBoolean;
   enableInactiveUsersDeletionAutoProcessing: FeatureFlagBoolean;
+  enableRequestArchivedConvention: FeatureFlagBoolean;
 };
 
 export type SetFeatureFlagParam = {

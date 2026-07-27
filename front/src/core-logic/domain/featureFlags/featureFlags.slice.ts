@@ -43,6 +43,7 @@ const initialState: FeatureFlagsState = {
   }),
   enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
   enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+  enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
   isLoading: true,
 };
 

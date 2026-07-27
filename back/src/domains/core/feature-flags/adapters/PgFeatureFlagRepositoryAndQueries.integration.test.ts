@@ -70,6 +70,7 @@ describe("PG getFeatureFlags", () => {
       }),
       enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
       enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+      enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -105,6 +106,7 @@ describe("PG getFeatureFlags", () => {
       }),
       enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
       enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+      enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
     });
   });
 
@@ -140,6 +142,7 @@ describe("PG getFeatureFlags", () => {
       }),
       enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
       enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+      enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -204,6 +207,7 @@ describe("PG getFeatureFlags", () => {
       }),
       enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
       enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+      enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
     });
   });
 });

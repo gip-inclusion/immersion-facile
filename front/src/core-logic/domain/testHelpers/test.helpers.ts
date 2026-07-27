@@ -37,6 +37,7 @@ const defaultFlagsInFront: FeatureFlags = {
   }),
   enableInactiveUsersCleanup: makeBooleanFeatureFlag(false),
   enableInactiveUsersDeletionAutoProcessing: makeBooleanFeatureFlag(false),
+  enableRequestArchivedConvention: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (
