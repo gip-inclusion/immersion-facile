@@ -60,7 +60,7 @@ export const TransferModalContent = ({
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           filterKind: makeListAgencyOptionsKindFilter({
             convention,
-            shouldListAll: false,
+            shouldListAll: true,
           }),
           departmentCode,
         }),
