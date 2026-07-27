@@ -713,7 +713,7 @@ const reminderKinds = {
 
 type ReminderKind = keyof typeof reminderKinds;
 
-export const getLastReminderDatesForRecipient = async ({
+const getLastReminderDatesForRecipient = async ({
   transaction,
   conventionId,
   reminderKind,
@@ -760,7 +760,7 @@ export const getLastReminderDatesForRecipient = async ({
   };
 };
 
-export const getLastRemindersFieldsByConventionId = async (
+const getLastRemindersFieldsByConventionId = async (
   transaction: KyselyDb,
   convention: ConventionDto,
 ): Promise<ConventionLastReminders> => {
@@ -827,7 +827,7 @@ export const getLastRemindersFieldsByConventions = async ({
     ),
   );
 
-export const getAssessmentFieldsByConventionId = async (
+const getAssessmentFieldsByConventionId = async (
   transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<ConventionAssessmentFields> => {
@@ -863,3 +863,19 @@ export const getAssessmentFieldsByConventionId = async (
           },
   };
 };
+
+export const getAssessmentFieldsByConventions = async ({
+  transaction,
+  conventionIds,
+}: {
+  transaction: KyselyDb;
+  conventionIds: ConventionId[];
+}): Promise<Record<ConventionId, ConventionAssessmentFields>> =>
+  Object.fromEntries(
+    await Promise.all(
+      conventionIds.map(async (conventionId) => [
+        conventionId,
+        await getAssessmentFieldsByConventionId(transaction, conventionId),
+      ]),
+    ),
+  );

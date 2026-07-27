@@ -113,6 +113,7 @@ import {
   type ImmersionObjective,
   type InternshipKind,
   internshipKinds,
+  type LastReminderDateByNotificationKind,
   levelsOfEducation,
   type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
@@ -581,10 +582,11 @@ export const conventionAssessmentFieldsSchema = z
   ])
   .nullable();
 
-const lastReminderDateByNotificationKindSchema = z.object({
-  email: dateTimeIsoStringSchema.nullable(),
-  sms: dateTimeIsoStringSchema.nullable(),
-});
+const lastReminderDateByNotificationKindSchema: ZodSchemaWithInputMatchingOutput<LastReminderDateByNotificationKind> =
+  z.object({
+    email: dateTimeIsoStringSchema.nullable(),
+    sms: dateTimeIsoStringSchema.nullable(),
+  });
 
 export const conventionLastRemindersSchema: ZodSchemaWithInputMatchingOutput<ConventionLastReminders> =
   z.object({

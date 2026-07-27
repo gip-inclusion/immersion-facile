@@ -1,4 +1,11 @@
-import { addSeconds, addYears, parseISO, subHours, subYears } from "date-fns";
+import {
+  addSeconds,
+  addYears,
+  parseISO,
+  subHours,
+  subSeconds,
+  subYears,
+} from "date-fns";
 import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
@@ -85,7 +92,7 @@ describe("Date utils tests - hours cooldown", () => {
   });
 
   it("does not format minutes as 60", () => {
-    const lastActionAt = new Date(now.getTime() - 1000);
+    const lastActionAt = subSeconds(now, 1);
 
     expect(
       formatHoursCooldownTimeRemaining({ lastActionAt, minHours, now }),

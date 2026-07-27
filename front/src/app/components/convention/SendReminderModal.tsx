@@ -21,43 +21,6 @@ type ReminderModal = {
   close: () => void;
 };
 
-const formatBlockedReminderMessage = (
-  lastSentAt: DateTimeIsoString,
-  now: Date,
-  recipientFullName?: string,
-) => {
-  const lastActionAt = new Date(lastSentAt);
-  const recipientPart = recipientFullName ? `à ${recipientFullName} ` : "";
-
-  return `Une relance a déjà été envoyée ${recipientPart}le ${toDisplayedDate({
-    date: lastActionAt,
-    withHours: true,
-  })}. Afin d’éviter les envois excessifs, vous ne pourrez effectuer un nouvel envoi que dans ${formatHoursCooldownTimeRemaining(
-    {
-      lastActionAt,
-      minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
-      now,
-    },
-  )}.`;
-};
-
-const getFirstChannelAvailableAgainLastSentAt = ({
-  emailLastSentAt,
-  smsLastSentAt,
-}: {
-  emailLastSentAt: DateTimeIsoString;
-  smsLastSentAt?: DateTimeIsoString | null;
-}): DateTimeIsoString => {
-  if (smsLastSentAt) {
-    if (new Date(emailLastSentAt) <= new Date(smsLastSentAt))
-      return emailLastSentAt;
-
-    return smsLastSentAt;
-  }
-
-  return emailLastSentAt;
-};
-
 export type SendReminderModalProps = {
   modal: ReminderModal;
   title: string;
@@ -247,4 +210,37 @@ export const SendReminderModal = ({
     </modal.Component>,
     document.body,
   );
+};
+
+const formatBlockedReminderMessage = (
+  lastSentAt: DateTimeIsoString,
+  now: Date,
+  recipientFullName?: string,
+) => {
+  const lastActionAt = new Date(lastSentAt);
+  const recipientPart = recipientFullName ? `à ${recipientFullName} ` : "";
+
+  return `Une relance a déjà été envoyée ${recipientPart}le ${toDisplayedDate({
+    date: lastActionAt,
+    withHours: true,
+  })}. Afin d’éviter les envois excessifs, vous ne pourrez effectuer un nouvel envoi que dans ${formatHoursCooldownTimeRemaining(
+    {
+      lastActionAt,
+      minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
+      now,
+    },
+  )}.`;
+};
+
+const getFirstChannelAvailableAgainLastSentAt = ({
+  emailLastSentAt,
+  smsLastSentAt,
+}: {
+  emailLastSentAt: DateTimeIsoString;
+  smsLastSentAt?: DateTimeIsoString | null;
+}): DateTimeIsoString => {
+  if (!smsLastSentAt) return emailLastSentAt;
+  return new Date(emailLastSentAt) <= new Date(smsLastSentAt)
+    ? emailLastSentAt
+    : smsLastSentAt;
 };
