@@ -44,6 +44,8 @@ import { connectedUserConventionsEpics } from "src/core-logic/domain/connected-u
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
 import { conventionsWithBroadcastFeedbackEpics } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.epics";
 import { conventionsWithBroadcastFeedbackSlice } from "src/core-logic/domain/connected-user/conventionsWithBroadcastFeedback/conventionsWithBroadcastFeedback.slice";
+import { archivedConventionRequestEpics } from "src/core-logic/domain/convention/archivedConventionRequest.epics";
+import { archivedConventionRequestSlice } from "src/core-logic/domain/convention/archivedConventionRequest.slice";
 import { conventionActionEpics } from "src/core-logic/domain/convention/convention-action/conventionAction.epics";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionDraftEpics } from "src/core-logic/domain/convention/convention-draft/conventionDraft.epics";
@@ -98,6 +100,7 @@ const allEpics: AppEpic<any>[] = [
   ...appellationEpics,
   ...assessmentEpics,
   ...authEpics,
+  ...archivedConventionRequestEpics,
   ...conventionActionEpics,
   ...conventionDraftEpics,
   ...conventionEpics,
@@ -157,6 +160,7 @@ const appReducer = combineReducers({
   [appellationSlice.name]: appellationSlice.reducer,
   [assessmentSlice.name]: assessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
+  [archivedConventionRequestSlice.name]: archivedConventionRequestSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
   [conventionDraftSlice.name]: conventionDraftSlice.reducer,
   [conventionTemplateSlice.name]: conventionTemplateSlice.reducer,
