@@ -74,6 +74,7 @@ import { makeNotifyToAgencyConventionSubmitted } from "../../domains/convention/
 import { makeNotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
 import { makeNotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { makeNotifyUserThatAgencyRegistrationRequestWasReceived } from "../../domains/convention/use-cases/notifications/NotifyUserThatAgencyRegistrationRequestWasReceived";
+import { makeNotifyUserThatArchivedConventionRequestWasReceived } from "../../domains/convention/use-cases/notifications/NotifyUserThatArchivedConventionRequestWasReceived";
 import { makeMarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { makeRemoveConventionFTAdvisorIfAgencyIsNotFranceTravail } from "../../domains/convention/use-cases/RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail";
 import { makeRenewConvention } from "../../domains/convention/use-cases/RenewConvention";
@@ -1272,6 +1273,13 @@ export const createUseCases = ({
           },
         },
       ),
+    notifyUserThatArchivedConventionRequestWasReceived:
+      makeNotifyUserThatArchivedConventionRequestWasReceived({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+        },
+      }),
     notifyToAgencyConventionSubmitted: makeNotifyToAgencyConventionSubmitted({
       uowPerformer,
       deps: {

@@ -19,6 +19,12 @@ export class InMemoryArchivedConventionRequestRepository
     );
   }
 
+  public async getById(
+    id: ArchivedConventionRequestId,
+  ): Promise<ArchivedConventionRequestEntity | undefined> {
+    return this.archivedConventionRequests[id];
+  }
+
   public async save(
     archivedConventionRequest: ArchivedConventionRequestEntity,
   ): Promise<void> {
