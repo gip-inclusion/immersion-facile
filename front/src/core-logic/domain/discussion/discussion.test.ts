@@ -232,6 +232,7 @@ describe("Discussion slice", () => {
           lastName: "La Girafe",
           phone: "0611223344",
         },
+        isEstablishmentReachableByPhoneAfter15Days: false,
       };
 
     it("fetches discussion establishment contact info successfully", () => {
@@ -612,6 +613,7 @@ describe("Discussion slice", () => {
       city: discussion.address.city,
       immersionObjective: null,
       exchangesData: discussionToExchangesData(discussion),
+      isEstablishmentReachableByPhoneAfter15Days: false,
     };
   };
 });

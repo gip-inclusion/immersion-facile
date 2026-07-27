@@ -2467,8 +2467,11 @@ describe("PgDiscussionRepository", () => {
         appellation: secretariat,
         businessName: discussion2.businessName,
         createdAt: discussion2.createdAt,
+        updatedAt: discussion2.updatedAt,
+        contactMode: discussion2.contactMode,
         kind: discussion2.kind,
         isEstablishmentBanned: false,
+        isEstablishmentReachableByPhoneAfter15Days: false,
         potentialBeneficiary: {
           firstName: discussion2.potentialBeneficiary.firstName,
           lastName: discussion2.potentialBeneficiary.lastName,
@@ -2486,8 +2489,11 @@ describe("PgDiscussionRepository", () => {
         appellation: styliste,
         businessName: discussion3.businessName,
         createdAt: discussion3.createdAt,
+        updatedAt: discussion3.updatedAt,
+        contactMode: discussion3.contactMode,
         kind: discussion3.kind,
         isEstablishmentBanned: false,
+        isEstablishmentReachableByPhoneAfter15Days: false,
         potentialBeneficiary: {
           firstName: discussion3.potentialBeneficiary.firstName,
           lastName: discussion3.potentialBeneficiary.lastName,
@@ -2505,8 +2511,11 @@ describe("PgDiscussionRepository", () => {
         appellation: styliste,
         businessName: discussion4.businessName,
         createdAt: discussion4.createdAt,
+        updatedAt: discussion4.updatedAt,
+        contactMode: discussion4.contactMode,
         kind: discussion4.kind,
         isEstablishmentBanned: false,
+        isEstablishmentReachableByPhoneAfter15Days: false,
         potentialBeneficiary: {
           firstName: discussion4.potentialBeneficiary.firstName,
           lastName: discussion4.potentialBeneficiary.lastName,
@@ -2696,6 +2705,82 @@ describe("PgDiscussionRepository", () => {
         });
       });
 
+      it("returns isEstablishmentReachableByPhoneAfter15Days: true when establishment contact mode is EMAIL and a user right is main contact by phone", async () => {
+        const discussion5 = new DiscussionBuilder()
+          .withId(uuid())
+          .withSiret("00000000000009")
+          .withContactMode("EMAIL")
+          .withAppellationCode(styliste.appellationCode)
+          .withCreatedAt(new Date("2025-05-22"))
+          .withStatus({ status: "PENDING" })
+          .build();
+
+        await pgDiscussionRepository.insert(discussion5);
+
+        await establishmentAggregateRepo.insertEstablishmentAggregate(
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(discussion5.siret)
+            .withLocationId(uuid())
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                status: "ACCEPTED",
+                userId: user.id,
+                job: "",
+                phone: "+33600000000",
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: true,
+              },
+            ])
+            .withOffers([stylisteOffer])
+            .build(),
+        );
+
+        const discussion5InList: DiscussionInList = {
+          id: discussion5.id,
+          siret: discussion5.siret,
+          status: discussion5.status,
+          appellation: styliste,
+          businessName: discussion5.businessName,
+          createdAt: discussion5.createdAt,
+          updatedAt: discussion5.updatedAt,
+          contactMode: discussion5.contactMode,
+          kind: discussion5.kind,
+          isEstablishmentBanned: false,
+          isEstablishmentReachableByPhoneAfter15Days: true,
+          potentialBeneficiary: {
+            firstName: discussion5.potentialBeneficiary.firstName,
+            lastName: discussion5.potentialBeneficiary.lastName,
+            phone: discussion5.potentialBeneficiary.phone,
+          },
+          city: discussion5.address.city,
+          immersionObjective:
+            discussion5.potentialBeneficiary.immersionObjective,
+          exchangesData: discussionToExchangesData(discussion5),
+        };
+
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            sort: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+            userRole: "establishment",
+          });
+
+        expectToEqual(result, {
+          data: [discussion5InList, discussion3InList, discussion2InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 3,
+          },
+        });
+      });
+
       describe("filters on user role", () => {
         const discussionWhereUserIsPotentialBeneficiary =
           new DiscussionBuilder()
@@ -2736,8 +2821,11 @@ describe("PgDiscussionRepository", () => {
           appellation: styliste,
           businessName: discussionWhereUserIsEstablishment.businessName,
           createdAt: discussionWhereUserIsEstablishment.createdAt,
+          updatedAt: discussionWhereUserIsEstablishment.updatedAt,
+          contactMode: discussionWhereUserIsEstablishment.contactMode,
           kind: discussionWhereUserIsEstablishment.kind,
           isEstablishmentBanned: false,
+          isEstablishmentReachableByPhoneAfter15Days: false,
           potentialBeneficiary: {
             firstName:
               discussionWhereUserIsEstablishment.potentialBeneficiary.firstName,
@@ -2759,8 +2847,11 @@ describe("PgDiscussionRepository", () => {
           appellation: styliste,
           businessName: discussionWhereUserIsPotentialBeneficiary.businessName,
           createdAt: discussionWhereUserIsPotentialBeneficiary.createdAt,
+          updatedAt: discussionWhereUserIsPotentialBeneficiary.updatedAt,
+          contactMode: discussionWhereUserIsPotentialBeneficiary.contactMode,
           kind: discussionWhereUserIsPotentialBeneficiary.kind,
           isEstablishmentBanned: false,
+          isEstablishmentReachableByPhoneAfter15Days: false,
           potentialBeneficiary: {
             firstName:
               discussionWhereUserIsPotentialBeneficiary.potentialBeneficiary

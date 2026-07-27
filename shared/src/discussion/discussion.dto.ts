@@ -9,7 +9,10 @@ import type {
 } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
 import type { WithBannedEstablishmentInformations } from "../establishment/bannedEstablishmentInformations.dto";
-import type { BusinessName } from "../establishment/establishment.dto";
+import type {
+  BusinessName,
+  WithPhoneContactAdditionalCondition,
+} from "../establishment/establishment.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { PhoneNumber } from "../phone/phone.dto";
 import type {
@@ -316,10 +319,17 @@ export type ExchangeFromDashboard = ExchangeMessageFromDashboard &
 export type DiscussionDisplayStatus =
   | "accepted"
   | "rejected"
+  | "to-remind"
   | "new"
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
+
+export type DiscussionDisplayStatusByRole = {
+  [R in ExchangeRole]: R extends "establishment"
+    ? Exclude<DiscussionDisplayStatus, "to-remind">
+    : DiscussionDisplayStatus;
+};
 
 export type DiscussionInList = Pick<
   DiscussionReadDto,
@@ -330,6 +340,8 @@ export type DiscussionInList = Pick<
   | "siret"
   | "kind"
   | "status"
+  | "contactMode"
+  | "updatedAt"
   | "isEstablishmentBanned"
 > & {
   potentialBeneficiary: {
@@ -343,7 +355,7 @@ export type DiscussionInList = Pick<
     count: number;
     lastExchange: Pick<ExchangeRead, "sender" | "sentAt"> | null;
   };
-};
+} & WithPhoneContactAdditionalCondition;
 
 export type DiscussionOrderKey = ExtractFromExisting<
   keyof DiscussionInList,

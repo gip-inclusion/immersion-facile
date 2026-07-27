@@ -22,6 +22,7 @@ describe("Discussions", () => {
         "establishment" | "potentialBeneficiary"
       >["sender"];
       expectedDisplayStatus: DiscussionDisplayStatus;
+      shouldEstablishmentBeReminded: boolean;
     };
 
     const createExchange = ({
@@ -53,6 +54,7 @@ describe("Discussions", () => {
             rejectionKind: "UNABLE_TO_HELP",
           })
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message: "status is ACCEPTED",
@@ -61,6 +63,7 @@ describe("Discussions", () => {
         discussion: new DiscussionBuilder()
           .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message: "candidate has sent the first message without being answered",
@@ -77,6 +80,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message:
@@ -94,6 +98,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message:
@@ -111,6 +116,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message:
@@ -143,6 +149,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message: "last message is sent by establishment",
@@ -168,6 +175,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message:
@@ -185,6 +193,7 @@ describe("Discussions", () => {
             }),
           ])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message: "discussion contact method is recent and not email",
@@ -196,6 +205,7 @@ describe("Discussions", () => {
           .withContactMode("PHONE")
           .withExchanges([])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
       {
         message:
@@ -208,6 +218,7 @@ describe("Discussions", () => {
           .withContactMode("PHONE")
           .withExchanges([])
           .buildRead(),
+        shouldEstablishmentBeReminded: false,
       },
     ];
 
@@ -215,6 +226,7 @@ describe("Discussions", () => {
       discussion,
       expectedDisplayStatus,
       viewer,
+      shouldEstablishmentBeReminded,
     }) => {
       expectToEqual(
         getDiscussionDisplayStatus({
@@ -227,6 +239,7 @@ describe("Discussions", () => {
                 discussion.exchanges[discussion.exchanges.length - 1],
             },
           },
+          shouldEstablishmentBeReminded,
           now,
           viewer,
         }),
@@ -300,6 +313,7 @@ describe("Discussions", () => {
                 ],
             },
           },
+          shouldEstablishmentBeReminded: false,
           now,
           viewer: "establishment",
         });
@@ -319,6 +333,7 @@ describe("Discussions", () => {
                 ],
             },
           },
+          shouldEstablishmentBeReminded: false,
           now,
           viewer: "potentialBeneficiary",
         });
@@ -340,6 +355,7 @@ describe("Discussions", () => {
                 ],
             },
           },
+          shouldEstablishmentBeReminded: false,
           now,
           viewer: "establishment",
         });
@@ -361,6 +377,7 @@ describe("Discussions", () => {
                 ],
             },
           },
+          shouldEstablishmentBeReminded: false,
           now,
           viewer: "potentialBeneficiary",
         });

@@ -64,7 +64,7 @@ const makeDiscussionRead = async (
   ).at(0);
 
   if (!appellation) throw errors.rome.missingAppellation({ appellationCode });
-  const discussionRead = {
+  const discussionRead: DiscussionReadDto = {
     ...rest,
     appellation,
   };

@@ -12,6 +12,7 @@ import {
   type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import type { EstablishmentUserRight } from "../../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
   type GetDiscussionEstablishmentContactInfo,
@@ -190,6 +191,7 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
             lastName: establishmentAdmin.lastName,
             phone: "+33600000001",
           },
+          isEstablishmentReachableByPhoneAfter15Days: false,
         },
       );
     });
@@ -207,6 +209,7 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
             lastName: establishmentAdmin.lastName,
             phone: "+33600000001",
           },
+          isEstablishmentReachableByPhoneAfter15Days: false,
         },
       );
     });
@@ -243,6 +246,7 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
             lastName: establishmentAdmin.lastName,
             phone: "+33600000001",
           },
+          isEstablishmentReachableByPhoneAfter15Days: false,
         },
       );
     });
@@ -260,6 +264,7 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
             lastName: establishmentAdmin.lastName,
             phone: "+33600000001",
           },
+          isEstablishmentReachableByPhoneAfter15Days: false,
         },
       );
     });
@@ -270,30 +275,34 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
         .withFirstName("Jean")
         .withLastName("Dupont")
         .buildUser();
+
+      const establishmentUserAdminWithRights: EstablishmentUserRight = {
+        role: "establishment-admin",
+        status: "ACCEPTED",
+        job: "",
+        phone: "+33600000001",
+        userId: establishmentAdmin.id,
+        shouldReceiveDiscussionNotifications: false,
+        isMainContactByPhone: false,
+      };
+      const establishmentUserAdminWithRights2: EstablishmentUserRight = {
+        role: "establishment-admin",
+        status: "ACCEPTED",
+        job: "",
+        phone: "+33600000002",
+        userId: secondAdmin.id,
+        shouldReceiveDiscussionNotifications: false,
+        isMainContactByPhone: true,
+      };
+
       uow.userRepository.users = [...uow.userRepository.users, secondAdmin];
       uow.establishmentAggregateRepository.establishmentAggregates = [
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(discussion.siret)
           .withEstablishmentWelcomeAddress(defaultAddress.addressAndPosition)
           .withUserRights([
-            {
-              role: "establishment-admin",
-              status: "ACCEPTED",
-              job: "",
-              phone: "+33600000001",
-              userId: establishmentAdmin.id,
-              shouldReceiveDiscussionNotifications: false,
-              isMainContactByPhone: false,
-            },
-            {
-              role: "establishment-admin",
-              status: "ACCEPTED",
-              job: "",
-              phone: "+33600000002",
-              userId: secondAdmin.id,
-              shouldReceiveDiscussionNotifications: false,
-              isMainContactByPhone: true,
-            },
+            establishmentUserAdminWithRights,
+            establishmentUserAdminWithRights2,
           ])
           .build(),
       ];
@@ -308,8 +317,9 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
           mainContact: {
             firstName: secondAdmin.firstName,
             lastName: secondAdmin.lastName,
-            phone: "+33600000002",
+            phone: establishmentUserAdminWithRights2.phone,
           },
+          isEstablishmentReachableByPhoneAfter15Days: true,
         },
       );
     });
@@ -320,30 +330,34 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
         .withFirstName("Jean")
         .withLastName("Dupont")
         .buildUser();
+
+      const establishmentUserAdminWithRights: EstablishmentUserRight = {
+        role: "establishment-admin",
+        status: "ACCEPTED",
+        job: "",
+        phone: "+33600000001",
+        userId: establishmentAdmin.id,
+        shouldReceiveDiscussionNotifications: false,
+        isMainContactByPhone: false,
+      };
+      const establishmentUserAdminWithRights2: EstablishmentUserRight = {
+        role: "establishment-admin",
+        status: "ACCEPTED",
+        job: "",
+        phone: "+33600000002",
+        userId: secondAdmin.id,
+        shouldReceiveDiscussionNotifications: false,
+        isMainContactByPhone: false,
+      };
+
       uow.userRepository.users = [...uow.userRepository.users, secondAdmin];
       uow.establishmentAggregateRepository.establishmentAggregates = [
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(discussion.siret)
           .withEstablishmentWelcomeAddress(defaultAddress.addressAndPosition)
           .withUserRights([
-            {
-              role: "establishment-admin",
-              status: "ACCEPTED",
-              job: "",
-              phone: "+33600000001",
-              userId: establishmentAdmin.id,
-              shouldReceiveDiscussionNotifications: false,
-              isMainContactByPhone: false,
-            },
-            {
-              role: "establishment-admin",
-              status: "ACCEPTED",
-              job: "",
-              phone: "+33600000002",
-              userId: secondAdmin.id,
-              shouldReceiveDiscussionNotifications: false,
-              isMainContactByPhone: false,
-            },
+            establishmentUserAdminWithRights,
+            establishmentUserAdminWithRights2,
           ])
           .build(),
       ];
@@ -358,8 +372,9 @@ describe("GetDiscussionEstablishmentContactInfo", () => {
           mainContact: {
             firstName: establishmentAdmin.firstName,
             lastName: establishmentAdmin.lastName,
-            phone: "+33600000001",
+            phone: establishmentUserAdminWithRights.phone,
           },
+          isEstablishmentReachableByPhoneAfter15Days: false,
         },
       );
     });

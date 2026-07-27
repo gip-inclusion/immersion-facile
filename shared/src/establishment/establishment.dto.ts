@@ -30,11 +30,15 @@ export type EstablishmentMainContact = {
   phone: PhoneNumber;
 };
 
+export type WithPhoneContactAdditionalCondition = {
+  isEstablishmentReachableByPhoneAfter15Days: boolean;
+};
+
 export type DiscussionEstablishmentContactInfo = {
   siret: SiretDto;
   potentialBeneficiaryWelcomeAddress?: AddressAndPosition;
   mainContact: EstablishmentMainContact;
-};
+} & WithPhoneContactAdditionalCondition;
 
 export type GetEstablishmentPublicOptionsByFiltersInput = {
   nameIncludes?: string;

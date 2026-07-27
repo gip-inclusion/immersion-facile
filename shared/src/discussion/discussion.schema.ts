@@ -9,6 +9,7 @@ import {
 } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
 import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations.schema";
+import { withPhoneContactAdditionalConditionSchema } from "../establishment/establishment.schema";
 import { contactModeSchema } from "../formEstablishment/FormEstablishment.schema";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
@@ -337,32 +338,36 @@ export const flatGetPaginatedDiscussionsParamsSchema: ZodSchemaWithInputMatching
   });
 
 export const discussionInListSchema: ZodSchemaWithInputMatchingOutput<DiscussionInList> =
-  z.object({
-    id: discussionIdSchema,
-    siret: siretSchema,
-    status: discussionStatusSchema,
-    appellation: appellationAndRomeDtoSchema,
-    businessName: zStringMinLength1Max1024,
-    createdAt: makeDateStringSchema(),
-    kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
-    city: zStringMinLength1Max1024,
-    exchangesData: z.object({
-      count: z.number(),
-      lastExchange: z
-        .object({
-          sender: exchangeRoleSchema,
-          sentAt: makeDateStringSchema(),
-        })
-        .nullable(),
-    }),
-    potentialBeneficiary: z.object({
-      firstName: firstnameMandatorySchema,
-      lastName: lastnameMandatorySchema,
-      phone: phoneNumberSchema.nullable(),
-    }),
-    immersionObjective: immersionObjectiveSchema.nullable(),
-    isEstablishmentBanned: z.boolean(),
-  });
+  z
+    .object({
+      id: discussionIdSchema,
+      siret: siretSchema,
+      status: discussionStatusSchema,
+      appellation: appellationAndRomeDtoSchema,
+      businessName: zStringMinLength1Max1024,
+      createdAt: makeDateStringSchema(),
+      kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
+      city: zStringMinLength1Max1024,
+      exchangesData: z.object({
+        count: z.number(),
+        lastExchange: z
+          .object({
+            sender: exchangeRoleSchema,
+            sentAt: makeDateStringSchema(),
+          })
+          .nullable(),
+      }),
+      potentialBeneficiary: z.object({
+        firstName: firstnameMandatorySchema,
+        lastName: lastnameMandatorySchema,
+        phone: phoneNumberSchema.nullable(),
+      }),
+      immersionObjective: immersionObjectiveSchema.nullable(),
+      isEstablishmentBanned: z.boolean(),
+      contactMode: contactModeSchema,
+      updatedAt: makeDateStringSchema(),
+    })
+    .and(withPhoneContactAdditionalConditionSchema);
 
 export const paginatedDiscussionListSchema = createPaginatedSchema(
   discussionInListSchema,
