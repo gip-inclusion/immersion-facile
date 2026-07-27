@@ -3,46 +3,62 @@ import type { ConventionStatus } from "shared";
 
 export const labelAndSeverityByStatus: Record<
   ConventionStatus,
-  { agencyLabel: string; beneficiaryLabel: string; color: FrCxArg }
+  { label: { agency: string; beneficiary: string }; color: FrCxArg }
 > = {
   ACCEPTED_BY_COUNSELLOR: {
-    beneficiaryLabel: "📄 En cours d'examen",
-    agencyLabel: "📄 Demande éligible",
+    label: {
+      beneficiary: "📄 En cours d'examen",
+      agency: "📄 Demande éligible",
+    },
     color: "fr-badge--purple-glycine",
   },
   ACCEPTED_BY_VALIDATOR: {
-    beneficiaryLabel: "✅ Demande validée",
-    agencyLabel: "✅ Demande validée",
+    label: {
+      beneficiary: "✅ Demande validée",
+      agency: "✅ Demande validée",
+    },
     color: "fr-badge--green-emeraude",
   },
   CANCELLED: {
-    beneficiaryLabel: "❌ Convention annulée",
-    agencyLabel: "❌ Convention annulée",
+    label: {
+      beneficiary: "❌ Convention annulée",
+      agency: "❌ Convention annulée",
+    },
     color: "fr-badge--error",
   },
   IN_REVIEW: {
-    beneficiaryLabel: "📄 En cours d'examen",
-    agencyLabel: "📄 Demande à étudier",
+    label: {
+      beneficiary: "📄 En cours d'examen",
+      agency: "📄 Demande à étudier",
+    },
     color: "fr-badge--purple-glycine",
   },
   PARTIALLY_SIGNED: {
-    beneficiaryLabel: "✍ Partiellement signée",
-    agencyLabel: "✍ Partiellement signée",
+    label: {
+      beneficiary: "✍ Partiellement signée",
+      agency: "✍ Partiellement signée",
+    },
     color: "fr-badge--purple-glycine",
   },
   READY_TO_SIGN: {
-    beneficiaryLabel: "✍ En cours de signature",
-    agencyLabel: "✍ En cours de signature",
+    label: {
+      beneficiary: "✍ En cours de signature",
+      agency: "✍ En cours de signature",
+    },
     color: "fr-badge--purple-glycine",
   },
   REJECTED: {
-    beneficiaryLabel: "❌ Demande rejetée",
-    agencyLabel: "❌ Demande rejetée",
+    label: {
+      beneficiary: "❌ Demande rejetée",
+      agency: "❌ Demande rejetée",
+    },
     color: "fr-badge--error",
   },
   DEPRECATED: {
-    beneficiaryLabel: "❌ Demande obsolète",
-    agencyLabel: "❌ Demande obsolète",
+    label: {
+      beneficiary: "❌ Demande obsolète",
+      agency: "❌ Demande obsolète",
+    },
     color: "fr-badge--error",
   },
 };

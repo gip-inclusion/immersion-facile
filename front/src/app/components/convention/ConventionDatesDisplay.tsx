@@ -1,10 +1,9 @@
 import { type ConventionDto, toDisplayedDate } from "shared";
 
 export const ConventionDatesDisplay = ({
-  convention: { dateEnd, dateStart },
-}: {
-  convention: Pick<ConventionDto, "dateStart" | "dateEnd">;
-}) => (
+  dateEnd,
+  dateStart,
+}: Pick<ConventionDto, "dateStart" | "dateEnd">) => (
   <>
     Du&nbsp;
     {toDisplayedDate({

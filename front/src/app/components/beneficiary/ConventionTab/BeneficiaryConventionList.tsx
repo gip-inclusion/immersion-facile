@@ -24,7 +24,7 @@ import { WithFeedbackReplacer } from "../../feedback/WithFeedbackReplacer";
 
 export const BeneficiaryConventionList = (): React.ReactNode => {
   const feedbackTopic: FeedbackTopic =
-    "connected-user-beneficiaryConventionList";
+    "connected-user-beneficiary-convention-list";
   const dispatch = useDispatch();
   const jwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
@@ -62,10 +62,6 @@ export const BeneficiaryConventionList = (): React.ReactNode => {
       {beneficiaryConventionList !== null &&
         beneficiaryConventionList.length > 0 && (
           <Table
-            id={
-              domElementIds.beneficiaryDashboardConventions
-                .beneficiaryConventionListTable
-            }
             fixed
             headers={["Entreprise", "Statut", "Bilan", "Dates", "Actions"]}
             data={conventionListToTableData(beneficiaryConventionList)}
@@ -124,7 +120,10 @@ const conventionListToTableData = (
       />
     </Fragment>,
     <Fragment key={convention.conventionId}>
-      <ConventionDatesDisplay convention={convention} />
+      <ConventionDatesDisplay
+        dateStart={convention.dateStart}
+        dateEnd={convention.dateEnd}
+      />
     </Fragment>,
     <Button disabled key={convention.conventionId}>
       Voir la convention

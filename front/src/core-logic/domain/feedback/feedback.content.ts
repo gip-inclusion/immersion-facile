@@ -53,8 +53,8 @@ const topics = [
   "auth-global",
   "broadcast-convention-again",
   "connected-user-conventions",
-  "connected-user-conventionList",
-  "connected-user-beneficiaryConventionList",
+  "connected-user-convention-list",
+  "connected-user-beneficiary-convention-list",
   "convention-action-accept-by-counsellor",
   "convention-action-accept-by-validator",
   "convention-action-cancel",
@@ -980,7 +980,7 @@ export const feedbacks: Record<
         "Une erreur est survenue lors de la récupération de vos conventions",
     },
   },
-  "connected-user-beneficiaryConventionList": {
+  "connected-user-beneficiary-convention-list": {
     "fetch.error": {
       action: conventionListSlice.actions.fetchBeneficiaryConventionListFailed,
       title: "Problème lors de la récupération de vos conventions",
@@ -994,7 +994,7 @@ export const feedbacks: Record<
       message: "",
     },
   },
-  "connected-user-conventionList": {
+  "connected-user-convention-list": {
     "fetch.error": {
       action: conventionListSlice.actions.fetchConventionListFailed,
       title: "Problème lors de la récupération des conventions",

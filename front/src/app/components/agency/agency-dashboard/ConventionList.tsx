@@ -172,7 +172,7 @@ export const ConventionList = () => {
 
   const statusOptions: CheckboxProps["options"] = useMemo(() => {
     return conventionStatuses.map((status) => ({
-      label: labelAndSeverityByStatus[status].agencyLabel,
+      label: labelAndSeverityByStatus[status].label.agency,
       nativeInputProps: {
         value: status,
         checked: tempFilters.statuses?.includes(status) ?? false,
@@ -264,7 +264,7 @@ export const ConventionList = () => {
           page: 1,
           perPage: defaultPerPageInWebPagination,
         },
-        feedbackTopic: "connected-user-conventionList",
+        feedbackTopic: "connected-user-convention-list",
       }),
     );
   };
@@ -329,7 +329,7 @@ export const ConventionList = () => {
         ) : null
       }
     >
-      <WithFeedbackReplacer topic="connected-user-conventionList">
+      <WithFeedbackReplacer topic="connected-user-convention-list">
         {match({
           conventions,
         })
@@ -392,7 +392,10 @@ export const ConventionList = () => {
                   <strong>{convention.businessName}</strong>
                 </Fragment>,
                 <Fragment key={`${convention.id}-dates`}>
-                  <ConventionDatesDisplay convention={convention} />
+                  <ConventionDatesDisplay
+                    dateStart={convention.dateStart}
+                    dateEnd={convention.dateEnd}
+                  />
                 </Fragment>,
 
                 <Button
@@ -428,8 +431,8 @@ export const ConventionList = () => {
                                 : filters.statuses
                                     .map(
                                       (status) =>
-                                        labelAndSeverityByStatus[status]
-                                          .agencyLabel,
+                                        labelAndSeverityByStatus[status].label
+                                          .agency,
                                     )
                                     .join(", ")
                             }`,

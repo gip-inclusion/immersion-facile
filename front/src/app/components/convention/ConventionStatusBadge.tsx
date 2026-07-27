@@ -10,12 +10,11 @@ export const ConventionStatusBadge = ({
   conventionStatus: ConventionStatus;
   userKind: "agency" | "beneficiary";
 }): React.ReactNode => {
-  const { color, agencyLabel, beneficiaryLabel } =
-    labelAndSeverityByStatus[conventionStatus];
+  const { color, label } = labelAndSeverityByStatus[conventionStatus];
 
   return (
     <Badge className={fr.cx(color)} small>
-      {userKind === "agency" ? agencyLabel : beneficiaryLabel}
+      {label[userKind]}
     </Badge>
   );
 };
