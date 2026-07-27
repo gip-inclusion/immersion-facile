@@ -61,20 +61,24 @@ const getCurrentUserEpic: ConnectedUserEpic = (
         establishmentSlice.actions.updateEstablishmentSucceeded.match(action),
     ),
     switchMap(({ payload }) =>
-      authGateway.getCurrentUser$(getConnectedUserJwt(state$.value)).pipe(
-        map(connectedUserSlice.actions.currentUserFetchSucceeded),
-        catchEpicError((error) =>
-          error?.message.includes(authExpiredBaseMessage)
-            ? authSlice.actions.fetchLogoutUrlRequested({
-                mode: "device-only",
-                feedbackTopic: payload.feedbackTopic,
-              })
-            : connectedUserSlice.actions.currentUserFetchFailed({
-                errorMessage: error?.message,
-                feedbackTopic: payload.feedbackTopic,
-              }),
+      authGateway
+        .getConnectedUser$({
+          jwt: getConnectedUserJwt(state$.value),
+        })
+        .pipe(
+          map(connectedUserSlice.actions.currentUserFetchSucceeded),
+          catchEpicError((error) =>
+            error?.message.includes(authExpiredBaseMessage)
+              ? authSlice.actions.fetchLogoutUrlRequested({
+                  mode: "device-only",
+                  feedbackTopic: payload.feedbackTopic,
+                })
+              : connectedUserSlice.actions.currentUserFetchFailed({
+                  errorMessage: error?.message,
+                  feedbackTopic: payload.feedbackTopic,
+                }),
+          ),
         ),
-      ),
     ),
   );
 

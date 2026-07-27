@@ -5,6 +5,7 @@ import {
   AgencyDtoBuilder,
   type AgencyRight,
   type ConnectedUser,
+  type ConnectedUserJwt,
   type InitiateLoginByEmailParams,
   noAgencyDashboards,
   noEstablishmentDashboard,
@@ -12,6 +13,7 @@ import {
   type RenewExpiredJwtRequestDto,
   sleep,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserId,
 } from "shared";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 
@@ -23,8 +25,34 @@ export class SimulatedAuthGateway implements AuthGateway {
   public getLogoutUrl$(): Observable<AbsoluteUrl> {
     return of("http://fake-logout.com");
   }
-  public getCurrentUser$(_token: string): Observable<ConnectedUser> {
-    return of(simulatedUserConnected);
+  public getConnectedUser$({
+    jwt: _,
+    userId,
+  }: {
+    jwt: ConnectedUserJwt;
+    userId?: UserId;
+  }): Observable<ConnectedUser> {
+    return of(
+      userId
+        ? {
+            email: "fake@user.com",
+            firstName: "Billy",
+            lastName: "Idol",
+            id: userId,
+            agencyRights: [],
+            dashboards: {
+              agencies: noAgencyDashboards,
+              establishments: noEstablishmentDashboard,
+            },
+            proConnect: {
+              externalId: "fake-user-external-id",
+              siret: "00000000000000",
+            },
+            createdAt: new Date().toISOString(),
+            isBackofficeAdmin: true,
+          }
+        : simulatedUserConnected,
+    );
   }
 
   public getConnectedUsers$(): Observable<ConnectedUser[]> {

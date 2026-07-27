@@ -9,6 +9,7 @@ import type {
   LogoutQueryParams,
   OAuthSuccessLoginParams,
   RenewExpiredJwtRequestDto,
+  UserId,
   WithUserFilters,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -57,12 +58,18 @@ export class HttpAuthGateway implements AuthGateway {
     );
   }
 
-  public getCurrentUser$(token: string): Observable<ConnectedUser> {
+  public getConnectedUser$({
+    jwt,
+    userId,
+  }: {
+    jwt: ConnectedUserJwt;
+    userId?: UserId;
+  }): Observable<ConnectedUser> {
     return from(
       this.httpClient
         .getConnectedUser({
-          headers: { authorization: token },
-          queryParams: {},
+          headers: { authorization: jwt },
+          queryParams: { userId },
         })
         .then((response) =>
           match(response)
