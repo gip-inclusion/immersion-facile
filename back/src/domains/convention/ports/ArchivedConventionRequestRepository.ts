@@ -1,5 +1,6 @@
 import type {
   AppellationCode,
+  ArchivedConventionRequestId,
   ArchivedConventionRequestWithConventionDetailsFormDto,
   ArchivedConventionRequestWithConventionIdFormDto,
   DateString,
@@ -23,5 +24,8 @@ export interface ArchivedConventionRequestRepository {
   save: (
     archivedConventionRequest: ArchivedConventionRequestEntity,
   ) => Promise<void>;
+  getById: (
+    id: ArchivedConventionRequestId,
+  ) => Promise<ArchivedConventionRequestEntity | undefined>;
   getAll: () => Promise<ArchivedConventionRequestEntity[]>;
 }

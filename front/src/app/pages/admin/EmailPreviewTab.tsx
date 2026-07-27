@@ -263,6 +263,9 @@ export const defaultEmailValueByEmailKind: {
       },
     ],
   },
+  ARCHIVED_CONVENTION_REQUEST_RECEIVED: {
+    archivedConventionRequestId: "ARCHIVED_CONVENTION_REQUEST_ID",
+  },
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: "ACCOMPANYING_AGENCY_NAME",
     refersToAgencyName: "REFERS_TO_AGENCY_NAME",

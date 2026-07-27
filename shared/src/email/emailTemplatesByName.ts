@@ -470,6 +470,35 @@ export const emailTemplatesByName =
         };
       },
     },
+    ARCHIVED_CONVENTION_REQUEST_RECEIVED: {
+      niceName: "Convention - Demande archivée accusé de réception",
+      tags: [
+        "template:demandeArchiveAccuseReception",
+        "theme:convention",
+        "role:utilisateurInitiateur",
+      ],
+      createEmailVariables: ({ archivedConventionRequestId }) => ({
+        subject: "Nous avons bien reçu votre demande de convention archivée",
+        greetings: `<strong>Identifiant de la demande d'accès à une convention archivée : ${archivedConventionRequestId}</strong>`,
+        content: `
+          Bonjour,
+
+          Nous vous confirmons la bonne réception de votre demande d'accès à une convention d'immersion archivée.
+
+          <strong>Que va-t-il se passer ensuite ?</strong>
+
+          <ul>
+          <li>Notre équipe va examiner votre demande (motif et informations fournies) pour s'assurer que nous pouvons vous transmettre ces documents de manière légitime.</li>
+          <li>Si votre demande est validée, la convention ainsi que le bilan d'immersion vous seront envoyés directement par email d'ici quelques jours.</li>
+          </ul>
+
+          Si nous avons besoin d'informations complémentaires pour retrouver votre convention, nous vous contacterons à cette adresse.
+
+          Vous n'avez aucune autre action à réaliser pour le moment.
+        `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WAS_ACTIVATED: {
       niceName: "Espace prescripteur - Admin agence - Agence activée",
       tags: [

@@ -1,4 +1,5 @@
 import type {
+  ArchivedConventionRequestId,
   ArchivedConventionRequestReason,
   ArchivedConventionRequestReasonFields,
 } from "shared";
@@ -36,6 +37,18 @@ export class PgArchivedConventionRequestRepository
       .execute();
 
     return rows.map(toArchivedConventionRequestEntity);
+  }
+
+  public async getById(
+    id: ArchivedConventionRequestId,
+  ): Promise<ArchivedConventionRequestEntity | undefined> {
+    const row = await this.transaction
+      .selectFrom("archived_convention_requests")
+      .selectAll()
+      .where("archived_convention_requests.id", "=", id)
+      .executeTakeFirst();
+
+    return row ? toArchivedConventionRequestEntity(row) : undefined;
   }
 
   public async save(

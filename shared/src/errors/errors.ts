@@ -679,6 +679,10 @@ export const errors = {
       ),
   },
   archivedConventionRequest: {
+    notFound: ({ id }: { id: string }) =>
+      new NotFoundError(
+        `Aucune demande de convention archivée trouvée avec l'identifiant '${id}'.`,
+      ),
     unknownReason: ({ reason }: { reason: string }) =>
       new Error(
         `La raison de demande de convention archivée est inconnue : ${reason}`,

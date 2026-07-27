@@ -3,6 +3,7 @@ import type {
   DelegationAgencyKind,
   DelegationConventionReminderKind,
 } from "../agency/agency.dto";
+import type { ArchivedConventionRequestId } from "../archivedConventionRequest/archivedConventionRequest.dto";
 import type {
   AssessmentDtoCompleted,
   AssessmentDtoPartiallyCompleted,
@@ -97,6 +98,9 @@ export type EmailParamsByEmailType = {
       agencyName: string;
       adminEmails: Email[];
     }[];
+  };
+  ARCHIVED_CONVENTION_REQUEST_RECEIVED: {
+    archivedConventionRequestId: ArchivedConventionRequestId;
   };
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
