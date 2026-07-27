@@ -14,7 +14,6 @@ import type {
   NotificationsByKind,
   RejectConnectedUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserId,
   UserParamsForAgency,
   UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
@@ -65,11 +64,6 @@ export interface AdminGateway {
     params: GetUsersFilters,
     token: ConnectedUserJwt,
   ): Observable<UserWithNumberOfAgenciesAndEstablishments[]>;
-
-  getIcUser$(
-    params: { userId: UserId },
-    token: ConnectedUserJwt,
-  ): Observable<ConnectedUser>;
 
   revokeApiConsumer$(
     consumerId: ApiConsumerId,

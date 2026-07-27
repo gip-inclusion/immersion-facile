@@ -13,10 +13,10 @@ const fetchUserEpic: FetchUserEpic = (action$, state$, { authGateway }) =>
   action$.pipe(
     filter(fetchUserSlice.actions.fetchUserRequested.match),
     switchMap((action) =>
-      adminGateway.getIcUser$(
-        { userId: action.payload.userId },
-        getConnectedUserJwt(state$.value),
-      ),
+      authGateway.getConnectedUser$({
+        jwt: getConnectedUserJwt(state$.value),
+        userId: action.payload.userId,
+      }),
     ),
     map(fetchUserSlice.actions.fetchUserSucceeded),
   );

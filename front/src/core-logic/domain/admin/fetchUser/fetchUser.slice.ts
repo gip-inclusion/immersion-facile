@@ -4,7 +4,7 @@ import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 
-type FetchUserState = {
+export type FetchUserState = {
   user: ConnectedUser | null;
   isFetching: boolean;
 };

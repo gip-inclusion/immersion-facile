@@ -8,7 +8,11 @@ import {
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
-import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
+import {
+  type FetchUserState,
+  fetchUserInitialState,
+  fetchUserSlice,
+} from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
@@ -28,20 +32,26 @@ describe("Admin Users slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("fetches the user successfully", () => {
-    expectToEqual(adminFetchUserSelectors.isFetching(store.getState()), false);
-    expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), null);
+  describe("fetchUserRequested", () => {
+    it("fetches the user successfully", () => {
+      expectAdminFetchUserSelectors(fetchUserInitialState);
 
-    store.dispatch(
-      fetchUserSlice.actions.fetchUserRequested({ userId: user.id }),
-    );
+      store.dispatch(
+        fetchUserSlice.actions.fetchUserRequested({ userId: user.id }),
+      );
 
-    expectToEqual(adminFetchUserSelectors.isFetching(store.getState()), true);
+      expectAdminFetchUserSelectors({
+        ...fetchUserInitialState,
+        isFetching: true,
+      });
 
-    feedWithUsers(user);
+      feedWithUsers(user);
 
-    expectToEqual(adminFetchUserSelectors.isFetching(store.getState()), false);
-    expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), user);
+      expectAdminFetchUserSelectors({
+        user,
+        isFetching: false,
+      });
+    });
   });
 
   describe("when current user has successfully requested an update of another user", () => {
@@ -87,14 +97,18 @@ describe("Admin Users slice", () => {
         updateUserOnAgencySelectors.isLoading(store.getState()),
         false,
       );
-      expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), {
-        ...user,
-        agencyRights: [
-          {
-            ...agencyRight,
-            roles: [...agencyRight.roles, "counsellor"],
-          },
-        ],
+
+      expectAdminFetchUserSelectors({
+        isFetching: false,
+        user: {
+          ...user,
+          agencyRights: [
+            {
+              ...agencyRight,
+              roles: [...agencyRight.roles, "counsellor"],
+            },
+          ],
+        },
       });
     });
 
@@ -140,10 +154,11 @@ describe("Admin Users slice", () => {
         updateUserOnAgencySelectors.isLoading(store.getState()),
         false,
       );
-      expectToEqual(
-        adminFetchUserSelectors.fetchedUser(store.getState()),
+
+      expectAdminFetchUserSelectors({
+        isFetching: false,
         user,
-      );
+      });
     });
   });
 
@@ -190,9 +205,13 @@ describe("Admin Users slice", () => {
         removeUserFromAgencySelectors.isLoading(store.getState()),
         false,
       );
-      expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), {
-        ...user,
-        agencyRights: [],
+
+      expectAdminFetchUserSelectors({
+        isFetching: false,
+        user: {
+          ...user,
+          agencyRights: [],
+        },
       });
     });
 
@@ -238,14 +257,26 @@ describe("Admin Users slice", () => {
         removeUserFromAgencySelectors.isLoading(store.getState()),
         false,
       );
-      expectToEqual(
-        adminFetchUserSelectors.fetchedUser(store.getState()),
+      expectAdminFetchUserSelectors({
+        isFetching: false,
         user,
-      );
+      });
     });
   });
 
   const feedWithUsers = (icUser: ConnectedUser) => {
-    dependencies.adminGateway.getIcUserResponse$.next(icUser);
+    dependencies.authGateway.getConnectedUserResponse$.next(icUser);
+  };
+
+  const expectAdminFetchUserSelectors = (expectedValues: FetchUserState) => {
+    const state = store.getState();
+    expectToEqual(
+      adminFetchUserSelectors.isFetching(state),
+      expectedValues.isFetching,
+    );
+    expectToEqual(
+      adminFetchUserSelectors.fetchedUser(state),
+      expectedValues.user,
+    );
   };
 });
