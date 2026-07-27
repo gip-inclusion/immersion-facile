@@ -285,6 +285,9 @@ const EstablishmentDiscussionTable = ({
         <DiscussionStatusBadge
           key={discussion.id}
           discussion={discussion}
+          isEstablishmentReachableByPhoneAfter15Days={
+            discussion.isEstablishmentReachableByPhoneAfter15Days
+          }
           viewer={"establishment"}
           small
         />,
@@ -447,6 +450,9 @@ const BeneficiaryDiscussionTable = ({
           key={discussion.id}
           discussion={discussion}
           viewer={"potentialBeneficiary"}
+          isEstablishmentReachableByPhoneAfter15Days={
+            discussion.isEstablishmentReachableByPhoneAfter15Days
+          }
           small
         />,
         <Button

@@ -1062,6 +1062,7 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
         "pad.ogr_appellation",
       )
       .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
+      .innerJoin("establishments", "establishments.siret", "discussions.siret")
       .leftJoin(
         "banned_establishments",
         "banned_establishments.siret",
@@ -1115,14 +1116,27 @@ const getPaginatedDiscussionsForEstablishmentUser = async ({
         sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
           "createdAt",
         ),
+        sql<string>`TO_CHAR(${ref("discussions.updated_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          "updatedAt",
+        ),
         ref("discussions.city").as("city"),
         ref("discussions.siret").as("siret"),
         ref("discussions.kind").as("kind"),
         ref("discussions.status").as("status"),
+        sql<ContactMode>`${ref("discussions.contact_method")}`.as(
+          "contactMode",
+        ),
         ref("discussions.immersion_objective").as("immersionObjective"),
         sql<boolean>`${ref("banned_establishments.siret")} IS NOT NULL`.as(
           "isEstablishmentBanned",
         ),
+        sql<boolean>`
+                ${ref("establishments.contact_mode")} = 'EMAIL' AND EXISTS (
+                  SELECT 1 FROM establishments__users
+                  WHERE establishments__users.siret = ${ref("discussions.siret")}
+                  AND establishments__users.is_main_contact_by_phone = true
+                )
+              `.as("isEstablishmentReachableByPhoneAfter15Days"),
         jsonBuildObject({
           firstName: ref("potential_beneficiary_first_name"),
           lastName: ref("potential_beneficiary_last_name"),
@@ -1191,6 +1205,7 @@ const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({
         "pad.ogr_appellation",
       )
       .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
+      .innerJoin("establishments", "establishments.siret", "discussions.siret")
       .leftJoin(
         "banned_establishments",
         "banned_establishments.siret",
@@ -1244,14 +1259,27 @@ const getPaginatedDiscussionsForPotentialBeneficiaryUser = async ({
         sql<string>`TO_CHAR(${ref("discussions.created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
           "createdAt",
         ),
+        sql<string>`TO_CHAR(${ref("discussions.updated_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+          "updatedAt",
+        ),
         ref("discussions.city").as("city"),
         ref("discussions.siret").as("siret"),
         ref("discussions.kind").as("kind"),
         ref("discussions.status").as("status"),
+        sql<ContactMode>`${ref("discussions.contact_method")}`.as(
+          "contactMode",
+        ),
         ref("discussions.immersion_objective").as("immersionObjective"),
         sql<boolean>`${ref("banned_establishments.siret")} IS NOT NULL`.as(
           "isEstablishmentBanned",
         ),
+        sql<boolean>`
+                ${ref("establishments.contact_mode")} = 'EMAIL' AND EXISTS (
+                  SELECT 1 FROM establishments__users
+                  WHERE establishments__users.siret = ${ref("discussions.siret")}
+                  AND establishments__users.is_main_contact_by_phone = true
+                )
+              `.as("isEstablishmentReachableByPhoneAfter15Days"),
         jsonBuildObject({
           firstName: ref("potential_beneficiary_first_name"),
           lastName: ref("potential_beneficiary_last_name"),

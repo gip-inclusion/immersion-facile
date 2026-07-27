@@ -138,6 +138,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
         lastName: mainContactRight.lastName ?? "Nom",
         phone: mainContactRight.phone,
       },
+      isEstablishmentReachableByPhoneAfter15Days: false,
     }).pipe(delay(this.delay));
   }
 

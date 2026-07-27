@@ -331,6 +331,7 @@ describe("discussion e2e", () => {
               lastName: establishmentAdminConnectedUser.lastName,
               phone: "+33688774455",
             },
+            isEstablishmentReachableByPhoneAfter15Days: false,
           },
         },
       );
@@ -365,6 +366,7 @@ describe("discussion e2e", () => {
               lastName: establishmentAdminConnectedUser.lastName,
               phone: "+33688774455",
             },
+            isEstablishmentReachableByPhoneAfter15Days: false,
           },
         },
       );

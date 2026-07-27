@@ -8,6 +8,7 @@ import {
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { EstablishmentAdminRight } from "../../entities/EstablishmentAggregate";
 import { hasUserRightToAccessDiscussion } from "../../helpers/discussion.utils";
+import { isEstablishmentReachableByPhoneAfter15Days } from "../../helpers/establishment.utils";
 
 export type GetDiscussionEstablishmentContactInfo = ReturnType<
   typeof makeGetDiscussionEstablishmentContactInfo
@@ -74,5 +75,7 @@ export const makeGetDiscussionEstablishmentContactInfo = useCaseBuilder(
         lastName: mainContactUser.lastName,
         phone: mainContactRight.phone,
       },
+      isEstablishmentReachableByPhoneAfter15Days:
+        isEstablishmentReachableByPhoneAfter15Days(establishmentAggregate),
     };
   });
