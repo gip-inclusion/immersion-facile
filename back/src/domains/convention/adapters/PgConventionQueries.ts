@@ -8,7 +8,6 @@ import {
   type AssessmentStatus,
   assessmentStatuses,
   type BroadcastErrorKind,
-  type ConventionAssessmentFields,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
@@ -61,7 +60,7 @@ import {
   createBroadcastFeedbackCountBuilder,
   createConventionQueryBuilder,
   createConventionsWithErroredBroadcastFeedbackBuilder,
-  getAssessmentFieldsByConventionId,
+  getAssessmentFieldsByConventions,
   getConventionAgencyFieldsForAgencies,
   getLastRemindersFieldsByConventions,
   getReadConventionById,
@@ -311,22 +310,10 @@ export class PgConventionQueries implements ConventionQueries {
       uniqAgencyIds,
     );
 
-    const assessmentPromises = conventions.map(async (pgResult) => {
-      const assessment = await getAssessmentFieldsByConventionId(
-        this.transaction,
-        pgResult.dto.id,
-      );
-      return { conventionId: pgResult.dto.id, assessment };
+    const assessmentByConventionId = await getAssessmentFieldsByConventions({
+      transaction: this.transaction,
+      conventionIds: conventions.map(({ dto }) => dto.id),
     });
-
-    const assessmentResults = await Promise.all(assessmentPromises);
-    const assessmentByConventionId = assessmentResults.reduce(
-      (acc, { conventionId, assessment }) => {
-        acc[conventionId] = assessment;
-        return acc;
-      },
-      {} as Record<ConventionId, ConventionAssessmentFields>,
-    );
     const lastRemindersByConventionId =
       await getLastRemindersFieldsByConventions({
         transaction: this.transaction,
@@ -437,22 +424,10 @@ export class PgConventionQueries implements ConventionQueries {
       uniqAgencyIds,
     );
 
-    const assessmentPromises = data.map(async ({ dto }) => {
-      const assessment = await getAssessmentFieldsByConventionId(
-        this.transaction,
-        dto.id,
-      );
-      return { conventionId: dto.id, assessment };
+    const assessmentByConventionId = await getAssessmentFieldsByConventions({
+      transaction: this.transaction,
+      conventionIds: data.map(({ dto }) => dto.id),
     });
-
-    const assessmentResults = await Promise.all(assessmentPromises);
-    const assessmentByConventionId = assessmentResults.reduce(
-      (acc, { conventionId, assessment }) => {
-        acc[conventionId] = assessment;
-        return acc;
-      },
-      {} as Record<string, ConventionAssessmentFields>,
-    );
     const lastRemindersByConventionId =
       await getLastRemindersFieldsByConventions({
         transaction: this.transaction,
