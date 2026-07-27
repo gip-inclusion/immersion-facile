@@ -98,7 +98,7 @@ describe("InclusionConnected", () => {
 
       expectConnectedUserSelectorIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(connectedUser);
+      dependencies.authGateway.getConnectedUserResponse$.next(connectedUser);
 
       expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
@@ -119,7 +119,7 @@ describe("InclusionConnected", () => {
 
       expectConnectedUserSelectorIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(connectedUser);
+      dependencies.authGateway.getConnectedUserResponse$.next(connectedUser);
 
       expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
@@ -139,7 +139,7 @@ describe("InclusionConnected", () => {
 
       expectConnectedUserSelectorIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(connectedUser);
+      dependencies.authGateway.getConnectedUserResponse$.next(connectedUser);
 
       expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
@@ -168,7 +168,9 @@ describe("InclusionConnected", () => {
       expectConnectedUserSelectorIsLoadingToBe(true);
 
       const errorMessage = `Something went wrong : ${authExpiredMessage()} blah blah`;
-      dependencies.authGateway.currentUser$.error(new Error(errorMessage));
+      dependencies.authGateway.getConnectedUserResponse$.error(
+        new Error(errorMessage),
+      );
       expectCurrentUserToBe(null);
       expectToEqual(authSelectors.federatedIdentity(store.getState()), null);
     });
@@ -184,7 +186,9 @@ describe("InclusionConnected", () => {
       expectConnectedUserSelectorIsLoadingToBe(true);
 
       const errorMessage = "Something went wrong";
-      dependencies.authGateway.currentUser$.error(new Error(errorMessage));
+      dependencies.authGateway.getConnectedUserResponse$.error(
+        new Error(errorMessage),
+      );
       expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(null);
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
@@ -238,7 +242,7 @@ describe("InclusionConnected", () => {
         }),
       );
 
-      dependencies.authGateway.currentUser$.next(connectedUser);
+      dependencies.authGateway.getConnectedUserResponse$.next(connectedUser);
 
       expectConnectedUserSelectorIsLoadingToBe(false);
       expectCurrentUserToBe(connectedUser);
@@ -677,7 +681,7 @@ describe("InclusionConnected", () => {
           }),
         );
 
-        dependencies.authGateway.currentUser$.next({
+        dependencies.authGateway.getConnectedUserResponse$.next({
           ...user,
           establishments: [otherEstablishmentToKeepData],
         });
@@ -773,7 +777,7 @@ describe("InclusionConnected", () => {
           }),
         );
 
-        dependencies.authGateway.currentUser$.next({
+        dependencies.authGateway.getConnectedUserResponse$.next({
           ...user,
           establishments: [
             {

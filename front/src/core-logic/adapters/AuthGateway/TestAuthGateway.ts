@@ -3,9 +3,11 @@ import type {
   AbsoluteUrl,
   AfterOAuthSuccessRedirectionResponse,
   ConnectedUser,
+  ConnectedUserJwt,
   InitiateLoginByEmailParams,
   OAuthSuccessLoginParams,
   RenewExpiredJwtRequestDto,
+  UserId,
 } from "shared";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 
@@ -16,7 +18,7 @@ export class TestAuthGateway implements AuthGateway {
 
   public getLogoutUrlResponse$ = new Subject<AbsoluteUrl>();
 
-  public currentUser$ = new Subject<ConnectedUser>();
+  public getConnectedUserResponse$ = new Subject<ConnectedUser>();
 
   public getConnectedUsersResponse$ = new Subject<ConnectedUser[]>();
 
@@ -29,8 +31,11 @@ export class TestAuthGateway implements AuthGateway {
     return this.getLogoutUrlResponse$;
   }
 
-  public getCurrentUser$(_token: string): Observable<ConnectedUser> {
-    return this.currentUser$;
+  public getConnectedUser$(_params: {
+    jwt: ConnectedUserJwt;
+    userId?: UserId;
+  }): Observable<ConnectedUser> {
+    return this.getConnectedUserResponse$;
   }
 
   public getConnectedUsers$(): Observable<ConnectedUser[]> {

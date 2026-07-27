@@ -331,7 +331,7 @@ describe("Auth slice", () => {
       },
       createdAt: new Date().toISOString(),
     };
-    dependencies.authGateway.currentUser$.next(user);
+    dependencies.authGateway.getConnectedUserResponse$.next(user);
     expectToEqual(connectedUserSelectors.currentUser(store.getState()), user);
 
     expectAuthStateToBe({

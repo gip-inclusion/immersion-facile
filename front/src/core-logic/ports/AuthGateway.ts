@@ -8,6 +8,7 @@ import type {
   LogoutQueryParams,
   OAuthSuccessLoginParams,
   RenewExpiredJwtRequestDto,
+  UserId,
   WithUserFilters,
 } from "shared";
 
@@ -16,7 +17,10 @@ export interface AuthGateway {
   getLogoutUrl$(
     payload: LogoutQueryParams & { authToken: string },
   ): Observable<AbsoluteUrl>;
-  getCurrentUser$(token: string): Observable<ConnectedUser>;
+  getConnectedUser$(params: {
+    jwt: ConnectedUserJwt;
+    userId?: UserId;
+  }): Observable<ConnectedUser>;
   getConnectedUsers$: (
     token: ConnectedUserJwt,
     filters: WithUserFilters,
