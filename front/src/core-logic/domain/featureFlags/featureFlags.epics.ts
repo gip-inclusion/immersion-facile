@@ -1,5 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -35,7 +35,10 @@ const setFeatureFlagEpic: FeatureFlagEpic = (
   action$.pipe(
     filter(featureFlagsSlice.actions.setFeatureFlagRequested.match),
     switchMap(({ payload }) =>
-      adminGateway.updateFeatureFlags$(payload, getAdminToken(state$.value)),
+      adminGateway.updateFeatureFlags$(
+        payload,
+        getConnectedUserJwt(state$.value),
+      ),
     ),
     map(featureFlagsSlice.actions.setFeatureFlagSucceeded),
     catchEpicError(featureFlagsSlice.actions.setFeatureFlagFailed),

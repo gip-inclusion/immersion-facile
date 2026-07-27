@@ -1,6 +1,6 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -25,7 +25,7 @@ const createUserOnAgencyEpic: CreateUserOnAgencyEpic = (
     filter(createUserOnAgencySlice.actions.createUserOnAgencyRequested.match),
     switchMap((action) =>
       agencyGateway
-        .createUserForAgency$(action.payload, getAdminToken(state$.value))
+        .createUserForAgency$(action.payload, getConnectedUserJwt(state$.value))
         .pipe(
           map((user) =>
             createUserOnAgencySlice.actions.createUserOnAgencySucceeded({

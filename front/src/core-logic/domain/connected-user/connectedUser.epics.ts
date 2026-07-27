@@ -9,6 +9,7 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { getConnectedUserJwt } from "../admin/admin.helpers";
 
 type ConnectedUserAction = ActionOfSlice<typeof connectedUserSlice>;
 type ConnectedUserEpic = AppEpic<ConnectedUserAction | AuthAction>;
@@ -60,22 +61,20 @@ const getCurrentUserEpic: ConnectedUserEpic = (
         establishmentSlice.actions.updateEstablishmentSucceeded.match(action),
     ),
     switchMap(({ payload }) =>
-      authGateway
-        .getCurrentUser$(state$.value.auth.federatedIdentity?.token ?? "")
-        .pipe(
-          map(connectedUserSlice.actions.currentUserFetchSucceeded),
-          catchEpicError((error) =>
-            error?.message.includes(authExpiredBaseMessage)
-              ? authSlice.actions.fetchLogoutUrlRequested({
-                  mode: "device-only",
-                  feedbackTopic: payload.feedbackTopic,
-                })
-              : connectedUserSlice.actions.currentUserFetchFailed({
-                  errorMessage: error?.message,
-                  feedbackTopic: payload.feedbackTopic,
-                }),
-          ),
+      authGateway.getCurrentUser$(getConnectedUserJwt(state$.value)).pipe(
+        map(connectedUserSlice.actions.currentUserFetchSucceeded),
+        catchEpicError((error) =>
+          error?.message.includes(authExpiredBaseMessage)
+            ? authSlice.actions.fetchLogoutUrlRequested({
+                mode: "device-only",
+                feedbackTopic: payload.feedbackTopic,
+              })
+            : connectedUserSlice.actions.currentUserFetchFailed({
+                errorMessage: error?.message,
+                feedbackTopic: payload.feedbackTopic,
+              }),
         ),
+      ),
     ),
   );
 

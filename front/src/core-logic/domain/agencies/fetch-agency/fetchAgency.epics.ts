@@ -1,7 +1,7 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import type { WithAgencyId } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { normalizeUsers } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.epics";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
@@ -41,7 +41,10 @@ const getAgencyEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
     ),
     switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway
-        .getAgencyById$(action.payload.agencyId, getAdminToken(state$.value))
+        .getAgencyById$(
+          action.payload.agencyId,
+          getConnectedUserJwt(state$.value),
+        )
         .pipe(
           map((agency) =>
             fetchAgencySlice.actions.fetchAgencySucceeded(agency),
@@ -61,7 +64,7 @@ const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
     filter(fetchAgencySlice.actions.fetchAgencyUsersRequested.match),
     switchMap((action: PayloadActionWithOrWithoutFeedbackTopic<WithAgencyId>) =>
       dependencies.authGateway
-        .getConnectedUsers$(getAdminToken(state$.value), action.payload)
+        .getConnectedUsers$(getConnectedUserJwt(state$.value), action.payload)
         .pipe(
           map(normalizeUsers),
           map((users) =>

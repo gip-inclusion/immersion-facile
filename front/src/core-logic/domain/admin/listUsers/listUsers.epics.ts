@@ -1,6 +1,6 @@
 import { debounceTime, distinctUntilChanged, filter, map } from "rxjs";
 import { switchMap } from "rxjs/operators";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import type {
   ActionOfSlice,
@@ -18,7 +18,10 @@ const fetchUsersEpic: ListUserActionEpic = (
   action$.pipe(
     filter(listUsersSlice.actions.fetchUsersRequested.match),
     switchMap((action) =>
-      adminGateway.listUsers$(action.payload, getAdminToken(state$.value)),
+      adminGateway.listUsers$(
+        action.payload,
+        getConnectedUserJwt(state$.value),
+      ),
     ),
     map((action) => listUsersSlice.actions.fetchUsersSucceeded(action)),
   );

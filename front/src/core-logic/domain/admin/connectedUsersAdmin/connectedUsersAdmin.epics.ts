@@ -9,7 +9,7 @@ import type {
   UserParamsForAgency,
   WithUserFilters,
 } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import type { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/fetch-agency-options/fetchAgencyOptions.epics";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -37,7 +37,7 @@ const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionE
       ),
       switchMap((action: PayloadAction<WithUserFilters>) =>
         authGateway.getConnectedUsers$(
-          getAdminToken(state$.value),
+          getConnectedUserJwt(state$.value),
           action.payload,
         ),
       ),
@@ -61,7 +61,7 @@ const fetchConnectedUsersWithAgencyIdEpic: ConnectedUsersAdminActionEpic = (
     filter(connectedUsersAdminSlice.actions.fetchAgencyUsersRequested.match),
     switchMap((action: PayloadAction<WithUserFilters>) =>
       authGateway.getConnectedUsers$(
-        getAdminToken(state$.value),
+        getConnectedUserJwt(state$.value),
         action.payload,
       ),
     ),
@@ -84,7 +84,10 @@ const registerAgencyToUserEpic: ConnectedUsersAdminActionEpic = (
     ),
     switchMap((action: PayloadAction<UserParamsForAgency>) =>
       adminGateway
-        .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
+        .updateUserRoleForAgency$(
+          action.payload,
+          getConnectedUserJwt(state$.value),
+        )
         .pipe(
           map(() =>
             connectedUsersAdminSlice.actions.registerAgencyWithRoleToUserSucceeded(
@@ -112,7 +115,7 @@ const rejectAgencyToUserEpic: ConnectedUsersAdminActionEpic = (
     ),
     switchMap((action: PayloadAction<RejectConnectedUserRoleForAgencyParams>) =>
       adminGateway
-        .rejectUserForAgency$(action.payload, getAdminToken(state$.value))
+        .rejectUserForAgency$(action.payload, getConnectedUserJwt(state$.value))
         .pipe(
           map(() =>
             connectedUsersAdminSlice.actions.rejectAgencyWithRoleToUserSucceeded(
@@ -137,7 +140,7 @@ const createUserOnAgencyEpic: ConnectedUsersAdminActionEpic = (
     filter(connectedUsersAdminSlice.actions.createUserOnAgencyRequested.match),
     switchMap((action) =>
       adminGateway
-        .createUserForAgency$(action.payload, getAdminToken(state$.value))
+        .createUserForAgency$(action.payload, getConnectedUserJwt(state$.value))
         .pipe(
           map((user) =>
             connectedUsersAdminSlice.actions.createUserOnAgencySucceeded({
@@ -174,7 +177,10 @@ const updateUserOnAgencyEpic: ConnectedUsersAdminActionEpic = (
     filter(connectedUsersAdminSlice.actions.updateUserOnAgencyRequested.match),
     switchMap((action) =>
       adminGateway
-        .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
+        .updateUserRoleForAgency$(
+          action.payload,
+          getConnectedUserJwt(state$.value),
+        )
         .pipe(
           map(() =>
             connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded(

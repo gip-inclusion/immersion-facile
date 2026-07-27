@@ -1,6 +1,6 @@
 import { concatMap, filter, map } from "rxjs";
 import type { AdminDashboardName } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -20,7 +20,7 @@ const getConventionDashboardUrl: DashboardUrlsEpic = (
     filter(dashboardUrlsSlice.actions.dashboardUrlRequested.match),
     concatMap((action) =>
       adminGateway
-        .getDashboardUrl$(action.payload, getAdminToken(state$.value))
+        .getDashboardUrl$(action.payload, getConnectedUserJwt(state$.value))
         .pipe(
           map(({ url, name }) =>
             dashboardUrlsSlice.actions.dashboardUrlSucceeded({
