@@ -1,6 +1,5 @@
 import { type Observable, of, throwError } from "rxjs";
 import {
-  AgencyDtoBuilder,
   type ApiConsumer,
   type ApiConsumerId,
   type ApiConsumerJwt,
@@ -16,8 +15,6 @@ import {
   noAgencyDashboards,
   noEstablishmentDashboard,
   type RejectConnectedUserRoleForAgencyParams,
-  toAgencyDtoForAgencyUsersAndAdmins,
-  type UserId,
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
@@ -131,33 +128,6 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(
       simulatedUsers.filter((user) => user.email.includes(emailContains)),
     );
-  }
-
-  public getIcUser$(
-    params: {
-      userId: UserId;
-    },
-    _token: ConnectedUserJwt,
-  ): Observable<ConnectedUser> {
-    const user = simulatedUsers.find((user) => user.id === params.userId);
-    if (!user) throw new Error(`User ${params.userId} not found`);
-    return of({
-      ...user,
-      agencyRights: [
-        {
-          agency: toAgencyDtoForAgencyUsersAndAdmins(
-            new AgencyDtoBuilder().build(),
-            [],
-          ),
-          roles: ["validator"],
-          isNotifiedByEmail: true,
-        },
-      ],
-      dashboards: {
-        agencies: noAgencyDashboards,
-        establishments: noEstablishmentDashboard,
-      },
-    });
   }
 
   public revokeApiConsumer$(

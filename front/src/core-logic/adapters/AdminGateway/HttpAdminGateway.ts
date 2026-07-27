@@ -15,7 +15,6 @@ import {
   type GetUsersFilters,
   type RejectConnectedUserRoleForAgencyParams,
   type SetFeatureFlagParam,
-  type UserId,
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
 } from "shared";
@@ -221,22 +220,6 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
-    );
-  }
-
-  public getIcUser$(
-    params: { userId: UserId },
-    token: ConnectedUserJwt,
-  ): Observable<ConnectedUser> {
-    return from(
-      this.httpClient
-        .getIcUser({ headers: { authorization: token }, urlParams: params })
-        .then((response) => {
-          return match(response)
-            .with({ status: 200 }, ({ body }) => body ?? undefined)
-            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
-            .otherwise(otherwiseThrow);
-        }),
     );
   }
 

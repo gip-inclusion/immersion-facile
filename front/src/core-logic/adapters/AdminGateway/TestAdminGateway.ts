@@ -51,8 +51,6 @@ export class TestAdminGateway implements AdminGateway {
     UserWithNumberOfAgenciesAndEstablishments[]
   >();
 
-  public getIcUserResponse$ = new Subject<ConnectedUser>();
-
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
     _adminToken: ConnectedUserJwt,
@@ -111,13 +109,6 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<UserWithNumberOfAgenciesAndEstablishments[]> {
     return this.listUsersResponse$;
-  }
-
-  public getIcUser$(
-    _params: { userId: string },
-    _token: string,
-  ): Observable<ConnectedUser> {
-    return this.getIcUserResponse$;
   }
 
   public revokeApiConsumerResponse$ = new Subject<void>();
