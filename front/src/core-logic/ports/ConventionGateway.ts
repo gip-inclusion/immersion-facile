@@ -1,6 +1,7 @@
 import type { Observable } from "rxjs";
 import type {
   ApiConsumerName,
+  ArchivedConventionRequestFormDto,
   BeneficiaryConventionListDto,
   ConnectedUserJwt,
   ConventionDraftDto,
@@ -132,5 +133,9 @@ export interface ConventionGateway {
   deleteConventionTemplate$(
     conventionTemplateId: ConventionTemplateId,
     jwt: string,
+  ): Observable<void>;
+  saveArchivedConventionRequest$(
+    archivedConventionRequest: ArchivedConventionRequestFormDto,
+    jwt: ConnectedUserJwt,
   ): Observable<void>;
 }

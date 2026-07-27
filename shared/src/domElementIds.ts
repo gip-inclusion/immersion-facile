@@ -1245,6 +1245,12 @@ export const domElementIds = {
     reasonSelect: "im-archived-convention-request__reason-select",
     otherReasonInput: "im-archived-convention-request__other-reason-input",
     submitButton: "im-archived-convention-request__submit-button",
+    success: {
+      goToMyAccountButton:
+        "im-archived-convention-request-success__go-to-my-account-button",
+      newRequestButton:
+        "im-archived-convention-request-success__new-request-button",
+    },
     login: {
       proConnectButton:
         "im-login-form__inclusion-connect-button--archived-convention-request",
