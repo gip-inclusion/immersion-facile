@@ -165,17 +165,6 @@ export const adminRoutes = defineRoutes({
       403: httpErrorSchema,
     },
   }),
-  getIcUser: defineRoute({
-    method: "get",
-    url: "/admin/inclusion-connected-users/:userId",
-    ...withAuthorizationHeaders,
-    responses: {
-      200: connectedUserSchema,
-      401: httpErrorSchema,
-      403: httpErrorSchema,
-      404: httpErrorSchema,
-    },
-  }),
   banEstablishment: defineRoute({
     method: "post",
     url: "/admin/ban-establishment",
