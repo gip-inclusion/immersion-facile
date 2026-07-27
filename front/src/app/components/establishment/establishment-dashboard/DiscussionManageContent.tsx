@@ -132,14 +132,14 @@ export const DiscussionManageContent = ({
       dispatch(
         discussionSlice.actions.fetchDiscussionEstablishmentContactInfoRequested(
           {
-            discussionId,
+            discussionId: discussion.id,
             jwt: connectedUserJwt,
             feedbackTopic: "dashboard-discussion-contact-info",
           },
         ),
       );
     }
-  }, [discussion, connectedUserJwt, discussionId, dispatch]);
+  }, [discussion, connectedUserJwt, dispatch]);
 
   useEffect(
     () => () => {
