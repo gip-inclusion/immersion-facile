@@ -2,7 +2,7 @@ import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { filter, type Observable } from "rxjs";
 import { delay, map, switchMap } from "rxjs/operators";
 import { isStringJson } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import type {
   PayloadActionWithFeedbackTopicError,
   PayloadWithFeedbackTopic,
@@ -179,7 +179,7 @@ const broadcastConventionAgainEpic: ConventionActionEpic = (
       conventionGateway
         .broadcastConventionAgain$(
           { conventionId: payload.conventionId },
-          getAdminToken(state$.value),
+          getConnectedUserJwt(state$.value),
         )
         .pipe(
           delay(minimumDelayBeforeItIsPossibleToBroadcastAgainMs, scheduler),

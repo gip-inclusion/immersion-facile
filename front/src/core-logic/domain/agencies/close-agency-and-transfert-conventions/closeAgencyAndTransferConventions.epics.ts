@@ -1,5 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -23,7 +23,7 @@ const closeAgencyAndTransfertConventionsEpic: AppEpic<
       agencyGateway
         .closeAgencyAndTransfertConventions$(
           action.payload,
-          getAdminToken(state$.value),
+          getConnectedUserJwt(state$.value),
         )
         .pipe(
           map(() =>

@@ -15,7 +15,7 @@ import {
   formEstablishmentSchema,
   keys,
 } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -54,7 +54,7 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
       adminGateway
         .addEstablishmentBatch$(
           action.payload.formEstablishmentBatch,
-          getAdminToken(state$.value),
+          getConnectedUserJwt(state$.value),
         )
         .pipe(
           map((batchResponse) =>

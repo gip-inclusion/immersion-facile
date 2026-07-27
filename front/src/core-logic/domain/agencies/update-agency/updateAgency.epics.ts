@@ -1,6 +1,6 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -21,7 +21,7 @@ const updateAgencyEpic: UpdateAgencyEpic = (
     filter(updateAgencySlice.actions.updateAgencyRequested.match),
     switchMap((action) =>
       agencyGateway
-        .updateAgency$(action.payload, getAdminToken(state$.value))
+        .updateAgency$(action.payload, getConnectedUserJwt(state$.value))
         .pipe(
           map(() =>
             updateAgencySlice.actions.updateAgencySucceeded(action.payload),
