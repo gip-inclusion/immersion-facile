@@ -185,7 +185,7 @@ export const ConventionValidation = ({
         <Badge
           className={`${fr.cx("fr-mr-2w")} ${labelAndSeverityByStatus[status].color}`}
         >
-          {labelAndSeverityByStatus[status].agencyLabel}
+          {labelAndSeverityByStatus[status].label.agency}
         </Badge>
         {shouldShowConventionLastBroadcastFeedbackErrorInfo && (
           <Badge className={fr.cx("fr-mr-2w")} severity="error">

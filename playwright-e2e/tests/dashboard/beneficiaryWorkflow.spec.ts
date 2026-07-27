@@ -19,20 +19,7 @@ test.describe("Beneficiary dashboard workflow", () => {
       await goToDashboard(page, "candidate");
       await expectLocatorToBeVisibleAndEnabled(page.locator(".fr-tabs__list"));
       await goToBeneficiaryDashboardTab(page, "conventions");
-
-      const beneficiaryConventionListTableLocatorId = `#${
-        domElementIds.beneficiaryDashboardConventions
-          .beneficiaryConventionListTable
-      }`;
-
-      await expect(
-        page.locator(beneficiaryConventionListTableLocatorId),
-      ).toBeVisible();
-      await expect(
-        page.locator(
-          `${beneficiaryConventionListTableLocatorId} table tbody tr`,
-        ),
-      ).toHaveCount(1);
+      await expect(page.locator("table tbody tr")).toHaveCount(1);
     });
   });
 

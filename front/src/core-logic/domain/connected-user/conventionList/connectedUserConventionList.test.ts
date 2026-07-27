@@ -95,7 +95,7 @@ describe("ConnectedUserConventionList", () => {
             page: 1,
             perPage: defaultPerPageInWebPagination,
           },
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -132,7 +132,7 @@ describe("ConnectedUserConventionList", () => {
             page: 1,
             perPage: defaultPerPageInWebPagination,
           },
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -147,7 +147,7 @@ describe("ConnectedUserConventionList", () => {
         ...defaultConventionListState,
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-        "connected-user-conventionList": {
+        "connected-user-convention-list": {
           on: "fetch",
           level: "error",
           title: "Problème lors de la récupération des conventions",
@@ -170,7 +170,7 @@ describe("ConnectedUserConventionList", () => {
         conventionListSlice.actions.fetchConventionListRequested({
           jwt,
           filters: customFilters,
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -196,7 +196,7 @@ describe("ConnectedUserConventionList", () => {
             page: 1,
             perPage: defaultPerPageInWebPagination,
           },
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -224,7 +224,7 @@ describe("ConnectedUserConventionList", () => {
             page: 2,
             perPage: 10,
           },
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -259,7 +259,7 @@ describe("ConnectedUserConventionList", () => {
         conventionListSlice.actions.fetchConventionListRequested({
           jwt,
           filters: customFilters,
-          feedbackTopic: "connected-user-conventionList",
+          feedbackTopic: "connected-user-convention-list",
         }),
       );
 
@@ -295,7 +295,7 @@ describe("ConnectedUserConventionList", () => {
 
   describe("beneficiaryConventionList", () => {
     const feedbackTopic: FeedbackTopic =
-      "connected-user-beneficiaryConventionList";
+      "connected-user-beneficiary-convention-list";
 
     it("fetch list succedeed then cleared", () => {
       expectConventionListSelectors(defaultConventionListState);
@@ -303,7 +303,7 @@ describe("ConnectedUserConventionList", () => {
       store.dispatch(
         conventionListSlice.actions.fetchBeneficiaryConventionListRequested({
           jwt,
-          feedbackTopic: "connected-user-beneficiaryConventionList",
+          feedbackTopic: "connected-user-beneficiary-convention-list",
         }),
       );
 

@@ -238,7 +238,14 @@ const getPageByRouteName: {
     />
   ),
   beneficiaryDashboardDiscussions: (route) => (
-    <BeneficiaryDashboardPage route={route} />
+    <ConnectedPrivateRoutePage
+      route={route}
+      oAuthConnectionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
+      }
+    >
+      <BeneficiaryDashboardPage route={route} />
+    </ConnectedPrivateRoutePage>
   ),
   beneficiaryDashboardConventions: (route) => (
     <BeneficiaryDashboardPage route={route} />

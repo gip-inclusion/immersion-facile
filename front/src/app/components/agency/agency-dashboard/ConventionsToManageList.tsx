@@ -118,7 +118,7 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
         className={fr.cx(labelAndSeverityByStatus[convention.status].color)}
         small
       >
-        {labelAndSeverityByStatus[convention.status].agencyLabel}
+        {labelAndSeverityByStatus[convention.status].label.agency}
       </Badge>
     </>
   );

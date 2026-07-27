@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { useMemo } from "react";
-import { Loader, PageHeader, SectionHighlight } from "react-design-system";
+import { Loader, SectionHighlight } from "react-design-system";
 import {
   type BeneficiaryDashboardTab,
   domElementIds,
@@ -13,10 +13,7 @@ import type { DashboardTab } from "src/app/utils/dashboard";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { BeneficiaryConventionTabContent } from "../../components/beneficiary/ConventionTab/BeneficiaryConventionTabContent";
-import {
-  ConnectedPrivateRoutePage,
-  type FrontBeneficiaryDashboardRoute,
-} from "../auth/ConnectedPrivateRoutePage";
+import type { FrontBeneficiaryDashboardRoute } from "../auth/ConnectedPrivateRoutePage";
 import {
   beneficiaryDashboardRouteNameFromTabId,
   beneficiaryDashboardTabFromRouteName,
@@ -35,15 +32,10 @@ export const BeneficiaryDashboardPage = ({
   const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
   const isLoadingDiscussionList = useAppSelector(discussionSelectors.isLoading);
 
-  const controlledTabs = makeControlledTabs(tabs, currentTab);
+  const tabsWithIsDefault = makeTabsWithIsDefault(tabs, currentTab);
 
   return (
-    <ConnectedPrivateRoutePage
-      route={route}
-      oAuthConnectionPageHeader={
-        <PageHeader title="Vous devez vous connecter pour accéder à votre espace candidat" />
-      }
-    >
+    <>
       {(isLoadingUser || isLoadingDiscussionList) && <Loader />}
       <h1>Mon espace bénéficiaire</h1>
       <SectionHighlight>
@@ -58,7 +50,7 @@ export const BeneficiaryDashboardPage = ({
         </p>
       </SectionHighlight>
       <Tabs
-        tabs={controlledTabs}
+        tabs={tabsWithIsDefault}
         id={domElementIds.beneficiaryDashboard.tabContainer}
         className={fr.cx("fr-mt-4w")}
         selectedTabId={currentTab}
@@ -69,9 +61,9 @@ export const BeneficiaryDashboardPage = ({
           }
         }}
       >
-        {controlledTabs.find((tab) => tab.tabId === currentTab)?.content}
+        {tabsWithIsDefault.find((tab) => tab.tabId === currentTab)?.content}
       </Tabs>
-    </ConnectedPrivateRoutePage>
+    </>
   );
 };
 
@@ -88,7 +80,7 @@ const tabs: (DashboardTab & { tabId: BeneficiaryDashboardTab })[] = [
   },
 ];
 
-const makeControlledTabs = (
+const makeTabsWithIsDefault = (
   rawTabs: DashboardTab[],
   currentTab: BeneficiaryDashboardTab,
 ) =>

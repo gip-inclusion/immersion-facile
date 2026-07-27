@@ -113,7 +113,7 @@ export const ConventionsWithBroadcastErrorList = ({
 
   const statusOptions: CheckboxProps["options"] = useMemo(() => {
     return conventionStatuses.map((status) => ({
-      label: labelAndSeverityByStatus[status].agencyLabel,
+      label: labelAndSeverityByStatus[status].label.agency,
       nativeInputProps: {
         value: status,
         checked: tempFilters.conventionStatus?.includes(status) ?? false,
@@ -341,7 +341,7 @@ export const ConventionsWithBroadcastErrorList = ({
                           : filters.conventionStatus
                               .map(
                                 (status) =>
-                                  labelAndSeverityByStatus[status].agencyLabel,
+                                  labelAndSeverityByStatus[status].label.agency,
                               )
                               .join(", ")
                       }`,
@@ -423,7 +423,7 @@ export const ConventionsWithBroadcastErrorList = ({
                   {
                     labelAndSeverityByStatus[
                       conventionWithBroadcastFeedback.status
-                    ].agencyLabel
+                    ].label.agency
                   }
                 </Badge>
               </>
