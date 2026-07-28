@@ -71,6 +71,8 @@ export const authRoutes = defineRoutes({
       200: connectedUserSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   getConnectedUsers: defineRoute({
