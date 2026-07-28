@@ -375,6 +375,8 @@ const getAllowedStartAuthPage = (
   if (routeName === "myAccountEstablishmentRegistration") return "myAccount";
   if (routeName === "beneficiaryDashboardDiscussions")
     return "beneficiaryDashboardDiscussions";
+  if (routeName === "beneficiaryDashboardConventions")
+    return "beneficiaryDashboardConventions";
   if (routeName === "beneficiaryDashboard") return "beneficiaryDashboard";
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
@@ -634,6 +636,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
     myAccount: defaultPageContent,
     beneficiaryDashboard: beneficiaryDashboardContent,
     beneficiaryDashboardDiscussions: beneficiaryDashboardContent,
+    beneficiaryDashboardConventions: beneficiaryDashboardContent,
     default: defaultPageContent,
   };
 

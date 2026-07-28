@@ -39,6 +39,7 @@ const allowedLoginSourcesRoutes: Record<AllowedLoginSource, string> = {
   myAccount: "mon-compte",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   beneficiaryDashboardDiscussions: "tableau-de-bord-beneficiaire/discussions",
+  beneficiaryDashboardConventions: "tableau-de-bord-beneficiaire/conventions",
 };
 
 export const legacyFrontRoutes = {
