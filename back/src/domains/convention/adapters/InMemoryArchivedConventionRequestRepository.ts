@@ -12,13 +12,6 @@ export class InMemoryArchivedConventionRequestRepository
     ArchivedConventionRequestEntity
   > = {};
 
-  public async getAll(): Promise<ArchivedConventionRequestEntity[]> {
-    return Object.values(this.archivedConventionRequests).sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-  }
-
   public async getById(
     id: ArchivedConventionRequestId,
   ): Promise<ArchivedConventionRequestEntity | undefined> {

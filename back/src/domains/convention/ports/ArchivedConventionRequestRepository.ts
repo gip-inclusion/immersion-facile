@@ -27,5 +27,4 @@ export interface ArchivedConventionRequestRepository {
   getById: (
     id: ArchivedConventionRequestId,
   ) => Promise<ArchivedConventionRequestEntity | undefined>;
-  getAll: () => Promise<ArchivedConventionRequestEntity[]>;
 }

@@ -57,7 +57,7 @@ describe("PgArchivedConventionRequestRepository", () => {
 
     await repository.save(request);
 
-    expectToEqual(await repository.getAll(), [request]);
+    expectToEqual(await repository.getById(request.id), request);
   });
 
   it("saves a request with conventionSearchMethod = withConventionDetails", async () => {
@@ -77,35 +77,6 @@ describe("PgArchivedConventionRequestRepository", () => {
 
     await repository.save(request);
 
-    expectToEqual(await repository.getAll(), [request]);
-  });
-
-  it("returns all requests sorted by createdAt descending", async () => {
-    const olderRequest: ArchivedConventionRequestEntity = {
-      id: "11111111-1111-4111-8111-111111111111",
-      userId: user.id,
-      createdAt: "2024-06-01T12:00:00.000Z",
-      conventionSearchMethod: "withConventionId",
-      conventionId: "22222222-2222-4222-8222-222222222222",
-      reason: "legalDispute",
-    };
-    const newerRequest: ArchivedConventionRequestEntity = {
-      id: "33333333-3333-4333-8333-333333333333",
-      userId: user.id,
-      createdAt: "2024-06-02T12:00:00.000Z",
-      conventionSearchMethod: "withConventionDetails",
-      beneficiaryFirstName: "Jean",
-      beneficiaryLastName: "Dupont",
-      siret: "12345678901234",
-      immersionDate: "2024-01-15",
-      immersionAppellationCode: immersionAppellation.appellationCode,
-      reason: "other",
-      otherReason: "Motif personnalisé pour la demande",
-    };
-
-    await repository.save(olderRequest);
-    await repository.save(newerRequest);
-
-    expectToEqual(await repository.getAll(), [newerRequest, olderRequest]);
+    expectToEqual(await repository.getById(request.id), request);
   });
 });

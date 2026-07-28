@@ -29,16 +29,6 @@ export class PgArchivedConventionRequestRepository
 {
   constructor(private readonly transaction: KyselyDb) {}
 
-  public async getAll(): Promise<ArchivedConventionRequestEntity[]> {
-    const rows = await this.transaction
-      .selectFrom("archived_convention_requests")
-      .selectAll()
-      .orderBy("archived_convention_requests.created_at", "desc")
-      .execute();
-
-    return rows.map(toArchivedConventionRequestEntity);
-  }
-
   public async getById(
     id: ArchivedConventionRequestId,
   ): Promise<ArchivedConventionRequestEntity | undefined> {
