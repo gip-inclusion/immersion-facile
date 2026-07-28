@@ -1197,6 +1197,18 @@ export const domElementIds = {
   beneficiaryDashboardConventions: {
     beneficiaryConventionListHelpdeskNoConventionHint:
       "im-beneficary-convention-list__no-convention-helpdesk-hint",
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--beneficiary-dashboard-conventions",
+      byEmailButton:
+        "im-login-form__connect-button--beneficiary-dashboard-conventions-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--beneficiary-dashboard-conventions",
+      retryButton:
+        "im-login-form__retry-login-button--beneficiary-dashboard-conventions",
+      contactSupport:
+        "im-login-form__contact-support-link--beneficiary-dashboard-conventions",
+    },
   },
   beneficiaryDashboardDiscussions: {
     login: {
