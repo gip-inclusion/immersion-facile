@@ -19,7 +19,7 @@ import {
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpAuthGateway implements AuthGateway {
   constructor(private readonly httpClient: HttpClient<AuthRoutes>) {}
@@ -75,7 +75,7 @@ export class HttpAuthGateway implements AuthGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
