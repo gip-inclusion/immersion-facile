@@ -18,23 +18,29 @@ export const ConventionAssessmentStatusBadge = ({
     assessment: ConventionAssessmentFields["assessment"];
   };
   userKind: "agency" | "beneficiary";
-}): React.ReactNode =>
-  isConventionValidated(status) &&
-  !isConventionEndingInOneDayOrMore(dateEnd) && (
-    <Badge
-      small
-      severity={
-        getAssessmentLabelsAndSeverityByStatus({
-          isPlural: false,
-        })[getAssessmentCompletionStatus(assessment)].severity
-      }
-    >
-      {
-        getAssessmentLabelsAndSeverityByStatus({
-          isPlural: false,
-        })[getAssessmentCompletionStatus(assessment)].shortLabel[
-          userKind === "agency" ? "agencyLabel" : "beneficiaryLabel"
-        ]
-      }
-    </Badge>
+}): React.ReactNode => {
+  const shouldShowBadge =
+    isConventionValidated(status) && !isConventionEndingInOneDayOrMore(dateEnd);
+  if (!shouldShowBadge && userKind === "beneficiary")
+    return <Badge small>Non Concernée</Badge>;
+  return (
+    shouldShowBadge && (
+      <Badge
+        small
+        severity={
+          getAssessmentLabelsAndSeverityByStatus({
+            isPlural: false,
+          })[getAssessmentCompletionStatus(assessment)].severity
+        }
+      >
+        {
+          getAssessmentLabelsAndSeverityByStatus({
+            isPlural: false,
+          })[getAssessmentCompletionStatus(assessment)].shortLabel[
+            userKind === "agency" ? "agencyLabel" : "beneficiaryLabel"
+          ]
+        }
+      </Badge>
+    )
   );
+};
