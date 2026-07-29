@@ -4,7 +4,11 @@ import type {
   WithRequiredPagination,
 } from "../pagination/pagination.dto";
 import type { SearchTextAlphaNumeric } from "../search/searchText.schema";
-import type { ConventionId, ConventionStatus } from "./convention.dto";
+import {
+  type ConventionId,
+  type ConventionStatus,
+  conventionStatusesAllowedForModification,
+} from "./convention.dto";
 import type { WithFirstnameAndLastname } from "./convention.schema";
 
 export type ConventionWithBroadcastFeedback = {
@@ -25,6 +29,21 @@ export const functionalBroadcastFeedbackErrorMessage = [
   "Plusieurs dossiers trouvés pour les critères transmis",
   "Identifiant National DE non trouvé",
   "Identifiant National DE trouvé mais écart sur la date de naissance",
+  "Identifiant National DE trouvé, le bénéficiaire est un candidat",
+  "Identifiant National DE trouvé mais écart sur la date de naissance, le bénéficiaire est un candidat",
+  "Identifiant national non trouvé",
+  "Identifiant national non trouvé avec le numéro de téléphone",
+  "Identifiant national trouvé avec le mail, bénéficiaire est un candidat",
+  "Identifiant national trouvé avec le téléphone, bénéficiaire est un candidat ",
+  "Identifiant national DE trouvé avec le mail mais écart sur la date de naissance",
+  "Identifiant National DE trouvé avec le téléphone, mais écart sur la date de naissance",
+  "Identifiant National trouvé avec le mail, mais écart sur la date de naissance, bénéficiaire est un candidat",
+  "Identifiant National trouvé avec le téléphone, mais écart sur la date de naissance, bénéficiaire est un candidat",
+  "Plusieurs Identifiant National DE trouvés",
+  "Plusieurs Identifiants nationaux DE trouvés avec mail",
+  "Plusieurs Identifiants nationaux DE trouvés avec téléphone",
+  "Plusieurs Identifiants nationaux DE trouvés avec mail et téléphone ",
+  "Le bénéficiaire FT connect est un candidat",
   "Accord non signé pour ce type de structure d'accompagnement",
 ] as const;
 
@@ -45,6 +64,20 @@ export const isFranceTravailBroadcastTemporaryNetworkErrorMessage = (
   return (
     trimmedMessage === "read econnreset" || trimmedMessage.includes("timeout")
   );
+};
+
+export type BroadcastFeedbackConventionStatusCategory =
+  | "pendingValidation"
+  | "validated"
+  | "unvalidated";
+
+export const getBroadcastFeedbackConventionStatusCategory = (
+  status: ConventionStatus,
+): BroadcastFeedbackConventionStatusCategory => {
+  if (conventionStatusesAllowedForModification.includes(status))
+    return "pendingValidation";
+  if (status === "ACCEPTED_BY_VALIDATOR") return "validated";
+  return "unvalidated";
 };
 
 export type BroadcastErrorKind = "functional" | "technical";
