@@ -1,11 +1,9 @@
 import {
-  type ConventionAgencyPublicFields,
+  type AgencyUserConventionListDto,
   ConventionDtoBuilder,
-  type ConventionReadDto,
   type ConventionWithUnfinalizedAssessment,
   type DataWithPagination,
   expectToEqual,
-  makeEmptyLastReminders,
 } from "shared";
 import { connectedUserConventionsToManageSelectors } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.selectors";
 import { connectedUserConventionsToManageSlice } from "src/core-logic/domain/connected-user/conventionsToManage/connectedUserConventionsToManage.slice";
@@ -44,24 +42,21 @@ describe("ConnectedUserConventionsToManage", () => {
       connectedUserConventionsToManageSelectors.isLoading(store.getState()),
       true,
     );
-    const agencyFields: ConventionAgencyPublicFields = {
-      agencyContactEmail: "contact@mail.com",
+    const convention: AgencyUserConventionListDto = {
+      id: "convention-id",
+      status: "READY_TO_SIGN",
+      dateStart: "2024-01-15",
+      dateEnd: "2024-01-20",
+      businessName: "Business Name",
       agencyName: "Agency Name",
-      agencyDepartment: "75",
-      agencyKind: "pole-emploi" as const,
-      agencySiret: "11112222000033",
-      agencyValidationSteps: "validator-only",
-    };
-
-    const convention: ConventionReadDto = {
-      ...new ConventionDtoBuilder().build(),
-      ...agencyFields,
       assessment: null,
-      lastReminders: makeEmptyLastReminders(),
-      isEstablishmentBanned: false,
+      beneficiary: {
+        firstName: "John",
+        lastName: "Doe",
+      },
     };
 
-    const result: DataWithPagination<ConventionReadDto> = {
+    const result: DataWithPagination<AgencyUserConventionListDto> = {
       data: [convention],
       pagination: {
         totalRecords: 10,

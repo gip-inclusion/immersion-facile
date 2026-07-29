@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type {
-  ConventionReadDto,
+  AgencyUserConventionListDto,
   ConventionWithUnfinalizedAssessment,
   DataWithPagination,
   FlatGetConventionsForAgencyUserParams,
@@ -13,7 +13,7 @@ import type {
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 type ConnectedUserConventionsToManageState = {
-  conventions: ConventionReadDto[];
+  conventions: AgencyUserConventionListDto[];
   isLoading: boolean;
   pagination: Pagination | undefined;
   conventionsWithAssessmentIssue: ConventionWithUnfinalizedAssessment[];
@@ -47,7 +47,7 @@ export const connectedUserConventionsToManageSlice = createSlice({
     getConventionsForConnectedUserSucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<
-        DataWithPagination<ConventionReadDto>
+        DataWithPagination<AgencyUserConventionListDto>
       >,
     ) => {
       state.isLoading = false;
