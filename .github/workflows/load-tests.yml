@@ -28,8 +28,8 @@ permissions:
   contents: read
 
 jobs:
-  k6-local-ramp:
-    name: "Load test"
+  load-tests:
+    name: "Load tests"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
@@ -62,13 +62,13 @@ jobs:
           TARGET_RPS: ${{ inputs.target_rps }}
           PRE_ALLOCATED_VUS: ${{ inputs.pre_allocated_vus }}
           MAX_VUS: ${{ inputs.max_vus }}
-          K6_WEB_DASHBOARD: true
-          K6_WEB_DASHBOARD_EXPORT: dist/k6-local-ramp-report.html
-        run: pnpm --dir load-tests k6:local-ramp
+          K6_WEB_DASHBOARD: "true"
+          K6_WEB_DASHBOARD_EXPORT: dist/load-tests-report.html
+        run: pnpm --dir load-tests k6:ramping-arrival
 
       - name: Upload k6 report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: k6-local-ramp-report
-          path: load-tests/dist/k6-local-ramp-report.html
+          name: load-tests-report
+          path: load-tests/dist/load-tests-report.html

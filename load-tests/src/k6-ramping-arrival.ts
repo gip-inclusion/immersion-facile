@@ -18,9 +18,9 @@ const getPositiveIntegerFromEnv = (name: string, fallback: number) => {
 const baseUrl = __ENV.BASE_URL ?? "http://localhost:1234";
 const endpointPath = __ENV.ENDPOINT_PATH ?? "/feature-flags";
 const targetUrl = `${trimTrailingSlashes(baseUrl)}/${trimLeadingSlashes(endpointPath)}`;
-const targetRps = getPositiveIntegerFromEnv("TARGET_RPS", 5000);
-const preAllocatedVUs = getPositiveIntegerFromEnv("PRE_ALLOCATED_VUS", 1000);
-const maxVUs = getPositiveIntegerFromEnv("MAX_VUS", 4000);
+const targetRps = getPositiveIntegerFromEnv("TARGET_RPS", 10);
+const preAllocatedVUs = getPositiveIntegerFromEnv("PRE_ALLOCATED_VUS", 2);
+const maxVUs = getPositiveIntegerFromEnv("MAX_VUS", 5);
 
 export const options: Options = {
   scenarios: {
@@ -31,10 +31,10 @@ export const options: Options = {
       preAllocatedVUs,
       maxVUs,
       stages: [
-        { duration: "15s", target: Math.round(targetRps * 0.1) },
-        { duration: "30s", target: Math.round(targetRps * 0.25) },
-        { duration: "30s", target: Math.round(targetRps * 0.5) },
-        { duration: "1m", target: targetRps },
+        { duration: "15s", target: Math.round(targetRps * 0.1) }, //10 RPS => 150
+        { duration: "30s", target: Math.round(targetRps * 0.25) }, //25 RPS => 750
+        { duration: "30s", target: Math.round(targetRps * 0.5) }, // 50 RPS => 1500
+        { duration: "1m", target: targetRps }, // 100 RPS => 6000
         { duration: "15s", target: 0 },
       ],
     },

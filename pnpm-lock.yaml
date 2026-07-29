@@ -633,13 +633,6 @@ importers:
         version: 5.9.3
 
   load-tests:
-    dependencies:
-      '@gatling.io/core':
-        specifier: 3.15.1
-        version: 3.15.1
-      '@gatling.io/http':
-        specifier: 3.15.1
-        version: 3.15.1
     devDependencies:
       '@gatling.io/cli':
         specifier: 3.15.1
@@ -2102,15 +2095,6 @@ packages:
   '@gatling.io/cli@3.15.1':
     resolution: {integrity: sha512-ByPlnSz93+Hj5y6wrEdBSGCh095eDt3/XAfym0kd5NAEB2kgjSICZ9ORUoenDvwGjCcsbJMq8Jg/QJx6mZ7TuA==}
     hasBin: true
-
-  '@gatling.io/core@3.15.1':
-    resolution: {integrity: sha512-rgPZdGDsIQ79eqcRbykQA/tZjVCcQiYX6yB247nVAmFlmuo+4YfXCY0HsQSpYw40pmM+c1rJxqVm+h8qcm1sRQ==}
-
-  '@gatling.io/http@3.15.1':
-    resolution: {integrity: sha512-oR3JldMppwJk+AqS/2E+HdddqzMY7rAuFSYIa3de0nWx/VpOntym8LdPck6VilvDzs/D+kbbbIHg1apWa2MNjA==}
-
-  '@gatling.io/jvm-types@3.15.1':
-    resolution: {integrity: sha512-vv0EOAUfARwS1d7ZI+MeMygzYd4wGqM8flMubawgsfY7q6lOsfgnD8fs6BHByW5Hrvjc6X7x43E/HrPaynx4LA==}
 
   '@grpc/grpc-js@1.14.4':
     resolution: {integrity: sha512-k9Dj3DV/itK9D06Y8f190Qgop7/Ui+D0njFV3LHMPwPT75DpXLQohE9Wmz0QElrJnzsjB7KPWiKJbOl7IPDArQ==}
@@ -11273,17 +11257,6 @@ snapshots:
       - react-native-b4a
       - supports-color
       - typescript
-
-  '@gatling.io/core@3.15.1':
-    dependencies:
-      '@gatling.io/jvm-types': 3.15.1
-
-  '@gatling.io/http@3.15.1':
-    dependencies:
-      '@gatling.io/core': 3.15.1
-      '@gatling.io/jvm-types': 3.15.1
-
-  '@gatling.io/jvm-types@3.15.1': {}
 
   '@grpc/grpc-js@1.14.4':
     dependencies:
