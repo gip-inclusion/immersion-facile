@@ -1,15 +1,14 @@
 import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
+  type AgencyUserConventionListDto,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AuthenticatedConventionRoutes,
   authExpiredMessage,
   authenticatedConventionRoutes,
   ConnectedUserBuilder,
   type ConnectedUserJwt,
-  type ConventionAgencyPublicFields,
   ConventionDtoBuilder,
-  type ConventionReadDto,
   type ConventionTemplate,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -18,7 +17,6 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
-  makeEmptyLastReminders,
   type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -363,41 +361,52 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields: ConventionAgencyPublicFields = {
+      const conventionList1: AgencyUserConventionListDto = {
+        id: conventionWithAssessment.id,
+        status: conventionWithAssessment.status,
+        dateStart: conventionWithAssessment.dateStart,
+        dateEnd: conventionWithAssessment.dateEnd,
+        businessName: conventionWithAssessment.businessName,
         agencyName: peAgency.name,
-        agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.contactEmail,
-        agencyKind: peAgency.kind,
-        agencySiret: peAgency.agencySiret,
-        agencyValidationSteps: "validator-only",
-        agencyRefersTo: undefined,
-      };
-
-      const conventionRead1: ConventionReadDto = {
-        ...conventionWithAssessment,
-        ...agencyFields,
+        agencyReferent: conventionWithAssessment.agencyReferent,
         assessment: {
-          status: "COMPLETED" as const,
+          status: "COMPLETED",
           endedWithAJob: false,
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
-        lastReminders: makeEmptyLastReminders(),
-        isEstablishmentBanned: false,
+        beneficiary: {
+          firstName: conventionWithAssessment.signatories.beneficiary.firstName,
+          lastName: conventionWithAssessment.signatories.beneficiary.lastName,
+          federatedIdentity:
+            conventionWithAssessment.signatories.beneficiary.federatedIdentity,
+        },
       };
 
-      const conventionRead2: ConventionReadDto = {
-        ...conventionWithoutAssessment,
-        ...agencyFields,
+      const conventionList2: AgencyUserConventionListDto = {
+        id: conventionWithoutAssessment.id,
+        status: conventionWithoutAssessment.status,
+        dateStart: conventionWithoutAssessment.dateStart,
+        dateEnd: conventionWithoutAssessment.dateEnd,
+        businessName: conventionWithoutAssessment.businessName,
+        agencyName: peAgency.name,
+        agencyReferent: conventionWithoutAssessment.agencyReferent,
         assessment: null,
-        lastReminders: makeEmptyLastReminders(),
-        isEstablishmentBanned: false,
+        beneficiary: {
+          firstName:
+            conventionWithoutAssessment.signatories.beneficiary.firstName,
+          lastName:
+            conventionWithoutAssessment.signatories.beneficiary.lastName,
+          federatedIdentity:
+            conventionWithoutAssessment.signatories.beneficiary
+              .federatedIdentity,
+        },
       };
 
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          data: [conventionRead1, conventionRead2],
+          data: [conventionList1, conventionList2],
           pagination: {
             currentPage: 1,
             totalPages: 1,
@@ -426,33 +435,32 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields: ConventionAgencyPublicFields = {
+      const conventionList1: AgencyUserConventionListDto = {
+        id: conventionWithAssessment.id,
+        status: conventionWithAssessment.status,
+        dateStart: conventionWithAssessment.dateStart,
+        dateEnd: conventionWithAssessment.dateEnd,
+        businessName: conventionWithAssessment.businessName,
         agencyName: peAgency.name,
-        agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.contactEmail,
-        agencyKind: peAgency.kind,
-        agencySiret: peAgency.agencySiret,
-        agencyValidationSteps: "validator-only",
-        agencyRefersTo: undefined,
-      };
-
-      const conventionRead1: ConventionReadDto = {
-        ...conventionWithAssessment,
-        ...agencyFields,
+        agencyReferent: conventionWithAssessment.agencyReferent,
         assessment: {
-          status: "COMPLETED" as const,
+          status: "COMPLETED",
           endedWithAJob: false,
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
-        lastReminders: makeEmptyLastReminders(),
-        isEstablishmentBanned: false,
+        beneficiary: {
+          firstName: conventionWithAssessment.signatories.beneficiary.firstName,
+          lastName: conventionWithAssessment.signatories.beneficiary.lastName,
+          federatedIdentity:
+            conventionWithAssessment.signatories.beneficiary.federatedIdentity,
+        },
       };
 
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          data: [conventionRead1],
+          data: [conventionList1],
           pagination: {
             currentPage: 1,
             totalPages: 1,
@@ -513,41 +521,52 @@ describe("authenticatedConventionRoutes", () => {
         },
       });
 
-      const agencyFields: ConventionAgencyPublicFields = {
+      const conventionList1: AgencyUserConventionListDto = {
+        id: conventionWithAssessment.id,
+        status: conventionWithAssessment.status,
+        dateStart: conventionWithAssessment.dateStart,
+        dateEnd: conventionWithAssessment.dateEnd,
+        businessName: conventionWithAssessment.businessName,
         agencyName: peAgency.name,
-        agencyDepartment: peAgency.address.departmentCode,
-        agencyContactEmail: peAgency.contactEmail,
-        agencyKind: peAgency.kind,
-        agencySiret: peAgency.agencySiret,
-        agencyValidationSteps: "validator-only",
-        agencyRefersTo: undefined,
-      };
-
-      const conventionRead1: ConventionReadDto = {
-        ...conventionWithAssessment,
-        ...agencyFields,
+        agencyReferent: conventionWithAssessment.agencyReferent,
         assessment: {
-          status: "COMPLETED" as const,
+          status: "COMPLETED",
           endedWithAJob: false,
           signedAt: assessmentCreatedAt,
           createdAt: assessmentCreatedAt,
         },
-        lastReminders: makeEmptyLastReminders(),
-        isEstablishmentBanned: false,
+        beneficiary: {
+          firstName: conventionWithAssessment.signatories.beneficiary.firstName,
+          lastName: conventionWithAssessment.signatories.beneficiary.lastName,
+          federatedIdentity:
+            conventionWithAssessment.signatories.beneficiary.federatedIdentity,
+        },
       };
 
-      const conventionRead2: ConventionReadDto = {
-        ...conventionWithoutAssessment,
-        ...agencyFields,
+      const conventionList2: AgencyUserConventionListDto = {
+        id: conventionWithoutAssessment.id,
+        status: conventionWithoutAssessment.status,
+        dateStart: conventionWithoutAssessment.dateStart,
+        dateEnd: conventionWithoutAssessment.dateEnd,
+        businessName: conventionWithoutAssessment.businessName,
+        agencyName: peAgency.name,
+        agencyReferent: conventionWithoutAssessment.agencyReferent,
         assessment: null,
-        lastReminders: makeEmptyLastReminders(),
-        isEstablishmentBanned: false,
+        beneficiary: {
+          firstName:
+            conventionWithoutAssessment.signatories.beneficiary.firstName,
+          lastName:
+            conventionWithoutAssessment.signatories.beneficiary.lastName,
+          federatedIdentity:
+            conventionWithoutAssessment.signatories.beneficiary
+              .federatedIdentity,
+        },
       };
 
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          data: [conventionRead1, conventionRead2],
+          data: [conventionList1, conventionList2],
           pagination: {
             currentPage: 1,
             totalPages: 1,
