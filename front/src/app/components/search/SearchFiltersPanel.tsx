@@ -25,6 +25,7 @@ import {
   radiusOptions,
 } from "src/app/pages/search/SearchPage";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
+import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
 import {
   minimalInitialSearchParams,
@@ -114,7 +115,19 @@ export const SearchFiltersPanel = ({
       <Button
         priority="tertiary"
         className={fr.cx("fr-mb-2w")}
-        onClick={() => onSearchFormSubmit(minimalInitialSearchParams)}
+        onClick={() => {
+          dispatch(
+            appellationSlice.actions.clearLocatorDataRequested({
+              locator: "search-form-appellation",
+            }),
+          );
+          dispatch(
+            geosearchSlice.actions.clearLocatorDataRequested({
+              locator: "search-form-place",
+            }),
+          );
+          onSearchFormSubmit(minimalInitialSearchParams);
+        }}
         size="small"
         id={domElementIds[routeName].resetFiltersButton}
       >
@@ -252,6 +265,11 @@ export const SearchFiltersPanel = ({
             });
           }}
           onPlaceClear={() => {
+            dispatch(
+              geosearchSlice.actions.clearLocatorDataRequested({
+                locator: "search-form-place",
+              }),
+            );
             const updatedInitialValues: SearchPageParams =
               formValues.sortBy === "distance"
                 ? {

@@ -26,12 +26,12 @@ const getAutocompleteValue = (
   defaultValue?: PropsValue<OptionType<LookupSearchResult>>,
   searchTerm?: string,
 ): OptionType<LookupSearchResult> | null => {
-  if (searchTerm === "" && defaultValue === undefined) return null;
   if (value)
     return {
       label: value.label,
       value: value,
     };
+  if (searchTerm === "" && defaultValue === undefined) return null;
   if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
   return null;
 };
