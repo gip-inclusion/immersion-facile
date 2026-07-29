@@ -1,6 +1,7 @@
 import type {
   AgencyId,
   AppellationCode,
+  AssessmentCompletionStatusFilter,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -10,13 +11,15 @@ import type {
   ConventionWithBroadcastFeedback,
   ConventionWithUnfinalizedAssessment,
   DataWithPagination,
+  DateFilter,
   DateString,
   Email,
-  GetConventionsForAgencyUserParams,
+  GetPaginatedConventionsSortBy,
   OptionalDateRange,
   PaginationQueryParams,
   SiretDto,
   UserId,
+  WithSort,
 } from "shared";
 
 export type GetConventionsFilters = {
@@ -45,11 +48,22 @@ export type GetConventionsParams = {
   sortBy: GetConventionsSortBy;
 };
 
-export type GetPaginatedConventionsForAgencyUserParams =
-  GetConventionsForAgencyUserParams & {
-    agencyUserId: UserId;
-    pagination: Required<PaginationQueryParams>;
-  };
+export type GetPaginatedConventionsFilters = {
+  search?: string;
+  statuses?: ConventionStatus[];
+  agencyIds?: AgencyId[];
+  agencyDepartmentCodes?: string[];
+  dateStart?: DateFilter;
+  dateEnd?: DateFilter;
+  dateSubmission?: DateFilter;
+  assessmentCompletionStatus?: AssessmentCompletionStatusFilter[];
+};
+
+export type GetPaginatedConventionsParams = {
+  filters?: GetPaginatedConventionsFilters;
+  sort?: WithSort<GetPaginatedConventionsSortBy>["sort"];
+  pagination: Required<PaginationQueryParams>;
+};
 
 export type GetConventionIdsParams = {
   filters: {
@@ -90,9 +104,9 @@ export interface ConventionQueries {
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
 
-  getPaginatedConventionsForAgencyUser(
-    params: GetPaginatedConventionsForAgencyUserParams,
-  ): Promise<DataWithPagination<ConventionReadDto>>;
+  getPaginatedConventions(
+    params: GetPaginatedConventionsParams,
+  ): Promise<DataWithPagination<ConventionDto>>;
 
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;

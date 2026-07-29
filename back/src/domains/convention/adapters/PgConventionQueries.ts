@@ -28,9 +28,8 @@ import {
   type DateTimeIsoString,
   errors,
   functionalBroadcastFeedbackErrorMessage,
-  type GetPaginatedConventionsFilters,
   type GetPaginatedConventionsSortBy,
-  type NotEmptyArray,
+  hasEmptyArrayFilter,
   type PaginationQueryParams,
   pipeWithValue,
   type UserId,
@@ -50,16 +49,17 @@ import type {
   GetConventionsFilters,
   GetConventionsParams,
   GetConventionsSortBy,
+  GetPaginatedConventionsParams,
 } from "../ports/ConventionQueries";
 import {
   type BroadcastFeedbackBaseQueryBuilder,
   type ConventionBaseQueryBuilder,
   type ConventionQueryBuilder,
   type ConventionsWithErroredBroadcastFeedbackBuilder,
-  createAgencyUserConventionBaseBuilder,
   createBroadcastFeedbackCountBuilder,
   createConventionQueryBuilder,
   createConventionsWithErroredBroadcastFeedbackBuilder,
+  createPaginatedConventionsBaseBuilder,
   getAssessmentFieldsByConventions,
   getConventionAgencyFieldsForAgencies,
   getLastRemindersFieldsByConventions,
@@ -342,16 +342,13 @@ export class PgConventionQueries implements ConventionQueries {
     });
   }
 
-  public async getPaginatedConventionsForAgencyUser({
+  public async getPaginatedConventions({
     filters = {},
     pagination,
     sort,
-    agencyUserId,
-  }: WithSort<GetPaginatedConventionsSortBy> & {
-    agencyUserId: UserId;
-    pagination: Required<PaginationQueryParams>;
-    filters?: GetPaginatedConventionsFilters;
-  }): Promise<DataWithPagination<ConventionReadDto>> {
+  }: GetPaginatedConventionsParams): Promise<
+    DataWithPagination<ConventionDto>
+  > {
     const {
       search,
       statuses,
@@ -366,19 +363,27 @@ export class PgConventionQueries implements ConventionQueries {
 
     rest satisfies Record<string, never>;
 
+    if (hasEmptyArrayFilter(filters))
+      return {
+        data: [],
+        pagination: calculatePaginationResult({
+          ...pagination,
+          totalRecords: 0,
+        }),
+      };
+
     const trimmedSearch = search?.trim();
 
     const filteredBuilder = pipeWithValue(
-      createAgencyUserConventionBaseBuilder({
+      createPaginatedConventionsBaseBuilder({
         transaction: this.transaction,
-        agencyUserId,
       }),
+      filterByAgencyIds(agencyIds),
       filterSearch(trimmedSearch),
       filterDate("date_start", dateStart),
       filterDate("date_end", dateEnd),
       filterDate("date_submission", dateSubmission),
       filterInList("status", statuses),
-      filterInList("agency_id", agencyIds),
       filterByAgencyDepartmentCodes(agencyDepartmentCodes),
       filterByAssessmentCompletionStatus(assessmentCompletionStatus),
     );
@@ -404,60 +409,12 @@ export class PgConventionQueries implements ConventionQueries {
       countQuery.executeTakeFirstOrThrow(),
     ]);
 
-    const totalRecords = countResult.count;
-
-    if (data.length === 0) {
-      return {
-        data: [],
-        pagination: calculatePaginationResult({
-          ...pagination,
-          totalRecords,
-        }),
-      };
-    }
-
-    const agencyIdsInResult = data.map(({ dto }) => dto.agencyId);
-    const uniqAgencyIds = [...new Set(agencyIdsInResult)];
-
-    const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
-      this.transaction,
-      uniqAgencyIds,
-    );
-
-    const assessmentByConventionId = await getAssessmentFieldsByConventions({
-      transaction: this.transaction,
-      conventionIds: data.map(({ dto }) => dto.id),
-    });
-    const lastRemindersByConventionId =
-      await getLastRemindersFieldsByConventions({
-        transaction: this.transaction,
-        conventions: data.map(({ dto }) => dto),
-      });
-
-    const conventionsReadDto = data.map(({ dto }) => {
-      const agencyFields = agencyFieldsByAgencyIds[dto.agencyId];
-      if (!agencyFields)
-        throw errors.agency.notFound({ agencyId: dto.agencyId });
-
-      const assessmentFields = assessmentByConventionId[dto.id];
-
-      return validateAndParseZodSchema({
-        schemaName: "conventionReadSchema",
-        inputSchema: conventionReadSchema,
-        id: dto.id,
-        schemaParsingInput: {
-          ...dto,
-          ...agencyFields,
-          ...assessmentFields,
-          lastReminders: lastRemindersByConventionId[dto.id],
-        },
-        logger,
-      });
-    });
-
     return {
-      data: conventionsReadDto,
-      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
+      data: validateConventionResults(data),
+      pagination: calculatePaginationResult({
+        ...pagination,
+        totalRecords: countResult.count,
+      }),
     };
   }
 
@@ -753,8 +710,17 @@ const sortConventions =
       .orderBy("conventions.id", "asc") as T;
   };
 
+const filterByAgencyIds =
+  (agencyIds: AgencyId[] | undefined) =>
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
+    if (!agencyIds) return builder;
+    return builder.where(
+      sql<boolean>`conventions.agency_id = ANY(${agencyIds}::uuid[])`,
+    );
+  };
+
 const filterByAgencyDepartmentCodes =
-  (agencyDepartmentCodes: NotEmptyArray<string> | undefined) =>
+  (agencyDepartmentCodes: string[] | undefined) =>
   (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
     if (!agencyDepartmentCodes) return builder;
     return builder.where(

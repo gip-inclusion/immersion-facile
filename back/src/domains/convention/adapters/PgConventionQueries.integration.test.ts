@@ -12,7 +12,6 @@ import {
   AssessmentDtoBuilder,
   type BroadcastFeedback,
   ConnectedUserBuilder,
-  type ConventionAgencyPublicFields,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -1521,7 +1520,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("getPaginatedConventionsForAgencyUser", () => {
+  describe("getPaginatedConventions", () => {
     const agencyId = "cccccc99-9c0b-1bbb-bb6d-6bb9bd38cccc";
     const agency = new AgencyDtoBuilder()
       .withId(agencyId)
@@ -1545,11 +1544,6 @@ describe("Pg implementation of ConventionQueries", () => {
         streetNumberAndAddress: "Rue de la République",
       })
       .build();
-
-    const singleAgencyUser = new ConnectedUserBuilder()
-      .withEmail("single-agency-user@mail.com")
-      .withId("11111111-2222-3333-4444-555555555555")
-      .buildUser();
 
     const conventionA = new ConventionDtoBuilder()
       .withId("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
@@ -1620,36 +1614,10 @@ describe("Pg implementation of ConventionQueries", () => {
       )
       .build();
 
-    const agencyFields: ConventionAgencyPublicFields = {
-      agencyName: agency.name,
-      agencyContactEmail: agency.contactEmail,
-      agencyDepartment: agency.address.departmentCode,
-      agencyKind: agency.kind,
-      agencySiret: agency.agencySiret,
-      agencyValidationSteps: "validator-only",
-      agencyRefersTo: undefined,
-    };
-
-    const differentAgencyFields: ConventionAgencyPublicFields = {
-      agencyName: differentAgency.name,
-      agencyContactEmail: differentAgency.contactEmail,
-      agencyDepartment: differentAgency.address.departmentCode,
-      agencyKind: differentAgency.kind,
-      agencySiret: differentAgency.agencySiret,
-      agencyValidationSteps: "counsellor-and-validator",
-      agencyRefersTo: undefined,
-    };
-
     beforeEach(async () => {
-      await new PgUserRepository(db).save(singleAgencyUser);
-
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-          [singleAgencyUser.id]: {
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
         }),
       );
 
@@ -1672,74 +1640,34 @@ describe("Pg implementation of ConventionQueries", () => {
       );
     });
 
-    it("should return conventions for the agency user with pagination", async () => {
-      const resultPage1 =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 2 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+    it("should return conventions with pagination", async () => {
+      const resultPage1 = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        pagination: { page: 1, perPage: 2 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(resultPage1.data.length).toBe(2);
       expect(resultPage1.pagination).toEqual({
         currentPage: 1,
         totalPages: 2,
         numberPerPage: 2,
         totalRecords: 4,
       });
-      expectToEqual(resultPage1.data, [
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionC,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
+      expectToEqual(resultPage1.data, [conventionD, conventionC]);
 
-      const resultPage2 =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 2, perPage: 2 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const resultPage2 = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        pagination: { page: 2, perPage: 2 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(resultPage2.data.length).toBe(2);
-      expectToEqual(resultPage2.data, [
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
+      expectToEqual(resultPage2.data, [conventionB, conventionA]);
       expectToEqual(resultPage2.pagination, {
         currentPage: 2,
         totalPages: 2,
@@ -1748,27 +1676,41 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
 
+    it("should not filter by agency when agencyIds is undefined", async () => {
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [
+        conventionD,
+        conventionC,
+        conventionB,
+        conventionA,
+      ]);
+      expectToEqual(result.pagination, {
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 10,
+        totalRecords: 4,
+      });
+    });
+
     it("should return correct data when accessing a non-first page", async () => {
-      const resultPage3 =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 3, perPage: 1 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const resultPage3 = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        pagination: { page: 3, perPage: 1 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
       expectToEqual(resultPage3, {
-        data: [
-          {
-            ...conventionB,
-            ...agencyFields,
-            assessment: null,
-            lastReminders: makeEmptyLastReminders(),
-            isEstablishmentBanned: false,
-          },
-        ],
+        data: [conventionB],
         pagination: {
           currentPage: 3,
           totalPages: 4,
@@ -1779,63 +1721,43 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("should filter conventions by status", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { statuses: ["READY_TO_SIGN"] },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          statuses: ["READY_TO_SIGN"],
+        },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionA,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
+      expectToEqual(result.data, [conventionD, conventionA]);
     });
 
     it("should filter conventions by beneficiary name", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "John" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId, differentAgencyId], search: "John" },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
       expect(result.data.length).toBe(2);
     });
 
     it("should filter conventions by beneficiary fullname", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "John D" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId, differentAgencyId], search: "John D" },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
       expect(result.data.length).toBe(1);
       expectToEqual(result.data[0].signatories.beneficiary.lastName, "Doe");
@@ -1843,415 +1765,144 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("should filter conventions by establishment name", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "Business B" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          search: "Business B",
         },
-      ]);
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [conventionB]);
     });
 
     it("should filter conventions by establishment SIRET", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: conventionA.siret },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-      expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          search: conventionA.siret,
         },
-      ]);
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+      expectToEqual(result.data, [conventionA]);
     });
 
     it("should filter conventions by convention ID", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: conventionA.id },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          search: conventionA.id,
         },
-      ]);
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [conventionA]);
     });
 
     it("should return no results for non-existent convention ID", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "00000000-0000-0000-0000-000000000000" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          search: "00000000-0000-0000-0000-000000000000",
+        },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(result.data.length).toBe(0);
       expectToEqual(result.data, []);
     });
 
     it("should filter conventions by agency referent first name", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "Marie" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId, differentAgencyId], search: "Marie" },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
         },
-      ]);
+      });
+
+      expectToEqual(result.data, [conventionA]);
     });
 
     it("should filter conventions by agency referent last name", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "Martin" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expectToEqual(result.data, [
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId, differentAgencyId], search: "Martin" },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
         },
-      ]);
+      });
+
+      expectToEqual(result.data, [conventionB]);
     });
 
     it("should filter conventions by agency referent fullname", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { search: "Pierre Martin" },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expectToEqual(result.data, [
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          search: "Pierre Martin",
         },
-      ]);
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [conventionB]);
     });
 
     it("should filter conventions by date range", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            dateStart: {
-              from: "2023-02-01",
-              to: "2023-03-31",
-            },
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          dateStart: {
+            from: "2023-02-01",
+            to: "2023-03-31",
           },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+        },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [
-        {
-          ...conventionC,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
+      expectToEqual(result.data, [conventionC, conventionB]);
     });
     it("should filter conventions by date range with only from", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            dateEnd: {
-              from: "2023-03-01",
-            },
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          dateEnd: {
+            from: "2023-03-01",
           },
-          sort: {
-            by: "dateEnd",
-            direction: "desc",
-          },
-        });
-
-      expectToEqual(result.data, [
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
         },
-        {
-          ...conventionC,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+        sort: {
+          by: "dateEnd",
+          direction: "desc",
         },
-      ]);
-    });
-
-    describe("lastReminders", () => {
-      it("returns last signature reminder dates when notifications exist", async () => {
-        const emailSentAt = new Date("2025-01-07T08:00:00.000Z");
-        const smsSentAt = new Date("2025-01-07T09:00:00.000Z");
-
-        await insertEmailReminder({
-          conventionId: conventionA.id,
-          emailKind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-          recipientEmail: conventionA.signatories.beneficiary.email,
-          createdAt: emailSentAt,
-        });
-        await insertSmsReminder({
-          conventionId: conventionB.id,
-          smsKind: "ReminderForSignatories",
-          recipientPhone: conventionB.signatories.beneficiary.phone,
-          createdAt: smsSentAt,
-        });
-
-        const result =
-          await conventionQueries.getPaginatedConventionsForAgencyUser({
-            agencyUserId: validator.id,
-            pagination: { page: 1, perPage: 10 },
-            filters: {
-              agencyIds: [agencyId],
-              statuses: ["READY_TO_SIGN", "IN_REVIEW"],
-            },
-            sort: {
-              by: "dateSubmission",
-              direction: "desc",
-            },
-          });
-
-        expectToEqual(result.data, [
-          {
-            ...conventionB,
-            ...agencyFields,
-            assessment: null,
-            lastReminders: {
-              conventionSignatures: {
-                beneficiary: { email: null, sms: smsSentAt.toISOString() },
-                "establishment-representative": { email: null, sms: null },
-                "beneficiary-representative": { email: null, sms: null },
-                "beneficiary-current-employer": { email: null, sms: null },
-              },
-              assessmentCompletion: { email: null, sms: null },
-              assessmentSignature: { email: null, sms: null },
-            },
-            isEstablishmentBanned: false,
-          },
-          {
-            ...conventionA,
-            ...agencyFields,
-            assessment: null,
-            lastReminders: {
-              conventionSignatures: {
-                beneficiary: { email: emailSentAt.toISOString(), sms: null },
-                "establishment-representative": { email: null, sms: null },
-                "beneficiary-representative": { email: null, sms: null },
-                "beneficiary-current-employer": { email: null, sms: null },
-              },
-              assessmentCompletion: { email: null, sms: null },
-              assessmentSignature: { email: null, sms: null },
-            },
-            isEstablishmentBanned: false,
-          },
-        ]);
       });
 
-      it("returns last assessment completion reminder dates when notifications exist", async () => {
-        const emailSentAt = new Date("2025-01-08T08:00:00.000Z");
-        const smsSentAt = new Date("2025-01-08T09:00:00.000Z");
-
-        await insertEmailReminder({
-          conventionId: conventionC.id,
-          emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-          recipientEmail: conventionC.establishmentTutor.email,
-          createdAt: emailSentAt,
-        });
-        await insertSmsReminder({
-          conventionId: conventionC.id,
-          smsKind: "ReminderForAssessment",
-          recipientPhone: conventionC.establishmentTutor.phone,
-          createdAt: smsSentAt,
-        });
-
-        const result =
-          await conventionQueries.getPaginatedConventionsForAgencyUser({
-            agencyUserId: validator.id,
-            pagination: { page: 1, perPage: 10 },
-            filters: { statuses: ["ACCEPTED_BY_VALIDATOR"] },
-            sort: {
-              by: "dateSubmission",
-              direction: "desc",
-            },
-          });
-
-        expectToEqual(result.data, [
-          {
-            ...conventionC,
-            ...agencyFields,
-            agencyValidationSteps: "validator-only",
-            assessment: {
-              status: "COMPLETED",
-              endedWithAJob: false,
-              signedAt: null,
-              createdAt: completedAssessment.createdAt,
-            },
-            lastReminders: {
-              conventionSignatures: {
-                beneficiary: { email: null, sms: null },
-                "establishment-representative": { email: null, sms: null },
-                "beneficiary-representative": { email: null, sms: null },
-                "beneficiary-current-employer": { email: null, sms: null },
-              },
-              assessmentCompletion: {
-                email: emailSentAt.toISOString(),
-                sms: smsSentAt.toISOString(),
-              },
-              assessmentSignature: { email: null, sms: null },
-            },
-            isEstablishmentBanned: false,
-          },
-        ]);
-      });
-
-      it("returns last assessment signature reminder dates when notifications exist", async () => {
-        const emailSentAt = new Date("2025-01-09T08:00:00.000Z");
-        const smsSentAt = new Date("2025-01-09T09:00:00.000Z");
-
-        await insertEmailReminder({
-          conventionId: conventionA.id,
-          emailKind: "ASSESSMENT_NEEDS_SIGNATURE_BENEFICIARY_NOTIFICATION",
-          recipientEmail: conventionA.signatories.beneficiary.email,
-          createdAt: emailSentAt,
-        });
-        await insertSmsReminder({
-          conventionId: conventionA.id,
-          smsKind: "ReminderForAssessmentSignature",
-          recipientPhone: conventionA.signatories.beneficiary.phone,
-          createdAt: smsSentAt,
-        });
-
-        const result =
-          await conventionQueries.getPaginatedConventionsForAgencyUser({
-            agencyUserId: validator.id,
-            pagination: { page: 1, perPage: 10 },
-            filters: { search: "John D" },
-            sort: {
-              by: "dateSubmission",
-              direction: "desc",
-            },
-          });
-
-        expectToEqual(result.data, [
-          {
-            ...conventionA,
-            ...agencyFields,
-            assessment: null,
-            lastReminders: {
-              conventionSignatures: {
-                beneficiary: { email: null, sms: null },
-                "establishment-representative": { email: null, sms: null },
-                "beneficiary-representative": { email: null, sms: null },
-                "beneficiary-current-employer": { email: null, sms: null },
-              },
-              assessmentCompletion: { email: null, sms: null },
-              assessmentSignature: {
-                email: emailSentAt.toISOString(),
-                sms: smsSentAt.toISOString(),
-              },
-            },
-            isEstablishmentBanned: false,
-          },
-        ]);
-      });
+      expectToEqual(result.data, [conventionD, conventionC]);
     });
 
     describe("assessment completion status filter", () => {
@@ -2286,31 +1937,19 @@ describe("Pg implementation of ConventionQueries", () => {
             ),
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["finalized"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionWithOldAssessment,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt: null,
-                createdAt: oldAssessmentWithoutSignature.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["finalized"],
             },
-          ]);
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+          expectToEqual(result.data, [conventionWithOldAssessment]);
         });
 
         it(`should return convention with assessment signed and created after ${ASSESSEMENT_SIGNATURE_RELEASE_DATE.toISOString()}`, async () => {
@@ -2333,34 +1972,19 @@ describe("Pg implementation of ConventionQueries", () => {
             numberOfHoursActuallyMade: null,
           });
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["finalized"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionC,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt: addDays(
-                  ASSESSEMENT_SIGNATURE_RELEASE_DATE,
-                  2,
-                ).toISOString(),
-                createdAt: completedAssessment.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["finalized"],
             },
-          ]);
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+          expectToEqual(result.data, [conventionC]);
         });
       });
 
@@ -2391,31 +2015,19 @@ describe("Pg implementation of ConventionQueries", () => {
             createAssessmentEntity(oldAssessment, conventionWithOldAssessment),
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["to-sign"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionC,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt: null,
-                createdAt: completedAssessment.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-sign"],
             },
-          ]);
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+          expectToEqual(result.data, [conventionC]);
         });
       });
 
@@ -2445,32 +2057,21 @@ describe("Pg implementation of ConventionQueries", () => {
             anyConventionUpdatedAt,
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["to-complete"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-complete"],
+            },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
 
           expectToEqual(result.data, [
-            {
-              ...recentConventionWithoutAssessment,
-              ...agencyFields,
-              assessment: null,
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
-            {
-              ...oldConventionWithoutAssessment,
-              ...agencyFields,
-              assessment: null,
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
+            recentConventionWithoutAssessment,
+            oldConventionWithoutAssessment,
           ]);
         });
 
@@ -2498,18 +2099,17 @@ describe("Pg implementation of ConventionQueries", () => {
             createAssessmentEntity(signedAssessment, validatedConvention),
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: {
-                assessmentCompletionStatus: ["to-complete"],
-              },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-complete"],
+            },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
 
           expectToEqual(result.data, []);
         });
@@ -2547,26 +2147,19 @@ describe("Pg implementation of ConventionQueries", () => {
             anyConventionUpdatedAt,
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["to-complete"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionWithAssessmentToComplete,
-              ...agencyFields,
-              assessment: null,
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-complete"],
             },
-          ]);
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+          expectToEqual(result.data, [conventionWithAssessmentToComplete]);
         });
 
         it("should return convention without assessment when dateEnd is within one day", async () => {
@@ -2587,26 +2180,19 @@ describe("Pg implementation of ConventionQueries", () => {
             anyConventionUpdatedAt,
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: { assessmentCompletionStatus: ["to-complete"] },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionEndingWithinOneDay,
-              ...agencyFields,
-              assessment: null,
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-complete"],
             },
-          ]);
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
+
+          expectToEqual(result.data, [conventionEndingWithinOneDay]);
         });
       });
 
@@ -2622,39 +2208,21 @@ describe("Pg implementation of ConventionQueries", () => {
             anyConventionUpdatedAt,
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: {
-                assessmentCompletionStatus: ["to-complete", "to-sign"],
-              },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
+          const result = await conventionQueries.getPaginatedConventions({
+            pagination: { page: 1, perPage: 10 },
+            filters: {
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["to-complete", "to-sign"],
+            },
+            sort: {
+              by: "dateSubmission",
+              direction: "desc",
+            },
+          });
 
           expectToEqual(result.data, [
-            {
-              ...conventionC,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt: null,
-                createdAt: completedAssessment.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
-            {
-              ...validatedConventionWithoutAssessment,
-              ...agencyFields,
-              assessment: null,
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
+            conventionC,
+            validatedConventionWithoutAssessment,
           ]);
         });
 
@@ -2685,61 +2253,34 @@ describe("Pg implementation of ConventionQueries", () => {
             ),
           );
 
-          const result =
-            await conventionQueries.getPaginatedConventionsForAgencyUser({
-              agencyUserId: validator.id,
-              pagination: { page: 1, perPage: 10 },
-              filters: {
-                assessmentCompletionStatus: ["finalized", "to-sign"],
-              },
-              sort: {
-                by: "dateSubmission",
-                direction: "desc",
-              },
-            });
-
-          expectToEqual(result.data, [
-            {
-              ...conventionC,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt: null,
-                createdAt: completedAssessment.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
-            {
-              ...anotherValidatedConvention,
-              ...agencyFields,
-              assessment: {
-                status: "COMPLETED",
-                endedWithAJob: false,
-                signedAt,
-                createdAt: signedAssessment.createdAt,
-              },
-              lastReminders: makeEmptyLastReminders(),
-              isEstablishmentBanned: false,
-            },
-          ]);
-        });
-      });
-
-      it("should not filter conventions by assessment completion statuses if the convention is not accepted by validator", async () => {
-        const result =
-          await conventionQueries.getPaginatedConventionsForAgencyUser({
-            agencyUserId: validator.id,
+          const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              assessmentCompletionStatus: ["to-complete"],
+              agencyIds: [agencyId, differentAgencyId],
+              assessmentCompletionStatus: ["finalized", "to-sign"],
             },
             sort: {
               by: "dateSubmission",
               direction: "desc",
             },
           });
+
+          expectToEqual(result.data, [conventionC, anotherValidatedConvention]);
+        });
+      });
+
+      it("should not filter conventions by assessment completion statuses if the convention is not accepted by validator", async () => {
+        const result = await conventionQueries.getPaginatedConventions({
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            agencyIds: [agencyId, differentAgencyId],
+            assessmentCompletionStatus: ["to-complete"],
+          },
+          sort: {
+            by: "dateSubmission",
+            direction: "desc",
+          },
+        });
 
         expectToEqual(result.data, []);
       });
@@ -2755,263 +2296,90 @@ describe("Pg implementation of ConventionQueries", () => {
         anyConventionUpdatedAt,
       );
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          sort: {
-            by: "dateStart",
-            direction: "asc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        pagination: { page: 1, perPage: 10 },
+        sort: {
+          by: "dateStart",
+          direction: "asc",
+        },
+      });
 
-      expect(result.data.length).toBe(5);
       expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...sameDateStartConvention,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionB,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionC,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
+        conventionA,
+        sameDateStartConvention,
+        conventionB,
+        conventionC,
+        conventionD,
       ]);
     });
 
     it("should respect pagination limits", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 2 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionC,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
-    });
-
-    it("should filter by multiple criteria", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            statuses: ["READY_TO_SIGN", "IN_REVIEW"],
-            dateSubmission: {
-              from: "2023-01-01",
-              to: "2023-02-15",
-            },
-            search: "@convention-a.com",
-          },
-          sort: {
-            by: "dateStart",
-            direction: "desc",
-          },
-        });
-
-      expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
-    });
-
-    it("should only return conventions from agencies the user belongs to", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: singleAgencyUser.id,
-          pagination: { page: 1, perPage: 10 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expectToEqual(result.data, [
-        {
-          ...conventionC,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
-
-      const allConventionsBelongToUsersAgency = result.data.every(
-        (convention) => convention.agencyId === agencyId,
-      );
-      expect(allConventionsBelongToUsersAgency).toBe(true);
-    });
-
-    it("should not return conventions if user has no appropriate role", async () => {
-      const userWithoutProperRole = new ConnectedUserBuilder()
-        .withEmail("no-proper-role@mail.com")
-        .withId("99999999-9999-9999-9999-999999999999")
-        .buildUser();
-
-      await new PgUserRepository(db).save(userWithoutProperRole);
-
-      // Get the existing agency
-      const existingAgency = await agencyRepo.getById(agency.id);
-      if (!existingAgency) throw new Error(`Agency ${agency.id} not found`);
-
-      // Update the agency with the new user rights
-      await agencyRepo.update({
-        ...existingAgency,
-        usersRights: {
-          ...existingAgency.usersRights,
-          [userWithoutProperRole.id]: {
-            isNotifiedByEmail: true,
-            roles: ["to-review"],
-          },
+      const result = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        pagination: { page: 1, perPage: 2 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
         },
       });
 
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: userWithoutProperRole.id,
-          pagination: { page: 1, perPage: 10 },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      expectToEqual(result.data, [conventionD, conventionC]);
+    });
 
-      expect(result.data.length).toBe(0);
-      expectToEqual(result.data, []);
-      expectToEqual(result.pagination, {
-        currentPage: 1,
-        totalPages: 1,
-        numberPerPage: 10,
-        totalRecords: 0,
+    it("should filter by multiple criteria", async () => {
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId, differentAgencyId],
+          statuses: ["READY_TO_SIGN", "IN_REVIEW"],
+          dateSubmission: {
+            from: "2023-01-01",
+            to: "2023-02-15",
+          },
+          search: "@convention-a.com",
+        },
+        sort: {
+          by: "dateStart",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [conventionA]);
+    });
+
+    it("should return empty page when agencyIds is empty", async () => {
+      const result = await conventionQueries.getPaginatedConventions({
+        filters: { agencyIds: [] },
+        pagination: { page: 1, perPage: 10 },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
       });
     });
 
     it("should filter conventions by agencyIds", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { agencyIds: [agencyId] },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId] },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(result.data.length).toBe(3);
-      expectToEqual(result.data, [
-        {
-          ...conventionC,
-          ...agencyFields,
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionB,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-      ]);
+      expectToEqual(result.data, [conventionC, conventionB, conventionA]);
 
       // Verify all returned conventions belong to the specified agency
       const allConventionsBelongToSpecifiedAgency = result.data.every(
@@ -3021,83 +2389,37 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("should filter conventions by multiple agencyIds", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: { agencyIds: [agencyId, differentAgencyId] },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: { agencyIds: [agencyId, differentAgencyId] },
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
 
-      expect(result.data.length).toBe(4);
       expectToEqual(result.data, [
-        {
-          ...conventionD,
-          ...differentAgencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionC,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: {
-            status: "COMPLETED",
-            endedWithAJob: false,
-            signedAt: null,
-            createdAt: completedAssessment.createdAt,
-          },
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionB,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
-        {
-          ...conventionA,
-          ...agencyFields,
-          agencyValidationSteps: "counsellor-and-validator",
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
-        },
+        conventionD,
+        conventionC,
+        conventionB,
+        conventionA,
       ]);
     });
 
     it("should filter conventions by agencyIds combined with other filters", async () => {
-      const result =
-        await conventionQueries.getPaginatedConventionsForAgencyUser({
-          agencyUserId: validator.id,
-          pagination: { page: 1, perPage: 10 },
-          filters: {
-            agencyIds: [agencyId],
-            statuses: ["READY_TO_SIGN"],
-          },
-          sort: {
-            by: "dateSubmission",
-            direction: "desc",
-          },
-        });
-
-      expect(result.data.length).toBe(1);
-      expectToEqual(result.data, [
-        {
-          ...conventionA,
-          ...agencyFields,
-          assessment: null,
-          lastReminders: makeEmptyLastReminders(),
-          isEstablishmentBanned: false,
+      const result = await conventionQueries.getPaginatedConventions({
+        pagination: { page: 1, perPage: 10 },
+        filters: {
+          agencyIds: [agencyId],
+          statuses: ["READY_TO_SIGN"],
         },
-      ]);
+        sort: {
+          by: "dateSubmission",
+          direction: "desc",
+        },
+      });
+
+      expectToEqual(result.data, [conventionA]);
     });
   });
 
