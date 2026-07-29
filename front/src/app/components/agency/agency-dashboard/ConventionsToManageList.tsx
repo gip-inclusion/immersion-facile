@@ -6,7 +6,7 @@ import { useCallback, useMemo } from "react";
 import { HeadingSection, Task } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type ConventionDto,
+  type AgencyUserConventionListDto,
   domElementIds,
   frontRoutes,
   getDaysBetween,
@@ -107,12 +107,17 @@ export const ConventionsToManageList = ({
   );
 };
 
-const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
+const AgencyTaskItem = ({
+  convention,
+}: {
+  convention: AgencyUserConventionListDto;
+}) => {
   const title = (
     <>
       <span className={fr.cx("fr-pr-2v")}>
-        {convention.signatories.beneficiary.firstName}{" "}
-        {convention.signatories.beneficiary.lastName}{" "}
+        {convention.beneficiary.firstName} {
+          convention.beneficiary.lastName
+        }{" "}
       </span>
       <Badge
         className={fr.cx(labelAndSeverityByStatus[convention.status].color)}
@@ -122,18 +127,16 @@ const AgencyTaskItem = ({ convention }: { convention: ConventionDto }) => {
       </Badge>
     </>
   );
-  const footer = convention.signatories.beneficiary.federatedIdentity
-    ?.provider === "peConnect" &&
-    convention.signatories.beneficiary.federatedIdentity?.payload && (
+  const footer = convention.beneficiary.federatedIdentity?.provider ===
+    "peConnect" &&
+    convention.beneficiary.federatedIdentity.payload && (
       <>
         Conseiller :{" "}
         {getFormattedFirstnameAndLastname({
           firstname:
-            convention.signatories.beneficiary.federatedIdentity.payload.advisor
-              ?.firstName,
+            convention.beneficiary.federatedIdentity.payload.advisor?.firstName,
           lastname:
-            convention.signatories.beneficiary.federatedIdentity.payload.advisor
-              ?.lastName,
+            convention.beneficiary.federatedIdentity.payload.advisor?.lastName,
         })}
       </>
     );
