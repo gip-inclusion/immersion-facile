@@ -1,7 +1,9 @@
 import {
   type AgencyDto,
+  type AgencyUserConventionListDto,
   type ConventionAssessmentFields,
   type ConventionDto,
+  type ConventionId,
   type ConventionLastReminders,
   type ConventionReadDto,
   type ConventionRole,
@@ -125,6 +127,60 @@ export const assesmentEntityToConventionAssessmentFields = (
           createdAt: assessmentEntity.createdAt,
         },
       };
+};
+
+export const conventionDtosToAgencyUserConventionListDtos = async (
+  conventions: ConventionDto[],
+  uow: UnitOfWork,
+): Promise<AgencyUserConventionListDto[]> => {
+  if (conventions.length === 0) return [];
+
+  const agencyIds = [...new Set(conventions.map(({ agencyId }) => agencyId))];
+  const [agencies, assessments] = await Promise.all([
+    uow.agencyRepository.getByIds(agencyIds),
+    uow.assessmentRepository.getByConventionIds(
+      conventions.map(({ id }) => id),
+    ),
+  ]);
+  const agencyById = Object.fromEntries(
+    agencies.map((agency) => [agency.id, agency]),
+  );
+
+  const assessmentByConventionId = assessments.reduce<
+    Record<ConventionId, AssessmentEntity>
+  >(
+    (acc, assessment) => ({
+      ...acc,
+      [assessment.conventionId]: assessment,
+    }),
+    {},
+  );
+
+  return conventions.map((convention) => {
+    const agency = agencyById[convention.agencyId];
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const { beneficiary } = convention.signatories;
+
+    return {
+      id: convention.id,
+      status: convention.status,
+      dateStart: convention.dateStart,
+      dateEnd: convention.dateEnd,
+      businessName: convention.businessName,
+      agencyName: agency.name,
+      agencyReferent: convention.agencyReferent,
+      assessment: assesmentEntityToConventionAssessmentFields(
+        assessmentByConventionId[convention.id],
+      ).assessment,
+      beneficiary: {
+        firstName: beneficiary.firstName,
+        lastName: beneficiary.lastName,
+        federatedIdentity: beneficiary.federatedIdentity,
+      },
+    };
+  });
 };
 
 const getConventionLastRemindersFields = async (

@@ -1,11 +1,13 @@
 import { subMonths } from "date-fns";
 import {
   AgencyDtoBuilder,
+  type AgencyRole,
+  type AgencyUserConventionListDto,
   ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
-  type ConventionReadDto,
   type DataWithPagination,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   type GetConventionsForAgencyUserParams,
 } from "shared";
@@ -20,7 +22,7 @@ import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryU
 import { makeGetConventionsForAgencyUser } from "./GetConventionsForAgencyUser";
 
 const expectOnlyConventionInResult = (
-  result: DataWithPagination<ConventionReadDto>,
+  result: DataWithPagination<AgencyUserConventionListDto>,
   convention: ConventionDto,
 ) => {
   expect(result.data).toHaveLength(1);
@@ -208,6 +210,157 @@ describe("GetConventionsForAgencyUser", () => {
         numberPerPage: 10,
         totalRecords: 1,
       });
+    });
+  });
+
+  describe("Agency rights", () => {
+    const allowedRoles: AgencyRole[] = [
+      "counsellor",
+      "validator",
+      "agency-admin",
+      "agency-viewer",
+    ];
+
+    it.each(
+      allowedRoles,
+    )("should return conventions when user has the %s role", async (role) => {
+      uow.agencyRepository.agencies = [
+        {
+          ...agency,
+          usersRights: {
+            [agencyUserId]: { isNotifiedByEmail: true, roles: [role] },
+          },
+        },
+      ];
+
+      const result = await getConventionsForAgencyUser.execute(
+        { pagination: { page: 1, perPage: 10 } },
+        currentUser,
+      );
+
+      expect(result.data).toHaveLength(10);
+      expect(result.pagination.totalRecords).toBe(conventions.length);
+    });
+
+    it("should return no convention when user only has a non-authorized role", async () => {
+      uow.agencyRepository.agencies = [
+        {
+          ...agency,
+          usersRights: {
+            [agencyUserId]: {
+              isNotifiedByEmail: true,
+              roles: ["to-review"],
+            },
+          },
+        },
+      ];
+
+      const result = await getConventionsForAgencyUser.execute(
+        { pagination: { page: 1, perPage: 10 } },
+        currentUser,
+      );
+
+      expectToEqual(result, {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          numberPerPage: 10,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("should only return requested conventions from agencies where user has valid rights", async () => {
+      const agencyUserHasValidRightOn = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+          .withName("Agency user has valid right on")
+          .build(),
+        {
+          [agencyUserId]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor"],
+          },
+        },
+      );
+      const agencyUserHasNoValidRightOn = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("cccccccc-cccc-cccc-cccc-cccccccccccc")
+          .withName("Agency user has no valid right on")
+          .build(),
+        {},
+      );
+      const conventionFromAgencyUserHasValidRightOn = new ConventionDtoBuilder()
+        .withId("convention-from-agency-user-has-valid-right-on")
+        .withAgencyId(agencyUserHasValidRightOn.id)
+        .build();
+      const conventionFromAgencyUserHasNoValidRightOn =
+        new ConventionDtoBuilder()
+          .withId("convention-from-agency-user-has-no-valid-right-on")
+          .withAgencyId(agencyUserHasNoValidRightOn.id)
+          .build();
+
+      uow.agencyRepository.agencies = [
+        agency,
+        agencyUserHasValidRightOn,
+        agencyUserHasNoValidRightOn,
+      ];
+      uow.conventionRepository.setConventions([
+        conventions[0],
+        conventionFromAgencyUserHasValidRightOn,
+        conventionFromAgencyUserHasNoValidRightOn,
+      ]);
+
+      const result = await getConventionsForAgencyUser.execute(
+        {
+          filters: {
+            agencyIds: [
+              agencyUserHasValidRightOn.id,
+              agencyUserHasNoValidRightOn.id,
+            ],
+          },
+          pagination: { page: 1, perPage: 10 },
+        },
+        currentUser,
+      );
+
+      expectToEqual(
+        result.data.map(({ id }) => id),
+        [conventionFromAgencyUserHasValidRightOn.id],
+      );
+    });
+
+    it("should return all conventions from agencies where user has valid rights when no agency filter is requested", async () => {
+      const agencyUserHasValidRightOn = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+          .withName("Agency user has valid right on")
+          .build(),
+        {
+          [agencyUserId]: { isNotifiedByEmail: true, roles: ["agency-viewer"] },
+        },
+      );
+      const conventionFromAgencyUserHasValidRightOn = new ConventionDtoBuilder()
+        .withId("convention-from-agency-user-has-valid-right-on")
+        .withAgencyId(agencyUserHasValidRightOn.id)
+        .build();
+
+      uow.agencyRepository.agencies = [agency, agencyUserHasValidRightOn];
+      uow.conventionRepository.setConventions([
+        conventions[0],
+        conventionFromAgencyUserHasValidRightOn,
+      ]);
+
+      const result = await getConventionsForAgencyUser.execute(
+        { pagination: { page: 1, perPage: 10 } },
+        currentUser,
+      );
+
+      expectArraysToEqualIgnoringOrder(
+        result.data.map(({ id }) => id),
+        [conventions[0].id, conventionFromAgencyUserHasValidRightOn.id],
+      );
     });
   });
 });
