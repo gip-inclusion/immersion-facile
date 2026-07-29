@@ -24,29 +24,33 @@ const maxVUs = getPositiveIntegerFromEnv("MAX_VUS", 4000);
 
 export const options: Options = {
   scenarios: {
-    featureFlags: {
+    rampingEndpoint: {
       executor: "ramping-arrival-rate",
       startRate: 1,
       timeUnit: "1s",
       preAllocatedVUs,
       maxVUs,
       stages: [
-        { duration: "10s", target: Math.round(targetRps * 0.1) },
-        { duration: "20s", target: Math.round(targetRps * 0.25) },
-        { duration: "20s", target: Math.round(targetRps * 0.5) },
-        { duration: "30s", target: targetRps },
-        { duration: "10s", target: 0 },
+        { duration: "15s", target: Math.round(targetRps * 0.1) },
+        { duration: "30s", target: Math.round(targetRps * 0.25) },
+        { duration: "30s", target: Math.round(targetRps * 0.5) },
+        { duration: "1m", target: targetRps },
+        { duration: "15s", target: 0 },
       ],
     },
   },
   thresholds: {
+    checks: ["rate>0.99"],
+    dropped_iterations: ["count==0"],
     http_req_failed: ["rate<0.01"],
     http_req_duration: ["p(95)<500", "p(99)<1000"],
   },
 };
 
 export default function () {
-  const response = http.get(targetUrl);
+  const response = http.get(targetUrl, {
+    tags: { name: endpointPath },
+  });
 
   check(response, {
     "status is 200": () => response.status === 200,
