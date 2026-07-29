@@ -367,12 +367,12 @@ export const ConventionList = () => {
                 <Fragment key={`${convention.id}-beneficiary`}>
                   <strong>
                     {getFormattedFirstnameAndLastname({
-                      firstname: convention.signatories.beneficiary.firstName,
-                      lastname: convention.signatories.beneficiary.lastName,
+                      firstname: convention.beneficiary.firstName,
+                      lastname: convention.beneficiary.lastName,
                     })}
                   </strong>
-                  {convention.signatories.beneficiary.federatedIdentity
-                    ?.provider === "peConnect" && (
+                  {convention.beneficiary.federatedIdentity?.provider ===
+                    "peConnect" && (
                     <div className={fr.cx("fr-mt-1w")}>
                       <img
                         src={logoFtSvg}
