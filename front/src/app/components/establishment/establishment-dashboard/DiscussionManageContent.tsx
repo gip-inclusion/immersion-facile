@@ -610,24 +610,26 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                 )}
               </BorderedSection>
             )}
-          {discussion.status === "PENDING" && viewer === "establishment" && (
-            <BorderedSection>
-              <h3 className={fr.cx("fr-h6")}>Actions</h3>
-              <ButtonsGroup
-                buttons={getDiscussionActionsButtons({
-                  discussion,
-                  connectedUser,
-                  viewer,
-                  makeInitiateConventionDraftButtonProps: (discussionProps) =>
-                    getActivateDraftConventionButtonProps({
-                      ...discussionProps,
-                      saveConventionDraftThenRedirectRequested,
-                      saveConventionDraftIsLoading,
-                    }),
-                })}
-              />
-            </BorderedSection>
-          )}
+          {(discussion.status === "PENDING" ||
+            discussion.status === "ACCEPTED") &&
+            viewer === "establishment" && (
+              <BorderedSection>
+                <h3 className={fr.cx("fr-h6")}>Actions</h3>
+                <ButtonsGroup
+                  buttons={getDiscussionActionsButtons({
+                    discussion,
+                    connectedUser,
+                    viewer,
+                    makeInitiateConventionDraftButtonProps: (discussionProps) =>
+                      getActivateDraftConventionButtonProps({
+                        ...discussionProps,
+                        saveConventionDraftThenRedirectRequested,
+                        saveConventionDraftIsLoading,
+                      }),
+                  })}
+                />
+              </BorderedSection>
+            )}
           {viewer === "potentialBeneficiary" &&
             !(
               discussion.status === "ACCEPTED" &&
