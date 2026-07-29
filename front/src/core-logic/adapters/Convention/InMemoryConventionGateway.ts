@@ -2,6 +2,7 @@ import { from, type Observable, Subject } from "rxjs";
 import {
   type AddConventionInput,
   type AgencyOption,
+  type AgencyUserConventionListDto,
   type ApiConsumerName,
   type ArchivedConventionRequestDto,
   type BeneficiaryConventionListDto,
@@ -94,7 +95,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public deleteConventionTemplateResult$ = new Subject<void>();
 
   public getConventionsForUserResult$ = new Subject<
-    DataWithPagination<ConventionReadDto>
+    DataWithPagination<AgencyUserConventionListDto>
   >();
   public getBeneficiaryConventionListResult$ =
     new Subject<BeneficiaryConventionListDto>();
@@ -295,7 +296,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public getConventionsForUser$(
     _params: FlatGetConventionsForAgencyUserParams,
     _jwt: string,
-  ): Observable<DataWithPagination<ConventionReadDto>> {
+  ): Observable<DataWithPagination<AgencyUserConventionListDto>> {
     return this.getConventionsForUserResult$;
   }
   public getConventionLastBroadcastFeedback$(

@@ -1,6 +1,7 @@
 import { from, type Observable } from "rxjs";
 import type {
   AddConventionInput,
+  AgencyUserConventionListDto,
   ApiConsumerName,
   ArchivedConventionRequestDto,
   AuthenticatedConventionRoutes,
@@ -494,7 +495,7 @@ export class HttpConventionGateway implements ConventionGateway {
   public getConventionsForUser$(
     params: FlatGetConventionsForAgencyUserParams,
     jwt: string,
-  ): Observable<DataWithPagination<ConventionReadDto>> {
+  ): Observable<DataWithPagination<AgencyUserConventionListDto>> {
     return from(
       this.authenticatedHttpClient
         .getConventionsForAgencyUser({
