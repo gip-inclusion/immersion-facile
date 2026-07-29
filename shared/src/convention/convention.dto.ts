@@ -698,10 +698,10 @@ export const assessmentCompletionStatusFilters = [
 export type AssessmentCompletionStatusFilter =
   (typeof assessmentCompletionStatusFilters)[number];
 
-export type GetPaginatedConventionsFilters = {
+export type GetConventionsForAgencyUserFilters = {
   search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
-  agencyIds?: NotEmptyArray<string>;
+  agencyIds?: NotEmptyArray<AgencyId>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
@@ -716,7 +716,7 @@ export type GetPaginatedConventionsSortBy = keyof Pick<
 
 export type GetConventionsForAgencyUserParams =
   WithOptionalSort<GetPaginatedConventionsSortBy> & {
-    filters?: GetPaginatedConventionsFilters;
+    filters?: GetConventionsForAgencyUserFilters;
     pagination?: PaginationQueryParams;
   };
 
@@ -734,7 +734,7 @@ export type FlatGetConventionsForAgencyUserParams = {
   // filters
   search?: string;
   statuses?: NotEmptyArray<ConventionStatus>;
-  agencyIds?: NotEmptyArray<string>;
+  agencyIds?: NotEmptyArray<AgencyId>;
   agencyDepartmentCodes?: NotEmptyArray<string>;
 
   // date filters

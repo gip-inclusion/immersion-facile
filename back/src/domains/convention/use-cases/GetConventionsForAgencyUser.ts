@@ -1,7 +1,8 @@
 import { subMonths } from "date-fns";
 import {
+  type AgencyRole,
+  type AgencyUserConventionListDto,
   type ConnectedUser,
-  type ConventionReadDto,
   type DataWithPagination,
   type DateString,
   defaultMonthsThresholdForConventionsListing,
@@ -11,8 +12,17 @@ import {
   getPaginationParamsForWeb,
   type WithSort,
 } from "shared";
+import { conventionDtosToAgencyUserConventionListDtos } from "../../../utils/convention";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
+
+const agencyRolesWithConventionAccess: AgencyRole[] = [
+  "counsellor",
+  "validator",
+  "agency-admin",
+  "agency-viewer",
+];
 
 export const makeGetConventionsForAgencyUser = useCaseBuilder(
   "GetConventionsForAgencyUser",
@@ -20,7 +30,7 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
   .withInput<GetConventionsForAgencyUserParams>(
     getConventionsForAgencyUserParamsSchema,
   )
-  .withOutput<DataWithPagination<ConventionReadDto>>()
+  .withOutput<DataWithPagination<AgencyUserConventionListDto>>()
   .withCurrentUser<ConnectedUser>()
   .withDeps<{ timeGateway: TimeGateway }>()
   .build(async ({ inputParams, uow, currentUser, deps }) => {
@@ -39,10 +49,26 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
 
     const now = deps.timeGateway.now();
 
-    return uow.conventionQueries.getPaginatedConventionsForAgencyUser({
+    const user = await getUserWithRights(uow, currentUser.id);
+
+    const agencyIdsUserHasValidRightsOn = user.agencyRights
+      .filter(({ roles }) =>
+        roles.some((role) => agencyRolesWithConventionAccess.includes(role)),
+      )
+      .map(({ agency }) => agency.id);
+
+    const requestedAgencyIds = filters?.agencyIds;
+    const agencyIds = requestedAgencyIds?.length
+      ? agencyIdsUserHasValidRightsOn.filter((id) =>
+          requestedAgencyIds.includes(id),
+        )
+      : agencyIdsUserHasValidRightsOn;
+
+    const paginated = await uow.conventionQueries.getPaginatedConventions({
       ...withSort,
       filters: {
         ...filters,
+        agencyIds,
         dateEnd: {
           ...filters?.dateEnd,
           from: shouldUseDefaultDateEndFrom(filters?.dateEnd?.from, now)
@@ -56,9 +82,15 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
             : filters?.dateEnd?.to,
         },
       },
-      agencyUserId: currentUser.id,
       pagination,
     });
+
+    const data = await conventionDtosToAgencyUserConventionListDtos(
+      paginated.data,
+      uow,
+    );
+
+    return { data, pagination: paginated.pagination };
   });
 
 const shouldUseDefaultDateEndFrom = (
