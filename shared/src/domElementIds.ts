@@ -1223,6 +1223,8 @@ export const domElementIds = {
       contactSupport:
         "im-login-form__contact-support-link--beneficiary-dashboard-discussions",
     },
+    displayPhoneContactButton:
+      "im-beneficiary-discussion_display-phone-contact-button",
   },
   conventionTemplate: {
     login: {

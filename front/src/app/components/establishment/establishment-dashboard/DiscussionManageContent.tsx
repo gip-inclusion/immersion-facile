@@ -473,6 +473,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
                   </>
                 ) : (
                   <Button
+                    id={
+                      domElementIds.beneficiaryDashboardDiscussions
+                        .displayPhoneContactButton
+                    }
                     iconId="ri-eye-line"
                     iconPosition="left"
                     priority="secondary"
