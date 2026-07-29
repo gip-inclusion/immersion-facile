@@ -1,13 +1,10 @@
 import {
+  type AgencyUserConventionListDto,
   type BeneficiaryConventionListDto,
-  type ConventionAgencyPublicFields,
-  ConventionDtoBuilder,
-  type ConventionReadDto,
   type DataWithPagination,
   defaultPerPageInWebPagination,
   expectToEqual,
   type FlatGetConventionsForAgencyUserParams,
-  makeEmptyLastReminders,
 } from "shared";
 import { conventionListSelectors } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.selectors";
 import {
@@ -37,46 +34,36 @@ describe("ConnectedUserConventionList", () => {
   };
   const jwt = "my-jwt";
 
-  const agencyFields: ConventionAgencyPublicFields = {
-    agencyContactEmail: "contact@mail.com",
+  const convention1: AgencyUserConventionListDto = {
+    id: "convention-1",
+    status: "READY_TO_SIGN",
+    dateStart: "2024-01-15",
+    dateEnd: "2024-01-20",
+    businessName: "Business Name",
     agencyName: "Agency Name",
-    agencyDepartment: "75",
-    agencyKind: "pole-emploi" as const,
-    agencySiret: "11112222000033",
-    agencyValidationSteps: "validator-only",
-  };
-
-  const convention1: ConventionReadDto = {
-    ...new ConventionDtoBuilder()
-      .withId("convention-1")
-      .withDateStart("2024-01-15")
-      .build(),
-    ...agencyFields,
     assessment: null,
-    lastReminders: makeEmptyLastReminders(),
-    isEstablishmentBanned: false,
-  };
-
-  const convention2: ConventionReadDto = {
-    ...new ConventionDtoBuilder()
-      .withId("convention-2")
-      .withDateStart("2024-02-20")
-      .build(),
-    ...agencyFields,
-    assessment: null,
-    lastReminders: makeEmptyLastReminders(),
-    isEstablishmentBanned: false,
-  };
-
-  const conventionsWithPagination: DataWithPagination<ConventionReadDto> = {
-    data: [convention1, convention2],
-    pagination: {
-      totalRecords: 2,
-      currentPage: 1,
-      totalPages: 1,
-      numberPerPage: defaultPerPageInWebPagination,
+    beneficiary: {
+      firstName: "John",
+      lastName: "Doe",
     },
   };
+
+  const convention2: AgencyUserConventionListDto = {
+    ...convention1,
+    id: "convention-2",
+    dateStart: "2024-02-20",
+  };
+
+  const conventionsWithPagination: DataWithPagination<AgencyUserConventionListDto> =
+    {
+      data: [convention1, convention2],
+      pagination: {
+        totalRecords: 2,
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: defaultPerPageInWebPagination,
+      },
+    };
 
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
@@ -279,7 +266,9 @@ describe("ConnectedUserConventionList", () => {
     });
 
     const feedGatewayWithConventionListOrError = (
-      conventionListOrError?: DataWithPagination<ConventionReadDto> | Error,
+      conventionListOrError?:
+        | DataWithPagination<AgencyUserConventionListDto>
+        | Error,
     ) => {
       if (conventionListOrError instanceof Error) {
         dependencies.conventionGateway.getConventionsForUserResult$.error(

@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  type AgencyUserConventionListDto,
   type BeneficiaryConventionListDto,
   type ConnectedUserJwt,
-  type ConventionReadDto,
   type DataWithPagination,
   defaultPerPageInWebPagination,
   type FlatGetConventionsForAgencyUserParams,
@@ -20,13 +20,13 @@ export type FetchConventionListRequestedPayload = {
 
 export type ConventionListState = {
   isLoading: boolean;
-  conventionsWithPagination: DataWithPagination<ConventionReadDto> & {
+  conventionsWithPagination: DataWithPagination<AgencyUserConventionListDto> & {
     filters: FlatGetConventionsForAgencyUserParams;
   };
   beneficiaryConventionList: BeneficiaryConventionListDto | null;
 };
 
-export const initialConventionWithPagination: DataWithPagination<ConventionReadDto> & {
+export const initialConventionWithPagination: DataWithPagination<AgencyUserConventionListDto> & {
   filters: FlatGetConventionsForAgencyUserParams;
 } = {
   data: [],
@@ -67,7 +67,7 @@ export const conventionListSlice = createSlice({
     fetchConventionListSucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<{
-        conventionsWithPagination: DataWithPagination<ConventionReadDto>;
+        conventionsWithPagination: DataWithPagination<AgencyUserConventionListDto>;
       }>,
     ) => {
       state.conventionsWithPagination = {
