@@ -1,0 +1,74 @@
+name: "Load tests"
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL to test"
+        required: true
+        default: "https://pentest.immersion-facile.beta.gouv.fr"
+      endpoint_path:
+        description: "Endpoint path to test"
+        required: true
+        default: "/feature-flags"
+      target_rps:
+        description: "Target requests per second"
+        required: true
+        default: "100"
+      pre_allocated_vus:
+        description: "Pre-allocated virtual users"
+        required: true
+        default: "2"
+      max_vus:
+        description: "Maximum virtual users"
+        required: true
+        default: "10"
+
+permissions:
+  contents: read
+
+jobs:
+  k6-local-ramp:
+    name: "Load test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: load-tests-${{ inputs.base_url }}-${{ inputs.endpoint_path }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.32.1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 load test
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+          ENDPOINT_PATH: ${{ inputs.endpoint_path }}
+          TARGET_RPS: ${{ inputs.target_rps }}
+          PRE_ALLOCATED_VUS: ${{ inputs.pre_allocated_vus }}
+          MAX_VUS: ${{ inputs.max_vus }}
+          K6_WEB_DASHBOARD: true
+          K6_WEB_DASHBOARD_EXPORT: dist/k6-local-ramp-report.html
+        run: pnpm --dir load-tests k6:local-ramp
+
+      - name: Upload k6 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-local-ramp-report
+          path: load-tests/dist/k6-local-ramp-report.html
