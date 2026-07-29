@@ -1,13 +1,221 @@
 import type { ReactNode } from "react";
 import {
+  type BroadcastFeedbackConventionStatusCategory,
   type FunctionalBroadcastFeedbackErrorMessage,
+  immersionFacileHelpdeskRootUrl,
   isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
 } from "shared";
 
 type BroadcastFeedbackError = {
   description: string;
-  solution: (isConventionValidated?: boolean) => NonNullable<ReactNode>;
+  solution: (
+    statusCategory: BroadcastFeedbackConventionStatusCategory,
+  ) => NonNullable<ReactNode>;
+};
+
+const PcmIdentificationInstructions = () => (
+  <p>
+    Je me rends sur mon assistant Immersion Facilitée accessible depuis «
+    Gestion des aides » via PCM pour forcer l’identification du bénéficiaire. Je
+    suis la démarche indiquée dans le{" "}
+    <a
+      href="https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/_layouts/15/Doc.aspx?sourcedoc=%7B40B26A24-77FD-40B3-A083-F6805C8C0B6E%7D&file=%5B26M03_3.C%5D_CFTPro_CDDE_Identification_Beneficiaires_Immersions.SA.V1.pptx&action=edit&mobileredirect=true"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      guide
+    </a>
+    .
+  </p>
+);
+
+const UnexpectedErrorInstructions = () => (
+  <>
+    <p>Cette erreur ne devrait pas arriver.</p>
+    <p>
+      Je contacte{" "}
+      <a
+        href={immersionFacileHelpdeskRootUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        le support Immersion Facilitée
+      </a>
+      , en précisant le numéro de la convention, son statut et l’erreur.
+    </p>
+  </>
+);
+
+const unidentifiedBeneficiaryError: BroadcastFeedbackError = {
+  description:
+    "L'adresse mail ET / OU le numéro de téléphone indiqué sur la convention ne sont pas identiques à ceux du dossier France Travail. Ou le candidat n’a jamais été inscrit (inconnu du SI France Travail).",
+  solution: (statusCategory) => {
+    if (statusCategory === "unvalidated")
+      return (
+        <>
+          <PcmIdentificationInstructions />
+          <p>
+            Si l’adresse mail et le numéro de téléphone sont similaires entre
+            France Travail et la convention :
+          </p>
+          <UnexpectedErrorInstructions />
+        </>
+      );
+
+    if (statusCategory === "validated")
+      return (
+        <>
+          <p>
+            {"->"} Dans le cas où l'adresse mail et / ou le téléphone sont
+            différents :
+          </p>
+          <PcmIdentificationInstructions />
+          <p>
+            {"->"} Dans le cas où il n'a jamais été inscrit (non connu du SI
+            France Travail) :
+          </p>
+          <ul>
+            <li>Je procède à l'inscription du bénéficiaire.</li>
+            <li>
+              Je rediffuse la convention dans mon SI France Travail depuis
+              Immersion Facilitée.
+            </li>
+          </ul>
+        </>
+      );
+
+    return (
+      <>
+        <p>
+          {"->"} Dans le cas où l'adresse mail et / ou le téléphone sont
+          différents :
+        </p>
+        <ul>
+          <li>
+            Je contacte le bénéficiaire pour l'informer que je modifie l'adresse
+            mail et/ou le téléphone (de préférence un portable) indiqués sur la
+            convention par ceux présents dans le dossier France Travail avant
+            validation de la convention.
+          </li>
+          <li>
+            Dès que la convention sera modifiée, elle s’installera dans votre SI
+            et l’erreur disparaîtra de vos « conventions à vérifier ».
+          </li>
+        </ul>
+        <p>
+          {"->"} Dans le cas où il n'a jamais été inscrit (non connu du SI
+          France Travail) :
+        </p>
+        <ul>
+          <li>
+            Je procède à son inscription avant validation de la convention.
+          </li>
+          <li>
+            Je peux rediffuser la convention pour qu’elle s’installe dans mes
+            applicatifs.
+          </li>
+          <li>
+            Ou dès validation de la convention, elle s’installera
+            automatiquement.
+          </li>
+        </ul>
+      </>
+    );
+  },
+};
+
+const candidateBeneficiaryError: BroadcastFeedbackError = {
+  description:
+    "Personne en immersion connue du SI France Travail en tant que « candidat ».",
+  solution: (statusCategory) => {
+    if (statusCategory === "unvalidated")
+      return <UnexpectedErrorInstructions />;
+
+    return (
+      <ul>
+        <li>Je procède à son inscription.</li>
+        <li>
+          Je vérifie que l’adresse mail, le numéro de téléphone et la date de
+          naissance correspondent aux informations dans le dossier France
+          Travail, sinon je modifie la convention.
+        </li>
+        {statusCategory === "pendingValidation" && (
+          <li>
+            Je peux rediffuser la convention pour qu’elle s’installe dans mes
+            applicatifs, ou dès validation de la convention, elle s’installera
+            automatiquement.
+          </li>
+        )}
+        {statusCategory === "validated" && (
+          <li>
+            Je rediffuse la convention pour qu’elle s’installe dans mes
+            applicatifs.
+          </li>
+        )}
+      </ul>
+    );
+  },
+};
+
+const birthDateMismatchError: BroadcastFeedbackError = {
+  description:
+    "La date de naissance du bénéficiaire indiquée sur la convention n'est pas identique à celle du dossier France Travail.",
+  solution: (statusCategory) =>
+    statusCategory === "pendingValidation" ? (
+      <ul>
+        <li>
+          Je modifie la date de naissance du bénéficiaire sur la convention en
+          récupérant celle sous MAP.
+        </li>
+        <li>
+          Dès que la convention sera modifiée, elle s’installera automatiquement
+          dans votre SI et l’erreur disparaîtra de vos « conventions à vérifier
+          ».
+        </li>
+      </ul>
+    ) : (
+      <>
+        <p>
+          Je procède à la modification de la date de naissance sur la
+          convention.
+        </p>
+        <ul>
+          <li>
+            Depuis la convention : je clique sur « modifier la convention ».
+          </li>
+          <li>
+            Je modifie la date de naissance sur la convention, puis je clique
+            sur sauvegarder. Automatiquement la convention est installée dans
+            vos applicatifs.
+          </li>
+          <li>J'actualise ma page pour vérifier que l'erreur a disparu.</li>
+        </ul>
+      </>
+    ),
+};
+
+const multipleBeneficiariesError: BroadcastFeedbackError = {
+  description:
+    "Les informations mail, n° de téléphone ET/OU date de naissance communiquées sur la convention se retrouvent dans plusieurs dossiers France Travail.",
+  solution: (statusCategory) =>
+    statusCategory === "pendingValidation" ? (
+      <>
+        <p>
+          J’identifie le bon candidat dans le SI France Travail et les
+          informations qui diffèrent entre le SI France Travail et la
+          convention.
+        </p>
+        <p>Je modifie les informations qui diffèrent sur la convention.</p>
+        <p>
+          Dès que la convention sera modifiée, elle s’installera automatiquement
+          dans votre SI et l’erreur disparaîtra de vos « conventions à vérifier
+          ».
+        </p>
+      </>
+    ) : (
+      <PcmIdentificationInstructions />
+    ),
 };
 
 export const broadcastFeedbackErrorMessageMap: Record<
@@ -51,7 +259,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
     {
       description:
         "L'email transmis par le partenaire ne correspond pas à l'email renseigné dans le dossier du jeune.",
-      solution: (isConventionValidated) => (
+      solution: (statusCategory) => (
         <>
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans la
@@ -62,11 +270,11 @@ export const broadcastFeedbackErrorMessageMap: Record<
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans votre
             logiciel (i-milo)
-            {!isConventionValidated
+            {statusCategory === "pendingValidation"
               ? ", modifiez les informations du candidat sur la demande de convention, et renvoyez-la en signature."
               : " :"}
           </p>
-          {!!isConventionValidated && (
+          {statusCategory !== "pendingValidation" && (
             <ol>
               <li>Dupliquez la convention.</li>
               <li>Corrigez les informations bénéficiaire.</li>
@@ -102,7 +310,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
     {
       description:
         "Le téléphone transmis par le partenaire ne correspond pas au téléphone renseigné dans le dossier du jeune.",
-      solution: (isConventionValidated) => (
+      solution: (statusCategory) => (
         <>
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans la
@@ -114,11 +322,11 @@ export const broadcastFeedbackErrorMessageMap: Record<
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans votre
             logiciel (i-milo)
-            {!isConventionValidated
+            {statusCategory === "pendingValidation"
               ? ", modifiez les informations du candidat sur la demande de convention, et renvoyez-la en signature."
               : " :"}
           </p>
-          {!!isConventionValidated && (
+          {statusCategory !== "pendingValidation" && (
             <ol>
               <li>Dupliquez la convention.</li>
               <li>Corrigez les informations bénéficiaire.</li>
@@ -141,7 +349,7 @@ export const broadcastFeedbackErrorMessageMap: Record<
     {
       description:
         "L'email et le téléphone transmis par le partenaires ne correspondent pas aux email et téléphone renseignés dans le dossier du jeune.",
-      solution: (isConventionValidated) => (
+      solution: (statusCategory) => (
         <>
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans la
@@ -153,11 +361,11 @@ export const broadcastFeedbackErrorMessageMap: Record<
           <p>
             {"->"} Si les bonnes informations sont celles saisies dans votre
             logiciel (i-milo)
-            {!isConventionValidated
+            {statusCategory === "pendingValidation"
               ? ", modifiez les informations du candidat sur la demande de convention, et renvoyez-la en signature."
               : " :"}
           </p>
-          {isConventionValidated && (
+          {statusCategory !== "pendingValidation" && (
             <ol>
               <li>Dupliquez la convention.</li>
               <li>Corrigez les informations bénéficiaire.</li>
@@ -180,115 +388,36 @@ export const broadcastFeedbackErrorMessageMap: Record<
       </>
     ),
   },
-  "Identifiant National DE non trouvé": {
-    description:
-      "Le bénéficiaire n’est pas inscrit à France travail OU l’adresse mail OU le numéro de téléphone indiqué sur la convention n’est pas identique à ceux du dossier France travail.",
-    solution: (isConventionValidated) => (
-      <>
-        <p>{"-> "}Dans le cas où il n'est pas inscrit :</p>
-        <p>
-          {!isConventionValidated ? (
-            <ul>
-              <li>
-                Je procède à son inscription avant validation de la convention.
-              </li>
-              <li>
-                Je peux rediffuser la convention pour qu’elle s’installe dans
-                mes applicatifs,
-              </li>
-              <li>
-                Ou dès validation de la convention, elle s’installera
-                automatiquement.
-              </li>
-            </ul>
-          ) : (
-            <ul>
-              <li>Je procède à l'inscription du bénéficiaire.</li>
-              <li>
-                Je rediffuse la convention dans mon SI France Travail depuis
-                Immersion Facilitée.
-              </li>
-            </ul>
-          )}
-        </p>
-        <p>
-          {"-> "}Dans le cas où l'adresse mail et / ou le téléphone sont
-          différents:
-        </p>
-        <p>
-          {!isConventionValidated ? (
-            <ul>
-              <li>
-                Je contacte le bénéficiaire pour l'informer que je modifie
-                l'adresse mail et/ou le téléphone (de préférence un portable)
-                indiqués sur la convention par ceux présents dans le dossier
-                France travail avant validation de la convention.
-              </li>
-              <li>
-                Dès que la convention sera modifiée, elle s’installera dans
-                votre SI et l’erreur disparaîtra de vos « conventions à vérifier
-                ».
-              </li>
-            </ul>
-          ) : (
-            <p>
-              Je me rends sur mon assistant Immersion Facilitée accessible
-              depuis “Gestion des aides” via PCM pour forcer l’identification du
-              bénéficiaire. Je suis la démarche indiquée dans la version{" "}
-              <a
-                href="https://poleemploi.sharepoint.com/:p:/r/sites/NAT-Mediatheque-Appropriation/_layouts/15/Doc.aspx?sourcedoc=%7B40B26A24-77FD-40B3-A083-F6805C8C0B6E%7D&file=%5B26M03_3.C%5D_CFTPro_CDDE_Identification_Beneficiaires_Immersions.SA.V1.pptx&action=edit&mobileredirect=true"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ici
-              </a>
-            </p>
-          )}
-        </p>
-      </>
-    ),
-  },
-  "Identifiant National DE trouvé mais écart sur la date de naissance": {
-    description:
-      "La date de naissance du bénéficiaire indiquée sur la convention n'est pas identique à celle du dossier France Travail.",
-    solution: (isConventionValidated) => (
-      <>
-        {isConventionValidated ? (
-          <>
-            <p>
-              Je procède moi-même à la modification de la date de naissance sur
-              la convention.
-            </p>
-            <ul>
-              <li>
-                Depuis la convention : je clique sur « modifier la convention ».
-              </li>
-              <li>
-                Je modifie la convention, puis je clique sur sauvegarder.
-                Automatiquement la convention est installée dans vos
-                applicatifs.
-              </li>
-              <li>
-                J'actualise ma page, pour vérifier que l'erreur a disparu.
-              </li>
-            </ul>
-          </>
-        ) : (
-          <ul>
-            <li>
-              Je modifie la date de naissance du bénéficiaire sur la convention
-              en récupérant celle sous MAP.
-            </li>
-            <li>
-              Dès que la convention sera modifiée, elle s’installera
-              automatiquement dans votre SI et l’erreur disparaîtra de vos «
-              conventions à vérifier ».
-            </li>
-          </ul>
-        )}
-      </>
-    ),
-  },
+  "Identifiant National DE non trouvé": unidentifiedBeneficiaryError,
+  "Identifiant National DE trouvé mais écart sur la date de naissance":
+    birthDateMismatchError,
+  "Identifiant National DE trouvé, le bénéficiaire est un candidat":
+    candidateBeneficiaryError,
+  "Identifiant National DE trouvé mais écart sur la date de naissance, le bénéficiaire est un candidat":
+    candidateBeneficiaryError,
+  "Identifiant national non trouvé": unidentifiedBeneficiaryError,
+  "Identifiant national non trouvé avec le numéro de téléphone":
+    unidentifiedBeneficiaryError,
+  "Identifiant national trouvé avec le mail, bénéficiaire est un candidat":
+    candidateBeneficiaryError,
+  "Identifiant national trouvé avec le téléphone, bénéficiaire est un candidat ":
+    candidateBeneficiaryError,
+  "Identifiant national DE trouvé avec le mail mais écart sur la date de naissance":
+    birthDateMismatchError,
+  "Identifiant National DE trouvé avec le téléphone, mais écart sur la date de naissance":
+    birthDateMismatchError,
+  "Identifiant National trouvé avec le mail, mais écart sur la date de naissance, bénéficiaire est un candidat":
+    candidateBeneficiaryError,
+  "Identifiant National trouvé avec le téléphone, mais écart sur la date de naissance, bénéficiaire est un candidat":
+    candidateBeneficiaryError,
+  "Plusieurs Identifiant National DE trouvés": multipleBeneficiariesError,
+  "Plusieurs Identifiants nationaux DE trouvés avec mail":
+    multipleBeneficiariesError,
+  "Plusieurs Identifiants nationaux DE trouvés avec téléphone":
+    multipleBeneficiariesError,
+  "Plusieurs Identifiants nationaux DE trouvés avec mail et téléphone ":
+    multipleBeneficiariesError,
+  "Le bénéficiaire FT connect est un candidat": candidateBeneficiaryError,
   "Accord non signé pour ce type de structure d'accompagnement": {
     description: "Accord non signé pour ce type de structure d'accompagnement.",
     solution: () => (
@@ -326,5 +455,5 @@ export const getBroadcastFeedbackDescription = (errorMessage: string) => {
   if (isFranceTravailBroadcastTemporaryNetworkErrorMessage(errorMessage))
     return franceTravailTemporaryNetworkErrorBroadcastFeedback.description;
 
-  return "Erreur technique : Immersion Facilitée travaille actuellement à une proposition de solution avec votre DSI. Elle vous sera proposée prochainement.";
+  return "Erreur technique : Immersion Facilitée travaille actuellement à une résolution avec votre DSI.";
 };

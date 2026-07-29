@@ -3,7 +3,7 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import type { ReactNode } from "react";
 import {
   type ConventionStatus,
-  conventionStatusesAllowedForModification,
+  getBroadcastFeedbackConventionStatusCategory,
   isFranceTravailBroadcastTemporaryNetworkErrorMessage,
   isFunctionalBroadcastFeedbackError,
   type SubscriberErrorFeedback,
@@ -24,15 +24,15 @@ export const SubscriberErrorFeedbackComponent = ({
 }: SubscriberErrorFeedbackProps): JSX.Element => {
   const { message } = subscriberErrorFeedback;
 
-  const isConventionValidated =
-    !conventionStatusesAllowedForModification.includes(conventionStatus);
+  const statusCategory =
+    getBroadcastFeedbackConventionStatusCategory(conventionStatus);
 
   if (isFunctionalBroadcastFeedbackError(message)) {
     return (
       <BroadcastErrorDetails
         description={broadcastFeedbackErrorMessageMap[message].description}
         solution={broadcastFeedbackErrorMessageMap[message].solution(
-          isConventionValidated,
+          statusCategory,
         )}
       />
     );
@@ -44,7 +44,9 @@ export const SubscriberErrorFeedbackComponent = ({
         description={
           franceTravailTemporaryNetworkErrorBroadcastFeedback.description
         }
-        solution={franceTravailTemporaryNetworkErrorBroadcastFeedback.solution()}
+        solution={franceTravailTemporaryNetworkErrorBroadcastFeedback.solution(
+          statusCategory,
+        )}
       />
     );
   }
@@ -56,8 +58,8 @@ export const SubscriberErrorFeedbackComponent = ({
       label="Détail de l'erreur"
       solution={
         <p>
-          Immersion facilitée travaille actuellement à une proposition de
-          solution avec votre DSI. Elle vous sera proposée prochainement.
+          Immersion Facilitée travaille actuellement à une résolution avec votre
+          DSI.
         </p>
       }
     />
