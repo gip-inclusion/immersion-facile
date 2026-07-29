@@ -243,6 +243,11 @@ export const isFunction = <T>(
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
+export const hasEmptyArrayFilter = (filters: object): boolean =>
+  Object.values(filters).some(
+    (value) => Array.isArray(value) && value.length === 0,
+  );
+
 export const replaceEmptyValuesByUndefinedFromObject = <T>(obj: T): T => {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === "string") return (obj === "" ? undefined : obj) as T;
