@@ -49,12 +49,12 @@ const getAutocompleteValue = (
   defaultValue?: PropsValue<OptionType<AppellationMatchDto>>,
   searchTerm?: string,
 ): OptionType<AppellationMatchDto> | null => {
-  if (searchTerm === "" && defaultValue === undefined) return null;
   if (value)
     return {
       label: value.appellation.appellationLabel,
       value: value,
     };
+  if (searchTerm === "" && defaultValue === undefined) return null;
   if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
   return null;
 };

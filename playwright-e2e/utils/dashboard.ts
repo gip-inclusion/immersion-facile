@@ -200,12 +200,12 @@ const initiateConventionFromEstablishmentInformations = async ({
     `#${domElementIds.establishmentDashboard.initiateConvention.modalButton}`,
   );
 
-  expect(
+  await expect(
     page.locator(
       `#${domElementIds.conventionImmersion.conventionSection.immersionAddress}`,
     ),
   ).toHaveValue(selectedAddress);
-  expect(
+  await expect(
     page.locator(
       `#${domElementIds.conventionImmersion.conventionSection.immersionAppellation}-wrapper .im-select__single-value`,
     ),
