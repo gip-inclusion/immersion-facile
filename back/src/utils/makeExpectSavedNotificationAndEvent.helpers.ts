@@ -12,8 +12,8 @@ import {
 } from "shared";
 import type { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";
 import type {
+  EventPriority,
   NotificationAddedEvent,
-  NotificationBatchAddedEvent,
 } from "../domains/core/events/events";
 import type { InMemoryNotificationRepository } from "../domains/core/notifications/adapters/InMemoryNotificationRepository";
 import type { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
@@ -21,6 +21,7 @@ import type { WithNotificationIdAndKind } from "../domains/core/notifications/he
 export type ExpectSavedNotificationsAndEvents = ({
   emails,
   sms,
+  priority,
 }: ExpectedNotifications) => void;
 
 export const makeExpectSavedNotificationsAndEvents =
@@ -28,7 +29,7 @@ export const makeExpectSavedNotificationsAndEvents =
     notificationRepository: InMemoryNotificationRepository,
     outboxRepository: InMemoryOutboxRepository,
   ): ExpectSavedNotificationsAndEvents =>
-  ({ emails = [], sms = [] }) => {
+  ({ emails = [], sms = [], priority }) => {
     const paramsByKind = createParamsByKind(
       notificationRepository,
       emails,
@@ -40,47 +41,20 @@ export const makeExpectSavedNotificationsAndEvents =
         event.topic === "NotificationAdded",
     );
 
+    if (priority !== undefined)
+      notificationAddedEvents.forEach((event) => {
+        expectToEqual(event.priority, priority);
+      });
+
     notificationKinds.forEach(
       expectNotificationsOfKind(notificationAddedEvents, paramsByKind),
     );
   };
 
-export type ExpectSavedNotificationsBatchAndEvent = ReturnType<
-  typeof makeExpectSavedNotificationsBatchAndEvent
->;
-export const makeExpectSavedNotificationsBatchAndEvent =
-  (
-    notificationRepository: InMemoryNotificationRepository,
-    outboxRepository: InMemoryOutboxRepository,
-  ) =>
-  ({ emails = [], sms = [] }: ExpectedNotifications) => {
-    const paramsByKind = createParamsByKind(
-      notificationRepository,
-      emails,
-      sms,
-    );
-
-    const notificationBatchAddedEvents = outboxRepository.events.filter(
-      (event): event is NotificationBatchAddedEvent =>
-        event.topic === "NotificationBatchAdded",
-    );
-
-    expect(notificationBatchAddedEvents.length).toBeLessThanOrEqual(1);
-
-    if (notificationBatchAddedEvents.length === 0) {
-      expectToEqual(paramsByKind.email.notificationsOfKind, []);
-      expectToEqual(paramsByKind.sms.notificationsOfKind, []);
-    } else {
-      notificationKinds.forEach(
-        expectNotificationsBatch(notificationBatchAddedEvents[0], paramsByKind),
-      );
-    }
-  };
-
 type ExpectedNotifications = {
   emails?: TemplatedEmail[];
   sms?: TemplatedSms[];
-  inBatch?: boolean;
+  priority?: EventPriority;
 };
 
 const createParamsByKind = (
@@ -144,27 +118,5 @@ const expectNotificationsOfKind =
       notificationAddedEvents
         .filter(({ payload }) => payload.kind === kind)
         .map(({ payload }) => payload),
-    );
-  };
-
-const expectNotificationsBatch =
-  (
-    notificationBatchAddedEvent: NotificationBatchAddedEvent,
-    paramsByKind: ParamByKind,
-  ) =>
-  (kind: NotificationKind) => {
-    const { notificationsOfKind, expectedTemplatedContent } =
-      paramsByKind[kind];
-
-    expectToEqual(
-      notificationsOfKind.map(({ templatedContent }) => templatedContent),
-      expectedTemplatedContent,
-    );
-
-    expectToEqual(
-      notificationsOfKind.map(({ id }) => ({ id, kind })),
-      notificationBatchAddedEvent.payload.filter(
-        (payload) => payload.kind === kind,
-      ),
     );
   };

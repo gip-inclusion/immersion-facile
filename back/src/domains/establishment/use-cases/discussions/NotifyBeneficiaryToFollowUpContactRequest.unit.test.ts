@@ -2,6 +2,7 @@ import {
   ConnectedUserBuilder,
   DiscussionBuilder,
   errors,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -36,6 +37,7 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
     .buildUser();
 
   const expectedNotificationId = "notification-id-1";
+  const expectedEventId = "event-id-1";
 
   let uow: InMemoryUnitOfWork;
   let notifyBeneficiaryToFollowUpContactRequest: NotifyBeneficiaryToFollowUpContactRequest;
@@ -57,7 +59,7 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
         },
       });
 
-    uuidGenerator.setNextUuids([expectedNotificationId]);
+    uuidGenerator.setNextUuids([expectedNotificationId, expectedEventId]);
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
@@ -213,6 +215,13 @@ describe("NotifyBeneficiaryToFollowUpContactRequest", () => {
               contactPhone: "+33123456789",
             },
           },
+        },
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
+          payload: { id: expectedNotificationId, kind: "email" },
+          priority: 5,
         },
       ]);
     });
