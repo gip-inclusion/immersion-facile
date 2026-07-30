@@ -628,6 +628,7 @@ const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
       ],
     },
     agencyDashboard: agencyDashboardContent,
+    agencyDashboardAgencyDetails: agencyDashboardContent,
     manageConventionConnectedUser: agencyDashboardContent,
     admin: {
       title: "Mon espace administrateur",
