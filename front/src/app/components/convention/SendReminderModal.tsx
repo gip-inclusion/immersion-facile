@@ -79,7 +79,11 @@ export const SendReminderModal = ({
     ? isEmailDisabled && isSmsDisabled
     : isEmailDisabled;
 
+  const isBothChannelsBlocked =
+    hasMobilePhone && isEmailDisabled && isSmsDisabled;
+
   const emailLastSentAt = lastReminderDateByNotificationKind?.email;
+  const smsLastSentAt = lastReminderDateByNotificationKind?.sms;
 
   const handleCancel = () => {
     setNotificationKind(undefined);
@@ -140,16 +144,25 @@ export const SendReminderModal = ({
       ]}
     >
       {isAllChannelsBlocked && emailLastSentAt ? (
-        <p>
-          {formatBlockedReminderMessage(
-            getFirstChannelAvailableAgainLastSentAt({
-              emailLastSentAt,
-              smsLastSentAt: lastReminderDateByNotificationKind?.sms,
-            }),
-            now,
-            recipientFullName,
-          )}
-        </p>
+        isBothChannelsBlocked && smsLastSentAt ? (
+          <BothChannelsBlockedReminderMessage
+            recipientFullName={recipientFullName}
+            emailLastSentAt={emailLastSentAt}
+            smsLastSentAt={smsLastSentAt}
+            now={now}
+          />
+        ) : (
+          <p>
+            {formatBlockedReminderMessage(
+              getFirstChannelAvailableAgainLastSentAt({
+                emailLastSentAt,
+                smsLastSentAt,
+              }),
+              now,
+              recipientFullName,
+            )}
+          </p>
+        )
       ) : (
         <>
           {description}
@@ -209,6 +222,53 @@ export const SendReminderModal = ({
       )}
     </modal.Component>,
     document.body,
+  );
+};
+
+const BothChannelsBlockedReminderMessage = ({
+  recipientFullName,
+  emailLastSentAt,
+  smsLastSentAt,
+  now,
+}: {
+  recipientFullName?: string;
+  emailLastSentAt: DateTimeIsoString;
+  smsLastSentAt: DateTimeIsoString;
+  now: Date;
+}) => {
+  const recipientPart = recipientFullName ? ` à ${recipientFullName}` : "";
+  const earliestLastSentAt = getFirstChannelAvailableAgainLastSentAt({
+    emailLastSentAt,
+    smsLastSentAt,
+  });
+
+  return (
+    <>
+      <p>Une relance a déjà été envoyée{recipientPart} :</p>
+      <ul>
+        <li>
+          par SMS le{" "}
+          {toDisplayedDate({ date: new Date(smsLastSentAt), withHours: true })}
+        </li>
+        <li>
+          par email le{" "}
+          {toDisplayedDate({
+            date: new Date(emailLastSentAt),
+            withHours: true,
+          })}
+        </li>
+      </ul>
+      <p>
+        Afin d’éviter les envois excessifs, vous ne pourrez effectuer un nouvel
+        envoi que dans{" "}
+        {formatHoursCooldownTimeRemaining({
+          lastActionAt: new Date(earliestLastSentAt),
+          minHours: CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
+          now,
+        })}
+        .
+      </p>
+    </>
   );
 };
 
