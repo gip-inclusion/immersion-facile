@@ -7,8 +7,8 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
-  type ExpectSavedNotificationsBatchAndEvent,
-  makeExpectSavedNotificationsBatchAndEvent,
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -60,16 +60,15 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
 
   let uow: InMemoryUnitOfWork;
   let closeInactiveAgenciesWithoutRecentConventions: CloseInactiveAgenciesWithoutRecentConventions;
-  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    expectSavedNotificationsBatchAndEvent =
-      makeExpectSavedNotificationsBatchAndEvent(
-        uow.notificationRepository,
-        uow.outboxRepository,
-      );
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
     timeGateway = new CustomTimeGateway(defaultDate);
     closeInactiveAgenciesWithoutRecentConventions =
       makeCloseInactiveAgenciesWithoutRecentConventions({
@@ -137,7 +136,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
       expectToEqual(result, {
         numberOfAgenciesClosed: 0,
       });
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [],
       });
     });
@@ -169,7 +168,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
       expectToEqual(result, {
         numberOfAgenciesClosed: 0,
       });
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [],
       });
       expectToEqual(uow.agencyRepository.agencies, [agency1WithRights]);
@@ -220,7 +219,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",
@@ -285,7 +284,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",
@@ -398,7 +397,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         numberOfAgenciesClosed: 2,
       });
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",
@@ -474,7 +473,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",
@@ -559,7 +558,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
           statusJustification: "Agence fermée automatiquement pour inactivité",
         },
       ]);
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",
@@ -627,7 +626,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "AGENCY_CLOSED_FOR_INACTIVITY",

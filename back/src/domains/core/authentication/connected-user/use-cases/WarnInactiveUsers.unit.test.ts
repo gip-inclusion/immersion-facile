@@ -9,14 +9,15 @@ import {
   type AbsoluteUrl,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  expectArraysToMatch,
   expectToEqual,
   frontRoutes,
   makeBooleanFeatureFlag,
   makeRouteAbsoluteUrl,
 } from "shared";
 import {
-  type ExpectSavedNotificationsBatchAndEvent,
-  makeExpectSavedNotificationsBatchAndEvent,
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -28,6 +29,7 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { inactiveUserNotificationEventPriority } from "./inactiveUserConstants";
 import {
   makeUser,
   saveDeletionWarningNotification,
@@ -49,7 +51,7 @@ describe("WarnInactiveUsers", () => {
 
   let uow: InMemoryUnitOfWork;
   let warnInactiveUsers: WarnInactiveUsers;
-  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
@@ -60,11 +62,10 @@ describe("WarnInactiveUsers", () => {
     timeGateway = new CustomTimeGateway();
     timeGateway.setNextDate(now);
 
-    expectSavedNotificationsBatchAndEvent =
-      makeExpectSavedNotificationsBatchAndEvent(
-        uow.notificationRepository,
-        uow.outboxRepository,
-      );
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
 
     warnInactiveUsers = makeWarnInactiveUsers({
       deps: {
@@ -154,7 +155,7 @@ describe("WarnInactiveUsers", () => {
     const result = await warnInactiveUsers.execute();
 
     expectToEqual(result, { numberOfWarningsSent: 2 });
-    expectSavedNotificationsBatchAndEvent({
+    expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "ACCOUNT_DELETION_WARNING",
@@ -181,6 +182,7 @@ describe("WarnInactiveUsers", () => {
           },
         },
       ],
+      priority: inactiveUserNotificationEventPriority,
     });
   });
 
@@ -298,7 +300,7 @@ describe("WarnInactiveUsers", () => {
     const result = await warnInactiveUsers.execute();
 
     expectToEqual(result, { numberOfWarningsSent: 1 });
-    expectSavedNotificationsBatchAndEvent({
+    expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "ACCOUNT_DELETION_WARNING",
@@ -313,6 +315,7 @@ describe("WarnInactiveUsers", () => {
           },
         },
       ],
+      priority: inactiveUserNotificationEventPriority,
     });
   });
 
@@ -340,10 +343,6 @@ describe("WarnInactiveUsers", () => {
     const result = await warnInactiveUsers.execute();
 
     expectToEqual(result, { numberOfWarningsSent: 1 });
-    const batchEvent = uow.outboxRepository.events.find(
-      (e) => e.topic === "NotificationBatchAdded",
-    );
-    expectToEqual(batchEvent?.payload.length, 1);
     const newWarnings = uow.notificationRepository.notifications.filter(
       (n) =>
         n.kind === "email" &&
@@ -351,6 +350,16 @@ describe("WarnInactiveUsers", () => {
         n.followedIds.userId === freshCandidate.id,
     );
     expectToEqual(newWarnings.length, 1);
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "NotificationAdded",
+        payload: {
+          id: newWarnings[0].id,
+          kind: newWarnings[0].kind,
+        },
+        priority: inactiveUserNotificationEventPriority,
+      },
+    ]);
   });
 
   it("processes inactive users in batches and skips the empty final batch", async () => {
@@ -368,17 +377,28 @@ describe("WarnInactiveUsers", () => {
         batchSize: 2,
       },
     });
-    uow.userRepository.users = makeInactiveUsers(3);
+    const inactiveUsers = makeInactiveUsers(3);
+    uow.userRepository.users = inactiveUsers;
 
     const result = await warnInactiveUsers.execute();
 
     expectToEqual(result, { numberOfWarningsSent: 3 });
-    expectToEqual(
-      uow.outboxRepository.events
-        .filter((event) => event.topic === "NotificationBatchAdded")
-        .map((event) => event.payload.length),
-      [2, 1],
-    );
+    expectToEqual(uow.outboxRepository.events.length, 3);
+    expectSavedNotificationsAndEvents({
+      emails: inactiveUsers.map((user) => ({
+        kind: "ACCOUNT_DELETION_WARNING",
+        recipients: [user.email],
+        params: {
+          fullName: `${user.firstName} ${user.lastName}`,
+          deletionDate: "22 janvier 2026",
+          loginUrl: makeRouteAbsoluteUrl({
+            route: frontRoutes.myAccount(),
+            baseUrl: immersionBaseUrl,
+          }),
+        },
+      })),
+      priority: inactiveUserNotificationEventPriority,
+    });
     expectToEqual(countingUowPerformer.getCount(), 4);
   });
 

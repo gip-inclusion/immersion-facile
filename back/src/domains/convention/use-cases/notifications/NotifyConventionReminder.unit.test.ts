@@ -25,8 +25,8 @@ import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
-  type ExpectSavedNotificationsBatchAndEvent,
-  makeExpectSavedNotificationsBatchAndEvent,
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -58,7 +58,7 @@ describe("NotifyConventionReminder use case", () => {
   let timeGateway: CustomTimeGateway;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
-  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
@@ -66,11 +66,10 @@ describe("NotifyConventionReminder use case", () => {
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
 
-    expectSavedNotificationsBatchAndEvent =
-      makeExpectSavedNotificationsBatchAndEvent(
-        uow.notificationRepository,
-        uow.outboxRepository,
-      );
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
 
     useCase = makeNotifyConventionReminder({
       uowPerformer: new InMemoryUowPerformer(uow),
@@ -104,7 +103,7 @@ describe("NotifyConventionReminder use case", () => {
       );
 
       //Assert
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [],
       });
     });
@@ -124,7 +123,7 @@ describe("NotifyConventionReminder use case", () => {
       );
 
       //Assert
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [],
       });
     });
@@ -205,7 +204,7 @@ describe("NotifyConventionReminder use case", () => {
           baseUrl: config.immersionFacileBaseUrl,
         });
 
-        expectSavedNotificationsBatchAndEvent({
+        expectSavedNotificationsAndEvents({
           emails: [
             makeAgencyFirstReminderEmail({
               email: validator1.email,
@@ -254,7 +253,7 @@ describe("NotifyConventionReminder use case", () => {
             }),
             errors.convention.forbiddenReminder({ convention, kind }),
           );
-          expectSavedNotificationsBatchAndEvent({
+          expectSavedNotificationsAndEvents({
             emails: [],
           });
         });
@@ -287,7 +286,7 @@ describe("NotifyConventionReminder use case", () => {
           baseUrl: config.immersionFacileBaseUrl,
         });
 
-        expectSavedNotificationsBatchAndEvent({
+        expectSavedNotificationsAndEvents({
           emails: [
             makeAgencyLastReminderEmail({
               email: validator1.email,
@@ -333,7 +332,7 @@ describe("NotifyConventionReminder use case", () => {
           );
 
           //Assert
-          expectSavedNotificationsBatchAndEvent({
+          expectSavedNotificationsAndEvents({
             emails: [],
           });
         });
@@ -409,7 +408,7 @@ describe("NotifyConventionReminder use case", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
@@ -498,7 +497,7 @@ describe("NotifyConventionReminder use case", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
@@ -548,7 +547,7 @@ describe("NotifyConventionReminder use case", () => {
           }),
           errors.convention.forbiddenReminder({ convention, kind }),
         );
-        expectSavedNotificationsBatchAndEvent({});
+        expectSavedNotificationsAndEvents({});
       });
     });
   });
@@ -705,7 +704,7 @@ describe("NotifyConventionReminder use case", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
@@ -781,7 +780,7 @@ describe("NotifyConventionReminder use case", () => {
         },
       ]);
 
-      expectSavedNotificationsBatchAndEvent({
+      expectSavedNotificationsAndEvents({
         emails: [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,

@@ -2,6 +2,7 @@ import {
   ConnectedUserBuilder,
   DiscussionBuilder,
   errors,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -35,6 +36,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
     .buildUser();
 
   const expectedNotificationIds = ["notification-id-1", "notification-id-2"];
+  const expectedEventIds = ["event-id-1", "event-id-2"];
 
   let uow: InMemoryUnitOfWork;
   let markDiscussionDeprecatedAndNotify: MarkDiscussionDeprecatedAndNotify;
@@ -55,7 +57,10 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
       },
     });
 
-    uuidGenerator.setNextUuids(expectedNotificationIds);
+    uuidGenerator.setNextUuids([
+      ...expectedNotificationIds,
+      ...expectedEventIds,
+    ]);
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
@@ -200,6 +205,14 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
         },
       },
     ]);
+    expectArraysToMatch(
+      uow.outboxRepository.events,
+      expectedNotificationIds.map((id: string) => ({
+        topic: "NotificationAdded",
+        payload: { id, kind: "email" },
+        priority: 5,
+      })),
+    );
   });
 
   it("should emit only beneficiary notification if establishment is not found", async () => {
@@ -228,6 +241,13 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             discussionCreatedAt: discussion.createdAt,
           },
         },
+      },
+    ]);
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "NotificationAdded",
+        payload: { id: expectedNotificationIds[0], kind: "email" },
+        priority: 5,
       },
     ]);
   });
