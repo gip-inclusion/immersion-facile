@@ -238,6 +238,7 @@ describe("CloseInactiveAgenciesWithoutRecentConventions", () => {
             },
           },
         ],
+        priority: 7,
       });
     });
 

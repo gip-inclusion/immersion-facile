@@ -210,7 +210,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
       expectedNotificationIds.map((id: string) => ({
         topic: "NotificationAdded",
         payload: { id, kind: "email" },
-        priority: 5,
+        priority: 7,
       })),
     );
   });
@@ -247,7 +247,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
       {
         topic: "NotificationAdded",
         payload: { id: expectedNotificationIds[0], kind: "email" },
-        priority: 5,
+        priority: 7,
       },
     ]);
   });

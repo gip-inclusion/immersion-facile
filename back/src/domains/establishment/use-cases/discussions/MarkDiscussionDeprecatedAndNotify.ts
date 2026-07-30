@@ -77,27 +77,31 @@ export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
       status: "REJECTED",
       rejectionKind: "DEPRECATED",
     });
-    await deps.saveNotificationsBatchAndRelatedEvent(uow, [
-      ...(establishmentNotification ? [establishmentNotification] : []),
-      {
-        kind: "email",
-        templatedContent: {
-          kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",
-          recipients: [discussion.potentialBeneficiary.email],
-          params: {
-            beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-            beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-            businessName: discussion.businessName,
-            searchPageUrl: makeRouteAbsoluteUrl({
-              route: frontRoutes.search(),
-              baseUrl: deps.config.immersionFacileBaseUrl,
-            }),
-            discussionCreatedAt: discussion.createdAt,
+    await deps.saveNotificationsBatchAndRelatedEvent(
+      uow,
+      [
+        ...(establishmentNotification ? [establishmentNotification] : []),
+        {
+          kind: "email",
+          templatedContent: {
+            kind: "DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY",
+            recipients: [discussion.potentialBeneficiary.email],
+            params: {
+              beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
+              beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+              businessName: discussion.businessName,
+              searchPageUrl: makeRouteAbsoluteUrl({
+                route: frontRoutes.search(),
+                baseUrl: deps.config.immersionFacileBaseUrl,
+              }),
+              discussionCreatedAt: discussion.createdAt,
+            },
+          },
+          followedIds: {
+            establishmentSiret: discussion.siret,
           },
         },
-        followedIds: {
-          establishmentSiret: discussion.siret,
-        },
-      },
-    ]);
+      ],
+      { priority: 7 },
+    );
   });

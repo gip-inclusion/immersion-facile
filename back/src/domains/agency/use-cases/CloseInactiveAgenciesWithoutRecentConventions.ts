@@ -109,7 +109,9 @@ export const makeCloseInactiveAgenciesWithoutRecentConventions = useCaseBuilder(
           }),
         );
 
-        await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications);
+        await deps.saveNotificationsBatchAndRelatedEvent(uow, notifications, {
+          priority: 7,
+        });
         numberOfAgenciesClosed += agenciesToClose.length;
       });
     }
