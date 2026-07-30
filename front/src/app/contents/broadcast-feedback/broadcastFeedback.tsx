@@ -132,6 +132,21 @@ const candidateBeneficiaryError: BroadcastFeedbackError = {
     if (statusCategory === "unvalidated")
       return <UnexpectedErrorInstructions />;
 
+    if (statusCategory === "validated")
+      return (
+        <ul>
+          <li>
+            Je procède à son inscription en essayant de mettre les mêmes
+            informations que sur la convention (mail et numéro de téléphone)
+            dans le dossier FT. Sinon, je devrai traiter la nouvelle erreur.
+          </li>
+          <li>
+            Je rediffuse la convention pour qu’elle s’installe dans mes
+            applicatifs.
+          </li>
+        </ul>
+      );
+
     return (
       <ul>
         <li>Je procède à son inscription.</li>
@@ -140,19 +155,11 @@ const candidateBeneficiaryError: BroadcastFeedbackError = {
           naissance correspondent aux informations dans le dossier France
           Travail, sinon je modifie la convention.
         </li>
-        {statusCategory === "pendingValidation" && (
-          <li>
-            Je peux rediffuser la convention pour qu’elle s’installe dans mes
-            applicatifs, ou dès validation de la convention, elle s’installera
-            automatiquement.
-          </li>
-        )}
-        {statusCategory === "validated" && (
-          <li>
-            Je rediffuse la convention pour qu’elle s’installe dans mes
-            applicatifs.
-          </li>
-        )}
+        <li>
+          Je peux rediffuser la convention pour qu’elle s’installe dans mes
+          applicatifs, ou dès validation de la convention, elle s’installera
+          automatiquement.
+        </li>
       </ul>
     );
   },
@@ -170,8 +177,7 @@ const birthDateMismatchError: BroadcastFeedbackError = {
         </li>
         <li>
           Dès que la convention sera modifiée, elle s’installera automatiquement
-          dans votre SI et l’erreur disparaîtra de vos « conventions à vérifier
-          ».
+          dans mon SI et l’erreur disparaîtra de mes « conventions à vérifier ».
         </li>
       </ul>
     ) : (
@@ -209,8 +215,7 @@ const multipleBeneficiariesError: BroadcastFeedbackError = {
         <p>Je modifie les informations qui diffèrent sur la convention.</p>
         <p>
           Dès que la convention sera modifiée, elle s’installera automatiquement
-          dans votre SI et l’erreur disparaîtra de vos « conventions à vérifier
-          ».
+          dans mon SI et l’erreur disparaîtra de mes « conventions à vérifier ».
         </p>
       </>
     ) : (
