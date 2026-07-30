@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import type { ModalProps } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { type ComponentType, type ReactNode, useState } from "react";
@@ -244,7 +245,9 @@ const BothChannelsBlockedReminderMessage = ({
 
   return (
     <>
-      <p>Une relance a déjà été envoyée{recipientPart} :</p>
+      <p className={fr.cx("fr-mb-0")}>
+        Une relance a déjà été envoyée{recipientPart} :
+      </p>
       <ul>
         <li>
           par SMS le{" "}
