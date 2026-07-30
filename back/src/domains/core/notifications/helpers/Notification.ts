@@ -79,6 +79,8 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
     notificationsContent: NotificationContentAndFollowedIds[],
     options?: { priority: number },
   ): Promise<Notification[]> => {
+    if (notificationsContent.length === 0) return [];
+
     const now = timeGateway.now().toISOString();
 
     const notifications = notificationsContent.map((content) => ({
@@ -87,18 +89,20 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
       createdAt: now,
     }));
 
-    const event = createNewEvent({
-      topic: "NotificationBatchAdded",
-      occurredAt: now,
-      payload: notifications.map((notification) => ({
-        id: notification.id,
-        kind: notification.kind,
-      })),
-      priority: options?.priority ?? defaultPriority,
-    });
+    const events = notifications.map((notification) =>
+      createNewEvent({
+        topic: "NotificationAdded",
+        occurredAt: now,
+        payload: {
+          id: notification.id,
+          kind: notification.kind,
+        },
+        priority: options?.priority ?? defaultPriority,
+      }),
+    );
 
     await uow.notificationRepository.saveBatch(notifications);
-    await uow.outboxRepository.save(event);
+    await uow.outboxRepository.saveNewEventsBatch(events);
 
     return notifications;
   };
