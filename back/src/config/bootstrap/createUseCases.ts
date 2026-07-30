@@ -126,7 +126,6 @@ import {
   makeSaveNotificationsBatchAndRelatedEvent,
 } from "../../domains/core/notifications/helpers/Notification";
 import { makeSendNotification } from "../../domains/core/notifications/useCases/SendNotification";
-import { makeSendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { makeHtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { makeUpdateInvalidPhone } from "../../domains/core/phone-number/use-cases/UpdateInvalidPhone";
 import { makeAppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
@@ -280,12 +279,6 @@ export const createUseCases = ({
         createNewEvent,
         notificationGateway: gateways.notification,
         timeGateway: gateways.timeGateway,
-      },
-    }),
-    sendNotificationsInBatch: makeSendNotificationInBatch({
-      uowPerformer,
-      deps: {
-        notificationGateway: gateways.notification,
       },
     }),
 

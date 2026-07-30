@@ -89,10 +89,6 @@ export type NotificationAddedEvent = GenericEvent<
   "NotificationAdded",
   WithNotificationIdAndKind
 >;
-export type NotificationBatchAddedEvent = GenericEvent<
-  "NotificationBatchAdded",
-  WithNotificationIdAndKind[]
->;
 
 export type TriggeredBy =
   | { kind: "connected-user"; userId: UserId }
@@ -123,7 +119,6 @@ export type WithTriggeredBy = {
 // biome-ignore format: better readability without formatting
 export type DomainEvent =
   | NotificationAddedEvent
-  | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & Partial<WithDiscussionId> & Partial<WithConventionDraftId> & WithTriggeredBy>
