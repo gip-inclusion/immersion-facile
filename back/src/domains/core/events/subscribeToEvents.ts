@@ -61,7 +61,6 @@ const getUseCasesByTopics = (
   DiscussionBeneficiaryFollowUpRequested: [
     useCases.notifyBeneficiaryToFollowUpContactRequest,
   ],
-  NotificationBatchAdded: [useCases.sendNotificationsInBatch],
 
   // "Happy case" for conventions.
   ConventionSubmittedByBeneficiary: [
