@@ -40,13 +40,20 @@ import { makeTestPgPool } from "../../../config/pg/pgPool";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { assesmentEntityToConventionAssessmentFields } from "../../../utils/convention";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import type { AgencyRepository } from "../../agency/ports/AgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { PgBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/PgBroadcastFeedbacksRepository";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import {
   type AssessmentEntity,
   createAssessmentEntity,
 } from "../entities/AssessmentEntity";
-import type { GetConventionsParams } from "../ports/ConventionQueries";
+import type { AssessmentRepository } from "../ports/AssessmentRepository";
+import type {
+  ConventionQueries,
+  GetConventionsParams,
+} from "../ports/ConventionQueries";
+import type { ConventionRepository } from "../ports/ConventionRepository";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
@@ -1520,7 +1527,10 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("getPaginatedConventions", () => {
+  describe.each([
+    "Pg",
+    "InMemory",
+  ] as const)("%s getPaginatedConventions", (adapter) => {
     const agencyId = "cccccc99-9c0b-1bbb-bb6d-6bb9bd38cccc";
     const agency = new AgencyDtoBuilder()
       .withId(agencyId)
@@ -1614,7 +1624,25 @@ describe("Pg implementation of ConventionQueries", () => {
       )
       .build();
 
+    let conventionQueries: ConventionQueries;
+    let agencyRepo: AgencyRepository;
+    let assessmentRepo: AssessmentRepository;
+    let conventionRepository: ConventionRepository;
+
     beforeEach(async () => {
+      if (adapter === "Pg") {
+        conventionQueries = new PgConventionQueries(db);
+        agencyRepo = new PgAgencyRepository(db);
+        assessmentRepo = new PgAssessmentRepository(db);
+        conventionRepository = new PgConventionRepository(db);
+      } else {
+        const uow = createInMemoryUow();
+        conventionQueries = uow.conventionQueries;
+        agencyRepo = uow.agencyRepository;
+        assessmentRepo = uow.assessmentRepository;
+        conventionRepository = uow.conventionRepository;
+      }
+
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
