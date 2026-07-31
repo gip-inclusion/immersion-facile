@@ -1,3 +1,4 @@
+import { uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyUserConventionListDto,
@@ -135,7 +136,7 @@ export const conventionDtosToAgencyUserConventionListDtos = async (
 ): Promise<AgencyUserConventionListDto[]> => {
   if (conventions.length === 0) return [];
 
-  const agencyIds = [...new Set(conventions.map(({ agencyId }) => agencyId))];
+  const agencyIds = uniq(conventions.map(({ agencyId }) => agencyId));
   const [agencies, assessments] = await Promise.all([
     uow.agencyRepository.getByIds(agencyIds),
     uow.assessmentRepository.getByConventionIds(
@@ -163,6 +164,15 @@ export const conventionDtosToAgencyUserConventionListDtos = async (
 
     const { beneficiary } = convention.signatories;
 
+    const federatedIdentity = beneficiary.federatedIdentity
+      ? {
+          provider: beneficiary.federatedIdentity.provider,
+          ...(beneficiary.federatedIdentity.payload
+            ? { payload: beneficiary.federatedIdentity.payload }
+            : {}),
+        }
+      : undefined;
+
     return {
       id: convention.id,
       status: convention.status,
@@ -177,7 +187,7 @@ export const conventionDtosToAgencyUserConventionListDtos = async (
       beneficiary: {
         firstName: beneficiary.firstName,
         lastName: beneficiary.lastName,
-        federatedIdentity: beneficiary.federatedIdentity,
+        federatedIdentity,
       },
     };
   });

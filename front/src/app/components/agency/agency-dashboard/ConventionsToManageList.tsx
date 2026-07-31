@@ -83,8 +83,11 @@ export const ConventionsToManageList = ({
       {currentUserConventions?.length === 0 && (
         <p>Aucune convention à traiter en urgence.</p>
       )}
-      {currentUserConventions.map((convention) => (
-        <AgencyTaskItem key={convention.id} convention={convention} />
+      {currentUserConventions.map((conventionListItem) => (
+        <AgencyTaskItem
+          key={conventionListItem.id}
+          conventionListItem={conventionListItem}
+        />
       ))}
       {pagination &&
         pagination?.totalRecords > NUMBER_ITEM_TO_DISPLAY_IN_PAGINATED_PAGE && (
@@ -108,41 +111,44 @@ export const ConventionsToManageList = ({
 };
 
 const AgencyTaskItem = ({
-  convention,
+  conventionListItem,
 }: {
-  convention: AgencyUserConventionListDto;
+  conventionListItem: AgencyUserConventionListDto;
 }) => {
   const title = (
     <>
       <span className={fr.cx("fr-pr-2v")}>
-        {convention.beneficiary.firstName} {
-          convention.beneficiary.lastName
-        }{" "}
+        {conventionListItem.beneficiary.firstName}{" "}
+        {conventionListItem.beneficiary.lastName}{" "}
       </span>
       <Badge
-        className={fr.cx(labelAndSeverityByStatus[convention.status].color)}
+        className={fr.cx(
+          labelAndSeverityByStatus[conventionListItem.status].color,
+        )}
         small
       >
-        {labelAndSeverityByStatus[convention.status].label.agency}
+        {labelAndSeverityByStatus[conventionListItem.status].label.agency}
       </Badge>
     </>
   );
-  const footer = convention.beneficiary.federatedIdentity?.provider ===
+  const footer = conventionListItem.beneficiary.federatedIdentity?.provider ===
     "peConnect" &&
-    convention.beneficiary.federatedIdentity.payload && (
+    conventionListItem.beneficiary.federatedIdentity.payload && (
       <>
         Conseiller :{" "}
         {getFormattedFirstnameAndLastname({
           firstname:
-            convention.beneficiary.federatedIdentity.payload.advisor?.firstName,
+            conventionListItem.beneficiary.federatedIdentity.payload.advisor
+              ?.firstName,
           lastname:
-            convention.beneficiary.federatedIdentity.payload.advisor?.lastName,
+            conventionListItem.beneficiary.federatedIdentity.payload.advisor
+              ?.lastName,
         })}
       </>
     );
   const immersionStartedSinceDays = getDaysBetween(
     new Date(),
-    new Date(convention.dateStart),
+    new Date(conventionListItem.dateStart),
   );
 
   const description = match({ immersionStartedSinceDays })
@@ -196,7 +202,7 @@ const AgencyTaskItem = ({
                 target: "_blank",
                 rel: "noreferrer",
                 href: frontRoutes.manageConventionConnectedUser({
-                  conventionId: convention.id,
+                  conventionId: conventionListItem.id,
                 }).link.href,
               }}
             >

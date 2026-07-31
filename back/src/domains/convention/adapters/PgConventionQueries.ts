@@ -29,7 +29,6 @@ import {
   errors,
   functionalBroadcastFeedbackErrorMessage,
   type GetPaginatedConventionsSortBy,
-  hasEmptyArrayFilter,
   type PaginationQueryParams,
   pipeWithValue,
   type UserId,
@@ -64,6 +63,7 @@ import {
   getConventionAgencyFieldsForAgencies,
   getLastRemindersFieldsByConventions,
   getReadConventionById,
+  hasEmptyArrayFilter,
   wrapInMaterializedCteWithEnrichment,
 } from "./pgConventionSql";
 
@@ -712,12 +712,12 @@ const sortConventions =
 
 const filterByAgencyIds =
   (agencyIds: AgencyId[] | undefined) =>
-  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
-    if (!agencyIds) return builder;
-    return builder.where(
-      sql<boolean>`conventions.agency_id = ANY(${agencyIds}::uuid[])`,
-    );
-  };
+  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder =>
+    agencyIds
+      ? builder.where(
+          sql<boolean>`conventions.agency_id = ANY(${agencyIds}::uuid[])`,
+        )
+      : builder;
 
 const filterByAgencyDepartmentCodes =
   (agencyDepartmentCodes: string[] | undefined) =>

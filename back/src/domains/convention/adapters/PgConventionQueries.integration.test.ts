@@ -1642,7 +1642,6 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it("should return conventions with pagination", async () => {
       const resultPage1 = await conventionQueries.getPaginatedConventions({
-        filters: { agencyIds: [agencyId, differentAgencyId] },
         pagination: { page: 1, perPage: 2 },
         sort: {
           by: "dateSubmission",
@@ -1659,7 +1658,6 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultPage1.data, [conventionD, conventionC]);
 
       const resultPage2 = await conventionQueries.getPaginatedConventions({
-        filters: { agencyIds: [agencyId, differentAgencyId] },
         pagination: { page: 2, perPage: 2 },
         sort: {
           by: "dateSubmission",
@@ -1701,7 +1699,6 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it("should return correct data when accessing a non-first page", async () => {
       const resultPage3 = await conventionQueries.getPaginatedConventions({
-        filters: { agencyIds: [agencyId, differentAgencyId] },
         pagination: { page: 3, perPage: 1 },
         sort: {
           by: "dateSubmission",
@@ -1724,7 +1721,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           statuses: ["READY_TO_SIGN"],
         },
         sort: {
@@ -1739,7 +1735,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should filter conventions by beneficiary name", async () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
-        filters: { agencyIds: [agencyId, differentAgencyId], search: "John" },
+        filters: { search: "John" },
         sort: {
           by: "dateSubmission",
           direction: "desc",
@@ -1752,7 +1748,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should filter conventions by beneficiary fullname", async () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
-        filters: { agencyIds: [agencyId, differentAgencyId], search: "John D" },
+        filters: { search: "John D" },
         sort: {
           by: "dateSubmission",
           direction: "desc",
@@ -1768,7 +1764,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           search: "Business B",
         },
         sort: {
@@ -1784,7 +1779,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           search: conventionA.siret,
         },
         sort: {
@@ -1799,7 +1793,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           search: conventionA.id,
         },
         sort: {
@@ -1815,7 +1808,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           search: "00000000-0000-0000-0000-000000000000",
         },
         sort: {
@@ -1830,7 +1822,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should filter conventions by agency referent first name", async () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
-        filters: { agencyIds: [agencyId, differentAgencyId], search: "Marie" },
+        filters: { search: "Marie" },
         sort: {
           by: "dateSubmission",
           direction: "desc",
@@ -1843,7 +1835,7 @@ describe("Pg implementation of ConventionQueries", () => {
     it("should filter conventions by agency referent last name", async () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
-        filters: { agencyIds: [agencyId, differentAgencyId], search: "Martin" },
+        filters: { search: "Martin" },
         sort: {
           by: "dateSubmission",
           direction: "desc",
@@ -1857,7 +1849,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           search: "Pierre Martin",
         },
         sort: {
@@ -1873,7 +1864,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           dateStart: {
             from: "2023-02-01",
             to: "2023-03-31",
@@ -1891,7 +1881,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           dateEnd: {
             from: "2023-03-01",
           },
@@ -1940,7 +1929,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["finalized"],
             },
             sort: {
@@ -1975,7 +1963,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["finalized"],
             },
             sort: {
@@ -2018,7 +2005,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-sign"],
             },
             sort: {
@@ -2060,7 +2046,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-complete"],
             },
             sort: {
@@ -2102,7 +2087,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-complete"],
             },
             sort: {
@@ -2150,7 +2134,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-complete"],
             },
             sort: {
@@ -2183,7 +2166,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-complete"],
             },
             sort: {
@@ -2211,7 +2193,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["to-complete", "to-sign"],
             },
             sort: {
@@ -2256,7 +2237,6 @@ describe("Pg implementation of ConventionQueries", () => {
           const result = await conventionQueries.getPaginatedConventions({
             pagination: { page: 1, perPage: 10 },
             filters: {
-              agencyIds: [agencyId, differentAgencyId],
               assessmentCompletionStatus: ["finalized", "to-sign"],
             },
             sort: {
@@ -2273,7 +2253,6 @@ describe("Pg implementation of ConventionQueries", () => {
         const result = await conventionQueries.getPaginatedConventions({
           pagination: { page: 1, perPage: 10 },
           filters: {
-            agencyIds: [agencyId, differentAgencyId],
             assessmentCompletionStatus: ["to-complete"],
           },
           sort: {
@@ -2297,7 +2276,6 @@ describe("Pg implementation of ConventionQueries", () => {
       );
 
       const result = await conventionQueries.getPaginatedConventions({
-        filters: { agencyIds: [agencyId, differentAgencyId] },
         pagination: { page: 1, perPage: 10 },
         sort: {
           by: "dateStart",
@@ -2316,7 +2294,6 @@ describe("Pg implementation of ConventionQueries", () => {
 
     it("should respect pagination limits", async () => {
       const result = await conventionQueries.getPaginatedConventions({
-        filters: { agencyIds: [agencyId, differentAgencyId] },
         pagination: { page: 1, perPage: 2 },
         sort: {
           by: "dateSubmission",
@@ -2331,7 +2308,6 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getPaginatedConventions({
         pagination: { page: 1, perPage: 10 },
         filters: {
-          agencyIds: [agencyId, differentAgencyId],
           statuses: ["READY_TO_SIGN", "IN_REVIEW"],
           dateSubmission: {
             from: "2023-01-01",

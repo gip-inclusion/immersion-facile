@@ -17,13 +17,6 @@ import { getUserWithRights } from "../../connected-users/helpers/userRights.help
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-const agencyRolesWithConventionAccess: AgencyRole[] = [
-  "counsellor",
-  "validator",
-  "agency-admin",
-  "agency-viewer",
-];
-
 export const makeGetConventionsForAgencyUser = useCaseBuilder(
   "GetConventionsForAgencyUser",
 )
@@ -92,7 +85,12 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
 
     return { data, pagination: paginated.pagination };
   });
-
+const agencyRolesWithConventionAccess: AgencyRole[] = [
+  "counsellor",
+  "validator",
+  "agency-admin",
+  "agency-viewer",
+];
 const shouldUseDefaultDateEndFrom = (
   dateEndFrom: DateString | undefined,
   now: Date,

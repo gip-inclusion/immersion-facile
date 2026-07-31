@@ -1,5 +1,5 @@
 import type { BusinessName } from "../establishment/establishment.dto";
-import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type { FtConnectIdentityWithoutToken } from "../federatedIdentities/federatedIdentity.dto";
 import type { Firstname, Lastname } from "../user/user.dto";
 import type { DateString } from "../utils/date";
 import type {
@@ -21,6 +21,6 @@ export type AgencyUserConventionListDto = {
   beneficiary: {
     firstName: Firstname;
     lastName: Lastname;
-    federatedIdentity?: FtConnectIdentity;
+    federatedIdentity?: FtConnectIdentityWithoutToken;
   };
 };
