@@ -27,13 +27,13 @@ import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
 import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
 import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
-import { makeAddArchivedConventionRequest } from "../../domains/convention/use-cases/AddArchivedConventionRequest";
 import { makeAddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { makeAddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { makeGetConventionsWithErroredBroadcastFeedback } from "../../domains/convention/use-cases/broadcast/GetConventionsWithErroredBroadcastFeedback";
+import { makeCreateArchivedConventionRequest } from "../../domains/convention/use-cases/CreateArchivedConventionRequest";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { makeCreateOrUpdateConventionTemplate } from "../../domains/convention/use-cases/CreateOrUpdateConventionTemplate";
 import { makeDeleteAssessment } from "../../domains/convention/use-cases/DeleteAssessment";
@@ -318,7 +318,7 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
       },
     }),
-    addArchivedConventionRequest: makeAddArchivedConventionRequest({
+    createArchivedConventionRequest: makeCreateArchivedConventionRequest({
       uowPerformer,
       deps: {
         createNewEvent,

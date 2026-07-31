@@ -65,7 +65,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
-        deps.useCases.addArchivedConventionRequest.execute(
+        deps.useCases.createArchivedConventionRequest.execute(
           req.body,
           getGenericAuthOrThrow(req.payloads?.currentUser),
         ),
