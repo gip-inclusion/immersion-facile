@@ -9,6 +9,10 @@ export type ArchivedConventionRequestId = Flavor<
   "ArchivedConventionRequestId"
 >;
 
+export type WithArchivedConventionRequestId = {
+  archivedConventionRequestId: ArchivedConventionRequestId;
+};
+
 export const archivedConventionRequestReasons = [
   "legalDispute",
   "urssafOrInspectionControl",
@@ -29,7 +33,7 @@ export type ArchivedConventionRequestReasonFields =
       otherReason: string;
     };
 
-export type ArchivedConventionRequestWithConventionIdFormDto =
+export type ArchivedConventionRequestWithConventionIdDto =
   ArchivedConventionRequestReasonFields & {
     id: ArchivedConventionRequestId;
     conventionSearchMethod: "withConventionId";
@@ -41,7 +45,7 @@ export type ArchivedConventionRequestWithConventionIdFormDto =
     immersionAppellation?: never;
   };
 
-export type ArchivedConventionRequestWithConventionDetailsFormDto =
+export type ArchivedConventionRequestWithConventionDetailsDto =
   ArchivedConventionRequestReasonFields & {
     id: ArchivedConventionRequestId;
     conventionSearchMethod: "withConventionDetails";
@@ -53,6 +57,6 @@ export type ArchivedConventionRequestWithConventionDetailsFormDto =
     immersionAppellation: AppellationAndRomeDto;
   };
 
-export type ArchivedConventionRequestFormDto =
-  | ArchivedConventionRequestWithConventionIdFormDto
-  | ArchivedConventionRequestWithConventionDetailsFormDto;
+export type ArchivedConventionRequestDto =
+  | ArchivedConventionRequestWithConventionIdDto
+  | ArchivedConventionRequestWithConventionDetailsDto;

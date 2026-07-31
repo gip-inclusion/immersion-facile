@@ -2,7 +2,7 @@ import { from, type Observable } from "rxjs";
 import type {
   AddConventionInput,
   ApiConsumerName,
-  ArchivedConventionRequestFormDto,
+  ArchivedConventionRequestDto,
   AuthenticatedConventionRoutes,
   BeneficiaryConventionListDto,
   ConnectedUserJwt,
@@ -144,7 +144,7 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public saveArchivedConventionRequest$(
-    archivedConventionRequest: ArchivedConventionRequestFormDto,
+    archivedConventionRequest: ArchivedConventionRequestDto,
     jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(

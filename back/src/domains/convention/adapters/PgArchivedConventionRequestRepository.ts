@@ -1,28 +1,10 @@
-import type {
-  ArchivedConventionRequestId,
-  ArchivedConventionRequestReason,
-  ArchivedConventionRequestReasonFields,
-} from "shared";
-import { archivedConventionRequestReasons, errors } from "shared";
+import type { ArchivedConventionRequestId } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import type {
-  ArchivedConventionRequestEntity,
-  ArchivedConventionRequestRepository,
-} from "../ports/ArchivedConventionRequestRepository";
-
-type ArchivedConventionRequestRow = {
-  id: string;
-  user_id: string;
-  created_at: Date;
-  convention_id: string | null;
-  beneficiary_first_name: string | null;
-  beneficiary_last_name: string | null;
-  siret: string | null;
-  immersion_date: string | null;
-  immersion_appellation_code: number | null;
-  reason: string;
-  other_reason: string | null;
-};
+import {
+  type ArchivedConventionRequestEntity,
+  toArchivedConventionRequestEntity,
+} from "../entities/ArchivedConventionRequestEntity";
+import type { ArchivedConventionRequestRepository } from "../ports/ArchivedConventionRequestRepository";
 
 export class PgArchivedConventionRequestRepository
   implements ArchivedConventionRequestRepository
@@ -81,60 +63,3 @@ export class PgArchivedConventionRequestRepository
       .execute();
   }
 }
-
-const isArchivedConventionRequestReason = (
-  reason: string,
-): reason is ArchivedConventionRequestReason =>
-  archivedConventionRequestReasons.some((value) => value === reason);
-
-const toArchivedConventionRequestEntity = (
-  row: ArchivedConventionRequestRow,
-): ArchivedConventionRequestEntity => {
-  if (!isArchivedConventionRequestReason(row.reason))
-    throw errors.archivedConventionRequest.unknownReason({
-      reason: row.reason,
-    });
-
-  const reasonFields: ArchivedConventionRequestReasonFields =
-    row.reason === "other"
-      ? {
-          reason: "other",
-          otherReason: row.other_reason ?? "",
-        }
-      : { reason: row.reason };
-
-  const common = {
-    id: row.id,
-    userId: row.user_id,
-    createdAt: row.created_at.toISOString(),
-    ...reasonFields,
-  };
-
-  if (row.convention_id)
-    return {
-      ...common,
-      conventionSearchMethod: "withConventionId",
-      conventionId: row.convention_id,
-    };
-
-  if (
-    !row.beneficiary_first_name ||
-    !row.beneficiary_last_name ||
-    !row.siret ||
-    !row.immersion_date ||
-    !row.immersion_appellation_code
-  )
-    throw errors.archivedConventionRequest.incomplete({
-      id: row.id,
-    });
-
-  return {
-    ...common,
-    conventionSearchMethod: "withConventionDetails",
-    beneficiaryFirstName: row.beneficiary_first_name,
-    beneficiaryLastName: row.beneficiary_last_name,
-    siret: row.siret,
-    immersionDate: row.immersion_date,
-    immersionAppellationCode: row.immersion_appellation_code.toString(),
-  };
-};

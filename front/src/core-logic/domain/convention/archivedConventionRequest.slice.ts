@@ -1,8 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type {
-  ArchivedConventionRequestFormDto,
-  ConnectedUserJwt,
-} from "shared";
+import type { ArchivedConventionRequestDto, ConnectedUserJwt } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -24,7 +21,7 @@ export const archivedConventionRequestSlice = createSlice({
     saveArchivedConventionRequestRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
-        archivedConventionRequest: ArchivedConventionRequestFormDto;
+        archivedConventionRequest: ArchivedConventionRequestDto;
         jwt: ConnectedUserJwt;
       }>,
     ) => {

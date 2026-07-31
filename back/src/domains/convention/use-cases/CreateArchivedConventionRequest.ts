@@ -2,7 +2,7 @@ import { archivedConventionRequestSchema, type ConnectedUser } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
-import type { ArchivedConventionRequestEntity } from "../ports/ArchivedConventionRequestRepository";
+import type { ArchivedConventionRequestEntity } from "../entities/ArchivedConventionRequestEntity";
 
 export type CreateArchivedConventionRequest = ReturnType<
   typeof makeCreateArchivedConventionRequest

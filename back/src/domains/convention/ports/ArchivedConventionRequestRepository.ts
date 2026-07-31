@@ -1,24 +1,5 @@
-import type {
-  AppellationCode,
-  ArchivedConventionRequestId,
-  ArchivedConventionRequestWithConventionDetailsFormDto,
-  ArchivedConventionRequestWithConventionIdFormDto,
-  DateString,
-  UserId,
-} from "shared";
-
-export type ArchivedConventionRequestEntity = (
-  | ArchivedConventionRequestWithConventionIdFormDto
-  | (Omit<
-      ArchivedConventionRequestWithConventionDetailsFormDto,
-      "immersionAppellation"
-    > & {
-      immersionAppellationCode: AppellationCode;
-    })
-) & {
-  userId: UserId;
-  createdAt: DateString;
-};
+import type { ArchivedConventionRequestId } from "shared";
+import type { ArchivedConventionRequestEntity } from "../entities/ArchivedConventionRequestEntity";
 
 export interface ArchivedConventionRequestRepository {
   save: (

@@ -685,7 +685,7 @@ export const errors = {
       ),
     unknownReason: ({ reason }: { reason: string }) =>
       new Error(
-        `La raison de demande de convention archivée est inconnue : ${reason}`,
+        `La raison de la demande de convention archivée est inconnue : ${reason}`,
       ),
     incomplete: ({ id }: { id: string }) =>
       new Error(`La demande de convention archivée est incomplète pour ${id}`),

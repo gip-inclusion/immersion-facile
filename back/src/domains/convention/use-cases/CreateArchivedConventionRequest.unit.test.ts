@@ -1,5 +1,5 @@
 import {
-  type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestDto,
   type ConnectedUser,
   ConnectedUserBuilder,
   expectArraysToMatch,
@@ -44,7 +44,7 @@ describe("CreateArchivedConventionRequest", () => {
   });
 
   it("saves an archived convention request with conventionSearchMethod = withConventionId", async () => {
-    const input: ArchivedConventionRequestFormDto = {
+    const input: ArchivedConventionRequestDto = {
       id: requestId,
       conventionSearchMethod: "withConventionId",
       conventionId: "22222222-2222-4222-8222-222222222222",
@@ -79,7 +79,7 @@ describe("CreateArchivedConventionRequest", () => {
   });
 
   it("saves an archived convention request with conventionSearchMethod = withConventionDetails", async () => {
-    const input: ArchivedConventionRequestFormDto = {
+    const input: ArchivedConventionRequestDto = {
       id: requestId,
       conventionSearchMethod: "withConventionDetails",
       beneficiaryFirstName: "Jean",

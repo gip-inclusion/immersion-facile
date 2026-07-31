@@ -1,6 +1,5 @@
 import {
   type AgencyId,
-  type ArchivedConventionRequestId,
   type ContactEstablishmentEventPayload,
   type ConventionDraftId,
   type ConventionId,
@@ -20,6 +19,7 @@ import {
   userIdSchema,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
+  type WithArchivedConventionRequestId,
   type WithAssessmentDto,
   type WithConventionDraftId,
   type WithConventionDto,
@@ -148,7 +148,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionDraftToDelete", WithConventionDraftId & WithTriggeredBy>
   | GenericEvent<"ConventionDraftSaved",NotifyConventionDraftSavedInputParams>
-  | GenericEvent<"ArchivedConventionRequestCreated", { archivedConventionRequestId: ArchivedConventionRequestId } & WithTriggeredBy>
+  | GenericEvent<"ArchivedConventionRequestCreated", WithArchivedConventionRequestId & WithTriggeredBy>
 
   // ESTABLISHMENT RELATED
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
