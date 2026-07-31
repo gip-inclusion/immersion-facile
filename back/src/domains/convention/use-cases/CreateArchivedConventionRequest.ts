@@ -4,12 +4,12 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { ArchivedConventionRequestEntity } from "../ports/ArchivedConventionRequestRepository";
 
-export type AddArchivedConventionRequest = ReturnType<
-  typeof makeAddArchivedConventionRequest
+export type CreateArchivedConventionRequest = ReturnType<
+  typeof makeCreateArchivedConventionRequest
 >;
 
-export const makeAddArchivedConventionRequest = useCaseBuilder(
-  "AddArchivedConventionRequest",
+export const makeCreateArchivedConventionRequest = useCaseBuilder(
+  "CreateArchivedConventionRequest",
 )
   .withInput(archivedConventionRequestSchema)
   .withCurrentUser<ConnectedUser>()

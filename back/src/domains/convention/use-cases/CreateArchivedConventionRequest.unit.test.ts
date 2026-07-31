@@ -17,13 +17,13 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  type AddArchivedConventionRequest,
-  makeAddArchivedConventionRequest,
-} from "./AddArchivedConventionRequest";
+  type CreateArchivedConventionRequest,
+  makeCreateArchivedConventionRequest,
+} from "./CreateArchivedConventionRequest";
 
-describe("AddArchivedConventionRequest", () => {
+describe("CreateArchivedConventionRequest", () => {
   let uow: InMemoryUnitOfWork;
-  let saveArchivedConventionRequest: AddArchivedConventionRequest;
+  let createArchivedConventionRequest: CreateArchivedConventionRequest;
   let createNewEvent: CreateNewEvent;
   let timeGateway: CustomTimeGateway;
 
@@ -37,7 +37,7 @@ describe("AddArchivedConventionRequest", () => {
 
     uow = createInMemoryUow();
     createNewEvent = makeCreateNewEvent({ timeGateway, uuidGenerator });
-    saveArchivedConventionRequest = makeAddArchivedConventionRequest({
+    createArchivedConventionRequest = makeCreateArchivedConventionRequest({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: { createNewEvent, timeGateway },
     });
@@ -51,7 +51,7 @@ describe("AddArchivedConventionRequest", () => {
       reason: "legalDispute",
     };
 
-    await saveArchivedConventionRequest.execute(input, connectedUser);
+    await createArchivedConventionRequest.execute(input, connectedUser);
 
     expectToEqual(
       uow.archivedConventionRequestRepository.archivedConventionRequests,
@@ -96,7 +96,7 @@ describe("AddArchivedConventionRequest", () => {
       otherReason: "Motif personnalisé",
     };
 
-    await saveArchivedConventionRequest.execute(input, connectedUser);
+    await createArchivedConventionRequest.execute(input, connectedUser);
 
     expectToEqual(
       uow.archivedConventionRequestRepository.archivedConventionRequests[
