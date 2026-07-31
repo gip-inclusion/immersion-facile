@@ -3,7 +3,7 @@ import {
   type AddConventionInput,
   type AgencyOption,
   type ApiConsumerName,
-  type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestDto,
   type BeneficiaryConventionListDto,
   type ConnectedUserJwt,
   type ConventionDraftDto,
@@ -135,7 +135,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public saveArchivedConventionRequest$(
-    _archivedConventionRequest: ArchivedConventionRequestFormDto,
+    _archivedConventionRequest: ArchivedConventionRequestDto,
     _jwt: ConnectedUserJwt,
   ): Observable<void> {
     return this.saveArchivedConventionRequestResult$;
@@ -263,7 +263,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.conventionModificationResult$;
   }
 
-  // Same as GET above, but using a magic link
   async #getMagicLink({
     conventionId,
   }: FetchConventionRequestedPayload): Promise<ConventionReadDto> {

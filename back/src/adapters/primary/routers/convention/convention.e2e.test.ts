@@ -3,7 +3,7 @@ import {
   type AbsoluteUrl,
   type AddConventionInput,
   AgencyDtoBuilder,
-  type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestDto,
   AssessmentDtoBuilder,
   authExpiredMessage,
   CONVENTION_MANUAL_REMINDER_COOLDOWN_IN_HOURS,
@@ -530,7 +530,7 @@ describe("convention e2e", () => {
 
       inMemoryUow.userRepository.users = [basicUser];
 
-      const archivedConventionRequestDto: ArchivedConventionRequestFormDto = {
+      const archivedConventionRequestDto: ArchivedConventionRequestDto = {
         id: "11111111-1111-4111-8111-111111111111",
         conventionSearchMethod: "withConventionId",
         conventionId: convention.id,

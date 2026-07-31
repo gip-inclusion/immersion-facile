@@ -15,7 +15,7 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import {
-  type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestDto,
   type ArchivedConventionRequestId,
   type ArchivedConventionRequestReasonFields,
   archivedConventionRequestReasons,
@@ -62,7 +62,7 @@ const archivedConventionRequestWithConventionDetailsSchema = z.object({
   immersionAppellation: appellationAndRomeDtoSchema,
 });
 
-export const archivedConventionRequestSchema: ZodSchemaWithInputMatchingOutput<ArchivedConventionRequestFormDto> =
+export const archivedConventionRequestSchema: ZodSchemaWithInputMatchingOutput<ArchivedConventionRequestDto> =
   z
     .discriminatedUnion("conventionSearchMethod", [
       archivedConventionRequestWithConventionIdSchema,

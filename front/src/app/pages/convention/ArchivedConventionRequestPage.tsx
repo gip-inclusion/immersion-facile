@@ -8,7 +8,7 @@ import { Loader, PageHeader } from "react-design-system";
 import { type DefaultValues, FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type ArchivedConventionRequestFormDto,
+  type ArchivedConventionRequestDto,
   archivedConventionRequestSchema,
   domElementIds,
   frontRoutes,
@@ -33,7 +33,7 @@ type ArchivedConventionRequestPageProps = {
 
 const initialValues = (
   id: string,
-): DefaultValues<ArchivedConventionRequestFormDto> => ({
+): DefaultValues<ArchivedConventionRequestDto> => ({
   id,
   conventionSearchMethod: "withConventionId",
   conventionId: "",
@@ -47,7 +47,7 @@ export const ArchivedConventionRequestPage = ({
   const isLoading = useAppSelector(
     archivedConventionRequestSelectors.isLoading,
   );
-  const methods = useForm<ArchivedConventionRequestFormDto>({
+  const methods = useForm<ArchivedConventionRequestDto>({
     resolver: zodResolver(archivedConventionRequestSchema),
     mode: "onTouched",
     defaultValues: initialValues(uuidV4()),
@@ -63,7 +63,7 @@ export const ArchivedConventionRequestPage = ({
   const conventionSearchMethod = watch("conventionSearchMethod");
   const reason = watch("reason");
 
-  const onSubmit = (values: ArchivedConventionRequestFormDto) => {
+  const onSubmit = (values: ArchivedConventionRequestDto) => {
     if (!connectedUserJwt) return;
 
     dispatch(
@@ -307,7 +307,7 @@ export const ArchivedConventionRequestPage = ({
 
 const reasonOptions: {
   label: string;
-  value: ArchivedConventionRequestFormDto["reason"];
+  value: ArchivedConventionRequestDto["reason"];
 }[] = [
   {
     label: "Contentieux juridique",
