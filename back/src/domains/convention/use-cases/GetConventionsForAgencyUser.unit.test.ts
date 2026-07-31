@@ -21,15 +21,6 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { makeGetConventionsForAgencyUser } from "./GetConventionsForAgencyUser";
 
-const expectOnlyConventionInResult = (
-  result: DataWithPagination<AgencyUserConventionListDto>,
-  convention: ConventionDto,
-) => {
-  expect(result.data).toHaveLength(1);
-  expect(result.data[0]?.id).toBe(convention.id);
-  expect(result.data[0]?.dateEnd).toBe(convention.dateEnd);
-};
-
 describe("GetConventionsForAgencyUser", () => {
   const agencyUserId = "agency-user-id-12345";
   const currentUser = new ConnectedUserBuilder()
@@ -211,6 +202,14 @@ describe("GetConventionsForAgencyUser", () => {
         totalRecords: 1,
       });
     });
+    const expectOnlyConventionInResult = (
+      result: DataWithPagination<AgencyUserConventionListDto>,
+      convention: ConventionDto,
+    ) => {
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0]?.id).toBe(convention.id);
+      expect(result.data[0]?.dateEnd).toBe(convention.dateEnd);
+    };
   });
 
   describe("Agency rights", () => {

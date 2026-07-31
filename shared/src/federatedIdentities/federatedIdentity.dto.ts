@@ -54,6 +54,8 @@ export type FtConnectIdentity = GenericFederatedIdentity<
   FtConnectAdvisorForBeneficiary
 >;
 
+export type FtConnectIdentityWithoutToken = Omit<FtConnectIdentity, "token">;
+
 type ConnectedUserIdentity = GenericFederatedIdentity<
   "proConnect" | "email",
   ConnectedUserJwt

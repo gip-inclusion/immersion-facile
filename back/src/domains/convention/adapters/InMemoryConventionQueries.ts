@@ -19,7 +19,6 @@ import {
   type DateFilter,
   errors,
   type GetPaginatedConventionsSortBy,
-  hasEmptyArrayFilter,
   isConventionEndingInOneDayOrMore,
   isFunctionalBroadcastFeedbackError,
   isUnvalidatedConventionStatus,
@@ -50,6 +49,7 @@ import type {
 } from "../ports/ConventionQueries";
 import type { InMemoryAssessmentRepository } from "./InMemoryAssessmentRepository";
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
+import { hasEmptyArrayFilter } from "./pgConventionSql";
 
 const logger = createLogger(__filename);
 

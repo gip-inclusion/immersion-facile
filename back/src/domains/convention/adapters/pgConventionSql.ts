@@ -39,6 +39,11 @@ import {
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 
+export const hasEmptyArrayFilter = (filters: object): boolean =>
+  Object.values(filters).some(
+    (value) => Array.isArray(value) && value.length === 0,
+  );
+
 // Common type for the query builder with proper return type
 type ConventionQueryBuilderDb = Database & {
   b: Database["actors"];
