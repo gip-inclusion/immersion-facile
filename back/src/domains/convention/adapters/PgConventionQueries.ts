@@ -353,7 +353,6 @@ export class PgConventionQueries implements ConventionQueries {
       search,
       statuses,
       agencyIds,
-      agencyDepartmentCodes,
       dateStart,
       dateEnd,
       dateSubmission,
@@ -384,7 +383,6 @@ export class PgConventionQueries implements ConventionQueries {
       filterDate("date_end", dateEnd),
       filterDate("date_submission", dateSubmission),
       filterInList("status", statuses),
-      filterByAgencyDepartmentCodes(agencyDepartmentCodes),
       filterByAssessmentCompletionStatus(assessmentCompletionStatus),
     );
 
@@ -718,17 +716,6 @@ const filterByAgencyIds =
           sql<boolean>`conventions.agency_id = ANY(${agencyIds}::uuid[])`,
         )
       : builder;
-
-const filterByAgencyDepartmentCodes =
-  (agencyDepartmentCodes: string[] | undefined) =>
-  (builder: ConventionBaseQueryBuilder): ConventionBaseQueryBuilder => {
-    if (!agencyDepartmentCodes) return builder;
-    return builder.where(
-      "agencies.department_code",
-      "in",
-      agencyDepartmentCodes,
-    );
-  };
 
 const filterByAssessmentCompletionStatus =
   (

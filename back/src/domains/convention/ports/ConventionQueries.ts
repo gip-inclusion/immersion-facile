@@ -52,7 +52,6 @@ export type GetPaginatedConventionsFilters = {
   search?: string;
   statuses?: ConventionStatus[];
   agencyIds?: AgencyId[];
-  agencyDepartmentCodes?: string[];
   dateStart?: DateFilter;
   dateEnd?: DateFilter;
   dateSubmission?: DateFilter;

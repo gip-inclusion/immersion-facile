@@ -2,7 +2,6 @@ import { addDays, isAfter, isBefore, subDays, subMonths } from "date-fns";
 import { propEq, toPairs } from "ramda";
 import {
   type AgencyId,
-  type AgencyWithUsersRights,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type ConventionDto,
   type ConventionId,
@@ -179,10 +178,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       };
 
     const filteredConventions = this.conventionRepository.conventions.filter(
-      makeApplyPaginatedFiltersToConventions(
-        filters,
-        this.agencyRepository.agencies,
-      ),
+      makeApplyPaginatedFiltersToConventions(filters),
     );
 
     const withAssessmentFilter = filters.assessmentCompletionStatus?.length
@@ -736,18 +732,14 @@ const sortConventionsInMemory = (
 };
 
 const makeApplyPaginatedFiltersToConventions =
-  (
-    {
-      search,
-      statuses,
-      agencyIds,
-      agencyDepartmentCodes,
-      dateStart,
-      dateEnd,
-      dateSubmission,
-    }: GetPaginatedConventionsFilters,
-    agencies: AgencyWithUsersRights[],
-  ) =>
+  ({
+    search,
+    statuses,
+    agencyIds,
+    dateStart,
+    dateEnd,
+    dateSubmission,
+  }: GetPaginatedConventionsFilters) =>
   (convention: ConventionDto) => {
     const trimmedSearch = search?.trim();
 
@@ -769,17 +761,6 @@ const makeApplyPaginatedFiltersToConventions =
           agencyIds && agencyIds.length > 0
             ? agencyIds.includes(agencyId)
             : true,
-        ({ agencyId }) => {
-          if (!agencyDepartmentCodes || agencyDepartmentCodes.length === 0)
-            return true;
-
-          const agency = agencies.find(({ id }) => id === agencyId);
-
-          return (
-            !!agency &&
-            agencyDepartmentCodes.includes(agency.address.departmentCode)
-          );
-        },
       ] satisfies Array<(convention: ConventionDto) => boolean>
     ).every((filter) => filter(convention));
   };
