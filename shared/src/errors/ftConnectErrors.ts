@@ -1,3 +1,5 @@
+import { expectToEqual } from "../test.helpers";
+
 export type FTConnectErrorKind = (typeof ftConnectErrorKinds)[number];
 const ftConnectErrorKinds = [
   "peConnectInvalidGrant",
@@ -57,8 +59,7 @@ export async function testRawFTConnectError(
 ) {
   const error: FTConnectError = await getTypedError<FTConnectError>(() => cb());
   expect(error.constructor.name).toEqual(expectedError.constructor.name);
-  expect(error).toStrictEqual(expectedError);
-  expect(error.title).toStrictEqual(expectedError.title);
+  expectToEqual(error, expectedError);
 }
 
 export async function testManagedFTConnectError(

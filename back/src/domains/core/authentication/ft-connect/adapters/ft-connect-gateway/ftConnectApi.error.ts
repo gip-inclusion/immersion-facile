@@ -17,6 +17,9 @@ class ConnectionRefusedError extends Error {
   }
 }
 
+export const ftConnectNetworkErrorMessage =
+  "Nous n'avons pas réussi à joindre pôle emploi connect.";
+
 // ! In a map the highest priority is given to the lasted entry
 export const ftConnectErrorStrategy = (
   error: AxiosError,
@@ -119,7 +122,7 @@ export const ftConnectErrorStrategy = (
       error.message === "Network Error",
       new FTConnectError(
         "Une erreur est survenue - Erreur réseau",
-        "Nous n’avons pas réussi à joindre pôle emploi connect.",
+        ftConnectNetworkErrorMessage,
         error,
       ),
     ],
