@@ -408,11 +408,7 @@ export const createPaginatedConventionsBaseBuilder = ({
 }: {
   transaction: KyselyDb;
 }): ConventionBaseQueryBuilder =>
-  withActorJoins(
-    transaction
-      .selectFrom("conventions")
-      .leftJoin("agencies", "agencies.id", "conventions.agency_id"),
-  );
+  withActorJoins(transaction.selectFrom("conventions"));
 
 export const wrapInMaterializedCteWithEnrichment = ({
   transaction,

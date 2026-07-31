@@ -28,6 +28,11 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
   .withDeps<{ timeGateway: TimeGateway }>()
   .build(async ({ inputParams, uow, currentUser, deps }) => {
     const { filters, sort } = inputParams;
+    const {
+      agencyDepartmentCodes: departmentCodesFilter,
+      agencyIds: agencyIdsFilter,
+      ...restFilters
+    } = filters ?? {};
 
     const withSort: WithSort<GetPaginatedConventionsSortBy> | null = sort?.by
       ? {
@@ -48,31 +53,35 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
       .filter(({ roles }) =>
         roles.some((role) => agencyRolesWithConventionAccess.includes(role)),
       )
+      .filter(
+        ({ agency }) =>
+          !departmentCodesFilter?.length ||
+          departmentCodesFilter.includes(agency.address.departmentCode),
+      )
       .map(({ agency }) => agency.id);
 
-    const requestedAgencyIds = filters?.agencyIds;
-    const agencyIds = requestedAgencyIds?.length
+    const agencyIds = agencyIdsFilter?.length
       ? agencyIdsUserHasValidRightsOn.filter((id) =>
-          requestedAgencyIds.includes(id),
+          agencyIdsFilter.includes(id),
         )
       : agencyIdsUserHasValidRightsOn;
 
     const paginated = await uow.conventionQueries.getPaginatedConventions({
       ...withSort,
       filters: {
-        ...filters,
+        ...restFilters,
         agencyIds,
         dateEnd: {
-          ...filters?.dateEnd,
-          from: shouldUseDefaultDateEndFrom(filters?.dateEnd?.from, now)
+          ...restFilters.dateEnd,
+          from: shouldUseDefaultDateEndFrom(restFilters.dateEnd?.from, now)
             ? subMonths(
                 now,
                 defaultMonthsThresholdForConventionsListing,
               ).toISOString()
-            : filters?.dateEnd?.from,
-          to: shouldIgnoreDateEndTo(filters?.dateEnd?.to, now)
+            : restFilters.dateEnd?.from,
+          to: shouldIgnoreDateEndTo(restFilters.dateEnd?.to, now)
             ? undefined
-            : filters?.dateEnd?.to,
+            : restFilters.dateEnd?.to,
         },
       },
       pagination,
@@ -85,12 +94,14 @@ export const makeGetConventionsForAgencyUser = useCaseBuilder(
 
     return { data, pagination: paginated.pagination };
   });
+
 const agencyRolesWithConventionAccess: AgencyRole[] = [
   "counsellor",
   "validator",
   "agency-admin",
   "agency-viewer",
 ];
+
 const shouldUseDefaultDateEndFrom = (
   dateEndFrom: DateString | undefined,
   now: Date,

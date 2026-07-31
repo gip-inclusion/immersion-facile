@@ -330,6 +330,74 @@ describe("GetConventionsForAgencyUser", () => {
       );
     });
 
+    it("should only return conventions from agencies matching agencyDepartmentCodes", async () => {
+      const agencyInParis = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+          .withName("Agency in Paris")
+          .withAddress({
+            city: "Paris",
+            departmentCode: "75",
+            postcode: "75001",
+            streetNumberAndAddress: "1 rue de Paris",
+          })
+          .build(),
+        {
+          [agencyUserId]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor"],
+          },
+        },
+      );
+      const agencyInLyon = toAgencyWithRights(
+        new AgencyDtoBuilder()
+          .withId("cccccccc-cccc-cccc-cccc-cccccccccccc")
+          .withName("Agency in Lyon")
+          .withAddress({
+            city: "Lyon",
+            departmentCode: "69",
+            postcode: "69001",
+            streetNumberAndAddress: "1 rue de Lyon",
+          })
+          .build(),
+        {
+          [agencyUserId]: {
+            isNotifiedByEmail: true,
+            roles: ["counsellor"],
+          },
+        },
+      );
+      const conventionInParis = new ConventionDtoBuilder()
+        .withId("convention-in-paris")
+        .withAgencyId(agencyInParis.id)
+        .build();
+      const conventionInLyon = new ConventionDtoBuilder()
+        .withId("convention-in-lyon")
+        .withAgencyId(agencyInLyon.id)
+        .build();
+
+      uow.agencyRepository.agencies = [agency, agencyInParis, agencyInLyon];
+      uow.conventionRepository.setConventions([
+        conventionInParis,
+        conventionInLyon,
+      ]);
+
+      const result = await getConventionsForAgencyUser.execute(
+        {
+          filters: {
+            agencyDepartmentCodes: ["75"],
+          },
+          pagination: { page: 1, perPage: 10 },
+        },
+        currentUser,
+      );
+
+      expectToEqual(
+        result.data.map(({ id }) => id),
+        [conventionInParis.id],
+      );
+    });
+
     it("should return all conventions from agencies where user has valid rights when no agency filter is requested", async () => {
       const agencyUserHasValidRightOn = toAgencyWithRights(
         new AgencyDtoBuilder()
