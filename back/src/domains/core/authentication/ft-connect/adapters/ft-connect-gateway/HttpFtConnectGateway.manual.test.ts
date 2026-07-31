@@ -3,6 +3,7 @@ import {
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
+  expectToEqual,
   FTConnectError,
   ManagedFTConnectError,
   TooManyRequestApiError,
@@ -19,6 +20,7 @@ import type {
   ExternalFtConnectContactDetails,
   ExternalFtConnectUser,
 } from "./ftConnectApi.dto";
+import { ftConnectNetworkErrorMessage } from "./ftConnectApi.error";
 import {
   makeFtConnectExternalRoutes,
   toFtConnectAdvisorDto,
@@ -268,14 +270,20 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE")
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
+            .onGet(routes.getUserContactDetails.url)
+            .reply(200, peExternalContactDetails)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expect(
+
+          expectToEqual(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
-          ).toBeUndefined();
+            undefined,
+          );
         });
 
         it("Bad status code -> OK with undefined", async () => {
@@ -293,9 +301,11 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expect(
+
+          expectToEqual(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
-          ).toBeUndefined();
+            undefined,
+          );
         });
 
         it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
@@ -323,7 +333,7 @@ describe("HttpFtConnectGateway", () => {
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              ftConnectNetworkErrorMessage,
               new Error(),
             ),
           );
@@ -370,14 +380,18 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, peExternalUser)
             .onGet(routes.getUserBirthDate.url)
             .reply(200, "UNSUPPORTED RESPONSE")
+            .onGet(routes.getUserContactDetails.url)
+            .reply(200, peExternalContactDetails)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d'emploi",
             });
-          expect(
+
+          expectToEqual(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
-          ).toBeUndefined();
+            undefined,
+          );
         });
 
         it("Bad status code -> OK with undefined", async () => {
@@ -395,9 +409,11 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expect(
+
+          expectToEqual(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
-          ).toBeUndefined();
+            undefined,
+          );
         });
 
         it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
@@ -410,6 +426,7 @@ describe("HttpFtConnectGateway", () => {
             .abortRequest()
             .onGet(routes.getUserContactDetails.url)
             .reply(200, peExternalContactDetails);
+
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
@@ -429,11 +446,12 @@ describe("HttpFtConnectGateway", () => {
             .networkError()
             .onGet(routes.getUserContactDetails.url)
             .reply(200, peExternalContactDetails);
+
           await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              ftConnectNetworkErrorMessage,
               new Error(),
             ),
           );
@@ -495,9 +513,11 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d'emploi",
             });
-          expect(
+
+          expectToEqual(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
-          ).toBeUndefined();
+            undefined,
+          );
         });
 
         it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
@@ -533,7 +553,7 @@ describe("HttpFtConnectGateway", () => {
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n'avons pas réussi à joindre pôle emploi connect.",
+              ftConnectNetworkErrorMessage,
               new Error(),
             ),
           );
@@ -609,7 +629,12 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
-            });
+            })
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
+            .onGet(routes.getUserContactDetails.url)
+            .reply(200, peExternalContactDetails);
+
           expectObjectsToMatch(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
@@ -686,7 +711,7 @@ describe("HttpFtConnectGateway", () => {
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              ftConnectNetworkErrorMessage,
               new Error(),
             ),
           );
@@ -748,8 +773,13 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
+            .onGet(routes.getUserBirthDate.url)
+            .reply(200, peExternalBirthDate)
+            .onGet(routes.getUserContactDetails.url)
+            .reply(200, peExternalContactDetails)
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE");
+
           expectObjectsToMatch(
             await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
@@ -820,7 +850,7 @@ describe("HttpFtConnectGateway", () => {
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              ftConnectNetworkErrorMessage,
               new Error(),
             ),
           );

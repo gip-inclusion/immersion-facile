@@ -119,7 +119,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
   constructor(
     private httpClient: HttpClient<FtConnectExternalRoutes>,
     private ftConnectConfig: OAuthConfig,
-    private ftConnectMaxRequestsPerInterval: number,
+    ftConnectMaxRequestsPerInterval: number,
     highWater = ftConnectHighWater,
   ) {
     this.#limiter = new Bottleneck({
@@ -228,13 +228,15 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       externalFtUser?.idIdentiteExterne,
     );
 
-    return externalFtUser && externalFtBirthDate
+    return externalFtUser &&
+      externalFtBirthDate &&
+      externalFtPhone !== undefined
       ? {
           user: toFtConnectUserDto({
             ...externalFtUser,
             isUserJobseeker,
             birthdate: externalFtBirthDate,
-            phone: externalFtPhone,
+            phone: externalFtPhone ?? undefined,
           }),
           advisors: (isUserJobseeker
             ? await this.#getAdvisorsInfo(headers)
@@ -281,12 +283,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return false;
       }
-      const externalFtConnectStatut = validateAndParseZodSchema({
-        schemaName: "externalFtConnectUserStatutSchema",
-        inputSchema: externalFtConnectUserStatutSchema,
-        schemaParsingInput: response.body,
-        logger,
-      });
+      const externalFtConnectStatut = externalFtConnectUserStatutSchema.parse(
+        response.body,
+      );
       const isJobSeeker = isJobSeekerFromStatus(
         externalFtConnectStatut.codeStatutIndividu,
       );
@@ -329,12 +328,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalFtConnectUser = validateAndParseZodSchema({
-        schemaName: "externalFtConnectUserSchema",
-        inputSchema: externalFtConnectUserSchema,
-        schemaParsingInput: response.body,
-        logger,
-      });
+      const externalFtConnectUser = externalFtConnectUserSchema.parse(
+        response.body,
+      );
       log.success({});
       return externalFtConnectUser;
     } catch (error) {
@@ -373,12 +369,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalFtConnectBirthDate = validateAndParseZodSchema({
-        schemaName: "externalFtConnectBirthDateSchema",
-        inputSchema: externalFtConnectBirthDateSchema,
-        schemaParsingInput: response.body,
-        logger,
-      });
+      const externalFtConnectBirthDate = externalFtConnectBirthDateSchema.parse(
+        response.body,
+      );
       log.success({});
       return ftconnectBeneficiaryBirthdateToIfBeneficiaryBirthdate(
         externalFtConnectBirthDate.dateDeNaissance,
@@ -401,7 +394,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
 
   async #getUserContactPhone(
     headers: FtConnectHeaders,
-  ): Promise<string | undefined> {
+  ): Promise<string | null | undefined> {
     const log = getUserContactDetailsLogger;
     try {
       log.total({});
@@ -420,17 +413,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalFtConnectContactDetails = validateAndParseZodSchema({
-        schemaName: "externalFtConnectContactDetailsSchema",
-        inputSchema: externalFtConnectContactDetailsSchema,
-        schemaParsingInput: response.body,
-        logger,
-      });
+      const externalFtConnectContactDetails =
+        externalFtConnectContactDetailsSchema.parse(response.body);
       log.success({});
-      return (
+      const phoneNumber =
         externalFtConnectContactDetails.telephone1 ??
-        externalFtConnectContactDetails.telephone2
-      );
+        externalFtConnectContactDetails.telephone2;
+      return phoneNumber ?? null;
     } catch (error) {
       errorChecker(
         error,
@@ -468,12 +457,9 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return [];
       }
-      const externalFtConnectAdvisors = validateAndParseZodSchema({
-        schemaName: "externalFtConnectAdvisorsSchema",
-        inputSchema: externalFtConnectAdvisorsSchema,
-        schemaParsingInput: response.body,
-        logger,
-      });
+      const externalFtConnectAdvisors = externalFtConnectAdvisorsSchema.parse(
+        response.body,
+      );
       log.success({});
       return externalFtConnectAdvisors;
     } catch (error) {
