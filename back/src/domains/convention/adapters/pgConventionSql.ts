@@ -15,6 +15,7 @@ import {
   type ConventionLastReminders,
   type ConventionReadDto,
   conventionReadSchema,
+  conventionSchema,
   type DateString,
   type DateTimeIsoString,
   type Email,
@@ -597,6 +598,25 @@ export const getConventionAgencyFieldsForAgencies = async (
     }),
     {},
   );
+};
+
+export const getConventionDtoById = async (
+  transaction: KyselyDb,
+  conventionId: ConventionId,
+): Promise<ConventionDto | undefined> => {
+  const pgConvention = await createConventionQueryBuilder(transaction, false)
+    .where("conventions.id", "=", conventionId)
+    .executeTakeFirst();
+
+  if (!pgConvention) return;
+
+  return validateAndParseZodSchema({
+    schemaName: "conventionSchema",
+    inputSchema: conventionSchema,
+    schemaParsingInput: pgConvention.dto,
+    id: pgConvention.dto.id,
+    logger: createLogger(__filename),
+  });
 };
 
 export const getReadConventionById = async (

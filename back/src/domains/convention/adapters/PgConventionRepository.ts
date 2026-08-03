@@ -5,7 +5,6 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionId,
-  conventionSchema,
   type DateString,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
@@ -20,7 +19,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getOrCreatePhoneIds } from "../../core/phone-number/adapters/pgPhoneHelper";
 import type { ConventionRepository } from "../ports/ConventionRepository";
-import { getReadConventionById } from "./pgConventionSql";
+import { getConventionDtoById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
   constructor(private transaction: KyselyDb) {}
@@ -73,9 +72,7 @@ export class PgConventionRepository implements ConventionRepository {
   public async getById(
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {
-    const readDto = await getReadConventionById(this.transaction, conventionId);
-    if (!readDto) return;
-    return conventionSchema.parse(readDto);
+    return getConventionDtoById(this.transaction, conventionId);
   }
 
   public async save(

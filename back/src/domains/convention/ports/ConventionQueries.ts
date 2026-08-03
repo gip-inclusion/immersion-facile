@@ -99,9 +99,7 @@ export interface ConventionQueries {
     params: GetConventionIdsParams,
   ): Promise<ConventionId[]>;
 
-  getConventionById: (
-    id: ConventionId,
-  ) => Promise<ConventionReadDto | undefined>;
+  getConventionById: (id: ConventionId) => Promise<ConventionDto | undefined>;
 
   getPaginatedConventions(
     params: GetPaginatedConventionsParams,
