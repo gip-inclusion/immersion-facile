@@ -1,0 +1,26 @@
+Projet 2 - project 13
+-- Début
+-- Fin
+-- Status - select
+-- Répartition - select
+-- Phase Produit - select
+-- Team - select
+-- Priorité - Select
+-- Confiance - select
+-- Impact - select
+-- Portée - select
+-- Conformité - select
+-- Score PICC - number
+-- KPI - Text
+
+
+Projet 1 - project 10
+- Status | status - select
+- Criticité |criticité - select
+- Team | team- select
+- Priorité Bizdev | priorité Bizdev - select
+- Sprint | sprint - sprint
+- Score PIC | score PIC - number
+- Score Portée | portée - number
+- Score Impact | impact- number
+- Score Confiance | confiance - number
