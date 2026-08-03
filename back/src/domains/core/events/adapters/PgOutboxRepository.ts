@@ -1,4 +1,4 @@
-import { differenceWith, propEq } from "ramda";
+import { differenceWith, propEq, splitEvery } from "ramda";
 import {
   type DateString,
   errors,
@@ -20,6 +20,8 @@ import type {
   DeleteOldestEventsParams,
   OutboxRepository,
 } from "../ports/OutboxRepository";
+
+const saveNewEventsBatchChunkSize = 500;
 
 export type StoredEventRow = {
   id: string;
@@ -136,20 +138,23 @@ export class PgOutboxRepository implements OutboxRepository {
 
   public async saveNewEventsBatch(events: DomainEvent[]): Promise<void> {
     if (events.length === 0) return;
-    await this.transaction
-      .insertInto("outbox")
-      .values(
-        events.map((event) => ({
-          id: event.id,
-          occurred_at: event.occurredAt,
-          was_quarantined: event.wasQuarantined,
-          topic: event.topic,
-          payload: JSON.stringify(event.payload),
-          status: event.status,
-          priority: event.priority,
-        })),
-      )
-      .execute();
+
+    for (const eventsChunk of splitEvery(saveNewEventsBatchChunkSize, events)) {
+      await this.transaction
+        .insertInto("outbox")
+        .values(
+          eventsChunk.map((event) => ({
+            id: event.id,
+            occurred_at: event.occurredAt,
+            was_quarantined: event.wasQuarantined,
+            topic: event.topic,
+            payload: JSON.stringify(event.payload),
+            status: event.status,
+            priority: event.priority,
+          })),
+        )
+        .execute();
+    }
   }
 
   public async save(event: DomainEvent): Promise<void> {
