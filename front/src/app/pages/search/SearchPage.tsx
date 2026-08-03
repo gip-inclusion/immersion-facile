@@ -119,7 +119,7 @@ export const radiusHintText = "Affinez votre localisation";
 
 export const placeHintText = "Une ville, un département, une région, etc.";
 
-export const placeInputLabel = <>Dans quelle ville ?</>;
+export const placeInputLabel = "Dans quelle ville ?";
 
 export const SearchPage = ({
   route,

@@ -112,9 +112,7 @@ export const SearchListResults = ({
     ].length;
     return currentFiltersLength > 0 ? `(${currentFiltersLength})` : "";
   };
-  // const isFullRemoteSearch =
-  //   searchParams.remoteWorkModes?.length === 1 &&
-  //   !isPhysicalWorkMode(searchParams.remoteWorkModes[0]);
+
   const numberOfColumns = 6;
   const filteredSortOptions = getSortedByOptions(
     areValidGeoParams(formValues),

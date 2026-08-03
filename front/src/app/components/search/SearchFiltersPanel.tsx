@@ -66,7 +66,6 @@ export const SearchFiltersPanel = ({
     formState: { errors },
     watch,
   } = useFormContext<SearchPageParams>();
-  //const { isLayoutDesktop } = useLayout();
   const dispatch = useDispatch();
   const formValues = getValues();
   const [place] = watch(["place"]);
