@@ -90,8 +90,8 @@ jobs:
             --arg header "${{ inputs.tag }}${releaseSuffix}" \
             --arg text "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}." \
             --arg body "$RELEASE_BODY" \
-            --arg changes "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}" \
-            --arg releases "https://github.com/gip-inclusion/immersion-facile/releases" \
+            --arg changes "https://github.com/Immersion-Facilitee/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}" \
+            --arg releases "https://github.com/Immersion-Facilitee/immersion-facile/releases" \
             --arg app "https://${{ inputs.environment }}.immersion-facile.beta.gouv.fr" \
             --arg workflow "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}" \
             '{
@@ -123,11 +123,11 @@ jobs:
                 "fields": [
                   {
                     "name": "Les changements contenus dans cette version :",
-                    "value": "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}"
+                    "value": "https://github.com/Immersion-Facilitee/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}"
                   },
                   {
                     "name": "Dernières releases :",
-                    "value": "https://github.com/gip-inclusion/immersion-facile/releases"
+                    "value": "https://github.com/Immersion-Facilitee/immersion-facile/releases"
                   },
                   {
                     "name": "Application :",
