@@ -72,8 +72,8 @@ jobs:
             try {
               const release = await github.request(`GET /repos/${{ github.repository }}/releases/tags/${tag}`);
               let body = release.data.body || '';
-              if (body.length > 3900) {
-                body = body.substring(0, 3900) + `\n\n... Liste tronquée, voir la release complète sur GitHub : ${releaseUrl}`;
+              if (body.length > 2700) {
+                body = body.substring(0, 2700) + `\n\n... Liste tronquée, voir la release complète sur GitHub : ${releaseUrl}`;
               }
               core.setOutput('body', body);
             } catch (e) {
