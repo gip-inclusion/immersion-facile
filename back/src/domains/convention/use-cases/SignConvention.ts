@@ -34,8 +34,7 @@ export const makeSignConvention = useCaseBuilder("SignConvention")
         requestedConventionId: conventionId,
         jwtPayload,
       });
-      const convention =
-        await uow.conventionQueries.getConventionById(conventionId);
+      const convention = await uow.conventionRepository.getById(conventionId);
       if (!convention) throw errors.convention.notFound({ conventionId });
 
       const { role, userWithRights, signedConvention } = await signConvention({
