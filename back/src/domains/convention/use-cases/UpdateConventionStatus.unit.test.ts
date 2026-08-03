@@ -7,6 +7,7 @@ import {
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
+  ForbiddenError,
   validSignatoryRoles,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -203,6 +204,39 @@ describe("UpdateConventionStatus", () => {
           },
         },
         nextDate: validationDate,
+      });
+
+      it("rejects ACCEPTED_BY_VALIDATOR from IN_REVIEW when counsellor validation is required", async () => {
+        const {
+          updateConventionStatusUseCase,
+          conventionRepository,
+          timeGateway,
+        } = setupInitialState({
+          initialStatus: "IN_REVIEW",
+          conventionId: conventionWithAgencyTwoStepsValidationId,
+        });
+
+        await expectPromiseToFailWithError(
+          executeUpdateConventionStatusUseCase({
+            jwtPayload: createConventionMagicLinkPayload({
+              id: conventionWithAgencyTwoStepsValidationId,
+              role: "validator",
+              email: "",
+              now: timeGateway.now(),
+            }),
+            updateStatusParams: {
+              status: "ACCEPTED_BY_VALIDATOR",
+              conventionId: conventionWithAgencyTwoStepsValidationId,
+              firstname: "Validator Firstname",
+              lastname: "Validator Lastname",
+            },
+            updateConventionStatusUseCase,
+            conventionRepository,
+          }),
+          new ForbiddenError(
+            `Vous ne pouvez pas valider la convention: '${conventionWithAgencyTwoStepsValidationId}', elle doit d'abord être revue et marquée comme éligible par un conseiller.`,
+          ),
+        );
       });
 
       it("keeps date approval when going to status ACCEPTED_BY_VALIDATOR", async () => {

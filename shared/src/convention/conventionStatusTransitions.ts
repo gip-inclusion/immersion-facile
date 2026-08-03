@@ -1,10 +1,19 @@
 import type { Role, SignatoryRole } from "../role/role.dto";
-import type { ConventionReadDto, ConventionStatus } from "./convention.dto";
+import type {
+  AgencyValidationStep,
+  ConventionDto,
+  ConventionStatus,
+} from "./convention.dto";
+
+type StatusTransitionRefineParams = {
+  convention: ConventionDto;
+  agencyValidationSteps: AgencyValidationStep;
+};
 
 export type StatusTransitionConfig = {
   validInitialStatuses: ConventionStatus[];
   validRoles: Role[];
-  refine?: (conventionRead: ConventionReadDto) => {
+  refine?: (params: StatusTransitionRefineParams) => {
     isError: boolean;
     errorMessage: string;
   };
@@ -34,10 +43,10 @@ export const statusTransitionConfigs: Record<
       "back-office",
       ...validSignatoryRoles,
     ],
-    refine: (conventionRead) => {
-      const renewedKey: keyof ConventionReadDto = "renewed";
+    refine: ({ convention }) => {
+      const renewedKey: keyof ConventionDto = "renewed";
       return {
-        isError: renewedKey in conventionRead,
+        isError: renewedKey in convention,
         errorMessage: "Cannot edit a renewed convention",
       };
     },
@@ -60,11 +69,11 @@ export const statusTransitionConfigs: Record<
   ACCEPTED_BY_VALIDATOR: {
     validInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
     validRoles: ["validator"],
-    refine: (conventionRead) => ({
+    refine: ({ convention, agencyValidationSteps }) => ({
       isError:
-        conventionRead.status === "IN_REVIEW" &&
-        conventionRead.agencyValidationSteps === "counsellor-and-validator",
-      errorMessage: `Vous ne pouvez pas valider la convention: '${conventionRead.id}', elle doit d'abord être revue et marquée comme éligible par un conseiller.`,
+        convention.status === "IN_REVIEW" &&
+        agencyValidationSteps === "counsellor-and-validator",
+      errorMessage: `Vous ne pouvez pas valider la convention: '${convention.id}', elle doit d'abord être revue et marquée comme éligible par un conseiller.`,
     }),
   },
 

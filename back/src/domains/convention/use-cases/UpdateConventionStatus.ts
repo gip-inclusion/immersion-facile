@@ -4,7 +4,6 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionRole,
   type ConventionStatus,
-  conventionSchema,
   type DateString,
   errors,
   type Role,
@@ -14,6 +13,10 @@ import {
   validatedConventionStatuses,
   type WithConventionIdLegacy,
 } from "shared";
+import {
+  agencyDtoToConventionAgencyFields,
+  agencyWithRightToAgencyDto,
+} from "../../../utils/agency";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -58,41 +61,50 @@ export const makeUpdateConventionStatus = useCaseBuilder(
       requestedConventionId: inputParams.conventionId,
       jwtPayload: payload,
     });
-    const conventionRead = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
-    if (!conventionRead)
+    if (!convention)
       throw errors.convention.notFound({
         conventionId: inputParams.conventionId,
       });
 
-    const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
 
-    if (!agency)
+    if (!agencyWithRights)
       throw errors.agency.notFound({
-        agencyId: conventionRead.agencyId,
+        agencyId: convention.agencyId,
       });
 
     const roleOrUser = await getRoleInPayloadOrUser(
       uow,
       payload,
       inputParams.status,
-      conventionRead.id,
+      convention.id,
     );
 
     const roles =
       "roleInPayload" in roleOrUser
         ? [roleOrUser.roleInPayload]
-        : await rolesFromUser(roleOrUser.userWithRights, conventionRead);
+        : await rolesFromUser(roleOrUser.userWithRights, convention);
 
     const assessment = await uow.assessmentRepository.getByConventionId(
-      conventionRead.id,
+      convention.id,
+    );
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    const { agencyValidationSteps } = agencyDtoToConventionAgencyFields(
+      agency,
+      null,
     );
 
     throwIfTransitionNotAllowed({
       roles,
       targetStatus: inputParams.status,
-      conventionRead,
+      convention,
+      agencyValidationSteps,
       hasAssessment: !!assessment,
     });
 
@@ -117,12 +129,12 @@ export const makeUpdateConventionStatus = useCaseBuilder(
       if (reviewedConventionStatuses.includes(inputParams.status))
         return conventionUpdatedAt;
       if (validatedConventionStatuses.includes(inputParams.status))
-        return conventionRead.dateApproval;
+        return convention.dateApproval;
       return undefined;
     };
 
     const updatedConvention: ConventionDto = {
-      ...conventionSchema.parse(conventionRead),
+      ...convention,
       status: inputParams.status,
       dateValidation: validatedConventionStatuses.includes(inputParams.status)
         ? conventionUpdatedAt
@@ -132,7 +144,7 @@ export const makeUpdateConventionStatus = useCaseBuilder(
       ...(hasCounsellor
         ? {
             validators: {
-              ...conventionRead.validators,
+              ...convention.validators,
               agencyCounsellor: {
                 firstname: inputParams.firstname,
                 lastname: inputParams.lastname,
@@ -143,7 +155,7 @@ export const makeUpdateConventionStatus = useCaseBuilder(
       ...(hasValidator
         ? {
             validators: {
-              ...conventionRead.validators,
+              ...convention.validators,
               agencyValidator: {
                 firstname: inputParams.firstname,
                 lastname: inputParams.lastname,

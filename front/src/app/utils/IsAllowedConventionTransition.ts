@@ -17,6 +17,9 @@ export const isAllowedConventionTransition = (
     actingRoles.some((actingRole) =>
       transitionConfig.validRoles.includes(actingRole),
     ) &&
-    !transitionConfig.refine?.(convention).isError
+    !transitionConfig.refine?.({
+      convention,
+      agencyValidationSteps: convention.agencyValidationSteps,
+    }).isError
   );
 };
