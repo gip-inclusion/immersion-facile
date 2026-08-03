@@ -109,6 +109,31 @@ describe("PgConventionRepository", () => {
     conventionRepository = new PgConventionRepository(db);
   });
 
+  describe("getById", () => {
+    it("returns undefined if no convention were found with id", async () => {
+      expectToEqual(
+        await conventionRepository.getById(
+          "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa",
+        ),
+        undefined,
+      );
+    });
+
+    it("returns the convention dto when it exists", async () => {
+      const convention = conventionStylisteBuilder
+        .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
+        .withEstablishmentNumberOfEmployeesRange("20-49")
+        .build();
+
+      await conventionRepository.save(convention, anyConventionUpdatedAt);
+
+      expectToEqual(
+        await conventionRepository.getById(convention.id),
+        convention,
+      );
+    });
+  });
+
   it("Adds a new convention", async () => {
     const convention = conventionStylisteBuilder
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")

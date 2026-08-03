@@ -61,8 +61,8 @@ import {
   createPaginatedConventionsBaseBuilder,
   getAssessmentFieldsByConventions,
   getConventionAgencyFieldsForAgencies,
+  getConventionDtoById,
   getLastRemindersFieldsByConventions,
-  getReadConventionById,
   hasEmptyArrayFilter,
   wrapInMaterializedCteWithEnrichment,
 } from "./pgConventionSql";
@@ -243,8 +243,8 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getConventionById(
     id: ConventionId,
-  ): Promise<ConventionReadDto | undefined> {
-    return getReadConventionById(this.transaction, id);
+  ): Promise<ConventionDto | undefined> {
+    return getConventionDtoById(this.transaction, id);
   }
 
   public async getConventions({

@@ -11,7 +11,6 @@ import {
   type ConventionWithBroadcastFeedback,
   type ConventionWithUnfinalizedAssessment,
   calculatePaginationResult,
-  conventionReadSchema,
   conventionSchema,
   conventionStatusesDemonstratingUserActivity,
   type DataWithPagination,
@@ -111,19 +110,16 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getConventionById(
     id: ConventionId,
-  ): Promise<ConventionReadDto | undefined> {
+  ): Promise<ConventionDto | undefined> {
     const convention = this.conventionRepository.conventions.find(
       propEq(id, "id"),
     );
     if (!convention) return;
 
-    const conventionReadDto =
-      await this.#addAgencyAndAssessmentDataToConvention(convention);
-
     return validateAndParseZodSchema({
-      schemaName: "conventionReadSchema",
-      inputSchema: conventionReadSchema,
-      schemaParsingInput: conventionReadDto,
+      schemaName: "conventionSchema",
+      inputSchema: conventionSchema,
+      schemaParsingInput: convention,
       id: convention.id,
       logger,
     });
