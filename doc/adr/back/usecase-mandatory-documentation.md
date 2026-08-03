@@ -3,7 +3,7 @@
 ## Problématique
 
 - La création systématique de usecase et d'un fichier de test unitaire même pour un usecase de query très basique à des fins de documentation fonctionnelle pour tout les membres de l'équipe dont les non-techs
-  - un POC de documentation de feature par un rapport de test a été transmi au PO et aux UX pour voir si ça leur est utile: https://github.com/gip-inclusion/immersion-facile/issues/2537
+  - un POC de documentation de feature par un rapport de test a été transmi au PO et aux UX pour voir si ça leur est utile: https://github.com/Immersion-Facilitee/immersion-facile/issues/2537
 
 ## Discussion
 

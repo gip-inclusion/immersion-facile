@@ -14,13 +14,13 @@ Nous utilisons `pnpm` comme gestionnaire de paquets (pour l'installer : `npm ins
 
 ### Démarrer le projet
 
-- Demander à être ajouté comme contributeur au projet `gip-inclusion/immersion-facile`
+- Demander à être ajouté comme contributeur au projet `Immersion-Facilitee/immersion-facile`
 - Cloner le projet
 
 #### Cloner le projet
 
 ```sh
-git clone ssh://git@github.com:gip-inclusion/immersion-facile.git immersion-facile
+git clone ssh://git@github.com:Immersion-Facilitee/immersion-facile.git immersion-facile
 cd immersion-facile
 ```
 
