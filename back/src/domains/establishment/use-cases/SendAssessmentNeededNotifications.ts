@@ -176,8 +176,7 @@ const sendAssessmentNotifications = async (
   deps: Deps,
   conventionId: ConventionId,
 ): Promise<{ id: ConventionId }> => {
-  const convention =
-    await uow.conventionQueries.getConventionById(conventionId);
+  const convention = await uow.conventionRepository.getById(conventionId);
   if (!convention) throw errors.convention.notFound({ conventionId });
 
   const agency = await uow.agencyRepository.getById(convention.agencyId);

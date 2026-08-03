@@ -637,7 +637,7 @@ describe("SendAssessmentNeededNotifications", () => {
           conventionsQtyWithImmersionEnding: 2,
           conventionsAssessmentSentErrored: {
             [conventionWithSignatoriesWithSamePhoneNumber.id]: new Error(
-              `Schema validation failed for schema conventionReadSchema for element with id ${conventionWithSignatoriesWithSamePhoneNumber.id}. See issues for details.`,
+              `Schema validation failed for schema conventionSchema for element with id ${conventionWithSignatoriesWithSamePhoneNumber.id}. See issues for details.`,
             ),
           },
         },
