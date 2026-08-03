@@ -7,7 +7,6 @@ import {
   type BeneficiaryRepresentative,
   type ConventionActorRole,
   type ConventionDto,
-  type ConventionReadDto,
   type Email,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
@@ -67,20 +66,19 @@ export const makeNotifyConventionReminder = useCaseBuilder(
   .withInput(conventionReminderPayloadSchema)
   .withDeps<Deps>()
   .build(async ({ inputParams: { conventionId, reminderKind }, uow, deps }) => {
-    const conventionRead =
-      await uow.conventionQueries.getConventionById(conventionId);
-    if (!conventionRead) throw errors.convention.notFound({ conventionId });
+    const convention = await uow.conventionRepository.getById(conventionId);
+    if (!convention) throw errors.convention.notFound({ conventionId });
 
     return reminderKind === "ReminderForSignatories"
       ? onSignatoriesReminder({
           reminderKind,
-          conventionRead,
+          convention,
           uow,
           deps,
         })
       : onAgencyReminder({
           reminderKind,
-          conventionRead,
+          convention,
           uow,
           deps,
         });
@@ -88,27 +86,27 @@ export const makeNotifyConventionReminder = useCaseBuilder(
 
 const onAgencyReminder = async ({
   reminderKind,
-  conventionRead,
+  convention,
   uow,
   deps,
 }: {
   reminderKind: AgenciesReminderKind;
-  conventionRead: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   deps: Deps;
 }): Promise<void> => {
   const agencyWithRights = await uow.agencyRepository.getById(
-    conventionRead.agencyId,
+    convention.agencyId,
   );
   if (!agencyWithRights)
     throw errors.agency.notFound({
-      agencyId: conventionRead.agencyId,
+      agencyId: convention.agencyId,
     });
 
   const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-  if (conventionRead.status !== "IN_REVIEW")
+  if (convention.status !== "IN_REVIEW")
     throw errors.convention.forbiddenReminder({
-      convention: conventionRead,
+      convention,
       kind: reminderKind,
     });
 
@@ -124,7 +122,7 @@ const onAgencyReminder = async ({
       (counsellorOrValidatorEmail) =>
         createAgencyReminderEmail({
           counsellorOrValidatorEmail,
-          conventionRead,
+          convention,
           agency,
           reminderKind,
           config: deps.config,
@@ -135,22 +133,22 @@ const onAgencyReminder = async ({
 
 const onSignatoriesReminder = async ({
   reminderKind,
-  conventionRead,
+  convention,
   uow,
   deps,
 }: {
   reminderKind: SignatoriesReminderKind;
-  conventionRead: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   deps: Deps;
 }): Promise<void> => {
-  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
+  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status))
     throw errors.convention.forbiddenReminder({
-      convention: conventionRead,
+      convention,
       kind: reminderKind,
     });
 
-  const signatories = Object.values(conventionRead.signatories);
+  const signatories = Object.values(convention.signatories);
 
   const smsSignatories = signatories.filter(
     (signatory) => !signatory.signedAt && isValidMobilePhone(signatory.phone),
@@ -158,9 +156,9 @@ const onSignatoriesReminder = async ({
 
   const emailActors = [
     ...signatories,
-    ...(isEstablishmentTutorIsEstablishmentRepresentative(conventionRead)
+    ...(isEstablishmentTutorIsEstablishmentRepresentative(convention)
       ? []
-      : [conventionRead.establishmentTutor]),
+      : [convention.establishmentTutor]),
   ];
 
   const templatedEmails: TemplatedEmail[] = await executeInSequence(
@@ -168,7 +166,7 @@ const onSignatoriesReminder = async ({
     (actor) =>
       makeSignatoryReminderEmail({
         actor,
-        conventionRead: conventionRead,
+        convention,
         uow,
         deps,
       }),
@@ -177,7 +175,7 @@ const onSignatoriesReminder = async ({
   const templatedSms = await executeInSequence(smsSignatories, (signatory) =>
     prepareSmsReminderParams({
       actor: signatory,
-      conventionRead,
+      convention,
       uow,
       reminderKind,
       deps,
@@ -185,9 +183,9 @@ const onSignatoriesReminder = async ({
   );
 
   const followedIds = {
-    conventionId: conventionRead.id,
-    agencyId: conventionRead.agencyId,
-    establishmentSiret: conventionRead.siret,
+    conventionId: convention.id,
+    agencyId: convention.agencyId,
+    establishmentSiret: convention.siret,
   };
 
   await deps.saveNotificationsBatchAndRelatedEvent(uow, [
@@ -210,12 +208,12 @@ const onSignatoriesReminder = async ({
 
 const makeSignatoryReminderEmail = async ({
   actor: { email, role, firstName, lastName },
-  conventionRead,
+  convention,
   uow,
   deps,
 }: {
   actor: GenericActor<ConventionActorRole>;
-  conventionRead: ConventionDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   deps: Deps;
 }): Promise<TemplatedEmail> => ({
@@ -227,19 +225,19 @@ const makeSignatoryReminderEmail = async ({
     }),
     actorLastName: getFormattedFirstnameAndLastname({ lastname: lastName }),
     beneficiaryFirstName: getFormattedFirstnameAndLastname({
-      firstname: conventionRead.signatories.beneficiary.firstName,
+      firstname: convention.signatories.beneficiary.firstName,
     }),
     beneficiaryLastName: getFormattedFirstnameAndLastname({
-      lastname: conventionRead.signatories.beneficiary.lastName,
+      lastname: convention.signatories.beneficiary.lastName,
     }),
-    businessName: conventionRead.businessName,
-    conventionId: conventionRead.id,
-    signatoriesSummary: toSignatoriesSummary(conventionRead).join("\n"),
+    businessName: convention.businessName,
+    conventionId: convention.id,
+    signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
     magicLinkUrl: isSignatoryRole(role)
       ? await prepareConventionMagicShortLinkMaker({
           config: deps.config,
           conventionMagicLinkPayload: {
-            id: conventionRead.id,
+            id: convention.id,
             role,
             email,
             now: deps.timeGateway.now(),
@@ -257,13 +255,13 @@ const makeSignatoryReminderEmail = async ({
 
 const prepareSmsReminderParams = async ({
   actor: { role, email, phone },
-  conventionRead,
+  convention,
   uow,
   reminderKind,
   deps,
 }: {
   actor: GenericActor<ConventionActorRole>;
-  conventionRead: ConventionReadDto;
+  convention: ConventionDto;
   uow: UnitOfWork;
   reminderKind: SignatoriesReminderKind;
   deps: Deps;
@@ -271,7 +269,7 @@ const prepareSmsReminderParams = async ({
   const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
     config: deps.config,
     conventionMagicLinkPayload: {
-      id: conventionRead.id,
+      id: convention.id,
       role,
       email,
       now: deps.timeGateway.now(),
@@ -295,13 +293,13 @@ const prepareSmsReminderParams = async ({
 
 const createAgencyReminderEmail = async ({
   counsellorOrValidatorEmail,
-  conventionRead,
+  convention,
   agency,
   reminderKind,
   config,
 }: {
   counsellorOrValidatorEmail: Email;
-  conventionRead: ConventionDto;
+  convention: ConventionDto;
   agency: AgencyDto;
   reminderKind: AgenciesReminderKind;
   config: AppConfig;
@@ -312,23 +310,23 @@ const createAgencyReminderEmail = async ({
           kind: "AGENCY_FIRST_REMINDER",
           recipients: [counsellorOrValidatorEmail],
           params: {
-            conventionId: conventionRead.id,
+            conventionId: convention.id,
             agencyName: agency.name,
             agencyReferentName: getFormattedFirstnameAndLastname(
-              conventionRead.agencyReferent ?? {},
+              convention.agencyReferent ?? {},
             ),
             beneficiaryFirstName: getFormattedFirstnameAndLastname({
-              firstname: conventionRead.signatories.beneficiary.firstName,
+              firstname: convention.signatories.beneficiary.firstName,
             }),
             beneficiaryLastName: getFormattedFirstnameAndLastname({
-              lastname: conventionRead.signatories.beneficiary.lastName,
+              lastname: convention.signatories.beneficiary.lastName,
             }),
-            businessName: conventionRead.businessName,
-            dateStart: conventionRead.dateStart,
-            dateEnd: conventionRead.dateEnd,
+            businessName: convention.businessName,
+            dateStart: convention.dateStart,
+            dateEnd: convention.dateEnd,
             manageConventionLink: makeRouteAbsoluteUrl({
               route: frontRoutes.manageConventionConnectedUser({
-                conventionId: conventionRead.id,
+                conventionId: convention.id,
               }),
               baseUrl: config.immersionFacileBaseUrl,
             }),
@@ -338,20 +336,20 @@ const createAgencyReminderEmail = async ({
           kind: "AGENCY_LAST_REMINDER",
           recipients: [counsellorOrValidatorEmail],
           params: {
-            conventionId: conventionRead.id,
+            conventionId: convention.id,
             agencyReferentName: getFormattedFirstnameAndLastname(
-              conventionRead.agencyReferent ?? {},
+              convention.agencyReferent ?? {},
             ),
             beneficiaryFirstName: getFormattedFirstnameAndLastname({
-              firstname: conventionRead.signatories.beneficiary.firstName,
+              firstname: convention.signatories.beneficiary.firstName,
             }),
             beneficiaryLastName: getFormattedFirstnameAndLastname({
-              lastname: conventionRead.signatories.beneficiary.lastName,
+              lastname: convention.signatories.beneficiary.lastName,
             }),
-            businessName: conventionRead.businessName,
+            businessName: convention.businessName,
             manageConventionLink: makeRouteAbsoluteUrl({
               route: frontRoutes.manageConventionConnectedUser({
-                conventionId: conventionRead.id,
+                conventionId: convention.id,
               }),
               baseUrl: config.immersionFacileBaseUrl,
             }),
@@ -361,9 +359,9 @@ const createAgencyReminderEmail = async ({
   return {
     kind: "email",
     followedIds: {
-      conventionId: conventionRead.id,
+      conventionId: convention.id,
       agencyId: agency.id,
-      establishmentSiret: conventionRead.siret,
+      establishmentSiret: convention.siret,
     },
     templatedContent: templatedEmail,
   };
