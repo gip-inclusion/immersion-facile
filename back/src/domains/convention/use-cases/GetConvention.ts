@@ -11,6 +11,7 @@ import {
   withConventionIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { conventionDtoToConventionReadDto } from "../../../utils/convention";
 import {
   isHashMatchConventionEmails,
   isHashMatchNotNotifiedCounsellorOrValidator,
@@ -32,9 +33,14 @@ export const makeGetConvention = useCaseBuilder("GetConvention")
   .withCurrentUser<ConventionRelatedJwtPayload | ApiConsumer>()
   .build(
     async ({ inputParams: { conventionId }, uow, currentUser: jwtPayload }) => {
-      const convention =
-        await uow.conventionQueries.getConventionById(conventionId);
-      if (!convention) throw errors.convention.notFound({ conventionId });
+      const conventionDto =
+        await uow.conventionRepository.getById(conventionId);
+      if (!conventionDto) throw errors.convention.notFound({ conventionId });
+
+      const convention = await conventionDtoToConventionReadDto(
+        conventionDto,
+        uow,
+      );
 
       if ("id" in jwtPayload) return onApiConsumer(jwtPayload, convention);
       return "emailHash" in jwtPayload
