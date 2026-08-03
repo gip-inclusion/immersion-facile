@@ -16,7 +16,7 @@
 9. Le dev qui a fait la feature est celui qui merge sur la branche "main"
 10. Quand les devs veulent faire une release, on prévient @if-produit et @if-devs qu'une recette est faisable sur la staging en créant un thread sur Slack (dans #if-staging-déploiement, en partant du message de déploiement de la pré-release)
     - Pendant la recette, on bloque le merge de PR
-    - Pour du détail sur la recette voir [la documentation du processus de recette](https://github.com/gip-inclusion/immersion-facile/blob/main/doc/adr/review-and-deployment-process.md).
+    - Pour du détail sur la recette voir [la documentation du processus de recette](https://github.com/Immersion-Facilitee/immersion-facile/blob/main/doc/adr/review-and-deployment-process.md).
 11. Quand le métier a validé la recette, on lance le déploiement en prod
 
 

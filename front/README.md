@@ -75,7 +75,7 @@ sudo apt-get update && sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev li
 
 ##### Report / Trace viewer
 
-Playwright est lancé en CI pour valider nos parcours principaux. En cas de souci, si les tests ne passent pas, il est possible d'accéder au trace viewer de la PR concernée. Par exemple, [sur cette PR](https://github.com/gip-inclusion/immersion-facile/actions/runs/11277188528), le job Playwright tests n'est pas passé. On a un peu de détail dans les annotations faites directement sous le workflow, et en scrollant en bas de page, on a accès au report, à télécharger (zip).
+Playwright est lancé en CI pour valider nos parcours principaux. En cas de souci, si les tests ne passent pas, il est possible d'accéder au trace viewer de la PR concernée. Par exemple, [sur cette PR](https://github.com/Immersion-Facilitee/immersion-facile/actions/runs/11277188528), le job Playwright tests n'est pas passé. On a un peu de détail dans les annotations faites directement sous le workflow, et en scrollant en bas de page, on a accès au report, à télécharger (zip).
 Une fois téléchargé : 
 - dezipper l'archive (ça doit produire un dossier `playwright-report`)
 - se placer avec un terminal dans le dossier contenant le dossier `playwright-report`
@@ -97,9 +97,9 @@ Dans cet exemple
 
 Résultat attendu :
 
-- à partir de ce fichier : https://github.com/gip-inclusion/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.scss
-- on obtient un fichier `${fileName}.styles.ts`, soit : https://github.com/gip-inclusion/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.styles.ts
-- qui peut être utilisé via un import par défaut, exemple : https://github.com/gip-inclusion/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.tsx#L29
+- à partir de ce fichier : https://github.com/Immersion-Facilitee/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.scss
+- on obtient un fichier `${fileName}.styles.ts`, soit : https://github.com/Immersion-Facilitee/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.styles.ts
+- qui peut être utilisé via un import par défaut, exemple : https://github.com/Immersion-Facilitee/immersion-facile/blob/dev/front/src/app/pages/search/SearchPage.tsx#L29
 
 ### Management de l'état de l'application avec Redux
 
