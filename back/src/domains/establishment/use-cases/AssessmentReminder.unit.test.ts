@@ -140,6 +140,36 @@ describe("AssessmentReminder", () => {
       ]);
       expectObjectInArrayToMatch(uow.outboxRepository.events, []);
     });
+
+    it("when convention is cancelled", async () => {
+      const cancelledConvention = new ConventionDtoBuilder()
+        .withId("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2")
+        .withStatus("CANCELLED")
+        .withStatusJustification("Annulée par le bénéficiaire")
+        .withDateStart(subDays(subMonths(now, 3), 2).toISOString())
+        .withDateEnd(subMonths(now, 3).toISOString())
+        .withSchedule(reasonableSchedule)
+        .withAgencyId(agency.id)
+        .build();
+      await uow.conventionRepository.save(cancelledConvention);
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention: cancelledConvention,
+          createdAt: subDays(now, 3).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-1"]);
+
+      const { numberOfConventionsReminded } = await assessmentReminder.execute({
+        mode: "3daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfConventionsReminded).toBe(0);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+    });
   });
 
   describe("reminders are sent", () => {

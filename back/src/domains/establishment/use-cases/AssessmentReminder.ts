@@ -12,6 +12,7 @@ import {
   immersionFacileNoReplyEmailSender,
   localization,
   makeRouteAbsoluteUrl,
+  unvalidatedConventionStatuses,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -82,26 +83,59 @@ export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
       outOfTrx: deps.outOfTrx,
     });
 
-    await executeInSequence(conventionIdsToRemind, async (conventionId) => {
-      const convention =
-        await uow.conventionQueries.getConventionById(conventionId);
-      if (!convention)
-        throw errors.convention.notFound({ conventionId: conventionId });
-      await sendAssessmentReminders({
-        uow,
-        convention,
-        now,
-        generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
-        shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-        config: deps.config,
-      });
-    });
+    const remindedConventionsCount = await executeInSequence(
+      conventionIdsToRemind,
+      (conventionId) =>
+        sendAssessmentReminderIfNeeded({
+          conventionId,
+          uow,
+          now,
+          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+          shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+          config: deps.config,
+        }),
+    );
 
     return {
-      numberOfConventionsReminded: conventionIdsToRemind.length,
+      numberOfConventionsReminded: remindedConventionsCount.filter(
+        (wasReminded) => wasReminded,
+      ).length,
     };
   });
+
+const sendAssessmentReminderIfNeeded = async ({
+  uow,
+  conventionId,
+  now,
+  generateConventionMagicLinkUrl,
+  saveNotificationAndRelatedEvent,
+  shortLinkIdGeneratorGateway,
+  config,
+}: Omit<SendAssessmentReminderParams, "convention"> & {
+  conventionId: ConventionId;
+}): Promise<boolean> => {
+  const convention =
+    await uow.conventionQueries.getConventionById(conventionId);
+  if (!convention) throw errors.convention.notFound({ conventionId });
+
+  if (
+    unvalidatedConventionStatuses.some((status) => status === convention.status)
+  )
+    return false;
+
+  await sendAssessmentReminders({
+    uow,
+    convention,
+    now,
+    generateConventionMagicLinkUrl,
+    saveNotificationAndRelatedEvent,
+    shortLinkIdGeneratorGateway,
+    config,
+  });
+
+  return true;
+};
 
 const getConventionIdsToRemind = async ({
   mode,
