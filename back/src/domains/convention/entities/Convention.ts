@@ -3,6 +3,7 @@ import {
   type AgencyDto,
   type AgencyId,
   type AgencyKind,
+  type AgencyValidationStep,
   type AgencyWithUsersRights,
   type ApiConsumer,
   allSignatoryRoles,
@@ -34,12 +35,14 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 export const throwIfTransitionNotAllowed = ({
   targetStatus,
   roles,
-  conventionRead,
+  convention,
+  agencyValidationSteps,
   hasAssessment,
 }: {
   targetStatus: ConventionStatus;
   roles: Role[];
-  conventionRead: ConventionReadDto;
+  convention: ConventionDto;
+  agencyValidationSteps: AgencyValidationStep;
   hasAssessment: boolean;
 }) => {
   const config = statusTransitionConfigs[targetStatus];
@@ -53,12 +56,12 @@ export const throwIfTransitionNotAllowed = ({
     throw errors.convention.badRoleStatusChange({
       roles,
       status: targetStatus,
-      conventionId: conventionRead.id,
+      conventionId: convention.id,
     });
 
-  if (!config.validInitialStatuses.includes(conventionRead.status))
+  if (!config.validInitialStatuses.includes(convention.status))
     throw errors.convention.badStatusTransition({
-      currentStatus: conventionRead.status,
+      currentStatus: convention.status,
       targetStatus,
     });
 
@@ -66,7 +69,10 @@ export const throwIfTransitionNotAllowed = ({
     throw errors.convention.notAllowedToCancelConventionWithAssessment();
 
   if (config.refine) {
-    const { isError, errorMessage } = config.refine(conventionRead);
+    const { isError, errorMessage } = config.refine({
+      convention,
+      agencyValidationSteps,
+    });
     if (isError) throw new ForbiddenError(errorMessage);
   }
 };
@@ -335,7 +341,7 @@ export const signConvention = async ({
   now,
 }: {
   uow: UnitOfWork;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   jwtPayload: ConventionDomainJwtPayload | ConnectedUserDomainJwtPayload;
   now: DateTimeIsoString;
 }) => {
@@ -354,7 +360,8 @@ export const signConvention = async ({
   throwIfTransitionNotAllowed({
     roles: [role],
     targetStatus: signedConvention.status,
-    conventionRead: convention,
+    convention,
+    agencyValidationSteps: "validator-only",
     hasAssessment: false,
   });
   const signedId = await uow.conventionRepository.update(signedConvention);

@@ -186,7 +186,7 @@ const agencyWithCounsellorEmails = toAgencyWithRights(
       roles: ["validator"],
     },
     [userWithRoleCounsellor.id]: {
-      isNotifiedByEmail: false,
+      isNotifiedByEmail: true,
       roles: ["counsellor"],
     },
     [userWithRoleToReview.id]: {
