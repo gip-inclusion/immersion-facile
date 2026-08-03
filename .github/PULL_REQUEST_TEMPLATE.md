@@ -9,7 +9,7 @@
 - [ ] Le titre respecte la convention : `#ID_ISSUE - Message clair et en français, compréhensible par quelqu'un du métier`
 - [ ] Auteurs assignés sur la PR et l'issue liée
 - [ ] Description du travail commentée sur l'issue (cf. `/document-issue`)
-- [ ] L'issue est en **RfR** dans le [projet GitHub](https://github.com/orgs/gip-inclusion/projects/10?query=sort%3Aupdated-desc+is%3Aopen)
+- [ ] L'issue est en **RfR** dans le [projet GitHub](https://github.com/orgs/Immersion-Facilitee/projects/1?query=sort%3Aupdated-desc+is%3Aopen)
 
 ## Points d'attention pour le reviewer
 

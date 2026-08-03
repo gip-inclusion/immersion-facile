@@ -17,7 +17,7 @@ Historique de différence de comportement entre repo ayant généré du support/
 
 Ce n'est pas une pratique mise en place à date sur le code.
 Un exemple/démo a été fait en mars pour expérimenter la pratique sur UserRepository suite à une comparaison entre l'implémentation PG vs InMemory :
-[Lien vers le commit en question](https://github.com/gip-inclusion/immersion-facile/commit/6f3a3831c7755214536ae54cd10b8042d24d8a7e)
+[Lien vers le commit en question](https://github.com/Immersion-Facilitee/immersion-facile/commit/6f3a3831c7755214536ae54cd10b8042d24d8a7e)
 
 Cette démo consiste à jouer les mêmes tests d'intégration du repo PG mais sur le repo InMemory.
 Rappel : les tests d'intégration valident le comportement des méthodes du port consommé par le métier.
