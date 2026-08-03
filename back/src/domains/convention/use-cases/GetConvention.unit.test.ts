@@ -652,7 +652,7 @@ describe("Get Convention", () => {
             agencyContactEmail: agency.contactEmail,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
-            agencyValidationSteps: "counsellor-and-validator",
+            agencyValidationSteps: "validator-only",
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
@@ -714,7 +714,7 @@ describe("Get Convention", () => {
             agencyContactEmail: agency.contactEmail,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
-            agencyValidationSteps: "counsellor-and-validator",
+            agencyValidationSteps: "validator-only",
             assessment: {
               status: assessment.status,
               endedWithAJob: assessment.endedWithAJob,
@@ -744,7 +744,7 @@ describe("Get Convention", () => {
             agencyContactEmail: agency.contactEmail,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
-            agencyValidationSteps: "counsellor-and-validator",
+            agencyValidationSteps: "validator-only",
             assessment: null,
             lastReminders: makeEmptyLastReminders(),
             isEstablishmentBanned: false,
