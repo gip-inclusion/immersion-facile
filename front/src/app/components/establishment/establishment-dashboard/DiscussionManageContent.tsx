@@ -422,6 +422,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       </header>
 
       {discussionEstablishmentContactInfo &&
+        viewer === "potentialBeneficiary" &&
         shouldEstablishmentBeReminded({
           contactMode: discussion.contactMode,
           discussionUpdatedAt: discussion.updatedAt,
