@@ -1,13 +1,11 @@
 import { useState } from "react";
 import {
-  type OptionType,
   RSAutocomplete,
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import type { PropsValue } from "react-select";
 import type { AppellationMatchDto } from "shared";
-import { isSingleOption } from "src/app/components/forms/autocomplete/autocomplete.utils";
+import { getAutocompleteValue } from "src/app/components/forms/autocomplete/autocomplete.utils";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { makeAppellationLocatorSelector } from "src/core-logic/domain/appellation/appellation.selectors";
 import {
@@ -44,21 +42,6 @@ const useAppellationAutocomplete = (
   };
 };
 
-const getAutocompleteValue = (
-  value?: AppellationMatchDto | null,
-  defaultValue?: PropsValue<OptionType<AppellationMatchDto>>,
-  searchTerm?: string,
-): OptionType<AppellationMatchDto> | null => {
-  if (value)
-    return {
-      label: value.appellation.appellationLabel,
-      value: value,
-    };
-  if (searchTerm === "" && defaultValue === undefined) return null;
-  if (defaultValue && isSingleOption(defaultValue)) return defaultValue;
-  return null;
-};
-
 export const AppellationAutocomplete = ({
   onAppellationClear,
   onAppellationSelected,
@@ -82,7 +65,12 @@ export const AppellationAutocomplete = ({
         inputValue: searchTerm,
         placeholder:
           props.selectProps?.placeholder ?? "Ex : Boulanger, styliste, etc.",
-        value: getAutocompleteValue(value, defaultValue, searchTerm),
+        value: getAutocompleteValue(
+          (v) => v.appellation.appellationLabel,
+          value,
+          defaultValue,
+          searchTerm,
+        ),
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||
