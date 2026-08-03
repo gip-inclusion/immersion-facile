@@ -2,8 +2,8 @@ import subDays from "date-fns/subDays";
 import { difference, uniq } from "ramda";
 import {
   type AbsoluteUrl,
+  type ConventionDto,
   type ConventionId,
-  type ConventionReadDto,
   type Email,
   errors,
   executeInSequence,
@@ -35,7 +35,7 @@ type AssessmentReminderOutput = {
 
 type SendAssessmentReminderParams = {
   uow: UnitOfWork;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   now: Date;
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
@@ -184,7 +184,7 @@ const createTutorNotification = ({
   convention,
   assessmentCreationLink,
 }: {
-  convention: ConventionReadDto;
+  convention: ConventionDto;
   assessmentCreationLink: AbsoluteUrl;
 }): NotificationContentAndFollowedIds => {
   return {

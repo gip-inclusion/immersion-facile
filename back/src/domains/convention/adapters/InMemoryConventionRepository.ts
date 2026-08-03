@@ -1,5 +1,12 @@
 import { values } from "ramda";
-import { type ConventionDto, type ConventionId, errors } from "shared";
+import {
+  type ConventionDto,
+  type ConventionId,
+  conventionSchema,
+  errors,
+} from "shared";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
+import { createLogger } from "../../../utils/logger";
 import type { ConventionRepository } from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {
@@ -42,7 +49,16 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   public async getById(id: ConventionId) {
-    return this.#conventions[id];
+    const convention = this.#conventions[id];
+    if (!convention) return;
+
+    return validateAndParseZodSchema({
+      schemaName: "conventionSchema",
+      inputSchema: conventionSchema,
+      schemaParsingInput: convention,
+      id: convention.id,
+      logger: createLogger(__filename),
+    });
   }
 
   public async save(convention: ConventionDto): Promise<void> {
