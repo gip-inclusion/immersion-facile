@@ -97,7 +97,6 @@ export const SearchListResults = ({
     hasResults &&
     isLastPage &&
     isSearchWithAppellationAndGeoParams;
-  const routeParams = route.params as Partial<SearchPageParams>;
   const displayTotalFiltersLength = (formValues: SearchPageParams): string => {
     const currentFiltersLength = [
       ...getAppellationAndNafValues(
@@ -154,17 +153,17 @@ export const SearchListResults = ({
                 {pagination.totalRecords > 1 ? "s" : ""} trouvé
                 {pagination.totalRecords > 1 ? "s" : ""}
               </h2>
-              {routeParams.appellations &&
-                routeParams.appellations.length > 0 && (
+              {searchParams.appellations &&
+                searchParams.appellations.length > 0 && (
                   <span className={cx(fr.cx("fr-text--xs"))}>
                     pour la recherche{" "}
                     <a
-                      href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
+                      href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${searchParams.appellations[0].romeCode}`}
                       target="_blank"
                       className={fr.cx("fr-text--bold")}
                       rel="noreferrer"
                     >
-                      {routeParams.appellations[0].appellationLabel}
+                      {searchParams.appellations[0].appellationLabel}
                     </a>
                   </span>
                 )}
