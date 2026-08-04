@@ -37,7 +37,7 @@ export const authFailed = "AuthFailed";
 
 export type FtExternalId = Flavor<string, "FtExternalId">;
 
-type FtConnectAdvisorForBeneficiary = {
+export type FtConnectAdvisorForBeneficiary = {
   advisor?: {
     email: string;
     firstName: string;
