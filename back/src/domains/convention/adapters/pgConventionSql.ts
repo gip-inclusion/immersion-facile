@@ -13,8 +13,6 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionLastReminders,
-  type ConventionReadDto,
-  conventionReadSchema,
   conventionSchema,
   type DateString,
   type DateTimeIsoString,
@@ -615,49 +613,6 @@ export const getConventionDtoById = async (
     inputSchema: conventionSchema,
     schemaParsingInput: pgConvention.dto,
     id: pgConvention.dto.id,
-    logger: createLogger(__filename),
-  });
-};
-
-export const getReadConventionById = async (
-  transaction: KyselyDb,
-  conventionId: ConventionId,
-): Promise<ConventionReadDto | undefined> => {
-  const pgConvention = await createConventionQueryBuilder(transaction, true)
-    .where("conventions.id", "=", conventionId)
-    .executeTakeFirst();
-
-  if (!pgConvention) return;
-
-  const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
-    transaction,
-    [pgConvention.dto.agencyId],
-  );
-
-  const assessmentFields = await getAssessmentFieldsByConventionId(
-    transaction,
-    pgConvention.dto.id,
-  );
-  const lastReminders = await getLastRemindersFieldsByConventionId(
-    transaction,
-    pgConvention.dto,
-  );
-
-  return validateAndParseZodSchema({
-    schemaName: "conventionReadSchema",
-    inputSchema: conventionReadSchema,
-    schemaParsingInput: {
-      ...pgConvention.dto,
-      ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
-      ...assessmentFields,
-      lastReminders,
-    },
-    id:
-      pgConvention.dto &&
-      typeof pgConvention.dto === "object" &&
-      "id" in pgConvention.dto
-        ? (pgConvention.dto.id as string)
-        : undefined,
     logger: createLogger(__filename),
   });
 };
