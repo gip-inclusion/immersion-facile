@@ -33,7 +33,6 @@ export * from "./notification-indicator";
 export * from "./nps-form";
 export * from "./over-footer";
 export * from "./page-header";
-export * from "./pe-connect-button";
 export * from "./rich-dropdown";
 export * from "./rich-table";
 export * from "./rs-autocomplete";
