@@ -18,7 +18,7 @@ import {
   businessAddressSchema,
   businessNameSchema,
 } from "../establishment/businessComponents.schema";
-import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { ftConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { dateFilterSchema } from "../filters";
 import {
   createPaginatedSchema,
@@ -176,7 +176,7 @@ const beneficiarySchema: ZodSchemaWithInputMatchingOutput<
     emergencyContact: optionalEmptyStringMax1024,
     emergencyContactPhone: phoneNumberSchema.optional().or(z.literal("")),
     emergencyContactEmail: emailPossiblyEmptySchema,
-    federatedIdentity: peConnectIdentitySchema.optional(),
+    federatedIdentity: ftConnectIdentitySchema.optional(),
     financiaryHelp: zStringCanBeEmptyMax1800.optional(),
     birthdate: makeDateStringSchema(),
     isRqth: zBoolean.optional(),

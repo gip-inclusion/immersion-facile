@@ -271,7 +271,7 @@ export const makeListAgencyOptionsKindFilter = ({
   if (convention.internshipKind === "mini-stage-cci") return "miniStageOnly";
   if (shouldListAll) return "miniStageExcluded";
   return convention.signatories?.beneficiary?.federatedIdentity?.provider ===
-    "peConnect"
+    "ftConnect"
     ? "immersionPeOnly"
     : "miniStageExcluded";
 };
