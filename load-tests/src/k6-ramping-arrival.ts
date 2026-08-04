@@ -5,22 +5,29 @@ import type { Options } from "k6/options";
 const trimTrailingSlashes = (value: string) => value.replace(/\/+$/, "");
 const trimLeadingSlashes = (value: string) => value.replace(/^\/+/g, "");
 
-const getPositiveIntegerFromEnv = (name: string, fallback: number) => {
+const getValueFromEnv = (name: string): string => {
   const value = __ENV[name];
-  if (!value) return fallback;
-
-  const parsedValue = Number.parseInt(value, 10);
-  return Number.isFinite(parsedValue) && parsedValue > 0
-    ? parsedValue
-    : fallback;
+  if (!value) throw new Error(`${name} is not set`);
+  return value;
 };
 
-const baseUrl = __ENV.BASE_URL ?? "http://localhost:1234";
-const endpointPath = __ENV.ENDPOINT_PATH ?? "/feature-flags";
+const getPositiveIntegerFromEnv = (name: string): number => {
+  const value = getValueFromEnv(name);
+  const parsedValue = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+    throw new Error(`${name} must be greater than 0`);
+  }
+
+  return parsedValue;
+};
+
+const baseUrl = getValueFromEnv("BASE_URL");
+const endpointPath = getValueFromEnv("ENDPOINT_PATH");
 const targetUrl = `${trimTrailingSlashes(baseUrl)}/${trimLeadingSlashes(endpointPath)}`;
-const targetRps = getPositiveIntegerFromEnv("TARGET_RPS", 10);
-const preAllocatedVUs = getPositiveIntegerFromEnv("PRE_ALLOCATED_VUS", 2);
-const maxVUs = getPositiveIntegerFromEnv("MAX_VUS", 5);
+const targetRps = getPositiveIntegerFromEnv("TARGET_RPS");
+const preAllocatedVUs = getPositiveIntegerFromEnv("PRE_ALLOCATED_VUS");
+const maxVUs = getPositiveIntegerFromEnv("MAX_VUS");
 
 export const options: Options = {
   scenarios: {
