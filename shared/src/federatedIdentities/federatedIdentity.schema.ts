@@ -4,11 +4,14 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import type {
+  FtConnectAdvisorForBeneficiary,
   FtConnectIdentity,
   FtConnectIdentityWithoutToken,
 } from "./federatedIdentity.dto";
 
-const ftConnectAdvisorPayloadSchema = z
+const ftConnectAdvisorPayloadSchema: ZodSchemaWithInputMatchingOutput<
+  FtConnectAdvisorForBeneficiary | undefined
+> = z
   .object({
     advisor: z
       .object({
