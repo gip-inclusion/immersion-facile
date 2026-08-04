@@ -263,11 +263,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
 
   async #userIsJobseeker(
     headers: FtConnectHeaders,
-    peExternalId: string | undefined,
+    ftExternalId: string | undefined,
   ): Promise<boolean> {
     const log = getUserStatutInfoLogger;
     try {
-      log.total({ ftConnect: { peExternalId } });
+      log.total({ ftConnect: { ftExternalId } });
       const response = await scheduleWithBackpressure(
         this.#limiter,
         "France Travail Connect: getUserStatutInfo",
@@ -279,7 +279,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          ftConnect: { peExternalId },
+          ftConnect: { ftExternalId },
           message: `getUserStatutInfo - Response status is ${response.status}.`,
         });
         return false;
@@ -290,7 +290,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       const isJobSeeker = isJobSeekerFromStatus(
         externalFtConnectStatut.codeStatutIndividu,
       );
-      log.success({ ftConnect: { peExternalId, isJobSeeker } });
+      log.success({ ftConnect: { ftExternalId, isJobSeeker } });
       return isJobSeeker;
     } catch (error) {
       errorChecker(

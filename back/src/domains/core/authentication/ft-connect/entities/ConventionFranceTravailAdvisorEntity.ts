@@ -14,7 +14,7 @@ export const conventionFranceTravailUserAdvisorFromDto = (
   conventionId: string,
 ): ConventionFtUserAdvisorEntity => ({
   advisor: dto.advisor,
-  peExternalId: dto.user.peExternalId,
+  ftExternalId: dto.user.ftExternalId,
   conventionId,
   _entityName: "ConventionFranceTravailAdvisor",
 });
@@ -31,7 +31,7 @@ const onlyValidAdvisorsForImmersion = (
 const logger = createLogger(__filename);
 
 export const chooseValidAdvisor = (
-  { peExternalId }: FtConnectUserDto,
+  { ftExternalId }: FtConnectUserDto,
   advisors: FtConnectAdvisorDto[],
 ): FtConnectImmersionAdvisorDto | undefined => {
   const sortedValidAdvisors: FtConnectImmersionAdvisorDto[] = advisors
@@ -42,7 +42,7 @@ export const chooseValidAdvisor = (
   if (!preferredAdvisor) {
     logger.error({
       ftConnect: {
-        peExternalId,
+        ftExternalId,
       },
       message: "getAdvisorsInfo - ftConnectNoValidAdvisor",
     });

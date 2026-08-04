@@ -14,7 +14,7 @@ import type { FtConnectImmersionAdvisorDto } from "./FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "./FtConnectUserDto";
 
 export type ConventionFtUserAdvisorDto = {
-  peExternalId: FtExternalId;
+  ftExternalId: FtExternalId;
   conventionId: string;
   advisor?: FtConnectImmersionAdvisorDto;
 };
@@ -50,7 +50,7 @@ export const toPartialConventionDtoWithFtIdentity = (
   lastName: ftConnectUserInfo.lastName,
   birthdate: ftConnectUserInfo.birthdate,
   phone: ftConnectUserInfo.phone,
-  fedId: ftConnectUserInfo.peExternalId,
+  fedId: ftConnectUserInfo.ftExternalId,
   fedIdProvider: "ftConnect",
   fedIdToken: ftConnectIdToken,
 });

@@ -156,7 +156,7 @@ const userAdvisorDto: FtUserAndAdvisor = {
     type: "CAPEMPLOI",
   },
   user: {
-    peExternalId: userFtExternalId,
+    ftExternalId: userFtExternalId,
     email: "",
     firstName: "",
     isJobseeker: true,

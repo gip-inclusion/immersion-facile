@@ -382,7 +382,7 @@ describe("AssessmentReminder", () => {
             firstName: "John",
             lastName: "Doe",
             isJobseeker: true,
-            peExternalId: "pe-external-id",
+            ftExternalId: "pe-external-id",
             birthdate: "1990-01-01",
           },
           advisor: {

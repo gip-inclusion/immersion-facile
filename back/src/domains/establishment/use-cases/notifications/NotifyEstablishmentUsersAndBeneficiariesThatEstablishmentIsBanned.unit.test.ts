@@ -474,7 +474,7 @@ describe("NotifyEstablishmentIsBanned", () => {
         firstName: "Jean",
         lastName: "Bénéficiaire",
         isJobseeker: true,
-        peExternalId: "beneficiary-external-id",
+        ftExternalId: "beneficiary-external-id",
         email: "jean@beneficiaire.com",
         birthdate: "2000-02-02",
       };
@@ -506,7 +506,7 @@ describe("NotifyEstablishmentIsBanned", () => {
 
       uow.conventionRepository.setConventions([conventionWithFtConnectUsers]);
       uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers = {
-        [ftConnectedBeneficiary.peExternalId]: {
+        [ftConnectedBeneficiary.ftExternalId]: {
           advisor: ftConnectImmersionAdvisor,
           user: ftConnectedBeneficiary,
         },
@@ -514,7 +514,7 @@ describe("NotifyEstablishmentIsBanned", () => {
       uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers =
         {
           [conventionWithFtConnectUsers.id]:
-            ftConnectedBeneficiary.peExternalId,
+            ftConnectedBeneficiary.ftExternalId,
         };
 
       await notifyThatEstablishmentIsBanned.execute({ siret });

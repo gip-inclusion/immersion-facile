@@ -35,7 +35,7 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
     firstName: "",
     isJobseeker: true,
     lastName: "",
-    peExternalId: userFtExternalId,
+    ftExternalId: userFtExternalId,
     birthdate: "1990-01-01",
   };
   const ftAdvisor: FtConnectImmersionAdvisorDto = {
@@ -182,7 +182,7 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
         uow.conventionFranceTravailAdvisorRepository
           .conventionFranceTravailUsers,
         {
-          [conventionId]: ftConnectUser.peExternalId,
+          [conventionId]: ftConnectUser.ftExternalId,
         },
       );
     });
@@ -199,9 +199,9 @@ describe("RemoveConventionFTAdvisorIfAgencyIsNotFranceTravail", () => {
   }) => {
     uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers[
       conventionId
-    ] = user.peExternalId;
+    ] = user.ftExternalId;
     uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers[
-      user.peExternalId
+      user.ftExternalId
     ] = {
       advisor,
       user,

@@ -235,7 +235,7 @@ const saveFTConnectAuthenticationDataAndReturnRedirectURI = async ({
         phone: userAndAdvisors.user.phone,
         federatedIdentity: {
           provider: "ftConnect",
-          token: userAndAdvisors.user.peExternalId,
+          token: userAndAdvisors.user.ftExternalId,
         },
       },
     },
@@ -257,7 +257,7 @@ const saveFTConnectAuthenticationDataAndReturnRedirectURI = async ({
     deps.createNewEvent({
       topic: "FTConnectedSuccessfully",
       payload: {
-        ftConnectUserId: userAndAdvisors.user.peExternalId,
+        ftConnectUserId: userAndAdvisors.user.ftExternalId,
         conventionDraftId: conventionDraft.id,
       },
     }),

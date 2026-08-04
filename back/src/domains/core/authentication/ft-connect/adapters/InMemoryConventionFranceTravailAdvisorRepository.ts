@@ -42,7 +42,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
 
     const userAndAdvisor = this.#ftConnectedUsers[userFtExternalId];
     return {
-      peExternalId: userFtExternalId,
+      ftExternalId: userFtExternalId,
       conventionId,
       advisor: userAndAdvisor?.advisor,
       _entityName: "ConventionFranceTravailAdvisor",
@@ -72,7 +72,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   public async saveFtUserAndAdvisor(
     peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
-    this.#ftConnectedUsers[peUserAndAdvisor.user.peExternalId] =
+    this.#ftConnectedUsers[peUserAndAdvisor.user.ftExternalId] =
       peUserAndAdvisor;
   }
 

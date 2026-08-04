@@ -40,7 +40,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   const userAdvisorDto: FtUserAndAdvisor = {
     advisor,
     user: {
-      peExternalId: userFtExternalId,
+      ftExternalId: userFtExternalId,
       email: "",
       firstName: "",
       isJobseeker: true,
@@ -116,7 +116,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     );
     uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
       conventionId,
-      userAdvisorDto.user.peExternalId,
+      userAdvisorDto.user.ftExternalId,
     );
 
     await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({
@@ -181,14 +181,14 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
 
     uow.conventionRepository.setConventions([conventionDtoFromEvent]);
     uow.conventionFranceTravailAdvisorRepository.ftConnectedUsers = {
-      [userAdvisorDto.user.peExternalId]: {
+      [userAdvisorDto.user.ftExternalId]: {
         user: userAdvisorDto.user,
         advisor: undefined,
       },
     };
     uow.conventionFranceTravailAdvisorRepository.conventionFranceTravailUsers =
       {
-        [conventionId]: userAdvisorDto.user.peExternalId,
+        [conventionId]: userAdvisorDto.user.ftExternalId,
       };
 
     await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({

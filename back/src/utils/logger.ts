@@ -125,7 +125,7 @@ type LoggerParams = Partial<{
   ftConnect: Partial<{
     ftId: ConventionId;
     originalId: ConventionId;
-    peExternalId: FtExternalId;
+    ftExternalId: FtExternalId;
     isJobSeeker: boolean;
   }>;
   reportTitle: string;

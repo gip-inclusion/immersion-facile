@@ -41,7 +41,7 @@ const user: FtConnectUserDto = {
   firstName: "",
   isJobseeker: true,
   lastName: "",
-  peExternalId: userFtExternalId,
+  ftExternalId: userFtExternalId,
   birthdate: "",
 };
 const placementAdvisor: FtConnectImmersionAdvisorDto = {
@@ -132,7 +132,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
             advisor_firstname: placementAdvisor.firstName,
             advisor_lastname: placementAdvisor.lastName,
             advisor_email: placementAdvisor.email,
@@ -161,7 +161,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
             advisor_firstname: null,
             advisor_lastname: null,
             advisor_email: null,
@@ -194,7 +194,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            ft_connect_id: franceTravailUpdatedUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailUpdatedUserAdvisor.user.ftExternalId,
             advisor_firstname: capemploiAdvisor.firstName,
             advisor_lastname: capemploiAdvisor.lastName,
             advisor_email: capemploiAdvisor.email,
@@ -244,7 +244,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
             advisor_firstname: placementAdvisor.firstName,
             advisor_lastname: placementAdvisor.lastName,
             advisor_email: placementAdvisor.email,
@@ -263,7 +263,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         [
           {
             convention_id: conventionId,
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
             created_at: expect.any(Date),
           },
         ],
@@ -298,7 +298,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: franceTravailFirstUserAdvisor.advisor,
-        peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
+        ftExternalId: franceTravailFirstUserAdvisor.user.ftExternalId,
         conventionId,
       });
     });
@@ -320,7 +320,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,
-        peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
+        ftExternalId: franceTravailFirstUserAdvisor.user.ftExternalId,
         conventionId,
       });
     });
@@ -422,7 +422,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         [
           {
             convention_id: otherConventionId,
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
           },
         ],
       );
@@ -430,7 +430,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         await db.selectFrom("ft_connect_users").selectAll().execute(),
         [
           {
-            ft_connect_id: franceTravailFirstUserAdvisor.user.peExternalId,
+            ft_connect_id: franceTravailFirstUserAdvisor.user.ftExternalId,
             advisor_firstname: placementAdvisor.firstName,
             advisor_lastname: placementAdvisor.lastName,
             advisor_email: placementAdvisor.email,

@@ -192,7 +192,7 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusDidNotShow", () => {
               email: advisorEmail,
             },
             user: {
-              peExternalId: "pe-external-id",
+              ftExternalId: "pe-external-id",
               email: "elsa@email.com",
               firstName: "Elsa",
               lastName: "Oldenburg",
