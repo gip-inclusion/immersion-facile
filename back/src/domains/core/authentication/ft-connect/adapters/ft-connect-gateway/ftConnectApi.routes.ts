@@ -111,7 +111,7 @@ export const toFtConnectUserDto = (
     lastName: externalFtConnectUser.family_name,
     birthdate: externalFtConnectUser.birthdate,
     phone: externalFtConnectUser.phone,
-    peExternalId: externalFtConnectUser.idIdentiteExterne,
+    ftExternalId: externalFtConnectUser.idIdentiteExterne,
   };
 };
 

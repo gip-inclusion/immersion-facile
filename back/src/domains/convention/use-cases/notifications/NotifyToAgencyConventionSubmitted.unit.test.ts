@@ -280,7 +280,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         firstName: "John",
         isJobseeker: true,
         lastName: "Doe",
-        peExternalId: ftIdentity.token,
+        ftExternalId: ftIdentity.token,
         birthdate: "2000-01-01",
       },
     });
@@ -368,7 +368,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         firstName: "John",
         isJobseeker: true,
         lastName: "Doe",
-        peExternalId: ftIdentity.token,
+        ftExternalId: ftIdentity.token,
         birthdate: "2000-01-01",
       },
     });

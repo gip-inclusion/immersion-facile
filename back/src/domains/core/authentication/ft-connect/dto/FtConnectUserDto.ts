@@ -7,5 +7,5 @@ export type FtConnectUserDto = {
   lastName: string;
   birthdate: DateString;
   phone?: PhoneNumber;
-  peExternalId: FtExternalId;
+  ftExternalId: FtExternalId;
 };

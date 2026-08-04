@@ -26,6 +26,6 @@ export const conventionFranceTravailUserAdvisorDtoSchema: ZodSchemaWithInputMatc
         }),
       })
       .optional(),
-    peExternalId: zUuidLike,
+    ftExternalId: zUuidLike,
     conventionId: z.uuid(),
   });

@@ -273,7 +273,7 @@ describe("NotifyAgencyThatAssessmentIsCreatedWithStatusCompletedOrPartiallyCompl
     beforeEach(() => {
       uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
         user: {
-          peExternalId: "pe-external-id",
+          ftExternalId: "pe-external-id",
           email: advisorEmail,
           firstName: "Elsa",
           isJobseeker: true,

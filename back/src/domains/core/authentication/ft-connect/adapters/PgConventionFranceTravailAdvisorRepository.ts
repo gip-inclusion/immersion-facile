@@ -96,7 +96,7 @@ export class PgConventionFranceTravailAdvisorRepository
           schemaName: "conventionFranceTravailUserAdvisorDtoSchema",
           inputSchema: conventionFranceTravailUserAdvisorDtoSchema,
           schemaParsingInput: conventionPeUserAdvisor,
-          id: conventionPeUserAdvisor.peExternalId,
+          id: conventionPeUserAdvisor.ftExternalId,
           logger,
         }),
       )
@@ -144,7 +144,7 @@ export class PgConventionFranceTravailAdvisorRepository
     await this.transaction
       .insertInto("ft_connect_users")
       .values({
-        ft_connect_id: user.peExternalId,
+        ft_connect_id: user.ftExternalId,
         advisor_firstname: advisor?.firstName ?? null,
         advisor_lastname: advisor?.lastName ?? null,
         advisor_email: advisor?.email ?? null,
@@ -195,7 +195,7 @@ const toConventionFranceTravailUserAdvisorDTO = ({
           type: advisor_kind,
         }
       : undefined,
-  peExternalId: ft_connect_id,
+  ftExternalId: ft_connect_id,
   conventionId: convention_id,
 });
 

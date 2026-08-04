@@ -630,7 +630,7 @@ describe("TransferConventionToAgency", () => {
           firstName: "",
           isJobseeker: true,
           lastName: "",
-          peExternalId: userFtExternalId,
+          ftExternalId: userFtExternalId,
           birthdate: "1990-01-01",
         };
         const ftAdvisor: FtConnectImmersionAdvisorDto = {
@@ -696,7 +696,7 @@ describe("TransferConventionToAgency", () => {
             {
               conventionId,
               advisor: ftAdvisor,
-              peExternalId: userFtExternalId,
+              ftExternalId: userFtExternalId,
               _entityName: "ConventionFranceTravailAdvisor",
             },
           );
@@ -758,7 +758,7 @@ describe("TransferConventionToAgency", () => {
             {
               conventionId,
               advisor: ftAdvisor,
-              peExternalId: userFtExternalId,
+              ftExternalId: userFtExternalId,
               _entityName: "ConventionFranceTravailAdvisor",
             },
           );
@@ -975,7 +975,7 @@ describe("TransferConventionToAgency", () => {
           firstName: "",
           isJobseeker: true,
           lastName: "",
-          peExternalId: userFtExternalId,
+          ftExternalId: userFtExternalId,
           birthdate: "1990-01-01",
         };
         const ftAdvisor: FtConnectImmersionAdvisorDto = {
@@ -1048,7 +1048,7 @@ describe("TransferConventionToAgency", () => {
             {
               conventionId,
               advisor: ftAdvisor,
-              peExternalId: userFtExternalId,
+              ftExternalId: userFtExternalId,
               _entityName: "ConventionFranceTravailAdvisor",
             },
           );
@@ -1118,7 +1118,7 @@ describe("TransferConventionToAgency", () => {
             {
               conventionId,
               advisor: ftAdvisor,
-              peExternalId: userFtExternalId,
+              ftExternalId: userFtExternalId,
               _entityName: "ConventionFranceTravailAdvisor",
             },
           );

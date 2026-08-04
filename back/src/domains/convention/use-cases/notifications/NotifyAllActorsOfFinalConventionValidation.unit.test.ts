@@ -546,7 +546,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
 
       uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
         user: {
-          peExternalId: userFtExternalId,
+          ftExternalId: userFtExternalId,
           email: "john.doe@plop.fr",
           firstName: "John",
           isJobseeker: true,
@@ -649,7 +649,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
 
       uow.conventionFranceTravailAdvisorRepository.saveFtUserAndAdvisor({
         user: {
-          peExternalId: userFtExternalId,
+          ftExternalId: userFtExternalId,
           email: "john.doe@plop.fr",
           firstName: "John",
           isJobseeker: true,

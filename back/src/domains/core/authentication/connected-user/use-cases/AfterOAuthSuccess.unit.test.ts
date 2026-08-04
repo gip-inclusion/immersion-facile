@@ -492,14 +492,14 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       firstName: "John",
       lastName: "Doe",
       birthdate: "1990-01-01",
-      peExternalId: "123",
+      ftExternalId: "123",
     };
     const ftNotJobseekerUser: FtConnectUserDto = {
       isJobseeker: false,
       firstName: "Jane",
       lastName: "Joe",
       birthdate: "1990-01-01",
-      peExternalId: "456",
+      ftExternalId: "456",
     };
     const defaultFtOngoingOAuth: OngoingOAuth = {
       fromUri: "/demande-immersion",
@@ -561,7 +561,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 phone: ftJobseekerUser.phone,
                 federatedIdentity: {
                   provider: "ftConnect",
-                  token: ftJobseekerUser.peExternalId,
+                  token: ftJobseekerUser.ftExternalId,
                 },
               },
             },
@@ -577,7 +577,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             topic: "FTConnectedSuccessfully",
             payload: {
-              ftConnectUserId: ftJobseekerUser.peExternalId,
+              ftConnectUserId: ftJobseekerUser.ftExternalId,
               conventionDraftId,
             },
           },
@@ -628,7 +628,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 phone: ftJobseekerUser.phone,
                 federatedIdentity: {
                   provider: "ftConnect",
-                  token: ftJobseekerUser.peExternalId,
+                  token: ftJobseekerUser.ftExternalId,
                 },
               },
             },
@@ -644,7 +644,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             topic: "FTConnectedSuccessfully",
             payload: {
-              ftConnectUserId: ftJobseekerUser.peExternalId,
+              ftConnectUserId: ftJobseekerUser.ftExternalId,
               conventionDraftId,
             },
           },
@@ -699,7 +699,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 phone: ftNotJobseekerUser.phone,
                 federatedIdentity: {
                   provider: "ftConnect",
-                  token: ftNotJobseekerUser.peExternalId,
+                  token: ftNotJobseekerUser.ftExternalId,
                 },
               },
             },
@@ -710,7 +710,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             topic: "FTConnectedSuccessfully",
             payload: {
-              ftConnectUserId: ftNotJobseekerUser.peExternalId,
+              ftConnectUserId: ftNotJobseekerUser.ftExternalId,
               conventionDraftId,
             },
           },

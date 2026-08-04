@@ -483,7 +483,7 @@ describe("auth router", () => {
             firstName: "Jean",
             lastName: "Dupont",
             birthdate: "1990-01-01",
-            peExternalId: ftConnectExternalId,
+            ftExternalId: ftConnectExternalId,
           });
           gateways.ftConnectGateway.setAdvisors([
             {

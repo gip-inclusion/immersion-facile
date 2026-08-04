@@ -161,7 +161,7 @@ export const errors = {
       ftExternalId: FtExternalId;
     }) =>
       new Error(
-        `Association between Convention and userAdvisor failed. rowCount: ${rowCount}, conventionId: ${conventionId}, peExternalId: ${ftExternalId}`,
+        `Association between Convention and userAdvisor failed. rowCount: ${rowCount}, conventionId: ${conventionId}, ftExternalId: ${ftExternalId}`,
       ),
   },
   generic: {
