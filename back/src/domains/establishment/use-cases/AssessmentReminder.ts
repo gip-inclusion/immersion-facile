@@ -12,7 +12,6 @@ import {
   immersionFacileNoReplyEmailSender,
   localization,
   makeRouteAbsoluteUrl,
-  unvalidatedConventionStatuses,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -83,7 +82,7 @@ export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
       outOfTrx: deps.outOfTrx,
     });
 
-    const remindedConventionsCount = await executeInSequence(
+    const potentialRemindedConventions = await executeInSequence(
       conventionIdsToRemind,
       (conventionId) =>
         sendAssessmentReminderIfNeeded({
@@ -98,7 +97,7 @@ export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
     );
 
     return {
-      numberOfConventionsReminded: remindedConventionsCount.filter(
+      numberOfConventionsReminded: potentialRemindedConventions.filter(
         (wasReminded) => wasReminded,
       ).length,
     };
@@ -119,10 +118,7 @@ const sendAssessmentReminderIfNeeded = async ({
     await uow.conventionQueries.getConventionById(conventionId);
   if (!convention) throw errors.convention.notFound({ conventionId });
 
-  if (
-    unvalidatedConventionStatuses.some((status) => status === convention.status)
-  )
-    return false;
+  if (convention.status === "CANCELLED") return false;
 
   await sendAssessmentReminders({
     uow,
