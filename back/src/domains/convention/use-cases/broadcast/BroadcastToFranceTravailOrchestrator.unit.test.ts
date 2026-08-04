@@ -43,7 +43,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     .build();
 
   const conventionWithoutAssessment = new ConventionDtoBuilder()
-    .withId("convention-without-assessment-id")
+    .withId("11111111-1111-4111-8111-111111111111")
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withAgencyId(agency.id)
     .build();
@@ -160,7 +160,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
 
   it("does not include assessment key when assessment is legacy", async () => {
     const conventionWithLegacyAssessment = new ConventionDtoBuilder()
-      .withId("convention-with-legacy-assessment-id")
+      .withId("22222222-2222-4222-8222-222222222222")
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withAgencyId(agency.id)
       .build();

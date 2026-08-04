@@ -1,5 +1,6 @@
 import { type ConventionId, errors, executeInSequence } from "shared";
 import { match } from "ts-pattern";
+import { conventionDtoToConventionReadDto } from "../../../utils/convention";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
@@ -119,9 +120,9 @@ const resync = async ({
   conventionToSyncId: ConventionId;
   standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
 }): Promise<void> => {
-  const convention =
-    await uow.conventionQueries.getConventionById(conventionToSyncId);
-  if (!convention)
+  const conventionDto =
+    await uow.conventionRepository.getById(conventionToSyncId);
+  if (!conventionDto)
     throw errors.convention.notFound({
       conventionId: conventionToSyncId,
     });
@@ -132,6 +133,7 @@ const resync = async ({
   const assessment = assessmentEntity
     ? getOnlyAssessmentDto(assessmentEntity)
     : undefined;
+  const convention = await conventionDtoToConventionReadDto(conventionDto, uow);
 
   return assessment
     ? standardBroadcastToFTUsecase.execute({
