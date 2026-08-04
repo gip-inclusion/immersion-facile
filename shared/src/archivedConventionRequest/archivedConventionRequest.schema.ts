@@ -34,17 +34,21 @@ const otherReasonSchema = makeHardenedStringSchema({
 });
 
 const archivedConventionRequestReasonSchema: ZodSchemaWithInputMatchingOutput<ArchivedConventionRequestReasonFields> =
-  z.discriminatedUnion("reason", [
-    z.object({
-      reason: z.literal("other"),
-      otherReason: otherReasonSchema,
-    }),
-    z.object({
-      reason: z.enum(archivedConventionRequestReasonsWithoutOther, {
-        error: localization.invalidEnum,
+  z.discriminatedUnion(
+    "reason",
+    [
+      z.object({
+        reason: z.literal("other"),
+        otherReason: otherReasonSchema,
       }),
-    }),
-  ]);
+      z.object({
+        reason: z.enum(archivedConventionRequestReasonsWithoutOther, {
+          error: localization.invalidEnum,
+        }),
+      }),
+    ],
+    { error: localization.required },
+  );
 
 const archivedConventionRequestWithConventionIdSchema = z.object({
   id: archivedConventionRequestIdSchema,

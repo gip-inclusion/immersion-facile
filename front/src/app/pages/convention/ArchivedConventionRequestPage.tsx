@@ -4,7 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, PageHeader } from "react-design-system";
+import { Loader, PageHeader, useScrollTo } from "react-design-system";
 import { type DefaultValues, FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -17,6 +17,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ConnectedPrivateRoutePage } from "src/app/pages/auth/ConnectedPrivateRoutePage";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -62,6 +63,9 @@ export const ArchivedConventionRequestPage = ({
   } = methods;
   const conventionSearchMethod = watch("conventionSearchMethod");
   const reason = watch("reason");
+  const feedback = useFeedbackTopic("archived-convention-request");
+
+  useScrollTo(!!feedback);
 
   const onSubmit = (values: ArchivedConventionRequestDto) => {
     if (!connectedUserJwt) return;
@@ -111,9 +115,9 @@ export const ArchivedConventionRequestPage = ({
                 {
                   id: domElementIds.archivedConventionRequest.success
                     .goToMyAccountButton,
-                  children: "Retourner à mon espace",
+                  children: "Retourner à l'accueil",
                   priority: "primary",
-                  linkProps: frontRoutes.myAccount().link,
+                  linkProps: frontRoutes.home().link,
                 },
                 {
                   id: domElementIds.archivedConventionRequest.success
