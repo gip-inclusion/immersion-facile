@@ -9,7 +9,7 @@ import type { ExternalAccessToken } from "../adapters/ft-connect-gateway/ftConne
 export const externalAccessTokenSchema: ZodSchemaWithInputMatchingOutput<ExternalAccessToken> =
   z.object({
     access_token: makezTrimmedString(
-      "Le format du token peConnect est invalide",
+      "Le format du token ftConnect est invalide",
     ),
     expires_in: z.number().min(1, "Ce token est déja expiré"),
     id_token: zStringMinLength1Max3000,

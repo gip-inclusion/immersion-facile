@@ -35,7 +35,7 @@ export type ProConnectOngoingAuth = OngoingAuthCommon & {
   idToken: IdToken | null;
 };
 export type FTConnectOngoingAuth = OngoingAuthCommon & {
-  provider: ExtractFromExisting<FederatedIdentityProvider, "peConnect">;
+  provider: ExtractFromExisting<FederatedIdentityProvider, "ftConnect">;
   externalId?: ExternalId;
   accessToken?: OAuthJwt;
   idToken: IdToken | null;

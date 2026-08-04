@@ -83,7 +83,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   it("should resolve to undefined if the convention France Travail OAuth advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
       .withId("add5c20e-6dd2-45af-affe-927358005251")
-      .withFederatedIdentity({ provider: "peConnect", token: "blop" })
+      .withFederatedIdentity({ provider: "ftConnect", token: "blop" })
       .build();
 
     expect(
@@ -97,7 +97,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
+      .withFederatedIdentity({ provider: "ftConnect", token: userFtExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")
@@ -162,11 +162,11 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     });
   });
 
-  it("peConnected without advisor", async () => {
+  it("ftConnected without advisor", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
+      .withFederatedIdentity({ provider: "ftConnect", token: userFtExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")

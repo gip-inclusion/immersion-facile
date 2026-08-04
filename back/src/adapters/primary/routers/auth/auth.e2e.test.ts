@@ -427,7 +427,7 @@ describe("auth router", () => {
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByOAuth({
               queryParams: {
-                provider: "peConnect",
+                provider: "ftConnect",
                 redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
               },
             }),
@@ -447,7 +447,7 @@ describe("auth router", () => {
 
           expectToEqual(inMemoryUow.ongoingOAuthRepository.ongoingOAuths, [
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               nonce,
               state,
               usedAt: null,
@@ -463,7 +463,7 @@ describe("auth router", () => {
           uuidGenerator.new = () => conventionDraftId;
           inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               nonce,
               state,
               usedAt: null,
@@ -511,7 +511,7 @@ describe("auth router", () => {
 
           expectToEqual(inMemoryUow.ongoingOAuthRepository.ongoingOAuths, [
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               nonce,
               state,
               usedAt: now,
@@ -534,7 +534,7 @@ describe("auth router", () => {
                     lastName: "Dupont",
                     birthdate: "1990-01-01",
                     federatedIdentity: {
-                      provider: "peConnect",
+                      provider: "ftConnect",
                       token: ftConnectExternalId,
                     },
                   },
@@ -553,7 +553,7 @@ describe("auth router", () => {
         it("redirects to managed FT Connect error page when FT Connect throws a managed error", async () => {
           inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               nonce,
               state,
               usedAt: null,
@@ -562,7 +562,7 @@ describe("auth router", () => {
             },
           ];
           gateways.ftConnectGateway.getAccessToken = async () => {
-            throw new ManagedFTConnectError("peConnectNoAuthorisation");
+            throw new ManagedFTConnectError("ftConnectNoAuthorisation");
           };
 
           const response = await authRoutesClient.afterFTConnectOAuthLogin({
@@ -586,7 +586,7 @@ describe("auth router", () => {
           const rawErrorMessage = "Le service France Travail est indisponible";
           inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               nonce,
               state,
               usedAt: null,
@@ -705,13 +705,13 @@ describe("auth router", () => {
         });
       });
 
-      describe("when provider is 'peConnect'", () => {
-        it("when peConnect, returns a correct logout url with status 200", async () => {
+      describe("when provider is 'ftConnect'", () => {
+        it("when ftConnect, returns a correct logout url with status 200", async () => {
           const response = await authRoutesClient.getOAuthLogoutUrl({
             headers: { authorization: "fake-token" },
             queryParams: {
               idToken: "fake-id-token",
-              provider: "peConnect",
+              provider: "ftConnect",
             },
           });
 
@@ -999,7 +999,7 @@ describe("auth router", () => {
 
         it("400 - renew not allowed for back-office", async () => {
           const convention = new ConventionDtoBuilder()
-            .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+            .withFederatedIdentity({ provider: "ftConnect", token: "some-id" })
             .build();
           inMemoryUow.conventionRepository.setConventions([convention]);
           inMemoryUow.agencyRepository.agencies = [

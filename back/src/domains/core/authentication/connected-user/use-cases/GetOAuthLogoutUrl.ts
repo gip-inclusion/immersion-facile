@@ -26,7 +26,7 @@ export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
       deps: { proConnectOAuthGateway, ftConnectGateway },
       currentUser,
     }) => {
-      if (inputParams.provider === "peConnect") {
+      if (inputParams.provider === "ftConnect") {
         return ftConnectGateway.getLogoutUrl({
           idToken: inputParams.idToken,
           state: "NOT NECESSARY",

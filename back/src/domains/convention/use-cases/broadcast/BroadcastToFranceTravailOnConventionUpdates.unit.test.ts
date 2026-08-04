@@ -348,7 +348,7 @@ describe("BroadcastToFranceTravailOnConventionUpdates", () => {
       })
       .withBeneficiaryBirthdate("2000-10-05")
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+      .withFederatedIdentity({ provider: "ftConnect", token: "some-id" })
       .withDateStart("2021-05-12")
       .withDateEnd("2021-05-14T00:30:00.000Z") //
       .withSchedule(reasonableSchedule)

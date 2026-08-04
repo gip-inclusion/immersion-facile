@@ -23,7 +23,7 @@ export const makeBindConventionToFederatedIdentity = useCaseBuilder(
         convention.signatories.beneficiary.federatedIdentity;
 
       return federatedIdentity &&
-        federatedIdentity.provider === "peConnect" &&
+        federatedIdentity.provider === "ftConnect" &&
         federatedIdentity.token !== authFailed
         ? associateConventionToFederatedIdentity({
             convention,

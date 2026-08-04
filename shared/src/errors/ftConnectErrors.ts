@@ -2,14 +2,14 @@ import { expectToEqual } from "../test.helpers";
 
 export type FTConnectErrorKind = (typeof ftConnectErrorKinds)[number];
 const ftConnectErrorKinds = [
-  "peConnectInvalidGrant",
-  "peConnectNoAuthorisation",
-  "peConnectAdvisorForbiddenAccess",
-  "peConnectGetUserInfoForbiddenAccess",
-  "peConnectGetUserStatusInfoForbiddenAccess",
-  "peConnectGetUserBirthDateForbiddenAccess",
-  "peConnectGetUserContactDetailsForbiddenAccess",
-  "peConnectConnectionAborted",
+  "ftConnectInvalidGrant",
+  "ftConnectNoAuthorisation",
+  "ftConnectAdvisorForbiddenAccess",
+  "ftConnectGetUserInfoForbiddenAccess",
+  "ftConnectGetUserStatusInfoForbiddenAccess",
+  "ftConnectGetUserBirthDateForbiddenAccess",
+  "ftConnectGetUserContactDetailsForbiddenAccess",
+  "ftConnectConnectionAborted",
 ] as const;
 
 abstract class RedirectError extends Error {

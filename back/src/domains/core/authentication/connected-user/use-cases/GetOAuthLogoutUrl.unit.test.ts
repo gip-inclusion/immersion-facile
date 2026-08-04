@@ -97,12 +97,12 @@ describe("GetOAuthLogoutUrl", () => {
       });
     });
 
-    describe("when provider is 'peConnect'", () => {
+    describe("when provider is 'ftConnect'", () => {
       it("returns the ftConnect logout url", async () => {
         const idToken = "fake-id-token";
 
         const logoutUrl = await getOAuthLogoutUrl.execute(
-          { idToken, provider: "peConnect" },
+          { idToken, provider: "ftConnect" },
           connectedUser,
         );
 

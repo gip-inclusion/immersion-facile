@@ -185,7 +185,7 @@ describe("Get Convention", () => {
   const ftConnectedConvention = new ConventionDtoBuilder(convention)
     .withId(uuidGenerator.new())
     .withFederatedIdentity({
-      provider: "peConnect",
+      provider: "ftConnect",
       token: "some-id",
       payload: {
         advisor: {

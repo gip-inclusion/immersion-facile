@@ -32,7 +32,7 @@ describe("InitiateLoginByOAuth usecase", () => {
           uuidGenerator,
           oAuthGateways: {
             proConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
-            peConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
+            ftConnect: new InMemoryProConnectOAuthGateway(fakeProviderConfig),
           },
         },
       });

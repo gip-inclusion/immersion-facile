@@ -57,7 +57,7 @@ export const createAuthRouter = (deps: AppDependencies) => {
 
   authSharedRouter.getOAuthLogoutUrl(
     (req: Request<any, any, any, any>, res: Response, next: NextFunction) => {
-      if (req.query.provider === "peConnect") {
+      if (req.query.provider === "ftConnect") {
         return next();
       }
       return deps.connectedUserAuthMiddleware(req, res, next);
@@ -66,7 +66,7 @@ export const createAuthRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.getOAuthLogoutUrl.execute(
           req.query,
-          req.query.provider === "peConnect"
+          req.query.provider === "ftConnect"
             ? undefined
             : getGenericAuthOrThrow(req.payloads?.currentUser),
         ),

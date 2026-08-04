@@ -852,7 +852,7 @@ export const createUseCases = ({
       deps: {
         oAuthGateways: {
           proConnect: gateways.proConnectOAuthGateway,
-          peConnect: gateways.ftConnectGateway,
+          ftConnect: gateways.ftConnectGateway,
         },
         uuidGenerator,
       },

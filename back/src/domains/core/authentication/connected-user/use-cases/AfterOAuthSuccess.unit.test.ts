@@ -503,7 +503,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     };
     const defaultFtOngoingOAuth: OngoingOAuth = {
       fromUri: "/demande-immersion",
-      provider: "peConnect",
+      provider: "ftConnect",
       state,
       nonce: "nounce",
       usedAt: null,
@@ -540,7 +540,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
           {
             ...defaultFtOngoingOAuth,
-            provider: "peConnect",
+            provider: "ftConnect",
             accessToken,
             idToken,
             usedAt: timeGateway.now(),
@@ -560,7 +560,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 birthdate: ftJobseekerUser.birthdate,
                 phone: ftJobseekerUser.phone,
                 federatedIdentity: {
-                  provider: "peConnect",
+                  provider: "ftConnect",
                   token: ftJobseekerUser.peExternalId,
                 },
               },
@@ -588,7 +588,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {},
         );
         expectToEqual(response, {
-          provider: "peConnect",
+          provider: "ftConnect",
           redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
@@ -627,7 +627,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 birthdate: ftJobseekerUser.birthdate,
                 phone: ftJobseekerUser.phone,
                 federatedIdentity: {
-                  provider: "peConnect",
+                  provider: "ftConnect",
                   token: ftJobseekerUser.peExternalId,
                 },
               },
@@ -650,7 +650,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           },
         ]);
         expectToEqual(response, {
-          provider: "peConnect",
+          provider: "ftConnect",
           redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
@@ -698,7 +698,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
                 birthdate: ftNotJobseekerUser.birthdate,
                 phone: ftNotJobseekerUser.phone,
                 federatedIdentity: {
-                  provider: "peConnect",
+                  provider: "ftConnect",
                   token: ftNotJobseekerUser.peExternalId,
                 },
               },
@@ -716,7 +716,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           },
         ]);
         expectToEqual(response, {
-          provider: "peConnect",
+          provider: "ftConnect",
           redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
         });
       });
@@ -780,7 +780,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         expectToEqual(uow.conventionDraftRepository.conventionDrafts, []);
         expectToEqual(response, {
-          provider: "peConnect",
+          provider: "ftConnect",
           redirectUri: makeRouteAbsoluteUrl({
             route: frontRoutes.conventionImmersion({}),
             baseUrl: immersionFacileBaseUrl,

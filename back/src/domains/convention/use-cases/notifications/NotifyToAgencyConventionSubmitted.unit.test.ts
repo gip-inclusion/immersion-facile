@@ -256,9 +256,9 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     });
   });
 
-  it("Sends notification email to agency with warning when beneficiary is PeConnected and beneficiary has no PE advisor", async () => {
+  it("Sends notification email to agency with warning when beneficiary is ftConnected and beneficiary has no PE advisor", async () => {
     const ftIdentity: FtConnectIdentity = {
-      provider: "peConnect",
+      provider: "ftConnect",
       token: "123",
     };
     const validConvention = new ConventionDtoBuilder()
@@ -337,10 +337,10 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     });
   });
 
-  it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+  it("Sends notification email only to peAdvisor when beneficiary is ftConnected and beneficiary has PE advisor", async () => {
     const ftAdvisorEmail = "ft-advisor@gmail.com";
     const ftIdentity: FtConnectIdentity = {
-      provider: "peConnect",
+      provider: "ftConnect",
       token: "123",
     };
 

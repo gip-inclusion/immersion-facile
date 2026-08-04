@@ -58,7 +58,7 @@ describe("PgOutboxRepository", () => {
   it("countAllEvents", async () => {
     const common = {
       occurred_at: "2021-11-15T08:30:00.000Z",
-      topic: "PeConnectFederatedIdentityAssociated",
+      topic: "FtConnectFederatedIdentityAssociated",
       priority: null,
       payload:
         '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}',

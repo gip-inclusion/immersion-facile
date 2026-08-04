@@ -94,7 +94,7 @@ export const makeAfterOAuthSuccess = useCaseBuilder("AfterOAuthSuccess")
               }),
       )
       .with(
-        { provider: "peConnect" },
+        { provider: "ftConnect" },
         async (ftConnectOngoinOAuth: FTConnectOngoingAuth) => {
           return saveFTConnectAuthenticationDataAndReturnRedirectURI({
             uow,
@@ -234,7 +234,7 @@ const saveFTConnectAuthenticationDataAndReturnRedirectURI = async ({
         lastName: userAndAdvisors.user.lastName,
         phone: userAndAdvisors.user.phone,
         federatedIdentity: {
-          provider: "peConnect",
+          provider: "ftConnect",
           token: userAndAdvisors.user.peExternalId,
         },
       },
@@ -290,7 +290,7 @@ const onProConnectProvider = async ({
 
   if (accessToken.type !== "proConnect")
     throw errors.auth.accessTokenErrorType({
-      actualType: "peConnect",
+      actualType: "ftConnect",
       expectedType: "proConnect",
     });
 

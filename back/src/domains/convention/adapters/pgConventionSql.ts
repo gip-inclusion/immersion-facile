@@ -121,7 +121,7 @@ const createConventionSelection = (
               .when("ftu.ft_connect_id", "is not", null)
               .then(
                 jsonBuildObject({
-                  provider: sql`'peConnect'`,
+                  provider: sql`'ftConnect'`,
                   token: ref("ftu.ft_connect_id"),
                   payload: eb
                     .case()

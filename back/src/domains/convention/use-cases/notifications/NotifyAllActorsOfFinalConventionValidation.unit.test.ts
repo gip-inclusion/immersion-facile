@@ -507,7 +507,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       });
     });
 
-    it("With PeConnect Federated identity: beneficiary, establishment representative, agency counsellor & validator, and dedicated advisor", async () => {
+    it("With ftConnect Federated identity: beneficiary, establishment representative, agency counsellor & validator, and dedicated advisor", async () => {
       const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
@@ -616,7 +616,7 @@ describe("NotifyAllActorsOfFinalConventionValidation", () => {
       });
     });
 
-    it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
+    it("With ftConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
       const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
