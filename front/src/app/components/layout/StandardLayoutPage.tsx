@@ -11,25 +11,26 @@ type StandardLayoutPageProps = {
 };
 
 export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
-  const { page, version, allVersions } = getStandardContents(
+  const standardContent = getStandardContents(
     route.params.pagePath as StandardPageSlugs,
     route.params.version,
   );
-  const { title, content: Content, options } = page;
+  const { title, content: Content, options } = standardContent.page;
 
   return (
     <HeaderFooterLayout>
       <MainWrapper layout={options?.layout ?? "boxed"}>
         <h1 className={fr.cx("fr-h2")}>
           {title} (
-          {version === "latest" ? "dernière version" : `version du ${version}`})
+          {"version" in standardContent && onVersion(standardContent.version)})
         </h1>
         <Content />
-        {allVersions.length > 1 ? (
+        {"allVersions" in standardContent &&
+        standardContent.allVersions.length > 1 ? (
           <>
             <h2 className={fr.cx("fr-h3")}>Versions</h2>
             <ul>
-              {allVersions.map((version) => (
+              {standardContent.allVersions.map((version) => (
                 <li key={version}>
                   <a
                     {...frontRoutes.standard({
@@ -51,3 +52,6 @@ export const StandardLayoutPage = ({ route }: StandardLayoutPageProps) => {
     </HeaderFooterLayout>
   );
 };
+
+const onVersion = (version: string | "latest") =>
+  version === "latest" ? "dernière version" : `version du ${version}`;

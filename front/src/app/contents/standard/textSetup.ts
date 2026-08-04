@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import type { MainWrapperProps } from "react-design-system";
 import type { StandardPageSlugs } from "shared";
-import accessibilityContent from "./accessibilite";
+import { accessibility } from "./accessibilite";
 import budgetContent from "./budget";
 import cguContent from "./cgu";
 import legalsContent from "./mentions-legales";
@@ -21,11 +21,14 @@ export type VersionnedStandardContent = {
   latest: StandardPageContent;
 } & Record<string, StandardPageContent>;
 
-const mappedContents: Record<StandardPageSlugs, VersionnedStandardContent> = {
+const mappedContents: Record<
+  StandardPageSlugs,
+  VersionnedStandardContent | StandardPageContent
+> = {
   cgu: cguContent,
   "mentions-legales": legalsContent,
   "politique-de-confidentialite": policiesContent,
-  accessibilite: accessibilityContent,
+  accessibilite: accessibility,
   "plan-du-site": siteMapContent,
   "obligations-des-parties": obligationsContent,
   budget: budgetContent,
@@ -34,21 +37,19 @@ const mappedContents: Record<StandardPageSlugs, VersionnedStandardContent> = {
 export const getStandardContents = (
   path: StandardPageSlugs,
   version?: string,
-): { page: StandardPageContent; version: string; allVersions: string[] } => {
+):
+  | { page: StandardPageContent; version: string; allVersions: string[] }
+  | { page: StandardPageContent } => {
   const allVersions = Object.keys(mappedContents[path]);
+  const content = mappedContents[path];
 
-  if (version) {
-    const page = mappedContents[path][version];
-    return {
-      page: page ?? mappedContents[path].latest,
-      version: page ? version : "latest",
-      allVersions,
-    };
-  }
+  if (!("latest" in content)) return { page: content };
+
+  const contentVersion = version ?? "latest";
 
   return {
-    page: mappedContents[path].latest,
-    version: "latest",
+    page: content[contentVersion],
+    version: contentVersion,
     allVersions,
   };
 };
