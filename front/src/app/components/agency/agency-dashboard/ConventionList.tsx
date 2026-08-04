@@ -372,7 +372,7 @@ export const ConventionList = () => {
                     })}
                   </strong>
                   {convention.beneficiary.federatedIdentity?.provider ===
-                    "peConnect" && (
+                    "ftConnect" && (
                     <div className={fr.cx("fr-mt-1w")}>
                       <img
                         src={logoFtSvg}

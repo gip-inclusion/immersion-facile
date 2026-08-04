@@ -7,6 +7,7 @@ import {
   authRoutes,
   domElementIds,
   type frontRoutes,
+  type InitiateLoginByOAuthParams,
   legacyFrontRoutes,
   makeUrlWithQueryParams,
 } from "shared";
@@ -190,9 +191,9 @@ const SharedConventionMessage = ({
           href={makeUrlWithQueryParams(
             `/api${authRoutes.initiateLoginByOAuth.url}`,
             {
-              provider: "peConnect",
+              provider: "ftConnect",
               redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
-            },
+            } satisfies InitiateLoginByOAuthParams,
           )}
           onClick={() => {
             storeConventionRouteParamsOnDevice(route.params);

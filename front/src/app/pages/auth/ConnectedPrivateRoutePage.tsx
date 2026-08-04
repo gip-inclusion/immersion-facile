@@ -170,7 +170,7 @@ export const ConnectedPrivateRoutePage = ({
       token &&
       provider &&
       isFederatedIdentityProvider(provider) &&
-      provider !== "peConnect"
+      provider !== "ftConnect"
     ) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
