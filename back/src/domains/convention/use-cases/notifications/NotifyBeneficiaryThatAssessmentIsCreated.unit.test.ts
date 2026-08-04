@@ -6,6 +6,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   getFormattedFirstnameAndLastname,
+  reasonableSchedule,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -122,8 +123,18 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
 
     it("Sends one email to the beneficiary and one to the legal representative for mini-stage CCI", async () => {
       const today = timeGateway.now();
+      const dateStart = new Date("2024-10-07").toISOString();
+      const dateEnd = new Date("2024-10-11").toISOString();
       const cciConventionWithRepresentative = new ConventionDtoBuilder()
         .withInternshipKind("mini-stage-cci")
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd)
+        .withSchedule(() =>
+          reasonableSchedule({
+            start: new Date(dateStart),
+            end: new Date(dateEnd),
+          }),
+        )
         .withBeneficiaryRepresentative({
           role: "beneficiary-representative",
           firstName: "Legal",

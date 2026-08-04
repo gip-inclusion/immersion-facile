@@ -66,21 +66,21 @@ describe("RenewExpiredJwt use case", () => {
   const validConvention: ConventionDto = new ConventionDtoBuilder()
     .withAgencyId(defaultAgency.id)
     .withBeneficiaryCurrentEmployer({
-      email: "currentEmployer@mail.com",
-      businessName: "",
-      businessSiret: "",
-      firstName: "",
-      lastName: "",
-      job: "",
+      email: "currentemployer@mail.com",
+      businessName: "Current Employer SARL",
+      businessSiret: "12345678901234",
+      firstName: "Jean",
+      lastName: "Dupont",
+      job: "Manager",
       role: "beneficiary-current-employer",
-      phone: "",
+      phone: "+33601010102",
       businessAddress: "Rue des Bouchers 67065 Strasbourg",
     })
     .withBeneficiaryRepresentative({
-      email: "beneficiaryRepresentative@mail.com",
-      firstName: "",
-      lastName: "",
-      phone: "",
+      email: "beneficiaryrepresentative@mail.com",
+      firstName: "Marie",
+      lastName: "Dupont",
+      phone: "+33601010101",
       role: "beneficiary-representative",
     })
     .build();

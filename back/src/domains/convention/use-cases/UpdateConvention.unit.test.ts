@@ -89,7 +89,24 @@ describe("Update Convention", () => {
     .notSigned()
     .build();
 
-  const acceptedByCounsellorConvention = new ConventionDtoBuilder(convention)
+  const signedAt = "2024-10-04T00:00:00.000Z";
+  const makeFullySignedConventionBuilder = (convention: ConventionDto) =>
+    new ConventionDtoBuilder(convention)
+      .signedByBeneficiary(signedAt)
+      .signedByBeneficiaryRepresentative(signedAt)
+      .signedByEstablishmentRepresentative(signedAt)
+      .withBeneficiaryCurrentEmployer(
+        convention.signatories.beneficiaryCurrentEmployer
+          ? {
+              ...convention.signatories.beneficiaryCurrentEmployer,
+              signedAt,
+            }
+          : undefined,
+      );
+
+  const acceptedByCounsellorConvention = makeFullySignedConventionBuilder(
+    convention,
+  )
     .withStatus("ACCEPTED_BY_COUNSELLOR")
     .build();
 
@@ -645,7 +662,15 @@ describe("Update Convention", () => {
     it.each(
       statusTransitionConfigs.READY_TO_SIGN.validInitialStatuses,
     )("allows when convention initial status is %s", async (initialStatus: ConventionStatus) => {
-      const storedConvention = new ConventionDtoBuilder(convention)
+      const statusesNeedingAllSignatures: ConventionStatus[] = [
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+      ];
+      const storedConvention = (
+        statusesNeedingAllSignatures.includes(initialStatus)
+          ? makeFullySignedConventionBuilder(convention)
+          : new ConventionDtoBuilder(convention)
+      )
         .withStatus(initialStatus)
         .build();
 
@@ -654,6 +679,7 @@ describe("Update Convention", () => {
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
         .withStatus("READY_TO_SIGN")
         .withStatusJustification("justif")
+        .notSigned()
         .build();
 
       await updateConvention.execute(
@@ -671,6 +697,7 @@ describe("Update Convention", () => {
         .withStatus("READY_TO_SIGN")
         .withBeneficiaryEmail("new@email.fr")
         .withStatusJustification("justif")
+        .notSigned()
         .build();
 
       beforeEach(() => {

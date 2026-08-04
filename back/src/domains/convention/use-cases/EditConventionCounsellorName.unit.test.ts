@@ -102,8 +102,11 @@ describe("EditCounsellorName", () => {
       "ACCEPTED_BY_COUNSELLOR",
       "ACCEPTED_BY_VALIDATOR",
     ] satisfies ConventionStatus[])("should throw an error if convention status %s does not allow counsellor names to be edited", async (status) => {
+      const signedAt = new Date("2024-01-01").toISOString();
       const conventionWithStatus = new ConventionDtoBuilder(convention)
         .withStatus(status)
+        .signedByBeneficiary(signedAt)
+        .signedByEstablishmentRepresentative(signedAt)
         .build();
       uow.userRepository.users = [notConnectedUser];
       uow.conventionRepository.setConventions([conventionWithStatus]);
@@ -480,8 +483,13 @@ describe("EditCounsellorName", () => {
       it.each(
         conventionStatusesWithoutJustificationNorValidator,
       )("with status %s", async (status) => {
+        const signedAt = new Date("2024-01-01").toISOString();
         const initialConvention = new ConventionDtoBuilder(convention)
           .withStatus(status)
+          .signedByBeneficiary(status === "IN_REVIEW" ? signedAt : undefined)
+          .signedByEstablishmentRepresentative(
+            status === "IN_REVIEW" ? signedAt : undefined,
+          )
           .build();
         uow.conventionRepository.setConventions([initialConvention]);
         uow.userRepository.users = [connectedUser];
@@ -707,8 +715,13 @@ describe("EditCounsellorName", () => {
       it.each(
         conventionStatusesWithoutJustificationNorValidator,
       )("with status %s", async (status) => {
+        const signedAt = new Date("2024-01-01").toISOString();
         const initialConvention = new ConventionDtoBuilder(convention)
           .withStatus(status)
+          .signedByBeneficiary(status === "IN_REVIEW" ? signedAt : undefined)
+          .signedByEstablishmentRepresentative(
+            status === "IN_REVIEW" ? signedAt : undefined,
+          )
           .build();
         uow.conventionRepository.setConventions([initialConvention]);
         uow.userRepository.users = [notConnectedUser];
