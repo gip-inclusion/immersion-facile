@@ -7,7 +7,10 @@ export const useScrollTo = (
   const previousValueToWatch = useRef(valueToWatch);
 
   useEffect(() => {
-    if (!valueToWatch || valueToWatch === previousValueToWatch.current) return;
+    const hasValueChanged = valueToWatch !== previousValueToWatch.current;
+    previousValueToWatch.current = valueToWatch;
+
+    if (!valueToWatch || !hasValueChanged) return;
 
     const elementToScollToTop = elementId
       ? document.getElementById(elementId)
@@ -16,7 +19,5 @@ export const useScrollTo = (
     elementToScollToTop?.scrollIntoView({
       behavior: "smooth",
     });
-
-    previousValueToWatch.current = valueToWatch;
   }, [valueToWatch, elementId]);
 };
