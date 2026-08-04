@@ -356,7 +356,7 @@ const ConventionFormContent = ({
   const route = useConventionRoute();
   const fromPeConnectedUser =
     defaultValues.signatories?.beneficiary?.federatedIdentity?.provider ===
-    "peConnect";
+    "ftConnect";
 
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);

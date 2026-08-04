@@ -132,7 +132,7 @@ const AgencyTaskItem = ({
     </>
   );
   const footer = conventionListItem.beneficiary.federatedIdentity?.provider ===
-    "peConnect" &&
+    "ftConnect" &&
     conventionListItem.beneficiary.federatedIdentity.payload && (
       <>
         Conseiller :{" "}

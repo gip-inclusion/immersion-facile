@@ -360,7 +360,7 @@ export const ConventionDocumentPage = ({
             Identifiant de la convention : <strong>{convention.id}</strong>
           </li>
           {convention.signatories.beneficiary.federatedIdentity?.provider ===
-            "peConnect" &&
+            "ftConnect" &&
             convention.signatories.beneficiary.federatedIdentity?.payload && (
               <li>
                 conseiller France Travail (anciennement Pôle emploi) référent :{" "}
