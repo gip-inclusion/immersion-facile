@@ -1,22 +1,11 @@
 import { immersionFacileContactEmail } from "shared";
 import { SectionTitle } from "./headings";
-import type { VersionnedStandardContent } from "./textSetup";
+import type { StandardPageContent } from "./textSetup";
 
-const schemaPluriannuelAccessibilite2026To2028Url =
-  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Schema-pluriannuel-accessibilite-2023-2025-V1.pdf";
-
-const planActionAccessibilite2025Url =
-  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Plan-annuel-accessibilite-25.pdf";
-
-const planActionAccessibilite2026Url =
-  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Plan-annuel-26-FT.pdf";
-
-export default {
-  latest: {
-    title: "Accessibilité",
-    content: () => <LatestAccessibilityContent />,
-  },
-} satisfies VersionnedStandardContent;
+export const accessibility: StandardPageContent = {
+  title: "Accessibilité",
+  content: () => <LatestAccessibilityContent />,
+};
 
 const LatestAccessibilityContent = () => (
   <>
@@ -116,3 +105,12 @@ const LatestAccessibilityContent = () => (
     </p>
   </>
 );
+
+const schemaPluriannuelAccessibilite2026To2028Url =
+  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Schema-pluriannuel-accessibilite-2023-2025-V1.pdf";
+
+const planActionAccessibilite2025Url =
+  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Plan-annuel-accessibilite-25.pdf";
+
+const planActionAccessibilite2026Url =
+  "https://www.francetravail.fr/files/live/sites/PE/files/fichiers-en-telechargement/accessibilite/Plan-annuel-26-FT.pdf";
