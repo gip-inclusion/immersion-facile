@@ -11,8 +11,6 @@ import type {
 export type OAuthJwt = Flavor<string, "OAuthJwt">;
 export type OAuthNonce = Flavor<string, "OAuthNonce">;
 
-export type OngoingOAuthProvider = "proConnect" | "email" | "peConnect";
-
 type OngoingAuthCommon = {
   userId?: string;
   state: OAuthState;

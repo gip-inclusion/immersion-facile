@@ -8,7 +8,7 @@ export type FederatedIdentityProvider =
 export const federatedIdentityProviders = [
   "proConnect",
   "email",
-  "peConnect",
+  "ftConnect",
 ] as const;
 
 export const isFederatedIdentityProvider = (
@@ -20,7 +20,7 @@ type GenericFederatedIdentity<
   Provider extends FederatedIdentityProvider,
   T extends FtConnectToken | ConnectedUserJwt,
   P = void,
-> = Provider extends "peConnect"
+> = Provider extends "ftConnect"
   ? {
       provider: Provider;
       token: T;
@@ -49,7 +49,7 @@ export type FtConnectAdvisorForBeneficiary = {
 export type FtConnectToken = FtExternalId | typeof authFailed;
 
 export type FtConnectIdentity = GenericFederatedIdentity<
-  "peConnect",
+  "ftConnect",
   FtConnectToken,
   FtConnectAdvisorForBeneficiary
 >;

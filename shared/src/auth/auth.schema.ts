@@ -82,7 +82,7 @@ export const oAuthSuccessLoginParamsSchema: ZodSchemaWithInputMatchingOutput<OAu
   });
 
 const oAuthProviderForLoginSchema: ZodSchemaWithInputMatchingOutput<OAuthProviderForLogin> =
-  z.enum(["proConnect", "peConnect"]);
+  z.enum(["proConnect", "ftConnect"]);
 
 export const logoutQueryParamsSchema: ZodSchemaWithInputMatchingOutput<LogoutQueryParams> =
   z.object({
@@ -97,4 +97,4 @@ export const afterOAuthSuccessRedirectionResponseSchema: ZodSchemaWithInputMatch
   });
 
 export const federatedIdentityProviderSchema: ZodSchemaWithInputMatchingOutput<FederatedIdentityProvider> =
-  z.enum(["proConnect", "email", "peConnect"]);
+  z.enum(["proConnect", "email", "ftConnect"]);

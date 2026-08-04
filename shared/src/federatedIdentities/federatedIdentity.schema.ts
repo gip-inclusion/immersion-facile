@@ -26,9 +26,9 @@ const ftConnectAdvisorPayloadSchema: ZodSchemaWithInputMatchingOutput<
   })
   .optional();
 
-export const peConnectIdentitySchema: ZodSchemaWithInputMatchingOutput<FtConnectIdentity> =
+export const ftConnectIdentitySchema: ZodSchemaWithInputMatchingOutput<FtConnectIdentity> =
   z.object({
-    provider: z.literal("peConnect"),
+    provider: z.literal("ftConnect"),
     token: z.string(),
     payload: ftConnectAdvisorPayloadSchema,
   });

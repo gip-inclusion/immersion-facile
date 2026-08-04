@@ -50,7 +50,7 @@ export type WithRedirectUri = {
 export type OAuthProviderForLogin = Exclude<FederatedIdentityProvider, "email">;
 export const oAuthProvidersForLogin = [
   "proConnect",
-  "peConnect",
+  "ftConnect",
 ] as const satisfies OAuthProviderForLogin[];
 
 export type InitiateLoginByOAuthParams = WithRedirectUri & {
