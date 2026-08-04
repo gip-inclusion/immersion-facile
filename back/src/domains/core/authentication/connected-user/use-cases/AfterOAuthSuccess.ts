@@ -225,7 +225,7 @@ const saveFTConnectAuthenticationDataAndReturnRedirectURI = async ({
   const conventionDraft: ConventionDraftDto = {
     id: deps.uuidGenerator.new(),
     internshipKind: "immersion",
-    fromPeConnectedUser: true,
+    fromFtConnectedUser: true,
     signatories: {
       beneficiary: {
         birthdate: userAndAdvisors.user.birthdate,

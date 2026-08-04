@@ -550,7 +550,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             id: conventionDraftId,
             internshipKind: "immersion",
-            fromPeConnectedUser: true,
+            fromFtConnectedUser: true,
             updatedAt: timeGateway.now().toISOString(),
             signatories: {
               beneficiary: {
@@ -617,7 +617,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             id: conventionDraftId,
             internshipKind: "immersion",
-            fromPeConnectedUser: true,
+            fromFtConnectedUser: true,
             updatedAt: timeGateway.now().toISOString(),
             signatories: {
               beneficiary: {
@@ -688,7 +688,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
           {
             id: conventionDraftId,
             internshipKind: "immersion",
-            fromPeConnectedUser: true,
+            fromFtConnectedUser: true,
             updatedAt: timeGateway.now().toISOString(),
             signatories: {
               beneficiary: {

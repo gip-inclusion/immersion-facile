@@ -354,7 +354,7 @@ const ConventionFormContent = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const route = useConventionRoute();
-  const fromPeConnectedUser =
+  const fromFtConnectedUser =
     defaultValues.signatories?.beneficiary?.federatedIdentity?.provider ===
     "ftConnect";
 
@@ -839,7 +839,7 @@ const ConventionFormContent = ({
                     internshipKind={conventionValues.internshipKind}
                     emailValidationErrors={emailValidationErrors}
                     setEmailValidationErrors={setEmailValidationErrors}
-                    fromPeConnectedUser={fromPeConnectedUser}
+                    fromFtConnectedUser={fromFtConnectedUser}
                     isConventionTemplate={isTemplateForm}
                   />
                 </Accordion>
