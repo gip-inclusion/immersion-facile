@@ -434,7 +434,7 @@ describe("auth router", () => {
             await authRoutesClient.initiateLoginByOAuth({
               queryParams: {
                 provider: "peConnect",
-                redirectUri: redirectUri,
+                redirectUri,
               },
             }),
             {
