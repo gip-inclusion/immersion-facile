@@ -18,7 +18,7 @@ describe("security e2e", () => {
 
   const convention = new ConventionDtoBuilder()
     .withAgencyId(peAgency.id)
-    .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+    .withFederatedIdentity({ provider: "ftConnect", token: "some-id" })
     .build();
 
   let unauthenticatedRequest: HttpClient<UnauthenticatedConventionRoutes>;

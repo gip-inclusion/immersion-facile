@@ -144,7 +144,7 @@ describe("HttpFtConnectGateway", () => {
     });
 
     describe("Wrong path", () => {
-      it("Invalid grant -> ManagedRedirectError kind peConnectInvalidGrant", async () => {
+      it("Invalid grant -> ManagedRedirectError kind ftConnectInvalidGrant", async () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).reply(400, {
           error_description:
             "The provided access grant is invalid, expired, or revoked.",
@@ -153,18 +153,18 @@ describe("HttpFtConnectGateway", () => {
         await expectPromiseToFailWithError(
           ftConnectGateway.getAccessToken({ code: "" }),
           new ManagedFTConnectError(
-            "peConnectInvalidGrant",
+            "ftConnectInvalidGrant",
             errors.generic.testError("Request failed with status code 400"),
           ),
         );
       });
 
-      it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+      it("request aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedFTConnectError(
           () => ftConnectGateway.getAccessToken({ code: "" }),
           new ManagedFTConnectError(
-            "peConnectConnectionAborted",
+            "ftConnectConnectionAborted",
             errors.generic.testError(""),
           ),
         );
@@ -250,25 +250,6 @@ describe("HttpFtConnectGateway", () => {
 
     describe("Wrong path", () => {
       describe("Errors on getUserInfo", () => {
-        // it(`Timeout on getUserInfo -> Retry`, async () => {
-        //   mock
-        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-        //     .reply(200, [ftExternalAdvisorCapemploi])
-        //     .onGet(peConnectTargets(appConfig).getUserInfo.url)
-        //     .timeout()
-        //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-        //     .reply(200, peExternalUser)*/
-        //     .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
-        //     .reply(200, {
-        //       codeStatutIndividu: "1",
-        //       libelleStatutIndividu: "Demandeur d’emploi",
-        //     });
-        //   expectObjectsToMatch(await ftConnectGateway.getUserAndAdvisors(accessToken), {
-        //     advisors: [ftConnectAdvisorCapEmploi],
-        //     user: ftConnectUser(true),
-        //   });
-        // });
-
         it("Zod Error -> OK with undefined", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
@@ -313,7 +294,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+        it("Connection aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -322,7 +303,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectConnectionAborted",
+              "ftConnectConnectionAborted",
               errors.generic.testError("Request aborted"),
             ),
           );
@@ -344,7 +325,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess", async () => {
+        it("Error 401 -> ManagedRedirectError kind ftConnectUserForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -353,7 +334,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectGetUserInfoForbiddenAccess",
+              "ftConnectGetUserInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
           );
@@ -421,7 +402,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+        it("Connection aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -435,7 +416,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectConnectionAborted",
+              "ftConnectConnectionAborted",
               errors.generic.testError("Request aborted"),
             ),
           );
@@ -462,7 +443,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Error 401 -> ManagedRedirectError kind peConnectGetUserBirthDateForbiddenAccess", async () => {
+        it("Error 401 -> ManagedRedirectError kind ftConnectGetUserBirthDateForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -475,7 +456,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectGetUserBirthDateForbiddenAccess",
+              "ftConnectGetUserBirthDateForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
           );
@@ -525,7 +506,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+        it("Connection aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -538,7 +519,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectConnectionAborted",
+              "ftConnectConnectionAborted",
               errors.generic.testError("Request aborted"),
             ),
           );
@@ -564,7 +545,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Error 401 -> ManagedRedirectError kind peConnectGetUserContactDetailsForbiddenAccess", async () => {
+        it("Error 401 -> ManagedRedirectError kind ftConnectGetUserContactDetailsForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -577,7 +558,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectGetUserContactDetailsForbiddenAccess",
+              "ftConnectGetUserContactDetailsForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
           );
@@ -605,25 +586,6 @@ describe("HttpFtConnectGateway", () => {
       });
 
       describe("Errors on getAdvisorsInfo", () => {
-        // it(`Timeout on getAdvisorsInfo -> Retry`, async () => {
-        //   mock
-        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-        //     .timeout()
-        //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-        //     .reply(200, peExternalUser)*/
-        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-        //     .reply(200, [ftExternalAdvisorCapemploi])
-        //     .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
-        //     .reply(200, {
-        //       codeStatutIndividu: "1",
-        //       libelleStatutIndividu: "Demandeur d’emploi",
-        //     });
-        //   expectObjectsToMatch(await ftConnectGateway.getUserAndAdvisors(accessToken), {
-        //     advisors: [ftConnectAdvisorCapEmploi],
-        //     user: ftConnectUser(true),
-        //   });
-        // });
-
         it("Zod Error -> OK with No advisors", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
@@ -673,7 +635,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+        it("Connection aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .abortRequest()
@@ -691,7 +653,7 @@ describe("HttpFtConnectGateway", () => {
           await testManagedFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectConnectionAborted",
+              "ftConnectConnectionAborted",
               new Error(),
             ),
           );
@@ -722,7 +684,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Error 401 -> ManagedRedirectError kind peConnectAdvisorForbiddenAccess", async () => {
+        it("Error 401 -> ManagedRedirectError kind ftConnectAdvisorForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(401)
@@ -740,7 +702,7 @@ describe("HttpFtConnectGateway", () => {
           await testManagedFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectAdvisorForbiddenAccess",
+              "ftConnectAdvisorForbiddenAccess",
               new Error(),
             ),
           );
@@ -818,7 +780,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
+        it("Connection aborted -> ManagedRedirectError kind ftConnectConnectionAborted", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -833,7 +795,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectConnectionAborted",
+              "ftConnectConnectionAborted",
               new Error("Request aborted"),
             ),
           );
@@ -861,7 +823,7 @@ describe("HttpFtConnectGateway", () => {
           );
         });
 
-        it("Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess", async () => {
+        it("Error 401 -> ManagedRedirectError kind ftConnectUserForbiddenAccess", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
@@ -876,7 +838,7 @@ describe("HttpFtConnectGateway", () => {
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
-              "peConnectGetUserStatusInfoForbiddenAccess",
+              "ftConnectGetUserStatusInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
           );

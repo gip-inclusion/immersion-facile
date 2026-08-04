@@ -72,7 +72,7 @@ describe("AssociateFtConnectFederatedIdentity", () => {
   it("authfailed", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: authFailed })
+      .withFederatedIdentity({ provider: "ftConnect", token: authFailed })
       .build();
 
     await associateFtConnectFederatedIdentity.execute({
@@ -100,7 +100,7 @@ describe("AssociateFtConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
+      .withFederatedIdentity({ provider: "ftConnect", token: userFtExternalId })
       .build();
 
     await associateFtConnectFederatedIdentity.execute({
@@ -123,7 +123,7 @@ describe("AssociateFtConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
+      .withFederatedIdentity({ provider: "ftConnect", token: userFtExternalId })
       .build();
 
     await associateFtConnectFederatedIdentity.execute({

@@ -51,7 +51,7 @@ export const toPartialConventionDtoWithFtIdentity = (
   birthdate: ftConnectUserInfo.birthdate,
   phone: ftConnectUserInfo.phone,
   fedId: ftConnectUserInfo.peExternalId,
-  fedIdProvider: "peConnect",
+  fedIdProvider: "ftConnect",
   fedIdToken: ftConnectIdToken,
 });
 

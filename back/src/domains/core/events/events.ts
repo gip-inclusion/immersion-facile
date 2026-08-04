@@ -187,7 +187,7 @@ export type DomainEvent =
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
-  // PECONNECT related
+  // FTCONNECT related
   | GenericEvent<"FTConnectedSuccessfully", WithFTConnectEvent>
   | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>

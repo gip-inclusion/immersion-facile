@@ -150,7 +150,7 @@ export const errors = {
     badConfig: (message: string) => new Error(message),
   },
   ftConnect: {
-    noAuth: () => new ManagedFTConnectError("peConnectNoAuthorisation"),
+    noAuth: () => new ManagedFTConnectError("ftConnectNoAuthorisation"),
     associationFailed: ({
       conventionId,
       ftExternalId,

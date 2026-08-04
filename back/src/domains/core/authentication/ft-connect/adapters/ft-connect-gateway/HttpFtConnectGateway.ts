@@ -64,7 +64,7 @@ type CounterType =
   | "getUserContactDetails"
   | "exchangeCodeForAccessToken";
 
-const counterApiKind = "peConnect";
+const counterApiKind = "ftConnect";
 const makeFtConnectLogger = (
   logger: OpacifiedLogger,
   counterType: CounterType,

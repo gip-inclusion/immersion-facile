@@ -73,7 +73,7 @@ describe("convention e2e", () => {
   };
   const convention = new ConventionDtoBuilder()
     .withAgencyId(peAgency.id)
-    .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+    .withFederatedIdentity({ provider: "ftConnect", token: "some-id" })
     .build();
 
   const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";

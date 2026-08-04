@@ -360,7 +360,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
         (await conventionRepository.getById(conventionId))?.signatories
           .beneficiary.federatedIdentity,
         {
-          provider: "peConnect",
+          provider: "ftConnect",
           token: userFtExternalId,
           payload: {
             advisor: placementAdvisor,

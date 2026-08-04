@@ -87,36 +87,36 @@ export const ftConnectErrorStrategy = (
     ],
     [
       isAdvisorForbiddenError(error, context),
-      new ManagedFTConnectError("peConnectAdvisorForbiddenAccess", error),
+      new ManagedFTConnectError("ftConnectAdvisorForbiddenAccess", error),
     ],
     [
       isGetUserInfoForbiddenError(error, context),
-      new ManagedFTConnectError("peConnectGetUserInfoForbiddenAccess", error),
+      new ManagedFTConnectError("ftConnectGetUserInfoForbiddenAccess", error),
     ],
     [
       isGetUserStatusInfoForbiddenError(error, context),
       new ManagedFTConnectError(
-        "peConnectGetUserStatusInfoForbiddenAccess",
+        "ftConnectGetUserStatusInfoForbiddenAccess",
         error,
       ),
     ],
     [
       isGetUserBirthDateForbiddenError(error, context),
       new ManagedFTConnectError(
-        "peConnectGetUserBirthDateForbiddenAccess",
+        "ftConnectGetUserBirthDateForbiddenAccess",
         error,
       ),
     ],
     [
       isGetUserContactDetailsForbiddenError(error, context),
       new ManagedFTConnectError(
-        "peConnectGetUserContactDetailsForbiddenAccess",
+        "ftConnectGetUserContactDetailsForbiddenAccess",
         error,
       ),
     ],
     [
       error.code === "ECONNABORTED",
-      new ManagedFTConnectError("peConnectConnectionAborted", error),
+      new ManagedFTConnectError("ftConnectConnectionAborted", error),
     ],
     [
       error.message === "Network Error",
@@ -128,7 +128,7 @@ export const ftConnectErrorStrategy = (
     ],
     [
       isInvalidGrantError(context, error),
-      new ManagedFTConnectError("peConnectInvalidGrant", error),
+      new ManagedFTConnectError("ftConnectInvalidGrant", error),
     ],
   ]);
 

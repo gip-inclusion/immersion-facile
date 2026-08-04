@@ -191,7 +191,7 @@ const mapToEntity = (
     agency_referent_last_name: conventionDraft.agencyReferent?.lastname,
     ft_connect_id:
       conventionDraft.signatories?.beneficiary?.federatedIdentity?.provider ===
-      "peConnect"
+      "ftConnect"
         ? conventionDraft.signatories?.beneficiary?.federatedIdentity?.token
         : undefined,
     establishment_tutor: conventionDraft.establishmentTutor

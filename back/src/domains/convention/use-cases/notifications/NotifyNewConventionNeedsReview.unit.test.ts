@@ -73,7 +73,7 @@ describe("NotifyNewConventionNeedsReview", () => {
 
   const ftAdvisorEmail = "ft-advisor@gmail.com";
   const ftIdentity: FtConnectIdentity = {
-    provider: "peConnect",
+    provider: "ftConnect",
     token: "123",
   };
 
@@ -311,7 +311,7 @@ describe("NotifyNewConventionNeedsReview", () => {
       });
     });
 
-    it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+    it("Sends notification email only to peAdvisor when beneficiary is ftConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
       const conventionInReviewWithFtAdvisor = new ConventionDtoBuilder(
@@ -483,7 +483,7 @@ describe("NotifyNewConventionNeedsReview", () => {
       expectSavedNotificationsAndEvents({ emails: [] });
     });
 
-    it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+    it("Sends notification email only to peAdvisor when beneficiary is ftConnected and beneficiary has PE advisor", async () => {
       uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
       const conventionAcceptedByCounsellorWithFtAdvisor =

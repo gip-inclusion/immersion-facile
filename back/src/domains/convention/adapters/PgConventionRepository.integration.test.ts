@@ -375,7 +375,7 @@ describe("PgConventionRepository", () => {
         ...extraFields,
       })
       .withFederatedIdentity({
-        provider: "peConnect",
+        provider: "ftConnect",
         token: userFtExternalId,
         payload: {
           advisor: {
@@ -419,7 +419,7 @@ describe("PgConventionRepository", () => {
     expect(
       conventionRetreived?.signatories.beneficiary.federatedIdentity,
     ).toStrictEqual({
-      provider: "peConnect",
+      provider: "ftConnect",
       token: userFtExternalId,
       payload: {
         advisor: {
@@ -447,7 +447,7 @@ describe("PgConventionRepository", () => {
         ...extraFields,
       })
       .withFederatedIdentity({
-        provider: "peConnect",
+        provider: "ftConnect",
         token: userFtExternalId,
       })
       .withAgencyId(agency.id)
@@ -483,7 +483,7 @@ describe("PgConventionRepository", () => {
     expect(
       conventionRetreived?.signatories.beneficiary.federatedIdentity,
     ).toStrictEqual({
-      provider: "peConnect",
+      provider: "ftConnect",
       token: userFtExternalId,
     });
   });
@@ -561,7 +561,7 @@ describe("PgConventionRepository", () => {
     const ftConnectId: FtConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = conventionStylisteBuilder
       .withFederatedIdentity({
-        provider: "peConnect",
+        provider: "ftConnect",
         token: ftConnectId,
         payload: {
           advisor: {
