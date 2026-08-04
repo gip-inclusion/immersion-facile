@@ -215,6 +215,7 @@ describe("EditConventionWithFinalStatus", () => {
           phone: "+33601010102",
           firstName: "Rep",
           lastName: "Legal",
+          signedAt: new Date("2024-01-01").toISOString(),
         })
         .build();
       uow.conventionRepository.setConventions([conventionWithRepresentative]);
@@ -233,8 +234,7 @@ describe("EditConventionWithFinalStatus", () => {
           adminJwtPayload,
         ),
         errors.convention.invalidConventionAfterFinalStatusEdit({
-          message:
-            "L'âge du bénéficiaire doit être au minimum de 16ans; La confirmation de votre accord est obligatoire.",
+          message: "L'âge du bénéficiaire doit être au minimum de 16ans",
           conventionId,
         }),
       );

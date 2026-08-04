@@ -14,6 +14,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   type Notification,
+  reasonableSchedule,
   type SignatoryRole,
   UserBuilder,
 } from "shared";
@@ -46,39 +47,46 @@ describe("SendAssessmentLink", () => {
   let timeGateway: TimeGateway;
 
   const now = new Date();
+  const signedAt = subDays(now, 10).toISOString();
+  const dateStart = subDays(now, 5).toISOString();
+  const dateEnd = now.toISOString();
 
   const shortLinkId = "link1";
 
   const convention = new ConventionDtoBuilder()
     .withId("add5c20e-6dd2-45af-affe-927358005251")
     .withStatus("ACCEPTED_BY_VALIDATOR")
-    .withDateEnd(now.toISOString())
+    .withDateStart(dateStart)
+    .withDateEnd(dateEnd)
+    .withSchedule(reasonableSchedule)
     .withBeneficiaryEmail("beneficiary@mail.com")
     .withBeneficiaryRepresentative({
       email: "beneficiary-representative@mail.com",
       firstName: "Robert",
       lastName: "Thénardier",
-      phone: "",
+      phone: "+33601010101",
       role: "beneficiary-representative",
+      signedAt,
     })
     .withBeneficiaryCurrentEmployer({
       email: "beneficiary-current-employer@mail.com",
       firstName: "Robert",
       lastName: "Thénardier",
-      phone: "",
+      phone: "+33601010102",
       role: "beneficiary-current-employer",
-      businessName: "",
-      businessSiret: "",
-      job: "",
-      signedAt: undefined,
+      businessName: "Current Employer SARL",
+      businessSiret: "12345678901234",
+      job: "Manager",
+      signedAt,
       businessAddress: "Rue des Bouchers 67065 Strasbourg",
     })
     .withEstablishmentRepresentative({
       email: "establishment-representative@mail.com",
       firstName: "Robert",
       lastName: "Thénardier",
-      phone: "",
+      phone: "+33602010203",
       role: "establishment-representative",
+      signedAt,
     })
     .withEstablishmentTutor({
       email: "tutor@mail.com",
@@ -224,6 +232,7 @@ describe("SendAssessmentLink", () => {
         convention,
       )
         .withDateEnd(addDays(today, 2).toISOString())
+        .withSchedule(reasonableSchedule)
         .build();
 
       uow.agencyRepository.agencies = [

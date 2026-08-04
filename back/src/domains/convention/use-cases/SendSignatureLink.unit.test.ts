@@ -498,14 +498,13 @@ describe("Send signature link", () => {
 
     it.each([
       "+33555689727", // Métropole
-      "+262269567890", // Mayotte
-      "+590590123456", // Guadeloupe
-      "+594594234567", // Guyane
-      "+596596345678", // Martinique
-      "+262262456789", // Réunion
-      "+68940301010", //  Polynésie française
-      "+687261234", // Nouvelle-Calédonie
-      "+508412345", //Saint-Pierre-et-Miquelon
+      "+262269612345", // Mayotte
+      "+590590275843", // Guadeloupe
+      "+594594912345", // Guyane
+      "+596596812345", // Martinique
+      "+262262612345", // Réunion
+      "+687245678", // Nouvelle-Calédonie
+      "+508412356", // Saint-Pierre-et-Miquelon
     ])("throws bad request if phone number format %s is incorrect", async (phoneNumber) => {
       const shortLinkId = "link1";
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);

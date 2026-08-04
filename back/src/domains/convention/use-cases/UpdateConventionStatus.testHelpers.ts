@@ -329,6 +329,10 @@ export const executeUpdateConventionStatusUseCase = async ({
   const storedConvention = await conventionRepository.getById(
     updateStatusParams.conventionId,
   );
+  if (!storedConvention)
+    throw errors.convention.notFound({
+      conventionId: updateStatusParams.conventionId,
+    });
   return storedConvention;
 };
 

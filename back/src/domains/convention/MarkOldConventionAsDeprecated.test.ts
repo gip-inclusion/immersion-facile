@@ -1,4 +1,8 @@
-import { ConventionDtoBuilder, reasonableSchedule } from "shared";
+import {
+  ConventionDtoBuilder,
+  expectToEqual,
+  reasonableSchedule,
+} from "shared";
 import { makeCreateNewEvent } from "../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -55,12 +59,17 @@ describe("MarkOldConventionAsDeprecated", () => {
     });
 
     expect(result.numberOfUpdatedConventions).toBe(1);
-    const deprecatedConvention = await uow.conventionRepository.getById(
-      conventionToDeprecate.id,
-    );
-    expect(deprecatedConvention.status).toEqual("DEPRECATED");
-    expect(deprecatedConvention.statusJustification).toEqual(
-      "Devenu obsolète car le statut était PARTIALLY_SIGNED alors que la date de fin est dépassée depuis longtemps",
+
+    const expectedDeprecatedConvention = {
+      ...conventionToDeprecate,
+      status: "DEPRECATED" as const,
+      statusJustification:
+        "Devenu obsolète car le statut était PARTIALLY_SIGNED alors que la date de fin est dépassée depuis longtemps",
+    };
+
+    expectToEqual(
+      await uow.conventionRepository.getById(conventionToDeprecate.id),
+      expectedDeprecatedConvention,
     );
     expect(uow.outboxRepository.events).toHaveLength(1);
     expect(uow.outboxRepository.events[0].topic).toEqual(
