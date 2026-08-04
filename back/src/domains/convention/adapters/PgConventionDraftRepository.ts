@@ -98,7 +98,7 @@ export class PgConventionDraftRepository implements ConventionDraftRepository {
               lastname: row.agency_referent_last_name ?? undefined,
             }
           : undefined,
-      fromPeConnectedUser: row.ft_connect_id ? true : undefined,
+      fromFtConnectedUser: row.ft_connect_id ? true : undefined,
       establishmentTutor:
         (row.establishment_tutor as EstablishmentTutor) ?? undefined,
       signatories: (row.signatories as Signatories) ?? undefined,

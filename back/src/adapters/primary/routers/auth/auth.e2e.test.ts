@@ -526,7 +526,7 @@ describe("auth router", () => {
               {
                 id: conventionDraftId,
                 internshipKind: "immersion",
-                fromPeConnectedUser: true,
+                fromFtConnectedUser: true,
                 updatedAt: gateways.timeGateway.now().toISOString(),
                 signatories: {
                   beneficiary: {

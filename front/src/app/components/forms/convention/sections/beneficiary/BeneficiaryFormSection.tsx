@@ -44,7 +44,7 @@ type beneficiaryFormSectionProperties = {
   internshipKind: InternshipKind;
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
-  fromPeConnectedUser?: boolean;
+  fromFtConnectedUser?: boolean;
   isConventionTemplate: boolean;
 };
 
@@ -52,7 +52,7 @@ export const BeneficiaryFormSection = ({
   internshipKind,
   setEmailValidationErrors,
   emailValidationErrors,
-  fromPeConnectedUser,
+  fromFtConnectedUser,
   isConventionTemplate,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const [isMinorAccordingToAge, setIsMinorAccordingToAge] = useState(false);
@@ -144,7 +144,7 @@ export const BeneficiaryFormSection = ({
           ...formContents["signatories.beneficiary.firstName"],
           ...register("signatories.beneficiary.firstName"),
         }}
-        disabled={fromPeConnectedUser}
+        disabled={fromFtConnectedUser}
         {...getFieldError("signatories.beneficiary.firstName")}
       />
       <Input
@@ -154,7 +154,7 @@ export const BeneficiaryFormSection = ({
           ...formContents["signatories.beneficiary.lastName"],
           ...register("signatories.beneficiary.lastName"),
         }}
-        disabled={fromPeConnectedUser}
+        disabled={fromFtConnectedUser}
         {...getFieldError("signatories.beneficiary.lastName")}
       />
 
@@ -170,14 +170,14 @@ export const BeneficiaryFormSection = ({
           type: "date",
           max: "9999-12-31",
         }}
-        disabled={fromPeConnectedUser}
+        disabled={fromFtConnectedUser}
         {...getFieldError("signatories.beneficiary.birthdate")}
       />
       <EmailValidationInput
         hintText={formContents["signatories.beneficiary.email"].hintText}
         label={formContents["signatories.beneficiary.email"].label}
         disabled={
-          fromPeConnectedUser &&
+          fromFtConnectedUser &&
           emailSchema.safeParse(values.signatories.beneficiary.email).success
         }
         nativeInputProps={{

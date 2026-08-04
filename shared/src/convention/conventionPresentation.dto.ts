@@ -28,8 +28,8 @@ type WithIntershipKind = {
   internshipKind: InternshipKind;
 };
 
-type WithFromPeConnectedUser = {
-  fromPeConnectedUser?: boolean;
+type WithFromFtConnectedUser = {
+  fromFtConnectedUser?: boolean;
 };
 
 export type CreateConventionTemplatePresentationInitialValues =
@@ -54,7 +54,7 @@ export type CreateConventionPresentationInitialValues = OmitFromExistingKeys<
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
-  WithFromPeConnectedUser;
+  WithFromFtConnectedUser;
 
 export type WithFromConventionDraftId = {
   fromConventionDraftId: ConventionDraftId;
@@ -71,7 +71,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
 > &
   Partial<WithFromConventionDraftId> &
   WithSignatures &
-  WithFromPeConnectedUser;
+  WithFromFtConnectedUser;
 
 export type WithStatusJustification = {
   statusJustification: string;
