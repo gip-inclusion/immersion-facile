@@ -90,15 +90,15 @@ export const getSlackChannelName = (envType: Environment, isError: boolean) => {
 
 const formatCode = (content: string) => `\`\`\`${content}\`\`\``;
 
-export const notifyErrorObjectToTeam = <T>(obj: T) => {
-  notifyTeam({
+export const notifyErrorObjectToTeam = async <T>(obj: T) => {
+  await notifyTeam({
     rawContent: toPropertiesAsString(obj),
     isError: true,
   });
 };
 
-export const notifyToTeamAndThrowError = <T extends Error>(error: T) => {
-  notifyTeam({
+export const notifyToTeamAndThrowError = async <T extends Error>(error: T) => {
+  await notifyTeam({
     rawContent: toPropertiesAsString(error),
     isError: true,
   });

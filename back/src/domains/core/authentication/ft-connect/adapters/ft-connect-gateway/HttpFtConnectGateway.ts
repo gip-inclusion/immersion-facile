@@ -519,7 +519,7 @@ const errorChecker = (
   cbOnNotError: (stuff: unknown) => void,
 ): void => (error instanceof Error ? cbOnError(error) : cbOnNotError(error));
 
-const notifyTeamOnNotError = (payload: unknown): void =>
+const notifyTeamOnNotError = (payload: unknown): Promise<void> =>
   notifyErrorObjectToTeam({
     message: "Should have been an error.",
     payload,
