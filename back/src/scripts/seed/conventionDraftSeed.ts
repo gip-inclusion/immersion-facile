@@ -18,7 +18,7 @@ export const conventionDraftSeed = async (uow: UnitOfWork) => {
         lastName: "Doe",
         email: "john.doe@example.com",
         phone: "0202020202",
-        birthdate: new Date("2000-10-10T00:00:00.000Z").toISOString(),
+        birthdate: "2000-10-10",
       },
       establishmentRepresentative: {
         firstName: "Bob",
