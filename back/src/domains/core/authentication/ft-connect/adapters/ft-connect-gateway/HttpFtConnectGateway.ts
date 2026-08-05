@@ -6,6 +6,7 @@ import {
   HTTP_STATUS,
   queryParamsAsString,
   TooManyRequestApiError,
+  toInternationalPhoneNumber,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
@@ -419,7 +420,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       const phoneNumber =
         externalFtConnectContactDetails.telephone1 ??
         externalFtConnectContactDetails.telephone2;
-      return phoneNumber ?? null;
+      return phoneNumber ? toInternationalPhoneNumber(phoneNumber, "FR") : null;
     } catch (error) {
       errorChecker(
         error,
