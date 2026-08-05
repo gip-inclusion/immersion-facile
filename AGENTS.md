@@ -22,6 +22,8 @@ Run `pnpm fullcheck` after significant changes before handing off.
 - Use arrow functions
 - Avoid `let`, prefer `const`
 - Avoid `any` type and casting to `any`
+- Avoid using `as`
+- Do not add comments
 
 Prefer implicit returns:
 ```typescript
@@ -51,7 +53,7 @@ libs/
   react-design-system/   # Custom React components (non-DSFR)
   html-templates/        # HTML email templating
   scss-mapper/           # SCSS to TypeScript generator
-playwright/           # E2E tests
+playwright-e2e/           # E2E tests
 ```
 
 ### Shared Package
@@ -337,7 +339,7 @@ describe("PgSomeRepository", () => {
 });
 ```
 
-Playwright for E2E in `playwright/` workspace.
+Playwright for E2E in `playwright-e2e/` workspace.
 
 ## Database
 
