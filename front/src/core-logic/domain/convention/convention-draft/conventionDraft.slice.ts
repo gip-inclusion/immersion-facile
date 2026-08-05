@@ -47,6 +47,10 @@ export const conventionDraftSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+    clearFetchedConventionDraft: (state) => {
+      state.conventionDraft = initialConventionDraftState.conventionDraft;
+      state.isLoading = initialConventionDraftState.isLoading;
+    },
     saveConventionDraftThenRedirectRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<

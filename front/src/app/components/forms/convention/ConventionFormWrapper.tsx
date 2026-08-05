@@ -201,6 +201,7 @@ export const ConventionFormWrapper = ({
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     return () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
+      dispatch(conventionDraftSlice.actions.clearFetchedConventionDraft());
       dispatch(
         conventionSlice.actions.showSummaryChangeRequested({
           showSummary: false,
