@@ -5,6 +5,7 @@ on:
     types:
       - opened
       - synchronize
+      - ready_for_review
 concurrency:
   group: review-app-${{ github.event.number }}
   cancel-in-progress: true
@@ -50,7 +51,7 @@ jobs:
         with:
           script: |
             const workflowUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/review-app-trigger.yml`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -58,10 +59,9 @@ jobs:
               body: `📌 Deploy a review app for this PR:
 
               ➡️ [Click here to deploy review app](${workflowUrl}?ref=${context.payload.pull_request.head.ref})
-            
+
               When clicking the link above:
               1. Click the "Run workflow" button
               2. Enter this PR number: ${context.issue.number}
               3. Click "Run workflow" to start the deployment`
             });
-
