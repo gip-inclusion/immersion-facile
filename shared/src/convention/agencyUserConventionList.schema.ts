@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { businessNameSchema } from "../establishment/businessComponents.schema";
-import { peConnectIdentityWithoutTokenSchema } from "../federatedIdentities/federatedIdentity.schema";
+import { ftConnectIdentityWithoutTokenSchema } from "../federatedIdentities/federatedIdentity.schema";
 import type { DataWithPagination } from "../pagination/pagination.dto";
 import { createPaginatedSchema } from "../pagination/pagination.schema";
 import {
@@ -31,7 +31,7 @@ export const agencyUserConventionListDtoSchema: ZodSchemaWithInputMatchingOutput
     beneficiary: z.object({
       firstName: firstnameMandatorySchema,
       lastName: lastnameMandatorySchema,
-      federatedIdentity: peConnectIdentityWithoutTokenSchema.optional(),
+      federatedIdentity: ftConnectIdentityWithoutTokenSchema.optional(),
     }),
   });
 
