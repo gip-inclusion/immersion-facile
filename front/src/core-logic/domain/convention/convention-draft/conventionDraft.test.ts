@@ -28,16 +28,18 @@ describe("ConventionDraft slice", () => {
     internshipKind: "immersion",
   };
 
+  const conventionDraftStateInitial: ConventionDraftState = {
+    isLoading: false,
+    conventionDraft: null,
+  };
+
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   describe("Fetch convention draft", () => {
     it("fetches a convention draft successfully", () => {
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       store.dispatch(
         conventionDraftSlice.actions.fetchConventionDraftRequested({
@@ -62,10 +64,7 @@ describe("ConventionDraft slice", () => {
     it("stores error when fetching convention draft fails", () => {
       const errorMessage = "Convention draft not found";
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       store.dispatch(
         conventionDraftSlice.actions.fetchConventionDraftRequested({
@@ -82,10 +81,7 @@ describe("ConventionDraft slice", () => {
         new Error(errorMessage),
       );
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
@@ -117,19 +113,13 @@ describe("ConventionDraft slice", () => {
         conventionDraftSlice.actions.clearFetchedConventionDraft(),
       );
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
     });
   });
 
   describe("save convention draft", () => {
     it("fetches convention draft successfully before sharing", () => {
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       store.dispatch(
         conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
@@ -147,10 +137,7 @@ describe("ConventionDraft slice", () => {
 
       dependencies.conventionGateway.saveConventionDraftResult$.next();
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
         {
@@ -165,10 +152,7 @@ describe("ConventionDraft slice", () => {
     it("handles error when fetching convention draft fails before sharing", () => {
       const errorMessage = "Erreur lors de l'envoi de l'email";
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       store.dispatch(
         conventionDraftSlice.actions.saveConventionDraftThenRedirectRequested({
@@ -188,10 +172,7 @@ describe("ConventionDraft slice", () => {
         new Error(errorMessage),
       );
 
-      expectConventionDraftState({
-        isLoading: false,
-        conventionDraft: null,
-      });
+      expectConventionDraftState(conventionDraftStateInitial);
 
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["convention-draft"],
