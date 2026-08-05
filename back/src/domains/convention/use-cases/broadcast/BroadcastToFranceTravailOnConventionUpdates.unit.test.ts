@@ -350,7 +350,7 @@ describe("BroadcastToFranceTravailOnConventionUpdates", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withFederatedIdentity({ provider: "ftConnect", token: "some-id" })
       .withDateStart("2021-05-12")
-      .withDateEnd("2021-05-14T00:30:00.000Z") //
+      .withDateEnd("2021-05-14T00:30:00.000Z")
       .withSchedule(reasonableSchedule)
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
