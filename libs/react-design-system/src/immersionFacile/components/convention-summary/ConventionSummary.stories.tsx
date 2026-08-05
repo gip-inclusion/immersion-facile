@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import {
   type AgencySubSection,
   ConventionSummary,
@@ -52,7 +52,7 @@ export default {
 export const Default: Story = {
   args: {
     conventionId: "Titre de la section",
-    submittedAt: "",
+    submittedAt: "05/08/2026",
     summary: [],
     agencySubSection: agencySubSectionForConventionSummaryStory,
   },

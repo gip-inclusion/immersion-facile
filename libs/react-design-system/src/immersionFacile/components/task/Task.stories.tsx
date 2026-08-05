@@ -1,5 +1,5 @@
 import Button from "@codegouvfr/react-dsfr/Button";
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { Task, type TaskProps } from "./Task";
 
 const Component = Task;

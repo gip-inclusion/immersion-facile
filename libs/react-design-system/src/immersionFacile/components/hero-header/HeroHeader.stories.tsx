@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { HeroHeader, type HeroHeaderProps } from "./HeroHeader";
 
 const Component = HeroHeader;
