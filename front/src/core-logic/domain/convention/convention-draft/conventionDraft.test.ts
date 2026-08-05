@@ -99,6 +99,31 @@ describe("ConventionDraft slice", () => {
     });
   });
 
+  describe("Clear fetched convention draft", () => {
+    it("resets the convention draft state", () => {
+      store.dispatch(
+        conventionDraftSlice.actions.fetchConventionDraftRequested({
+          conventionDraftId,
+          feedbackTopic: "convention-draft",
+        }),
+      );
+      dependencies.conventionGateway.conventionDraft$.next(conventionDraft);
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: conventionDraft,
+      });
+
+      store.dispatch(
+        conventionDraftSlice.actions.clearFetchedConventionDraft(),
+      );
+
+      expectConventionDraftState({
+        isLoading: false,
+        conventionDraft: null,
+      });
+    });
+  });
+
   describe("save convention draft", () => {
     it("fetches convention draft successfully before sharing", () => {
       expectConventionDraftState({
