@@ -30,6 +30,8 @@ import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import type { ConventionRepository } from "../ports/ConventionRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
 describe("PgConventionRepository", () => {
@@ -109,12 +111,21 @@ describe("PgConventionRepository", () => {
     conventionRepository = new PgConventionRepository(db);
   });
 
-  describe("getById", () => {
+  describe.each(["Pg", "InMemory"] as const)("%s getById", (adapter) => {
+    let repository: ConventionRepository;
+
+    beforeEach(() => {
+      if (adapter === "Pg") {
+        repository = new PgConventionRepository(db);
+      } else {
+        const uow = createInMemoryUow();
+        repository = uow.conventionRepository;
+      }
+    });
+
     it("returns undefined if no convention were found with id", async () => {
       expectToEqual(
-        await conventionRepository.getById(
-          "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa",
-        ),
+        await repository.getById("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa"),
         undefined,
       );
     });
@@ -125,12 +136,9 @@ describe("PgConventionRepository", () => {
         .withEstablishmentNumberOfEmployeesRange("20-49")
         .build();
 
-      await conventionRepository.save(convention, anyConventionUpdatedAt);
+      await repository.save(convention, anyConventionUpdatedAt);
 
-      expectToEqual(
-        await conventionRepository.getById(convention.id),
-        convention,
-      );
+      expectToEqual(await repository.getById(convention.id), convention);
     });
   });
 
