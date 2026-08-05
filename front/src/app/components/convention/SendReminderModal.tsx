@@ -80,9 +80,6 @@ export const SendReminderModal = ({
     ? isEmailDisabled && isSmsDisabled
     : isEmailDisabled;
 
-  const isBothChannelsBlocked =
-    hasMobilePhone && isEmailDisabled && isSmsDisabled;
-
   const emailLastSentAt = lastReminderDateByNotificationKind?.email;
   const smsLastSentAt = lastReminderDateByNotificationKind?.sms;
 
@@ -119,6 +116,33 @@ export const SendReminderModal = ({
     (selectedNotificationKind === "email" && isEmailDisabled) ||
     (selectedNotificationKind === "sms" && isSmsDisabled);
 
+  const renderBlockedReminderContent = (
+    blockedEmailLastSentAt: DateTimeIsoString,
+  ) => {
+    if (hasMobilePhone && smsLastSentAt)
+      return (
+        <BothChannelsBlockedReminderMessage
+          recipientFullName={recipientFullName}
+          emailLastSentAt={blockedEmailLastSentAt}
+          smsLastSentAt={smsLastSentAt}
+          now={now}
+        />
+      );
+
+    return (
+      <p>
+        {formatBlockedReminderMessage(
+          getFirstChannelAvailableAgainLastSentAt({
+            emailLastSentAt: blockedEmailLastSentAt,
+            smsLastSentAt,
+          }),
+          now,
+          recipientFullName,
+        )}
+      </p>
+    );
+  };
+
   return createPortal(
     <modal.Component
       title={title}
@@ -145,25 +169,7 @@ export const SendReminderModal = ({
       ]}
     >
       {isAllChannelsBlocked && emailLastSentAt ? (
-        isBothChannelsBlocked && smsLastSentAt ? (
-          <BothChannelsBlockedReminderMessage
-            recipientFullName={recipientFullName}
-            emailLastSentAt={emailLastSentAt}
-            smsLastSentAt={smsLastSentAt}
-            now={now}
-          />
-        ) : (
-          <p>
-            {formatBlockedReminderMessage(
-              getFirstChannelAvailableAgainLastSentAt({
-                emailLastSentAt,
-                smsLastSentAt,
-              }),
-              now,
-              recipientFullName,
-            )}
-          </p>
-        )
+        renderBlockedReminderContent(emailLastSentAt)
       ) : (
         <>
           {description}
