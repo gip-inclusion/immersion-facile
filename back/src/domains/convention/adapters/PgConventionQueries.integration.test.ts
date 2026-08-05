@@ -119,7 +119,27 @@ describe("Pg implementation of ConventionQueries", () => {
     await pool.end();
   });
 
-  describe("getConventionById", () => {
+  describe.each([
+    "Pg",
+    "InMemory",
+  ] as const)("%s getConventionById", (adapter) => {
+    let conventionQueries: ConventionQueries;
+    let agencyRepo: AgencyRepository;
+    let conventionRepository: ConventionRepository;
+
+    beforeEach(() => {
+      if (adapter === "Pg") {
+        conventionQueries = new PgConventionQueries(db);
+        agencyRepo = new PgAgencyRepository(db);
+        conventionRepository = new PgConventionRepository(db);
+      } else {
+        const uow = createInMemoryUow();
+        conventionQueries = uow.conventionQueries;
+        agencyRepo = uow.agencyRepository;
+        conventionRepository = uow.conventionRepository;
+      }
+    });
+
     it("Returns undefined if no convention with such id", async () => {
       expect(
         await conventionQueries.getConventionById(conventionIdA),
