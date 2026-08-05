@@ -9,6 +9,7 @@ import {
   TooManyRequestApiError,
   testManagedFTConnectError,
   testRawFTConnectError,
+  toInternationalPhoneNumber,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
@@ -101,7 +102,11 @@ describe("HttpFtConnectGateway", () => {
       ...peExternalUser,
       isUserJobseeker,
       birthdate: peExternalBirthDate.dateDeNaissance,
-      phone: peExternalContactDetails.telephone1,
+      phone: toInternationalPhoneNumber(
+        // biome-ignore lint/style/noNonNullAssertion: telephone1 provided
+        peExternalContactDetails.telephone1!,
+        "FR",
+      ),
     });
   const ftConnectAdvisorPlacement = toFtConnectAdvisorDto(
     peExternalAdvisorPlacement,
