@@ -1,5 +1,5 @@
 import "./instrumentSentryCron";
-import { createLogger } from "../utils/logger";
+import { notifyErrorObjectToTeam, notifyTeam } from "../utils/notifyTeam";
 import { triggerDeactivateUnresponsiveEstablishments } from "./scheduledScripts/deactivateUnresponsiveEstablishments";
 import { triggerDeleteEmailAttachements } from "./scheduledScripts/deleteEmailAttachements";
 import { triggerDeleteOldConventionDrafts } from "./scheduledScripts/deleteOldConventionDrafts";
@@ -9,8 +9,6 @@ import { triggerMarkObsoleteDiscussionsAsDeprecated } from "./scheduledScripts/m
 import { triggerMarkOldConventionAsDeprecated } from "./scheduledScripts/markOldConventionAsDeprecated";
 import { triggerSuggestEstablishmentReengagementEvery6Months } from "./scheduledScripts/triggerSuggestEstablishmentReengagementEvery6Months";
 import { triggerUpdateAllEstablishmentsScores } from "./scheduledScripts/updateAllEstablishmentsScores";
-
-const logger = createLogger(__filename);
 
 const main = async () => {
   await triggerDeleteEmailAttachements({ exitOnFinish: false });
@@ -29,11 +27,18 @@ const main = async () => {
 };
 
 main()
-  .then(() => {
-    logger.info({ message: "Evening jobs executed successfully" });
+  .then(async () => {
+    await notifyTeam({
+      rawContent: "Evening jobs executed successfully",
+      isError: false,
+    });
     process.exit(0);
   })
-  .catch((error) => {
-    logger.error({ message: "Evening jobs triggered failed", error });
+  .catch(async (error) => {
+    await notifyTeam({
+      rawContent: "Evening jobs triggered failed",
+      isError: true,
+    });
+    await notifyErrorObjectToTeam(error);
     process.exit(1);
   });
