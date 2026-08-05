@@ -757,17 +757,30 @@ const isConventionBeforeDistinctSignatoriesPhoneNumbersReleaseDate = (
   new Date(conventionSubimissionDate).getTime() <=
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE.getTime();
 
+const signatoryKeys: (keyof Signatories)[] = [
+  "beneficiary",
+  "establishmentRepresentative",
+  "beneficiaryRepresentative",
+  "beneficiaryCurrentEmployer",
+];
+
+const getSignatoriesEntries = (convention: ConventionDto) =>
+  signatoryKeys.flatMap((key) => {
+    const signatory = convention.signatories[key];
+    return signatory ? [{ key, signatory }] : [];
+  });
+
 const addIssuesIfDuplicateSignatoriesEmails = (
   convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
 ) => {
   if (isConventionOld(convention.dateEnd)) return;
-  const signatoriesWithEmail = Object.entries(convention.signatories)
-    .filter(([_, value]) => !!value)
-    .map(([key, value]) => ({
-      key: key as keyof Signatories,
-      email: value.email,
-    }));
+  const signatoriesWithEmail = getSignatoriesEntries(convention).map(
+    ({ key, signatory }) => ({
+      key,
+      email: signatory.email,
+    }),
+  );
   signatoriesWithEmail.forEach((signatory) => {
     if (
       signatoriesWithEmail
@@ -791,12 +804,12 @@ const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
     )
   )
     return;
-  const signatoriesWithPhoneNumber = Object.entries(convention.signatories)
-    .filter(([_, value]) => !!value)
-    .map(([key, value]) => ({
-      key: key as keyof Signatories,
-      phoneNumber: value.phone,
-    }));
+  const signatoriesWithPhoneNumber = getSignatoriesEntries(convention).map(
+    ({ key, signatory }) => ({
+      key,
+      phoneNumber: signatory.phone,
+    }),
+  );
   signatoriesWithPhoneNumber.forEach((signatory) => {
     if (
       signatoriesWithPhoneNumber
