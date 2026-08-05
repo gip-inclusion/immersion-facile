@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { LinkHome, type LinkHomeProps } from "./LinkHome";
 
 const Component = LinkHome;

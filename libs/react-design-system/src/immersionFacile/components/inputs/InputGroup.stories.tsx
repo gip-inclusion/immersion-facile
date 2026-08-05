@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { InputGroup, type InputGroupProperties } from "./InputGroup";
 
 const Component = InputGroup;

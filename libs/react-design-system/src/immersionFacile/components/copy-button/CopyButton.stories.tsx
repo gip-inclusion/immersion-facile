@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { CopyButton, type CopyButtonProperties } from "./CopyButton";
 
 const Component = CopyButton;

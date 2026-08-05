@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { NPSForm, type NPSFormProps } from "./NPSForm";
 
 const Component = NPSForm;
@@ -31,5 +31,7 @@ export const Default: Story = {
       role: "beneficiary",
       status: "convention-status",
     },
+    mode: "embed",
+    formId: "form-id",
   },
 };

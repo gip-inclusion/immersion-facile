@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import {
   MaintenanceCallout,
   type MaintenanceCalloutProps,
@@ -30,5 +30,6 @@ export default {
 export const Default: Story = {
   args: {
     message: "insérer ici le message de maintenance",
+    level: "info",
   },
 };

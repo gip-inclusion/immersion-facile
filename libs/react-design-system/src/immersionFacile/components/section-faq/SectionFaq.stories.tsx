@@ -1,4 +1,4 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react-vite";
 import { SectionFaq, type SectionFaqProps } from "./SectionFaq";
 
 const Component = SectionFaq;
