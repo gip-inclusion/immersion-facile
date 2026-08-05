@@ -389,6 +389,13 @@ export type Signatories<T extends InternshipKind = InternshipKind> = {
   beneficiaryCurrentEmployer?: BeneficiaryCurrentEmployer;
 };
 
+export const signatoryKeys: (keyof Signatories)[] = [
+  "beneficiary",
+  "establishmentRepresentative",
+  "beneficiaryRepresentative",
+  "beneficiaryCurrentEmployer",
+];
+
 export const isSignatoryRole = (role: Role): role is SignatoryRole =>
   allSignatoryRoles.includes(role as SignatoryRole);
 
