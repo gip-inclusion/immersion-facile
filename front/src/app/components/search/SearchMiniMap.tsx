@@ -111,6 +111,83 @@ export const SearchMiniMap = ({
     mapRef.current?.setView(latLon, zoom);
   }, [markerProps, zoom, latitude, longitude]);
 
+  const mapContainerJsx = (
+    <MapContainer
+      className={cx("search-map-results__map")}
+      scrollWheelZoom={false}
+      center={kind === "single" ? markerProps.position : [latitude, longitude]}
+      zoom={zoom}
+      touchZoom={true}
+      minZoom={5}
+      ref={mapRef}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {markerProps && (
+        <Marker position={markerProps.position} icon={markerProps.icon} />
+      )}
+      {!markerProps &&
+        searchResults.map((searchResult, index) => {
+          const key = searchResult.locationId
+            ? `${searchResult.locationId}-${index}`
+            : `lbb-${index}`;
+          const appellations = searchResult.appellations;
+          const searchResultAppellationCode = appellations?.length
+            ? appellations[0].appellationCode
+            : null;
+          const appellationCode =
+            searchResultAppellationCode || searchParams.appellationCodes?.[0];
+          return (
+            <Marker
+              key={key}
+              position={[searchResult.position.lat, searchResult.position.lon]}
+              icon={getIconMarker(activeMarkerKey, isExternal, key)}
+              eventHandlers={{
+                click: () => {
+                  if (setActiveMarkerKey) {
+                    setActiveMarkerKey(key);
+                  }
+                },
+              }}
+            >
+              <Popup>
+                <SearchResult
+                  key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
+                  searchResult={searchResult}
+                  linkProps={
+                    searchResult.voluntaryToImmersion
+                      ? frontRoutes.searchResult({
+                          appellationCode: [appellationCode ?? ""],
+                          siret: searchResult.siret,
+                          ...(searchResult.locationId
+                            ? { location: searchResult.locationId }
+                            : {}),
+                        }).link
+                      : frontRoutes.searchResultExternal({
+                          siret: searchResult.siret,
+                          appellationCode: [appellationCode ?? ""],
+                        }).link
+                  }
+                />
+              </Popup>
+            </Marker>
+          );
+        })}
+    </MapContainer>
+  );
+
+  if (kind === "single")
+    return (
+      <div
+        ref={searchResultsWrapper}
+        className={cx("search-map-results", "search-map-results--inline")}
+      >
+        {mapContainerJsx}
+      </div>
+    );
+
   const mapJsx = (
     <div ref={searchResultsWrapper} key={`map-${kind}`}>
       <div
@@ -145,76 +222,7 @@ export const SearchMiniMap = ({
           >
             Fermer
           </Button>
-          <MapContainer
-            className={cx("search-map-results__map")}
-            scrollWheelZoom={false}
-            center={
-              kind === "single" ? markerProps.position : [latitude, longitude]
-            }
-            zoom={zoom}
-            touchZoom={true}
-            minZoom={5}
-            ref={mapRef}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {markerProps && (
-              <Marker position={markerProps.position} icon={markerProps.icon} />
-            )}
-            {!markerProps &&
-              searchResults.map((searchResult, index) => {
-                const key = searchResult.locationId
-                  ? `${searchResult.locationId}-${index}`
-                  : `lbb-${index}`;
-                const appellations = searchResult.appellations;
-                const searchResultAppellationCode = appellations?.length
-                  ? appellations[0].appellationCode
-                  : null;
-                const appellationCode =
-                  searchResultAppellationCode ||
-                  searchParams.appellationCodes?.[0];
-                return (
-                  <Marker
-                    key={key}
-                    position={[
-                      searchResult.position.lat,
-                      searchResult.position.lon,
-                    ]}
-                    icon={getIconMarker(activeMarkerKey, isExternal, key)}
-                    eventHandlers={{
-                      click: () => {
-                        if (setActiveMarkerKey) {
-                          setActiveMarkerKey(key);
-                        }
-                      },
-                    }}
-                  >
-                    <Popup>
-                      <SearchResult
-                        key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
-                        searchResult={searchResult}
-                        linkProps={
-                          searchResult.voluntaryToImmersion
-                            ? frontRoutes.searchResult({
-                                appellationCode: [appellationCode ?? ""],
-                                siret: searchResult.siret,
-                                ...(searchResult.locationId
-                                  ? { location: searchResult.locationId }
-                                  : {}),
-                              }).link
-                            : frontRoutes.searchResultExternal({
-                                siret: searchResult.siret,
-                                appellationCode: [appellationCode ?? ""],
-                              }).link
-                        }
-                      />
-                    </Popup>
-                  </Marker>
-                );
-              })}
-          </MapContainer>
+          {mapContainerJsx}
         </div>
       </div>
     </div>

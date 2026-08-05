@@ -13,6 +13,20 @@
     text-align: right;
   }
 
+  &--inline {
+    display: none;
+    overflow: hidden;
+
+    @include for-screen-min($bp-lg) {
+      display: block;
+    }
+
+    .search-map-results__map {
+      height: 42vh;
+      min-height: 386px;
+    }
+  }
+
   &__overlay {
     position: fixed;
     top: 0;
