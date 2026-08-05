@@ -33,8 +33,8 @@ export const ftConnectIdentitySchema: ZodSchemaWithInputMatchingOutput<FtConnect
     payload: ftConnectAdvisorPayloadSchema,
   });
 
-export const peConnectIdentityWithoutTokenSchema: ZodSchemaWithInputMatchingOutput<FtConnectIdentityWithoutToken> =
+export const ftConnectIdentityWithoutTokenSchema: ZodSchemaWithInputMatchingOutput<FtConnectIdentityWithoutToken> =
   z.object({
-    provider: z.literal("peConnect"),
+    provider: z.literal("ftConnect"),
     payload: ftConnectAdvisorPayloadSchema,
   });
