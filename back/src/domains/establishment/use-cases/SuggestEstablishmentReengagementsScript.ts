@@ -1,5 +1,5 @@
 import { subMonths } from "date-fns";
-import { castError, type SiretDto } from "shared";
+import { castError, executeInSequence, type SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -55,13 +55,9 @@ export const makeSuggestEstablishmentReengagementsScript = useCaseBuilder(
 
     const errors: Record<SiretDto, Error> = {};
 
-    await Promise.all(
-      siretsToContact.map(async (siret) => {
-        await deps.suggestEstablishmentReengagement
-          .execute(siret)
-          .catch((error) => {
-            errors[siret] = castError(error);
-          });
+    await executeInSequence(siretsToContact, (siret) =>
+      deps.suggestEstablishmentReengagement.execute(siret).catch((error) => {
+        errors[siret] = castError(error);
       }),
     );
 
