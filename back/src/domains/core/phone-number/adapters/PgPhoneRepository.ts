@@ -82,7 +82,8 @@ export class PgPhoneRepository implements PhoneRepository {
     const rows = await pipeWithValue(
       this.transaction
         .selectFrom("phone_numbers")
-        .select(["id", "phone_number", "status", "verified_at"]),
+        .select(["id", "phone_number", "status", "verified_at"])
+        .orderBy("id", "asc"),
       (b) =>
         verifiedBefore
           ? b.where((eb) =>
