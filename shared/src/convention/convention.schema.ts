@@ -733,7 +733,7 @@ export const generateMagicLinkRequestSchema: ZodSchemaWithInputMatchingOutput<Ge
     role: z.enum(allRoles, {
       error: localization.invalidEnum,
     }),
-    expired: z.boolean(), //< defaults to false
+    expired: z.boolean(),
   });
 
 export const transferConventionToAgencyRequestSchema: ZodSchemaWithInputMatchingOutput<TransferConventionToAgencyRequestDto> =
@@ -958,11 +958,9 @@ const conventionAvailableSort = [
 
 export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatchingOutput<FlatGetConventionsForAgencyUserParams> =
   z.object({
-    // pagination
     page: zToNumber.optional(),
     perPage: zToNumber.optional(),
 
-    // sort
     sortBy: z
       .enum(conventionAvailableSort, {
         error: localization.invalidEnum,
@@ -974,13 +972,11 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
       })
       .optional(),
 
-    // filters
     search: z.string().optional(),
     statuses: z.tuple([statusSchema], statusSchema).optional(),
     agencyIds: z.tuple([agencyIdSchema], agencyIdSchema).optional(),
     agencyDepartmentCodes: z.tuple([z.string()], z.string()).optional(),
 
-    // date filters
     dateStartFrom: makeDateStringSchema().optional(),
     dateStartTo: makeDateStringSchema().optional(),
     dateEndFrom: makeDateStringSchema().optional(),
@@ -988,7 +984,6 @@ export const flatGetConventionsForAgencyUserParamsSchema: ZodSchemaWithInputMatc
     dateSubmissionFrom: makeDateStringSchema().optional(),
     dateSubmissionTo: makeDateStringSchema().optional(),
 
-    // assessment filter
     assessmentCompletionStatus: z
       .tuple(
         [assessmentCompletionStatusFilterSchema],
