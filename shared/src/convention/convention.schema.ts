@@ -121,6 +121,7 @@ import {
   type RenewConventionParams,
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   type Signatories,
+  signatoryKeys,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionRequestDto,
   type UpdateConventionStatusRequestDto,
@@ -321,46 +322,46 @@ export const conventionDateStartSchema: ZodSchemaWithInputMatchingOutput<DateStr
 export const conventionDateEndSchema: ZodSchemaWithInputMatchingOutput<DateString> =
   makeDateStringSchema(localization.invalidDateEnd);
 
-export const conventionCommonSchema: ZodSchemaWithInputMatchingOutput<ConventionCommon> =
-  z
-    .object({
-      id: conventionIdSchema,
-      status: conventionStatusSchema,
-      statusJustification: zStringCanBeEmptyMax6000.optional(),
-      agencyId: agencyIdSchema,
-      updatedAt: makeDateStringSchema().optional(),
-      dateSubmission: makeDateStringSchema(),
-      dateStart: conventionDateStartSchema,
-      dateEnd: conventionDateEndSchema,
-      dateValidation: makeDateStringSchema(
-        localization.invalidValidationFormatDate,
-      ).optional(),
-      dateApproval: makeDateStringSchema(
-        localization.invalidApprovalFormatDate,
-      ).optional(),
-      siret: siretSchema,
-      businessName: businessNameSchema,
-      schedule: scheduleSchema,
-      workConditions: zStringCanBeEmptyMax6000.optional(),
-      businessAdvantages: zStringCanBeEmptyMax3000.optional(),
-      individualProtection: zBoolean,
-      individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
-      sanitaryPrevention: zBoolean,
-      sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
-      remoteWorkMode: remoteWorkModeSchema,
-      immersionAddress: addressWithPostalCodeSchema,
-      immersionObjective: immersionObjectiveSchema,
-      immersionAppellation: appellationAndRomeDtoSchema,
-      immersionActivities: zTrimmedStringWithMax(2000),
-      immersionSkills: zStringPossiblyEmptyWithMax(2000),
-      establishmentTutor: establishmentTutorSchema,
-      validators: conventionValidatorsSchema.optional(),
-      agencyReferent: withOptionalFirstnameAndLastnameSchema.optional(),
-      renewed: renewedSchema.optional(),
-      establishmentNumberEmployeesRange:
-        numberOfEmployeesRangeSchema.optional(),
-    })
-    .extend(withAcquisitionShape);
+export const conventionCommonSchema = z
+  .object({
+    id: conventionIdSchema,
+    status: conventionStatusSchema,
+    statusJustification: zStringCanBeEmptyMax6000.optional(),
+    agencyId: agencyIdSchema,
+    updatedAt: makeDateStringSchema().optional(),
+    dateSubmission: makeDateStringSchema(),
+    dateStart: conventionDateStartSchema,
+    dateEnd: conventionDateEndSchema,
+    dateValidation: makeDateStringSchema(
+      localization.invalidValidationFormatDate,
+    ).optional(),
+    dateApproval: makeDateStringSchema(
+      localization.invalidApprovalFormatDate,
+    ).optional(),
+    siret: siretSchema,
+    businessName: businessNameSchema,
+    schedule: scheduleSchema,
+    workConditions: zStringCanBeEmptyMax6000.optional(),
+    businessAdvantages: zStringCanBeEmptyMax3000.optional(),
+    individualProtection: zBoolean,
+    individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
+    sanitaryPrevention: zBoolean,
+    sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
+    remoteWorkMode: remoteWorkModeSchema,
+    immersionAddress: addressWithPostalCodeSchema,
+    immersionObjective: immersionObjectiveSchema,
+    immersionAppellation: appellationAndRomeDtoSchema,
+    immersionActivities: zTrimmedStringWithMax(2000),
+    immersionSkills: zStringPossiblyEmptyWithMax(2000),
+    establishmentTutor: establishmentTutorSchema,
+    validators: conventionValidatorsSchema.optional(),
+    agencyReferent: withOptionalFirstnameAndLastnameSchema.optional(),
+    renewed: renewedSchema.optional(),
+    establishmentNumberEmployeesRange: numberOfEmployeesRangeSchema.optional(),
+  })
+  .extend(
+    withAcquisitionShape,
+  ) satisfies ZodSchemaWithInputMatchingOutput<ConventionCommon>;
 
 export const internshipKindSchema: ZodSchemaWithInputMatchingOutput<InternshipKind> =
   z.enum(internshipKinds, {
@@ -385,21 +386,17 @@ const cciSignatoriesSchema: ZodSchemaWithInputMatchingOutput<
   beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
 });
 
-export const immersionConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"immersion">
-> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
+export const immersionConventionSchema = conventionCommonSchema.extend({
   internshipKind: z.literal("immersion"),
   signatories: immersionSignatoriesSchema,
-}) as unknown as ZodSchemaWithInputMatchingOutput<
+}) satisfies ZodSchemaWithInputMatchingOutput<
   ConventionCommon & ConventionInternshipKindSpecific<"immersion">
 >;
 
-export const miniStageConventionSchema: ZodSchemaWithInputMatchingOutput<
-  ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
-> = (conventionCommonSchema as unknown as z.ZodObject<any>).extend({
+export const miniStageConventionSchema = conventionCommonSchema.extend({
   internshipKind: z.literal("mini-stage-cci"),
   signatories: cciSignatoriesSchema,
-}) as unknown as ZodSchemaWithInputMatchingOutput<
+}) satisfies ZodSchemaWithInputMatchingOutput<
   ConventionCommon & ConventionInternshipKindSpecific<"mini-stage-cci">
 >;
 
@@ -417,165 +414,161 @@ export const conventionInternshipKindSpecificSchema: ZodSchemaWithInputMatchingO
   }),
 ]);
 
-export const conventionSchema: ZodSchemaWithInputMatchingOutput<ConventionDto> =
-  (
-    z.discriminatedUnion("internshipKind", [
-      immersionConventionSchema as unknown as z.ZodObject<any>,
-      miniStageConventionSchema as unknown as z.ZodObject<any>,
-    ]) as unknown as ZodSchemaWithInputMatchingOutput<ConventionDto>
-  )
-    .check((ctx) => {
-      if (
-        !startDateIsBeforeEndDate({
+export const conventionSchema = z
+  .discriminatedUnion("internshipKind", [
+    immersionConventionSchema,
+    miniStageConventionSchema,
+  ])
+  .check((ctx) => {
+    if (
+      !startDateIsBeforeEndDate({
+        dateStart: ctx.value.dateStart,
+        dateEnd: ctx.value.dateEnd,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
           dateStart: ctx.value.dateStart,
           dateEnd: ctx.value.dateEnd,
-        })
-      ) {
-        ctx.issues.push({
-          input: {
-            dateStart: ctx.value.dateStart,
-            dateEnd: ctx.value.dateEnd,
-          },
-          code: "custom",
-          message: localization.invalidDateStartDateEnd,
-          path: [getConventionFieldName("dateEnd")],
-          continue: true,
-        });
-      }
-    })
-    .check((ctx) => {
-      if (
-        !underMaxCalendarDuration({
+        },
+        code: "custom",
+        message: localization.invalidDateStartDateEnd,
+        path: [getConventionFieldName("dateEnd")],
+        continue: true,
+      });
+    }
+  })
+  .check((ctx) => {
+    if (
+      !underMaxCalendarDuration({
+        dateStart: ctx.value.dateStart,
+        dateEnd: ctx.value.dateEnd,
+        internshipKind: ctx.value.internshipKind,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
           dateStart: ctx.value.dateStart,
           dateEnd: ctx.value.dateEnd,
+        },
+        code: "custom",
+        ...getConventionTooLongMessageAndPath({
           internshipKind: ctx.value.internshipKind,
-        })
-      ) {
-        ctx.issues.push({
-          input: {
-            dateStart: ctx.value.dateStart,
-            dateEnd: ctx.value.dateEnd,
-          },
-          code: "custom",
-          ...getConventionTooLongMessageAndPath({
-            internshipKind: ctx.value.internshipKind,
-          }),
-          continue: true,
-        });
-      }
-    })
-    .check((ctx) => {
-      if (
-        !underMaxPresenceDays({
+        }),
+        continue: true,
+      });
+    }
+  })
+  .check((ctx) => {
+    if (
+      !underMaxPresenceDays({
+        schedule: ctx.value.schedule,
+        internshipKind: ctx.value.internshipKind,
+        dateSubmission: ctx.value.dateSubmission,
+      })
+    ) {
+      ctx.issues.push({
+        input: {
           schedule: ctx.value.schedule,
           internshipKind: ctx.value.internshipKind,
           dateSubmission: ctx.value.dateSubmission,
-        })
-      ) {
-        ctx.issues.push({
-          input: {
-            schedule: ctx.value.schedule,
-            internshipKind: ctx.value.internshipKind,
-            dateSubmission: ctx.value.dateSubmission,
-          },
-          code: "custom",
-          ...getOverMaxWorkedDaysMessageAndPath({
-            internshipKind: ctx.value.internshipKind,
-            schedule: ctx.value.schedule,
-            dateSubmission: ctx.value.dateSubmission,
-          }),
-          continue: true,
-        });
-      }
-    })
-    .check((ctx) => {
-      if (
-        !minorBeneficiaryHasRepresentative({
-          dateStart: ctx.value.dateStart,
-          signatories: ctx.value.signatories,
+        },
+        code: "custom",
+        ...getOverMaxWorkedDaysMessageAndPath({
+          internshipKind: ctx.value.internshipKind,
+          schedule: ctx.value.schedule,
           dateSubmission: ctx.value.dateSubmission,
-        })
-      ) {
-        const beneficiaryAgeAtConventionStart = getExactAge({
-          birthDate: new Date(ctx.value.signatories.beneficiary.birthdate),
-          referenceDate: new Date(ctx.value.dateStart),
-        });
-        ctx.issues.push({
-          input: {
-            dateStart: ctx.value.dateStart,
-            dateSubmission: ctx.value.dateSubmission,
-          },
-          code: "custom",
-          message: `Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait ${beneficiaryAgeAtConventionStart} ans au démarrage de la convention.`,
-          path: [
-            getConventionFieldName("signatories.beneficiaryRepresentative"),
-          ],
-          continue: true,
-        });
-      }
-    })
-    .superRefine((convention, issueMaker) => {
-      const addIssue = (message: string, path: string) => {
-        issueMaker.addIssue({
-          code: z.ZodIssueCode.custom,
-          message,
-          path: [path],
-        });
-      };
-      const beneficiaryAgeAtConventionStart = differenceInYears(
-        new Date(convention.dateStart),
-        new Date(convention.signatories.beneficiary.birthdate),
-      );
-
-      addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
-      addIssuesIfDuplicateSignatoriesPhoneNumbers(convention, addIssue);
-      addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
-
-      if (convention.internshipKind === "mini-stage-cci") {
-        addIssueIfLimitedScheduleHoursExceeded(
-          convention,
-          addIssue,
-          beneficiaryAgeAtConventionStart,
-        );
-        addIssueIfSundayIsInSchedule(
-          addIssue,
-          convention.id,
-          convention.schedule.complexSchedule,
-          convention.dateEnd,
-        );
-      }
-
-      addIssueIfAgeLessThanMinimumAge(
-        addIssue,
-        beneficiaryAgeAtConventionStart,
-        ageRequirementByInternshipKind[convention.internshipKind],
-      );
-
-      addIssueIfAgeMoreThanMaximumAge(
-        addIssue,
-        beneficiaryAgeAtConventionStart,
-        convention.dateSubmission,
-        BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
-      );
-
-      const message = validateSchedule({
-        dateEnd: convention.dateEnd,
-        dateStart: convention.dateStart,
-        id: convention.id,
-        schedule: convention.schedule,
+        }),
+        continue: true,
       });
-      if (message) {
-        addIssue(message, "schedule");
-      }
-    })
-    .refine(mustBeSignedByEveryone, {
-      message: localization.mustBeSignedByEveryone,
-      path: [getConventionFieldName("status")],
-    })
-    .refine(validateBeneficiaryAddressAndParse, {
-      message: localization.invalidBeneficiaryAddress,
-      path: [getConventionFieldName("signatories.beneficiary.address")],
+    }
+  })
+  .check((ctx) => {
+    if (
+      !minorBeneficiaryHasRepresentative({
+        dateStart: ctx.value.dateStart,
+        signatories: ctx.value.signatories,
+        dateSubmission: ctx.value.dateSubmission,
+      })
+    ) {
+      const beneficiaryAgeAtConventionStart = getExactAge({
+        birthDate: new Date(ctx.value.signatories.beneficiary.birthdate),
+        referenceDate: new Date(ctx.value.dateStart),
+      });
+      ctx.issues.push({
+        input: {
+          dateStart: ctx.value.dateStart,
+          dateSubmission: ctx.value.dateSubmission,
+        },
+        code: "custom",
+        message: `Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait ${beneficiaryAgeAtConventionStart} ans au démarrage de la convention.`,
+        path: [getConventionFieldName("signatories.beneficiaryRepresentative")],
+        continue: true,
+      });
+    }
+  })
+  .superRefine((convention, issueMaker) => {
+    const addIssue = (message: string, path: string) => {
+      issueMaker.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [path],
+      });
+    };
+    const beneficiaryAgeAtConventionStart = differenceInYears(
+      new Date(convention.dateStart),
+      new Date(convention.signatories.beneficiary.birthdate),
+    );
+
+    addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
+    addIssuesIfDuplicateSignatoriesPhoneNumbers(convention, addIssue);
+    addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
+
+    if (convention.internshipKind === "mini-stage-cci") {
+      addIssueIfLimitedScheduleHoursExceeded(
+        convention,
+        addIssue,
+        beneficiaryAgeAtConventionStart,
+      );
+      addIssueIfSundayIsInSchedule(
+        addIssue,
+        convention.id,
+        convention.schedule.complexSchedule,
+        convention.dateEnd,
+      );
+    }
+
+    addIssueIfAgeLessThanMinimumAge(
+      addIssue,
+      beneficiaryAgeAtConventionStart,
+      ageRequirementByInternshipKind[convention.internshipKind],
+    );
+
+    addIssueIfAgeMoreThanMaximumAge(
+      addIssue,
+      beneficiaryAgeAtConventionStart,
+      convention.dateSubmission,
+      BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
+    );
+
+    const message = validateSchedule({
+      dateEnd: convention.dateEnd,
+      dateStart: convention.dateStart,
+      id: convention.id,
+      schedule: convention.schedule,
     });
+    if (message) {
+      addIssue(message, "schedule");
+    }
+  })
+  .refine(mustBeSignedByEveryone, {
+    message: localization.mustBeSignedByEveryone,
+    path: [getConventionFieldName("status")],
+  })
+  .refine(validateBeneficiaryAddressAndParse, {
+    message: localization.invalidBeneficiaryAddress,
+    path: [getConventionFieldName("signatories.beneficiary.address")],
+  }) satisfies ZodSchemaWithInputMatchingOutput<ConventionDto>;
 
 export const conventionAssessmentFieldsSchema: ZodSchemaWithInputMatchingOutput<
   ConventionAssessmentFields["assessment"]
@@ -756,13 +749,6 @@ const isConventionBeforeDistinctSignatoriesPhoneNumbersReleaseDate = (
 ) =>
   new Date(conventionSubimissionDate).getTime() <=
   SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE.getTime();
-
-const signatoryKeys: (keyof Signatories)[] = [
-  "beneficiary",
-  "establishmentRepresentative",
-  "beneficiaryRepresentative",
-  "beneficiaryCurrentEmployer",
-];
 
 const getSignatoriesEntries = (convention: ConventionDto) =>
   signatoryKeys.flatMap((key) => {
