@@ -382,14 +382,13 @@ export const SearchFiltersPanel = ({
         }
         id={domElementIds[routeName].filterConditionsSection}
       >
-        <p className={fr.cx("fr-mb-2w")}>
-          Afficher uniquement les entreprises&nbsp;:
-        </p>
         <Checkbox
           className={fr.cx("fr-mb-2w")}
           options={[
             {
               label: rqthLabel,
+              hintText:
+                "Entreprises ayant indiqué être ouvertes à l'accueil de ces profils lors de l'inscription",
               nativeInputProps: {
                 checked:
                   formValues.fitForDisabledWorkers?.some(
@@ -414,6 +413,8 @@ export const SearchFiltersPanel = ({
           options={[
             {
               label: "Mises en relation disponibles",
+              hintText:
+                "Entreprises n'ayant pas atteint leur limite de mise en relation",
               nativeInputProps: {
                 checked: formValues.showOnlyAvailableOffers,
                 onChange: (event) => {
