@@ -209,8 +209,10 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       .filter((result) => result.numberOfUsersToReview > 0);
   }
 
-  public async getImmersionFacileAgencyId(): Promise<AgencyId> {
-    return "immersion-facile-agency";
+  public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .find((agency) => agency.kind === "immersion-facile")?.id;
   }
 
   public async getUserIdWithAgencyRightsByFilters(
@@ -219,7 +221,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     if (!isWithAgencyRole(filters)) {
       const agency = this.#agencies[filters.agencyId];
       if (!agency) throw errors.agency.notFound(filters);
-      return keys(agency.usersRights);
+      return keys(agency.usersRights).sort();
     }
 
     return uniq(
@@ -229,7 +231,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
           const userIds = toPairs(agency.usersRights)
             .filter(([_, right]) => right?.roles.includes(filters.agencyRole))
             .map(([userId]) => userId);
-          return [...acc, ...userIds];
+          return [...acc, ...userIds].sort();
         }, []),
     );
   }

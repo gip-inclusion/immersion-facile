@@ -427,7 +427,7 @@ export class PgAgencyRepository implements AgencyRepository {
           ? b.where("agency_id", "=", filters.agencyId)
           : b.where("roles", "@>", `["${filters.agencyRole}"]`),
     )
-      .orderBy("user_id asc")
+      .orderBy("user_id", "asc")
       .execute();
     return results.map((result) => result.user_id);
   }
