@@ -39,7 +39,6 @@ import {
 } from "src/app/pages/search/SearchPage.utils";
 
 type SearchFilterPanelProps = {
-  initialValues: SearchPageParams;
   appellationInputLabel: ReactNode;
   useNaturalLanguageForAppellations?: boolean;
   routeName: SearchRoute["name"];
@@ -50,7 +49,6 @@ type SearchFilterPanelProps = {
 };
 
 export const SearchFiltersPanel = ({
-  initialValues,
   appellationInputLabel,
   useNaturalLanguageForAppellations,
   routeName,
@@ -269,30 +267,16 @@ export const SearchFiltersPanel = ({
                 locator: "search-form-place",
               }),
             );
-            const updatedInitialValues: SearchPageParams =
-              formValues.sortBy === "distance"
-                ? {
-                    ...formValues,
-                    place: initialValues.place,
-                    latitude: 0,
-                    longitude: 0,
-                    distanceKm: 0,
-                  }
-                : {
-                    ...formValues,
-                    place: initialValues.place,
-                    latitude: initialValues.latitude,
-                    longitude: initialValues.longitude,
-                    distanceKm: undefined,
-                  };
-            onSearchFormSubmit(updatedInitialValues);
 
-            if (formValues.sortBy === "distance") {
-              onSearchFormSubmit({
-                ...formValues,
-                sortBy: "date",
-              });
-            }
+            onSearchFormSubmit({
+              ...formValues,
+              place: undefined,
+              latitude: undefined,
+              longitude: undefined,
+              distanceKm: undefined,
+              sortBy:
+                formValues.sortBy === "distance" ? "score" : formValues.sortBy,
+            });
           }}
           className={fr.cx("fr-mt-2w")}
           initialInputValue={place}

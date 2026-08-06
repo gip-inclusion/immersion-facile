@@ -129,7 +129,6 @@ export const SearchListResults = ({
       >
         <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
           <SearchFiltersPanel
-            initialValues={searchParams}
             appellationInputLabel={appellationInputLabel(
               useNaturalLanguageForAppellations,
             )}
