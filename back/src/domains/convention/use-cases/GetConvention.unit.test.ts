@@ -4,6 +4,7 @@ import {
   type ApiConsumer,
   type ApiConsumerRights,
   AssessmentDtoBuilder,
+  type BanEstablishmentPayload,
   ConnectedUserBuilder,
   type ConventionDomainJwtPayload,
   ConventionDtoBuilder,
@@ -14,6 +15,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   makeEmptyLastReminders,
+  type Notification,
   type Role,
   type User,
 } from "shared";
@@ -430,10 +432,220 @@ describe("Get Convention", () => {
           errors.user.notFound({ userId: johnDoe.id }),
         );
       });
+
+      it("When the agency does not exist", async () => {
+        uow.agencyRepository.agencies = [];
+
+        await expectPromiseToFailWithError(
+          getConvention.execute(
+            { conventionId: convention.id },
+            { userId: establishmentRep.id },
+          ),
+          errors.agency.notFound({ agencyId: agency.id }),
+        );
+      });
     });
   });
 
   describe("Right paths", () => {
+    describe("ConventionReadDto enrichment", () => {
+      const expectedAssessment = {
+        status: assessment.status,
+        endedWithAJob: assessment.endedWithAJob,
+        signedAt: assessment.signedAt,
+        createdAt: assessment.createdAt,
+      };
+
+      it("includes agencyRefersTo when agency refers to another agency", async () => {
+        const referringAgency = new AgencyDtoBuilder()
+          .withId("33333333-3333-4333-8333-333333333333")
+          .withName("Agence référente")
+          .withAgencySiret("55552222000055")
+          .withAgencyContactEmail(validator.email)
+          .build();
+
+        const agencyWithRefersTo = new AgencyDtoBuilder(agency)
+          .withRefersToAgencyInfo({
+            refersToAgencyId: referringAgency.id,
+            refersToAgencyName: referringAgency.name,
+            refersToAgencyContactEmail: referringAgency.contactEmail,
+          })
+          .build();
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agencyWithRefersTo),
+          toAgencyWithRights(referringAgency),
+        ];
+
+        expectToEqual(
+          await getConvention.execute(
+            { conventionId: convention.id },
+            { userId: establishmentRep.id },
+          ),
+          {
+            ...convention,
+            agencyName: agencyWithRefersTo.name,
+            agencyDepartment: agencyWithRefersTo.address.departmentCode,
+            agencyKind: agencyWithRefersTo.kind,
+            agencyContactEmail: agencyWithRefersTo.contactEmail,
+            agencySiret: agencyWithRefersTo.agencySiret,
+            agencyValidationSteps: "validator-only",
+            agencyRefersTo: {
+              id: referringAgency.id,
+              name: referringAgency.name,
+              contactEmail: referringAgency.contactEmail,
+              kind: referringAgency.kind,
+              siret: referringAgency.agencySiret,
+            },
+            assessment: expectedAssessment,
+            lastReminders: makeEmptyLastReminders(),
+            isEstablishmentBanned: false,
+          },
+        );
+      });
+
+      it("includes banned establishment information when siret is banned", async () => {
+        const banEstablishmentPayload: BanEstablishmentPayload = {
+          siret: convention.siret,
+          establishmentBannishmentJustification: "Entreprise bannie pour tests",
+        };
+        uow.bannedEstablishmentRepository.bannedEstablishments = [
+          banEstablishmentPayload,
+        ];
+
+        expectToEqual(
+          await getConvention.execute(
+            { conventionId: convention.id },
+            { userId: establishmentRep.id },
+          ),
+          {
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencyContactEmail: agency.contactEmail,
+            agencySiret: agency.agencySiret,
+            agencyValidationSteps: "validator-only",
+            assessment: expectedAssessment,
+            lastReminders: makeEmptyLastReminders(),
+            isEstablishmentBanned: true,
+            establishmentBannishmentJustification:
+              banEstablishmentPayload.establishmentBannishmentJustification,
+          },
+        );
+      });
+
+      it("includes lastReminders when reminder notifications exist", async () => {
+        const signatureEmailAt = "2025-01-02T10:00:00.000Z";
+        const assessmentCompletionEmailAt = "2025-01-04T09:00:00.000Z";
+        const assessmentSignatureSmsAt = "2025-01-05T10:00:00.000Z";
+        const followedIds = {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        };
+
+        const signatureEmailReminder: Notification = {
+          id: "signature-email",
+          createdAt: signatureEmailAt,
+          kind: "email",
+          followedIds,
+          templatedContent: {
+            kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+            recipients: [convention.signatories.beneficiary.email],
+            params: {
+              agencyLogoUrl: undefined,
+              beneficiaryName: "Beneficiary",
+              businessName: convention.businessName,
+              conventionId: convention.id,
+              establishmentRepresentativeName: "Establishment Rep",
+              establishmentTutorName: "Tutor",
+              internshipKind: convention.internshipKind,
+              conventionSignShortlink: "https://short.link",
+              signatoryName: "Signatory",
+            },
+          },
+        };
+
+        const assessmentCompletionEmailReminder: Notification = {
+          id: "assessment-completion-email",
+          createdAt: assessmentCompletionEmailAt,
+          kind: "email",
+          followedIds,
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+            recipients: [convention.establishmentTutor.email],
+            params: {
+              agencyLogoUrl: undefined,
+              assessmentCreationLink: "https://short.link",
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              conventionId: convention.id,
+              establishmentTutorName: "Tutor",
+              internshipKind: convention.internshipKind,
+            },
+          },
+        };
+
+        const assessmentSignatureSmsReminder: Notification = {
+          id: "assessment-signature-sms",
+          createdAt: assessmentSignatureSmsAt,
+          kind: "sms",
+          followedIds,
+          templatedContent: {
+            kind: "ReminderForAssessmentSignature",
+            recipientPhone: convention.signatories.beneficiary.phone,
+            params: { shortLink: "https://short.link" },
+          },
+        };
+
+        uow.notificationRepository.notifications = [
+          signatureEmailReminder,
+          assessmentCompletionEmailReminder,
+          assessmentSignatureSmsReminder,
+        ];
+
+        const emptyLastReminders = makeEmptyLastReminders();
+
+        expectToEqual(
+          await getConvention.execute(
+            { conventionId: convention.id },
+            { userId: establishmentRep.id },
+          ),
+          {
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencyContactEmail: agency.contactEmail,
+            agencySiret: agency.agencySiret,
+            agencyValidationSteps: "validator-only",
+            assessment: expectedAssessment,
+            lastReminders: {
+              ...emptyLastReminders,
+              conventionSignatures: {
+                ...emptyLastReminders.conventionSignatures,
+                beneficiary: {
+                  email: signatureEmailAt,
+                  sms: null,
+                },
+              },
+              assessmentCompletion: {
+                email: assessmentCompletionEmailAt,
+                sms: null,
+              },
+              assessmentSignature: {
+                email: null,
+                sms: assessmentSignatureSmsAt,
+              },
+            },
+            isEstablishmentBanned: false,
+          },
+        );
+      });
+    });
+
     describe("with connected user", () => {
       it("that have agency rights", async () => {
         uow.agencyRepository.agencies = [
