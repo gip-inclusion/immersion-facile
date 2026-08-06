@@ -1,4 +1,3 @@
-import { keys } from "ramda";
 import {
   AgencyDtoBuilder,
   type AuthRoutes,
@@ -19,6 +18,7 @@ import {
   expectToEqual,
   FTConnectError,
   frontRoutes,
+  getFrontRouteUriWithoutQueryParams,
   ManagedFTConnectError,
   makeRouteAbsoluteUrl,
   noAgencyDashboards,
@@ -118,7 +118,7 @@ describe("auth router", () => {
 
     describe("Right path with Proconnect", () => {
       describe("handle all allowed user connection pages", () => {
-        it.each(keys(allowedLoginSources))(`${displayRouteName(
+        it.each(allowedLoginSources)(`${displayRouteName(
           authRoutes.initiateLoginByOAuth,
         )} 302 > [ProConnect]/login - 302 > ${displayRouteName(
           authRoutes.afterEmailOrProConnectOAuthLogin,
@@ -127,7 +127,9 @@ describe("auth router", () => {
           const uuids = [nonce, state, generatedUserId];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-          const redirectUri = allowedLoginSources[source]().href;
+          const redirectUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
 
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByOAuth({
@@ -178,7 +180,7 @@ describe("auth router", () => {
           if (response.status !== 302)
             throw errors.generic.testError("Response must be 302");
           const locationHeader = response.headers.location as string;
-          const locationPrefix = `${appConfig.immersionFacileBaseUrl}${allowedLoginSources[source]({ token: "" }).href}`;
+          const locationPrefix = `${appConfig.immersionFacileBaseUrl}${redirectUri}`;
 
           expect(locationHeader).toContain(locationPrefix);
           const { params } = decodeURIWithParams(locationHeader);
@@ -301,7 +303,7 @@ describe("auth router", () => {
 
     describe("Right path with email", () => {
       describe("handle all allowed user connection pages", () => {
-        it.each(keys(allowedLoginSources))(`${displayRouteName(
+        it.each(allowedLoginSources)(`${displayRouteName(
           authRoutes.initiateLoginByEmail,
         )} 200 | EMAIL with connexion link > ${displayRouteName(
           authRoutes.afterEmailOrProConnectOAuthLogin,
@@ -317,7 +319,9 @@ describe("auth router", () => {
           ];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-          const redirectUri = frontRoutes[source]().href;
+          const redirectUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
 
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByEmail({

@@ -1,5 +1,4 @@
 import {
-  allowedLoginSources,
   BadRequestError,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -39,7 +38,7 @@ describe("InitiateLoginByEmail usecase", () => {
   let uuidGenerator: TestUuidGenerator;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
-  const redirectUri = allowedLoginSources.establishmentDashboardDiscussions({
+  const redirectUri = frontRoutes.establishmentDashboardDiscussions({
     discussionId: "any-discussion-id",
   }).href;
 

@@ -237,7 +237,7 @@ export const {
   ),
   agencyDashboardAgencies: agencyDashboardAgencies,
   agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
-    { agencyId: param.path.optional.string },
+    { agencyId: param.path.string },
     ({ agencyId }) => `/${agencyId}`,
   ),
   beneficiaryDashboard,
@@ -323,9 +323,7 @@ export const {
   conventionTemplate: defineRoute(
     {
       ...connectedUserParams,
-      fromRoute: param.query.optional.ofType(
-        conventionTemplateFromRouteSerializer,
-      ),
+      fromRoute: param.query.ofType(conventionTemplateFromRouteSerializer),
       conventionTemplateId: param.query.optional.string,
     },
     () => "/modele-convention",
@@ -431,7 +429,7 @@ export const {
     () => "/pilotage-convention",
   ),
   manageConventionConnectedUser: defineRoute(
-    { ...connectedUserParams, conventionId: param.query.optional.string },
+    { ...connectedUserParams, conventionId: param.query.string },
     () => "/pilotage-convention-inclusion-connect",
   ),
   openApiDoc: defineRoute(

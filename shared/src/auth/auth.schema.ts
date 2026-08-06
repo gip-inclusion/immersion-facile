@@ -1,25 +1,35 @@
-import { keys } from "ramda";
+import { takeWhile } from "ramda";
 import { z } from "zod";
-import {
-  type AllowedFtRedirectRoute,
-  type AllowedLoginSource,
-  type FederatedIdentityProvider,
-  frontRoutes,
-  type LogoutQueryParams,
-  type OAuthProviderForLogin,
-} from "..";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { emailSchema } from "../email/email.schema";
+import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
+import { frontRoutes } from "../routes/routes";
 import type { ZodSchemaWithInputMatchingOutput } from "../zodUtils";
 import {
   type AfterOAuthSuccessRedirectionResponse,
+  type AllowedFtRedirectRoute,
+  type AllowedLoginSource,
   allowedLoginSources,
   type InitiateLoginByEmailParams,
   type InitiateLoginByOAuthParams,
+  type LogoutQueryParams,
+  type OAuthProviderForLogin,
   type OAuthSuccessLoginParams,
   oAuthProvidersForLogin,
   type WithRedirectUri,
 } from "./auth.dto";
+
+export const getFrontRouteUriWithoutQueryParams = (
+  route: (typeof frontRoutes)[AllowedLoginSource | AllowedFtRedirectRoute],
+): string => {
+  const [pathDef] = route["~internal"].pathDefs;
+
+  const segments = takeWhile((segment) => !segment.namedParamDef, pathDef)
+    .map((segment) => segment.leading)
+    .filter(Boolean);
+
+  return `/${segments.join("/")}`;
+};
 
 const isAllowedRedirectPath = (
   redirectPath: string,
@@ -35,12 +45,7 @@ const isAllowedRedirectPath = (
   const cleanPath = decodeURIComponent(pathname);
 
   return allowedPaths.some((path) => {
-    const [allowedPath] = {
-      ...allowedLoginSources,
-      conventionImmersion: frontRoutes.conventionImmersion,
-    }
-      [path]()
-      .href.split("?", 1);
+    const allowedPath = getFrontRouteUriWithoutQueryParams(frontRoutes[path]);
 
     return cleanPath === allowedPath || cleanPath.startsWith(`${allowedPath}/`);
   });
@@ -50,7 +55,7 @@ export const withRedirectUriSchema: ZodSchemaWithInputMatchingOutput<WithRedirec
   z.object({
     redirectUri: z
       .string()
-      .refine((uri) => isAllowedRedirectPath(uri, keys(allowedLoginSources)), {
+      .refine((uri) => isAllowedRedirectPath(uri, [...allowedLoginSources]), {
         message: "redirectUri is not allowed",
       }),
   });
@@ -62,7 +67,7 @@ export const initiateLoginByOAuthParamsSchema: ZodSchemaWithInputMatchingOutput<
       .refine(
         (uri) =>
           isAllowedRedirectPath(uri, [
-            ...keys(allowedLoginSources),
+            ...allowedLoginSources,
             "conventionImmersion",
           ]),
         {

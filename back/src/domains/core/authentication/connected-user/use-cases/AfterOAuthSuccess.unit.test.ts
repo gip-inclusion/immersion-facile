@@ -1,5 +1,4 @@
 import { subDays } from "date-fns";
-import { keys } from "ramda";
 import {
   AgencyDtoBuilder,
   allowedLoginSources,
@@ -9,9 +8,11 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  getFrontRouteUriWithoutQueryParams,
   type IdToken,
   makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
+  queryParamsAsString,
   type SiretDto,
   type UserWithAdminRights,
 } from "shared";
@@ -387,11 +388,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
       describe("handle dynamic login pages", () => {
         it.each(
-          keys(allowedLoginSources),
+          allowedLoginSources,
         )("generates an app token and returns a redirection url which includes token and user data for %s", async (source) => {
-          const allowedRoute = allowedLoginSources[source];
+          const fromUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
           const { initialOngoingOAuth, idToken, userId } =
-            makeSuccessfulAuthenticationConditions(allowedRoute({}).href);
+            makeSuccessfulAuthenticationConditions(fromUri);
 
           const response = await afterOAuthSuccessRedirection.execute({
             code: "my-code",
@@ -400,7 +403,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
           expectToEqual(response, {
             provider: "proConnect",
-            redirectUri: `http://fake-connected-user${allowedRoute({ token: `jwt-${userId}`, idToken, provider: "proConnect" }).href}`,
+            redirectUri: `http://fake-connected-user${fromUri}?${queryParamsAsString(
+              {
+                token: `jwt-${userId}`,
+                idToken,
+                provider: "proConnect",
+              },
+            )}`,
           });
         });
       });
@@ -875,14 +884,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
     describe("handle dynamic login pages", () => {
       it.each(
-        keys(allowedLoginSources),
+        allowedLoginSources,
       )("generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth", async (source) => {
         const email = "my-email@mail.com";
-
-        const allowedRoute = allowedLoginSources[source];
+        const fromUri = getFrontRouteUriWithoutQueryParams(frontRoutes[source]);
 
         const initialOngoingOAuth: OngoingOAuth = {
-          fromUri: allowedRoute().href,
+          fromUri,
           provider: "email",
           state: "my-state",
           nonce: "nounce", // matches the one in the payload of the token
@@ -922,7 +930,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         expectToEqual(redirectedUrl, {
           provider: "email",
-          redirectUri: `http://fake-connected-user${allowedRoute({ token: "jwt-new-user-id", idToken: "", provider: "email" }).href}`,
+          redirectUri: `http://fake-connected-user${fromUri}?${queryParamsAsString(
+            {
+              token: "jwt-new-user-id",
+              idToken: "",
+              provider: "email",
+            },
+          )}`,
         });
       });
     });
