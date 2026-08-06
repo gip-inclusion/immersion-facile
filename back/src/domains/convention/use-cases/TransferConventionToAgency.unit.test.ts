@@ -429,10 +429,6 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(convention.id),
-          expectedConvention,
-        );
         expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
         ]);
@@ -491,10 +487,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(initialConvention.id),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
 
         expectArraysToMatch(uow.outboxRepository.events, [
           {
@@ -548,12 +543,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(
-            conventionWithAgencyRefersTo.id,
-          ),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionTransferredToAgency",
@@ -610,12 +602,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(
-            conventionWithAgencyRefersTo.id,
-          ),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
         expectArraysToMatch(uow.outboxRepository.events, [
           {
             topic: "ConventionTransferredToAgency",
@@ -697,10 +686,9 @@ describe("TransferConventionToAgency", () => {
             agencyId: otherAgency.id,
           };
 
-          expectToEqual(
-            await uow.conventionRepository.getById(convention.id),
+          expectToEqual(uow.conventionRepository.conventions, [
             expectedConvention,
-          );
+          ]);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -760,10 +748,9 @@ describe("TransferConventionToAgency", () => {
             agencyId: otherAgency.id,
           };
 
-          expectToEqual(
-            await uow.conventionRepository.getById(convention.id),
+          expectToEqual(uow.conventionRepository.conventions, [
             expectedConvention,
-          );
+          ]);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -840,10 +827,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(convention.id),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
 
         expectArraysToMatch(uow.outboxRepository.events, [
           {
@@ -900,10 +886,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(initialConvention.id),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
 
         expectArraysToMatch(uow.outboxRepository.events, [
           {
@@ -961,12 +946,9 @@ describe("TransferConventionToAgency", () => {
           agencyId: otherAgency.id,
         };
 
-        expectToEqual(
-          await uow.conventionRepository.getById(
-            conventionWithAgencyRefersTo.id,
-          ),
+        expectToEqual(uow.conventionRepository.conventions, [
           expectedConvention,
-        );
+        ]);
 
         expectArraysToMatch(uow.outboxRepository.events, [
           {
@@ -1056,10 +1038,9 @@ describe("TransferConventionToAgency", () => {
             agencyId: otherAgency.id,
           };
 
-          expectToEqual(
-            await uow.conventionRepository.getById(convention.id),
+          expectToEqual(uow.conventionRepository.conventions, [
             expectedConvention,
-          );
+          ]);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,
@@ -1127,10 +1108,9 @@ describe("TransferConventionToAgency", () => {
             agencyId: otherAgency.id,
           };
 
-          expectToEqual(
-            await uow.conventionRepository.getById(convention.id),
+          expectToEqual(uow.conventionRepository.conventions, [
             expectedConvention,
-          );
+          ]);
           expectToEqual(
             await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
               conventionId,

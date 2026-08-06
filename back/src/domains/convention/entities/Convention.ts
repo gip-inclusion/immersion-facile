@@ -27,7 +27,10 @@ import {
   statusTransitionConfigs,
   type UserWithRights,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import {
+  agencyDtoToConventionAgencyFields,
+  agencyWithRightToAgencyDto,
+} from "../../../utils/agency";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic } from "../../core/events/events";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -354,6 +357,18 @@ export const signConvention = async ({
   if (!isAllowedToSign(role))
     throw errors.convention.roleNotAllowedToSign({ role });
 
+  const agencyWithRights = await uow.agencyRepository.getById(
+    convention.agencyId,
+  );
+  if (!agencyWithRights)
+    throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+  const { agencyValidationSteps } = agencyDtoToConventionAgencyFields(
+    agency,
+    null,
+  );
+
   const signedConvention = conventionSchema.parse(
     signConventionDtoWithRole(convention, role, now),
   );
@@ -361,7 +376,7 @@ export const signConvention = async ({
     roles: [role],
     targetStatus: signedConvention.status,
     convention,
-    agencyValidationSteps: "validator-only",
+    agencyValidationSteps,
     hasAssessment: false,
   });
   const signedId = await uow.conventionRepository.update(signedConvention);
