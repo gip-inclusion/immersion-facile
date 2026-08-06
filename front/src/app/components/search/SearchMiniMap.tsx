@@ -1,6 +1,9 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   MapContainer,
   Marker,
@@ -8,16 +11,19 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import { domElementIds, frontRoutes } from "shared";
+import {
+  domElementIds,
+  frontRoutes,
+  type GeoPositionDto,
+  type OfferDto,
+} from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import type { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchMiniMap.scss";
-import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
-import { createPortal } from "react-dom";
+import { keys } from "ramda";
 
 type SearchMiniMapListProps = {
   kind: "list";
@@ -75,7 +81,15 @@ const getDefaultZoomLevel = (
   if (kind === "single") {
     return 17;
   }
-  return distanceKm ? distanceToZoomOptions[distanceKm] : 10;
+  return distanceKm
+    ? distanceToZoomOptions[
+        keys(distanceToZoomOptions).reduce((closest, current) => {
+          const currentDiff = Math.abs(current - distanceKm);
+          const closestDiff = Math.abs(closest - distanceKm);
+          return currentDiff < closestDiff ? current : closest;
+        })
+      ]
+    : 10;
 };
 
 export const SearchMiniMap = ({
@@ -91,31 +105,53 @@ export const SearchMiniMap = ({
   const mapRef = useRef<L.Map | null>(null);
   const { cx } = useStyles();
   const [isMapOpened, setIsMapOpened] = useState(false);
-
-  const { latitude, longitude } = {
-    latitude: searchParams.latitude ?? 48.8589384,
-    longitude: searchParams.longitude ?? 2.2646348,
-  };
-
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
 
   const zoom = useMemo(
-    () => getDefaultZoomLevel(kind, searchParams.distanceKm),
-    [kind, searchParams],
+    () =>
+      getDefaultZoomLevel(
+        kind,
+        searchParams.distanceKm ??
+          getMaxDistanceFromSearchResults(searchResults),
+      ),
+    [kind, searchParams, searchResults],
   );
+
+  const mapCenterPosition: GeoPositionDto = useMemo(() => {
+    if (searchParams.latitude && searchParams.longitude)
+      return {
+        lat: searchParams.latitude,
+        lon: searchParams.longitude,
+      };
+
+    const parisDefaultLocation: GeoPositionDto = {
+      lat: 48.8589384,
+      lon: 2.2646348,
+    };
+
+    return searchResults.length > 0
+      ? getEpicenterFromPositions(
+          searchResults.map((result) => result.position),
+        )
+      : parisDefaultLocation;
+  }, [searchParams, searchResults]);
 
   useEffect(() => {
     const latLon = markerProps
       ? markerProps.position
-      : ([latitude, longitude] as L.LatLngExpression);
+      : ([mapCenterPosition.lat, mapCenterPosition.lon] as L.LatLngExpression);
     mapRef.current?.setView(latLon, zoom);
-  }, [markerProps, zoom, latitude, longitude]);
+  }, [markerProps, zoom, mapCenterPosition]);
 
   const mapContainerJsx = (
     <MapContainer
       className={cx("search-map-results__map")}
       scrollWheelZoom={false}
-      center={kind === "single" ? markerProps.position : [latitude, longitude]}
+      center={
+        kind === "single"
+          ? markerProps.position
+          : [mapCenterPosition.lat, mapCenterPosition.lon]
+      }
       zoom={zoom}
       touchZoom={true}
       minZoom={5}
@@ -227,6 +263,7 @@ export const SearchMiniMap = ({
       </div>
     </div>
   );
+
   return (
     <>
       <Button
@@ -245,13 +282,85 @@ export const SearchMiniMap = ({
     </>
   );
 };
+
 const distanceToZoomOptions: Record<number, number> = {
-  1: 16,
+  1: 15,
   2: 14,
   5: 12,
   10: 11,
   20: 10,
   50: 9,
   100: 8,
+  200: 7,
+  400: 6.5,
+  600: 6,
+  3000: 1,
 };
-20;
+
+const getMaxDistanceFromSearchResults = (
+  searchResults: OfferDto[],
+): number | undefined =>
+  searchResults
+    .map((result) => result.position)
+    .reduce((maxDist, posA, index, positions) => {
+      const maxForPosA = positions
+        .slice(index + 1)
+        .reduce(
+          (innerMax, posB) => Math.max(innerMax, getDistanceInKm(posA, posB)),
+          0,
+        );
+
+      return Math.max(maxDist, maxForPosA);
+    }, 0);
+
+const getDistanceInKm = (
+  position1: GeoPositionDto,
+  position2: GeoPositionDto,
+): number => {
+  const haversineFormulaResult =
+    Math.sin(degreesToRad(position2.lat - position1.lat) / 2) ** 2 +
+    Math.cos(degreesToRad(position1.lat)) *
+      Math.cos(degreesToRad(position2.lat)) *
+      Math.sin(degreesToRad(position2.lon - position1.lon) / 2) ** 2;
+
+  const centralAngleInRadians =
+    2 *
+    Math.atan2(
+      Math.sqrt(haversineFormulaResult),
+      Math.sqrt(1 - haversineFormulaResult),
+    );
+
+  const EARTH_RADIUS_IN_KM = 6371;
+
+  return centralAngleInRadians * EARTH_RADIUS_IN_KM;
+};
+
+const getEpicenterFromPositions = (
+  positions: GeoPositionDto[],
+): GeoPositionDto => {
+  const [avgX, avgY, avgZ] = positions
+    .reduce(
+      ([sumX, sumY, sumZ], { lat, lon }) => {
+        const latRad = degreesToRad(lat);
+        const lonRad = degreesToRad(lon);
+        return [
+          sumX + Math.cos(latRad) * Math.cos(lonRad),
+          sumY + Math.cos(latRad) * Math.sin(lonRad),
+          sumZ + Math.sin(latRad),
+        ];
+      },
+      [0, 0, 0],
+    )
+    .map((value) => value / positions.length);
+
+  const lonCenterRad = Math.atan2(avgY, avgX);
+  const hyp = Math.sqrt(avgX * avgX + avgY * avgY);
+  const latCenterRad = Math.atan2(avgZ, hyp);
+
+  return {
+    lat: (latCenterRad * 180) / Math.PI,
+    lon: (lonCenterRad * 180) / Math.PI,
+  };
+};
+
+const degreesToRad = (degree: number) => (degree * Math.PI) / 180;
