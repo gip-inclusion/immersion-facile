@@ -5,7 +5,6 @@ import {
   authRoutes,
   domElementIds,
   frontRoutes,
-  legacyFrontRoutes,
   makeUrlWithQueryParams,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -132,7 +131,7 @@ export const InitiateConventionPage = () => {
                       `/api${authRoutes.initiateLoginByOAuth.url}`,
                       {
                         provider: "peConnect",
-                        redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+                        redirectUri: `/${frontRoutes.conventionImmersion().href}`,
                       },
                     ),
                   }}

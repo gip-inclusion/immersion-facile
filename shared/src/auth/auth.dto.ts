@@ -1,28 +1,37 @@
-import type { legacyFrontRoutes } from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Email } from "../email/email.dto";
 import type { FederatedIdentityProvider } from "../federatedIdentities/federatedIdentity.dto";
+import type { frontRoutes } from "../routes/routes";
 import type { EmailAuthCodeJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
-
-export type AllowedLoginSource = (typeof allowedLoginSources)[number];
-export type AllowedRedirectUri = (typeof legacyFrontRoutes)[AllowedLoginSource];
+import type { ExtractFromExisting } from "../utils";
 
 export const allowedLoginSources = [
   "admin",
-  "formEstablishment",
+  "addAgency",
+  "agencyDashboard",
+  "agencyDashboardAgencyDetails",
+  "archivedConventionRequest",
+  "beneficiaryDashboard",
+  "beneficiaryDashboardConventions",
+  "beneficiaryDashboardDiscussions",
+  "conventionTemplate",
   "establishmentDashboard",
   "establishmentDashboardDiscussions",
-  "agencyDashboard",
-  "addAgency",
+  "formEstablishment",
   "manageConventionConnectedUser",
-  "conventionTemplate",
   "myAccount",
-  "beneficiaryDashboard",
-  "beneficiaryDashboardDiscussions",
-  "beneficiaryDashboardConventions",
-  "archivedConventionRequest",
-] as const;
+] as const satisfies readonly (keyof typeof frontRoutes)[];
+export type AllowedLoginSource = (typeof allowedLoginSources)[number];
+
+export type AllowedFtRedirectRoute = ExtractFromExisting<
+  keyof typeof frontRoutes,
+  "conventionImmersion"
+>;
+
+export type AllowedRedirectUri = ReturnType<
+  (typeof frontRoutes)[AllowedLoginSource]
+>["href"];
 
 export type ExternalId = Flavor<string, "ExternalId">;
 

@@ -6,8 +6,7 @@ import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
   authRoutes,
   domElementIds,
-  type frontRoutes,
-  legacyFrontRoutes,
+  frontRoutes,
   makeUrlWithQueryParams,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -191,7 +190,7 @@ const SharedConventionMessage = ({
             `/api${authRoutes.initiateLoginByOAuth.url}`,
             {
               provider: "peConnect",
-              redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              redirectUri: `/${frontRoutes.conventionImmersion().href}`,
             },
           )}
           onClick={() => {

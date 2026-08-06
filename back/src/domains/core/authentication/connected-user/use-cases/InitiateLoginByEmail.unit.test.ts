@@ -29,7 +29,7 @@ import {
   makeInitiateLoginByEmail,
 } from "./InitiateLoginByEmail";
 
-describe("RequestLoginByEmail usecase", () => {
+describe("InitiateLoginByEmail usecase", () => {
   const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
   let initiateLoginByEmail: InitiateLoginByEmail;
@@ -38,8 +38,9 @@ describe("RequestLoginByEmail usecase", () => {
   let uuidGenerator: TestUuidGenerator;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
-  const redirectUri = // must be allowed by the schema
-    "/tableau-de-bord-etablissement/discussions?discussionId=any-discussion-id";
+  const redirectUri = frontRoutes.establishmentDashboardDiscussions({
+    discussionId: "any-discussion-id",
+  }).href;
 
   const user: UserWithAdminRights = {
     id: "user-id",
@@ -75,7 +76,7 @@ describe("RequestLoginByEmail usecase", () => {
   });
 
   it("throws an error if the redirect uri is not allowed (simple open redirect)", async () => {
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       initiateLoginByEmail.execute({
         email: user.email,
         redirectUri: "@example.com",
@@ -87,7 +88,7 @@ describe("RequestLoginByEmail usecase", () => {
     );
   });
   it("throws an error if the redirect uri is not allowed (path containing open redirect)", async () => {
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       initiateLoginByEmail.execute({
         email: user.email,
         redirectUri: "/establishment@example.com",
@@ -203,7 +204,7 @@ describe("RequestLoginByEmail usecase", () => {
     await initiateLoginByEmail.execute({
       email: user.email,
       redirectUri:
-        "/tableau-de-bord-agence/dashboard/etablissement/1234567890/discussions/1234567890",
+        "/mon-compte/tableau-de-bord-agence/dashboard/etablissement/1234567890/discussions/1234567890",
     });
 
     expectSavedNotificationsAndEvents({

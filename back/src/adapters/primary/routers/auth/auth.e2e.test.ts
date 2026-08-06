@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
   type AuthRoutes,
-  allowedLoginUris,
+  allowedLoginSources,
   authExpiredMessage,
   authRoutes,
   ConventionDtoBuilder,
@@ -18,7 +18,7 @@ import {
   expectToEqual,
   FTConnectError,
   frontRoutes,
-  legacyFrontRoutes,
+  getFrontRouteUriWithoutQueryParams,
   ManagedFTConnectError,
   makeRouteAbsoluteUrl,
   noAgencyDashboards,
@@ -118,16 +118,18 @@ describe("auth router", () => {
 
     describe("Right path with Proconnect", () => {
       describe("handle all allowed user connection pages", () => {
-        it.each(allowedLoginUris)(`${displayRouteName(
+        it.each(allowedLoginSources)(`${displayRouteName(
           authRoutes.initiateLoginByOAuth,
         )} 302 > [ProConnect]/login - 302 > ${displayRouteName(
           authRoutes.afterEmailOrProConnectOAuthLogin,
-        )} 302 > page %s with required connected user params`, async (page) => {
+        )} 302 > page %s with required connected user params`, async (source) => {
           const generatedUserId = "my-user-id";
           const uuids = [nonce, state, generatedUserId];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
-          const redirectUri = `/${page}?discussionId=discussion0`;
+          const redirectUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
 
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByOAuth({
@@ -178,7 +180,7 @@ describe("auth router", () => {
           if (response.status !== 302)
             throw errors.generic.testError("Response must be 302");
           const locationHeader = response.headers.location as string;
-          const locationPrefix = `${appConfig.immersionFacileBaseUrl}${redirectUri}&token=`;
+          const locationPrefix = `${appConfig.immersionFacileBaseUrl}${redirectUri}`;
 
           expect(locationHeader).toContain(locationPrefix);
           const { params } = decodeURIWithParams(locationHeader);
@@ -230,7 +232,9 @@ describe("auth router", () => {
           await authRoutesClient.initiateLoginByOAuth({
             queryParams: {
               provider: "proConnect",
-              redirectUri: "/tableau-de-bord-agence/agences/agencyId",
+              redirectUri: frontRoutes.agencyDashboardAgencyDetails({
+                agencyId: "agencyId",
+              }).href,
             },
           }),
           {
@@ -299,11 +303,11 @@ describe("auth router", () => {
 
     describe("Right path with email", () => {
       describe("handle all allowed user connection pages", () => {
-        it.each(allowedLoginUris)(`${displayRouteName(
+        it.each(allowedLoginSources)(`${displayRouteName(
           authRoutes.initiateLoginByEmail,
         )} 200 | EMAIL with connexion link > ${displayRouteName(
           authRoutes.afterEmailOrProConnectOAuthLogin,
-        )} 200 > page %s with required connected user params`, async (uri) => {
+        )} 200 > page %s with required connected user params`, async (source) => {
           const email: Email = "mail@email.com";
           const generatedUserId = "my-user-id";
           const uuids = [
@@ -315,9 +319,13 @@ describe("auth router", () => {
           ];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+          const redirectUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
+
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByEmail({
-              body: { email, redirectUri: `/${uri}` },
+              body: { email, redirectUri },
             }),
             {
               body: "",
@@ -405,7 +413,7 @@ describe("auth router", () => {
               state,
               usedAt: gateways.timeGateway.now(),
               email,
-              fromUri: `/${uri}`,
+              fromUri: redirectUri,
             },
           ]);
         });
@@ -424,11 +432,13 @@ describe("auth router", () => {
           const uuids = [nonce, state];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+          const redirectUri = frontRoutes.conventionImmersion().href;
+
           expectHttpResponseToEqual(
             await authRoutesClient.initiateLoginByOAuth({
               queryParams: {
                 provider: "peConnect",
-                redirectUri: `/${legacyFrontRoutes.conventionImmersion}`,
+                redirectUri,
               },
             }),
             {
@@ -452,7 +462,7 @@ describe("auth router", () => {
               state,
               usedAt: null,
               idToken: null,
-              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              fromUri: redirectUri,
             },
           ]);
         });
@@ -468,7 +478,7 @@ describe("auth router", () => {
               state,
               usedAt: null,
               idToken: null,
-              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              fromUri: `/${frontRoutes.conventionImmersion().href}`,
             },
           ];
           gateways.ftConnectGateway.setAccessTokenResult({
@@ -505,7 +515,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.conventionImmersion}?conventionDraftId=${conventionDraftId}&skipIntro=true`,
+              location: `${appConfig.immersionFacileBaseUrl}/${frontRoutes.conventionImmersion({ conventionDraftId, skipIntro: true }).href}`,
             },
           });
 
@@ -517,7 +527,7 @@ describe("auth router", () => {
               usedAt: now,
               accessToken: ftConnectAccessToken,
               idToken: ftConnectIdToken,
-              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              fromUri: `/${frontRoutes.conventionImmersion().href}`,
             },
           ]);
           expectToEqual(
@@ -558,7 +568,7 @@ describe("auth router", () => {
               state,
               usedAt: null,
               idToken: null,
-              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              fromUri: `/${frontRoutes.conventionImmersion().href}`,
             },
           ];
           gateways.ftConnectGateway.getAccessToken = async () => {
@@ -576,7 +586,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.error}`,
+              location: `${appConfig.immersionFacileBaseUrl}${frontRoutes.temporaryError().href}`,
             },
           });
         });
@@ -591,7 +601,7 @@ describe("auth router", () => {
               state,
               usedAt: null,
               idToken: null,
-              fromUri: `/${legacyFrontRoutes.conventionImmersion}`,
+              fromUri: `/${frontRoutes.conventionImmersion().href}`,
             },
           ];
           gateways.ftConnectGateway.getAccessToken = async () => {
@@ -609,7 +619,7 @@ describe("auth router", () => {
             body: {},
             status: 302,
             headers: {
-              location: `${appConfig.immersionFacileBaseUrl}/${legacyFrontRoutes.error}?title=${encodeURIComponent(rawErrorTitle)}&message=${encodeURIComponent(rawErrorMessage)}`,
+              location: `${appConfig.immersionFacileBaseUrl}${frontRoutes.temporaryError({ title: rawErrorTitle, message: rawErrorMessage }).href}`,
             },
           });
         });

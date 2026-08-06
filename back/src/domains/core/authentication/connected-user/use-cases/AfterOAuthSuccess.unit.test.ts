@@ -8,9 +8,11 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  getFrontRouteUriWithoutQueryParams,
   type IdToken,
   makeRouteAbsoluteUrl,
   type OAuthSuccessLoginParams,
+  queryParamsAsString,
   type SiretDto,
   type UserWithAdminRights,
 } from "shared";
@@ -387,11 +389,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       describe("handle dynamic login pages", () => {
         it.each(
           allowedLoginSources,
-        )("generates an app token and returns a redirection url which includes token and user data for %s", async (page) => {
-          const { initialOngoingOAuth, fromUri, userId } =
-            makeSuccessfulAuthenticationConditions(
-              `/${page}?discussionId=discussion0`,
-            );
+        )("generates an app token and returns a redirection url which includes token and user data for %s", async (source) => {
+          const fromUri = getFrontRouteUriWithoutQueryParams(
+            frontRoutes[source],
+          );
+          const { initialOngoingOAuth, idToken, userId } =
+            makeSuccessfulAuthenticationConditions(fromUri);
 
           const response = await afterOAuthSuccessRedirection.execute({
             code: "my-code",
@@ -400,7 +403,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
           expectToEqual(response, {
             provider: "proConnect",
-            redirectUri: `http://fake-connected-user${fromUri}&token=jwt-${userId}&idToken=id-token&provider=proConnect`,
+            redirectUri: `http://fake-connected-user${fromUri}?${queryParamsAsString(
+              {
+                token: `jwt-${userId}`,
+                idToken,
+                provider: "proConnect",
+              },
+            )}`,
           });
         });
       });
@@ -502,7 +511,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
       peExternalId: "456",
     };
     const defaultFtOngoingOAuth: OngoingOAuth = {
-      fromUri: "/demande-immersion",
+      fromUri: frontRoutes.conventionImmersion().href,
       provider: "peConnect",
       state,
       nonce: "nounce",
@@ -589,7 +598,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         );
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
+          redirectUri: `http://baseUrl${frontRoutes.conventionImmersion({ conventionDraftId, skipIntro: true }).href}`,
         });
       });
 
@@ -651,7 +660,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         ]);
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
+          redirectUri: `http://baseUrl${frontRoutes.conventionImmersion({ conventionDraftId, skipIntro: true }).href}`,
         });
       });
 
@@ -717,7 +726,7 @@ describe("AfterOAuthSuccessRedirection use case", () => {
         ]);
         expectToEqual(response, {
           provider: "peConnect",
-          redirectUri: `http://baseUrl/demande-immersion?conventionDraftId=${conventionDraftId}&skipIntro=true`,
+          redirectUri: `http://baseUrl${frontRoutes.conventionImmersion({ conventionDraftId, skipIntro: true }).href}`,
         });
       });
     });
@@ -876,11 +885,12 @@ describe("AfterOAuthSuccessRedirection use case", () => {
     describe("handle dynamic login pages", () => {
       it.each(
         allowedLoginSources,
-      )("generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth", async (page) => {
+      )("generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth", async (source) => {
         const email = "my-email@mail.com";
+        const fromUri = getFrontRouteUriWithoutQueryParams(frontRoutes[source]);
 
         const initialOngoingOAuth: OngoingOAuth = {
-          fromUri: `/${page}?discussionId=discussion0`,
+          fromUri,
           provider: "email",
           state: "my-state",
           nonce: "nounce", // matches the one in the payload of the token
@@ -920,7 +930,13 @@ describe("AfterOAuthSuccessRedirection use case", () => {
 
         expectToEqual(redirectedUrl, {
           provider: "email",
-          redirectUri: `http://fake-connected-user/${page}?discussionId=discussion0&token=jwt-${userId}&idToken=&provider=email`,
+          redirectUri: `http://fake-connected-user${fromUri}?${queryParamsAsString(
+            {
+              token: "jwt-new-user-id",
+              idToken: "",
+              provider: "email",
+            },
+          )}`,
         });
       });
     });
