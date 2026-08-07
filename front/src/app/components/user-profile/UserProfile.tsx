@@ -3,6 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
+import { useScrollTo } from "react-design-system";
 import {
   type ConnectedUser,
   domElementIds,
@@ -10,6 +11,7 @@ import {
   type UserId,
 } from "shared";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
@@ -105,6 +107,8 @@ export const UserProfile = ({
   routeName,
 }: UserProfileProps) => {
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+
+  useScrollTo(!!useFeedbackTopic("agency-user-right-self"));
 
   const acceptedUserEstablishmentsRights =
     userWithRights.establishments?.filter(
