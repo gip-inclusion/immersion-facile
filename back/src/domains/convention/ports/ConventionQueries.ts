@@ -4,8 +4,6 @@ import type {
   AssessmentCompletionStatusFilter,
   ConventionDto,
   ConventionId,
-  ConventionReadDto,
-  ConventionScope,
   ConventionStatus,
   ConventionsWithErroredBroadcastFeedbackFilters,
   ConventionWithBroadcastFeedback,
@@ -46,6 +44,7 @@ export type GetConventionsSortBy = keyof Pick<
 export type GetConventionsParams = {
   filters: GetConventionsFilters;
   sortBy: GetConventionsSortBy;
+  limit?: number;
 };
 
 export type GetPaginatedConventionsFilters = {
@@ -105,13 +104,7 @@ export interface ConventionQueries {
     params: GetPaginatedConventionsParams,
   ): Promise<DataWithPagination<ConventionDto>>;
 
-  // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
-  getConventionsByScope(params: {
-    scope: ConventionScope;
-    limit: number;
-    filters: GetConventionsFilters;
-  }): Promise<ConventionReadDto[]>;
 
   getConventionsWithErroredBroadcastFeedbackForAgencyUser(params: {
     userAgencyIds: AgencyId[];

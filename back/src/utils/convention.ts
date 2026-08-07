@@ -12,6 +12,7 @@ import {
   conventionLastRemindersSchema,
   type Email,
   errors,
+  executeInSequence,
   isTruthy,
   makeEmptyLastReminders,
   type WithBannedEstablishmentInformations,
@@ -58,52 +59,109 @@ export const conventionEmailsByRole =
     return emails;
   };
 
-export const conventionDtoToConventionReadDto = async (
-  conventionDto: ConventionDto,
+export const conventionDtosToConventionReadDtos = async (
+  conventions: ConventionDto[],
   uow: UnitOfWork,
-): Promise<ConventionReadDto> => {
-  const agencyWithRights = await uow.agencyRepository.getById(
-    conventionDto.agencyId,
-  );
-  if (!agencyWithRights)
-    throw errors.agency.notFound({ agencyId: conventionDto.agencyId });
+): Promise<ConventionReadDto[]> => {
+  if (conventions.length === 0) return [];
 
-  const bannedEstablishment: BannedEstablishment | undefined =
-    await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
-      conventionDto.siret,
-    );
-
-  const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
-    bannedEstablishment
-      ? {
-          isEstablishmentBanned: true,
-          establishmentBannishmentJustification:
-            bannedEstablishment.establishmentBannishmentJustification,
-        }
-      : { isEstablishmentBanned: false };
-
-  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-  const assessment = await uow.assessmentRepository.getByConventionId(
-    conventionDto.id,
-  );
-  const lastReminders = await getConventionLastRemindersFields(
-    conventionDto,
-    uow.notificationRepository,
+  const agencyIds = uniq(conventions.map(({ agencyId }) => agencyId));
+  const agenciesWithRights = await uow.agencyRepository.getByIds(agencyIds);
+  const agencyWithRightsById = Object.fromEntries(
+    agenciesWithRights.map((agency) => [agency.id, agency]),
   );
 
-  return {
-    ...conventionDto,
-    ...agencyDtoToConventionAgencyFields(
-      agency,
-      agency.refersToAgencyId
-        ? ((await uow.agencyRepository.getById(agency.refersToAgencyId)) ??
-            null)
-        : null,
-    ),
-    ...assesmentEntityToConventionAssessmentFields(assessment),
-    ...withBannedEstablishmentInformations,
-    lastReminders,
+  const refersToAgencyIds = uniq(
+    agenciesWithRights
+      .map(({ refersToAgencyId }) => refersToAgencyId)
+      .filter(isTruthy)
+      .filter((id) => !agencyWithRightsById[id]),
+  );
+
+  const refersToAgenciesWithRights = (
+    await executeInSequence(refersToAgencyIds, (id) =>
+      uow.agencyRepository.getById(id),
+    )
+  ).filter(isTruthy);
+
+  const refersToAgenciesWithRightsById = Object.fromEntries(
+    refersToAgenciesWithRights.map((agency) => [agency.id, agency]),
+  );
+
+  const allAgenciesWithRightsById = {
+    ...agencyWithRightsById,
+    ...refersToAgenciesWithRightsById,
   };
+
+  const agencyDtos = await executeInSequence(
+    Object.values(allAgenciesWithRightsById),
+    (agency) => agencyWithRightToAgencyDto(uow, agency),
+  );
+  const agencyDtoById = Object.fromEntries(
+    agencyDtos.map((agency) => [agency.id, agency]),
+  );
+
+  const uniqueSirets = uniq(conventions.map(({ siret }) => siret));
+
+  const assessments = await uow.assessmentRepository.getByConventionIds(
+    conventions.map(({ id }) => id),
+  );
+  const bannedBySiretEntries = await executeInSequence(
+    uniqueSirets,
+    async (siret) => {
+      const banned =
+        await uow.bannedEstablishmentRepository.getBannedEstablishmentBySiret(
+          siret,
+        );
+      return [siret, banned] as const;
+    },
+  );
+  const lastRemindersList = await executeInSequence(conventions, (convention) =>
+    getConventionLastRemindersFields(convention, uow.notificationRepository),
+  );
+
+  const bannedBySiret = bannedBySiretEntries.reduce<
+    Record<string, BannedEstablishment | undefined>
+  >((acc, [siret, banned]) => ({ ...acc, [siret]: banned }), {});
+
+  const assessmentByConventionId = assessments.reduce<
+    Record<ConventionId, AssessmentEntity>
+  >(
+    (acc, assessment) => ({
+      ...acc,
+      [assessment.conventionId]: assessment,
+    }),
+    {},
+  );
+
+  return conventions.map((convention, index) => {
+    const agencyDto = agencyDtoById[convention.agencyId];
+
+    const bannedEstablishment = bannedBySiret[convention.siret];
+    const withBannedEstablishmentInformations: WithBannedEstablishmentInformations =
+      bannedEstablishment
+        ? {
+            isEstablishmentBanned: true,
+            establishmentBannishmentJustification:
+              bannedEstablishment.establishmentBannishmentJustification,
+          }
+        : { isEstablishmentBanned: false };
+
+    return {
+      ...convention,
+      ...agencyDtoToConventionAgencyFields(
+        agencyDto,
+        agencyDto.refersToAgencyId
+          ? (allAgenciesWithRightsById[agencyDto.refersToAgencyId] ?? null)
+          : null,
+      ),
+      ...assesmentEntityToConventionAssessmentFields(
+        assessmentByConventionId[convention.id],
+      ),
+      ...withBannedEstablishmentInformations,
+      lastReminders: lastRemindersList[index],
+    };
+  });
 };
 
 export const assesmentEntityToConventionAssessmentFields = (

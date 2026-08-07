@@ -31,6 +31,7 @@ import {
   type AgencyRightOfUser,
   type AgencyWithNumberOfUsersToReview,
   type GetAgenciesFilters,
+  type GetAgencyIdsFilters,
   type PartialAgencyWithUsersRights,
   throwIfAgencyHasNoUsersWhileNotClosedOrRejected,
 } from "../ports/AgencyRepository";
@@ -181,6 +182,19 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         totalRecords,
       }),
     };
+  }
+
+  public async getAgencyIdsByFilters(
+    filters: GetAgencyIdsFilters,
+  ): Promise<AgencyId[]> {
+    return Object.values(this.#agencies)
+      .filter(isTruthy)
+      .filter(
+        (agency) =>
+          agencyIsOfKind(agency, filters.kinds) &&
+          agencyIsOfStatus(agency, filters.status),
+      )
+      .map(({ id }) => id);
   }
 
   public async getAgenciesRelatedToAgency(
