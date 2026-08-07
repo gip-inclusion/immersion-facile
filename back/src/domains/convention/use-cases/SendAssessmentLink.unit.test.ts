@@ -232,7 +232,7 @@ describe("SendAssessmentLink", () => {
         convention,
       )
         .withDateEnd(addDays(today, 2).toISOString())
-        .withSchedule(reasonableSchedule)
+        .withSchedule(reasonableSchedule, ["samedi", "dimanche"])
         .build();
 
       uow.agencyRepository.agencies = [
