@@ -1620,6 +1620,14 @@ describe("PgAgencyRepository", () => {
       ]);
     });
 
+    it("returns all agencyIds when no filters defined", async () => {
+      expectToEqual(await agencyRepository.getAgencyIdsByFilters({}), [
+        agencyPeActive.id,
+        agencyPeClosed.id,
+        agencyMissionLocale.id,
+      ]);
+    });
+
     it("returns empty array when no agencies match", async () => {
       expectToEqual(
         await agencyRepository.getAgencyIdsByFilters({
