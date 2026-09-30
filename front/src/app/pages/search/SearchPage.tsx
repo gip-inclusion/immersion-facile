@@ -22,7 +22,12 @@ import {
 import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { domElementIds, Group, GroupSlug, type ValueOf } from "shared";
+import {
+  domElementIds,
+  type Group,
+  type GroupSlug,
+  type ValueOf,
+} from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -35,10 +40,7 @@ import {
   searchPageParamsFromRoute,
   useSearch,
 } from "src/app/hooks/search.hooks";
-import {
-  areValidGeoParams,
-  canSubmitSearch,
-} from "src/app/pages/search/SearchPage.utils";
+import { canSubmitSearch } from "src/app/pages/search/SearchPage.utils";
 import { useSearchRoute } from "src/app/routes/routes.hooks";
 import {
   isKeyInObjectAndValueNotUndefinedNorEmpty,
@@ -544,7 +546,6 @@ export const SearchPage = () => {
                     >
                       <SearchListResults
                         route={route}
-                        showDistance={areValidGeoParams(searchMade)}
                         isExternal={route.name === "externalSearch"}
                         onSearchFormSubmit={onSearchFormSubmit}
                         useNaturalLanguageForAppellations={
