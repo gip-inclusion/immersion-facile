@@ -17,6 +17,7 @@ import {
   errors,
   ForbiddenError,
   getConventionManageAllowedRoles,
+  isConventionArchived,
   isSignatoryRole,
   isValidMobilePhone,
   type Role,
@@ -171,6 +172,23 @@ export const isConventionInScope = (
 ): boolean =>
   isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
   isAgencyKindInConsumerScope(conventionRead, apiConsumer);
+
+export const throwIfConventionArchivedForNonAdmin = ({
+  convention,
+  now,
+  isBackofficeAdmin,
+  featureFlags,
+}: {
+  convention: Pick<ConventionDto, "id" | "dateEnd">;
+  now: Date;
+  isBackofficeAdmin: boolean;
+  featureFlags: FeatureFlags;
+}): void => {
+  if (!featureFlags.enableRequestArchivedConvention.isActive) return;
+  if (!isConventionArchived({ dateEnd: convention.dateEnd, now })) return;
+  if (isBackofficeAdmin) return;
+  throw errors.convention.archived({ conventionId: convention.id });
+};
 
 export const throwErrorOnConventionIdMismatch = ({
   requestedConventionId,
