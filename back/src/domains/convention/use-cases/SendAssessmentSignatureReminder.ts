@@ -36,6 +36,7 @@ import {
   retrieveConventionWithAgency,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
+  throwIfConventionArchivedForNonAdmin,
 } from "../entities/Convention";
 
 export type SendAssessmentSignatureReminder = ReturnType<
@@ -86,6 +87,13 @@ export const makeSendAssessmentSignatureReminder = useCaseBuilder(
       jwtPayload,
       isPeAdvisorAllowed: true,
       isValidatorOfAgencyRefersToAllowed: true,
+    });
+
+    await throwIfConventionArchivedForNonAdmin({
+      convention,
+      now: deps.timeGateway.now(),
+      jwtPayload,
+      uow,
     });
 
     const assessment = (
