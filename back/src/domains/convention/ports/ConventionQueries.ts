@@ -1,5 +1,6 @@
 import type {
   AgencyId,
+  ApiConsumerName,
   AppellationCode,
   AssessmentCompletionStatusFilter,
   ConventionDto,
@@ -104,6 +105,13 @@ export type GetConventionIdsParams = {
   sortBy?: GetConventionsSortBy;
 };
 
+export type GetConventionsWithErroredBroadcastFeedbackForAgencyUserParams = {
+  userAgencyIds: AgencyId[];
+  pagination: Required<PaginationQueryParams>;
+  filters?: ConventionsWithErroredBroadcastFeedbackFilters;
+  relevantConsumerNamesByAgencyId: Record<AgencyId, ApiConsumerName[]>;
+};
+
 export interface ConventionQueries {
   getConventionIdsByFilters(
     params: GetConventionIdsParams,
@@ -117,11 +125,9 @@ export interface ConventionQueries {
 
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
 
-  getConventionsWithErroredBroadcastFeedbackForAgencyUser(params: {
-    userAgencyIds: AgencyId[];
-    pagination: PaginationQueryParams;
-    filters?: ConventionsWithErroredBroadcastFeedbackFilters;
-  }): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
+  getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+    params: GetConventionsWithErroredBroadcastFeedbackForAgencyUserParams,
+  ): Promise<DataWithPagination<ConventionWithBroadcastFeedback>>;
 
   getConventionsWithUnfinalizedAssessmentForAgencyUser(params: {
     userAgencyIds: AgencyId[];

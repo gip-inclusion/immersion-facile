@@ -4,6 +4,7 @@ import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   type AgencyId,
+  type ApiConsumerName,
   type AppellationCode,
   ASSESSEMENT_SIGNATURE_RELEASE_DATE,
   type AssessmentDto,
@@ -2579,12 +2580,24 @@ describe("Pg implementation of ConventionQueries", () => {
   );
 
   describe("getConventionsWithErroredBroadcastFeedbackForAgencyUser", () => {
+    const defaultRelevantConsumerNamesByAgencyId: Record<
+      AgencyId,
+      ApiConsumerName[]
+    > = {
+      [agencyIdA]: [
+        "any-consumer-name",
+        broadcastToFtConsumerName,
+        "partner-consumer",
+      ],
+    };
+
     describe("when no conventions with errored broadcast feedback for the agency user", () => {
       it("should return empty array with pagination info", async () => {
         const result =
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: ["aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"],
+              relevantConsumerNamesByAgencyId: {},
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -2666,6 +2679,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -2760,6 +2775,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -2845,6 +2862,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "functional" },
             },
@@ -2888,6 +2907,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "functional" },
             },
@@ -2928,6 +2949,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "functional" },
             },
@@ -2993,6 +3016,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "functional" },
             },
@@ -3111,6 +3136,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: defaultPagination,
             },
           );
@@ -3195,6 +3222,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: defaultPagination,
             },
           );
@@ -3425,6 +3454,8 @@ describe("Pg implementation of ConventionQueries", () => {
             await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
               {
                 userAgencyIds: [agency.id],
+                relevantConsumerNamesByAgencyId:
+                  defaultRelevantConsumerNamesByAgencyId,
                 pagination: requestedPagination,
               },
             );
@@ -3560,6 +3591,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "functional" },
             },
@@ -3629,6 +3662,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { broadcastErrorKind: "technical" },
             },
@@ -3675,6 +3710,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { conventionStatus: ["IN_REVIEW"] },
             },
@@ -3722,6 +3759,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: {
                 broadcastErrorKind: "functional",
@@ -3818,6 +3857,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: {
                 search: searchFilter,
@@ -3864,6 +3905,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: { search: "00000000-0000-0000-0000-000000000000" },
             },
@@ -3885,6 +3928,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
               filters: {
                 search: conventionWithManagedError.id as SearchTextAlphaNumeric,
@@ -3994,6 +4039,8 @@ describe("Pg implementation of ConventionQueries", () => {
           await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
             {
               userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId:
+                defaultRelevantConsumerNamesByAgencyId,
               pagination: { page: 1, perPage: 10 },
             },
           );
@@ -4099,6 +4146,165 @@ describe("Pg implementation of ConventionQueries", () => {
             totalPages: 1,
             numberPerPage: 10,
             totalRecords: 4,
+          },
+        });
+      });
+    });
+
+    describe("filters last feedback by relevant consumer names", () => {
+      const siMiloProductionConsumerName = "si-milo-production";
+      const agency = new AgencyDtoBuilder().withId(agencyIdA).build();
+      const convention = new ConventionDtoBuilder()
+        .withId(conventionIdA)
+        .withAgencyId(agencyIdA)
+        .withStatus("READY_TO_SIGN")
+        .withDateSubmission("2025-01-02T00:00:00.000Z")
+        .build();
+      const cancelledConvention = new ConventionDtoBuilder(convention)
+        .withStatus("CANCELLED")
+        .build();
+
+      const partnerErrorBroadcast: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: siMiloProductionConsumerName,
+        conventionId: conventionIdA,
+        agencyId: agencyIdA,
+        serviceName: broadcastToPartnersServiceName,
+        occurredAt: "2024-07-01T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: conventionIdA,
+          conventionStatus: "READY_TO_SIGN",
+        },
+        subscriberErrorFeedback: {
+          message: "i-milo error",
+          error: { code: "IMILO_ERROR" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "IMILO_ERROR" },
+        },
+      };
+
+      const ftErrorBroadcast: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: broadcastToFtConsumerName,
+        conventionId: conventionIdA,
+        agencyId: agencyIdA,
+        serviceName: broadcastToFtServiceName,
+        occurredAt: "2024-07-30T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: conventionIdA,
+          conventionStatus: "READY_TO_SIGN",
+        },
+        subscriberErrorFeedback: {
+          message: "FT error",
+          error: { code: "FT_ERROR" },
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "FT_ERROR" },
+        },
+      };
+
+      const ftSuccessBroadcast: BroadcastFeedback = {
+        consumerId: null,
+        consumerName: broadcastToFtConsumerName,
+        conventionId: conventionIdA,
+        agencyId: agencyIdA,
+        serviceName: broadcastToFtServiceName,
+        occurredAt: "2024-06-01T00:00:00.000Z",
+        handledByAgency: false,
+        requestParams: {
+          conventionId: conventionIdA,
+          conventionStatus: "CANCELLED",
+        },
+        response: {
+          httpStatus: 201,
+        },
+      };
+
+      beforeEach(async () => {
+        await agencyRepo.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
+      });
+
+      it("ignores a more recent feedback whose consumer name is no longer relevant", async () => {
+        await conventionRepository.save(convention);
+        await broadcastFeedbacksRepository.save(partnerErrorBroadcast);
+        await broadcastFeedbacksRepository.save(ftErrorBroadcast);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId: {
+                [agencyIdA]: [siMiloProductionConsumerName],
+              },
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [
+            {
+              id: convention.id,
+              status: "READY_TO_SIGN",
+              beneficiary: {
+                firstname: convention.signatories.beneficiary.firstName,
+                lastname: convention.signatories.beneficiary.lastName,
+              },
+              lastBroadcastFeedback: {
+                ...partnerErrorBroadcast,
+                subscriberErrorFeedback: {
+                  message:
+                    partnerErrorBroadcast.subscriberErrorFeedback?.message ??
+                    "",
+                  error: JSON.stringify(
+                    partnerErrorBroadcast.subscriberErrorFeedback?.error,
+                  ),
+                },
+              },
+              agencyReferent: null,
+              agencyId: convention.agencyId,
+            },
+          ],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("excludes convention in unvalidated status when prior success is not relevant", async () => {
+        await conventionRepository.save(cancelledConvention);
+        await broadcastFeedbacksRepository.save(ftSuccessBroadcast);
+        await broadcastFeedbacksRepository.save(partnerErrorBroadcast);
+
+        const result =
+          await conventionQueries.getConventionsWithErroredBroadcastFeedbackForAgencyUser(
+            {
+              userAgencyIds: [agencyIdA],
+              relevantConsumerNamesByAgencyId: {
+                [agencyIdA]: [siMiloProductionConsumerName],
+              },
+              pagination: { page: 1, perPage: 10 },
+            },
+          );
+
+        expectToEqual(result, {
+          data: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 0,
           },
         });
       });
