@@ -1,23 +1,22 @@
 import { useState } from "react";
-import type { CreateDiscussionDto, OmitFromExistingKeys } from "shared";
-import { keys } from "shared";
+import type { CreateDiscussionDto } from "shared";
 
 const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";
 
-// TODO: fix circular reference to avoid ContactTranscientData empty object
-const unrelevantDataKeysForContactScope: (keyof CreateDiscussionDto)[] = [
-  "locationId",
-  "appellationCode",
-  "contactMode",
-  "siret",
-  "kind",
-] as const;
+const toContactTranscientData = ({
+  locationId: _locationId,
+  appellationCode: _appellationCode,
+  contactMode: _contactMode,
+  siret: _siret,
+  kind: _kind,
+  acquisitionCampaign: _acquisitionCampaign,
+  acquisitionKeyword: _acquisitionKeyword,
+  acquisitionMedium: _acquisitionMedium,
+  ...contactTranscientData
+}: CreateDiscussionDto) => contactTranscientData;
 
-export type ContactTranscientData = OmitFromExistingKeys<
-  CreateDiscussionDto,
-  (typeof unrelevantDataKeysForContactScope)[number]
->;
+export type ContactTranscientData = ReturnType<typeof toContactTranscientData>;
 
 type TranscientDataItem<T> = {
   value: T | null;
@@ -31,14 +30,6 @@ export type TranscientData = {
 };
 
 type PreferTranscientData = Record<keyof TranscientData, boolean>;
-
-const filterDataInScope = <T extends ContactTranscientData>(data: T) =>
-  keys(data).reduce((acc, key) => {
-    if (!unrelevantDataKeysForContactScope.includes(key)) {
-      acc[key] = data[key];
-    }
-    return acc;
-  }, {} as T);
 
 const isStringTranscientData = (data: object): data is TranscientData =>
   data && typeof data === "object" && "contact-establishment" in data;
@@ -87,18 +78,13 @@ export const useTranscientDataFromStorage = (
   };
 
   const setTranscientDataForScope = (
-    data: TranscientDataItem<ContactTranscientData>["value"],
+    data: CreateDiscussionDto,
     expireInMinutes = 0,
   ) => {
-    const updatedDataItem = data
-      ? {
-          expireAt: getExpireAt(expireInMinutes),
-          value: filterDataInScope(data),
-        }
-      : {
-          expireAt: 0,
-          value: null,
-        };
+    const updatedDataItem: TranscientDataItem<ContactTranscientData> = {
+      expireAt: getExpireAt(expireInMinutes),
+      value: toContactTranscientData(data),
+    };
     const updatedData = {
       ...transcientData,
       [scope]: updatedDataItem,
