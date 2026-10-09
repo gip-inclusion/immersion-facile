@@ -19,9 +19,20 @@ import {
   SectionTextEmbed,
   useScrollTo,
 } from "react-design-system";
+import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { domElementIds, type ValueOf } from "shared";
+<<<<<<< HEAD
+import { domElementIds, Group, GroupSlug, type ValueOf } from "shared";
+=======
+import {
+  domElementIds,
+  type Group,
+  type GroupSlug,
+  type ValueOf,
+} from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
+>>>>>>> 508bb3401 (unify group pages on SearchPage with classic filters)
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -42,7 +53,9 @@ import {
   isKeyInObjectAndValueNotUndefinedNorEmpty,
   isValueUndefinedOrEmpty,
 } from "src/app/utils/url.utils";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import labonneboiteLogoUrl from "src/assets/img/logo-lbb-centered.png";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
@@ -54,7 +67,7 @@ import {
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
-import { commonIllustrations } from "src/assets/img/illustrations";
+import { GroupHeroHeader } from "./GroupHeroHeader";
 import Styles from "./SearchPage.styles";
 
 export const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
@@ -139,14 +152,20 @@ export const SearchPage = ({
   useNaturalLanguageForAppellations?: boolean;
   isExternal: boolean;
 }) => {
-  const { cx } = useStyles();
   const dispatch = useDispatch();
+  const routeParams = route.params as Partial<SearchPageParams>;
+  const groupSlug = route.name === "group" ? route.params.groupSlug : undefined;
   const { pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
   );
   const isLoading = useAppSelector(searchSelectors.isLoading);
+  const [isLoadingGroupData, setIsLoadingGroupData] = useState<boolean>(
+    !!groupSlug,
+  );
+  const { cx } = useStyles();
   const { navigateToSearch } = useSearch(route);
   const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
+  const [groupData, setGroupData] = useState<Group | null>(null);
   const searchResultsWrapper = useRef<ElementRef<"div">>(null);
   const innerSearchResultWrapper = useRef<ElementRef<"div">>(null);
   const acquisitionParams = useGetAcquisitionParams();
@@ -182,9 +201,10 @@ export const SearchPage = ({
         : undefined,
       remoteWorkModes: undefined,
       showOnlyAvailableOffers: true,
+      group: groupSlug,
       ...acquisitionParams,
     }),
-    [enableSearchByScore, isExternal, acquisitionParams],
+    [enableSearchByScore, isExternal, acquisitionParams, groupSlug],
   );
 
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
@@ -202,7 +222,6 @@ export const SearchPage = ({
       }, {} as SearchPageParams),
     [],
   );
-  const routeParams = route.params as Partial<SearchPageParams>;
   const buildValuesFromRouteParams = useCallback(
     (paramsFromRoute: Partial<SearchPageParams>): SearchPageParams =>
       keys(initialValues).reduce(
@@ -237,6 +256,18 @@ export const SearchPage = ({
     },
     [navigateToSearch, filterFormValues],
   );
+
+  const getInitialGroupData = useCallback(async (groupSlug: GroupSlug) => {
+    const response =
+      await outOfReduxDependencies.searchGateway.getGroupBySlug(groupSlug);
+    const { group } = response;
+    setGroupData(group);
+    setIsLoadingGroupData(false);
+  }, []);
+
+  if (groupSlug && groupData === null) {
+    getInitialGroupData(groupSlug);
+  }
 
   useScrollTo(pagination?.currentPage ?? 1);
 
@@ -284,16 +315,13 @@ export const SearchPage = ({
           locator: "search-form-place",
         }),
       );
+      dispatch(nafSlice.actions.getAllSectionsRequested());
     },
     [dispatch],
   );
 
-  useEffect(() => {
-    dispatch(nafSlice.actions.getAllSectionsRequested());
-  }, [dispatch]);
-
   return (
-    <HeaderFooterLayout>
+    <HeaderFooterLayout isBreadcrumbsDisplayed={!groupData}>
       <MainWrapper vSpacing={0} layout="fullscreen">
         {!searchHasBeenMade ? (
           <>
@@ -446,7 +474,16 @@ export const SearchPage = ({
           </>
         ) : (
           <>
-            {isLoading && <Loader />}
+            {(isLoading || isLoadingGroupData) && <Loader />}
+            {groupData && (
+              <>
+                <Helmet>
+                  <title>{"TODO"}</title>
+                  <meta name="description" content={"TODO"} />
+                </Helmet>
+                <GroupHeroHeader groupData={groupData} />
+              </>
+            )}
             {isExternal && (
               <div className={fr.cx("fr-container", "fr-mb-4w")}>
                 <SectionHighlight
