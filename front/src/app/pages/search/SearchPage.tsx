@@ -67,6 +67,7 @@ import {
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchPage.scss";
+import { groupMetaContent } from "src/app/contents/meta/metaContents";
 import { GroupHeroHeader } from "./GroupHeroHeader";
 import Styles from "./SearchPage.styles";
 
@@ -477,10 +478,7 @@ export const SearchPage = ({
             {(isLoading || isLoadingGroupData) && <Loader />}
             {groupData && (
               <>
-                <Helmet>
-                  <title>{"TODO"}</title>
-                  <meta name="description" content={"TODO"} />
-                </Helmet>
+                <GroupMetaContent groupData={groupData} />
                 <GroupHeroHeader groupData={groupData} />
               </>
             )}
@@ -560,5 +558,15 @@ export const SearchPage = ({
         )}
       </MainWrapper>
     </HeaderFooterLayout>
+  );
+};
+
+const GroupMetaContent = ({ groupData }: { groupData: Group }) => {
+  const { title, description } = groupMetaContent(groupData.name);
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+    </Helmet>
   );
 };
