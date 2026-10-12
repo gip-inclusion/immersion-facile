@@ -230,5 +230,6 @@ const simulatedAgencyUsers: AgencyUserForListing[] = [
     ],
     createdAt: new Date().toISOString(),
     preventToDelete: false,
+    isProConnectUser: true,
   },
 ];

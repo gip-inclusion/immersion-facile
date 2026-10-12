@@ -81,7 +81,8 @@ export const RegisterUsersToAgencies = () => {
                 (feedback) =>
                   feedback.kind === "agencyRegisterToUserSuccess" ||
                   feedback.kind === "usersToReviewFetchSuccess" ||
-                  feedback.kind === "agencyRejectionForUserSuccess",
+                  feedback.kind === "agencyRejectionForUserSuccess" ||
+                  feedback.kind === "agencyUsersFetchSuccess",
               ),
               selectedUser: P.not(P.nullish),
             },
