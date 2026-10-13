@@ -16,18 +16,17 @@ export const NpsSection = ({
   ];
   return (
     <>
-      {!roles.includes("back-office") &&
-        npsShowStatuses.includes(convention.status) && (
-          <NPSForm
-            mode="embed"
-            formId={npsFormIds.conventionVerification}
-            conventionInfos={{
-              id: convention.id,
-              role: roles[0], // the tally does not support multiple roles
-              status: convention.status,
-            }}
-          />
-        )}
+      {npsShowStatuses.includes(convention.status) && (
+        <NPSForm
+          mode="embed"
+          formId={npsFormIds.conventionVerification}
+          conventionInfos={{
+            id: convention.id,
+            role: roles[0], // the tally does not support multiple roles
+            status: convention.status,
+          }}
+        />
+      )}
     </>
   );
 };
