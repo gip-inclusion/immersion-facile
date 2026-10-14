@@ -136,9 +136,7 @@ export const OffersSettingsSection = ({
       return availableForImmersionInProps;
     if (mode === "create" || shouldUpdateAvailability) return undefined;
     if (currentNextAvailabilityDate === undefined) return true;
-    if (currentNextAvailabilityDate < new Date().toISOString())
-      return undefined;
-    return false;
+    return currentNextAvailabilityDate <= new Date().toISOString();
   };
 
   const onClickEstablishmentDeleteButton = () => {
