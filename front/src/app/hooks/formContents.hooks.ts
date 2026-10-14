@@ -4,6 +4,7 @@ import {
   type AddressDto,
   type DotNestedKeys,
   keys,
+  localization,
   toDotNotation,
 } from "shared";
 import type {
@@ -18,6 +19,15 @@ export type FormFieldsObjectForContent<T> = Record<
 >;
 
 type AnyErrors = Record<string, any>;
+
+const addressDtoFieldLabels = {
+  streetNumberAndAddress: "numéro et nom de rue",
+  postcode: "code postal",
+  departmentCode: "code de département",
+  city: "ville",
+} as const satisfies Record<keyof AddressDto, string>;
+
+const addressDtoKeys = keys(addressDtoFieldLabels);
 
 export const getFormContents = <T>(
   formFieldsLabels: FormFieldsObjectForContent<T>,
@@ -75,7 +85,7 @@ const getFormFieldAttributes = <T>(
 };
 
 export const makeFieldError =
-  <Context extends FieldValues>(context: FormState<Context>) =>
+  <Context extends FieldValues>(context: Pick<FormState<Context>, "errors">) =>
   (
     name: keyof Context | DotNestedKeys<Context>,
   ): {
@@ -86,9 +96,7 @@ export const makeFieldError =
     if (isErrorAddressError(error)) {
       return {
         state: "error" as const,
-        stateRelatedMessage: `L'adresse fournie semble invalide (${keys(
-          error,
-        ).join(", ")})`,
+        stateRelatedMessage: getAddressErrorMessage(error),
       };
     }
     return error
@@ -99,17 +107,50 @@ export const makeFieldError =
       : null;
   };
 
-const isErrorAddressError = (error: unknown) => {
-  const keysOfAddressSchema: (keyof AddressDto)[] = [
-    "postcode",
-    "city",
-    "departmentCode",
-  ];
+const isErrorAddressError = (
+  error: unknown,
+): error is Record<string, unknown> => {
+  if (!error || typeof error !== "object") return false;
+  const errorKeys = keys(error);
   return (
-    error &&
-    typeof error === "object" &&
-    keys(error).every((key) => keysOfAddressSchema.includes(key))
+    errorKeys.length > 0 &&
+    errorKeys.every((key) => addressDtoKeys.includes(key))
   );
+};
+
+const getAddressErrorMessage = (error: Record<string, unknown>): string => {
+  const missingFieldLabels = addressDtoKeys
+    .filter((key) => key in error)
+    .map((key) => addressDtoFieldLabels[key]);
+
+  if (missingFieldLabels.length === 0) return localization.invalidAddress;
+
+  return localization.invalidAddressMissingFields(missingFieldLabels);
+};
+
+const collapseAddressErrors = (errors: AnyErrors): AnyErrors => {
+  if (isErrorAddressError(errors)) {
+    return { message: getAddressErrorMessage(errors) };
+  }
+
+  const collapsed: AnyErrors = {};
+  for (const key in errors) {
+    if (!(key in errors)) continue;
+    const value = errors[key];
+    if (isErrorAddressError(value)) {
+      collapsed[key] = { message: getAddressErrorMessage(value) };
+    } else if (
+      value &&
+      typeof value === "object" &&
+      !("message" in value) &&
+      value !== null
+    ) {
+      collapsed[key] = collapseAddressErrors(value);
+    } else {
+      collapsed[key] = value;
+    }
+  }
+  return collapsed;
 };
 
 type RootError = {
@@ -164,7 +205,9 @@ const replaceArrayPath = (flatErrorsObject: AnyErrors) =>
   }, {});
 
 export const displayReadableError = (errors: AnyErrors): AnyErrors =>
-  replaceArrayPath(toDotNotation(formErrorsToFlatErrors(errors)));
+  replaceArrayPath(
+    toDotNotation(formErrorsToFlatErrors(collapseAddressErrors(errors))),
+  );
 
 export const toErrorsWithLabels = ({
   labels,
