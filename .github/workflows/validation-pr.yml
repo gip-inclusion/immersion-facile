@@ -60,11 +60,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - name: Use Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24.14.0"
-          cache: "pnpm"
-      - run: |
-          pnpm back verify-migrations-order
+      - working-directory: back
+        run: ./src/scripts/verifyDatabaseMigrationsOrder.sh
