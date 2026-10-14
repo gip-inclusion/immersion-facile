@@ -1,4 +1,5 @@
 import z from "zod";
+import { orderedAgencyKindList } from "../agency/agency.dto";
 import {
   agencyKindSchema,
   refersToAgencyIdSchema,
@@ -60,6 +61,17 @@ const makeConventionPresentationSchema = (
   return schema;
 };
 
+const isSupportedAgencyKind = (agencyKind: unknown): boolean =>
+  orderedAgencyKindList.some((kind) => kind === agencyKind);
+
+const removeUnsupportedAgencyKindFilter = (val: unknown): unknown =>
+  val !== null &&
+  typeof val === "object" &&
+  "agencyKind" in val &&
+  !isSupportedAgencyKind(val.agencyKind)
+    ? { ...val, agencyKind: undefined }
+    : val;
+
 export const makeConventionPresentationSchemaWithNormalizedInput = ({
   isTemplateForm,
 }: {
@@ -67,7 +79,11 @@ export const makeConventionPresentationSchemaWithNormalizedInput = ({
 }): ZodSchemaWithInputMatchingOutput<ConventionFormInitialValues> =>
   z.preprocess(
     (val) =>
-      isTemplateForm ? replaceEmptyValuesByUndefinedFromObject(val) : val,
+      isTemplateForm
+        ? removeUnsupportedAgencyKindFilter(
+            replaceEmptyValuesByUndefinedFromObject(val),
+          )
+        : val,
     makeConventionPresentationSchema(isTemplateForm),
   );
 
