@@ -59,6 +59,7 @@ select
     ass.ended_with_a_job as assessment_ended_with_a_job,
     ass.type_of_contract as assessment_type_of_contract,
     ass.created_by ->> 'role' as assessment_created_by_role,
+    ass.number_of_hours_actually_made as assessment_hours_actually_made,
     case
         when estab.siret is not null then true
         else false
