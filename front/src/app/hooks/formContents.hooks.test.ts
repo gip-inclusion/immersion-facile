@@ -1,5 +1,10 @@
 import type { FieldErrors } from "react-hook-form";
-import { formErrorsToFlatErrors } from "./formContents.hooks";
+import { localization } from "shared";
+import {
+  displayReadableError,
+  formErrorsToFlatErrors,
+  makeFieldError,
+} from "./formContents.hooks";
 
 describe("form contents utils", () => {
   it("formErrorsToFlatErrors", () => {
@@ -63,5 +68,123 @@ describe("form contents utils", () => {
     };
 
     expect(formErrorsToFlatErrors(formErrors)).toStrictEqual(expected);
+  });
+
+  describe("makeFieldError with AddressDto nested errors", () => {
+    it("surfaces streetNumberAndAddress error on the parent address field", () => {
+      const getFieldError = makeFieldError({
+        errors: {
+          signatories: {
+            beneficiary: {
+              address: {
+                streetNumberAndAddress: {
+                  message: localization.required,
+                  type: "too_small",
+                },
+              },
+            },
+          },
+        },
+      });
+
+      expect(getFieldError("signatories.beneficiary.address")).toEqual({
+        state: "error",
+        stateRelatedMessage: localization.invalidAddressMissingFields([
+          "numéro et nom de rue",
+        ]),
+      });
+    });
+
+    it("lists all missing address fields with human-readable labels", () => {
+      const getFieldError = makeFieldError({
+        errors: {
+          signatories: {
+            beneficiary: {
+              address: {
+                streetNumberAndAddress: {
+                  message: localization.required,
+                  type: "too_small",
+                },
+                postcode: {
+                  message: localization.required,
+                  type: "too_small",
+                },
+                city: {
+                  message: localization.required,
+                  type: "too_small",
+                },
+              },
+            },
+          },
+        },
+      });
+
+      expect(getFieldError("signatories.beneficiary.address")).toEqual({
+        state: "error",
+        stateRelatedMessage: localization.invalidAddressMissingFields([
+          "numéro et nom de rue",
+          "code postal",
+          "ville",
+        ]),
+      });
+    });
+
+    it("keeps an error already set on the parent address field", () => {
+      const getFieldError = makeFieldError({
+        errors: {
+          signatories: {
+            beneficiary: {
+              address: {
+                message: localization.invalidBeneficiaryAddress,
+                type: "custom",
+              },
+            },
+          },
+        },
+      });
+
+      expect(getFieldError("signatories.beneficiary.address")).toEqual({
+        state: "error",
+        stateRelatedMessage: localization.invalidBeneficiaryAddress,
+      });
+    });
+  });
+
+  describe("displayReadableError with AddressDto nested errors", () => {
+    it("collapses nested address field errors to the parent address path", () => {
+      const errors = {
+        businessContact: {
+          address: {
+            postcode: {
+              message: localization.invalidPostalCode,
+              type: "invalid_string",
+            },
+          },
+        },
+      };
+
+      expect(displayReadableError(errors)).toStrictEqual({
+        "businessContact.address": localization.invalidAddressMissingFields([
+          "code postal",
+        ]),
+      });
+    });
+
+    it("keeps an error already set on the parent address path", () => {
+      const errors = {
+        signatories: {
+          beneficiary: {
+            address: {
+              message: localization.invalidAddress,
+              type: "custom",
+            },
+          },
+        },
+      };
+
+      expect(displayReadableError(errors)).toStrictEqual({
+        "signatories.beneficiary.address": localization.invalidAddress,
+      });
+    });
   });
 });
