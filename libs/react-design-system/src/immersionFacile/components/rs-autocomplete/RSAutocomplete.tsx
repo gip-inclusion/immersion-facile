@@ -148,7 +148,13 @@ export const RSAutocomplete = <T, L>({
   const CustomizedOption = selectProps?.components?.Option;
   return (
     <div
-      className={cx(fr.cx("fr-input-group"), className)}
+      className={cx(
+        fr.cx("fr-input-group", {
+          "fr-input-group--error": state === "error",
+          "fr-input-group--valid": state === "success",
+        }),
+        className,
+      )}
       id={selectProps?.id ?? `${selectProps?.inputId}-wrapper`}
     >
       <label className={fr.cx("fr-label")} htmlFor={selectProps?.inputId}>
@@ -171,7 +177,10 @@ export const RSAutocomplete = <T, L>({
         filterOption={() => true}
         classNames={{
           input: () =>
-            fr.cx("fr-input", { "fr-input--error": state === "error" }),
+            fr.cx("fr-input", {
+              "fr-input--error": state === "error",
+              "fr-input--valid": state === "success",
+            }),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
           menuList: () =>
             cx(fr.cx("fr-menu__list", "fr-mb-0"), Styles.menuList),
