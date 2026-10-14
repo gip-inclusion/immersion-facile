@@ -186,5 +186,44 @@ describe("form contents utils", () => {
         "signatories.beneficiary.address": localization.invalidAddress,
       });
     });
+
+    it("collapses nested address errors while keeping sibling field errors", () => {
+      const errors = {
+        appellations: {
+          message: "Vous devez renseigner au moins un métier",
+          type: "too_small",
+        },
+        businessContact: {
+          firstName: {
+            message: localization.required,
+            type: "too_small",
+          },
+          email: {
+            message: localization.invalidEmailFormat,
+            type: "invalid_string",
+          },
+          address: {
+            streetNumberAndAddress: {
+              message: localization.required,
+              type: "too_small",
+            },
+            postcode: {
+              message: localization.invalidPostalCode,
+              type: "invalid_string",
+            },
+          },
+        },
+      };
+
+      expect(displayReadableError(errors)).toStrictEqual({
+        appellations: "Vous devez renseigner au moins un métier",
+        "businessContact.firstName": localization.required,
+        "businessContact.email": localization.invalidEmailFormat,
+        "businessContact.address": localization.invalidAddressMissingFields([
+          "numéro et nom de rue",
+          "code postal",
+        ]),
+      });
+    });
   });
 });
