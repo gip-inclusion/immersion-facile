@@ -16,8 +16,10 @@ import type { Link } from "type-route";
 import "./SearchResult.scss";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
+type SearchResultMode = "list" | "map-preview";
+
 export type EnterpriseSearchResultProps = {
-  mode: "list" | "map-preview";
+  mode: SearchResultMode;
   searchResult: OfferDto;
   linkProps: Link;
   illustration?: ReactNode;
@@ -83,18 +85,18 @@ const SearchResultComponent = ({
       }
     : linkProps;
 
-  const offerLinkIdPrefix = {
+  const offerLinkIdPrefixByMode: Record<SearchResultMode, string> = {
     list: voluntaryToImmersion
       ? domElementIds.search.searchResultButton
       : domElementIds.search.lbbSearchResultButton,
     "map-preview": voluntaryToImmersion
       ? domElementIds.search.mapSearchResultButton
       : domElementIds.search.lbbMapSearchResultButton,
-  }[mode];
+  };
 
   const offerLinkProps = {
     ...linkPropsHandlingNotAvailable,
-    id: `${offerLinkIdPrefix}-${locationId}`,
+    id: `${offerLinkIdPrefixByMode[mode]}-${locationId}`,
   };
 
   const isMapPreview = mode === "map-preview";
