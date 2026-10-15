@@ -116,6 +116,12 @@ describe("makeConventionPresentationSchemaWithNormalizedInput", () => {
           beneficiary: { email: "beneficiary@test.com" },
         },
       },
+      {
+        id: validConventionId,
+        name: "Modèle immersion",
+        internshipKind: "immersion" as InternshipKind,
+        agencyKind: "not-a-kind",
+      },
     ])("throws on invalid data", (conventionTemplate) => {
       expect(() => schema.parse(conventionTemplate)).toThrow();
     });
