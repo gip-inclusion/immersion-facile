@@ -1,4 +1,5 @@
 {
+  "biome.enabled": true,
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "jest.runMode": {
     "type": "on-demand"
