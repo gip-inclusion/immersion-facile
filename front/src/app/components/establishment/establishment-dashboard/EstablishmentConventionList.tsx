@@ -15,6 +15,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionListSelectors } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.selectors";
 import { conventionListSlice } from "src/core-logic/domain/connected-user/conventionList/connectedUserConventionList.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import { match, P } from "ts-pattern";
 import { ConventionAssessmentStatusBadge } from "../../convention/ConventionAssessmentStatusBadge";
 import { ConventionDatesDisplay } from "../../convention/ConventionDatesDisplay";
 import { ConventionStatusBadge } from "../../convention/ConventionStatusBadge";
@@ -39,7 +40,6 @@ export const EstablishmentConventionList = ({
   } = useAppSelector(conventionListSelectors.establishmentConventionList);
   const isLoading = useAppSelector(conventionListSelectors.isLoading);
   const hasConventions = conventions.length > 0;
-  const hasActiveSearch = !!filters.search;
 
   useEffect(() => {
     if (!connectedUserJwt) return;
@@ -77,10 +77,10 @@ export const EstablishmentConventionList = ({
       )}
       <WithFeedbackReplacer topic={establishmentConventionListFeedbackTopic}>
         <RichTable
-          headers={getEstablishmentConventionTableHeaders(
+          headers={getEstablishmentConventionTableHeaders({
             hasConventions,
-            hasActiveSearch,
-          )}
+            search: filters.search,
+          })}
           isLoading={isLoading}
           label={"Listing des conventions"}
           hasViewSwitch={false}
@@ -98,7 +98,6 @@ export const EstablishmentConventionList = ({
                       ...filters,
                       search: query || undefined,
                       page: 1,
-                      perPage: 10,
                     },
                     feedbackTopic: establishmentConventionListFeedbackTopic,
                   },
@@ -134,18 +133,25 @@ export const EstablishmentConventionList = ({
   );
 };
 
-const getEstablishmentConventionTableHeaders = (
-  hasConventions: boolean,
-  hasActiveSearch: boolean,
-): string[] => {
-  if (hasConventions)
-    return ["Personne en immersion", "Statut", "Bilan", "Dates", "Actions"];
-  if (hasActiveSearch)
-    return [
-      "Aucune convention trouvée avec ces filtres, vous pouvez modifier les filtres pour élargir votre recherche.",
-    ];
-  return ["Nous n'avons pas trouvé de convention."];
-};
+const getEstablishmentConventionTableHeaders = ({
+  hasConventions,
+  search,
+}: {
+  hasConventions: boolean;
+  search: string | undefined;
+}): string[] =>
+  match({ hasConventions, search })
+    .with({ hasConventions: true }, () => [
+      "Personne en immersion",
+      "Statut",
+      "Bilan",
+      "Dates",
+      "Actions",
+    ])
+    .with({ search: P.string.minLength(1) }, ({ search }) => [
+      `Aucune convention trouvée pour la recherche « ${search} », vous pouvez modifier votre recherche pour l'élargir.`,
+    ])
+    .otherwise(() => ["Nous n'avons pas trouvé de convention."]);
 
 const toEstablishmentConventionTableData = (
   conventions: EstablishmentUserConventionListDto[],
