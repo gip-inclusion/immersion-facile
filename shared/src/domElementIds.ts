@@ -1043,8 +1043,6 @@ export const domElementIds = {
     },
     agencyDetails: {
       editAgencyForm: "im-agency-dashboard-form-edit-agency",
-      editAgencyFormGroupNameInput:
-        "im-agency-dashboard-form-edit-agency__group-name-input",
       editAgencyFormEditSubmitButton:
         "im-agency-dashboard-form-edit-agency__submit-button",
       editAgencyUserEmail: "im-agency-dashboard-edit-agency-user__email",
