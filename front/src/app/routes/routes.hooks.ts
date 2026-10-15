@@ -89,6 +89,16 @@ export const useSearchResultRoute =
     )["name"]
   >();
 
+export const useSearchRoute =
+  makeUseTypedRoute<
+    (
+      | typeof frontRoutes.search
+      | typeof frontRoutes.searchForStudent
+      | typeof frontRoutes.externalSearch
+      | typeof frontRoutes.group
+    )["name"]
+  >();
+
 type CreateDiscussionRouteName = (
   | typeof frontRoutes.searchResult
   | typeof frontRoutes.searchResultForStudent

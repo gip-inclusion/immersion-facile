@@ -288,7 +288,7 @@ const getPageByRouteName: {
     </DashboardPrivateRoutePage>
   ),
   formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
-  group: (route) => <SearchPage route={route} isExternal={false} />,
+  group: () => <SearchPage />,
   home: () => <HomePage type="default" />,
   homeAgencies: () => <HomePage type="agency" />,
   homeCandidates: () => <HomePage type="candidate" />,
@@ -344,29 +344,9 @@ const getPageByRouteName: {
     return <OpenApiDocV2Page />;
   },
   magicLinkInterstitial: () => <MagicLinkInterstitialPage />,
-  search: (route) => (
-    <SearchPage
-      route={route}
-      useNaturalLanguageForAppellations
-      isExternal={false}
-      key="internal-search"
-    />
-  ),
-  externalSearch: (route) => (
-    <SearchPage
-      route={route}
-      useNaturalLanguageForAppellations
-      isExternal
-      key="external-search"
-    />
-  ),
-  searchForStudent: (route) => (
-    <SearchPage
-      route={route}
-      useNaturalLanguageForAppellations
-      isExternal={false}
-    />
-  ),
+  search: () => <SearchPage key="internal-search" />,
+  externalSearch: () => <SearchPage key="external-search" />,
+  searchForStudent: () => <SearchPage />,
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
       <StandardLayoutPage route={route} />

@@ -22,17 +22,7 @@ import {
 import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
-<<<<<<< HEAD
 import { domElementIds, Group, GroupSlug, type ValueOf } from "shared";
-=======
-import {
-  domElementIds,
-  type Group,
-  type GroupSlug,
-  type ValueOf,
-} from "shared";
-import { Breadcrumbs } from "src/app/components/Breadcrumbs";
->>>>>>> 508bb3401 (unify group pages on SearchPage with classic filters)
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -42,13 +32,14 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   encodedSearchUriParams,
-  type SearchRoute,
+  searchPageParamsFromRoute,
   useSearch,
 } from "src/app/hooks/search.hooks";
 import {
   areValidGeoParams,
   canSubmitSearch,
 } from "src/app/pages/search/SearchPage.utils";
+import { useSearchRoute } from "src/app/routes/routes.hooks";
 import {
   isKeyInObjectAndValueNotUndefinedNorEmpty,
   isValueUndefinedOrEmpty,
@@ -144,17 +135,20 @@ export const placeHintText = "Une ville, un département, une région, etc.";
 
 export const placeInputLabel = "Dans quelle ville ?";
 
-export const SearchPage = ({
-  route,
-  useNaturalLanguageForAppellations,
-  isExternal,
-}: {
-  route: SearchRoute;
-  useNaturalLanguageForAppellations?: boolean;
-  isExternal: boolean;
-}) => {
+export const SearchPage = () => {
+  const route = useSearchRoute([
+    "search",
+    "searchForStudent",
+    "externalSearch",
+    "group",
+  ]);
+  const isExternal = route.name === "externalSearch";
+  const useNaturalLanguageForAppellations = route.name !== "group";
   const dispatch = useDispatch();
-  const routeParams = route.params as Partial<SearchPageParams>;
+  const routeParams = useMemo(
+    () => searchPageParamsFromRoute(route),
+    [route.name, route.params],
+  );
   const groupSlug = route.name === "group" ? route.params.groupSlug : undefined;
   const { pagination } = useAppSelector(
     searchSelectors.searchResultsWithPagination,
@@ -308,6 +302,10 @@ export const SearchPage = ({
     initialValues,
   ]);
 
+  useEffect(() => {
+    dispatch(nafSlice.actions.getAllSectionsRequested());
+  }, [dispatch]);
+
   useEffect(
     () => () => {
       setSearchMade(null);
@@ -316,7 +314,6 @@ export const SearchPage = ({
           locator: "search-form-place",
         }),
       );
-      dispatch(nafSlice.actions.getAllSectionsRequested());
     },
     [dispatch],
   );
@@ -479,7 +476,14 @@ export const SearchPage = ({
             {groupData && (
               <>
                 <GroupMetaContent groupData={groupData} />
-                <GroupHeroHeader groupData={groupData} />
+                <GroupHeroHeader
+                  groupData={groupData}
+                  onCtaClick={() => {
+                    searchResultsWrapper.current?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  }}
+                />
               </>
             )}
             {isExternal && (

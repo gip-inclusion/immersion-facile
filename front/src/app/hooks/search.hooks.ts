@@ -1,9 +1,14 @@
 import {
   type AcquisitionParams,
   acquisitionParams,
+  type FitForDisableWorkerOption,
+  fitForDisabledWorkersPositiveOptions,
   frontRoutes,
   type GetOffersFlatQueryParams,
   keys,
+  type SearchSortedBy,
+  type SortDirection,
+  searchSortedByOptions,
 } from "shared";
 import {
   getUrlParameters,
@@ -25,7 +30,65 @@ export type SearchRoute = Route<
 
 type ClassicSearchRouteName = Exclude<SearchRoute["name"], "group">;
 
-type SearchQueryRouteParams = Parameters<typeof frontRoutes.search>[0];
+type SearchQueryRouteParams = Extract<
+  SearchRoute,
+  { name: "search" }
+>["params"];
+
+const isSearchSortedBy = (value: string | undefined): value is SearchSortedBy =>
+  searchSortedByOptions.some((option) => option === value);
+
+const isSortDirection = (value: string | undefined): value is SortDirection =>
+  value === "asc" || value === "desc";
+
+const fitForDisabledWorkersFromRoute = (
+  value: boolean | undefined,
+): FitForDisableWorkerOption[] | undefined => {
+  if (value === undefined) return undefined;
+  if (value) return [...fitForDisabledWorkersPositiveOptions];
+  return ["no"];
+};
+
+const fitForDisabledWorkersToRoute = (
+  value: FitForDisableWorkerOption[] | undefined,
+): boolean | undefined => {
+  if (value === undefined) return undefined;
+  return value.some(
+    (option) => option === "yes-declared-only" || option === "yes-ft-certified",
+  );
+};
+
+const withNormalizedSearchQueryParams = ({
+  fitForDisabledWorkers,
+  sortBy,
+  sortOrder,
+  ...rest
+}: SearchQueryRouteParams): Partial<SearchPageParams> => ({
+  ...rest,
+  ...(fitForDisabledWorkers === undefined
+    ? {}
+    : {
+        fitForDisabledWorkers: fitForDisabledWorkersFromRoute(
+          fitForDisabledWorkers,
+        ),
+      }),
+  ...(isSearchSortedBy(sortBy) ? { sortBy } : {}),
+  ...(isSortDirection(sortOrder) ? { sortOrder } : {}),
+});
+
+export const searchPageParamsFromRoute = (
+  route: SearchRoute,
+): Partial<SearchPageParams> => {
+  if (route.name === "group") {
+    const { groupSlug, ...searchQueryParams } = route.params;
+    return {
+      ...withNormalizedSearchQueryParams(searchQueryParams),
+      group: groupSlug,
+    };
+  }
+
+  return withNormalizedSearchQueryParams(route.params);
+};
 
 const buildSearchQueryRouteParams = ({
   values,
@@ -57,6 +120,9 @@ const buildSearchQueryRouteParams = ({
     nafLabel: values.nafLabel,
     remoteWorkModes: values.remoteWorkModes,
     showOnlyAvailableOffers: values.showOnlyAvailableOffers,
+    fitForDisabledWorkers: fitForDisabledWorkersToRoute(
+      values.fitForDisabledWorkers,
+    ),
     at_campaign: acquisitionFromUrl.at_campaign,
     at_medium: acquisitionFromUrl.at_medium,
     at_kwd: acquisitionFromUrl.at_kwd,
