@@ -31,7 +31,7 @@ export const HomePage = ({ type }: HomePageProps) => {
   const sectionStatsDataForType = sectionStatsData[type];
   const sectionFaqDataForType = sectionFaqData[type];
   return (
-    <HeaderFooterLayout>
+    <HeaderFooterLayout isBreadcrumbsDisplayed={false}>
       <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
         <HeroHeader
           title={title}

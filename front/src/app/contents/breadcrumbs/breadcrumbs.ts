@@ -14,7 +14,6 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
   homeAgencies: {
     label: "Organismes prescripteurs",
     route: frontRoutes.homeAgencies(),
-    isDisplayedOnOwnPage: false,
     children: {
       addAgency: {
         label: "Inscrire mon organisme",
@@ -25,7 +24,6 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
   homeCandidates: {
     label: "Candidats",
     route: frontRoutes.homeCandidates(),
-    isDisplayedOnOwnPage: false,
     children: {
       search: {
         label: "Recherche",
