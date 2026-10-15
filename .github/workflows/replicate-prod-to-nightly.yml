@@ -28,8 +28,9 @@ jobs:
         if: always()
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL
+          --file .github/scripts/scalingo-one-off/with-keep-alive.sh
           --file .github/scripts/nightly-db/run-dbt.sh
-          -- bash /tmp/uploads/run-dbt.sh
+          -- bash /tmp/uploads/with-keep-alive.sh bash /tmp/uploads/run-dbt.sh
 
       - name: Vacuum and analyze nightly database
         if: always()
