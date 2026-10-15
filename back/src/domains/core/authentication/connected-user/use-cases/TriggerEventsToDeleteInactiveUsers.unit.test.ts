@@ -1,5 +1,9 @@
 import { subDays, subMilliseconds, subYears } from "date-fns";
-import { expectToEqual, makeBooleanFeatureFlag } from "shared";
+import {
+  expectObjectInArrayToMatch,
+  expectToEqual,
+  makeBooleanFeatureFlag,
+} from "shared";
 import { EstablishmentAggregateBuilder } from "../../../../establishment/helpers/EstablishmentBuilders";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -401,7 +405,7 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     expectToEqual(countingUowPerformer.getCount(), 4);
   });
 
-  it("does not trigger deletion for last ACCEPTED admin when remaining right is PENDING", async () => {
+  it("does not trigger deletion for last ACCEPTED admin when all remaining user rights are PENDING", async () => {
     const inactiveAdmin = makeUser({
       id: "inactive-admin-id",
       email: "inactive-admin@test.fr",
@@ -486,11 +490,15 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     const result = await triggerEventsToDeleteInactiveUsers.execute();
 
     expectToEqual(result, { numberOfDeletionsTriggered: 1 });
-    expectToEqual(uow.outboxRepository.events.length, 1);
-    expectToEqual(uow.outboxRepository.events[0].payload, {
-      userId: inactiveAdmin.id,
-      triggeredBy: { kind: "crawler" },
-    });
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      {
+        topic: "InactiveUserAccountDeletionTriggered",
+        payload: {
+          userId: inactiveAdmin.id,
+          triggeredBy: { kind: "crawler" },
+        },
+      },
+    ]);
   });
 
   it("triggers deletion for last ACCEPTED admin when no other user has rights on establishment", async () => {
@@ -524,11 +532,15 @@ describe("TriggerEventsToDeleteInactiveUsers", () => {
     const result = await triggerEventsToDeleteInactiveUsers.execute();
 
     expectToEqual(result, { numberOfDeletionsTriggered: 1 });
-    expectToEqual(uow.outboxRepository.events.length, 1);
-    expectToEqual(uow.outboxRepository.events[0].payload, {
-      userId: inactiveAdmin.id,
-      triggeredBy: { kind: "crawler" },
-    });
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      {
+        topic: "InactiveUserAccountDeletionTriggered",
+        payload: {
+          userId: inactiveAdmin.id,
+          triggeredBy: { kind: "crawler" },
+        },
+      },
+    ]);
   });
 
   it("does not trigger deletion when user is last ACCEPTED admin of one establishment even if they have an ACCEPTED contact right elsewhere", async () => {

@@ -1,8 +1,4 @@
-import {
-  onlyAdminUserRightsWithStatusAccepted,
-  onlyUserRightWithStatusAccepted,
-  type UserId,
-} from "shared";
+import { onlyAdminUserRightsWithStatusAccepted, type UserId } from "shared";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 
 export const isEstablishmentReachableByPhoneAfter15Days = (
@@ -13,21 +9,19 @@ export const isEstablishmentReachableByPhoneAfter15Days = (
     (right) => right.isMainContactByPhone,
   )?.phone;
 
-export const isLastAcceptedAdminWithPendingRightsOnly = (
+export const isLastAcceptedAdminWithOnlyPendingRemainingRights = (
   { userRights }: EstablishmentAggregate,
   userId: UserId,
 ): boolean => {
   const acceptedAdmins = userRights.filter(
     onlyAdminUserRightsWithStatusAccepted,
   );
-  const [onlyAcceptedAdmin] = acceptedAdmins;
-  if (acceptedAdmins.length !== 1 || onlyAcceptedAdmin?.userId !== userId)
-    return false;
-
   const remainingRights = userRights.filter((right) => right.userId !== userId);
+  const isUserTheOnlyAcceptedAdmin =
+    acceptedAdmins.length === 1 && acceptedAdmins[0]?.userId === userId;
+  const remainingRightsAreAllPending =
+    remainingRights.length > 0 &&
+    remainingRights.every(({ status }) => status === "PENDING");
 
-  return (
-    remainingRights.some(({ status }) => status === "PENDING") &&
-    !remainingRights.some(onlyUserRightWithStatusAccepted)
-  );
+  return isUserTheOnlyAcceptedAdmin && remainingRightsAreAllPending;
 };

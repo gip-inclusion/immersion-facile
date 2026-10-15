@@ -1096,7 +1096,7 @@ export const errors = {
       sirets: SiretDto[];
     }) =>
       new ForbiddenError(
-        `Il n'est pas possible de supprimer l'utilisateur '${userId}' car il est le seul administrateur accepté d'un établissement qui a encore des rattachements en attente (${sirets.join(", ")}).`,
+        `Il n'est pas possible de supprimer l'utilisateur '${userId}' car il est le seul administrateur accepté d'un établissement qui n'a que des utilisateurs en attente de rattachement (${sirets.join(", ")}).`,
       ),
     forbidden: ({ userId }: { userId: UserId }) =>
       new ForbiddenError(
