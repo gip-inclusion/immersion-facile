@@ -953,6 +953,7 @@ export const domElementIds = {
     distanceSelect: "im-group-page__distance-dropdown",
     fitForDisableWorkersFilterTag:
       "im-group-page__fit-for-disabled-workers-filter-tag",
+    heroHeaderCta: "im-group-page__hero-header-cta",
     lbbSearchResultButton: "im-group-page__lbb-contact-button",
     locationFilterTag: "im-group-page__location-filter-tag",
     nafAutocomplete: "im-group-page__naf-autocomplete",
