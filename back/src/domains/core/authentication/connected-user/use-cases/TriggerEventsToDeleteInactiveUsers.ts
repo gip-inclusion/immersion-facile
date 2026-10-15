@@ -6,7 +6,7 @@ import {
   type UserId,
 } from "shared";
 import { z } from "zod";
-import { isLastAcceptedAdminWithPendingRightsOnly } from "../../../../establishment/helpers/establishment.utils";
+import { isLastAcceptedAdminWithOnlyPendingRemainingRights } from "../../../../establishment/helpers/establishment.utils";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -108,7 +108,10 @@ export const makeTriggerEventsToDeleteInactiveUsers = useCaseBuilder(
                 );
 
               return establishments.some((establishment) =>
-                isLastAcceptedAdminWithPendingRightsOnly(establishment, userId),
+                isLastAcceptedAdminWithOnlyPendingRemainingRights(
+                  establishment,
+                  userId,
+                ),
               )
                 ? null
                 : userId;

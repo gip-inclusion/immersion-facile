@@ -36,11 +36,6 @@ describe("DeleteUser", () => {
     .withEmail("contactLessActive")
     .withLastLoginAt(new Date("2024-01-01"))
     .build();
-  const pendingMostActive = new UserBuilder()
-    .withId("pendingMostActive")
-    .withEmail("pendingMostActive")
-    .withLastLoginAt(new Date("2026-01-01"))
-    .build();
   const readOnlyAndCounsellor = new UserBuilder()
     .withId("readOnlyAndCounsellor")
     .withEmail("readOnlyAndCounsellor")
@@ -81,12 +76,6 @@ describe("DeleteUser", () => {
     userId: contactLessActive.id,
     role: "establishment-contact",
     status: "ACCEPTED",
-    shouldReceiveDiscussionNotifications: true,
-  };
-  const pendingMostActiveContactRight: EstablishmentContactRight = {
-    userId: pendingMostActive.id,
-    role: "establishment-contact",
-    status: "PENDING",
     shouldReceiveDiscussionNotifications: true,
   };
 
@@ -424,174 +413,188 @@ describe("DeleteUser", () => {
         ]);
       });
 
-      it("transfers admin right to the most active ACCEPTED remaining user and keeps PENDING rights unchanged", async () => {
-        uow.userRepository.users = [
-          admin1,
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder(establishment)
-            .withUserRights([
-              admin1Right,
-              contactLessActiveRight,
-              pendingMostActiveContactRight,
-            ])
-            .build(),
-        ];
+      describe("last accepted admin with pending rights", () => {
+        const pendingMostActive = new UserBuilder()
+          .withId("pendingMostActive")
+          .withEmail("pendingMostActive")
+          .withLastLoginAt(new Date("2026-01-01"))
+          .build();
+        const pendingMostActiveContactRight: EstablishmentContactRight = {
+          userId: pendingMostActive.id,
+          role: "establishment-contact",
+          status: "PENDING",
+          shouldReceiveDiscussionNotifications: true,
+        };
 
-        await deleteUser.execute({
-          userId: admin1.id,
-          triggeredBy: { kind: "crawler" },
-        });
-
-        expectToEqual(uow.userRepository.users, [
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ]);
-        expectToEqual(
-          uow.establishmentAggregateRepository.establishmentAggregates,
-          [
+        it("transfers admin right to the most active ACCEPTED remaining user and keeps PENDING rights unchanged", async () => {
+          uow.userRepository.users = [
+            admin1,
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ];
+          uow.establishmentAggregateRepository.establishmentAggregates = [
             new EstablishmentAggregateBuilder(establishment)
-              .withEstablishmentUpdatedAt(timeGateway.now())
               .withUserRights([
-                {
-                  userId: contactLessActive.id,
-                  role: "establishment-admin",
-                  status: "ACCEPTED",
-                  shouldReceiveDiscussionNotifications: true,
-                  isMainContactByPhone: true,
-                  job: "non-communiqué",
-                  phone: "+33600000000",
-                } satisfies EstablishmentAdminRight,
+                admin1Right,
+                contactLessActiveRight,
                 pendingMostActiveContactRight,
               ])
               .build(),
-          ],
-        );
-        expectArraysToMatch(uow.outboxRepository.events, [
-          { topic: "UserDeleted" },
-        ]);
-      });
+          ];
 
-      it("throw when trying to delete the last ACCEPTED admin when the only remaining right is PENDING", async () => {
-        const establishmentWithPendingContact =
-          new EstablishmentAggregateBuilder(establishment)
+          await deleteUser.execute({
+            userId: admin1.id,
+            triggeredBy: { kind: "crawler" },
+          });
+
+          expectToEqual(uow.userRepository.users, [
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ]);
+          expectToEqual(
+            uow.establishmentAggregateRepository.establishmentAggregates,
+            [
+              new EstablishmentAggregateBuilder(establishment)
+                .withEstablishmentUpdatedAt(timeGateway.now())
+                .withUserRights([
+                  {
+                    userId: contactLessActive.id,
+                    role: "establishment-admin",
+                    status: "ACCEPTED",
+                    shouldReceiveDiscussionNotifications: true,
+                    isMainContactByPhone: true,
+                    job: "non-communiqué",
+                    phone: "+33600000000",
+                  } satisfies EstablishmentAdminRight,
+                  pendingMostActiveContactRight,
+                ])
+                .build(),
+            ],
+          );
+          expectArraysToMatch(uow.outboxRepository.events, [
+            { topic: "UserDeleted" },
+          ]);
+        });
+
+        it("throw when trying to delete the last ACCEPTED admin when the only remaining right is PENDING", async () => {
+          const establishmentWithPendingContact =
+            new EstablishmentAggregateBuilder(establishment)
+              .withUserRights([admin1Right, pendingMostActiveContactRight])
+              .build();
+          uow.userRepository.users = [
+            admin1,
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ];
+          uow.establishmentAggregateRepository.establishmentAggregates = [
+            establishmentWithPendingContact,
+          ];
+
+          await expectPromiseToFailWithError(
+            deleteUser.execute({
+              userId: admin1.id,
+              triggeredBy: { kind: "crawler" },
+            }),
+            errors.user.deleteForbiddenLastAcceptedEstablishmentAdmin({
+              userId: admin1.id,
+              sirets: [establishment.establishment.siret],
+            }),
+          );
+
+          expectToEqual(uow.userRepository.users, [
+            admin1,
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ]);
+          expectToEqual(
+            uow.establishmentAggregateRepository.establishmentAggregates,
+            [establishmentWithPendingContact],
+          );
+          expectToEqual(uow.outboxRepository.events, []);
+        });
+
+        it("throw when trying to delete a user who is last ACCEPTED admin of one establishment even if they have an ACCEPTED contact right elsewhere", async () => {
+          const otherEstablishmentSiret = "12345678901234";
+          const blockingEstablishment = new EstablishmentAggregateBuilder(
+            establishment,
+          )
             .withUserRights([admin1Right, pendingMostActiveContactRight])
             .build();
-        uow.userRepository.users = [
-          admin1,
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishmentWithPendingContact,
-        ];
+          const otherEstablishment = new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(otherEstablishmentSiret)
+            .withUserRights([
+              {
+                ...admin2Right,
+                isMainContactByPhone: true,
+              },
+              {
+                ...contactMostActiveRight,
+                userId: admin1.id,
+              },
+            ])
+            .build();
+          uow.userRepository.users = [
+            admin1,
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ];
+          uow.establishmentAggregateRepository.establishmentAggregates = [
+            blockingEstablishment,
+            otherEstablishment,
+          ];
 
-        await expectPromiseToFailWithError(
-          deleteUser.execute({
-            userId: admin1.id,
-            triggeredBy: { kind: "crawler" },
-          }),
-          errors.user.deleteForbiddenLastAcceptedEstablishmentAdmin({
-            userId: admin1.id,
-            sirets: [establishment.establishment.siret],
-          }),
-        );
-
-        expectToEqual(uow.userRepository.users, [
-          admin1,
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ]);
-        expectToEqual(
-          uow.establishmentAggregateRepository.establishmentAggregates,
-          [establishmentWithPendingContact],
-        );
-        expectToEqual(uow.outboxRepository.events, []);
-      });
-
-      it("throw when trying to delete a user who is last ACCEPTED admin of one establishment even if they have an ACCEPTED contact right elsewhere", async () => {
-        const otherEstablishmentSiret = "12345678901234";
-        const blockingEstablishment = new EstablishmentAggregateBuilder(
-          establishment,
-        )
-          .withUserRights([admin1Right, pendingMostActiveContactRight])
-          .build();
-        const otherEstablishment = new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(otherEstablishmentSiret)
-          .withUserRights([
-            {
-              ...admin2Right,
-              isMainContactByPhone: true,
-            },
-            {
-              ...contactMostActiveRight,
+          await expectPromiseToFailWithError(
+            deleteUser.execute({
               userId: admin1.id,
-            },
-          ])
-          .build();
-        uow.userRepository.users = [
-          admin1,
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          blockingEstablishment,
-          otherEstablishment,
-        ];
+              triggeredBy: { kind: "crawler" },
+            }),
+            errors.user.deleteForbiddenLastAcceptedEstablishmentAdmin({
+              userId: admin1.id,
+              sirets: [establishment.establishment.siret],
+            }),
+          );
 
-        await expectPromiseToFailWithError(
-          deleteUser.execute({
-            userId: admin1.id,
-            triggeredBy: { kind: "crawler" },
-          }),
-          errors.user.deleteForbiddenLastAcceptedEstablishmentAdmin({
-            userId: admin1.id,
-            sirets: [establishment.establishment.siret],
-          }),
-        );
-
-        expectToEqual(uow.userRepository.users, [
-          admin1,
-          admin2,
-          contactMostActive,
-          contactLessActive,
-          pendingMostActive,
-          readOnlyAndCounsellor,
-          validator1,
-          validator2,
-        ]);
-        expectToEqual(
-          uow.establishmentAggregateRepository.establishmentAggregates,
-          [blockingEstablishment, otherEstablishment],
-        );
-        expectToEqual(uow.outboxRepository.events, []);
+          expectToEqual(uow.userRepository.users, [
+            admin1,
+            admin2,
+            contactMostActive,
+            contactLessActive,
+            pendingMostActive,
+            readOnlyAndCounsellor,
+            validator1,
+            validator2,
+          ]);
+          expectToEqual(
+            uow.establishmentAggregateRepository.establishmentAggregates,
+            [blockingEstablishment, otherEstablishment],
+          );
+          expectToEqual(uow.outboxRepository.events, []);
+        });
       });
     });
 

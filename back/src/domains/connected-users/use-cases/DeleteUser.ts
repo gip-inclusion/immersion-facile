@@ -33,7 +33,7 @@ import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../../establishment/entities/EstablishmentAggregate";
-import { isLastAcceptedAdminWithPendingRightsOnly } from "../../establishment/helpers/establishment.utils";
+import { isLastAcceptedAdminWithOnlyPendingRemainingRights } from "../../establishment/helpers/establishment.utils";
 
 export const partialDeleteOptions = [
   "establishement-only",
@@ -78,20 +78,24 @@ export const makeDeleteUser = useCaseBuilder("DeleteUser")
           { userId: userToDelete.id },
         );
 
-      const siretsWithLastAcceptedAdminAndPendingRightsOnly =
+      const siretsWithLastAcceptedAdminAndOnlyPendingRemainingRights =
         establishmentsWithUserRight
           .filter((establishment) =>
-            isLastAcceptedAdminWithPendingRightsOnly(
+            isLastAcceptedAdminWithOnlyPendingRemainingRights(
               establishment,
               userToDelete.id,
             ),
           )
           .map((establishment) => establishment.establishment.siret);
 
-      if (isNotEmptyArray(siretsWithLastAcceptedAdminAndPendingRightsOnly))
+      if (
+        isNotEmptyArray(
+          siretsWithLastAcceptedAdminAndOnlyPendingRemainingRights,
+        )
+      )
         throw errors.user.deleteForbiddenLastAcceptedEstablishmentAdmin({
           userId: userToDelete.id,
-          sirets: siretsWithLastAcceptedAdminAndPendingRightsOnly,
+          sirets: siretsWithLastAcceptedAdminAndOnlyPendingRemainingRights,
         });
 
       if (inputParams.partialDelete)
