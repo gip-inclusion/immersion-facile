@@ -1907,14 +1907,19 @@ Tél : ${beneficiaryPhone}`,
         "theme:MER",
         "role:utilisateurInitiateur",
       ],
-      createEmailVariables: (params) => ({
-        subject: "Réponse à la candidature impossible",
-        greetings: "Bonjour",
-        subContent: defaultSignature("immersion"),
-        ...discussionExchangeForbiddenContents(params)[params.sender][
-          params.reason
-        ],
-      }),
+      createEmailVariables: (params) => {
+        const discussionExchangeForbiddenContent =
+          discussionExchangeForbiddenContents(params)[params.sender][
+            params.reason
+          ];
+        return {
+          subject: "Réponse à la candidature impossible",
+          greetings: "Bonjour",
+          subContent: defaultSignature("immersion"),
+          content: discussionExchangeForbiddenContent.emailContent.content,
+          buttons: discussionExchangeForbiddenContent.emailContent.buttons,
+        };
+      },
     },
     ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
       niceName: "Etablissement - Relance mise en relation",
