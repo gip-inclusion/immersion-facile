@@ -554,6 +554,7 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
     loginPersona: LoginPersona;
+    email: Email;
     baseUrl: AbsoluteUrl;
   };
   ACCOUNT_DELETION_WARNING: {
