@@ -12,7 +12,7 @@ import {
   broadcastToPartnersServiceName,
 } from "../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getLinkedAgenciesFromAgencyId } from "./Convention";
+import { getLinkedAgenciesFromAgencyId } from "../entities/Convention";
 
 export const shouldBroadcastToFranceTravail = ({
   agency,

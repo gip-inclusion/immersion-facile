@@ -38,7 +38,7 @@ import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import {
   hasPriorSuccessfulBroadcast,
   isBroadcastFeedbackRelevant,
-} from "../entities/Broadcast";
+} from "../helpers/broadcast.helpers";
 import type {
   ConventionQueries,
   GetConventionIdsParams,
@@ -434,11 +434,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }: GetConventionsWithErroredBroadcastFeedbackForAgencyUserParams): Promise<
     DataWithPagination<ConventionWithBroadcastFeedback>
   > {
-    const hasRelevantBroadcastDestinations = Object.values(
+    const hasRelevantBroadcastConsumers = Object.values(
       relevantConsumerNamesByAgencyId,
     ).some((consumerNames) => consumerNames.length > 0);
 
-    if (userAgencyIds.length === 0 || !hasRelevantBroadcastDestinations)
+    if (userAgencyIds.length === 0 || !hasRelevantBroadcastConsumers)
       return {
         data: [],
         pagination: {

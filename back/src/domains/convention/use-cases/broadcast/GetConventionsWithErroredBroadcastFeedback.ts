@@ -10,7 +10,7 @@ import {
   getPaginationParamsForWeb,
 } from "shared";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
-import { getRelevantBroadcastConsumerNames } from "../../entities/Broadcast";
+import { getRelevantBroadcastConsumerNames } from "../../helpers/broadcast.helpers";
 
 export type GetConventionsWithErroredBroadcastFeedback = ReturnType<
   typeof makeGetConventionsWithErroredBroadcastFeedback
