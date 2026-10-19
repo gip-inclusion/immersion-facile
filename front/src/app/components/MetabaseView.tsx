@@ -5,7 +5,7 @@ import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
-import { globalStatsUrl, immersionStatsUrl } from "src/app/contents/statsUrls";
+import { publicStatsUrl } from "src/app/contents/statsUrls";
 import { ENV } from "src/config/environmentVariables";
 
 export const MetabaseView = ({
@@ -45,9 +45,7 @@ export const MetabaseView = ({
       titleAction={<MetabaseFullScreenButton url={url} />}
       description={subtitle}
     >
-      {ENV.envType === "production" ||
-      url === globalStatsUrl ||
-      url === immersionStatsUrl ? (
+      {ENV.envType === "production" || url === publicStatsUrl ? (
         <iframe
           title="Tableau Metabase"
           src={url}
