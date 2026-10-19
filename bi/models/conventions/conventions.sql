@@ -15,7 +15,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_end ON {{ this }} (date_end)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_submission ON {{ this }} (date_submission)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_date_approval ON {{ this }} (date_approval)",
-      "CREATE INDEX IF NOT EXISTS idx_conventions_date_validation ON {{ this }} (date_validation)",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_date_validation_covering ON {{ this }} (date_validation) INCLUDE (date_submission, updated_at, status_technical, internship_kind, agency_kind)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_agency_region ON {{ this }} (agency_region_name)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_estab_region ON {{ this }} (establishment_region_name)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_rome_code ON {{ this }} (rome_code)",
@@ -23,7 +23,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conventions_id ON {{ this }} (id)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_appellation_label ON {{ this }} (appellation_label)",
       "CREATE INDEX IF NOT EXISTS idx_conventions_rome_label ON {{ this }} (rome_label)",
-      "CREATE INDEX IF NOT EXISTS idx_conventions_analytics_assessment_completed ON {{ this }} (status_technical, internship_kind, updated_at) INCLUDE (date_end, assessment_signed_at, assessment_created_at) WHERE assessment_status IN ('COMPLETED', 'PARTIALLY_COMPLETED') AND assessment_signed_at IS NOT NULL AND assessment_created_at IS NOT NULL",
+      "CREATE INDEX IF NOT EXISTS idx_conventions_assessment_completed ON {{ this }} (status_technical, internship_kind, updated_at) INCLUDE (date_end, assessment_signed_at, assessment_created_at) WHERE assessment_status IN ('COMPLETED', 'PARTIALLY_COMPLETED')",
     ]
   )
 }}
