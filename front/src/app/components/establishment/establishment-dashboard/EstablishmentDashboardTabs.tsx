@@ -31,7 +31,6 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { initialDiscussionsWithPagination } from "src/core-logic/domain/discussion/discussion.slice";
 import { DiscussionTabContent } from "../../discussion/DiscussionTabContent";
-import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 import { EstablishmentConventionList } from "./EstablishmentConventionList";
 
 type EstablishmentDashboardTabsProps = {
@@ -153,14 +152,15 @@ const makeEstablishmentDashboardTabs = (
       content: (
         <>
           <HeadingSection
-            title="Piloter une convention"
+            title="Conventions"
             titleAs="h2"
             titleAction={<InitiateConventionButton />}
             className={fr.cx("fr-mt-0")}
           >
-            <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+            <EstablishmentConventionList
+              conventionsDashboardUrl={conventions}
+            />
           </HeadingSection>
-          <EstablishmentConventionList conventionsDashboardUrl={conventions} />
           <ConventionTemplatesList
             fromRoute={frontRoutes.establishmentDashboard()}
           />

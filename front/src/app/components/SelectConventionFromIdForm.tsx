@@ -15,8 +15,7 @@ import type { Route } from "type-route";
 
 type SelectConventionFromIdFormProps = {
   routeNameToRedirectTo: Route<
-    | typeof frontRoutes.adminConventionDetail
-    | typeof frontRoutes.manageConventionConnectedUser
+    typeof frontRoutes.adminConventionDetail
   >["name"];
 };
 
