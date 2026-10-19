@@ -6,7 +6,7 @@
       "CREATE INDEX IF NOT EXISTS idx_discussions_id ON {{ this }} (id)",
       "CREATE INDEX IF NOT EXISTS idx_discussions_siret ON {{ this }} (siret)",
       "CREATE INDEX IF NOT EXISTS idx_discussions_status ON {{ this }} (status)",
-      "CREATE INDEX IF NOT EXISTS idx_discussions_created_at ON {{ this }} (created_at)",
+      "CREATE INDEX IF NOT EXISTS idx_discussions_created_at_covering ON {{ this }} (created_at) INCLUDE (number_of_exchanges, convention_id)",
       "CREATE INDEX IF NOT EXISTS idx_discussions_convention_id ON {{ this }} (convention_id)"
     ]
   )
