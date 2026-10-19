@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { Fragment, type ReactNode, useEffect } from "react";
 import { RichTable } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -65,71 +64,67 @@ export const EstablishmentConventionList = ({
   if (!connectedUserJwt) return null;
 
   return (
-    <div className={fr.cx("fr-mt-4w")}>
-      {conventionsDashboardUrl && (
-        <div className={fr.cx("fr-grid-row", "fr-grid-row--right")}>
-          <MetabaseFullScreenButton
-            url={conventionsDashboardUrl}
-            label="Télécharger les données (Excel/CSV)"
-            tooltipText="L’export se fait depuis l’ancien tableau Metabase."
-          />
-        </div>
-      )}
-      <WithFeedbackReplacer topic={establishmentConventionListFeedbackTopic}>
-        <RichTable
-          headers={getEstablishmentConventionTableHeaders({
-            hasConventions,
-            search: filters.search,
-          })}
-          isLoading={isLoading}
-          label={"Listing des conventions"}
-          hasViewSwitch={false}
-          tableData={toEstablishmentConventionTableData(conventions)}
-          searchBar={{
-            label: "Rechercher",
-            placeholder:
-              "Rechercher une convention (ID de convention, nom, prénom, email, SIRET, ... )",
-            onSubmit: (query: string) => {
+    <WithFeedbackReplacer topic={establishmentConventionListFeedbackTopic}>
+      <RichTable
+        headers={getEstablishmentConventionTableHeaders({
+          hasConventions,
+          search: filters.search,
+        })}
+        isLoading={isLoading}
+        label={"Listing des conventions"}
+        hasViewSwitch={false}
+        tableData={toEstablishmentConventionTableData(conventions)}
+        searchBar={{
+          label: "Rechercher",
+          placeholder:
+            "Rechercher une convention (ID de convention, nom, prénom, email, SIRET, ... )",
+          action: conventionsDashboardUrl && (
+            <MetabaseFullScreenButton
+              url={conventionsDashboardUrl}
+              label="Télécharger les données (Excel/CSV)"
+              tooltipText="L’export se fait depuis l’ancien tableau Metabase."
+            />
+          ),
+          onSubmit: (query: string) => {
+            dispatch(
+              conventionListSlice.actions.fetchEstablishmentConventionListRequested(
+                {
+                  jwt: connectedUserJwt,
+                  filters: {
+                    ...filters,
+                    search: query || undefined,
+                    page: 1,
+                  },
+                  feedbackTopic: establishmentConventionListFeedbackTopic,
+                },
+              ),
+            );
+          },
+        }}
+        pagination={{
+          count: pagination.totalPages,
+          defaultPage: pagination.currentPage,
+          showFirstLast: true,
+          getPageLinkProps: (pageNumber) => ({
+            title: `Résultats de recherche, page : ${pageNumber}`,
+            onClick: (event) => {
+              event.preventDefault();
               dispatch(
                 conventionListSlice.actions.fetchEstablishmentConventionListRequested(
                   {
                     jwt: connectedUserJwt,
-                    filters: {
-                      ...filters,
-                      search: query || undefined,
-                      page: 1,
-                    },
+                    filters: { ...filters, page: pageNumber },
                     feedbackTopic: establishmentConventionListFeedbackTopic,
                   },
                 ),
               );
             },
-          }}
-          pagination={{
-            count: pagination.totalPages,
-            defaultPage: pagination.currentPage,
-            showFirstLast: true,
-            getPageLinkProps: (pageNumber) => ({
-              title: `Résultats de recherche, page : ${pageNumber}`,
-              onClick: (event) => {
-                event.preventDefault();
-                dispatch(
-                  conventionListSlice.actions.fetchEstablishmentConventionListRequested(
-                    {
-                      jwt: connectedUserJwt,
-                      filters: { ...filters, page: pageNumber },
-                      feedbackTopic: establishmentConventionListFeedbackTopic,
-                    },
-                  ),
-                );
-              },
-              href: "#",
-              key: `pagination-link-${pageNumber}`,
-            }),
-          }}
-        />
-      </WithFeedbackReplacer>
-    </div>
+            href: "#",
+            key: `pagination-link-${pageNumber}`,
+          }),
+        }}
+      />
+    </WithFeedbackReplacer>
   );
 };
 

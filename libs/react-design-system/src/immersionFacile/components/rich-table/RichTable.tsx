@@ -47,6 +47,7 @@ type RichTableProps = {
     placeholder: string;
     hintText?: string;
     onSubmit: (value: string) => void;
+    action?: ReactNode;
   };
   pagination: PaginationProps;
   isLoading: boolean;
@@ -112,38 +113,50 @@ export const RichTable = ({
       {isLoading && <Loader />}
       <header className={cx(Styles.header)}>
         {searchBar && (
-          <form
-            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-              const query = formData.get("search");
-              if (query && typeof query === "string") {
-                searchBar.onSubmit(query);
-              }
-            }}
-            className={fr.cx("fr-grid-row", "fr-search-bar")}
-          >
-            <div className={fr.cx("fr-col-lg-7")}>
-              <Input
-                label={searchBar.label}
-                nativeInputProps={{
-                  placeholder: searchBar.placeholder,
-                  role: "search",
-                  name: "search",
-                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                    setSearchValue(event.target.value);
-                  },
-                }}
-                className={fr.cx("fr-mb-0")}
-              />
-              {searchBar.hintText && (
-                <span className={fr.cx("fr-hint-text", "fr-mt-1w")}>
-                  {searchBar.hintText}
-                </span>
+          <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
+            <form
+              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                const formData = new FormData(event.currentTarget);
+                const query = formData.get("search");
+                if (query && typeof query === "string") {
+                  searchBar.onSubmit(query);
+                }
+              }}
+              className={fr.cx(
+                "fr-col-12",
+                !!searchBar.action && "fr-col-lg-7",
+                "fr-grid-row",
+                "fr-search-bar",
               )}
-            </div>
-            <Button type="submit">Rechercher</Button>
-          </form>
+            >
+              <div
+                className={fr.cx(searchBar.action ? "fr-col" : "fr-col-lg-7")}
+              >
+                <Input
+                  label={searchBar.label}
+                  nativeInputProps={{
+                    placeholder: searchBar.placeholder,
+                    role: "search",
+                    name: "search",
+                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                      setSearchValue(event.target.value);
+                    },
+                  }}
+                  className={fr.cx("fr-mb-0")}
+                />
+                {searchBar.hintText && (
+                  <span className={fr.cx("fr-hint-text", "fr-mt-1w")}>
+                    {searchBar.hintText}
+                  </span>
+                )}
+              </div>
+              <Button type="submit">Rechercher</Button>
+            </form>
+            {searchBar.action && (
+              <div className={fr.cx("fr-ml-auto")}>{searchBar.action}</div>
+            )}
+          </div>
         )}
         {(dropdownFilters || hasViewSwitch) && (
           <div className={cx(Styles.tools)}>
