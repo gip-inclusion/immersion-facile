@@ -394,6 +394,7 @@ describe.each(adapterKind)(
             .withLogoUrl("http://new-logo-url.fr")
             .withAgencySiret("11110000111100")
             .withCodeSafir("CODE_123")
+            .withGroupName("Réseau Cap-Emploi 75")
             .build(),
           {
             [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
@@ -581,33 +582,6 @@ describe.each(adapterKind)(
         expectToEqual(retrievedAgency, {
           ...agencyWithDelegation,
           delegationAgencyInfo: updatedDelegationInfo,
-        });
-      });
-
-      it("updates groupName from null to filled", async () => {
-        const agencyWithoutGroupName = toAgencyWithRights(
-          agency1builder.withGroupName(null).build(),
-          {
-            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-          },
-        );
-
-        await agencyRepository.insert(agencyWithoutGroupName);
-
-        const groupName = "Réseau Cap-Emploi 75";
-
-        await agencyRepository.update({
-          id: agencyWithoutGroupName.id,
-          status: agencyWithoutGroupName.status,
-          groupName,
-        });
-
-        const retrievedAgency = await agencyRepository.getById(
-          agencyWithoutGroupName.id,
-        );
-        expectToEqual(retrievedAgency, {
-          ...agencyWithoutGroupName,
-          groupName,
         });
       });
 
