@@ -19,6 +19,7 @@
       "CREATE INDEX IF NOT EXISTS idx_conv_count_agency_grouping_filters ON {{ this }} (agency_name, agency_kind, status_technical, agency_status, date_start) INCLUDE (agency_id)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_siret ON {{ this }} (siret)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_referenced_siret ON {{ this }} (siret) INCLUDE (date_validation, establishment_naf_code, rome_code) WHERE is_referenced_establishment",
+      "CREATE INDEX IF NOT EXISTS idx_conv_count_accepted_siret_validation ON {{ this }} (siret, date_validation) INCLUDE (is_referenced_establishment) WHERE status_technical = 'ACCEPTED_BY_VALIDATOR'",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_immersion_objective ON {{ this }} (immersion_objective)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_rome_label ON {{ this }} (rome_label)",
       "CREATE INDEX IF NOT EXISTS idx_conv_count_appellation_label ON {{ this }} (appellation_label)",
