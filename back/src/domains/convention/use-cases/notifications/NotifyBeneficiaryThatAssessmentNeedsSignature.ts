@@ -1,7 +1,6 @@
 import {
   errors,
   frontRoutes,
-  getAssessmentCreatorOrganizationName,
   getDisplayedBusinessName,
   getFormattedFirstnameAndLastname,
   makeRouteAbsoluteUrl,
@@ -13,7 +12,6 @@ import {
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
-import { retrieveConventionWithAgency } from "../../entities/Convention";
 
 export type NotifyBeneficiaryThatAssessmentNeedsSignature = ReturnType<
   typeof makeNotifyBeneficiaryThatAssessmentNeedsSignature
@@ -32,10 +30,14 @@ export const makeNotifyBeneficiaryThatAssessmentNeedsSignature = useCaseBuilder(
     config: AppConfig;
   }>()
   .build(async ({ uow, inputParams, deps }) => {
-    const { agency, convention } = await retrieveConventionWithAgency(
-      uow,
+    const convention = await uow.conventionRepository.getById(
       inputParams.convention.id,
     );
+
+    if (!convention)
+      throw errors.convention.notFound({
+        conventionId: inputParams.convention.id,
+      });
 
     const assessment = (
       await uow.assessmentRepository.getByConventionIds([
@@ -74,19 +76,7 @@ export const makeNotifyBeneficiaryThatAssessmentNeedsSignature = useCaseBuilder(
             }),
             baseUrl: deps.config.immersionFacileBaseUrl,
           }),
-          ...(createdBy
-            ? {
-                createdBy: {
-                  ...createdBy,
-                  organizationName: getAssessmentCreatorOrganizationName({
-                    role: createdBy.role,
-                    convention: convention,
-                    agencyName: agency.name,
-                    agencyRefersToName: agency.refersToAgencyName,
-                  }),
-                },
-              }
-            : {}),
+          ...(createdBy ? { createdBy } : {}),
         },
       },
       followedIds: {

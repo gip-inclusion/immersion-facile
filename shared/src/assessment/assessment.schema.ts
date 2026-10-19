@@ -8,6 +8,7 @@ import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/Sche
 import { firstnameSchema, lastnameSchema } from "../user/user.schema";
 import { dateTimeIsoStringSchema, makeDateStringSchema } from "../utils/date";
 import {
+  zStringMinLength1Max255,
   zStringMinLength1Max1024,
   zStringMinLength1Max3000,
   zStringMinLength1Max6000,
@@ -90,6 +91,7 @@ const assessmentCreatorSchema: ZodSchemaWithInputMatchingOutput<AssessmentCreato
     email: emailSchema,
     firstName: firstnameSchema,
     lastName: lastnameSchema,
+    organizationName: zStringMinLength1Max255,
   });
 
 export const assessmentDtoSchema: ZodSchemaWithInputMatchingOutput<AssessmentDto> =

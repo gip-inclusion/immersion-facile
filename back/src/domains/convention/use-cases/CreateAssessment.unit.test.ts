@@ -15,6 +15,7 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   ForbiddenError,
+  getDisplayedBusinessName,
   type Role,
   reasonableSchedule,
   splitCasesBetweenPassingAndFailing,
@@ -82,13 +83,21 @@ describe("CreateAssessment", () => {
   const makeUserAssessmentCreator = (
     role: AssessmentCreatorRole,
     { email, firstName, lastName }: User,
-  ): AssessmentCreator => ({ role, email, firstName, lastName });
+    organizationName: string,
+  ): AssessmentCreator => ({
+    role,
+    email,
+    firstName,
+    lastName,
+    organizationName,
+  });
 
   const tutorAssessmentCreator: AssessmentCreator = {
     role: "establishment-tutor",
     email: validatedConvention.establishmentTutor.email,
     firstName: validatedConvention.establishmentTutor.firstName,
     lastName: validatedConvention.establishmentTutor.lastName,
+    organizationName: getDisplayedBusinessName(validatedConvention),
   };
 
   const assessmentCreatorThroughMagicLinkByRole: Record<
@@ -96,8 +105,12 @@ describe("CreateAssessment", () => {
     AssessmentCreator
   > = {
     "establishment-tutor": tutorAssessmentCreator,
-    validator: makeUserAssessmentCreator("validator", validator),
-    counsellor: makeUserAssessmentCreator("counsellor", counsellor),
+    validator: makeUserAssessmentCreator("validator", validator, agency.name),
+    counsellor: makeUserAssessmentCreator(
+      "counsellor",
+      counsellor,
+      agency.name,
+    ),
   };
 
   const [passingStatuses, failingStatuses] = splitCasesBetweenPassingAndFailing(
@@ -402,7 +415,11 @@ describe("CreateAssessment", () => {
           ...assessment,
           _entityName: "Assessment",
           numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
-          createdBy: makeUserAssessmentCreator("validator", validator),
+          createdBy: makeUserAssessmentCreator(
+            "validator",
+            validator,
+            agency.name,
+          ),
         },
       ]);
     });
@@ -419,7 +436,46 @@ describe("CreateAssessment", () => {
           ...assessment,
           _entityName: "Assessment",
           numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
-          createdBy: makeUserAssessmentCreator("counsellor", counsellor),
+          createdBy: makeUserAssessmentCreator(
+            "counsellor",
+            counsellor,
+            agency.name,
+          ),
+        },
+      ]);
+    });
+
+    it("saves referring agency name when a validator on a delegated agency creates the assessment", async () => {
+      const delegatedAgency = new AgencyDtoBuilder()
+        .withId(agency.id)
+        .withName("Mission Locale")
+        .withRefersToAgencyInfo({
+          refersToAgencyId: "referring-agency",
+          refersToAgencyName: "France Travail",
+          refersToAgencyContactEmail: "contact@francetravail.fr",
+        })
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(delegatedAgency, {
+          [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ];
+
+      await createAssessment.execute(assessment, {
+        userId: validator.id,
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
+          createdBy: makeUserAssessmentCreator(
+            "validator",
+            validator,
+            "France Travail",
+          ),
         },
       ]);
     });
@@ -462,6 +518,7 @@ describe("CreateAssessment", () => {
           createdBy: makeUserAssessmentCreator(
             "establishment-tutor",
             tutorAndRepresentative,
+            getDisplayedBusinessName(conventionWithTutorAsRepresentative),
           ),
         },
       ]);
@@ -647,6 +704,7 @@ describe("CreateAssessment", () => {
             email: "spoofed@mail.com",
             firstName: "Fake",
             lastName: "User",
+            organizationName: "Fake Org",
           },
         },
         tutorPayload,

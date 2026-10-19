@@ -63,6 +63,7 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
         email: "marie@agence.fr",
         firstName: "Marie",
         lastName: "Dupont",
+        organizationName: "Mission Locale",
       },
     });
   }

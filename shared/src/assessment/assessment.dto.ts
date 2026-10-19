@@ -12,6 +12,7 @@ export type AssessmentCreator = {
   email: Email;
   firstName: Firstname;
   lastName: Lastname;
+  organizationName: string;
 };
 
 export type AssessmentStatus = AssessmentDto["status"];

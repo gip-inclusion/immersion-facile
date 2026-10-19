@@ -258,6 +258,7 @@ describe("Assessment routes", () => {
             email: convention.establishmentTutor.email,
             firstName: convention.establishmentTutor.firstName,
             lastName: convention.establishmentTutor.lastName,
+            organizationName: convention.businessName,
           },
         },
       });
