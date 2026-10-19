@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: discussion_with_number_of_exchanges
-    description: "Discussions enriched with the count of exchanges"
+    description: "Discussions enriched with the count of exchanges and last message info"
     columns:
       - name: id
         description: "Primary key - UUID of the discussion"
@@ -31,18 +31,6 @@ models:
         description: "Additional information about experience"
       - name: potential_beneficiary_date_preferences
         description: "Date preferences"
-      - name: establishment_contact_email
-        description: "Email of establishment contact"
-      - name: establishment_contact_first_name
-        description: "First name of establishment contact"
-      - name: establishment_contact_last_name
-        description: "Last name of establishment contact"
-      - name: establishment_contact_phone
-        description: "Phone of establishment contact"
-      - name: establishment_contact_job
-        description: "Job title of establishment contact"
-      - name: establishment_contact_copy_emails
-        description: "CC email addresses"
       - name: appellation_code
         description: "Foreign key to public_appellations_data table"
       - name: appellation_label
@@ -79,3 +67,12 @@ models:
         description: "Count of exchanges in the discussion"
         tests:
           - not_null
+      - name: last_message_from_beneficiary_at
+        description: "Timestamp of the last message sent by the potential beneficiary, null if none"
+      - name: last_message_from_establishment_at
+        description: "Timestamp of the last message sent by the establishment, null if none"
+      - name: last_message_from
+        description: "Sender role of the last message (establishment or potentialBeneficiary), null if no exchange"
+        tests:
+          - accepted_values:
+              values: ['establishment', 'potentialBeneficiary']

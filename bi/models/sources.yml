@@ -17,8 +17,8 @@ sources:
             description: "Last name of the actor"
           - name: email
             description: "Email of the actor"
-          - name: phone
-            description: "Phone number of the actor"
+          - name: phone_id
+            description: "Foreign key to phone_numbers table"
           - name: signed_at
             description: "Timestamp when the actor signed the convention"
           - name: extra_fields
@@ -67,8 +67,8 @@ sources:
             description: "Reference to another agency"
           - name: status_justification
             description: "Reason for rejection if applicable"
-          - name: phone_number
-            description: "Phone number of the agency"
+          - name: phone_id
+            description: "Foreign key to phone_numbers table"
           - name: acquisition_campaign
             description: "Marketing campaign that led to the agency"
           - name: acquisition_keyword
@@ -129,8 +129,8 @@ sources:
             description: "Last name of the contact person"
           - name: contact_job
             description: "Job title of the contact person"
-          - name: contact_phone
-            description: "Phone number of the contact person"
+          - name: contact_phone_id
+            description: "Foreign key to phone_numbers table for the contact person"
           - name: rights
             description: "Rights granted to the consumer"
 
@@ -303,26 +303,14 @@ sources:
             description: "Last name of potential beneficiary"
           - name: potential_beneficiary_email
             description: "Email of potential beneficiary"
-          - name: potential_beneficiary_phone
-            description: "Phone of potential beneficiary"
+          - name: potential_beneficiary_phone_id
+            description: "Foreign key to phone_numbers table for the potential beneficiary"
           - name: potential_beneficiary_resume_link
             description: "Link to beneficiary's resume"
           - name: potential_beneficiary_experience_additional_information
             description: "Additional information about experience"
           - name: potential_beneficiary_date_preferences
             description: "Date preferences"
-          - name: establishment_contact_email
-            description: "Email of establishment contact"
-          - name: establishment_contact_first_name
-            description: "First name of establishment contact"
-          - name: establishment_contact_last_name
-            description: "Last name of establishment contact"
-          - name: establishment_contact_phone
-            description: "Phone of establishment contact"
-          - name: establishment_contact_job
-            description: "Job title of establishment contact"
-          - name: establishment_contact_copy_emails
-            description: "CC email addresses"
           - name: appellation_code
             description: "Foreign key to public_appellations_data table"
           - name: immersion_objective
@@ -359,8 +347,6 @@ sources:
             description: "Message content"
           - name: sender
             description: "Sender role"
-          - name: recipient
-            description: "Recipient role"
           - name: sent_at
             description: "Timestamp when sent"
           - name: subject
@@ -401,8 +387,6 @@ sources:
             description: "URL of hero header logo"
           - name: hero_header_background_color
             description: "Background color of hero header"
-          - name: __old_tint_color
-            description: "Deprecated tint color (renamed)"
 
       - name: groups__sirets
         description: "Relationship between groups and SIRETs"
@@ -905,8 +889,8 @@ sources:
             description: "User role at establishment"
           - name: job
             description: "Job title"
-          - name: phone
-            description: "Phone number"
+          - name: phone_id
+            description: "Foreign key to phone_numbers table"
           - name: should_receive_discussion_notifications
             description: "Whether to receive discussion notifications"
           - name: is_main_contact_by_phone

@@ -15,7 +15,10 @@
 with exchange_counts as (
   select
     discussion_id,
-    count(*) as number_of_exchanges
+    count(*) as number_of_exchanges,
+    max(sent_at) filter (where sender = 'potentialBeneficiary') as last_message_from_beneficiary_at,
+    max(sent_at) filter (where sender = 'establishment') as last_message_from_establishment_at,
+    (array_agg(sender::text order by sent_at desc, id desc))[1] as last_message_from
   from {{ source('immersion', 'exchanges') }}
   group by discussion_id
 )
@@ -53,7 +56,10 @@ select
   pad.libelle_appellation_long as appellation_label,
   prd.code_rome as rome_code,
   prd.libelle_rome as rome_label,
-  coalesce(ec.number_of_exchanges, 0) as number_of_exchanges
+  coalesce(ec.number_of_exchanges, 0) as number_of_exchanges,
+  ec.last_message_from_beneficiary_at,
+  ec.last_message_from_establishment_at,
+  ec.last_message_from
 from {{ source('immersion', 'discussions') }} d
 left join exchange_counts ec
   on d.id = ec.discussion_id

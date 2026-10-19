@@ -95,7 +95,7 @@ models:
         description: "User's role at the establishment"
       - name: job
         description: "User's job title"
-      - name: phone
+      - name: phone_number
         description: "User's phone number"
       - name: should_receive_discussion_notifications
         description: "Whether user receives discussion notifications"
