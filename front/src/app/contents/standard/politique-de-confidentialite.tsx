@@ -2763,6 +2763,15 @@ const LatestPrivacyPolicyContent = () => (
       pouvez consulter les ﬁches proposées par la Commission Nationale de
       l'Informatique et des Libertés (CNIL) :
     </p>
+    <p>
+      Immersion Facilitée utilise des pixels de suivi dans ses courriels.
+      Conformément à la recommandation de la CNIL publiée au Journal officiel le
+      12 avril 2026, nous sommes exemptés du recueil de votre consentement car
+      les pixels dans nos courriels sont «&nbsp;adressés dans le cadre d'une
+      activité directement liée à une mission de service public&nbsp;». Vous
+      pouvez à tout moment refuser les pixels de suivi en bas de chaque courriel
+      reçu.
+    </p>
     <ul>
       <li>
         <a
@@ -2783,13 +2792,5 @@ const LatestPrivacyPolicyContent = () => (
         </a>
       </li>
     </ul>
-    <p>
-      Immersion Facilitée utilise des pixels de suivi dans ses courriels.
-      Conformément à la recommandation de la CNIL publiée au Journal officiel le
-      12 avril 2026, nous sommes exemptés du recueil de votre consentement car
-      les pixels dans nos courriels sont « adressés dans le cadre d'une activité
-      directement liée à une mission de service public ». Vous pouvez à tout
-      moment refuser les pixels de suivi en bas de chaque courriel reçu.
-    </p>
   </>
 );
