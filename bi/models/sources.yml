@@ -440,7 +440,7 @@ sources:
           - name: signed_at
             description: "Timestamp when benficiary signed the assessment"
           - name: created_by
-            description: "Snapshot of the assessment creator: role, email, firstName, lastName, plus userId when the creator is a user"
+            description: "Snapshot of the assessment creator: role, email, firstName, lastName, organizationName"
 
       - name: establishments
         description: "Establishments offering immersion opportunities"

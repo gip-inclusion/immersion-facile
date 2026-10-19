@@ -150,22 +150,19 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
   });
 
   it("notifies beneficiary with createdBy when present", async () => {
-    const counsellorAgency = new AgencyDtoBuilder()
-      .withId(convention.agencyId)
-      .withName("Mission Locale")
-      .build();
     const createdBy: AssessmentCreator = {
       role: "counsellor",
       email: "marie@agence.fr",
       firstName: "Marie",
       lastName: "Dupont",
+      organizationName: "Mission Locale",
     };
     const assessmentWithCreator: AssessmentDto = {
       ...assessment,
       createdBy,
     };
     uow.conventionRepository.setConventions([convention]);
-    uow.agencyRepository.agencies = [toAgencyWithRights(counsellorAgency)];
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     uow.assessmentRepository.assessments = [
       {
         _entityName: "Assessment",
@@ -197,10 +194,7 @@ describe("NotifyBeneficiaryThatAssessmentNeedsSignature", () => {
               }),
               baseUrl: config.immersionFacileBaseUrl,
             }),
-            createdBy: {
-              ...createdBy,
-              organizationName: "Mission Locale",
-            },
+            createdBy,
           },
           recipients: [convention.signatories.beneficiary.email],
         },

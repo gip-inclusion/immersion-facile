@@ -108,6 +108,7 @@ describe("Immersion Assessment slice", () => {
         email: "marie@agence.fr",
         firstName: "Marie",
         lastName: "Dupont",
+        organizationName: "Mission Locale",
       },
     };
     const feedGatewayWithGetError = (error: Error) => {

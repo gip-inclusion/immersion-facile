@@ -139,6 +139,7 @@ describe("PgAssessmentRepository", () => {
           email: "validator@mail.com",
           firstName: "Jean",
           lastName: "Dupont",
+          organizationName: "France Travail",
         },
       };
 
@@ -160,6 +161,7 @@ describe("PgAssessmentRepository", () => {
           email: convention.establishmentTutor.email,
           firstName: convention.establishmentTutor.firstName,
           lastName: convention.establishmentTutor.lastName,
+          organizationName: convention.businessName,
         },
       };
 
@@ -281,6 +283,7 @@ describe("PgAssessmentRepository", () => {
           email: convention.establishmentTutor.email,
           firstName: convention.establishmentTutor.firstName,
           lastName: convention.establishmentTutor.lastName,
+          organizationName: convention.businessName,
         },
       };
       await assessmentRepository.save(assessmentCreatedByTutor);

@@ -14,6 +14,7 @@ import {
   errors,
   ForbiddenError,
   getConventionManageAllowedRoles,
+  getDisplayedBusinessName,
   type Role,
   type User,
 } from "shared";
@@ -163,19 +164,36 @@ const getAssessmentCreator = async ({
 }): Promise<AssessmentCreator> => {
   if (!("role" in conventionJwtPayload)) {
     const user = await getUserWithRights(uow, conventionJwtPayload.userId);
+    const role = toAssessmentCreatorRole(
+      getConventionManageAllowedRoles(convention, user),
+    );
     return {
-      role: toAssessmentCreatorRole(
-        getConventionManageAllowedRoles(convention, user),
-      ),
+      role,
       ...toAssessmentCreatorIdentity(user),
+      organizationName: toAssessmentCreatorOrganizationName({
+        role,
+        convention,
+        agency,
+      }),
     };
   }
 
   const role = toAssessmentCreatorRole([conventionJwtPayload.role]);
+  const organizationName = toAssessmentCreatorOrganizationName({
+    role,
+    convention,
+    agency,
+  });
 
   if (role === "establishment-tutor") {
     const { email, firstName, lastName } = convention.establishmentTutor;
-    return { role, email, firstName, lastName };
+    return {
+      role,
+      email,
+      firstName,
+      lastName,
+      organizationName,
+    };
   }
 
   return {
@@ -188,6 +206,7 @@ const getAssessmentCreator = async ({
         emailHash: conventionJwtPayload.emailHash,
       }),
     ),
+    organizationName,
   };
 };
 
@@ -195,11 +214,26 @@ const toAssessmentCreatorIdentity = ({
   email,
   firstName,
   lastName,
-}: User): Omit<AssessmentCreator, "role"> => ({
+}: User): Omit<AssessmentCreator, "role" | "organizationName"> => ({
   email,
   firstName,
   lastName,
 });
+
+const toAssessmentCreatorOrganizationName = ({
+  role,
+  convention,
+  agency,
+}: {
+  role: AssessmentCreatorRole;
+  convention: ConventionDto;
+  agency: AgencyWithUsersRights;
+}): string => {
+  if (role === "establishment-tutor")
+    return getDisplayedBusinessName(convention);
+  if (role === "validator") return agency.refersToAgencyName ?? agency.name;
+  return agency.name;
+};
 
 const getAgencyUserMatchingEmailHash = async ({
   uow,

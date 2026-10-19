@@ -12,7 +12,6 @@ import {
   domElementIds,
   escapeHtml,
   frontRoutes,
-  getAssessmentCreatorOrganizationName,
   getDisplayedBusinessName,
   getFormattedFirstnameAndLastname,
   immersionFacileHelpdeskRootUrl,
@@ -388,12 +387,7 @@ export const AssessmentDocumentPage = ({
               ? `${createdByFullName} (${createdBy.email})`
               : createdBy.email}
             {" - "}
-            {getAssessmentCreatorOrganizationName({
-              role: createdBy.role,
-              convention,
-              agencyName: convention.agencyName,
-              agencyRefersToName: convention.agencyRefersTo?.name ?? null,
-            })}
+            {createdBy.organizationName}
           </p>
         )}
         <ul>

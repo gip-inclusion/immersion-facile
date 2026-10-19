@@ -186,6 +186,7 @@ describe("SendAssessmentSignatureReminder", () => {
       email: "paul@entreprise.fr",
       firstName: "Paul",
       lastName: "Martin",
+      organizationName: convention.businessName,
     };
     uow.assessmentRepository.assessments = [
       createAssessmentEntity({ ...assessmentDto, createdBy }, convention),
@@ -226,10 +227,7 @@ describe("SendAssessmentSignatureReminder", () => {
               }),
               baseUrl: config.immersionFacileBaseUrl,
             }),
-            createdBy: {
-              ...createdBy,
-              organizationName: convention.businessName,
-            },
+            createdBy,
           },
         },
       },

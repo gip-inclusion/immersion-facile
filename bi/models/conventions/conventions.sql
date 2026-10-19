@@ -239,12 +239,7 @@ ass.status as assessment_status,
     ass.created_by ->> 'email' as assessment_created_by_email,
     ass.created_by ->> 'firstName' as assessment_created_by_first_name,
     ass.created_by ->> 'lastName' as assessment_created_by_last_name,
-    case
-        when ass.created_by ->> 'role' = 'establishment-tutor' then c.business_name
-        when ass.created_by ->> 'role' = 'validator' and refer_a.name is not null then refer_a.name
-        when ass.created_by ->> 'role' in ('counsellor', 'validator') then a.name
-        else null
-    end as assessment_created_by_organization_name
+    ass.created_by ->> 'organizationName' as assessment_created_by_organization_name
 
 from {{ source('immersion', 'conventions') }} as c
 

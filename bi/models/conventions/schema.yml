@@ -282,10 +282,7 @@ models:
       - name: assessment_created_by_last_name
         description: Last name of the person who created the assessment, extracted from created_by JSON; null when created_by is absent
       - name: assessment_created_by_organization_name
-        description: |
-          Organization of the assessment creator, derived from created_by role.
-          establishment-tutor uses the convention business_name; validator uses the referring agency name when present, otherwise the agency name; counsellor uses the agency name.
-          Null when created_by is absent or the role is unknown.
+        description: Organization of the assessment creator, extracted from created_by JSON; null when created_by is absent
 
   - name: conventions_for_counting
     description: |
@@ -367,10 +364,7 @@ models:
       - name: assessment_created_by_last_name
         description: Last name of the person who created the assessment, extracted from created_by JSON; null when created_by is absent
       - name: assessment_created_by_organization_name
-        description: |
-          Organization of the assessment creator, derived from created_by role.
-          establishment-tutor uses the convention business_name; validator uses the referring agency name when present, otherwise the agency name; counsellor uses the agency name.
-          Null when created_by is absent or the role is unknown.
+        description: Organization of the assessment creator, extracted from created_by JSON; null when created_by is absent
       - name: beneficiary_email
         description: Beneficiary's email
       - name: schedule_total_hours

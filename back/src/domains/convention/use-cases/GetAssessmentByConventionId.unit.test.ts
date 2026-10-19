@@ -376,6 +376,7 @@ describe("GetAssessmentByConventionId", () => {
         email: validator.email,
         firstName: validator.firstName,
         lastName: validator.lastName,
+        organizationName: agency.name,
       };
       const assessmentWithCreator: AssessmentDto = {
         ...assessment,
