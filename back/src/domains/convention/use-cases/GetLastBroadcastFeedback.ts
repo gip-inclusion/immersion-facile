@@ -16,7 +16,7 @@ import {
   getRelevantBroadcastConsumerNames,
   hasPriorSuccessfulBroadcast,
   isBroadcastFeedbackRelevant,
-} from "../entities/Broadcast";
+} from "../helpers/broadcast.helpers";
 
 export type GetLastBroadcastFeedback = ReturnType<
   typeof makeGetLastBroadcastFeedback
