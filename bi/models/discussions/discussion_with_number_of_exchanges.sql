@@ -17,8 +17,7 @@ with exchange_counts as (
     discussion_id,
     count(*) as number_of_exchanges,
     max(sent_at) filter (where sender = 'potentialBeneficiary') as last_message_from_beneficiary_at,
-    max(sent_at) filter (where sender = 'establishment') as last_message_from_establishment_at,
-    (array_agg(sender::text order by sent_at desc, id desc))[1] as last_message_from
+    max(sent_at) filter (where sender = 'establishment') as last_message_from_establishment_at
   from {{ source('immersion', 'exchanges') }}
   group by discussion_id
 )
@@ -59,7 +58,14 @@ select
   coalesce(ec.number_of_exchanges, 0) as number_of_exchanges,
   ec.last_message_from_beneficiary_at,
   ec.last_message_from_establishment_at,
-  ec.last_message_from
+  case
+    when ec.last_message_from_beneficiary_at is null
+      and ec.last_message_from_establishment_at is null then null
+    when ec.last_message_from_establishment_at is null
+      or ec.last_message_from_beneficiary_at > ec.last_message_from_establishment_at
+      then 'potentialBeneficiary'
+    else 'establishment'
+  end as last_message_from
 from {{ source('immersion', 'discussions') }} d
 left join exchange_counts ec
   on d.id = ec.discussion_id
