@@ -212,9 +212,12 @@ export const discussionRejectionSchema: ZodSchemaWithInputMatchingOutput<WithDis
       rejectionReason: zStringMinLength1Max1024,
     }),
     z.object({
-      rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME", "DEPRECATED"], {
-        error: localization.invalidEnum,
-      }),
+      rejectionKind: z.enum(
+        ["UNABLE_TO_HELP", "NO_TIME", "DEPRECATED", "CLOSED_BY_CANDIDATE"],
+        {
+          error: localization.invalidEnum,
+        },
+      ),
     }),
     z.object({
       rejectionKind: z.literal("CANDIDATE_ALREADY_WARNED"),

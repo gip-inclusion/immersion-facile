@@ -253,7 +253,11 @@ export type WithDiscussionRejection =
   | RejectionCandidateAlreadyWarned;
 
 type RejectionWithoutReason = {
-  rejectionKind: "UNABLE_TO_HELP" | "NO_TIME" | "DEPRECATED";
+  rejectionKind:
+    | "UNABLE_TO_HELP"
+    | "NO_TIME"
+    | "DEPRECATED"
+    | "CLOSED_BY_CANDIDATE";
 };
 
 type RejectionWithReason = {

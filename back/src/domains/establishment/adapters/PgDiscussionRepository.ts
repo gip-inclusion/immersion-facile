@@ -701,7 +701,12 @@ const getWithDiscussionStatusFromPgDiscussion = (
     .with(
       {
         status: "REJECTED",
-        rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME", "DEPRECATED"),
+        rejectionKind: P.union(
+          "UNABLE_TO_HELP",
+          "NO_TIME",
+          "DEPRECATED",
+          "CLOSED_BY_CANDIDATE",
+        ),
       },
       ({ status, rejectionKind, candidateWarnedMethod }) => ({
         status,

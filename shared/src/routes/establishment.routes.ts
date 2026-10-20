@@ -140,6 +140,18 @@ export const establishmentRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
+  closeDiscussionByCandidate: defineRoute({
+    method: "post",
+    url: "/discussions/:discussionId/close",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
   replyToDiscussion: defineRoute({
     method: "post",
     url: "/discussion-for-establishment/:discussionId/send-message",

@@ -343,6 +343,30 @@ describe("PgDiscussionRepository", () => {
           );
         });
 
+        it("update with status REJECTED closed by candidate", async () => {
+          const discussion = new DiscussionBuilder()
+            .withSiret("01234567891011")
+            .withCreatedAt(new Date("2023-07-07"))
+            .withStatus({ status: "PENDING" })
+            .build();
+
+          await pgDiscussionRepository.insert(discussion);
+
+          const updatedDiscussion = new DiscussionBuilder(discussion)
+            .withStatus({
+              status: "REJECTED",
+              rejectionKind: "CLOSED_BY_CANDIDATE",
+            })
+            .build();
+
+          await pgDiscussionRepository.update(updatedDiscussion);
+
+          expectToEqual(
+            await pgDiscussionRepository.getById(discussion.id),
+            updatedDiscussion,
+          );
+        });
+
         it("update with status ACCEPTED", async () => {
           const siret = "01234567891011";
           const discussion = new DiscussionBuilder()

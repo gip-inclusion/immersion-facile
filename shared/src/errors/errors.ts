@@ -1251,6 +1251,16 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas le droit de rejeter la candidature '${discussionId}'.`,
       ),
+    closeForbidden: ({
+      discussionId,
+      userId,
+    }: {
+      discussionId: DiscussionId;
+      userId: UserId;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur '${userId}' n'a pas le droit de clôturer la candidature '${discussionId}'.`,
+      ),
     alreadyRejected: ({ discussionId }: { discussionId: DiscussionId }) =>
       new BadRequestError(`La candidature '${discussionId}' est déjà rejetée.`),
     accessForbidden: ({

@@ -587,6 +587,126 @@ describe("discussion e2e", () => {
     });
   });
 
+  describe(`${displayRouteName(
+    establishmentRoutes.closeDiscussionByCandidate,
+  )}`, () => {
+    it("401 - throws if user is not authenticated", async () => {
+      expectHttpResponseToEqual(
+        await httpClient.closeDiscussionByCandidate({
+          headers: { authorization: "" },
+          urlParams: { discussionId: "unrelevant-discussion-id" },
+        }),
+        {
+          status: 401,
+          body: { message: "Veuillez vous authentifier", status: 401 },
+        },
+      );
+    });
+
+    it("403 - throws if user is not the candidate of the discussion", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .withStatus({ status: "PENDING" })
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.closeDiscussionByCandidate({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 403,
+          body: {
+            message: errors.discussion.closeForbidden({
+              discussionId: discussion.id,
+              userId: establishmentAdminConnectedUser.id,
+            }).message,
+            status: 403,
+          },
+        },
+      );
+    });
+
+    it("400 - throws if discussion is not pending", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.closeDiscussionByCandidate({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 400,
+          body: {
+            message: errors.discussion.badStatus({
+              discussionId: discussion.id,
+              expectedStatus: "PENDING",
+            }).message,
+            status: 400,
+          },
+        },
+      );
+    });
+
+    it("200 - closes the discussion without notifying the establishment", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(existingEstablishment.establishment.siret)
+        .withPotentialBeneficiaryEmail(potentialBeneficiaryConnectedUser.email)
+        .withStatus({ status: "PENDING" })
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      expectHttpResponseToEqual(
+        await httpClient.closeDiscussionByCandidate({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: potentialBeneficiaryConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 200,
+          body: "",
+        },
+      );
+
+      expectToEqual(inMemoryUow.discussionRepository.discussions, [
+        {
+          ...discussion,
+          status: "REJECTED",
+          rejectionKind: "CLOSED_BY_CANDIDATE",
+          updatedAt: gateways.timeGateway.now().toISOString(),
+        },
+      ]);
+
+      await eventCrawler.processNewEvents();
+
+      expectToEqual(inMemoryUow.notificationRepository.notifications, []);
+    });
+  });
+
   describe(`${displayRouteName(establishmentRoutes.replyToDiscussion)}`, () => {
     const user = new ConnectedUserBuilder().buildUser();
     const establishment = new EstablishmentAggregateBuilder()

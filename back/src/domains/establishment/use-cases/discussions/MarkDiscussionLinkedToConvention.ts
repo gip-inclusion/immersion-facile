@@ -20,6 +20,7 @@ export const makeMarkDiscussionLinkedToConvention = useCaseBuilder(
     if (!discussionId) return;
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
+    if (discussion.status === "REJECTED") return;
     await uow.discussionRepository.update({
       ...discussion,
       updatedAt: deps.timeGateway.now().toISOString(),
