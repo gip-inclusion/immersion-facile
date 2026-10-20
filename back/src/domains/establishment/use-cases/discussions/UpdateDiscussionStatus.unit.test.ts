@@ -216,6 +216,22 @@ describe("UpdateDiscussionStatus", () => {
         }),
       );
     });
+
+    it("throws BadRequestError when establishment tries to close discussion as candidate", async () => {
+      await expectPromiseToFailWithError(
+        updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "REJECTED",
+            rejectionKind: "CLOSED_BY_CANDIDATE",
+          },
+          authorizedUser,
+        ),
+        errors.discussion.unsupportedRejectionKind("CLOSED_BY_CANDIDATE"),
+      );
+      expectToEqual(uow.discussionRepository.discussions, [discussion]);
+      expectToEqual(uow.outboxRepository.events, []);
+    });
   });
 
   describe("Accept discussion", () => {

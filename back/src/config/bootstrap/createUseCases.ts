@@ -147,6 +147,7 @@ import { makeContactEstablishment } from "../../domains/establishment/use-cases/
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { makeDeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { makeAddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
+import { makeCloseDiscussionByCandidate } from "../../domains/establishment/use-cases/discussions/CloseDiscussionByCandidate";
 import { makeGetDiscussionById } from "../../domains/establishment/use-cases/discussions/GetDiscussionById";
 import { makeGetDiscussionEstablishmentContactInfo } from "../../domains/establishment/use-cases/discussions/GetDiscussionEstablishmentContactInfo";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
@@ -1009,6 +1010,13 @@ export const createUseCases = ({
       uowPerformer,
     }),
     updateDiscussionStatus: makeUpdateDiscussionStatus({
+      uowPerformer,
+      deps: {
+        timeGateway,
+        createNewEvent,
+      },
+    }),
+    closeDiscussionByCandidate: makeCloseDiscussionByCandidate({
       uowPerformer,
       deps: {
         timeGateway,

@@ -79,4 +79,27 @@ describe("MarkDiscussionLinkedToConvention", () => {
       expectedUpdatedDiscussion,
     ]);
   });
+
+  it.each<DiscussionDto>([
+    new DiscussionBuilder()
+      .withSiret(convention.siret)
+      .withStatus({ status: "REJECTED", rejectionKind: "CLOSED_BY_CANDIDATE" })
+      .build(),
+    new DiscussionBuilder()
+      .withSiret(convention.siret)
+      .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
+      .build(),
+  ])(
+    "does not update the discussion when it is rejected with kind $rejectionKind",
+    async (rejectedDiscussion) => {
+      uow.discussionRepository.discussions = [rejectedDiscussion];
+
+      await markDiscussionLinkedToConvention.execute({
+        convention,
+        discussionId: rejectedDiscussion.id,
+      });
+
+      expectToEqual(uow.discussionRepository.discussions, [rejectedDiscussion]);
+    },
+  );
 });

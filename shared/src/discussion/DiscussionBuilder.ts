@@ -417,7 +417,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       .with(
         {
           status: "REJECTED",
-          rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME"),
+          rejectionKind: P.union(
+            "UNABLE_TO_HELP",
+            "NO_TIME",
+            "DEPRECATED",
+            "CLOSED_BY_CANDIDATE",
+          ),
         },
         ({ status, rejectionKind }) => {
           updatedDiscussion = {
@@ -452,19 +457,6 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
             status,
             rejectionKind,
             candidateWarnedMethod,
-          };
-        },
-      )
-      .with(
-        {
-          status: "REJECTED",
-          rejectionKind: "DEPRECATED",
-        },
-        ({ status, rejectionKind }) => {
-          updatedDiscussion = {
-            ...updatedDiscussion,
-            status,
-            rejectionKind,
           };
         },
       )
