@@ -142,9 +142,7 @@ type ConventionRouteParams = Pick<
 >;
 type ConventionParamKey = keyof ConventionRouteParams;
 
-const shouldPrefillAgencyReferentFromConnectedUser = (
-  user: UserWithRights,
-): boolean => {
+const isAgencyUser = (user: UserWithRights): boolean => {
   if (!user.agencyRights.length) return false;
   if (user.isBackofficeAdmin) return false;
   const { activeAgencyRights } = distinguishAgencyRights(user.agencyRights);
@@ -176,7 +174,7 @@ export const ConventionForm = ({
   const acquisitionParams = useGetAcquisitionParams();
 
   const currentUserAgencyReferentName =
-    currentUser && shouldPrefillAgencyReferentFromConnectedUser(currentUser)
+    currentUser && isAgencyUser(currentUser)
       ? {
           firstname: currentUser.firstName,
           lastname: currentUser.lastName,
