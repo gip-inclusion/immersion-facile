@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: ft_sectors
+    description: |
+      France Travail sectors (filières), as defined by France Travail.
+      Grain: 1 row per sector.
+    columns:
+      - name: code
+        description: France Travail sector code (e.g. FIL01)
+        tests:
+          - unique
+          - not_null
+      - name: label
+        description: Label of the France Travail sector
+
+  - name: ft_sectors__naf
+    description: |
+      Mapping between France Travail sectors and NAF codes (grouping by activity).
+      A NAF code can belong to several sectors.
+      Grain: 1 row per (ft_sector_code, naf_code).
+    columns:
+      - name: ft_sector_code
+        description: France Travail sector code, joins ft_sectors.code
+        tests:
+          - not_null
+      - name: naf_code
+        description: NAF/APE code without dot (e.g. 0111Z), joins naf_nomenclature.naf_code
+        tests:
+          - not_null
+
+  - name: ft_sectors__rome
+    description: |
+      Mapping between France Travail sectors and ROME codes (grouping by job).
+      A ROME code can belong to several sectors.
+      Grain: 1 row per (ft_sector_code, rome_code).
+    columns:
+      - name: ft_sector_code
+        description: France Travail sector code, joins ft_sectors.code
+        tests:
+          - not_null
+      - name: rome_code
+        description: ROME code (e.g. A1101)
+        tests:
+          - not_null

@@ -368,6 +368,30 @@ sources:
           - name: value
             description: "Flag value"
 
+      - name: ft_sectors
+        description: "France Travail sectors (filières) reference data"
+        columns:
+          - name: code
+            description: "Primary key - France Travail sector code (e.g., FIL01)"
+          - name: label
+            description: "Label of the France Travail sector"
+
+      - name: ft_sectors__naf
+        description: "Mapping between France Travail sectors and NAF codes (grouping by activity)"
+        columns:
+          - name: ft_sector_code
+            description: "France Travail sector code"
+          - name: naf_code
+            description: "NAF code without dot (e.g., 0111Z)"
+
+      - name: ft_sectors__rome
+        description: "Mapping between France Travail sectors and ROME codes (grouping by job)"
+        columns:
+          - name: ft_sector_code
+            description: "France Travail sector code"
+          - name: rome_code
+            description: "ROME code"
+
       - name: groups
         description: "Groups information"
         columns:
