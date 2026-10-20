@@ -4,5 +4,31 @@
 [ -n "$CI" ] && exit 0
 
 echo 'Pre-push hook'
-pnpm fullcheck
 
+MAX_PRS_IN_REVIEW=6
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "❌ gh CLI is required to check open PRs (https://cli.github.com/)"
+  exit 1
+fi
+
+if ! prs_in_review=$(
+  gh pr list \
+    --state open \
+    --limit 100 \
+    --json reviewDecision,isDraft \
+    --jq "[.[] | select(.isDraft == false and .reviewDecision == \"REVIEW_REQUIRED\")] | length"
+); then
+  echo "❌ Failed to fetch open PRs from the remote repository"
+  exit 1
+fi
+
+if [ "$prs_in_review" -gt "$MAX_PRS_IN_REVIEW" ]; then
+  echo "❌ Push blocked: $prs_in_review open PRs are in 'review required' status (max allowed: $MAX_PRS_IN_REVIEW)"
+  echo "   Merge or get reviews on existing PRs before pushing."
+  exit 1
+fi
+
+echo "✅ Open PRs in review required: $prs_in_review / $MAX_PRS_IN_REVIEW"
+
+pnpm fullcheck

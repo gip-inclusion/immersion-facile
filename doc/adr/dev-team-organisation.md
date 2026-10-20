@@ -79,3 +79,12 @@
 - 2023-02-16 - Voir le point de vue de Nathalie et Jérémy ?
 - 2023-02-16 - Situation qu'on souhaite éviter :
   > Ah je vous l'avais bien dit !
+
+## Utilisation de l'IA et responsabilité des devs
+
+- 2026-10-20 - L'IA doit être utilisée de façon transparente : pas de tabou, on s'autorise à produire 100% avec l'IA
+- 2026-10-20 - En revanche, la review ne peut pas être déléguée :
+  - l'IA peut être utilisée à des fins d'augmentation (expliquer, mettre en évidence des manques)
+  - c'est un outil supplémentaire, mais elle ne peut pas être utilisée comme seul moyen de faire une review
+  - les commentaires de review doivent être rédigés par un humain
+  - la responsabilité ne peut pas être déléguée : auteur et reviewer partagent la responsabilité du merge

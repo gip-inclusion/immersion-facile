@@ -16,6 +16,7 @@ logs2
 immersion-facile.code-workspace
 dev-dist
 coverage
+
 .devcontainer/.env
 
 .cursor/rules
@@ -29,3 +30,5 @@ bi/dbt_packages/
 bi/logs/
 bi/dbt-build.tar.gz
 bi/dbt-build/
+
+*:Zone.Identifier
