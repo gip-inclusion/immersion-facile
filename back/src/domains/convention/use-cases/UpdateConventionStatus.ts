@@ -26,7 +26,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   throwErrorOnConventionIdMismatch,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
   throwIfTransitionNotAllowed,
 } from "../entities/Convention";
 
@@ -110,7 +110,7 @@ export const makeUpdateConventionStatus = useCaseBuilder(
     });
 
     const now = deps.timeGateway.now();
-    await throwIfConventionArchivedForNonAdmin({
+    await throwIfConventionArchivedAndUserIsNotAdmin({
       convention,
       now,
       jwtPayload: payload,

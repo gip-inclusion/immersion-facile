@@ -175,7 +175,7 @@ export const isConventionInScope = (
   isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
   isAgencyKindInConsumerScope(conventionRead, apiConsumer);
 
-export const throwIfConventionArchivedForNonAdmin = async ({
+export const throwIfConventionArchivedAndUserIsNotAdmin = async ({
   convention,
   now,
   jwtPayload,

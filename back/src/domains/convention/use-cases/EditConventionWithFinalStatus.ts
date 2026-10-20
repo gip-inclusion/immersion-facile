@@ -27,7 +27,7 @@ import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   retrieveConventionWithAgency,
   throwErrorOnConventionIdMismatch,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 export const allowedConventionStatusesForEditWithFinalStatus =
@@ -98,7 +98,7 @@ export const makeEditConventionWithFinalStatus = useCaseBuilder(
       isValidatorOfAgencyRefersToAllowed: true,
     });
 
-    await throwIfConventionArchivedForNonAdmin({
+    await throwIfConventionArchivedAndUserIsNotAdmin({
       convention,
       now: deps.timeGateway.now(),
       jwtPayload,

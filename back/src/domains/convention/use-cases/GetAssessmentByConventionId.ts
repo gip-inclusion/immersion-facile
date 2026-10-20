@@ -13,7 +13,7 @@ import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { toAssessmentDto } from "../entities/AssessmentEntity";
 import {
   retrieveConventionWithAgency,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 export type GetAssessmentByConventionId = ReturnType<
@@ -40,7 +40,7 @@ export const makeGetAssessmentByConventionId = useCaseBuilder(
       uow,
     });
 
-    await throwIfConventionArchivedForNonAdmin({
+    await throwIfConventionArchivedAndUserIsNotAdmin({
       convention,
       now: deps.timeGateway.now(),
       jwtPayload: currentUser,

@@ -3,7 +3,6 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   allAgencyRoles,
-  archivedConventionErrorMessage,
   badSchemaErrorMessagePrefix,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -14,6 +13,7 @@ import {
   type WithConventionId,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import { throwIfArchivedConventionError } from "src/app/contents/convention-archive/conventionArchive.helpers";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -137,8 +137,10 @@ export const ConventionManageContent = ({
         errorMessage: message,
       });
 
-    if (message.includes(archivedConventionErrorMessage))
-      throw frontErrors.convention.archived({ conventionId });
+    throwIfArchivedConventionError({
+      errorMessage: message,
+      conventionId,
+    });
 
     throw frontErrors.convention.noRightsOnConvention({
       userEmail: currentUser?.email ?? "INCONNU",

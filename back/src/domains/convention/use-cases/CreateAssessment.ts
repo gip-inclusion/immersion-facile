@@ -33,7 +33,7 @@ import {
 } from "../entities/AssessmentEntity";
 import {
   retrieveConventionWithAgency,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 type CreateAssessmentDeps = {
@@ -70,7 +70,7 @@ export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
         uow,
       });
 
-      await throwIfConventionArchivedForNonAdmin({
+      await throwIfConventionArchivedAndUserIsNotAdmin({
         convention,
         now: deps.timeGateway.now(),
         jwtPayload: conventionJwtPayload,

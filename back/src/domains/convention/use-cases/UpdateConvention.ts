@@ -22,7 +22,7 @@ import {
   extractUserRolesOnConventionFromJwtPayload,
   retrieveConventionWithAgency,
   signConvention,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 export type UpdateConvention = ReturnType<typeof makeUpdateConvention>;
@@ -60,7 +60,7 @@ export const makeUpdateConvention = useCaseBuilder("UpdateConvention")
       });
 
       const now = deps.timeGateway.now();
-      await throwIfConventionArchivedForNonAdmin({
+      await throwIfConventionArchivedAndUserIsNotAdmin({
         convention: conventionFromRepo,
         now,
         jwtPayload,
