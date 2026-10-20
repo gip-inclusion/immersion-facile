@@ -7,7 +7,6 @@ import { Document, Loader, MainWrapper } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  archivedConventionErrorMessage,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
@@ -24,13 +23,13 @@ import {
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { AssessmentSignModalContent } from "src/app/components/forms/assessment/SignAssessmentModalContent";
+import { throwIfArchivedConventionError } from "src/app/contents/convention-archive/conventionArchive.helpers";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
-import { frontErrors } from "src/app/pages/error/front-errors";
 import { createFormModal } from "src/app/utils/createFormModal";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
@@ -148,11 +147,10 @@ export const AssessmentDocumentPage = ({
     return <Loader />;
 
   if (fetchConventionError) {
-    if (
-      conventionId &&
-      conventionFormFeedback.message.includes(archivedConventionErrorMessage)
-    )
-      throw frontErrors.convention.archived({ conventionId });
+    throwIfArchivedConventionError({
+      errorMessage: conventionFormFeedback.message,
+      conventionId,
+    });
 
     if (route.params.jwt)
       return (

@@ -6,7 +6,6 @@ import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type AssessmentStatus,
-  archivedConventionErrorMessage,
   type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -18,12 +17,12 @@ import {
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { throwIfArchivedConventionError } from "src/app/contents/convention-archive/conventionArchive.helpers";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { ShowConventionErrorOrRenewExpiredJwt } from "src/app/pages/convention/ShowConventionErrorOrRenewExpiredJwt";
-import { frontErrors } from "src/app/pages/error/front-errors";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -98,8 +97,10 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
 
   if (fetchConventionError) {
     const message = conventionFormFeedback?.message ?? "";
-    if (conventionId && message.includes(archivedConventionErrorMessage))
-      throw frontErrors.convention.archived({ conventionId });
+    throwIfArchivedConventionError({
+      errorMessage: message,
+      conventionId,
+    });
 
     return (
       <ShowConventionErrorOrRenewExpiredJwt

@@ -13,7 +13,6 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   agencyModifierRoles,
-  archivedConventionErrorMessage,
   type ConventionDraftId,
   type ConventionId,
   type ConventionJwtPayload,
@@ -35,6 +34,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { makeConventionSummaryContent } from "src/app/contents/convention/conventionSummary.helpers";
+import { throwIfArchivedConventionError } from "src/app/contents/convention-archive/conventionArchive.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -370,8 +370,10 @@ export const ConventionFormWrapper = ({
         )
         .with({ shouldRedirectToError: true }, () => {
           const message = conventionFormFeedback?.message ?? "";
-          if (conventionId && message.includes(archivedConventionErrorMessage))
-            throw frontErrors.convention.archived({ conventionId });
+          throwIfArchivedConventionError({
+            errorMessage: message,
+            conventionId,
+          });
 
           return (
             <>

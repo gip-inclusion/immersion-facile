@@ -1,5 +1,10 @@
 import { toPairs } from "ramda";
-import type { ArchivedConventionRequestDto } from "shared";
+import {
+  type ArchivedConventionRequestDto,
+  archivedConventionErrorMessage,
+  type ConventionId,
+} from "shared";
+import { frontErrors } from "src/app/pages/error/front-errors";
 
 export const archiveReasonContentMapping: Record<
   ArchivedConventionRequestDto["reason"],
@@ -19,3 +24,14 @@ export const archiveReasonOptions: {
   label: value,
   value: key,
 }));
+
+export const throwIfArchivedConventionError = ({
+  errorMessage,
+  conventionId,
+}: {
+  errorMessage: string;
+  conventionId: ConventionId | undefined;
+}): void => {
+  if (conventionId && errorMessage.includes(archivedConventionErrorMessage))
+    throw frontErrors.convention.archived({ conventionId });
+};

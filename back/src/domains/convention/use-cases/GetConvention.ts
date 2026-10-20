@@ -24,7 +24,7 @@ import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   isConventionInScope,
   throwErrorOnConventionIdMismatch,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 export type GetConvention = ReturnType<typeof makeGetConvention>;
@@ -50,22 +50,13 @@ export const makeGetConvention = useCaseBuilder("GetConvention")
         uow,
       );
 
-      const authorizedConvention =
-        "id" in jwtPayload
-          ? await onApiConsumer(jwtPayload, convention)
-          : "emailHash" in jwtPayload
-            ? await isConventionDomainPayloadHasRight({
-                jwtPayload,
-                uow,
-                convention,
-              })
-            : await onConnectedUserPayload({
-                userId: jwtPayload.userId,
-                uow,
-                convention,
-              });
+      const authorizedConvention = await getAuthorizedConvention({
+        jwtPayload,
+        convention,
+        uow,
+      });
 
-      await throwIfConventionArchivedForNonAdmin({
+      await throwIfConventionArchivedAndUserIsNotAdmin({
         convention: authorizedConvention,
         now: deps.timeGateway.now(),
         jwtPayload,
@@ -75,6 +66,29 @@ export const makeGetConvention = useCaseBuilder("GetConvention")
       return authorizedConvention;
     },
   );
+
+const getAuthorizedConvention = async ({
+  jwtPayload,
+  convention,
+  uow,
+}: {
+  jwtPayload: ConventionRelatedJwtPayload | ApiConsumer;
+  convention: ConventionReadDto;
+  uow: UnitOfWork;
+}): Promise<ConventionReadDto> => {
+  if ("id" in jwtPayload) return onApiConsumer(jwtPayload, convention);
+  if ("emailHash" in jwtPayload)
+    return isConventionDomainPayloadHasRight({
+      jwtPayload,
+      uow,
+      convention,
+    });
+  return onConnectedUserPayload({
+    userId: jwtPayload.userId,
+    uow,
+    convention,
+  });
+};
 
 const onApiConsumer = async (
   currentUser: ApiConsumer,

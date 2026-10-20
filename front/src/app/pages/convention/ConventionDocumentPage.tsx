@@ -12,7 +12,6 @@ import { useDispatch } from "react-redux";
 import {
   type AgencyModifierRole,
   addressDtoToString,
-  archivedConventionErrorMessage,
   type ConventionId,
   type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
@@ -29,6 +28,7 @@ import {
   type SignatoryRole,
   toDisplayedDate,
 } from "shared";
+import { throwIfArchivedConventionError } from "src/app/contents/convention-archive/conventionArchive.helpers";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
@@ -138,8 +138,10 @@ export const ConventionDocumentPage = ({
   if (fetchConventionError) {
     const conventionId = routeConventionId ?? jwtPayload.applicationId;
     const message = conventionFormFeedback?.message ?? "";
-    if (conventionId && message.includes(archivedConventionErrorMessage))
-      throw frontErrors.convention.archived({ conventionId });
+    throwIfArchivedConventionError({
+      errorMessage: message,
+      conventionId,
+    });
 
     return (
       <MainWrapper layout="default">

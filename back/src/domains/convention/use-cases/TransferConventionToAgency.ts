@@ -16,7 +16,7 @@ import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   retrieveConventionWithAgency,
   throwErrorOnConventionIdMismatch,
-  throwIfConventionArchivedForNonAdmin,
+  throwIfConventionArchivedAndUserIsNotAdmin,
 } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
@@ -70,7 +70,7 @@ export const makeTransferConventionToAgency = useCaseBuilder(
       isValidatorOfAgencyRefersToAllowed: false,
     });
 
-    await throwIfConventionArchivedForNonAdmin({
+    await throwIfConventionArchivedAndUserIsNotAdmin({
       convention,
       now: deps.timeGateway.now(),
       jwtPayload,
