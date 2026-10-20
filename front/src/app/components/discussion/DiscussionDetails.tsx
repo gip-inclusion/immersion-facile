@@ -40,6 +40,7 @@ import { makeConventionFromDiscussion } from "src/core-logic/domain/convention/c
 import { conventionDraftSelectors } from "src/core-logic/domain/convention/convention-draft/conventionDraft.selectors";
 import { conventionDraftSlice } from "src/core-logic/domain/convention/convention-draft/conventionDraft.slice";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
+import { feedbacks } from "src/core-logic/domain/feedback/feedback.content";
 import { match, P } from "ts-pattern";
 import {
   AcceptDiscussionModal,
@@ -54,6 +55,10 @@ import { contactModeToBadgeOptions } from "../immersion-offer/CreateDiscussionFo
 import { BeneficiaryGuideInformation } from "./BeneficiaryGuideInformation";
 import { DiscussionFollowUpBadge } from "./badges/DiscussionFollowUpBadge";
 import { DiscussionStatusBadge } from "./badges/DiscussionStatusBadge";
+import {
+  CloseDiscussionByCandidateModal,
+  openCloseDiscussionByCandidateModal,
+} from "./CloseDiscussionByCandidateModal";
 import { DiscussionSummary, DiscussionSummaryModal } from "./DiscussionSummary";
 import { EstablishmentContactInformation } from "./EstablishmentContactInformation";
 import { EstablishmentSummary } from "./EstablishmentSummary";
@@ -74,6 +79,14 @@ const acceptButton = {
   onClick: openAcceptDiscussionModal,
   children: "Marquer comme acceptée",
 } satisfies ButtonPropsWithId;
+
+const closeDiscussionByCandidateButton: ButtonPropsWithId = {
+  id: domElementIds.beneficiaryDashboard.discussion.closeDiscussionButton,
+  priority: "secondary",
+  type: "button",
+  onClick: openCloseDiscussionByCandidateModal,
+  children: "Clôturer cette candidature",
+};
 
 const rejectButton = {
   id: domElementIds.establishmentDashboard.discussion.rejectDiscussionButton,
@@ -176,7 +189,7 @@ const getDiscussionActionsButtons = ({
         viewer: "potentialBeneficiary",
         displayStatus: "new",
       },
-      () => [],
+      () => [closeDiscussionByCandidateButton],
     )
     .with(
       {
@@ -199,7 +212,7 @@ const getDiscussionActionsButtons = ({
         viewer: "potentialBeneficiary",
         displayStatus: "pending",
       },
-      () => [],
+      () => [closeDiscussionByCandidateButton],
     )
     .with(
       {
@@ -297,7 +310,38 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
       () =>
         "Candidature automatiquement refusée par manque de réponse de votre part dans un délai de 3 mois.",
     )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "CLOSED_BY_CANDIDATE",
+      },
+      () => "Candidature clôturée par le candidat.",
+    )
     .exhaustive();
+
+const getDiscussionRejectedInformation = (
+  discussion: DiscussionReadDto & { status: "REJECTED" },
+): string => {
+  const rejectedAt = new Date(discussion.updatedAt).toLocaleDateString(
+    "fr-FR",
+    { day: "numeric", month: "long", year: "numeric" },
+  );
+  return match(discussion.rejectionKind)
+    .with(
+      "CLOSED_BY_CANDIDATE",
+      () => `Candidature clôturée par le candidat le ${rejectedAt}.`,
+    )
+    .with(
+      "DEPRECATED",
+      () =>
+        `Candidature clôturée automatiquement le ${rejectedAt}, faute de réponse de l'entreprise.`,
+    )
+    .with(
+      P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER", "CANDIDATE_ALREADY_WARNED"),
+      () => `Candidature refusée par l'entreprise le ${rejectedAt}.`,
+    )
+    .exhaustive();
+};
 
 type DiscussionDetailsProps = {
   discussion: DiscussionReadDto;
@@ -368,11 +412,28 @@ export const DiscussionDetails = (
     discussion,
     viewer,
   });
-  const isViewerBeneficiaryAndDiscussionRejected =
-    viewer === "potentialBeneficiary" && discussion.status === "REJECTED";
+  const isDiscussionRejected = discussion.status === "REJECTED";
 
   return (
     <>
+      <Feedback
+        topics={["dashboard-discussion-closed-by-candidate"]}
+        render={({ title, level, message }) => (
+          <Alert
+            title={title}
+            description={
+              level === "error"
+                ? (feedbacks["dashboard-discussion-closed-by-candidate"][
+                    "update.error"
+                  ]?.message ?? message)
+                : message
+            }
+            severity={level}
+            small
+          />
+        )}
+      />
+
       <Feedback
         topics={["dashboard-discussion-status-updated"]}
         render={({ title, level, message }) => (
@@ -459,10 +520,24 @@ export const DiscussionDetails = (
               className={fr.cx("fr-mt-2w")}
             />
           )}
+        {discussion.status === "REJECTED" && (
+          <Alert
+            id={
+              domElementIds.establishmentDashboard.discussion
+                .statusInformationBanner
+            }
+            severity="info"
+            description={getDiscussionRejectedInformation(discussion)}
+            small
+            closable
+            className={fr.cx("fr-mt-2w")}
+          />
+        )}
       </header>
 
       {discussionEstablishmentContactInfo &&
         viewer === "potentialBeneficiary" &&
+        !isDiscussionRejected &&
         makeShouldEstablishmentBeReminded({
           contactMode: discussion.contactMode,
           discussionUpdatedAt: discussion.updatedAt,
@@ -525,19 +600,23 @@ export const DiscussionDetails = (
           />
         )}
 
-      {!isLayoutDesktop && shouldShowDiscussionActions && (
-        <div className={fr.cx("fr-grid-row", "fr-grid-row--right", "fr-mt-2w")}>
-          <ButtonWithSubMenu
-            navItems={discussionActionsButtons}
-            priority="primary"
-            buttonLabel={"Actions"}
-            buttonIconId={"fr-icon-more-fill"}
-            iconPosition="right"
-            position="bottom-right"
-            floatingMenuOnMobile
-          />
-        </div>
-      )}
+      {!isLayoutDesktop &&
+        shouldShowDiscussionActions &&
+        isNotEmptyArray(discussionActionsButtons) && (
+          <div
+            className={fr.cx("fr-grid-row", "fr-grid-row--right", "fr-mt-2w")}
+          >
+            <ButtonWithSubMenu
+              navItems={discussionActionsButtons}
+              priority="primary"
+              buttonLabel={"Actions"}
+              buttonIconId={"fr-icon-more-fill"}
+              iconPosition="right"
+              position="bottom-right"
+              floatingMenuOnMobile
+            />
+          </div>
+        )}
 
       <DiscussionContentContainer
         content={match(discussion.contactMode)
@@ -561,7 +640,7 @@ export const DiscussionDetails = (
                   )
                 }
                 exchangeFormComponent={
-                  !isViewerBeneficiaryAndDiscussionRejected && (
+                  !isDiscussionRejected && (
                     <DiscussionExchangeMessageForm
                       discussionId={discussion.id}
                       viewer={viewer}
@@ -587,10 +666,12 @@ export const DiscussionDetails = (
                 <BeneficiaryGuideInformation contactMode={contactMode} />
               </>
             ) : (
-              <DiscussionExchangeMessageForm
-                viewer="establishment"
-                discussionId={discussion.id}
-              />
+              !isDiscussionRejected && (
+                <DiscussionExchangeMessageForm
+                  viewer="establishment"
+                  discussionId={discussion.id}
+                />
+              )
             ),
           )
           .exhaustive()}
@@ -652,6 +733,15 @@ export const DiscussionDetails = (
         <AcceptDiscussionModal discussion={discussion} />,
         document.body,
       )}
+
+      {viewer === "potentialBeneficiary" &&
+        createPortal(
+          <CloseDiscussionByCandidateModal
+            discussionId={discussion.id}
+            discussionKind={discussion.kind}
+          />,
+          document.body,
+        )}
     </>
   );
 };

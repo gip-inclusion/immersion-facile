@@ -75,7 +75,7 @@ const statusBadgeData: {
     },
     rejected: {
       severity: undefined,
-      label: "Refusée",
+      label: "Clôturée",
     },
   },
   potentialBeneficiary: {
@@ -93,7 +93,7 @@ const statusBadgeData: {
     },
     rejected: {
       severity: undefined,
-      label: "Refusée",
+      label: "Clôturée",
     },
   },
 };

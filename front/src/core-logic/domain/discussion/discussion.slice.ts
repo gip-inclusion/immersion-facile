@@ -35,6 +35,11 @@ export type FetchDiscussionListRequestedPayload = {
   filters: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray;
 };
 
+export type CloseDiscussionByCandidateRequestedPayload = {
+  jwt: ConnectedUserJwt;
+  discussionId: DiscussionId;
+};
+
 export type UpdateDiscussionStatusRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
@@ -149,6 +154,24 @@ export const discussionSlice = createSlice({
       state.isLoading = false;
     },
     updateDiscussionStatusFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    closeDiscussionByCandidateRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<CloseDiscussionByCandidateRequestedPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    closeDiscussionByCandidateSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    closeDiscussionByCandidateFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

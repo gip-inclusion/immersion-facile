@@ -21,6 +21,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type {
+  CloseDiscussionByCandidateRequestedPayload,
   FetchDiscussionListRequestedPayload,
   FetchDiscussionRequestedPayload,
 } from "src/core-logic/domain/discussion/discussion.slice";
@@ -293,6 +294,26 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public closeDiscussionByCandidate$({
+    jwt,
+    discussionId,
+  }: CloseDiscussionByCandidateRequestedPayload): Observable<void> {
+    return from(
+      this.httpClient
+        .closeDiscussionByCandidate({
+          headers: { authorization: jwt },
+          urlParams: { discussionId },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

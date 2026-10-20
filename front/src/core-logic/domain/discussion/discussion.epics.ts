@@ -59,6 +59,30 @@ const updateDiscussionStatusEpic: DiscussionEpic = (
     ),
   );
 
+const closeDiscussionByCandidateEpic: DiscussionEpic = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(discussionSlice.actions.closeDiscussionByCandidateRequested.match),
+    switchMap((action) =>
+      establishmentGateway.closeDiscussionByCandidate$(action.payload).pipe(
+        map(() =>
+          discussionSlice.actions.closeDiscussionByCandidateSucceeded({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          discussionSlice.actions.closeDiscussionByCandidateFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
 const sendMessageEpic: DiscussionEpic = (
   action$,
   _state$,
@@ -157,6 +181,7 @@ const fetchDiscussionEstablishmentContactInfoEpic: DiscussionEpic = (
 export const discussionEpics = [
   fetchDiscussionByIdEpic,
   updateDiscussionStatusEpic,
+  closeDiscussionByCandidateEpic,
   sendMessageEpic,
   fetchDiscussionListEpic,
   fetchDiscussionEstablishmentContactInfoEpic,

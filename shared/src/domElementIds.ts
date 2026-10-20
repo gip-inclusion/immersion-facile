@@ -1130,6 +1130,8 @@ export const domElementIds = {
       rejectDiscussionCancelButton:
         "im-manage-establishment__reject-discussion-cancel-button",
       statusBadge: "im-manage-establishment__discussion-status-badge",
+      statusInformationBanner:
+        "im-manage-establishment__discussion-status-information-banner",
       followUpBadge: "im-manage-establishment__discussion-follow-up-badge",
       copyEmailButton: "im-manage-establishment__discussion-copy-email-button",
       sendMessageInput:
@@ -1198,6 +1200,13 @@ export const domElementIds = {
     discussion: {
       sendMessageSubmitButton:
         "im-beneficiary-dashboard__discussion-send-message-submit-button",
+      closeDiscussionButton:
+        "im-beneficiary-dashboard__close-discussion-button-open-modal",
+      closeDiscussionModal: "im-beneficiary-dashboard__close-discussion",
+      closeDiscussionCancelButton:
+        "im-beneficiary-dashboard__close-discussion-cancel-button",
+      closeDiscussionSubmitButton:
+        "im-beneficiary-dashboard__close-discussion-submit-button",
     },
   },
   beneficiaryDashboardConventions: {

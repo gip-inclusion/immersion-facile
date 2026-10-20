@@ -31,6 +31,22 @@ export const DiscussionManageContent = ({
   const showDiscussion = !isLoading && discussion && currentUser;
 
   useFeedbackEventCallback(
+    "dashboard-discussion-closed-by-candidate",
+    "update.success",
+    () => {
+      if (connectedUserJwt) {
+        dispatch(
+          discussionSlice.actions.fetchDiscussionRequested({
+            discussionId,
+            feedbackTopic: "dashboard-discussion",
+            jwt: connectedUserJwt,
+          }),
+        );
+      }
+    },
+  );
+
+  useFeedbackEventCallback(
     "dashboard-discussion-status-updated",
     "update.success",
     () => {
