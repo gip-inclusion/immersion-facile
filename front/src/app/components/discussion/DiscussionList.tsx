@@ -202,7 +202,7 @@ export const DiscussionList = ({ viewer }: { viewer: ExchangeRole }) => {
 
 const displayedStatuses: Record<DiscussionStatus, string> = {
   ACCEPTED: "Acceptée",
-  REJECTED: "Rejetée",
+  REJECTED: "Clôturée",
   PENDING: "En cours",
 };
 

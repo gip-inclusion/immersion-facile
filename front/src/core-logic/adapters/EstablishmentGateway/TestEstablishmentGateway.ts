@@ -16,6 +16,7 @@ import type {
   WithDiscussionStatusRejected,
 } from "shared";
 import type {
+  CloseDiscussionByCandidateRequestedPayload,
   FetchDiscussionListRequestedPayload,
   FetchDiscussionRequestedPayload,
   SendExchangeRequestedPayload,
@@ -49,6 +50,8 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public sendMessageResponse$ = new Subject<ExchangeRead>();
 
   public updateDiscussionStatusResponse$ = new Subject<void>();
+
+  public closeDiscussionByCandidateResponse$ = new Subject<void>();
 
   public addFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
@@ -121,6 +124,12 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _payload: SendExchangeRequestedPayload,
   ): Observable<ExchangeRead> {
     return this.sendMessageResponse$;
+  }
+
+  public closeDiscussionByCandidate$(
+    _payload: CloseDiscussionByCandidateRequestedPayload,
+  ): Observable<void> {
+    return this.closeDiscussionByCandidateResponse$;
   }
 
   public updateDiscussionStatus$(

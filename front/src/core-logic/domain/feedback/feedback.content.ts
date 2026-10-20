@@ -81,6 +81,7 @@ const topics = [
   "conventions-with-broadcast-feedback",
   "agency-user-registration",
   "dashboard-discussion-status-updated",
+  "dashboard-discussion-closed-by-candidate",
   "dashboard-discussion",
   "dashboard-discussion-contact-info",
   "beneficiary-dashboard-discussion-send-message",
@@ -265,6 +266,20 @@ export const feedbacks: Record<
       title: "Problème lors de la mise à jour de la candidature",
       message:
         "Une erreur est survenue lors de la mise à jour de la candidature",
+    },
+  },
+  "dashboard-discussion-closed-by-candidate": {
+    "update.success": {
+      action: discussionSlice.actions.closeDiscussionByCandidateSucceeded,
+      title: "Candidature clôturée avec succès",
+      message:
+        "Votre candidature a bien été clôturée. Merci d'avoir pris le temps de mettre à jour vos candidatures. L’entreprise pourra ainsi se concentrer sur les candidats qui souhaitent toujours poursuivre leur démarche.",
+    },
+    "update.error": {
+      action: discussionSlice.actions.closeDiscussionByCandidateFailed,
+      title: "Une erreur est survenue",
+      message:
+        "Impossible de procéder à la clôture de la candidature pour le moment. Veuillez réessayer ultérieurement ou contacter le support.",
     },
   },
   "dashboard-discussion": {

@@ -223,6 +223,69 @@ describe("Discussion slice", () => {
     });
   });
 
+  describe("dashboard discussion closed by candidate", () => {
+    it("dashboard discussion closed by candidate succeeded", () => {
+      expectDiscussionSelector(defaultStartingDiscussionState);
+
+      store.dispatch(
+        discussionSlice.actions.closeDiscussionByCandidateRequested({
+          jwt,
+          discussionId: discussion.id,
+          feedbackTopic: "dashboard-discussion-closed-by-candidate",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: true,
+      });
+
+      dependencies.establishmentGateway.closeDiscussionByCandidateResponse$.next();
+
+      expectDiscussionSelector(defaultStartingDiscussionState);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-discussion-closed-by-candidate": {
+          on: "update",
+          level: "success",
+          title: "Candidature clôturée avec succès",
+          message:
+            "Votre candidature a bien été clôturée. Merci d'avoir pris le temps de mettre à jour vos candidatures. L’entreprise pourra ainsi se concentrer sur les candidats qui souhaitent toujours poursuivre leur démarche.",
+        },
+      });
+    });
+
+    it("dashboard discussion closed by candidate failed", () => {
+      expectDiscussionSelector(defaultStartingDiscussionState);
+
+      store.dispatch(
+        discussionSlice.actions.closeDiscussionByCandidateRequested({
+          jwt,
+          discussionId: discussion.id,
+          feedbackTopic: "dashboard-discussion-closed-by-candidate",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: true,
+      });
+
+      dependencies.establishmentGateway.closeDiscussionByCandidateResponse$.error(
+        discussionFetchError,
+      );
+
+      expectDiscussionSelector(defaultStartingDiscussionState);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-discussion-closed-by-candidate": {
+          on: "update",
+          level: "error",
+          title: "Une erreur est survenue",
+          message: discussionFetchErrorMessage,
+        },
+      });
+    });
+  });
+
   describe("fetch discussion establishment contact info", () => {
     const discussionEstablishmentContactInfo: DiscussionEstablishmentContactInfo =
       {

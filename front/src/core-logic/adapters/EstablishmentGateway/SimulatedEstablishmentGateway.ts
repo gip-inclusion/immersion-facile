@@ -18,6 +18,7 @@ import {
   type WithDiscussionStatusRejected,
 } from "shared";
 import {
+  type CloseDiscussionByCandidateRequestedPayload,
   type FetchDiscussionListRequestedPayload,
   type FetchDiscussionRequestedPayload,
   initialDiscussionsWithPagination,
@@ -140,6 +141,12 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
       },
       isEstablishmentReachableByPhoneAfter15Days: false,
     }).pipe(delay(this.delay));
+  }
+
+  public closeDiscussionByCandidate$(
+    _payload: CloseDiscussionByCandidateRequestedPayload,
+  ): Observable<void> {
+    return of(undefined).pipe(delay(this.delay));
   }
 
   public updateDiscussionStatus$(

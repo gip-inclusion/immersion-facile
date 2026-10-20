@@ -19,6 +19,7 @@ import type {
   WithDiscussionStatus,
 } from "shared";
 import type {
+  CloseDiscussionByCandidateRequestedPayload,
   FetchDiscussionListRequestedPayload,
   FetchDiscussionRequestedPayload,
 } from "../domain/discussion/discussion.slice";
@@ -63,6 +64,9 @@ export interface EstablishmentGateway {
       jwt: ConventionSupportedJwt;
       discussionId: string;
     } & WithDiscussionStatus,
+  ): Observable<void>;
+  closeDiscussionByCandidate$(
+    payload: CloseDiscussionByCandidateRequestedPayload,
   ): Observable<void>;
   getDiscussions$(
     payload: FetchDiscussionListRequestedPayload,
