@@ -245,6 +245,7 @@ export const ConventionList = () => {
           agencyRight.agency.status !== "needsReview" &&
           agencyRight.agency.status !== "rejected",
       )
+      .sort((a, b) => a.agency.name.localeCompare(b.agency.name))
       .map((agencyRight) => ({
         label: agencyRight.agency.name,
         nativeInputProps: {
