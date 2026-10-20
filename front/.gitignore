@@ -9,7 +9,6 @@ front-build.tar.gz
 build
 scalingo/dist
 env-config.js
-:Zone.Identifier
 public/dsfr/
 
 /public/dsfr/
