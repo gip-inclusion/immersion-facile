@@ -41,6 +41,9 @@ on-run-end:
   - "ANALYZE public_analytics.groups"
   - "ANALYZE public_analytics.groups_sirets"
   - "ANALYZE public_analytics.broadcast_feedbacks"
+  - "ANALYZE public_analytics.ft_sectors"
+  - "ANALYZE public_analytics.ft_sectors__naf"
+  - "ANALYZE public_analytics.ft_sectors__rome"
 
 models:
   immersion_bi:

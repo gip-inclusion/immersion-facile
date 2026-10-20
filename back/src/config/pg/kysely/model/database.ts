@@ -46,6 +46,9 @@ export interface Database {
   establishments: Establishments;
   exchanges: Exchanges;
   feature_flags: FeatureFlags;
+  ft_sectors__naf: FtSectorsNaf;
+  ft_sectors__rome: FtSectorsRome;
+  ft_sectors: FtSectors;
   groups__sirets: GroupsSirets;
   groups: Groups;
   immersion_assessments: ImmersionAssessments;
@@ -780,6 +783,21 @@ interface FeatureFlags {
   is_active: boolean;
   kind: Generated<string>;
   value: Json | null;
+}
+
+interface FtSectors {
+  code: string;
+  label: string;
+}
+
+interface FtSectorsNaf {
+  ft_sector_code: string;
+  naf_code: string;
+}
+
+interface FtSectorsRome {
+  ft_sector_code: string;
+  rome_code: string;
 }
 
 // TO DELETE
