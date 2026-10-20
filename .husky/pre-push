@@ -5,7 +5,7 @@
 
 echo 'Pre-push hook'
 
-MAX_PRS_IN_REVIEW=6
+MAX_PRS_IN_REVIEW=4
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "❌ gh CLI is required to check open PRs (https://cli.github.com/)"
