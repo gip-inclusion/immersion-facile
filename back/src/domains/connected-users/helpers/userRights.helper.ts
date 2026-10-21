@@ -1,4 +1,6 @@
+import { uniq } from "ramda";
 import {
+  type EstablishmentAdminPrivateData,
   errors,
   type UserEstablishmentRightDetails,
   type UserEstablishmentRightDetailsWithAcceptedStatus,
@@ -40,31 +42,47 @@ const withEstablishments = async (
         userId: user.id,
       },
     );
-  const establishments: UserEstablishmentRightDetails[] = await Promise.all(
-    establishmentAggregates.map((establishment) =>
-      makeEstablishmentRights(uow, establishment, user.id),
+  const adminUsers = await uow.userRepository.getByIds(
+    uniq(
+      establishmentAggregates.flatMap(({ userRights }) =>
+        getAdminUserIds(userRights),
+      ),
     ),
   );
+  const adminsByUserId = adminUsers.reduce<
+    Record<UserId, EstablishmentAdminPrivateData>
+  >(
+    (acc, { id, firstName, lastName, email }) => ({
+      ...acc,
+      [id]: { firstName, lastName, email },
+    }),
+    {},
+  );
+  const establishments: UserEstablishmentRightDetails[] =
+    establishmentAggregates.map((establishmentAggregate) =>
+      makeEstablishmentRights(establishmentAggregate, user.id, adminsByUserId),
+    );
   return establishments.length ? { establishments } : {};
 };
 
-const makeEstablishmentRights = async (
-  uow: UnitOfWork,
+const getAdminUserIds = (
+  userRights: EstablishmentAggregate["userRights"],
+): UserId[] =>
+  userRights
+    .filter(({ role }) => role === "establishment-admin")
+    .map(({ userId }) => userId);
+
+const makeEstablishmentRights = (
   { establishment, userRights }: EstablishmentAggregate,
   userId: UserId,
-): Promise<UserEstablishmentRightDetails> => {
+  adminsByUserId: Record<UserId, EstablishmentAdminPrivateData>,
+): UserEstablishmentRightDetails => {
   const userRight = userRights.find((userRight) => userRight.userId === userId);
   if (!userRight) {
     throw errors.establishment.noUserRights({
       siret: establishment.siret,
     });
   }
-
-  const adminUsers = await uow.userRepository.getByIds(
-    userRights
-      .filter((user) => user.role === "establishment-admin")
-      .map(({ userId }) => userId),
-  );
 
   return match(userRight)
     .with({ status: "PENDING" }, (pendingUserRight) => {
@@ -94,11 +112,10 @@ const makeEstablishmentRights = async (
           : {}),
         role: userRight.role,
         status: acceptedUserRight.status,
-        admins: adminUsers.map(({ firstName, lastName, email }) => ({
-          firstName,
-          lastName,
-          email,
-        })),
+        admins: getAdminUserIds(userRights).flatMap((adminUserId) => {
+          const admin = adminsByUserId[adminUserId];
+          return admin ? [admin] : [];
+        }),
         shouldReceiveDiscussionNotifications:
           acceptedUserRight.shouldReceiveDiscussionNotifications,
       } satisfies UserEstablishmentRightDetailsWithAcceptedStatus;

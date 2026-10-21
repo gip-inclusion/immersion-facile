@@ -554,14 +554,14 @@ describe("GetConnectedUser", () => {
                       status: "ACCEPTED",
                       admins: [
                         {
-                          email: anotherUser.email,
-                          firstName: anotherUser.firstName,
-                          lastName: anotherUser.lastName,
-                        },
-                        {
                           email: notAdminUser.email,
                           firstName: notAdminUser.firstName,
                           lastName: notAdminUser.lastName,
+                        },
+                        {
+                          email: anotherUser.email,
+                          firstName: anotherUser.firstName,
+                          lastName: anotherUser.lastName,
                         },
                       ],
                       shouldReceiveDiscussionNotifications: true,
