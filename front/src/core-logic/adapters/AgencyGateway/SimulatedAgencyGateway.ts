@@ -211,23 +211,23 @@ const simulatedAgencyUsers: AgencyUserForListing[] = [
     email: "jbon8745@wanadoo.fr",
     firstName: "Jean",
     lastName: "Bon",
-    agencyRights: [
-      {
+    agencyRights: {
+      [MISSION_LOCAL_AGENCY_ACTIVE.id]: {
         agencyId: MISSION_LOCAL_AGENCY_ACTIVE.id,
         roles: ["to-review"],
         isNotifiedByEmail: true,
       },
-      {
+      [PE_AGENCY_ACTIVE.id]: {
         agencyId: PE_AGENCY_ACTIVE.id,
         roles: ["validator"],
         isNotifiedByEmail: true,
       },
-      {
+      [CCI_ACTIVE.id]: {
         agencyId: CCI_ACTIVE.id,
         roles: ["to-review"],
         isNotifiedByEmail: true,
       },
-    ],
+    },
     createdAt: new Date().toISOString(),
     preventToDelete: false,
     isProConnectUser: true,

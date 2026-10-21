@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   type AgencyDto,
+  type AgencyUserForListing,
   domElementIds,
   type UserId,
   type UserParamsForAgency,
@@ -18,7 +19,6 @@ import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutName
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
-import type { AgencyUserForManagement } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
@@ -26,7 +26,7 @@ import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
   agency: AgencyDto;
-  agencyUsersById: Record<UserId, AgencyUserForManagement>;
+  agencyUsersById: Record<UserId, AgencyUserForListing>;
   routeName: AgencyOverviewRouteName;
 };
 
@@ -58,7 +58,7 @@ export const AgencyUsers = ({
 
   const [mode, setMode] = useState<"add" | "update" | null>(null);
 
-  const onModifyClicked = (agencyUser: AgencyUserForManagement) => {
+  const onModifyClicked = (agencyUser: AgencyUserForListing) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     setMode("update");
     setSelectedUserData({

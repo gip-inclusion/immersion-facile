@@ -6,12 +6,16 @@ import { useMemo, useState } from "react";
 import { NotificationIndicator, ResponsiveTable } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import { type AgencyDto, type ConnectedUser, domElementIds } from "shared";
+import {
+  type AgencyDto,
+  type AgencyUserForListing,
+  type ConnectedUser,
+  domElementIds,
+} from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { AgencyUserForManagement } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -22,9 +26,9 @@ import {
 } from "./removeUserAgencyRights";
 
 type AgencyUsersTableProps = {
-  agencyUsers: AgencyUserForManagement[];
+  agencyUsers: AgencyUserForListing[];
   agency: AgencyDto;
-  onModifyClicked: (user: AgencyUserForManagement) => void;
+  onModifyClicked: (user: AgencyUserForListing) => void;
   routeName: AgencyOverviewRouteName;
 };
 
@@ -130,9 +134,9 @@ const TableLine = ({
   currentUser: ConnectedUser | null;
   isLocationAdmin: boolean;
   agency: AgencyDto;
-  agencyUser: AgencyUserForManagement;
+  agencyUser: AgencyUserForListing;
   index: number;
-  onModifyClicked: (user: AgencyUserForManagement) => void;
+  onModifyClicked: (user: AgencyUserForListing) => void;
   onDeleteClicked: (userRightToRemove: UserRightToRemove) => void;
 }): React.ReactNode[] => {
   const domElementIdSection = isLocationAdmin

@@ -3,6 +3,7 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyRight,
+  type AgencyUserForListing,
   type ConnectedUser,
   expectToEqual,
   noAgencyDashboards,
@@ -14,7 +15,6 @@ import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/dom
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
-import type { AgencyUserForManagement } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import {
   type FetchAgencyState,
   fetchAgencyInitialState,
@@ -34,7 +34,7 @@ import type { ReduxStore } from "src/core-logic/storeConfig/store";
 const agencyDto = new AgencyDtoBuilder().build();
 const agencyWithAdminEmails = toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []);
 
-const user1: AgencyUserForManagement = {
+const user1: AgencyUserForListing = {
   id: "fake-user-id-1",
   email: "jbon8745@wanadoo.fr",
   firstName: "Jean",
@@ -51,7 +51,7 @@ const user1: AgencyUserForManagement = {
   isProConnectUser: true,
 };
 
-const user2: AgencyUserForManagement = {
+const user2: AgencyUserForListing = {
   id: "user-in-error",
   email: "fake-user-email-4@test.fr",
   firstName: "Jean-Michel",
@@ -68,7 +68,7 @@ const user2: AgencyUserForManagement = {
   isProConnectUser: true,
 };
 
-const fakeAgencyUsers: Record<UserId, AgencyUserForManagement> = {
+const fakeAgencyUsers: Record<UserId, AgencyUserForListing> = {
   [user1.id]: user1,
   [user2.id]: user2,
 };
@@ -489,7 +489,7 @@ describe("fetchAgency", () => {
     describe("updateUser", () => {
       it("should update user successfully", () => {
         const originalUser = fakeAgencyUsers[user1.id];
-        const updatedUser: AgencyUserForManagement = {
+        const updatedUser: AgencyUserForListing = {
           ...originalUser,
           email: "updated-email@email.fr",
           agencyRights: {
@@ -590,13 +590,10 @@ describe("fetchAgency", () => {
     dependencies.agencyGateway.fetchedAgency$.next(agency);
   };
   const feedWithFetchedAgencyUsers = (
-    agencyUsers: Record<UserId, AgencyUserForManagement>,
+    agencyUsers: Record<UserId, AgencyUserForListing>,
   ) => {
     dependencies.agencyGateway.getAgencyUsersResponse$.next(
-      values(agencyUsers).map((agencyUser) => ({
-        ...agencyUser,
-        agencyRights: Object.values(agencyUser.agencyRights),
-      })),
+      values(agencyUsers),
     );
   };
 });

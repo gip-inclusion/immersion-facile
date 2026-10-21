@@ -831,6 +831,10 @@ describe("Agency routes", () => {
             roles: ["agency-admin"],
             isNotifiedByEmail: true,
           },
+          [nonAdminUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
         }),
       ];
 
@@ -842,25 +846,29 @@ describe("Agency routes", () => {
       });
 
       const response = await httpClient.getAgencyUsers({
-        queryParams: { agencyIds: [agency.id] },
+        queryParams: { agencyIds: [agency.id], agencyRole: "validator" },
         headers: { authorization: agencyAdminToken },
       });
 
-      const { proConnect: _, ...agencyAdminWithoutProConnect } = agencyAdmin;
+      const {
+        proConnect: _,
+        isBackofficeAdmin: __,
+        ...nonAdminUserWithoutProConnect
+      } = nonAdminUser;
 
       expectHttpResponseToEqual(response, {
         status: 200,
         body: [
           {
-            ...agencyAdminWithoutProConnect,
+            ...nonAdminUserWithoutProConnect,
             isProConnectUser: true,
-            agencyRights: [
-              {
+            agencyRights: {
+              [agency.id]: {
                 agencyId: agency.id,
-                roles: ["agency-admin"],
+                roles: ["validator"],
                 isNotifiedByEmail: true,
               },
-            ],
+            },
           },
         ],
       });

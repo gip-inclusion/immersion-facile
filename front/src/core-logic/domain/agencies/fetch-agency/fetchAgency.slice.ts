@@ -2,8 +2,6 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "ramda";
 import type {
   AgencyDto,
-  AgencyId,
-  AgencyRightForListing,
   AgencyUserForListing,
   UserId,
   WithAgencyId,
@@ -21,16 +19,9 @@ import type {
   ConnectedUserWithNormalizedAgencyRights,
 } from "../../admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 
-export type AgencyUserForManagement = Omit<
-  AgencyUserForListing,
-  "agencyRights"
-> & {
-  agencyRights: Record<AgencyId, AgencyRightForListing>;
-};
-
 export interface FetchAgencyState {
   agency: AgencyDto | null;
-  agencyUsers: Record<UserId, AgencyUserForManagement>;
+  agencyUsers: Record<UserId, AgencyUserForListing>;
   isLoading: boolean;
 }
 
@@ -73,7 +64,7 @@ export const fetchAgencySlice = createSlice({
 
     fetchAgencyUsersSucceeded: (
       state,
-      action: PayloadAction<Record<UserId, AgencyUserForManagement>>,
+      action: PayloadAction<Record<UserId, AgencyUserForListing>>,
     ) => {
       state.isLoading = false;
       state.agencyUsers = action.payload;
@@ -108,9 +99,7 @@ export const fetchAgencySlice = createSlice({
         if (!state.agencyUsers || state.agency?.id !== action.payload.agencyId)
           return;
         const { id } = action.payload.icUser;
-        state.agencyUsers[id] = toAgencyUserForManagement(
-          action.payload.icUser,
-        );
+        state.agencyUsers[id] = toAgencyUserForListing(action.payload.icUser);
       },
     );
     builder.addCase(
@@ -119,7 +108,7 @@ export const fetchAgencySlice = createSlice({
         if (!state.agencyUsers || !state.agencyUsers[action.payload.userId])
           return;
         state.agencyUsers = filter(
-          (agencyUser: AgencyUserForManagement) =>
+          (agencyUser: AgencyUserForListing) =>
             agencyUser.id !== action.payload.userId,
           state.agencyUsers,
         );
@@ -148,14 +137,14 @@ export const fetchAgencySlice = createSlice({
   },
 });
 
-const toAgencyUserForManagement = ({
+const toAgencyUserForListing = ({
   proConnect,
   dashboards: __,
   establishments: ___,
   isBackofficeAdmin: ____,
   agencyRights,
   ...user
-}: ConnectedUserWithNormalizedAgencyRights): AgencyUserForManagement => ({
+}: ConnectedUserWithNormalizedAgencyRights): AgencyUserForListing => ({
   ...user,
   isProConnectUser: proConnect !== null,
   agencyRights: Object.fromEntries(
@@ -168,12 +157,12 @@ const toAgencyUserForManagement = ({
   ),
 });
 
-export const toAgencyUsersForManagementById = (
+export const toAgencyUsersForListingById = (
   users: ConnectedUsersWithNormalizedAgencyRightsById,
-): Record<UserId, AgencyUserForManagement> =>
+): Record<UserId, AgencyUserForListing> =>
   Object.fromEntries(
     Object.entries(users).map(([userId, user]) => [
       userId,
-      toAgencyUserForManagement(user),
+      toAgencyUserForListing(user),
     ]),
   );

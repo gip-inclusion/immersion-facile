@@ -27,7 +27,7 @@ const getUsersInReviewEpic: UsersInReviewEpic = (
         .pipe(
           map((agencyUsers) => ({
             usersToReview: agencyUsers.flatMap((agencyUser) =>
-              agencyUser.agencyRights
+              Object.values(agencyUser.agencyRights)
                 .filter((agencyRight) =>
                   agencyRight.roles.includes("to-review"),
                 )
