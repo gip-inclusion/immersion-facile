@@ -3,11 +3,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { type ReactNode, useState } from "react";
-import {
-  CopyButton,
-  NotificationIndicator,
-  RichTable,
-} from "react-design-system";
+import { CopyButton, RichTable } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -95,18 +91,13 @@ export const EstablishmentsList = ({
           placeholder: "Rechercher par nom d’enseigne, raison sociale ou SIRET",
           onSubmit: setSearchQuery,
         }}
-        headers={[
-          "Entreprise",
-          "Mon rôle et mes notifications",
-          "Administrateurs",
-          "Actions",
-        ]}
+        headers={["Entreprise", "Mon rôle", "Administrateurs", "Actions"]}
         tableData={displayedEstablishments.map((establishment) => [
           <EstablishmentNameAndSiret
             key={`${establishment.siret}-name`}
             establishment={establishment}
           />,
-          <EstablishmentRoleAndNotifications
+          <EstablishmentRole
             key={`${establishment.siret}-role`}
             establishment={establishment}
           />,
@@ -190,7 +181,7 @@ const EstablishmentNameAndSiret = ({
   );
 };
 
-const EstablishmentRoleAndNotifications = ({
+const EstablishmentRole = ({
   establishment,
 }: {
   establishment: AcceptedUserEstablishmentRightDetails;
@@ -198,16 +189,9 @@ const EstablishmentRoleAndNotifications = ({
   const roleDisplay = establishmentRoleToDisplay[establishment.role];
 
   return (
-    <>
-      <Badge small className={fr.cx(roleDisplay.className, "fr-mb-1w")}>
-        {roleDisplay.label}
-      </Badge>
-      <div>
-        <NotificationIndicator
-          isNotified={establishment.shouldReceiveDiscussionNotifications}
-        />
-      </div>
-    </>
+    <Badge small className={fr.cx(roleDisplay.className)}>
+      {roleDisplay.label}
+    </Badge>
   );
 };
 
