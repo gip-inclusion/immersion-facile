@@ -15,7 +15,7 @@ import {
   onlyAdminUserRightsWithStatusAccepted,
   toLowerCaseWithoutDiacritics,
 } from "shared";
-import { establishmentRoleToDisplay } from "src/app/components/establishment/establishment-users";
+import { establishmentRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
@@ -186,7 +186,7 @@ const EstablishmentRole = ({
 }: {
   establishment: AcceptedUserEstablishmentRightDetails;
 }): ReactNode => {
-  const roleDisplay = establishmentRoleToDisplay[establishment.role];
+  const roleDisplay = establishmentRolesToDisplay[establishment.role];
 
   return (
     <Badge small className={fr.cx(roleDisplay.className)}>
