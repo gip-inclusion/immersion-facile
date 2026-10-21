@@ -164,7 +164,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
               )
               .otherwise(
                 () =>
-                  "Vous pouvez créer une nouvelle entreprise en suivant le bouton ci-dessous.",
+                  "Vous pouvez inscrire une nouvelle entreprise en suivant le bouton ci-dessous.",
               )}
           </p>
           <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -231,7 +231,7 @@ export const RequestRegisterEstablishmentsForUserForm = ({
               }}
               className={fr.cx("fr-mt-2w")}
             >
-              Créer une nouvelle entreprise
+              Inscrire une nouvelle entreprise
             </Button>
           )}
           {createPortal(

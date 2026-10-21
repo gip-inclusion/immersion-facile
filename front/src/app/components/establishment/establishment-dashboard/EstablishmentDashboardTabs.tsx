@@ -277,7 +277,7 @@ const OnboardingTabContent = () => (
               frontRoutes.formEstablishment().push();
             },
             iconId: "fr-icon-add-line",
-            children: "Créer une nouvelle entreprise",
+            children: "Inscrire une nouvelle entreprise",
           },
           {
             id: domElementIds.establishmentDashboard.manageEstablishments
