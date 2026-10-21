@@ -84,8 +84,11 @@ export const AgencyFormCommonFields = ({
     };
 
   const formValues = getValues();
+  const isFranceTravailAgency = watch("kind") === "france-travail";
   const shouldShowGroupName =
-    mode === "edit" && (isAdminConnected || Boolean(formValues.groupName));
+    mode === "edit" &&
+    !isFranceTravailAgency &&
+    (isAdminConnected || Boolean(formValues.groupName));
   const [validationSteps, setValidationSteps] = useState<ValidationSteps>(
     formValues.counsellorEmails.length || refersToOtherAgency
       ? "counsellorsAndValidators"
