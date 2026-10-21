@@ -197,6 +197,60 @@ describe("GetEstablishmentNameAndAdmins", () => {
         },
       );
     });
+
+    it("without admins whose right is still pending", async () => {
+      const pendingAdminUser = new UserBuilder()
+        .withId("4")
+        .withEmail("pending-admin@corp.com")
+        .build();
+      const establishmentWithPendingAdmin = new EstablishmentAggregateBuilder(
+        establishment,
+      )
+        .withUserRights([
+          ...establishment.userRights,
+          {
+            role: "establishment-admin",
+            status: "PENDING",
+            userId: pendingAdminUser.id,
+            job: "osef",
+            phone: "osef",
+            shouldReceiveDiscussionNotifications: true,
+            isMainContactByPhone: false,
+          },
+        ])
+        .build();
+
+      uow.userRepository.users = [
+        userWithoutEstablishmentRight,
+        establishmentAdminUser,
+        establishmentContactUser,
+        pendingAdminUser,
+      ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithPendingAdmin,
+      ];
+
+      const backofficeAdminUser: ConnectedUser = {
+        ...userWithoutEstablishmentRight,
+        isBackofficeAdmin: true,
+        agencyRights: [],
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
+      };
+
+      expectToEqual(
+        await getEstablishmentNameAndAdmins.execute(
+          { siret: establishmentWithPendingAdmin.establishment.siret },
+          backofficeAdminUser,
+        ),
+        {
+          name: establishmentWithPendingAdmin.establishment.name,
+          adminEmails: [establishmentAdminUser.email],
+        },
+      );
+    });
   });
 
   describe("wrong paths", () => {

@@ -2,6 +2,7 @@ import {
   type ConnectedUser,
   type EstablishmentNameAndAdmins,
   errors,
+  onlyAdminUserRightsWithStatusAccepted,
   type SiretDto,
   type WithSiretDto,
   withSiretSchema,
@@ -53,7 +54,7 @@ const getEstablishmentNameAndAdmins = async ({
 
   const adminsUsers = await uow.userRepository.getByIds(
     establishment.userRights
-      .filter(({ role }) => role === "establishment-admin")
+      .filter(onlyAdminUserRightsWithStatusAccepted)
       .map(({ userId }) => userId),
   );
 

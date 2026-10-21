@@ -1639,9 +1639,10 @@ describe("AddExchangeToDiscussion", () => {
           .build();
 
       await uow.userRepository.save(userWithPendingRight);
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregateWithPendingUserRight,
-      );
+        establishment2,
+      ];
 
       expectToEqual(
         await addExchangeToDiscussion.execute(
@@ -1714,9 +1715,10 @@ describe("AddExchangeToDiscussion", () => {
           .build();
 
       await uow.userRepository.save(userWithPendingRight);
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregateWithPendingUserRight,
-      );
+        establishment2,
+      ];
 
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(

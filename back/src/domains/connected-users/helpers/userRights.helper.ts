@@ -2,6 +2,7 @@ import { uniq } from "ramda";
 import {
   type EstablishmentAdminPrivateData,
   errors,
+  onlyAdminUserRightsWithStatusAccepted,
   type UserEstablishmentRightDetails,
   type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
@@ -69,7 +70,7 @@ const getAdminUserIds = (
   userRights: EstablishmentAggregate["userRights"],
 ): UserId[] =>
   userRights
-    .filter(({ role }) => role === "establishment-admin")
+    .filter(onlyAdminUserRightsWithStatusAccepted)
     .map(({ userId }) => userId);
 
 const makeEstablishmentRights = (
