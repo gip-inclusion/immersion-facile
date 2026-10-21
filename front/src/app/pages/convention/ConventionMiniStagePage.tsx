@@ -21,7 +21,11 @@ export const ConventionMiniStagePage = ({
 }: ConventionMiniStagePageProps) => {
   const t = useConventionTexts("mini-stage-cci");
   const initialRouteParams = useRef(route.params).current;
-  const { jwt: _, ...routeParamsWithoutJwt } = initialRouteParams;
+  const {
+    jwt: _,
+    shouldPrefillAgencyReferent: __,
+    ...routeParamsWithoutJwt
+  } = initialRouteParams;
   const isSharedConvention = useMemo(
     () => keys(routeParamsWithoutJwt).length > 0,
     [routeParamsWithoutJwt],

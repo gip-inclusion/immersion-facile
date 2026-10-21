@@ -173,6 +173,11 @@ export const ConventionForm = ({
   const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const acquisitionParams = useGetAcquisitionParams();
 
+  const shouldPrefillAgencyReferent =
+    mode === "create-convention-from-scratch" ||
+    ("shouldPrefillAgencyReferent" in route.params &&
+      route.params.shouldPrefillAgencyReferent === true);
+
   const currentUserAgencyReferentName =
     currentUser && isAgencyUser(currentUser)
       ? {
@@ -194,7 +199,7 @@ export const ConventionForm = ({
       internshipKind,
     }),
     ...acquisitionParams,
-    ...(mode === "create-convention-from-scratch"
+    ...(shouldPrefillAgencyReferent
       ? { agencyReferent: agencyReferentName }
       : {}),
     isEstablishmentBanned: false,
@@ -330,7 +335,9 @@ export const ConventionForm = ({
     conventionPresentationFromDraft,
     conventionPresentationFromConventionTemplate,
     agencyReferentName,
+    shouldPrefillAgencyReferent,
     route,
+    acquisitionParams,
   ]);
 
   return (

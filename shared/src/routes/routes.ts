@@ -302,6 +302,7 @@ export const {
     {
       jwt: param.query.optional.string,
       skipIntro: param.query.optional.boolean,
+      shouldPrefillAgencyReferent: param.query.optional.boolean,
       conventionId: param.query.optional.string,
       conventionDraftId: param.query.optional.string,
       conventionTemplateId: param.query.optional.string,
@@ -325,6 +326,7 @@ export const {
   conventionMiniStage: defineRoute(
     {
       jwt: param.query.optional.string,
+      shouldPrefillAgencyReferent: param.query.optional.boolean,
       conventionId: param.query.optional.string,
       conventionDraftId: param.query.optional.string,
       conventionTemplateId: param.query.optional.string,
