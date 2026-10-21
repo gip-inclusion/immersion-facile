@@ -96,20 +96,20 @@ const loginWithIdentityProvider = async (
   await expect(authButton).toBeVisible();
 
   await authButton.click();
-  await page.waitForURL(
-    `${getAuthEnvVarByIdentityProviderMode(identityProviderMode).baseUrl}/**`,
+  const proConnectContinueButton = page
+    .locator("button[type='submit']")
+    .getByText("Continuer", {
+      exact: false,
+    });
+  await expect(page.locator("input[name=email]")).toBeVisible();
+  await expect(proConnectContinueButton).toBeVisible();
+  expect(page.url()).toContain(
+    getAuthEnvVarByIdentityProviderMode(identityProviderMode).baseUrl,
   );
-  await page.waitForLoadState("domcontentloaded");
-  await page.waitForSelector("input[name=email]");
   await page.fill("input[name=email]", username);
 
   if (identityProviderMode === "ProConnect")
-    await page
-      .locator("button[type='submit']")
-      .getByText("Continuer", {
-        exact: false,
-      })
-      .click();
+    await proConnectContinueButton.click();
 
   await page.fill("input[name=password]", password);
 
