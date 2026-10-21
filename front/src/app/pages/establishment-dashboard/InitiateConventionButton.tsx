@@ -17,6 +17,7 @@ import {
   conventionTemplateIdSchema,
   domElementIds,
   frontRoutes,
+  getDisplayedBusinessName,
   type SiretDto,
   siretSchema,
   toDisplayedDate,
@@ -366,7 +367,7 @@ export const InitiateConventionButton = () => {
                     options={
                       currentUserEstablishments?.map((est) => ({
                         value: est.siret,
-                        label: est.businessName,
+                        label: getDisplayedBusinessName(est),
                       })) ?? []
                     }
                     nativeSelectProps={{

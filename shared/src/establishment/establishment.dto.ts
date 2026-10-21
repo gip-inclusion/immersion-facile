@@ -65,6 +65,7 @@ export type EstablishmentAdminPrivateData = {
 type UserEstablishmentRightDetailsCommon = {
   siret: SiretDto;
   businessName: BusinessName;
+  businessNameCustomized?: BusinessNameCustomized;
   role: EstablishmentRole;
   shouldReceiveDiscussionNotifications: boolean;
 };

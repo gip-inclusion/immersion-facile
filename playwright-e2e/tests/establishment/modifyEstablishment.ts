@@ -33,13 +33,11 @@ export const updateEstablishmentThroughEstablishmentDashboard =
       frontRoutes.establishmentDashboardFormEstablishment({
         siret: updatedFormEstablishment.siret,
       }).href;
-    if (!page.url().includes(establishmentDashboardUrl)) {
-      await page
-        .locator(
-          `#${domElementIds.establishmentDashboard.manageEstablishments.selectEstablishmentInput}`,
-        )
-        .selectOption(updatedFormEstablishment.siret);
-    }
+    await page
+      .locator(
+        `#${domElementIds.establishmentDashboard.manageEstablishments.manageEstablishmentButton}-${updatedFormEstablishment.siret}`,
+      )
+      .click();
 
     await page.waitForURL(establishmentDashboardUrl);
 

@@ -70,9 +70,10 @@ const makeEstablishmentRights = async (
     .with({ status: "PENDING" }, (pendingUserRight) => {
       const userRightDetailsWithPendingStatus = {
         siret: establishment.siret,
-        businessName: establishment.customizedName
-          ? establishment.customizedName
-          : establishment.name,
+        businessName: establishment.name,
+        ...(establishment.customizedName
+          ? { businessNameCustomized: establishment.customizedName }
+          : {}),
         role: userRight.role,
         status: pendingUserRight.status,
         shouldReceiveDiscussionNotifications:
@@ -87,9 +88,10 @@ const makeEstablishmentRights = async (
     .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
       const userRightDetailsWithAcceptedStatus = {
         siret: establishment.siret,
-        businessName: establishment.customizedName
-          ? establishment.customizedName
-          : establishment.name,
+        businessName: establishment.name,
+        ...(establishment.customizedName
+          ? { businessNameCustomized: establishment.customizedName }
+          : {}),
         role: userRight.role,
         status: acceptedUserRight.status,
         admins: adminUsers.map(({ firstName, lastName, email }) => ({

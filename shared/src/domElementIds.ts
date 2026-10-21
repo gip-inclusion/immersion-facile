@@ -1146,7 +1146,16 @@ export const domElementIds = {
       goToDiscussionButton: "im-manage-establishment__go-to-discussion-button",
     },
     manageEstablishments: {
-      selectEstablishmentInput: "im-manage-establishment__establishment-select",
+      manageEstablishmentButton:
+        "im-manage-establishment__manage-establishment-button",
+      showAllAdminsButton: "im-manage-establishment__show-all-admins-button",
+      adminsListModal: "im-manage-establishment__admins-list-modal",
+      adminsListModalCloseButton:
+        "im-manage-establishment__admins-list-modal-close-button",
+      adminsListModalCopyEmailButton:
+        "im-manage-establishment__admins-list-modal-copy-email-button",
+      backToEstablishmentsButton:
+        "im-manage-establishment__back-to-establishments-button",
       addUserButton: "im-manage-establishment__add-user-button",
       createEstablishment:
         "im-manage-establishment__create-establishment-button",

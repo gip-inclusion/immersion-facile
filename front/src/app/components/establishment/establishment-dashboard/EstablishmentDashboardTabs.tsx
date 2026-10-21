@@ -122,16 +122,14 @@ export const EstablishmentDashboardTabs = ({
 };
 const filterActiveEstablishmentsForUser = (
   establishment: UserEstablishmentRightDetails,
-) =>
-  !establishment.isEstablishmentBanned &&
-  (onlyAdminUserRightsWithStatusAccepted(establishment) ||
-    establishment.status === "PENDING");
+) => !establishment.isEstablishmentBanned;
 
 const makeEstablishmentDashboardTabs = (
   {
     dashboards: {
       establishments: { conventions },
     },
+    email,
     establishments,
     isBackofficeAdmin,
   }: ConnectedUser,
@@ -181,13 +179,13 @@ const makeEstablishmentDashboardTabs = (
         ]
       : []),
     {
-      label:
-        establishmentsArray.length > 1 ? "Mes entreprises" : "Mon entreprise",
+      label: "Mes entreprises",
       tabId: "fiche-entreprise",
       content: userCanManageEstablishments ? (
         <ManageEstablishmentsTab
           establishments={acceptedUserEstablishmentsRights}
           pendingEstablishmentRights={pendingUserEstablishmentsRights}
+          currentUserEmail={email}
           isBackofficeAdmin={isBackofficeAdmin}
         />
       ) : (

@@ -2,11 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import type { ReactNode } from "react";
 import { ResponsiveTable } from "react-design-system";
-import type {
-  EstablishmentUserRightStatus,
-  UserEstablishmentRightDetails,
-  UserEstablishmentRightDetailsWithAcceptedStatus,
-  UserEstablishmentRightDetailsWithPendingStatus,
+import {
+  type EstablishmentUserRightStatus,
+  getDisplayedBusinessName,
+  type UserEstablishmentRightDetails,
+  type UserEstablishmentRightDetailsWithAcceptedStatus,
+  type UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
 import { match } from "ts-pattern";
 import { establishmentRoleToDisplay } from "../establishment-users";
@@ -27,7 +28,11 @@ export const EstablishmentsRightsTable = ({
         withEstablishmentData[0].status,
       )}
       data={[...withEstablishmentData]
-        .sort((a, b) => a.businessName.localeCompare(b.businessName))
+        .sort((a, b) =>
+          getDisplayedBusinessName(a).localeCompare(
+            getDisplayedBusinessName(b),
+          ),
+        )
         .map((data) =>
           makeEstablishmentRightLine({
             data,
@@ -43,8 +48,8 @@ const getEstablishmentRightLineHeaders = (
   status: EstablishmentUserRightStatus,
 ) => {
   const strategy: Record<EstablishmentUserRightStatus, string[]> = {
-    ACCEPTED: ["Établissement", "Administrateurs", "Rôle"],
-    PENDING: ["Établissement", "Rôle et préférences demandés"],
+    ACCEPTED: ["Entreprise", "Administrateurs", "Rôle"],
+    PENDING: ["Entreprise", "Rôle et préférences demandés"],
   };
   return strategy[status];
 };

@@ -48,7 +48,7 @@ type RichTableProps = {
     hintText?: string;
     onSubmit: (value: string) => void;
   };
-  pagination: PaginationProps;
+  pagination?: PaginationProps;
   isLoading: boolean;
   label: string;
   className?: string;
@@ -85,7 +85,7 @@ export const RichTable = ({
   const searchBarRefOnSubmitRef = useRef(searchBar?.onSubmit).current;
   const tableRef = useRef<HTMLDivElement>(null);
 
-  useScrollTo(pagination.defaultPage ?? 1);
+  useScrollTo(pagination?.defaultPage ?? 1);
 
   useLayoutEffect(() => {
     tableRef.current?.querySelectorAll("th").forEach((th) => {
@@ -239,7 +239,7 @@ export const RichTable = ({
           ))}
         </div>
       )}
-      <Pagination {...pagination} />
+      {pagination && <Pagination {...pagination} />}
     </section>
   );
 };
