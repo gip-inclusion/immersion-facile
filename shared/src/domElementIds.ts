@@ -1150,6 +1150,8 @@ export const domElementIds = {
       addUserButton: "im-manage-establishment__add-user-button",
       createEstablishment:
         "im-manage-establishment__create-establishment-button",
+      createEstablishmentForAlreadyRegisteredUser:
+        "im-manage-establishment__create-establishment-button--already-registered-user",
       editUserButton: "im-manage-establishment__edit-user-button",
       deleteUserButton: "im-manage-establishment__delete-user-button",
       validateUserRightButton:
@@ -1158,6 +1160,8 @@ export const domElementIds = {
         "im-manage-establishment__reject-user-right-button",
       registerEstablishmentButton:
         "im-manage-establishment__register-establishment-button",
+      registerEstablishmentButtonForAlreadyRegisteredUser:
+        "im-manage-establishment__register-establishment-button--already-registered-user",
       adminEstablishmentLink:
         "im-manage-establishment__admin-establishment-link",
     },
