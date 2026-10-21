@@ -36,10 +36,6 @@ describe("ConventionReminder use case", () => {
   const now = new Date("2023-03-17");
   const eventIds = ["event-1", "event-2", "event-3", "event-4"];
   const topic = "ConventionReminderRequired";
-  const needSignatureStatuses: ConventionStatus[] = [
-    "READY_TO_SIGN",
-    "PARTIALLY_SIGNED",
-  ];
   const needReviewStatuses: ConventionStatus[] = ["IN_REVIEW"];
   const agency = new AgencyDtoBuilder().build();
 
@@ -66,16 +62,13 @@ describe("ConventionReminder use case", () => {
   });
 
   describe("Do nothing", () => {
-    it("When there is no convention that have status different of READY_TO_SIGN, PARTIALLY_SIGNED or IN_REVIEW.", async () => {
+    it("When there is no convention with status IN_REVIEW.", async () => {
       // Arrange
       const conventionsWithUnsupportedStatuses =
         makeOneConventionOfEachStatuses({
           withDateStart: now,
           agencyId: agency.id,
-        }).filter(
-          ({ status }) =>
-            ![...needSignatureStatuses, ...needReviewStatuses].includes(status),
-        );
+        }).filter(({ status }) => !needReviewStatuses.includes(status));
 
       uow.conventionRepository.setConventions(
         conventionsWithUnsupportedStatuses,
@@ -168,9 +161,7 @@ describe("ConventionReminder use case", () => {
 
       //Assert
       const supportedConventions = conventions.filter((convention) =>
-        [...needReviewStatuses, ...needSignatureStatuses].includes(
-          convention.status,
-        ),
+        needReviewStatuses.includes(convention.status),
       );
       const expectedEvents: Partial<DomainEvent>[] = [
         {
@@ -178,7 +169,7 @@ describe("ConventionReminder use case", () => {
           topic,
           payload: {
             reminderKind: "FirstReminderForAgency",
-            conventionId: supportedConventions[2].id,
+            conventionId: supportedConventions[0].id,
           },
         },
       ];
