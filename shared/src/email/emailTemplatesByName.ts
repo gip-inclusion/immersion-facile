@@ -947,7 +947,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         
         Vous pouvez télécharger la version finale en PDF, incluant toutes les informations et éventuels commentaires du candidat, en cliquant sur le bouton ci-dessous.
 
-        Ce lien a une validité de 1 mois. Vous pouvez également le télécharger en PDF en cliquant sur le bouton ci-dessous.
+        Ce lien a une validité de 1 mois.
         `,
         buttons: [
           {
@@ -1762,7 +1762,7 @@ Tél : ${beneficiaryPhone}`,
           : "un mini stage"
       } du ${displayDate(dateStart)} au ${displayDate(dateEnd)} dans l'entreprise ${businessName} est supprimée.
       
-      Les raisons en sont: ${deprecationReason}.         
+      Les raisons en sont: ${deprecationReason}         
       
       Bien cordialement,       
       `,
