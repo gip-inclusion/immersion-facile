@@ -53,6 +53,13 @@ describe("GetConnectedUser", () => {
     .withId("pending-id")
     .withFirstName("Pending")
     .withIsAdmin(false);
+  const pendingAdminUser = new ConnectedUserBuilder()
+    .withId("pending-admin-id")
+    .withFirstName("Pending")
+    .withLastName("Admin")
+    .withEmail("pending.admin@mail.com")
+    .withIsAdmin(false)
+    .buildUser();
 
   const connectedPendingUser = pendingUserBuilder.build();
 
@@ -498,6 +505,15 @@ describe("GetConnectedUser", () => {
                 shouldReceiveDiscussionNotifications: true,
                 isMainContactByPhone: false,
               },
+              {
+                job: "RH",
+                status: "PENDING",
+                role: "establishment-admin",
+                userId: pendingAdminUser.id,
+                phone: "+33600000003",
+                shouldReceiveDiscussionNotifications: true,
+                isMainContactByPhone: false,
+              },
             ];
 
           const establishmentUserRightsForSecondEstablishment: EstablishmentUserRight[] =
@@ -535,7 +551,12 @@ describe("GetConnectedUser", () => {
           it("retrieve establishments rights and discussions / conventions dashboards when user have right on at least one establishment even if there is no conventions/discussion for establishment for all user right status", async () => {
             uow.conventionRepository.setConventions([]);
             uow.discussionRepository.discussions = [];
-            uow.userRepository.users = [notAdminUser, anotherUser, pendingUser];
+            uow.userRepository.users = [
+              notAdminUser,
+              anotherUser,
+              pendingUser,
+              pendingAdminUser,
+            ];
 
             expectToEqual(
               await Promise.all([

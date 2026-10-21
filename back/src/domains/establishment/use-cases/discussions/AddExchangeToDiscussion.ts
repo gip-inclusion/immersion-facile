@@ -22,6 +22,8 @@ import {
   localization,
   makeRouteAbsoluteUrl,
   messageSchema,
+  onlyAdminUserRightsWithStatusAccepted,
+  onlyContactUserRightsWithStatusAccepted,
   type UserId,
 } from "shared";
 import { z } from "zod";
@@ -248,8 +250,8 @@ const onEstablishmentAndDiscussionNotRejected = async ({
     establishment.userRights.some(
       (userRight) =>
         userRight.userId === user.id &&
-        (userRight.role === "establishment-admin" ||
-          userRight.role === "establishment-contact"),
+        (onlyAdminUserRightsWithStatusAccepted(userRight) ||
+          onlyContactUserRightsWithStatusAccepted(userRight)),
     )
   )
     return addExchangeAndSendEvent({
