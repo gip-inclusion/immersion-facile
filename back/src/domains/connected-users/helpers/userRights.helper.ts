@@ -1,5 +1,7 @@
 import { uniq } from "ramda";
 import {
+  type BusinessName,
+  type BusinessNameCustomized,
   type EstablishmentAdminPrivateData,
   errors,
   onlyAdminUserRightsWithStatusAccepted,
@@ -89,10 +91,7 @@ const makeEstablishmentRights = (
     .with({ status: "PENDING" }, (pendingUserRight) => {
       const userRightDetailsWithPendingStatus = {
         siret: establishment.siret,
-        businessName: establishment.name,
-        ...(establishment.customizedName
-          ? { businessNameCustomized: establishment.customizedName }
-          : {}),
+        ...makeBusinessNames(establishment),
         role: userRight.role,
         status: pendingUserRight.status,
         shouldReceiveDiscussionNotifications:
@@ -107,10 +106,7 @@ const makeEstablishmentRights = (
     .with({ status: "ACCEPTED" }, (acceptedUserRight) => {
       const userRightDetailsWithAcceptedStatus = {
         siret: establishment.siret,
-        businessName: establishment.name,
-        ...(establishment.customizedName
-          ? { businessNameCustomized: establishment.customizedName }
-          : {}),
+        ...makeBusinessNames(establishment),
         role: userRight.role,
         status: acceptedUserRight.status,
         admins: getAdminUserIds(userRights).flatMap((adminUserId) => {
@@ -128,6 +124,18 @@ const makeEstablishmentRights = (
     })
     .exhaustive();
 };
+
+const makeBusinessNames = (
+  establishment: EstablishmentEntity,
+): {
+  businessName: BusinessName;
+  businessNameCustomized?: BusinessNameCustomized;
+} => ({
+  businessName: establishment.name,
+  ...(establishment.customizedName
+    ? { businessNameCustomized: establishment.customizedName }
+    : {}),
+});
 
 const makeWithBanEstablishmentInformations = (
   establishment: EstablishmentEntity,

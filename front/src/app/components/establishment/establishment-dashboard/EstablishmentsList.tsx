@@ -55,9 +55,7 @@ export const EstablishmentsList = ({
       getDisplayedBusinessName(a).localeCompare(getDisplayedBusinessName(b)),
     );
 
-  const onManageEstablishmentClicked = (
-    establishment: AcceptedUserEstablishmentRightDetails,
-  ): void => {
+  const onManageEstablishmentClicked = (): void => {
     dispatch(establishmentSlice.actions.clearEstablishmentRequested());
     dispatch(siretSlice.actions.siretInfoClearRequested());
     dispatch(
@@ -65,12 +63,6 @@ export const EstablishmentsList = ({
         locator: "create-establishment-in-person-address",
       }),
     );
-    frontRoutes
-      .establishmentDashboardFormEstablishment({
-        siret: establishment.siret,
-        shouldUpdateAvailability,
-      })
-      .push();
   };
 
   const onShowAllAdminsClicked = (
@@ -88,10 +80,16 @@ export const EstablishmentsList = ({
         hasViewSwitch={false}
         searchBar={{
           label: "Rechercher une entreprise",
-          placeholder: "Rechercher par nom d’enseigne, raison sociale ou SIRET",
+          placeholder: "Nom d’enseigne, raison sociale ou SIRET",
           onSubmit: setSearchQuery,
         }}
-        headers={["Entreprise", "Mon rôle", "Administrateurs", "Actions"]}
+        headers={
+          displayedEstablishments.length > 0
+            ? ["Entreprise", "Mon rôle", "Administrateurs", "Actions"]
+            : [
+                `Aucune entreprise trouvée pour la recherche « ${searchQuery} », vous pouvez modifier votre recherche pour l'élargir.`,
+              ]
+        }
         tableData={displayedEstablishments.map((establishment) => [
           <EstablishmentNameAndSiret
             key={`${establishment.siret}-name`}
@@ -111,6 +109,7 @@ export const EstablishmentsList = ({
             key={`${establishment.siret}-actions`}
             establishment={establishment}
             isBackofficeAdmin={isBackofficeAdmin}
+            shouldUpdateAvailability={shouldUpdateAvailability}
             onManageEstablishmentClicked={onManageEstablishmentClicked}
           />,
         ])}
@@ -225,16 +224,7 @@ const EstablishmentAdmins = ({
       <ul className={fr.cx("fr-raw-list")}>
         {adminEmails.slice(0, maxAdminsDisplayedInTable).map((email) => (
           <li key={email}>
-            {email === currentUserEmail ? (
-              <span className={fr.cx("fr-text--sm")}>Vous</span>
-            ) : (
-              <a
-                href={`mailto:${email}`}
-                className={fr.cx("fr-link", "fr-link--sm")}
-              >
-                {email}
-              </a>
-            )}
+            <AdminEmailItem email={email} currentUserEmail={currentUserEmail} />
           </li>
         ))}
       </ul>
@@ -248,6 +238,37 @@ const EstablishmentAdmins = ({
         >
           Voir la liste complète ({adminEmails.length})
         </Button>
+      )}
+    </>
+  );
+};
+
+const AdminEmailItem = ({
+  email,
+  currentUserEmail,
+  copyButtonId,
+}: {
+  email: Email;
+  currentUserEmail: Email;
+  copyButtonId?: string;
+}): ReactNode => {
+  if (email === currentUserEmail)
+    return <span className={fr.cx("fr-text--sm")}>Vous</span>;
+
+  return (
+    <>
+      <a href={`mailto:${email}`} className={fr.cx("fr-link", "fr-link--sm")}>
+        {email}
+      </a>
+      {copyButtonId && (
+        <CopyButton
+          id={copyButtonId}
+          label="Copier l'adresse email"
+          textToCopy={email}
+          withIcon
+          iconOnly
+          className={fr.cx("fr-ml-1v")}
+        />
       )}
     </>
   );
@@ -272,23 +293,11 @@ const AdminsListModalContent = ({
       {getAdminEmailsWithCurrentUserFirst(establishment, currentUserEmail).map(
         (email, index) => (
           <li key={email} className={fr.cx("fr-mb-1w")}>
-            {email === currentUserEmail ? (
-              <span>Vous</span>
-            ) : (
-              <>
-                <a href={`mailto:${email}`} className={fr.cx("fr-link")}>
-                  {email}
-                </a>
-                <CopyButton
-                  id={`${domElementIds.establishmentDashboard.manageEstablishments.adminsListModalCopyEmailButton}-${index}`}
-                  label="Copier l'adresse email"
-                  textToCopy={email}
-                  withIcon
-                  iconOnly
-                  className={fr.cx("fr-ml-1v")}
-                />
-              </>
-            )}
+            <AdminEmailItem
+              email={email}
+              currentUserEmail={currentUserEmail}
+              copyButtonId={`${domElementIds.establishmentDashboard.manageEstablishments.adminsListModalCopyEmailButton}-${index}`}
+            />
           </li>
         ),
       )}
@@ -299,44 +308,58 @@ const AdminsListModalContent = ({
 const EstablishmentActions = ({
   establishment,
   isBackofficeAdmin,
+  shouldUpdateAvailability,
   onManageEstablishmentClicked,
 }: {
   establishment: AcceptedUserEstablishmentRightDetails;
   isBackofficeAdmin: boolean | undefined;
-  onManageEstablishmentClicked: (
-    establishment: AcceptedUserEstablishmentRightDetails,
-  ) => void;
-}): ReactNode => (
-  <>
-    {onlyAdminUserRightsWithStatusAccepted(establishment) ? (
-      <Button
-        id={`${domElementIds.establishmentDashboard.manageEstablishments.manageEstablishmentButton}-${establishment.siret}`}
-        priority="secondary"
-        size="small"
-        onClick={() => onManageEstablishmentClicked(establishment)}
-      >
-        Gérer l'entreprise
-      </Button>
-    ) : (
-      <p className={fr.cx("fr-text--xs", "fr-hint-text", "fr-mb-0")}>
-        <span
-          className={fr.cx("fr-icon-lock-fill", "fr-icon--xs", "fr-mr-1v")}
-          aria-hidden="true"
-        />
-        Gestion réservée aux administrateurs
-      </p>
-    )}
-    {isBackofficeAdmin && (
-      <Button
-        id={`${domElementIds.establishmentDashboard.manageEstablishments.adminEstablishmentLink}-${establishment.siret}`}
-        priority="tertiary no outline"
-        size="small"
-        linkProps={
-          frontRoutes.adminEstablishments({ siret: establishment.siret }).link
-        }
-      >
-        Voir comme admin IF
-      </Button>
-    )}
-  </>
-);
+  shouldUpdateAvailability: string | undefined;
+  onManageEstablishmentClicked: () => void;
+}): ReactNode => {
+  const establishmentFormLink =
+    frontRoutes.establishmentDashboardFormEstablishment({
+      siret: establishment.siret,
+      shouldUpdateAvailability,
+    }).link;
+
+  return (
+    <>
+      {onlyAdminUserRightsWithStatusAccepted(establishment) ? (
+        <Button
+          id={`${domElementIds.establishmentDashboard.manageEstablishments.manageEstablishmentButton}-${establishment.siret}`}
+          priority="secondary"
+          size="small"
+          linkProps={{
+            ...establishmentFormLink,
+            onClick: (event) => {
+              onManageEstablishmentClicked();
+              establishmentFormLink.onClick(event);
+            },
+          }}
+        >
+          Gérer l'entreprise
+        </Button>
+      ) : (
+        <p className={fr.cx("fr-text--xs", "fr-hint-text", "fr-mb-0")}>
+          <span
+            className={fr.cx("fr-icon-lock-fill", "fr-icon--xs", "fr-mr-1v")}
+            aria-hidden="true"
+          />
+          Gestion réservée aux administrateurs
+        </p>
+      )}
+      {isBackofficeAdmin && (
+        <Button
+          id={`${domElementIds.establishmentDashboard.manageEstablishments.adminEstablishmentLink}-${establishment.siret}`}
+          priority="tertiary no outline"
+          size="small"
+          linkProps={
+            frontRoutes.adminEstablishments({ siret: establishment.siret }).link
+          }
+        >
+          Voir comme admin IF
+        </Button>
+      )}
+    </>
+  );
+};
