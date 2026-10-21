@@ -9,8 +9,8 @@ import {
   type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
+import { establishmentRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { match } from "ts-pattern";
-import { establishmentRoleToDisplay } from "../establishment-users";
 import { EstablishmentLineAdminsInfos } from "./establishment-line/EstablishmentLineAdminInfos";
 import { EstablishmentLineBusinessName } from "./establishment-line/EstablishmentLineBusinessName";
 import { EstablishmentLineDesiredRoleInfos } from "./establishment-line/EstablishmentLineDesiredRoleInfos";
@@ -64,7 +64,7 @@ const makeEstablishmentRightLine = ({
   isEstablishmentBanned: boolean;
   isBackofficeAdmin?: boolean;
 }): ReactNode[] => {
-  const roleDisplay = establishmentRoleToDisplay[data.role];
+  const roleDisplay = establishmentRolesToDisplay[data.role];
   return match(data)
     .with({ status: "ACCEPTED" }, (data) => [
       <EstablishmentLineBusinessName

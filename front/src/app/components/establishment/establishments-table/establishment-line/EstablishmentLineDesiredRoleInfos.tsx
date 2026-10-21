@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { NotificationIndicator } from "react-design-system";
 import type { UserEstablishmentRightDetailsWithPendingStatus } from "shared";
-import { establishmentRoleToDisplay } from "src/app/components/establishment/establishment-users";
+import { establishmentRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 
 export const EstablishmentLineDesiredRoleInfos = ({
   data,
@@ -11,8 +11,11 @@ export const EstablishmentLineDesiredRoleInfos = ({
 }) => (
   <>
     <div className={fr.cx("fr-mb-1w")}>
-      <Badge small {...establishmentRoleToDisplay[data.role]}>
-        {establishmentRoleToDisplay[data.role].label}
+      <Badge
+        small
+        className={fr.cx(establishmentRolesToDisplay[data.role].className)}
+      >
+        {establishmentRolesToDisplay[data.role].label}
       </Badge>
     </div>
     <div className={fr.cx("fr-mb-1w")}>
