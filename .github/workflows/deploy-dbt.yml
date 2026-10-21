@@ -17,6 +17,9 @@ jobs:
   deploy-dbt:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-dbt-${{ inputs.environment }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
       

@@ -108,6 +108,12 @@ Les secrets concernés doivent ensuite être changés.
 
 Si les logs d’un job n’ont pas pu être téléchargés ou si le scan n’a pas abouti, un message
 « Scan des secrets incomplet » est envoyé sur `#if-dev` et le job de scan échoue.
+Ne sont pas analysés, faute de logs :
+
+- les jobs qui n’ont jamais été attribués à un runner (ignorés, annulés ou expirés en attente
+  d’approbation d’un environnement) ;
+- les jobs terminés depuis plus de 90 jours, durée de rétention des logs du dépôt, à reporter
+  dans le workflow si elle change.
 
 L’extrait peut contenir des secrets que gitleaks n’a pas reconnus : il n’est envoyé que sur Slack,
 jamais dans un artefact ou un log GitHub. Les logs restent publics pendant l’exécution du run
