@@ -8,7 +8,10 @@ import {
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
 import { emailSchema } from "../email/email.schema";
 import { withBannedEstablishmentInformationSchema } from "../establishment/bannedEstablishmentInformations.schema";
-import { businessNameSchema } from "../establishment/businessComponents.schema";
+import {
+  businessCustomizedNameSchema,
+  businessNameSchema,
+} from "../establishment/businessComponents.schema";
 import type {
   UserEstablishmentRightDetails,
   WithEstablishmentDashboards,
@@ -101,6 +104,7 @@ const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
 const userEstablishmentRightDetailsCommonShape = {
   siret: siretSchema,
   businessName: businessNameSchema,
+  businessNameCustomized: businessCustomizedNameSchema.optional(),
   role: z.enum(establishmentsRoles, {
     error: localization.invalidEnum,
   }),

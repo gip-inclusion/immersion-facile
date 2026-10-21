@@ -81,7 +81,7 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
             route: frontRoutes.establishmentDashboardDiscussions(),
           },
           establishmentDashboardFormEstablishment: {
-            label: "Mon entreprise",
+            label: "Mes entreprises",
             route: frontRoutes.establishmentDashboardFormEstablishment(),
           },
         },

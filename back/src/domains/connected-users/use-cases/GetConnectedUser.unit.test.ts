@@ -514,11 +514,14 @@ describe("GetConnectedUser", () => {
 
           const establishmentAggregate1 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300012")
+            .withEstablishmentName("CODERPAD FRANCE")
+            .withEstablishmentCustomizedName("Coderpad")
             .withUserRights(establishmentUserRightsForFirstEstablishment)
             .build();
 
           const establishmentAggregate2 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300013")
+            .withEstablishmentName("FRANCE MERGUEZ DISTRIBUTION")
             .withUserRights(establishmentUserRightsForSecondEstablishment)
             .build();
 
@@ -545,9 +548,8 @@ describe("GetConnectedUser", () => {
                   establishments: [
                     {
                       siret: establishmentAggregate1.establishment.siret,
-                      businessName:
-                        establishmentAggregate1.establishment.customizedName ??
-                        establishmentAggregate1.establishment.name,
+                      businessName: "CODERPAD FRANCE",
+                      businessNameCustomized: "Coderpad",
                       role: "establishment-admin",
                       status: "ACCEPTED",
                       admins: [
@@ -567,9 +569,7 @@ describe("GetConnectedUser", () => {
                     },
                     {
                       siret: establishmentAggregate2.establishment.siret,
-                      businessName:
-                        establishmentAggregate2.establishment.customizedName ??
-                        establishmentAggregate2.establishment.name,
+                      businessName: "FRANCE MERGUEZ DISTRIBUTION",
                       role: "establishment-contact",
                       status: "ACCEPTED",
                       admins: [],
@@ -594,9 +594,8 @@ describe("GetConnectedUser", () => {
                   establishments: [
                     {
                       siret: establishmentAggregate1.establishment.siret,
-                      businessName:
-                        establishmentAggregate1.establishment.customizedName ??
-                        establishmentAggregate1.establishment.name,
+                      businessName: "CODERPAD FRANCE",
+                      businessNameCustomized: "Coderpad",
                       role: "establishment-contact",
                       status: "PENDING",
                       shouldReceiveDiscussionNotifications: true,

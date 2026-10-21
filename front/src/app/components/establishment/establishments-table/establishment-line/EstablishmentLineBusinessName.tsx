@@ -5,6 +5,7 @@ import { Tag } from "react-design-system";
 import {
   domElementIds,
   frontRoutes,
+  getDisplayedBusinessName,
   type UserEstablishmentRightDetailsWithAcceptedStatus,
   type UserEstablishmentRightDetailsWithPendingStatus,
 } from "shared";
@@ -29,7 +30,7 @@ export const EstablishmentLineBusinessName = ({
         </Badge>
       )}
     </li>
-    <li> {data.businessName}</li>
+    <li> {getDisplayedBusinessName(data)}</li>
     <li>
       {" "}
       <span className={fr.cx("fr-hint-text")}>{data.siret}</span>

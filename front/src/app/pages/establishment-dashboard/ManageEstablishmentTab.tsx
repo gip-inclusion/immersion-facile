@@ -1,26 +1,24 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
-import { useDispatch } from "react-redux";
 import {
   type AcceptedUserEstablishmentRightDetails,
   domElementIds,
+  type Email,
   frontRoutes,
   type PendingUserEstablishmentRightDetails,
 } from "shared";
+import { EstablishmentsList } from "src/app/components/establishment/establishment-dashboard/EstablishmentsList";
 import { EstablishmentsTablesSection } from "src/app/components/establishment/establishments-table/EstablishmentsTablesSection";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { makeUseTypedRoute } from "src/app/routes/routes.hooks";
-import { getUrlParameters } from "src/app/utils/url.utils";
-import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
-import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 type ManageEstablishmentTabProps = {
   establishments: AcceptedUserEstablishmentRightDetails[];
   pendingEstablishmentRights: PendingUserEstablishmentRightDetails[];
+  currentUserEmail: Email;
   isBackofficeAdmin: boolean | undefined;
 };
 
@@ -32,27 +30,17 @@ const useEstablishmentDashboardFormEstablishmentRoute =
 export const ManageEstablishmentsTab = ({
   establishments,
   pendingEstablishmentRights,
+  currentUserEmail,
   isBackofficeAdmin,
 }: ManageEstablishmentTabProps) => {
-  const dispatch = useDispatch();
   const route = useEstablishmentDashboardFormEstablishmentRoute([
     "establishmentDashboardFormEstablishment",
   ]);
-  const { siret } = route.params;
-  const initialUrlParams = getUrlParameters(window.location);
-  if (establishments.length === 1) {
-    frontRoutes
-      .establishmentDashboardFormEstablishment({
-        siret: establishments[0].siret,
-        shouldUpdateAvailability: initialUrlParams.shouldUpdateAvailability,
-      })
-      .push();
-  }
+  const { siret, shouldUpdateAvailability } = route.params;
   return (
     <>
       <HeadingSection
-        title="Piloter votre entreprise"
-        description="Les entreprises auxquelles vous êtes rattaché·e et vos demandes en cours."
+        title={`Mes entreprises (${establishments.length})`}
         titleAs="h2"
         className={fr.cx("fr-mt-0", "fr-mb-4w")}
         titleAction={
@@ -96,42 +84,33 @@ export const ManageEstablishmentsTab = ({
         />
       </HeadingSection>
       <div className={fr.cx("fr-mb-4w")}>
-        {establishments.length > 1 && (
-          <Select
-            label={"Sélectionner une entreprise"}
-            options={[
-              ...establishments.map((establishment) => ({
-                value: establishment.siret,
-                label: `${establishment.businessName}`,
-              })),
-            ]}
-            placeholder="Sélectionner une entreprise"
-            nativeSelectProps={{
-              defaultValue: "",
-              value: siret,
-              id: domElementIds.establishmentDashboard.manageEstablishments
-                .selectEstablishmentInput,
-              onChange: (event) => {
-                dispatch(
-                  establishmentSlice.actions.clearEstablishmentRequested(),
-                );
-                dispatch(siretSlice.actions.siretInfoClearRequested());
-                dispatch(
-                  geocodingSlice.actions.clearLocatorDataRequested({
-                    locator: "create-establishment-in-person-address",
-                  }),
-                );
-                frontRoutes
-                  .establishmentDashboardFormEstablishment({
-                    siret: event.currentTarget.value,
-                  })
-                  .push();
-              },
-            }}
-          />
-        )}
-        {route.params.siret && (
-          <EstablishmentForm mode="edit" key={route.params.siret} />
+        {siret ? (
+          <>
+            <Button
+              id={
+                domElementIds.establishmentDashboard.manageEstablishments
+                  .backToEstablishmentsButton
+              }
+              priority="tertiary"
+              iconId="fr-icon-arrow-left-line"
+              className={fr.cx("fr-mb-3w")}
+              linkProps={
+                frontRoutes.establishmentDashboardFormEstablishment().link
+              }
+            >
+              Retour à mes entreprises
+            </Button>
+            <EstablishmentForm mode="edit" key={siret} />
+          </>
+        ) : (
+          establishments.length > 0 && (
+            <EstablishmentsList
+              establishments={establishments}
+              currentUserEmail={currentUserEmail}
+              isBackofficeAdmin={isBackofficeAdmin}
+              shouldUpdateAvailability={shouldUpdateAvailability}
+            />
+          )
         )}
       </div>
     </>

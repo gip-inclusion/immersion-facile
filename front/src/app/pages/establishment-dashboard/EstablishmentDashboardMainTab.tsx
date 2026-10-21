@@ -78,7 +78,7 @@ export const EstablishmentDashboardMainTab = ({
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
-        <h1>Mon espace établissement</h1>
+        <h1>Mon espace entreprise</h1>
       </div>
       {(isLoadingUser || isLoadingEstablishment || isLoadingDiscussionList) && (
         <Loader />

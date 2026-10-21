@@ -26,13 +26,11 @@ export const goToManageEstablishmentThroughEstablishmentDashboard = async (
     frontRoutes.establishmentDashboardFormEstablishment({
       siret: establishment.siret,
     }).href;
-  if (!page.url().includes(establishmentDashboardUrl)) {
-    await page
-      .locator(
-        `#${domElementIds.establishmentDashboard.manageEstablishments.selectEstablishmentInput}`,
-      )
-      .selectOption(establishment.siret);
-  }
+  await page
+    .locator(
+      `#${domElementIds.establishmentDashboard.manageEstablishments.manageEstablishmentButton}-${establishment.siret}`,
+    )
+    .click();
   await page.waitForURL(establishmentDashboardUrl);
 };
 
