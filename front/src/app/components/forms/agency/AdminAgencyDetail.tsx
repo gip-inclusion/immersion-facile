@@ -11,7 +11,7 @@ import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedU
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import {
   fetchAgencySlice,
-  toAgencyUsersForManagementById,
+  toAgencyUsersForListingById,
 } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import type { Route } from "type-route";
 
@@ -53,7 +53,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
           <>
             <AgencyOverview
               agency={agency}
-              agencyUsers={toAgencyUsersForManagementById(agencyUsersById)}
+              agencyUsers={toAgencyUsersForListingById(agencyUsersById)}
               routeName={route.name}
             />
             <AgencyDashboard agency={agency} />

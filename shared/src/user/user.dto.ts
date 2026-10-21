@@ -69,7 +69,7 @@ export type AgencyRightForListing = Omit<AgencyRight, "agency"> & {
 };
 
 export type AgencyUserForListing = Omit<User, "proConnect"> & {
-  agencyRights: AgencyRightForListing[];
+  agencyRights: Record<AgencyId, AgencyRightForListing>;
   isProConnectUser: boolean;
 };
 

@@ -1,13 +1,10 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import type { AgencyUserForListing, UserId, WithAgencyId } from "shared";
+import type { WithAgencyId } from "shared";
 import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { closeAgencyAndTransferConventionsSlice } from "src/core-logic/domain/agencies/close-agency-and-transfert-conventions/closeAgencyAndTransferConventions.slice";
-import {
-  type AgencyUserForManagement,
-  fetchAgencySlice,
-} from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithOrWithoutFeedbackTopic,
@@ -70,9 +67,10 @@ const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
           agencyIds: [action.payload.agencyId],
         })
         .pipe(
-          map(normalizeAgencyUsersForManagement),
           map((users) =>
-            fetchAgencySlice.actions.fetchAgencyUsersSucceeded(users),
+            fetchAgencySlice.actions.fetchAgencyUsersSucceeded(
+              users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {}),
+            ),
           ),
           catchEpicError((error: Error) =>
             fetchAgencySlice.actions.fetchAgencyUsersFailed({
@@ -87,23 +85,3 @@ const getAgencyUsersEpic: FetchAgencyEpic = (action$, state$, dependencies) =>
   );
 
 export const fetchAgencyEpics = [getAgencyEpic, getAgencyUsersEpic];
-
-const normalizeAgencyUsersForManagement = (
-  users: AgencyUserForListing[],
-): Record<UserId, AgencyUserForManagement> =>
-  users.reduce(
-    (acc, user) => ({
-      ...acc,
-      [user.id]: {
-        ...user,
-        agencyRights: user.agencyRights.reduce(
-          (rightsAcc, right) => ({
-            ...rightsAcc,
-            [right.agencyId]: right,
-          }),
-          {},
-        ),
-      },
-    }),
-    {},
-  );

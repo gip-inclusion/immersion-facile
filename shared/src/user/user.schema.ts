@@ -120,7 +120,7 @@ const agencyRightForListingSchema: ZodSchemaWithInputMatchingOutput<AgencyRightF
 export const agencyUserForListingSchema: ZodSchemaWithInputMatchingOutput<AgencyUserForListing> =
   z.object(commonUserShape).and(
     z.object({
-      agencyRights: z.array(agencyRightForListingSchema),
+      agencyRights: z.record(agencyIdSchema, agencyRightForListingSchema),
       isProConnectUser: z.boolean(),
     }),
   );

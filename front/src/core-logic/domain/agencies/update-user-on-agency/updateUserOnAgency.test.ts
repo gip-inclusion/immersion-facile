@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  type AgencyUserForListing,
   type ConnectedUser,
   ConnectedUserBuilder,
   expectToEqual,
@@ -9,7 +10,6 @@ import {
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
-import type { AgencyUserForManagement } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
@@ -44,7 +44,7 @@ describe("UpdateUserOnAgency slice", () => {
     isNotifiedByEmail: true,
   };
 
-  const agencyUser: AgencyUserForManagement = {
+  const agencyUser: AgencyUserForListing = {
     id: user.id,
     email: user.email,
     firstName: user.firstName,

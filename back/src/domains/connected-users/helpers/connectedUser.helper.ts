@@ -124,9 +124,12 @@ export const getAgencyUsersByUserIdsAndAgencyIds = async (
       return {
         ...userWithoutAdminAndProConnect,
         isProConnectUser: proConnect !== null,
-        agencyRights: rights.filter((right) =>
-          agencyIds.includes(right.agencyId),
-        ),
+        agencyRights: rights
+          .filter((right) => agencyIds.includes(right.agencyId))
+          .reduce<Record<AgencyId, AgencyRightOfUser>>(
+            (acc, right) => ({ ...acc, [right.agencyId]: right }),
+            {},
+          ),
       };
     }),
   );

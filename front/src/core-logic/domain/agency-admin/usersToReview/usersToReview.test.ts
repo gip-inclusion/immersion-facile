@@ -62,13 +62,13 @@ describe("usersToReview", () => {
       preventToDelete: connectedUser.preventToDelete,
       lastLoginAt: connectedUser.lastLoginAt,
       isProConnectUser: connectedUser.proConnect !== null,
-      agencyRights: [
-        {
+      agencyRights: {
+        [agencyForUsers.id]: {
           agencyId: agencyForUsers.id,
           roles: ["to-review"],
           isNotifiedByEmail: false,
         },
-      ],
+      },
     };
 
     dependencies.agencyGateway.getAgencyUsersResponse$.next([agencyUser]);

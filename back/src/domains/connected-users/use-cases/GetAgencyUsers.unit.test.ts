@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyId,
   type AgencyRightForListing,
   type AgencyUserForListing,
   type AgencyUserRight,
@@ -32,7 +33,10 @@ const toExpectedAgencyUser = (
   return {
     ...userWithoutAdminAndProConnect,
     isProConnectUser: proConnect !== null,
-    agencyRights,
+    agencyRights: agencyRights.reduce<Record<AgencyId, AgencyRightForListing>>(
+      (acc, right) => ({ ...acc, [right.agencyId]: right }),
+      {},
+    ),
   };
 };
 
