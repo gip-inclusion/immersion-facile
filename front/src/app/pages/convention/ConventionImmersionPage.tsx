@@ -63,6 +63,7 @@ export const ConventionImmersionPage = ({
         at_kwd: ___,
         at_medium: _____,
         skipIntro: ____,
+        shouldPrefillAgencyReferent: _______,
         conventionDraftId,
         ...routeParamsWithoutJwtAndTrackers
       } = route.params;
@@ -124,6 +125,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
         at_kwd: __,
         at_campaign: ____,
         at_medium: _____,
+        shouldPrefillAgencyReferent: ______,
         conventionDraftId,
         ...routeParamsWithoutJwtAndTrackers
       } = initialRouteParams;

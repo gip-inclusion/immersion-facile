@@ -163,6 +163,7 @@ export const AgencyConventionTabContent = ({
       ? frontRoutes
           .conventionImmersion({
             skipIntro: true,
+            shouldPrefillAgencyReferent: true,
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencyId: agency.id,
@@ -170,6 +171,7 @@ export const AgencyConventionTabContent = ({
           .push()
       : frontRoutes
           .conventionMiniStage({
+            shouldPrefillAgencyReferent: true,
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencyId: agency.id,
