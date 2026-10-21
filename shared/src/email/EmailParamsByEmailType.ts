@@ -523,16 +523,6 @@ export type EmailParamsByEmailType = {
     conventionFormUrl: string;
     conventionDraftId: ConventionDraftId;
   };
-  SIGNATORY_REMINDER: {
-    actorFirstName: string;
-    actorLastName: string;
-    businessName: string;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    conventionId: ConventionId;
-    magicLinkUrl: AbsoluteUrl | undefined;
-    signatoriesSummary: string;
-  };
   SIGNEE_HAS_SIGNED_CONVENTION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     conventionId: ConventionId;

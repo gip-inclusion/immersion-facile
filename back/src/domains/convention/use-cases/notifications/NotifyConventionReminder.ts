@@ -1,54 +1,24 @@
-import { format } from "date-fns";
 import { uniq } from "ramda";
 import {
   type AgencyDto,
-  type Beneficiary,
-  type BeneficiaryCurrentEmployer,
-  type BeneficiaryRepresentative,
-  type ConventionActorRole,
   type ConventionDto,
   type Email,
-  type EstablishmentRepresentative,
-  type ExtractFromExisting,
   errors,
-  executeInSequence,
-  filterNotFalsy,
   frontRoutes,
-  type GenericActor,
   getDisplayedBusinessName,
   getFormattedFirstnameAndLastname,
-  isEstablishmentTutorIsEstablishmentRepresentative,
-  isSignatoryRole,
-  isValidMobilePhone,
-  loginPersonaByConventionRole,
   makeRouteAbsoluteUrl,
   type ReminderKind,
   type TemplatedEmail,
-  type TemplatedSms,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationsBatchAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
-import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
-import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
-
-type SignatoriesReminderKind = ExtractFromExisting<
-  ReminderKind,
-  "ReminderForSignatories"
->;
-
-type AgenciesReminderKind = ExtractFromExisting<
-  ReminderKind,
-  "FirstReminderForAgency" | "LastReminderForAgency"
->;
 
 export type NotifyConventionReminder = ReturnType<
   typeof makeNotifyConventionReminder
@@ -56,9 +26,6 @@ export type NotifyConventionReminder = ReturnType<
 
 type Deps = {
   saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
-  generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-  shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-  timeGateway: TimeGateway;
   config: AppConfig;
 };
 
@@ -71,57 +38,29 @@ export const makeNotifyConventionReminder = useCaseBuilder(
     const convention = await uow.conventionRepository.getById(conventionId);
     if (!convention) throw errors.convention.notFound({ conventionId });
 
-    return reminderKind === "ReminderForSignatories"
-      ? onSignatoriesReminder({
-          reminderKind,
-          convention,
-          uow,
-          deps,
-        })
-      : onAgencyReminder({
-          reminderKind,
-          convention,
-          uow,
-          deps,
-        });
-  });
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
+    if (!agencyWithRights)
+      throw errors.agency.notFound({
+        agencyId: convention.agencyId,
+      });
 
-const onAgencyReminder = async ({
-  reminderKind,
-  convention,
-  uow,
-  deps,
-}: {
-  reminderKind: AgenciesReminderKind;
-  convention: ConventionDto;
-  uow: UnitOfWork;
-  deps: Deps;
-}): Promise<void> => {
-  const agencyWithRights = await uow.agencyRepository.getById(
-    convention.agencyId,
-  );
-  if (!agencyWithRights)
-    throw errors.agency.notFound({
-      agencyId: convention.agencyId,
-    });
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    if (convention.status !== "IN_REVIEW")
+      throw errors.convention.forbiddenReminder({
+        convention,
+        kind: reminderKind,
+      });
 
-  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-  if (convention.status !== "IN_REVIEW")
-    throw errors.convention.forbiddenReminder({
-      convention,
-      kind: reminderKind,
-    });
+    const counsellorsAndValidatorsEmails = uniq([
+      ...agency.validatorEmails,
+      ...agency.counsellorEmails,
+    ]);
 
-  const counsellorsAndValidatorsEmails = uniq([
-    ...agency.validatorEmails,
-    ...agency.counsellorEmails,
-  ]);
-
-  await deps.saveNotificationsBatchAndRelatedEvent(
-    uow,
-    await executeInSequence(
-      counsellorsAndValidatorsEmails,
-      (counsellorOrValidatorEmail) =>
+    await deps.saveNotificationsBatchAndRelatedEvent(
+      uow,
+      counsellorsAndValidatorsEmails.map((counsellorOrValidatorEmail) =>
         createAgencyReminderEmail({
           counsellorOrValidatorEmail,
           convention,
@@ -129,159 +68,11 @@ const onAgencyReminder = async ({
           reminderKind,
           config: deps.config,
         }),
-    ),
-  );
-};
-
-const onSignatoriesReminder = async ({
-  reminderKind,
-  convention,
-  uow,
-  deps,
-}: {
-  reminderKind: SignatoriesReminderKind;
-  convention: ConventionDto;
-  uow: UnitOfWork;
-  deps: Deps;
-}): Promise<void> => {
-  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status))
-    throw errors.convention.forbiddenReminder({
-      convention,
-      kind: reminderKind,
-    });
-
-  const signatories = Object.values(convention.signatories);
-
-  const smsSignatories = signatories.filter(
-    (signatory) => !signatory.signedAt && isValidMobilePhone(signatory.phone),
-  );
-
-  const emailActors = [
-    ...signatories,
-    ...(isEstablishmentTutorIsEstablishmentRepresentative(convention)
-      ? []
-      : [convention.establishmentTutor]),
-  ];
-
-  const templatedEmails: TemplatedEmail[] = emailActors.map((actor) =>
-    makeSignatoryReminderEmail({
-      actor,
-      convention,
-      config: deps.config,
-    }),
-  );
-
-  const templatedSms = await executeInSequence(smsSignatories, (signatory) =>
-    prepareSmsReminderParams({
-      actor: signatory,
-      convention,
-      uow,
-      reminderKind,
-      deps,
-    }),
-  );
-
-  const followedIds = {
-    conventionId: convention.id,
-    agencyId: convention.agencyId,
-    establishmentSiret: convention.siret,
-  };
-
-  await deps.saveNotificationsBatchAndRelatedEvent(uow, [
-    ...templatedEmails.map(
-      (email): NotificationContentAndFollowedIds => ({
-        kind: "email",
-        followedIds,
-        templatedContent: email,
-      }),
-    ),
-    ...templatedSms.map(
-      (sms): NotificationContentAndFollowedIds => ({
-        kind: "sms",
-        followedIds,
-        templatedContent: sms,
-      }),
-    ),
-  ]);
-};
-
-const makeSignatoryReminderEmail = ({
-  actor: { email, role, firstName, lastName },
-  convention,
-  config,
-}: {
-  actor: GenericActor<ConventionActorRole>;
-  convention: ConventionDto;
-  config: AppConfig;
-}): TemplatedEmail => ({
-  kind: "SIGNATORY_REMINDER",
-  recipients: [email],
-  params: {
-    actorFirstName: getFormattedFirstnameAndLastname({
-      firstname: firstName,
-    }),
-    actorLastName: getFormattedFirstnameAndLastname({ lastname: lastName }),
-    beneficiaryFirstName: getFormattedFirstnameAndLastname({
-      firstname: convention.signatories.beneficiary.firstName,
-    }),
-    beneficiaryLastName: getFormattedFirstnameAndLastname({
-      lastname: convention.signatories.beneficiary.lastName,
-    }),
-    businessName: getDisplayedBusinessName(convention),
-    conventionId: convention.id,
-    signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
-    magicLinkUrl: isSignatoryRole(role)
-      ? makeRouteAbsoluteUrl({
-          route: frontRoutes.manageConventionConnectedUser({
-            conventionId: convention.id,
-            loginPersona: loginPersonaByConventionRole(role),
-            email,
-          }),
-          baseUrl: config.immersionFacileBaseUrl,
-        })
-      : undefined,
-  },
-});
-
-const prepareSmsReminderParams = async ({
-  actor: { role, email, phone },
-  convention,
-  uow,
-  reminderKind,
-  deps,
-}: {
-  actor: GenericActor<ConventionActorRole>;
-  convention: ConventionDto;
-  uow: UnitOfWork;
-  reminderKind: SignatoriesReminderKind;
-  deps: Deps;
-}): Promise<TemplatedSms> => {
-  const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
-    config: deps.config,
-    conventionMagicLinkPayload: {
-      id: convention.id,
-      role,
-      email,
-      now: deps.timeGateway.now(),
-    },
-    generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-    shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-    uow,
+      ),
+    );
   });
 
-  const shortLink = await makeShortMagicLink({
-    targetRoute: "conventionToSign",
-    lifetime: "1Month",
-  });
-
-  return {
-    kind: reminderKind,
-    recipientPhone: phone,
-    params: { shortLink },
-  };
-};
-
-const createAgencyReminderEmail = async ({
+const createAgencyReminderEmail = ({
   counsellorOrValidatorEmail,
   convention,
   agency,
@@ -291,9 +82,9 @@ const createAgencyReminderEmail = async ({
   counsellorOrValidatorEmail: Email;
   convention: ConventionDto;
   agency: AgencyDto;
-  reminderKind: AgenciesReminderKind;
+  reminderKind: ReminderKind;
   config: AppConfig;
-}): Promise<NotificationContentAndFollowedIds> => {
+}): NotificationContentAndFollowedIds => {
   const templatedEmail: TemplatedEmail =
     reminderKind === "FirstReminderForAgency"
       ? {
@@ -358,52 +149,3 @@ const createAgencyReminderEmail = async ({
     templatedContent: templatedEmail,
   };
 };
-
-export const toSignatoriesSummary = ({
-  signatories,
-  businessName,
-}: ConventionDto): string[] =>
-  [
-    beneficiarySummary(signatories.beneficiary),
-    beneficiaryRepresentativeSummary(signatories.beneficiaryRepresentative),
-    beneficiaryCurrentEmployer(signatories.beneficiaryCurrentEmployer),
-    establishmentSummary(signatories.establishmentRepresentative, businessName),
-  ].filter(filterNotFalsy);
-
-const beneficiarySummary = (
-  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
-): string =>
-  `- ${signStatus(beneficiary.signedAt)} - ${beneficiary.firstName} ${
-    beneficiary.lastName
-  }, bénéficiaire`;
-
-const beneficiaryRepresentativeSummary = (
-  beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
-): string | undefined =>
-  beneficiaryRepresentative &&
-  `- ${signStatus(beneficiaryRepresentative.signedAt)} - ${
-    beneficiaryRepresentative.firstName
-  } ${beneficiaryRepresentative.lastName}, représentant légal du bénéficiaire`;
-
-const beneficiaryCurrentEmployer = (
-  beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
-): string | undefined =>
-  beneficiaryCurrentEmployer &&
-  `- ${signStatus(beneficiaryCurrentEmployer.signedAt)} - ${
-    beneficiaryCurrentEmployer.firstName
-  } ${beneficiaryCurrentEmployer.lastName}, employeur actuel du bénéficiaire`;
-
-const establishmentSummary = (
-  establishmentRepresentative: EstablishmentRepresentative,
-  businessName: string,
-): string =>
-  `- ${signStatus(establishmentRepresentative.signedAt)} - ${
-    establishmentRepresentative.firstName
-  } ${
-    establishmentRepresentative.lastName
-  }, représentant l'entreprise ${businessName}`;
-
-const signStatus = (signAt: string | undefined): string =>
-  signAt
-    ? `√  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
-    : `❌ - N'a pas signé`;
