@@ -60,7 +60,7 @@ export const ManageEstablishmentsTab = ({
             buttons={[
               {
                 id: domElementIds.establishmentDashboard.manageEstablishments
-                  .createEstablishment,
+                  .createEstablishmentForAlreadyRegisteredUser,
                 priority: "secondary",
                 onClick: () => {
                   frontRoutes.formEstablishment().push();
@@ -70,7 +70,7 @@ export const ManageEstablishmentsTab = ({
               },
               {
                 id: domElementIds.establishmentDashboard.manageEstablishments
-                  .registerEstablishmentButton,
+                  .registerEstablishmentButtonForAlreadyRegisteredUser,
 
                 priority: "primary",
                 onClick: () => {
