@@ -40,8 +40,8 @@ const setFeatureFlagEpic: FeatureFlagEpic = (
         getConnectedUserJwt(state$.value),
       ),
     ),
-    map(featureFlagsSlice.actions.setFeatureFlagSucceeded),
-    catchEpicError(featureFlagsSlice.actions.setFeatureFlagFailed),
+    map(() => featureFlagsSlice.actions.setFeatureFlagSucceeded()),
+    catchEpicError(() => featureFlagsSlice.actions.setFeatureFlagFailed()),
   );
 
 export const featureFlagEpics = [fetchFeatureFlagsEpic, setFeatureFlagEpic];

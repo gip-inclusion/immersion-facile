@@ -1,10 +1,6 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { type Action, combineReducers, configureStore } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/browser";
-import {
-  combineEpics,
-  createEpicMiddleware,
-  type Epic,
-} from "redux-observable";
+import { combineEpics, createEpicMiddleware } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
@@ -201,7 +197,7 @@ const rootReducer: typeof appReducer = (state, action) =>
     action,
   );
 
-const rootEpic: Epic = (action$, store$, dependencies) =>
+const rootEpic: AppEpic<Action> = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(
     catchError((error, source) => {
       // biome-ignore lint/suspicious/noConsole: debug purpose
@@ -217,14 +213,17 @@ type StoreProps = {
 };
 
 export const createStore = ({ dependencies, preloadedState }: StoreProps) => {
-  const epicMiddleware = createEpicMiddleware({ dependencies });
+  const epicMiddleware = createEpicMiddleware<
+    Action,
+    Action,
+    RootState,
+    Dependencies
+  >({ dependencies });
   const store = configureStore({
     preloadedState,
     reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => [
-      ...getDefaultMiddleware({ thunk: false }),
-      epicMiddleware,
-    ],
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ thunk: false }).concat(epicMiddleware),
   });
   epicMiddleware.run(rootEpic);
   return store;

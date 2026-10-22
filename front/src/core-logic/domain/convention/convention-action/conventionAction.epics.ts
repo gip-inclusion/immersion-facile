@@ -1,4 +1,3 @@
-import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { filter, type Observable } from "rxjs";
 import { delay, map, switchMap } from "rxjs/operators";
 import { isStringJson } from "shared";
@@ -18,15 +17,29 @@ import {
   type StatusChangePayload,
 } from "./conventionAction.slice";
 
+export type ConventionAction = ActionOfSlice<typeof conventionActionSlice>;
+
+type ConventionActionEpic = AppEpic<ConventionAction>;
+
+type StatusChangeFeedbackPayload = StatusChangePayload &
+  PayloadWithFeedbackTopic;
+
 const makeConventionStatusChangeEpic =
   ({
     requestAction,
     successAction,
     failedAction,
   }: {
-    requestAction: ConventionStatusChangeAction;
-    successAction: ConventionStatusChangeAction;
-    failedAction: ConventionStatusChangeFailedAction;
+    requestAction: {
+      (payload: StatusChangeFeedbackPayload): ConventionAction;
+      match: (
+        action: unknown,
+      ) => action is { payload: StatusChangeFeedbackPayload; type: string };
+    };
+    successAction: (payload: StatusChangeFeedbackPayload) => ConventionAction;
+    failedAction: (
+      payload: PayloadActionWithFeedbackTopicError["payload"],
+    ) => ConventionAction;
   }): ConventionActionEpic =>
   (
     action$: Observable<ConventionAction>,
@@ -49,10 +62,6 @@ const makeConventionStatusChangeEpic =
           ),
       ),
     );
-
-export type ConventionAction = ActionOfSlice<typeof conventionActionSlice>;
-
-type ConventionActionEpic = AppEpic<ConventionAction>;
 
 const transferConventionToAgencyEpic: ConventionActionEpic = (
   action$,
@@ -237,13 +246,3 @@ export const conventionActionEpics = [
   renewConventionEpic,
   editConventionCounsellorNameEpic,
 ];
-
-type ConventionStatusChangeAction = ActionCreatorWithPayload<
-  StatusChangePayload & PayloadWithFeedbackTopic,
-  string
->;
-
-type ConventionStatusChangeFailedAction = ActionCreatorWithPayload<
-  PayloadActionWithFeedbackTopicError["payload"],
-  string
->;
