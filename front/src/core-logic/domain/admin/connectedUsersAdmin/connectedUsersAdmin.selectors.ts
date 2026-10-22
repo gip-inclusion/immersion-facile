@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { values } from "ramda";
-import type { AgencyUserForListing } from "shared";
+import { type AgencyUserForListing, hasAllowedRole } from "shared";
 import type { RootState } from "src/core-logic/storeConfig/store";
 
 const connectedUsersAdminState = ({ admin }: RootState) =>
@@ -39,7 +39,11 @@ const agenciesNeedingReviewForSelectedUser = createSelector(
     const inclusionConnectedUser = usersNeedingReview[selectedUser.id];
     if (!inclusionConnectedUser) return [];
     return values(inclusionConnectedUser.agencyRightsByAgencyId).filter(
-      ({ roles }) => roles.includes("to-review"),
+      ({ roles }) =>
+        hasAllowedRole({
+          allowedRoles: ["to-review"],
+          candidateRoles: roles,
+        }),
     );
   },
 );
@@ -49,7 +53,10 @@ const connectedUsersNeedingReview = createSelector(
   (users): AgencyUserForListing[] =>
     values(users).filter((user) =>
       values(user.agencyRightsByAgencyId).some((right) =>
-        right.roles.includes("to-review"),
+        hasAllowedRole({
+          allowedRoles: ["to-review"],
+          candidateRoles: right.roles,
+        }),
       ),
     ),
 );

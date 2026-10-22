@@ -11,6 +11,7 @@ import {
   type AgencyUserForListing,
   type AgencyUsersForListingById,
   domElementIds,
+  hasAllowedRole,
   type UserParamsForAgency,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
@@ -78,13 +79,19 @@ export const AgencyUsers = ({
   const [agencyUsers, agencyUsersInOtherAgency] = agencyRefersToOtherAgency
     ? partition(
         (user) =>
-          !user.agencyRightsByAgencyId[agency.id].roles.includes("validator"),
+          !hasAllowedRole({
+            allowedRoles: ["validator"],
+            candidateRoles: user.agencyRightsByAgencyId[agency.id].roles,
+          }),
         values(agencyUsersById),
       )
     : [values(agencyUsersById), []];
 
   const hasCounsellorRoles = agencyUsers.some((user) =>
-    user.agencyRightsByAgencyId[agency.id].roles.includes("counsellor"),
+    hasAllowedRole({
+      allowedRoles: ["counsellor"],
+      candidateRoles: user.agencyRightsByAgencyId[agency.id].roles,
+    }),
   );
 
   const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {
