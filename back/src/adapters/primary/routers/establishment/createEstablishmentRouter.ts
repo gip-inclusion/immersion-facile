@@ -128,7 +128,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateDiscussionStatus.execute(
+        deps.useCases.updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: req.params.discussionId,
             ...req.body,

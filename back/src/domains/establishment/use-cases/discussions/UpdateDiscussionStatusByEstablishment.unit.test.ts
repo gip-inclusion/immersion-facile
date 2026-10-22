@@ -20,11 +20,11 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  makeUpdateDiscussionStatus,
-  type UpdateDiscussionStatus,
-} from "./UpdateDiscussionStatus";
+  makeUpdateDiscussionStatusByEstablishment,
+  type UpdateDiscussionStatusByEstablishment,
+} from "./UpdateDiscussionStatusByEstablishment";
 
-describe("UpdateDiscussionStatus", () => {
+describe("UpdateDiscussionStatusByEstablishment", () => {
   const authorizedUser = new ConnectedUserBuilder()
 
     .withId("authorizedUser")
@@ -86,20 +86,21 @@ describe("UpdateDiscussionStatus", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let uuidGenerator: TestUuidGenerator;
-  let updateDiscussionStatus: UpdateDiscussionStatus;
+  let updateDiscussionStatusByEstablishment: UpdateDiscussionStatusByEstablishment;
 
   beforeEach(() => {
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     uow = createInMemoryUow();
 
-    updateDiscussionStatus = makeUpdateDiscussionStatus({
-      uowPerformer: new InMemoryUowPerformer(uow),
-      deps: {
-        timeGateway,
-        createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
-      },
-    });
+    updateDiscussionStatusByEstablishment =
+      makeUpdateDiscussionStatusByEstablishment({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          timeGateway,
+          createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+        },
+      });
 
     uow.discussionRepository.discussions = [discussion];
     uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -112,7 +113,7 @@ describe("UpdateDiscussionStatus", () => {
       uow.discussionRepository.discussions = [];
 
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -143,7 +144,7 @@ describe("UpdateDiscussionStatus", () => {
       ];
 
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -168,7 +169,7 @@ describe("UpdateDiscussionStatus", () => {
       uow.discussionRepository.discussions = [alreadyRejectedDiscussion];
 
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: alreadyRejectedDiscussion.id,
             status: "REJECTED",
@@ -186,7 +187,7 @@ describe("UpdateDiscussionStatus", () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -202,7 +203,7 @@ describe("UpdateDiscussionStatus", () => {
 
     it("throws when user have pending right on establishment", async () => {
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -219,7 +220,7 @@ describe("UpdateDiscussionStatus", () => {
 
     it("throws BadRequestError when establishment tries to close discussion as candidate", async () => {
       await expectPromiseToFailWithError(
-        updateDiscussionStatus.execute(
+        updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -236,7 +237,7 @@ describe("UpdateDiscussionStatus", () => {
 
   describe("Accept discussion", () => {
     it("accepts a discussion, providing candidateWarnedMethod. Should skip email sending", async () => {
-      await updateDiscussionStatus.execute(
+      await updateDiscussionStatusByEstablishment.execute(
         {
           discussionId: discussion.id,
           status: "ACCEPTED",
@@ -265,7 +266,7 @@ describe("UpdateDiscussionStatus", () => {
         const conventionId = "40400000-0000-4000-9000-000000000404";
 
         await expectPromiseToFailWithError(
-          updateDiscussionStatus.execute(
+          updateDiscussionStatusByEstablishment.execute(
             {
               discussionId: discussion.id,
               status: "ACCEPTED",
@@ -282,7 +283,7 @@ describe("UpdateDiscussionStatus", () => {
         const convention = new ConventionDtoBuilder().build();
         uow.conventionRepository.setConventions([convention]);
 
-        await updateDiscussionStatus.execute(
+        await updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "ACCEPTED",
@@ -313,7 +314,7 @@ describe("UpdateDiscussionStatus", () => {
   describe("Reject discussion", () => {
     describe("providing candidateWarnedMethod", () => {
       it("works, and does not send email", async () => {
-        await updateDiscussionStatus.execute(
+        await updateDiscussionStatusByEstablishment.execute(
           {
             discussionId: discussion.id,
             status: "REJECTED",
@@ -377,7 +378,7 @@ describe("UpdateDiscussionStatus", () => {
           expectedRejectionReason,
           params: { discussionId, ...rest },
         }) => {
-          await updateDiscussionStatus.execute(
+          await updateDiscussionStatusByEstablishment.execute(
             { discussionId, ...rest },
             authorizedUser,
           );
@@ -424,7 +425,10 @@ describe("UpdateDiscussionStatus", () => {
           rejectionKind: "NO_TIME",
         };
 
-        await updateDiscussionStatus.execute(params, authorizedUser);
+        await updateDiscussionStatusByEstablishment.execute(
+          params,
+          authorizedUser,
+        );
 
         const { htmlContent, subject } = makeExpectedEmailParams(
           "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -490,7 +494,10 @@ describe("UpdateDiscussionStatus", () => {
           rejectionKind: "NO_TIME",
         };
 
-        await updateDiscussionStatus.execute(params, authorizedUser);
+        await updateDiscussionStatusByEstablishment.execute(
+          params,
+          authorizedUser,
+        );
 
         const { htmlContent, subject } = makeExpectedEmailParams(
           "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",

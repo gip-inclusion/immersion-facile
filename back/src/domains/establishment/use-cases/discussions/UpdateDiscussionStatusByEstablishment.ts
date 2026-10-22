@@ -17,12 +17,12 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
-export type UpdateDiscussionStatus = ReturnType<
-  typeof makeUpdateDiscussionStatus
+export type UpdateDiscussionStatusByEstablishment = ReturnType<
+  typeof makeUpdateDiscussionStatusByEstablishment
 >;
 
-export const makeUpdateDiscussionStatus = useCaseBuilder(
-  "UpdateDiscussionStatus",
+export const makeUpdateDiscussionStatusByEstablishment = useCaseBuilder(
+  "UpdateDiscussionStatusByEstablishment",
 )
   .withInput<UpdateDiscussionStatusParams>(
     z
