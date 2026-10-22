@@ -158,7 +158,7 @@ import { makeNotifyBeneficiaryThatDiscussionWasRejectedOnEstablishmentDeleted } 
 import { makeNotifyBeneficiaryToFollowUpContactRequest } from "../../domains/establishment/use-cases/discussions/NotifyBeneficiaryToFollowUpContactRequest";
 import { makeRejectDiscussionsForDeletedEstablishment } from "../../domains/establishment/use-cases/discussions/RejectDiscussionsForDeletedEstablishment";
 import { makeSendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
-import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
+import { makeUpdateDiscussionStatusByEstablishment } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatusByEstablishment";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
 import { makeGetEstablishmentPublicOptionsByFilters } from "../../domains/establishment/use-cases/GetEstablishmentPublicOptionsByFilters";
@@ -1009,13 +1009,14 @@ export const createUseCases = ({
     getEstablishmentNameAndAdmins: makeGetEstablishmentNameAndAdmins({
       uowPerformer,
     }),
-    updateDiscussionStatus: makeUpdateDiscussionStatus({
-      uowPerformer,
-      deps: {
-        timeGateway,
-        createNewEvent,
-      },
-    }),
+    updateDiscussionStatusByEstablishment:
+      makeUpdateDiscussionStatusByEstablishment({
+        uowPerformer,
+        deps: {
+          timeGateway,
+          createNewEvent,
+        },
+      }),
     closeDiscussionByCandidate: makeCloseDiscussionByCandidate({
       uowPerformer,
       deps: {
