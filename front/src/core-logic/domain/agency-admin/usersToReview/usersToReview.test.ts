@@ -44,7 +44,6 @@ describe("usersToReview", () => {
       usersToReviewSlice.actions.fetchUsersToReviewRequested({
         feedbackTopic: "agency-users-to-review",
         agencies: [agencyForUsers],
-        agencyRole: "to-review",
       }),
     );
 
@@ -89,7 +88,6 @@ describe("usersToReview", () => {
       usersToReviewSlice.actions.fetchUsersToReviewRequested({
         feedbackTopic: "agency-users-to-review",
         agencies: [agencyForUsers],
-        agencyRole: "to-review",
       }),
     );
 
