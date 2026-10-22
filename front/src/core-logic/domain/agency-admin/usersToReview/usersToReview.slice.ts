@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import type {
   AgencyDtoForAgencyUsersAndAdmins,
   AgencyId,
-  AgencyRole,
   UserId,
 } from "shared";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
@@ -18,7 +17,6 @@ export type UserToReview = {
 
 type FetchUsersToReviewPayload = {
   agencies: AgencyDtoForAgencyUsersAndAdmins[];
-  agencyRole: AgencyRole;
 };
 
 type UsersToReviewState = {

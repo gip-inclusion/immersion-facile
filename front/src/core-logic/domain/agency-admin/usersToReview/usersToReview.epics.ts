@@ -22,7 +22,7 @@ const getUsersInReviewEpic: UsersInReviewEpic = (
       dependencies.agencyGateway
         .getAgencyUsers$(getConnectedUserJwt(state$.value), {
           agencyIds: action.payload.agencies.map(({ id }) => id),
-          agencyRole: action.payload.agencyRole,
+          agencyRole: "to-review",
         })
         .pipe(
           map((agencyUsers) => ({

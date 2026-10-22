@@ -92,7 +92,6 @@ export const AgencyAdminTabContent = ({
 
     dispatch(
       usersToReviewSlice.actions.fetchUsersToReviewRequested({
-        agencyRole: "to-review",
         agencies: activeAgenciesUserIsAdminOn,
         feedbackTopic: "agency-users-to-review",
       }),
