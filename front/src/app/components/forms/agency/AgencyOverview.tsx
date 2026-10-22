@@ -1,11 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type {
-  AgencyDto,
-  AgencyUserForListing,
-  frontRoutes,
-  UserId,
-} from "shared";
+import type { AgencyDto, AgencyUsersForListingById, frontRoutes } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
@@ -26,7 +21,7 @@ export type AgencyOverviewRouteName = Route<
 
 type AgencyOverviewProps = {
   agency: AgencyDto;
-  agencyUsers: Record<UserId, AgencyUserForListing>;
+  agencyUsers: AgencyUsersForListingById;
   routeName: AgencyOverviewRouteName;
 };
 

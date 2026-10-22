@@ -10,6 +10,7 @@ import {
   type ConnectedUser,
   type Email,
   type EstablishmentDashboards,
+  toAgencyRightsByAgencyId,
   type User,
   type UserId,
   type UserWithAdminRights,
@@ -43,11 +44,11 @@ export const getConnectedUserByUserId = async ({
   };
 };
 
-export const getConnectedUsersByUserIds = async (
+export const getAgencyUsersByUserIdsAndAgencyIds = async (
   uow: UnitOfWork,
   userIds: UserId[],
   agencyIds: AgencyId[],
-): Promise<ConnectedUser[]> => {
+): Promise<AgencyUserForListing[]> => {
   const users = await uow.userRepository.getByIds(userIds);
 
   const userRightsByUser = (
@@ -79,57 +80,20 @@ export const getConnectedUsersByUserIds = async (
   );
 
   return Promise.all(
-    users.map<Promise<ConnectedUser>>(async (user) => ({
-      ...user,
-      agencyRights: await makeAgencyRights(
-        userRightsByUser[user.id],
+    users.map(async (user) => {
+      const agencyRights = await makeAgencyRights(
+        userRightsByUser[user.id] ?? [],
         agenciesRelatedToUsersByAgencyId,
         uow,
-      ),
-      dashboards: {
-        agencies: {
-          agencyDashboardUrl: null,
-          agencyManagement: null,
-          erroredConventionsDashboardUrl: null,
-          establishmentManagement: null,
-          statsEstablishmentDetailsUrl: null,
-        },
-        establishments: {
-          conventions: null,
-          discussions: null,
-        },
-      },
-    })),
-  );
-};
-
-export const getAgencyUsersByUserIdsAndAgencyIds = async (
-  uow: UnitOfWork,
-  userIds: UserId[],
-  agencyIds: AgencyId[],
-): Promise<AgencyUserForListing[]> => {
-  const users = await uow.userRepository.getByIds(userIds);
-
-  return Promise.all(
-    users.map(async (user) => {
-      const rights = await uow.agencyRepository.getAgenciesRightsByUserId(
-        user.id,
       );
-      const {
-        isBackofficeAdmin: _,
-        proConnect,
-        ...userWithoutAdminAndProConnect
-      } = user;
 
       return {
-        ...userWithoutAdminAndProConnect,
-        isProConnectUser: proConnect !== null,
-        agencyRights: rights
-          .filter((right) => agencyIds.includes(right.agencyId))
-          .reduce<Record<AgencyId, AgencyRightOfUser>>(
-            (acc, right) => ({ ...acc, [right.agencyId]: right }),
-            {},
-          ),
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isProConnectUser: user.proConnect !== null,
+        agencyRightsByAgencyId: toAgencyRightsByAgencyId(agencyRights),
       };
     }),
   );

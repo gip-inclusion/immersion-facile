@@ -4,6 +4,8 @@ import {
   AgencyDtoBuilder,
   type AgencyId,
   type AgencyRight,
+  type AgencyUserForListing,
+  type AgencyUsersForListingById,
   type ConnectedUser,
   errors,
   expectToEqual,
@@ -29,8 +31,6 @@ import { feedbacksSelectors } from "../../feedback/feedback.selectors";
 import {
   type ConnectedUsersAdminFeedback,
   type ConnectedUsersAdminState,
-  type ConnectedUsersWithNormalizedAgencyRightsById,
-  type ConnectedUserWithNormalizedAgencyRights,
   connectedUsersAdminInitialState,
   connectedUsersAdminSlice,
 } from "./connectedUsersAdmin.slice";
@@ -70,43 +70,25 @@ const user2AgencyRights: Record<AgencyId, AgencyRight> = {
   [agency4.id]: agency4Right,
 };
 
-const authUser1: ConnectedUserWithNormalizedAgencyRights = {
+const authUser1: AgencyUserForListing = {
   id: "user-id-1",
   email: "user-email",
   firstName: "user-first-name",
   lastName: "user-last-name",
-  createdAt: new Date().toISOString(),
-  preventToDelete: false,
-  agencyRights: user1AgencyRights,
-  dashboards: {
-    agencies: noAgencyDashboards,
-    establishments: noEstablishmentDashboard,
-  },
-  proConnect: {
-    externalId: "fake-user-external-id-1",
-    siret: "00000111112222",
-  },
+  agencyRightsByAgencyId: user1AgencyRights,
+  isProConnectUser: true,
 };
 
-const authUser2: ConnectedUserWithNormalizedAgencyRights = {
+const authUser2: AgencyUserForListing = {
   id: "user-id-2",
   email: "user-email-2",
   firstName: "user-first-name-2",
   lastName: "user-last-name-2",
-  createdAt: new Date().toISOString(),
-  preventToDelete: false,
-  agencyRights: user2AgencyRights,
-  dashboards: {
-    agencies: noAgencyDashboards,
-    establishments: noEstablishmentDashboard,
-  },
-  proConnect: {
-    externalId: "fake-user-external-id-2",
-    siret: "00000000001234",
-  },
+  agencyRightsByAgencyId: user2AgencyRights,
+  isProConnectUser: true,
 };
 
-const testUserSet: ConnectedUsersWithNormalizedAgencyRightsById = {
+const testUserSet: AgencyUsersForListingById = {
   [authUser1.id]: authUser1,
   [authUser2.id]: authUser2,
 };
@@ -182,28 +164,13 @@ describe("Agency registration for authenticated users", () => {
       );
       expectIsFetchingIcUsersNeedingReviewToBe(true);
 
-      dependencies.adminGateway.getConnectedUsersResponse$.next([
-        {
-          ...authUser1,
-          agencyRights: [agency1Right, agency2Right],
-        },
-      ]);
+      dependencies.adminGateway.getConnectedUsersResponse$.next([authUser1]);
       expectIsFetchingIcUsersNeedingReviewToBe(false);
       expectToEqual(
         connectedUsersAdminSelectors.connectedUsersNeedingReview(
           store.getState(),
         ),
-        [
-          {
-            firstName: authUser1.firstName,
-            lastName: authUser1.lastName,
-            email: authUser1.email,
-            proConnect: authUser1.proConnect,
-            id: authUser1.id,
-            createdAt: authUser1.createdAt,
-            preventToDelete: false,
-          },
-        ],
+        [authUser1],
       );
       expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
     });
@@ -223,40 +190,15 @@ describe("Agency registration for authenticated users", () => {
       expectIsFetchingIcUsersNeedingReviewToBe(true);
 
       dependencies.adminGateway.getConnectedUsersResponse$.next([
-        {
-          ...authUser1,
-          agencyRights: [agency1Right, agency2Right],
-        },
-        {
-          ...authUser2,
-          agencyRights: [agency3Right, agency4Right],
-        },
+        authUser1,
+        authUser2,
       ]);
       expectIsFetchingIcUsersNeedingReviewToBe(false);
       expectToEqual(
         connectedUsersAdminSelectors.connectedUsersNeedingReview(
           store.getState(),
         ),
-        [
-          {
-            firstName: authUser1.firstName,
-            lastName: authUser1.lastName,
-            email: authUser1.email,
-            proConnect: authUser1.proConnect,
-            id: authUser1.id,
-            createdAt: authUser1.createdAt,
-            preventToDelete: false,
-          },
-          {
-            firstName: authUser2.firstName,
-            lastName: authUser2.lastName,
-            email: authUser2.email,
-            proConnect: authUser2.proConnect,
-            id: authUser2.id,
-            createdAt: authUser2.createdAt,
-            preventToDelete: false,
-          },
-        ],
+        [authUser1, authUser2],
       );
       expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
     });
@@ -279,14 +221,6 @@ describe("Agency registration for authenticated users", () => {
 
   describe("fetches agency users", () => {
     it("gets the users by agencyId successfully", () => {
-      const agencyUser: ConnectedUsersWithNormalizedAgencyRightsById[keyof ConnectedUsersWithNormalizedAgencyRightsById] =
-        {
-          ...authUser1,
-          agencyRights: {
-            [agency1Right.agency.id]: agency1Right,
-            [agency2Right.agency.id]: agency2Right,
-          },
-        };
       store.dispatch(
         connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
           agencyIds: [agency2.id],
@@ -294,17 +228,12 @@ describe("Agency registration for authenticated users", () => {
       );
       expectIsFetchingAgencyUsersToBe(true);
 
-      dependencies.adminGateway.getConnectedUsersResponse$.next([
-        {
-          ...authUser1,
-          agencyRights: [agency1Right, agency2Right],
-        },
-      ]);
+      dependencies.adminGateway.getConnectedUsersResponse$.next([authUser1]);
       expectIsFetchingAgencyUsersToBe(false);
       expectToEqual(
         connectedUsersAdminSelectors.agencyUsers(store.getState()),
         {
-          [agencyUser.id]: agencyUser,
+          [authUser1.id]: authUser1,
         },
       );
       expectFeedbackToEqual({ kind: "agencyUsersFetchSuccess" });
@@ -489,13 +418,13 @@ describe("Agency registration for authenticated users", () => {
         admin: prefilledAdminState,
       }));
       const originalUser = testUserSet[authUser1.id];
-      const updatedUser: ConnectedUserWithNormalizedAgencyRights = {
+      const updatedUser: AgencyUserForListing = {
         ...originalUser,
         email: "updated-email@email.fr",
-        agencyRights: {
-          ...originalUser.agencyRights,
+        agencyRightsByAgencyId: {
+          ...originalUser.agencyRightsByAgencyId,
           [agency2.id]: {
-            ...originalUser.agencyRights[agency2.id],
+            ...originalUser.agencyRightsByAgencyId[agency2.id],
             roles: ["agency-admin", "validator"],
             isNotifiedByEmail: false,
           },
@@ -511,7 +440,7 @@ describe("Agency registration for authenticated users", () => {
         connectedUsersAdminSlice.actions.updateUserOnAgencyRequested({
           userId: originalUser.id,
           agencyId: agency2.id,
-          roles: updatedUser.agencyRights[agency2.id].roles,
+          roles: updatedUser.agencyRightsByAgencyId[agency2.id].roles,
           feedbackTopic: "agency-user",
           isNotifiedByEmail: false,
           email: "updated-email@email.fr",
@@ -522,7 +451,7 @@ describe("Agency registration for authenticated users", () => {
       dependencies.adminGateway.updateAgencyRoleForUserResponse$.next(
         undefined,
       );
-      const expected: ConnectedUsersWithNormalizedAgencyRightsById = {
+      const expected: AgencyUsersForListingById = {
         ...connectedUsersAdminSelectors.agencyUsers(store.getState()),
         [originalUser.id]: updatedUser,
       };
@@ -565,7 +494,7 @@ describe("Agency registration for authenticated users", () => {
         connectedUsersAdminSlice.actions.updateUserOnAgencyRequested({
           userId: originalUser.id,
           agencyId: agency2.id,
-          roles: originalUser.agencyRights[agency2.id].roles,
+          roles: originalUser.agencyRightsByAgencyId[agency2.id].roles,
           feedbackTopic: "agency-user",
           isNotifiedByEmail: false,
           email: "email@email.fr",
@@ -645,19 +574,13 @@ describe("Agency registration for authenticated users", () => {
         connectedUsersAdminInitialState,
       );
 
-      const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
+      const userToCreate: AgencyUserForListing = {
         id: "fake-id",
         email: "fake-email@mail.com",
         firstName: "fake-first-name",
         lastName: "fake-last-name",
-        createdAt: new Date().toISOString(),
-        preventToDelete: false,
-        proConnect: null,
-        agencyRights: {},
-        dashboards: {
-          agencies: noAgencyDashboards,
-          establishments: noEstablishmentDashboard,
-        },
+        agencyRightsByAgencyId: {},
+        isProConnectUser: false,
       };
 
       store.dispatch(
@@ -674,7 +597,17 @@ describe("Agency registration for authenticated users", () => {
       expectIsUpdatingUserAgencyToBe(true);
 
       const user: ConnectedUser = {
-        ...userToCreate,
+        id: userToCreate.id,
+        email: userToCreate.email,
+        firstName: userToCreate.firstName,
+        lastName: userToCreate.lastName,
+        createdAt: new Date().toISOString(),
+        preventToDelete: false,
+        proConnect: null,
+        dashboards: {
+          agencies: noAgencyDashboards,
+          establishments: noEstablishmentDashboard,
+        },
         agencyRights: [
           {
             agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
@@ -691,8 +624,12 @@ describe("Agency registration for authenticated users", () => {
         connectedUsersAdminSelectors.agencyUsers(store.getState()),
         {
           [userToCreate.id]: {
-            ...user,
-            agencyRights: {
+            id: userToCreate.id,
+            email: userToCreate.email,
+            firstName: userToCreate.firstName,
+            lastName: userToCreate.lastName,
+            isProConnectUser: false,
+            agencyRightsByAgencyId: {
               [agency2.id]: {
                 agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
                 roles: ["validator"],
@@ -719,19 +656,13 @@ describe("Agency registration for authenticated users", () => {
         connectedUsersAdminInitialState,
       );
 
-      const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
+      const userToCreate: AgencyUserForListing = {
         id: "fake-id",
         email: "fake-email@mail.com",
         firstName: "fake-first-name",
         lastName: "fake-last-name",
-        proConnect: null,
-        createdAt: new Date().toISOString(),
-        preventToDelete: false,
-        agencyRights: {},
-        dashboards: {
-          agencies: noAgencyDashboards,
-          establishments: noEstablishmentDashboard,
-        },
+        agencyRightsByAgencyId: {},
+        isProConnectUser: false,
       };
 
       store.dispatch(
@@ -811,12 +742,7 @@ describe("Agency registration for authenticated users", () => {
         },
       );
 
-      dependencies.adminGateway.getConnectedUsersResponse$.next([
-        {
-          ...authUser1,
-          agencyRights: values(authUser1.agencyRights),
-        },
-      ]);
+      dependencies.adminGateway.getConnectedUsersResponse$.next([authUser1]);
 
       expectIsFetchingAgencyUsersToBe(false);
       expectToEqual(

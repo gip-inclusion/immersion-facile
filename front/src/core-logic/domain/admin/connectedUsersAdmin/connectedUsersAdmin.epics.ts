@@ -2,14 +2,14 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import type {
-  AgencyId,
-  AgencyRight,
-  ConnectedUser,
+  AgencyUserForListing,
+  AgencyUsersForListingById,
   RejectConnectedUserRoleForAgencyParams,
   UserParamsForAgency,
   WithUserFilters,
 } from "shared";
 import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
+import { toAgencyUserForListing } from "src/core-logic/domain/agencies/agencies.helpers";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -17,10 +17,7 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import {
-  type ConnectedUsersWithNormalizedAgencyRightsById,
-  connectedUsersAdminSlice,
-} from "./connectedUsersAdmin.slice";
+import { connectedUsersAdminSlice } from "./connectedUsersAdmin.slice";
 
 export type ConnectedUsersAdminAction = ActionOfSlice<
   typeof connectedUsersAdminSlice
@@ -43,7 +40,7 @@ const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionE
           action.payload,
         ),
       ),
-      map(normalizeUsers),
+      map(toAgencyUsersForListingById),
       map(
         connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewSucceeded,
       ),
@@ -67,7 +64,7 @@ const fetchConnectedUsersWithAgencyIdEpic: ConnectedUsersAdminActionEpic = (
         action.payload,
       ),
     ),
-    map(normalizeUsers),
+    map(toAgencyUsersForListingById),
     map(connectedUsersAdminSlice.actions.fetchAgencyUsersSucceeded),
     catchEpicError((error) =>
       connectedUsersAdminSlice.actions.fetchAgencyUsersFailed(error?.message),
@@ -158,16 +155,7 @@ const createUserOnAgencyEpic: ConnectedUsersAdminActionEpic = (
         .pipe(
           map((user) =>
             connectedUsersAdminSlice.actions.createUserOnAgencySucceeded({
-              icUser: {
-                ...user,
-                agencyRights: user.agencyRights.reduce(
-                  (agenciesAcc, agencyRight) => ({
-                    ...agenciesAcc,
-                    [agencyRight.agency.id]: agencyRight,
-                  }),
-                  {} as Record<AgencyId, AgencyRight>,
-                ),
-              },
+              icUser: toAgencyUserForListing(user),
               agencyId: action.payload.agencyId,
               feedbackTopic: action.payload.feedbackTopic,
             }),
@@ -260,24 +248,15 @@ const updateUserPreventToDeleteEpic: ConnectedUsersAdminActionEpic = (
     ),
   );
 
-export const normalizeUsers = (
-  users: ConnectedUser[],
-): ConnectedUsersWithNormalizedAgencyRightsById =>
+const toAgencyUsersForListingById = (
+  users: AgencyUserForListing[],
+): AgencyUsersForListingById =>
   users.reduce(
     (acc, user) => ({
       ...acc,
-      [user.id]: {
-        ...user,
-        agencyRights: user.agencyRights.reduce(
-          (agenciesAcc, agencyRight) => ({
-            ...agenciesAcc,
-            [agencyRight.agency.id]: agencyRight,
-          }),
-          {} as Record<AgencyId, AgencyRight>,
-        ),
-      },
+      [user.id]: user,
     }),
-    {} as ConnectedUsersWithNormalizedAgencyRightsById,
+    {},
   );
 
 export const connectedUsersAdminEpics = [

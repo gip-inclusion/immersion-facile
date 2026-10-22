@@ -2,6 +2,7 @@ import { type Observable, of, throwError } from "rxjs";
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  type AgencyUserForListing,
   type ApiConsumer,
   type ApiConsumerId,
   type ApiConsumerJwt,
@@ -18,6 +19,7 @@ import {
   noEstablishmentDashboard,
   type RejectConnectedUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
+  toAgencyRightsByAgencyId,
   type UserParamsForAgency,
   type UserWithNumberOfAgenciesAndEstablishments,
   type WithPreventToDelete,
@@ -77,24 +79,15 @@ export class SimulatedAdminGateway implements AdminGateway {
         });
   }
 
-  public getConnectedUsers$(): Observable<ConnectedUser[]> {
+  public getConnectedUsers$(): Observable<AgencyUserForListing[]> {
     return of([
       {
         id: "fake-user-id-1",
         email: "jbon8745@wanadoo.fr",
         firstName: "Jean",
         lastName: "Bon",
-        agencyRights: simulatedAgencyRights,
-        dashboards: {
-          agencies: noAgencyDashboards,
-          establishments: noEstablishmentDashboard,
-        },
-        proConnect: {
-          externalId: "fake-user-external-id-1",
-          siret: "00000000002222",
-        },
-        createdAt: new Date().toISOString(),
-        preventToDelete: false,
+        agencyRightsByAgencyId: toAgencyRightsByAgencyId(simulatedAgencyRights),
+        isProConnectUser: true,
       },
     ]);
   }

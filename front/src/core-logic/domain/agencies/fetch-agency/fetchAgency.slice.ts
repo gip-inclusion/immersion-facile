@@ -3,7 +3,7 @@ import { filter } from "ramda";
 import type {
   AgencyDto,
   AgencyUserForListing,
-  UserId,
+  AgencyUsersForListingById,
   WithAgencyId,
 } from "shared";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
@@ -14,14 +14,10 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithOrWithoutFeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import type {
-  ConnectedUsersWithNormalizedAgencyRightsById,
-  ConnectedUserWithNormalizedAgencyRights,
-} from "../../admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 
 export interface FetchAgencyState {
   agency: AgencyDto | null;
-  agencyUsers: Record<UserId, AgencyUserForListing>;
+  agencyUsers: AgencyUsersForListingById;
   isLoading: boolean;
 }
 
@@ -64,7 +60,7 @@ export const fetchAgencySlice = createSlice({
 
     fetchAgencyUsersSucceeded: (
       state,
-      action: PayloadAction<Record<UserId, AgencyUserForListing>>,
+      action: PayloadAction<AgencyUsersForListingById>,
     ) => {
       state.isLoading = false;
       state.agencyUsers = action.payload;
@@ -99,7 +95,7 @@ export const fetchAgencySlice = createSlice({
         if (!state.agencyUsers || state.agency?.id !== action.payload.agencyId)
           return;
         const { id } = action.payload.icUser;
-        state.agencyUsers[id] = toAgencyUserForListing(action.payload.icUser);
+        state.agencyUsers[id] = action.payload.icUser;
       },
     );
     builder.addCase(
@@ -127,42 +123,14 @@ export const fetchAgencySlice = createSlice({
           email,
           isNotifiedByEmail,
         } = action.payload;
-        state.agencyUsers[userId].agencyRights[agencyId].roles = newRoles;
-        state.agencyUsers[userId].agencyRights[agencyId].isNotifiedByEmail =
-          isNotifiedByEmail;
+        state.agencyUsers[userId].agencyRightsByAgencyId[agencyId].roles =
+          newRoles;
+        state.agencyUsers[userId].agencyRightsByAgencyId[
+          agencyId
+        ].isNotifiedByEmail = isNotifiedByEmail;
         state.agencyUsers[userId].email =
           email ?? state.agencyUsers[userId].email;
       },
     );
   },
 });
-
-const toAgencyUserForListing = ({
-  proConnect,
-  dashboards: __,
-  establishments: ___,
-  isBackofficeAdmin: ____,
-  agencyRights,
-  ...user
-}: ConnectedUserWithNormalizedAgencyRights): AgencyUserForListing => ({
-  ...user,
-  isProConnectUser: proConnect !== null,
-  agencyRights: Object.fromEntries(
-    Object.entries(agencyRights).map(
-      ([agencyId, { roles, isNotifiedByEmail }]) => [
-        agencyId,
-        { agencyId, roles, isNotifiedByEmail },
-      ],
-    ),
-  ),
-});
-
-export const toAgencyUsersForListingById = (
-  users: ConnectedUsersWithNormalizedAgencyRightsById,
-): Record<UserId, AgencyUserForListing> =>
-  Object.fromEntries(
-    Object.entries(users).map(([userId, user]) => [
-      userId,
-      toAgencyUserForListing(user),
-    ]),
-  );

@@ -17,6 +17,7 @@ import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import {
+  agencyUserForListingSchema,
   connectedUserSchema,
   userInListSchema,
   withPreventToDeleteSchema,
@@ -69,11 +70,11 @@ export const adminRoutes = defineRoutes({
 
   getConnectedUsers: defineRoute({
     method: "get",
-    url: "/admin/inclusion-connected/users",
+    url: "/admin/agencies/users",
     queryParamsSchema: withUserFiltersSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.array(connectedUserSchema),
+      200: z.array(agencyUserForListingSchema),
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

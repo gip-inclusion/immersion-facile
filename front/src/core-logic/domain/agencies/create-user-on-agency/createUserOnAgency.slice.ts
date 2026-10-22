@@ -1,6 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { UserParamsForAgency, WithAgencyId } from "shared";
-import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
+import type {
+  AgencyUserForListing,
+  UserParamsForAgency,
+  WithAgencyId,
+} from "shared";
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface CreateUserOnAgencyState {
@@ -26,7 +29,7 @@ export const createUserOnAgencySlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<
         {
-          icUser: ConnectedUserWithNormalizedAgencyRights;
+          icUser: AgencyUserForListing;
         } & WithAgencyId
       >,
     ) => {

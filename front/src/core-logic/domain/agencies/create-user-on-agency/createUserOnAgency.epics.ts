@@ -1,6 +1,7 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
+import { toAgencyUserForListing } from "src/core-logic/domain/agencies/agencies.helpers";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -29,16 +30,7 @@ const createUserOnAgencyEpic: CreateUserOnAgencyEpic = (
         .pipe(
           map((user) =>
             createUserOnAgencySlice.actions.createUserOnAgencySucceeded({
-              icUser: {
-                ...user,
-                agencyRights: user.agencyRights.reduce(
-                  (agenciesAcc, agencyRight) => ({
-                    ...agenciesAcc,
-                    [agencyRight.agency.id]: agencyRight,
-                  }),
-                  {},
-                ),
-              },
+              icUser: toAgencyUserForListing(user),
               agencyId: action.payload.agencyId,
               feedbackTopic: action.payload.feedbackTopic,
             }),

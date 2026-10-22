@@ -1,5 +1,6 @@
 import { type Observable, Subject } from "rxjs";
 import type {
+  AgencyUserForListing,
   ApiConsumer,
   ApiConsumerId,
   ApiConsumerJwt,
@@ -47,7 +48,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
 
-  public getConnectedUsersResponse$ = new Subject<ConnectedUser[]>();
+  public getConnectedUsersResponse$ = new Subject<AgencyUserForListing[]>();
 
   public banEstablishmentResponse$ = new Subject<void>();
 
@@ -79,7 +80,7 @@ export class TestAdminGateway implements AdminGateway {
     return this.createUserForAgencyResponse$;
   }
 
-  public getConnectedUsers$(): Observable<ConnectedUser[]> {
+  public getConnectedUsers$(): Observable<AgencyUserForListing[]> {
     return this.getConnectedUsersResponse$;
   }
 

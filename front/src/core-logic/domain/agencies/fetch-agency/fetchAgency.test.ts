@@ -4,14 +4,13 @@ import {
   AgencyDtoBuilder,
   type AgencyRight,
   type AgencyUserForListing,
+  type AgencyUsersForListingById,
   type ConnectedUser,
   expectToEqual,
   noAgencyDashboards,
   noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
-  type UserId,
 } from "shared";
-import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
@@ -39,15 +38,13 @@ const user1: AgencyUserForListing = {
   email: "jbon8745@wanadoo.fr",
   firstName: "Jean",
   lastName: "Bon",
-  agencyRights: {
+  agencyRightsByAgencyId: {
     [agencyDto.id]: {
-      agencyId: agencyDto.id,
+      agency: agencyWithAdminEmails,
       isNotifiedByEmail: true,
       roles: ["agency-admin"],
     },
   },
-  createdAt: new Date().toISOString(),
-  preventToDelete: false,
   isProConnectUser: true,
 };
 
@@ -56,19 +53,17 @@ const user2: AgencyUserForListing = {
   email: "fake-user-email-4@test.fr",
   firstName: "Jean-Michel",
   lastName: "Jeplante",
-  agencyRights: {
+  agencyRightsByAgencyId: {
     [agencyDto.id]: {
-      agencyId: agencyDto.id,
+      agency: agencyWithAdminEmails,
       isNotifiedByEmail: true,
       roles: ["agency-admin"],
     },
   },
-  createdAt: new Date().toISOString(),
-  preventToDelete: false,
   isProConnectUser: true,
 };
 
-const fakeAgencyUsers: Record<UserId, AgencyUserForListing> = {
+const fakeAgencyUsers: AgencyUsersForListingById = {
   [user1.id]: user1,
   [user2.id]: user2,
 };
@@ -309,25 +304,29 @@ describe("fetchAgency", () => {
           isNotifiedByEmail: false,
         };
 
-        const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
+        const userToCreate: AgencyUserForListing = {
           id: "fake-id",
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          proConnect: null,
-          createdAt: new Date().toISOString(),
-          preventToDelete: false,
-          agencyRights: {
+          isProConnectUser: false,
+          agencyRightsByAgencyId: {
             [agencyDto.id]: agencyRight,
-          },
-          dashboards: {
-            agencies: noAgencyDashboards,
-            establishments: noEstablishmentDashboard,
           },
         };
 
         const user: ConnectedUser = {
-          ...userToCreate,
+          id: userToCreate.id,
+          email: userToCreate.email,
+          firstName: userToCreate.firstName,
+          lastName: userToCreate.lastName,
+          proConnect: null,
+          createdAt: new Date().toISOString(),
+          preventToDelete: false,
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
           agencyRights: [agencyRight],
         };
 
@@ -335,10 +334,9 @@ describe("fetchAgency", () => {
           createUserOnAgencySlice.actions.createUserOnAgencyRequested({
             agencyId: agencyDto.id,
             userId: userToCreate.id,
-            isNotifiedByEmail:
-              userToCreate.agencyRights[agencyDto.id].isNotifiedByEmail,
+            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
             email: userToCreate.email,
-            roles: userToCreate.agencyRights[agencyDto.id].roles,
+            roles: agencyRight.roles,
             feedbackTopic: "agency-user-for-dashboard",
           }),
         );
@@ -349,23 +347,7 @@ describe("fetchAgency", () => {
           agency: agencyDto,
           agencyUsers: {
             ...fakeAgencyUsers,
-            [userToCreate.id]: {
-              id: user.id,
-              email: user.email,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              createdAt: user.createdAt,
-              preventToDelete: user.preventToDelete,
-              lastLoginAt: user.lastLoginAt,
-              isProConnectUser: false,
-              agencyRights: {
-                [agencyDto.id]: {
-                  agencyId: agencyDto.id,
-                  roles: ["validator"],
-                  isNotifiedByEmail: false,
-                },
-              },
-            },
+            [userToCreate.id]: userToCreate,
           },
         });
       });
@@ -384,20 +366,14 @@ describe("fetchAgency", () => {
           isNotifiedByEmail: false,
         };
 
-        const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
+        const userToCreate: AgencyUserForListing = {
           id: "fake-id",
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          proConnect: null,
-          createdAt: new Date().toISOString(),
-          preventToDelete: false,
-          agencyRights: {
+          isProConnectUser: false,
+          agencyRightsByAgencyId: {
             [agencyDto.id]: agencyRight,
-          },
-          dashboards: {
-            agencies: noAgencyDashboards,
-            establishments: noEstablishmentDashboard,
           },
         };
 
@@ -405,16 +381,25 @@ describe("fetchAgency", () => {
           createUserOnAgencySlice.actions.createUserOnAgencyRequested({
             agencyId: agencyDto.id,
             userId: userToCreate.id,
-            isNotifiedByEmail:
-              userToCreate.agencyRights[agencyDto.id].isNotifiedByEmail,
+            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
             email: userToCreate.email,
-            roles: userToCreate.agencyRights[agencyDto.id].roles,
+            roles: agencyRight.roles,
             feedbackTopic: "agency-user-for-dashboard",
           }),
         );
 
         const user: ConnectedUser = {
-          ...userToCreate,
+          id: userToCreate.id,
+          email: userToCreate.email,
+          firstName: userToCreate.firstName,
+          lastName: userToCreate.lastName,
+          proConnect: null,
+          createdAt: new Date().toISOString(),
+          preventToDelete: false,
+          dashboards: {
+            agencies: noAgencyDashboards,
+            establishments: noEstablishmentDashboard,
+          },
           agencyRights: [agencyRight],
         };
 
@@ -492,9 +477,9 @@ describe("fetchAgency", () => {
         const updatedUser: AgencyUserForListing = {
           ...originalUser,
           email: "updated-email@email.fr",
-          agencyRights: {
+          agencyRightsByAgencyId: {
             [agencyDto.id]: {
-              agencyId: agencyDto.id,
+              ...originalUser.agencyRightsByAgencyId[agencyDto.id],
               roles: ["agency-admin", "validator"],
               isNotifiedByEmail: false,
             },
@@ -590,7 +575,7 @@ describe("fetchAgency", () => {
     dependencies.agencyGateway.fetchedAgency$.next(agency);
   };
   const feedWithFetchedAgencyUsers = (
-    agencyUsers: Record<UserId, AgencyUserForListing>,
+    agencyUsers: AgencyUsersForListingById,
   ) => {
     dependencies.agencyGateway.getAgencyUsersResponse$.next(
       values(agencyUsers),

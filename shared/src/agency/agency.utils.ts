@@ -1,7 +1,7 @@
 import { partition } from "ramda";
 import type { AgencyRight, AgencyRole, ExcludeFromExisting } from "..";
 import { errors } from "../errors/errors";
-import type { AgencyDto } from "./agency.dto";
+import type { AgencyDto, AgencyId } from "./agency.dto";
 import type { AgencyPublicDisplayDto } from "./publicAgency.dto";
 
 export const toAgencyPublicDisplayDto = (
@@ -60,6 +60,14 @@ export const distinguishAgencyRights = (agencyRights: AgencyRight[]) => {
   );
   return { toReviewAgencyRights, activeAgencyRights };
 };
+
+export const toAgencyRightsByAgencyId = (
+  agencyRights: AgencyRight[],
+): Record<AgencyId, AgencyRight> =>
+  agencyRights.reduce<Record<AgencyId, AgencyRight>>(
+    (acc, right) => ({ ...acc, [right.agency.id]: right }),
+    {},
+  );
 
 export const agencyRoleIsNotToReview = (
   agencyRoles: AgencyRole[],

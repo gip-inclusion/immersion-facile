@@ -58,13 +58,10 @@ describe("usersToReview", () => {
       email: connectedUser.email,
       firstName: connectedUser.firstName,
       lastName: connectedUser.lastName,
-      createdAt: connectedUser.createdAt,
-      preventToDelete: connectedUser.preventToDelete,
-      lastLoginAt: connectedUser.lastLoginAt,
       isProConnectUser: connectedUser.proConnect !== null,
-      agencyRights: {
+      agencyRightsByAgencyId: {
         [agencyForUsers.id]: {
-          agencyId: agencyForUsers.id,
+          agency: agencyForUsers,
           roles: ["to-review"],
           isNotifiedByEmail: false,
         },

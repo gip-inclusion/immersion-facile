@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { domElementIds, type User } from "shared";
+import { domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
 import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
@@ -60,11 +60,13 @@ export const RegisterUsersToAgencies = () => {
             value: selectedUser?.id || "",
             id: domElementIds.admin.agencyTab.selectIcUserToReview,
             onChange: (event) => {
+              const selectedUserToReview = usersNeedingReview.find(
+                (icUser) => icUser.id === event.currentTarget.value,
+              );
+              if (!selectedUserToReview) return;
               dispatch(
                 connectedUsersAdminSlice.actions.connectedUserSelected(
-                  usersNeedingReview.find(
-                    (icUser) => icUser.id === event.currentTarget.value,
-                  ) as User,
+                  selectedUserToReview,
                 ),
               );
             },

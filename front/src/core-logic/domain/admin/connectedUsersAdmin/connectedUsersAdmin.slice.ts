@@ -1,13 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
-  AgencyId,
-  AgencyRight,
   AgencyRole,
-  ConnectedUser,
-  OmitFromExistingKeys,
+  AgencyUserForListing,
+  AgencyUsersForListingById,
   RejectConnectedUserRoleForAgencyParams,
-  User,
-  UserId,
   UserParamsForAgency,
   WithAgencyId,
   WithPreventToDelete,
@@ -16,18 +12,6 @@ import type {
 } from "shared";
 import type { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import type { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
-
-export type ConnectedUserWithNormalizedAgencyRights = OmitFromExistingKeys<
-  ConnectedUser,
-  "agencyRights"
-> & {
-  agencyRights: Record<AgencyId, AgencyRight>;
-};
-
-export type ConnectedUsersWithNormalizedAgencyRightsById = Record<
-  UserId,
-  ConnectedUserWithNormalizedAgencyRights
->;
 
 type ConnectedUsersAdminFeedbackKind =
   | "usersToReviewFetchSuccess"
@@ -39,9 +23,9 @@ export type ConnectedUsersAdminFeedback =
   SubmitFeedBack<ConnectedUsersAdminFeedbackKind>;
 
 export type ConnectedUsersAdminState = {
-  connectedUsersNeedingReview: ConnectedUsersWithNormalizedAgencyRightsById;
-  agencyUsers: ConnectedUsersWithNormalizedAgencyRightsById;
-  selectedUser: User | null;
+  connectedUsersNeedingReview: AgencyUsersForListingById;
+  agencyUsers: AgencyUsersForListingById;
+  selectedUser: AgencyUserForListing | null;
   isUpdatingConnectedUserAgency: boolean;
   isFetchingAgenciesNeedingReviewForIcUser: boolean;
   isFetchingAgencyUsers: boolean;
@@ -64,7 +48,10 @@ export const connectedUsersAdminSlice = createSlice({
   name: "connectedUsersAdmin",
   initialState: connectedUsersAdminInitialState,
   reducers: {
-    connectedUserSelected: (state, action: PayloadAction<User | null>) => {
+    connectedUserSelected: (
+      state,
+      action: PayloadAction<AgencyUserForListing | null>,
+    ) => {
       state.selectedUser = action.payload;
       if (state.feedback.kind === "errored")
         state.feedback = { kind: "usersToReviewFetchSuccess" };
@@ -84,7 +71,7 @@ export const connectedUsersAdminSlice = createSlice({
     },
     fetchConnectedUsersToReviewSucceeded: (
       state,
-      action: PayloadAction<ConnectedUsersWithNormalizedAgencyRightsById>,
+      action: PayloadAction<AgencyUsersForListingById>,
     ) => {
       state.isFetchingAgenciesNeedingReviewForIcUser = false;
       state.connectedUsersNeedingReview = action.payload;
@@ -103,7 +90,7 @@ export const connectedUsersAdminSlice = createSlice({
     },
     fetchAgencyUsersSucceeded: (
       state,
-      action: PayloadAction<ConnectedUsersWithNormalizedAgencyRightsById>,
+      action: PayloadAction<AgencyUsersForListingById>,
     ) => {
       state.isFetchingAgencyUsers = false;
       state.agencyUsers = action.payload;
@@ -127,11 +114,11 @@ export const connectedUsersAdminSlice = createSlice({
       if (!userNeedingReview) return;
 
       if (
-        !userNeedingReview.agencyRights[agencyId].roles.some(
+        !userNeedingReview.agencyRightsByAgencyId[agencyId].roles.some(
           (role: AgencyRole) => newRoles.includes(role),
         )
       )
-        userNeedingReview.agencyRights[agencyId].roles = newRoles;
+        userNeedingReview.agencyRightsByAgencyId[agencyId].roles = newRoles;
     },
     registerAgencyWithRoleToUserFailed: (
       state,
@@ -162,8 +149,8 @@ export const connectedUsersAdminSlice = createSlice({
       if (!userNeedingReview) return;
 
       const { [agencyId]: _agency, ...agenciesFiltered } =
-        userNeedingReview.agencyRights;
-      userNeedingReview.agencyRights = agenciesFiltered;
+        userNeedingReview.agencyRightsByAgencyId;
+      userNeedingReview.agencyRightsByAgencyId = agenciesFiltered;
     },
 
     rejectAgencyWithRoleToUserFailed: (
@@ -190,7 +177,7 @@ export const connectedUsersAdminSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<
         {
-          icUser: ConnectedUserWithNormalizedAgencyRights;
+          icUser: AgencyUserForListing;
         } & WithAgencyId
       >,
     ) => {
@@ -226,9 +213,11 @@ export const connectedUsersAdminSlice = createSlice({
         email,
         isNotifiedByEmail,
       } = action.payload;
-      state.agencyUsers[userId].agencyRights[agencyId].roles = newRoles;
-      state.agencyUsers[userId].agencyRights[agencyId].isNotifiedByEmail =
-        isNotifiedByEmail;
+      state.agencyUsers[userId].agencyRightsByAgencyId[agencyId].roles =
+        newRoles;
+      state.agencyUsers[userId].agencyRightsByAgencyId[
+        agencyId
+      ].isNotifiedByEmail = isNotifiedByEmail;
       state.agencyUsers[userId].email =
         email ?? state.agencyUsers[userId].email;
     },

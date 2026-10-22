@@ -150,7 +150,7 @@ const TableLine = ({
       name: agency.name,
       refersToAgencyId: agency.refersToAgencyId,
     },
-    roles: agencyUser.agencyRights[agency.id].roles,
+    roles: agencyUser.agencyRightsByAgencyId[agency.id].roles,
     userEmail: agencyUser.email,
     userId: agencyUser.id,
     isSelfRemoval: currentUser?.id === agencyUser.id,
@@ -165,9 +165,11 @@ const TableLine = ({
     />,
     <NotificationIndicator
       key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-notification`}
-      isNotified={agencyUser.agencyRights[agency.id].isNotifiedByEmail}
+      isNotified={
+        agencyUser.agencyRightsByAgencyId[agency.id].isNotifiedByEmail
+      }
     />,
-    agencyUser.agencyRights[agency.id].roles.map((role) => (
+    agencyUser.agencyRightsByAgencyId[agency.id].roles.map((role) => (
       <Badge
         key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-${role}`}
         small
@@ -181,7 +183,7 @@ const TableLine = ({
       inlineLayoutWhen={"always"}
       buttons={[
         {
-          children: agencyUser.agencyRights[agency.id].roles.includes(
+          children: agencyUser.agencyRightsByAgencyId[agency.id].roles.includes(
             "to-review",
           )
             ? "Valider"
@@ -190,7 +192,9 @@ const TableLine = ({
           className: fr.cx("fr-my-1v"),
           disabled:
             agency.refersToAgencyId !== null &&
-            agencyUser.agencyRights[agency.id].roles.includes("validator"),
+            agencyUser.agencyRightsByAgencyId[agency.id].roles.includes(
+              "validator",
+            ),
           id: `${
             isLocationAdmin
               ? domElementIds.admin.agencyTab.editAgencyUserRoleButton
