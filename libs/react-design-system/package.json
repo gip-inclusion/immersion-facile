@@ -18,8 +18,8 @@
     "@codegouvfr/react-dsfr": "^1.30.2",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@storybook/addon-docs": "10.5.6",
-    "@storybook/react-vite": "10.5.6",
+    "@storybook/addon-docs": "10.6.3",
+    "@storybook/react-vite": "10.6.3",
     "@types/node": "^24.12.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
@@ -34,8 +34,9 @@
     "require-from-string": "^2.0.2",
     "sass": "^1.97.3",
     "scss-mapper": "workspace:*",
-    "storybook": "10.5.6",
+    "storybook": "10.6.3",
     "tss-react": "^4.5.2",
+    "vite": "8.1.6",
     "type-route": "^1.0.0",
     "typescript": "^7.0.2"
   }
