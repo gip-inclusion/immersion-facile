@@ -1,3 +1,4 @@
+import { type Action, isAnyOf } from "@reduxjs/toolkit";
 import type { Observable } from "rxjs";
 import { concatMap, filter, map, switchMap } from "rxjs";
 import type { ConventionReadDto } from "shared";
@@ -17,6 +18,24 @@ import { conventionSlice } from "./convention.slice";
 type ConventionAction = ActionOfSlice<typeof conventionSlice>;
 
 type ConventionEpic = AppEpic<ConventionAction>;
+
+const getConventionTriggerMatchers = [
+  conventionSlice.actions.fetchConventionRequested,
+  conventionActionSlice.actions.signConventionSucceeded,
+  conventionActionSlice.actions.acceptByCounsellorSucceeded,
+  conventionActionSlice.actions.acceptByValidatorSucceeded,
+  conventionActionSlice.actions.deprecateConventionSucceeded,
+  conventionActionSlice.actions.rejectConventionSucceeded,
+  conventionActionSlice.actions.cancelConventionSucceeded,
+  conventionActionSlice.actions.transferConventionToAgencySucceeded,
+  conventionActionSlice.actions.editCounsellorNameSucceeded,
+  sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded,
+  sendAssessmentLinkSlice.actions.sendAssessmentLinkSucceeded,
+  sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderSucceeded,
+  assessmentSlice.actions.deleteAssessmentSucceeded,
+  editConventionWithFinalStatusSlice.actions
+    .editConventionWithFinalStatusSucceeded,
+] as const;
 
 const saveConventionEpic: ConventionEpic = (
   action$,
@@ -67,8 +86,7 @@ const showSummaryChangedEpic: ConventionEpic = (action$) =>
     filter(
       (
         action,
-      ): action is {
-        type: string;
+      ): action is typeof action & {
         payload: { showSummary: true; convention: ConventionReadDto };
       } => action.payload.showSummary,
     ),
@@ -110,47 +128,13 @@ const getSimilarConventionsEpic: ConventionEpic = (
     ),
   );
 
-const getConventionEpic: ConventionEpic = (
+const getConventionEpic: AppEpic<Action, ConventionAction> = (
   action$,
   _state$,
   { conventionGateway },
 ) =>
   action$.pipe(
-    filter(
-      (action) =>
-        conventionSlice.actions.fetchConventionRequested.match(action) ||
-        conventionActionSlice.actions.signConventionSucceeded.match(action) ||
-        conventionActionSlice.actions.acceptByCounsellorSucceeded.match(
-          action,
-        ) ||
-        conventionActionSlice.actions.acceptByValidatorSucceeded.match(
-          action,
-        ) ||
-        conventionActionSlice.actions.deprecateConventionSucceeded.match(
-          action,
-        ) ||
-        conventionActionSlice.actions.rejectConventionSucceeded.match(action) ||
-        conventionActionSlice.actions.cancelConventionSucceeded.match(action) ||
-        conventionActionSlice.actions.transferConventionToAgencySucceeded.match(
-          action,
-        ) ||
-        conventionActionSlice.actions.editCounsellorNameSucceeded.match(
-          action,
-        ) ||
-        sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded.match(
-          action,
-        ) ||
-        sendAssessmentLinkSlice.actions.sendAssessmentLinkSucceeded.match(
-          action,
-        ) ||
-        sendAssessmentLinkSlice.actions.sendAssessmentSignatureReminderSucceeded.match(
-          action,
-        ) ||
-        assessmentSlice.actions.deleteAssessmentSucceeded.match(action) ||
-        editConventionWithFinalStatusSlice.actions.editConventionWithFinalStatusSucceeded.match(
-          action,
-        ),
-    ),
+    filter(isAnyOf(...getConventionTriggerMatchers)),
     switchMap((action): Observable<ConventionAction> => {
       if ("updateStatusParams" in action.payload) {
         return conventionGateway
@@ -208,7 +192,6 @@ const getConventionEpic: ConventionEpic = (
           ),
         );
     }),
-    filter((action): action is ConventionAction => action !== undefined),
   );
 
 const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
