@@ -75,7 +75,6 @@
     "trigger-verify-and-fix-phones": "tsx src/scripts/triggerVerifyAndFixPhones.ts",
     "trigger-update-establishment-marketing-naf-code": "tsx src/scripts/triggerUpdateEstablishmentMarketingNafCode.ts",
     "typecheck": "tsc --noEmit",
-    "kysely-codegen": "kysely-codegen --dialect postgres",
     "verify-migrations-order": "./src/scripts/verifyDatabaseMigrationsOrder.sh"
   },
   "keywords": [],
@@ -97,7 +96,6 @@
     "html-templates": "workspace:*",
     "jsonwebtoken": "^9.0.2",
     "kysely": "^0.28.17",
-    "kysely-codegen": "^0.10.1",
     "libphonenumber-js": "^1.13.8",
     "multer": "2.4.0",
     "nanoid": "^6.0.1",

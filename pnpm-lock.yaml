@@ -147,9 +147,6 @@ importers:
       kysely:
         specifier: ^0.28.17
         version: 0.28.17
-      kysely-codegen:
-        specifier: ^0.10.1
-        version: 0.10.1(kysely@0.28.17)(pg@8.11.1)
       libphonenumber-js:
         specifier: ^1.13.8
         version: 1.13.8
@@ -5608,22 +5605,6 @@ packages:
 
   jws@3.2.3:
     resolution: {integrity: sha512-byiJ0FLRdLdSVSReO/U4E7RoEyOCKnEnEPMjq3HxWtvzLsV08/i5RQKsFVNkCldrCaPr2vDNAOMsfs8T/Hze7g==}
-
-  kysely-codegen@0.10.1:
-    resolution: {integrity: sha512-8Bslh952gN5gtucRv4jTZDFD18RBioS6M50zHfe5kwb5iSyEAunU4ZYMdHzkHraa4zxjg5/183XlOryBCXLRIw==}
-    hasBin: true
-    peerDependencies:
-      better-sqlite3: '>=7.6.2'
-      kysely: '>=0.19.12'
-      mysql2: ^2.3.3 || ^3.0.0
-      pg: ^8.8.0
-    peerDependenciesMeta:
-      better-sqlite3:
-        optional: true
-      mysql2:
-        optional: true
-      pg:
-        optional: true
 
   kysely@0.28.17:
     resolution: {integrity: sha512-nbD8lB9EB3wNdMhOCdx5Li8DxnLbvKByylRLcJ1h+4SkrowVeECAyZlyiKMThF7xFdRz0jSQ2MoJr+wXux2y0Q==}
@@ -13257,16 +13238,6 @@ snapshots:
     dependencies:
       jwa: 1.4.2
       safe-buffer: 5.2.1
-
-  kysely-codegen@0.10.1(kysely@0.28.17)(pg@8.11.1):
-    dependencies:
-      chalk: 4.1.2
-      dotenv: 16.5.0
-      kysely: 0.28.17
-      micromatch: 4.0.8
-      minimist: 1.2.8
-    optionalDependencies:
-      pg: 8.11.1
 
   kysely@0.28.17: {}
 
