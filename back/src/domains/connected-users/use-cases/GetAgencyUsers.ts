@@ -1,9 +1,10 @@
 import {
+  type AgencyId,
+  type AgencyRole,
   type AgencyUserForListing,
   type ConnectedUser,
   errors,
-  type GetAgencyUsersFilters,
-  getAgencyUsersFiltersSchema,
+  withUserFiltersSchema,
 } from "shared";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
@@ -14,15 +15,26 @@ import {
 
 export type GetAgencyUsers = ReturnType<typeof makeGetAgencyUsers>;
 export const makeGetAgencyUsers = useCaseBuilder("GetAgencyUsers")
-  .withInput(getAgencyUsersFiltersSchema)
+  .withInput(withUserFiltersSchema)
   .withCurrentUser<ConnectedUser>()
   .withOutput<AgencyUserForListing[]>()
   .build(async ({ uow, currentUser, inputParams: filters }) => {
+    const agencyIds = filters.agencyIds ?? [];
+
+    if (!currentUser.isBackofficeAdmin && agencyIds.length === 0)
+      throw errors.user.forbidden({ userId: currentUser.id });
+
     throwIfNotAgencyAdminOrBackofficeAdmin({
-      agencyIds: filters.agencyIds,
+      agencyIds,
       currentUser,
     });
-    throwIfRequestingToReviewUsersOnNeedsReviewAgency(filters, currentUser);
+
+    if (!currentUser.isBackofficeAdmin)
+      throwIfRequestingToReviewUsersOnNeedsReviewAgency({
+        agencyIds,
+        agencyRole: filters.agencyRole,
+        currentUser,
+      });
 
     const userIds =
       await uow.agencyRepository.getUserIdWithAgencyRightsByFilters(filters);
@@ -30,19 +42,24 @@ export const makeGetAgencyUsers = useCaseBuilder("GetAgencyUsers")
     const users = await getAgencyUsersByUserIdsAndAgencyIds(
       uow,
       userIds,
-      filters.agencyIds,
+      agencyIds,
     );
 
     return sortUsersByName(users);
   });
 
-const throwIfRequestingToReviewUsersOnNeedsReviewAgency = (
-  filters: GetAgencyUsersFilters,
-  currentUser: ConnectedUser,
-): void => {
-  if (filters.agencyRole !== "to-review") return;
+const throwIfRequestingToReviewUsersOnNeedsReviewAgency = ({
+  agencyIds,
+  agencyRole,
+  currentUser,
+}: {
+  agencyIds: AgencyId[];
+  agencyRole?: AgencyRole;
+  currentUser: ConnectedUser;
+}): void => {
+  if (agencyRole !== "to-review") return;
 
-  const hasNeedsReviewAgency = filters.agencyIds.some((agencyId) => {
+  const hasNeedsReviewAgency = agencyIds.some((agencyId) => {
     const agencyRight = currentUser.agencyRights.find(
       (right) => right.agency.id === agencyId,
     );

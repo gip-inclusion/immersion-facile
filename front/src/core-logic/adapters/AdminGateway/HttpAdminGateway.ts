@@ -1,6 +1,7 @@
 import { from, type Observable } from "rxjs";
 import {
   type AdminRoutes,
+  type AgencyUserForListing,
   type ApiConsumer,
   type ApiConsumerId,
   type ApiConsumerJwt,
@@ -78,7 +79,7 @@ export class HttpAdminGateway implements AdminGateway {
   public getConnectedUsers$(
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ): Observable<ConnectedUser[]> {
+  ): Observable<AgencyUserForListing[]> {
     return from(
       this.httpClient
         .getConnectedUsers({

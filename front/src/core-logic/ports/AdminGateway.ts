@@ -1,5 +1,6 @@
 import type { Observable } from "rxjs";
 import type {
+  AgencyUserForListing,
   ApiConsumer,
   ApiConsumerId,
   ApiConsumerJwt,
@@ -35,7 +36,7 @@ export interface AdminGateway {
   getConnectedUsers$: (
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ) => Observable<ConnectedUser[]>;
+  ) => Observable<AgencyUserForListing[]>;
 
   getDashboardUrl$: (
     params: GetDashboardParams,

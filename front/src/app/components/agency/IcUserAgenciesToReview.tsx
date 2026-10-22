@@ -8,9 +8,9 @@ import { useDispatch } from "react-redux";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyRight,
+  type AgencyUserForListing,
   domElementIds,
   frontRoutes,
-  type User,
   type UserParamsForAgency,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
@@ -22,7 +22,7 @@ import { hasCounsellorRoles } from "src/core-logic/domain/agencies/agencies.help
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
-  selectedUser: User;
+  selectedUser: AgencyUserForListing;
 };
 type IcUserAgenciesToReviewModalProps = {
   title: string;
@@ -36,7 +36,7 @@ const AgencyReviewForm = ({
   setModalProps,
 }: {
   agency: AgencyDtoForAgencyUsersAndAdmins;
-  selectedUser: User;
+  selectedUser: AgencyUserForListing;
   selectAgency: (agency: AgencyDtoForAgencyUsersAndAdmins) => void;
   setModalProps: (modalProps: IcUserAgenciesToReviewModalProps) => void;
 }) => (

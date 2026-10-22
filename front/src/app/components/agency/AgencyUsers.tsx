@@ -9,8 +9,8 @@ import { useDispatch } from "react-redux";
 import {
   type AgencyDto,
   type AgencyUserForListing,
+  type AgencyUsersForListingById,
   domElementIds,
-  type UserId,
   type UserParamsForAgency,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
@@ -26,7 +26,7 @@ import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
   agency: AgencyDto;
-  agencyUsersById: Record<UserId, AgencyUserForListing>;
+  agencyUsersById: AgencyUsersForListingById;
   routeName: AgencyOverviewRouteName;
 };
 
@@ -64,9 +64,10 @@ export const AgencyUsers = ({
     setSelectedUserData({
       agencyId: agency.id,
       userId: agencyUser.id,
-      roles: agencyUser.agencyRights[agency.id].roles,
+      roles: agencyUser.agencyRightsByAgencyId[agency.id].roles,
       email: agencyUser.email,
-      isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+      isNotifiedByEmail:
+        agencyUser.agencyRightsByAgencyId[agency.id].isNotifiedByEmail,
       isProConnectUser: agencyUser.isProConnectUser,
     });
     manageUserModal.open();
@@ -76,13 +77,14 @@ export const AgencyUsers = ({
 
   const [agencyUsers, agencyUsersInOtherAgency] = agencyRefersToOtherAgency
     ? partition(
-        (user) => !user.agencyRights[agency.id].roles.includes("validator"),
+        (user) =>
+          !user.agencyRightsByAgencyId[agency.id].roles.includes("validator"),
         values(agencyUsersById),
       )
     : [values(agencyUsersById), []];
 
   const hasCounsellorRoles = agencyUsers.some((user) =>
-    user.agencyRights[agency.id].roles.includes("counsellor"),
+    user.agencyRightsByAgencyId[agency.id].roles.includes("counsellor"),
   );
 
   const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {

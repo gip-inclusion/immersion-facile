@@ -1,5 +1,5 @@
+import { values } from "ramda";
 import { filter, map, switchMap } from "rxjs";
-import { errors } from "shared";
 import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { usersToReviewSlice } from "src/core-logic/domain/agency-admin/usersToReview/usersToReview.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -27,27 +27,17 @@ const getUsersInReviewEpic: UsersInReviewEpic = (
         .pipe(
           map((agencyUsers) => ({
             usersToReview: agencyUsers.flatMap((agencyUser) =>
-              Object.values(agencyUser.agencyRights)
+              values(agencyUser.agencyRightsByAgencyId)
                 .filter((agencyRight) =>
                   agencyRight.roles.includes("to-review"),
                 )
-                .map((agencyRight) => {
-                  const agency = action.payload.agencies.find(
-                    ({ id }) => id === agencyRight.agencyId,
-                  );
-                  if (!agency)
-                    throw errors.agency.notFound({
-                      agencyId: agencyRight.agencyId,
-                    });
-
-                  return {
-                    id: agencyUser.id,
-                    email: agencyUser.email,
-                    firstName: agencyUser.firstName,
-                    lastName: agencyUser.lastName,
-                    agency,
-                  };
-                }),
+                .map((agencyRight) => ({
+                  id: agencyUser.id,
+                  email: agencyUser.email,
+                  firstName: agencyUser.firstName,
+                  lastName: agencyUser.lastName,
+                  agency: agencyRight.agency,
+                })),
             ),
             feedbackTopic: action.payload.feedbackTopic,
           })),

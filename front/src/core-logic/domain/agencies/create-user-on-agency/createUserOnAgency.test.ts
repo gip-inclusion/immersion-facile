@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyUserForListing,
   type ConnectedUser,
   errors,
   expectToEqual,
@@ -7,7 +8,6 @@ import {
   noEstablishmentDashboard,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { createUserOnAgencySelectors } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.selectors";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
@@ -31,19 +31,13 @@ describe("CreateUserOnAgency", () => {
     }));
   });
 
-  const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
+  const userToCreate: AgencyUserForListing = {
     id: "fake-id",
     email: "fake-email@mail.com",
     firstName: "fake-first-name",
     lastName: "fake-last-name",
-    proConnect: null,
-    createdAt: new Date().toISOString(),
-    preventToDelete: false,
-    agencyRights: {},
-    dashboards: {
-      agencies: noAgencyDashboards,
-      establishments: noEstablishmentDashboard,
-    },
+    agencyRightsByAgencyId: {},
+    isProConnectUser: false,
   };
 
   it("should create user successfully", () => {
@@ -69,7 +63,17 @@ describe("CreateUserOnAgency", () => {
     );
 
     const user: ConnectedUser = {
-      ...userToCreate,
+      id: userToCreate.id,
+      email: userToCreate.email,
+      firstName: userToCreate.firstName,
+      lastName: userToCreate.lastName,
+      createdAt: new Date().toISOString(),
+      preventToDelete: false,
+      proConnect: null,
+      dashboards: {
+        agencies: noAgencyDashboards,
+        establishments: noEstablishmentDashboard,
+      },
       agencyRights: [
         {
           agency: toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []),

@@ -32,7 +32,6 @@ import {
   type ZodSchemaWithInputMatchingOutput,
 } from "../zodUtils";
 import type {
-  AgencyRightForListing,
   AgencyUserForListing,
   ConnectedUser,
   Firstname,
@@ -110,20 +109,15 @@ const agencyRightSchema: ZodSchemaWithInputMatchingOutput<AgencyRight> =
     isNotifiedByEmail: z.boolean(),
   });
 
-const agencyRightForListingSchema: ZodSchemaWithInputMatchingOutput<AgencyRightForListing> =
-  z.object({
-    agencyId: agencyIdSchema,
-    roles: z.array(agencyRoleSchema),
-    isNotifiedByEmail: z.boolean(),
-  });
-
 export const agencyUserForListingSchema: ZodSchemaWithInputMatchingOutput<AgencyUserForListing> =
-  z.object(commonUserShape).and(
-    z.object({
-      agencyRights: z.record(agencyIdSchema, agencyRightForListingSchema),
-      isProConnectUser: z.boolean(),
-    }),
-  );
+  z.object({
+    id: userIdSchema,
+    email: emailSchema,
+    firstName: zStringCanBeEmpty,
+    lastName: zStringCanBeEmpty,
+    agencyRightsByAgencyId: z.record(agencyIdSchema, agencyRightSchema),
+    isProConnectUser: z.boolean(),
+  });
 
 export const getAgencyUsersFiltersSchema: ZodSchemaWithInputMatchingOutput<GetAgencyUsersFilters> =
   z.object({

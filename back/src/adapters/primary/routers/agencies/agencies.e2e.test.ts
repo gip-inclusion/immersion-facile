@@ -14,6 +14,7 @@ import {
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
   type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -850,21 +851,20 @@ describe("Agency routes", () => {
         headers: { authorization: agencyAdminToken },
       });
 
-      const {
-        proConnect: _,
-        isBackofficeAdmin: __,
-        ...nonAdminUserWithoutProConnect
-      } = nonAdminUser;
-
       expectHttpResponseToEqual(response, {
         status: 200,
         body: [
           {
-            ...nonAdminUserWithoutProConnect,
+            id: nonAdminUser.id,
+            email: nonAdminUser.email,
+            firstName: nonAdminUser.firstName,
+            lastName: nonAdminUser.lastName,
             isProConnectUser: true,
-            agencyRights: {
+            agencyRightsByAgencyId: {
               [agency.id]: {
-                agencyId: agency.id,
+                agency: toAgencyDtoForAgencyUsersAndAdmins(agency, [
+                  agencyAdmin.email,
+                ]),
                 roles: ["validator"],
                 isNotifiedByEmail: true,
               },
@@ -885,7 +885,7 @@ describe("Agency routes", () => {
       });
     });
 
-    it("403 - non agency admin user", async () => {
+    it("403 - non agency admin user nor backofficeAdmin", async () => {
       inMemoryUow.userRepository.users = [nonAdminUser];
       inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
@@ -906,6 +906,44 @@ describe("Agency routes", () => {
         body: {
           status: 403,
           message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+        },
+      });
+    });
+
+    it("403 - agency admin of another agency", async () => {
+      const otherAgency = new AgencyDtoBuilder()
+        .withId("other-agency-id")
+        .withKind("mission-locale")
+        .build();
+
+      inMemoryUow.userRepository.users = [agencyAdmin];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {}),
+        toAgencyWithRights(otherAgency, {
+          [agencyAdmin.id]: {
+            roles: ["agency-admin"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      const agencyAdminToken = generateConnectedUserJwt({
+        userId: agencyAdmin.id,
+        version: currentJwtVersions.connectedUser,
+        iat: Date.now(),
+        exp: addDays(new Date(), 5).getTime(),
+      });
+
+      const response = await httpClient.getAgencyUsers({
+        queryParams: { agencyIds: [agency.id] },
+        headers: { authorization: agencyAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: agencyAdmin.id }).message,
         },
       });
     });

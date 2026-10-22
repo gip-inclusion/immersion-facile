@@ -1008,26 +1008,23 @@ describe("Admin router", () => {
         headers: { authorization: backOfficeAdminToken },
       });
 
-      const { validatorEmails: _, counsellorEmails: __, ...rest } = agency;
-
       expectHttpResponseToEqual(response, {
         status: 200,
         body: [
           {
-            ...agencyUser,
-            agencyRights: [
-              {
-                agency: {
-                  ...rest,
-                  admins: [agencyUser.email],
-                },
+            id: agencyUser.id,
+            email: agencyUser.email,
+            firstName: agencyUser.firstName,
+            lastName: agencyUser.lastName,
+            isProConnectUser: true,
+            agencyRightsByAgencyId: {
+              [agency.id]: {
+                agency: toAgencyDtoForAgencyUsersAndAdmins(agency, [
+                  agencyUser.email,
+                ]),
                 roles: ["agency-admin"],
                 isNotifiedByEmail: true,
               },
-            ],
-            dashboards: {
-              agencies: noAgencyDashboards,
-              establishments: noEstablishmentDashboard,
             },
           },
         ],

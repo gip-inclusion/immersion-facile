@@ -49,16 +49,9 @@ describe("UpdateUserOnAgency slice", () => {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    createdAt: user.createdAt,
-    preventToDelete: user.preventToDelete,
-    lastLoginAt: user.lastLoginAt,
     isProConnectUser: user.proConnect !== null,
-    agencyRights: {
-      [agency.id]: {
-        agencyId: agency.id,
-        roles: agencyRight.roles,
-        isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-      },
+    agencyRightsByAgencyId: {
+      [agency.id]: agencyRight,
     },
   };
 

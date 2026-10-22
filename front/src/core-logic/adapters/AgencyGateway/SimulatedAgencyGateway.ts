@@ -14,6 +14,7 @@ import {
   type ListAgencyOptionsRequestDto,
   noAgencyDashboards,
   noEstablishmentDashboard,
+  toAgencyDtoForAgencyUsersAndAdmins,
   toAgencyPublicDisplayDto,
   type UserParamsForAgency,
   type WithAgencyId,
@@ -211,25 +212,26 @@ const simulatedAgencyUsers: AgencyUserForListing[] = [
     email: "jbon8745@wanadoo.fr",
     firstName: "Jean",
     lastName: "Bon",
-    agencyRights: {
+    agencyRightsByAgencyId: {
       [MISSION_LOCAL_AGENCY_ACTIVE.id]: {
-        agencyId: MISSION_LOCAL_AGENCY_ACTIVE.id,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(
+          MISSION_LOCAL_AGENCY_ACTIVE,
+          [],
+        ),
         roles: ["to-review"],
         isNotifiedByEmail: true,
       },
       [PE_AGENCY_ACTIVE.id]: {
-        agencyId: PE_AGENCY_ACTIVE.id,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(PE_AGENCY_ACTIVE, []),
         roles: ["validator"],
         isNotifiedByEmail: true,
       },
       [CCI_ACTIVE.id]: {
-        agencyId: CCI_ACTIVE.id,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(CCI_ACTIVE, []),
         roles: ["to-review"],
         isNotifiedByEmail: true,
       },
     },
-    createdAt: new Date().toISOString(),
-    preventToDelete: false,
     isProConnectUser: true,
   },
 ];

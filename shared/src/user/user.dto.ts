@@ -14,6 +14,7 @@ import type {
 import type { AgencyRole } from "../role/role.dto";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
+import type { OmitFromExistingKeys } from "../utils";
 import type { DateTimeIsoString } from "../utils/date";
 
 export type UserId = Flavor<string, "UserId">;
@@ -64,14 +65,15 @@ export type UserWithRights = UserWithAgencyRights &
 
 export type ConnectedUser = UserWithRights & WithDashboards;
 
-export type AgencyRightForListing = Omit<AgencyRight, "agency"> & {
-  agencyId: AgencyId;
-};
-
-export type AgencyUserForListing = Omit<User, "proConnect"> & {
-  agencyRights: Record<AgencyId, AgencyRightForListing>;
+export type AgencyUserForListing = OmitFromExistingKeys<
+  User,
+  "proConnect" | "createdAt" | "lastLoginAt" | "preventToDelete"
+> & {
+  agencyRightsByAgencyId: Record<AgencyId, AgencyRight>;
   isProConnectUser: boolean;
 };
+
+export type AgencyUsersForListingById = Record<UserId, AgencyUserForListing>;
 
 export type GetAgencyUsersFilters = {
   agencyIds: AgencyId[];

@@ -1,8 +1,11 @@
 import {
   type AgencyId,
   type AgencyRole,
+  type AgencyUserForListing,
   type ConnectedUser,
   errors,
+  hasAllowedRole,
+  toAgencyRightsByAgencyId,
   type UserParamsForAgency,
 } from "shared";
 
@@ -36,9 +39,27 @@ export const hasCounsellorRoles = ({
   users,
   agencyId,
 }: {
-  users: { agencyRights: Partial<Record<AgencyId, { roles: AgencyRole[] }>> }[];
+  users: {
+    agencyRightsByAgencyId: Record<AgencyId, { roles: AgencyRole[] }>;
+  }[];
   agencyId: AgencyId;
 }): boolean =>
   users.some((user) =>
-    user.agencyRights[agencyId]?.roles.includes("counsellor"),
+    user.agencyRightsByAgencyId[agencyId]?.roles.includes("counsellor"),
   );
+
+export const toAgencyUserForListing = ({
+  proConnect,
+  dashboards: _,
+  establishments: __,
+  isBackofficeAdmin: ___,
+  createdAt: ____,
+  lastLoginAt: _____,
+  preventToDelete: ______,
+  agencyRights,
+  ...user
+}: ConnectedUser): AgencyUserForListing => ({
+  ...user,
+  isProConnectUser: proConnect !== null,
+  agencyRightsByAgencyId: toAgencyRightsByAgencyId(agencyRights),
+});

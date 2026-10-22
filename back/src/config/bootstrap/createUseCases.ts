@@ -23,7 +23,6 @@ import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases
 import { makeDeleteUser } from "../../domains/connected-users/use-cases/DeleteUser";
 import { makeGetAgencyUsers } from "../../domains/connected-users/use-cases/GetAgencyUsers";
 import { makeGetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
-import { makeGetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
 import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
 import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
@@ -756,10 +755,6 @@ export const createUseCases = ({
         dashboardGateway: gateways.dashboardGateway,
         timeGateway,
       },
-    }),
-
-    getConnectedUsers: makeGetConnectedUsers({
-      uowPerformer,
     }),
 
     getAgencyUsers: makeGetAgencyUsers({
