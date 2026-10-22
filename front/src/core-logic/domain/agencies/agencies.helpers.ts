@@ -45,7 +45,10 @@ export const hasCounsellorRoles = ({
   agencyId: AgencyId;
 }): boolean =>
   users.some((user) =>
-    user.agencyRightsByAgencyId[agencyId]?.roles.includes("counsellor"),
+    hasAllowedRole({
+      allowedRoles: ["counsellor"],
+      candidateRoles: user.agencyRightsByAgencyId[agencyId]?.roles ?? [],
+    }),
   );
 
 export const toAgencyUserForListing = ({

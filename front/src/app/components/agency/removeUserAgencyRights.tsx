@@ -7,6 +7,7 @@ import {
   type AgencyRole,
   domElementIds,
   type Email,
+  hasAllowedRole,
   type UserId,
 } from "shared";
 import { Feedback } from "../feedback/Feedback";
@@ -63,7 +64,10 @@ export const makeRemoveUserAgencyRightsButtonProps = ({
   priority: "secondary",
   disabled:
     userRightToRemove.agency.refersToAgencyId !== null &&
-    userRightToRemove.roles.includes("validator"),
+    hasAllowedRole({
+      allowedRoles: ["validator"],
+      candidateRoles: userRightToRemove.roles,
+    }),
   id: removeUserButtonId,
   onClick: () => onDeleteClicked(userRightToRemove),
   size,
@@ -124,7 +128,10 @@ const makeDescriptionFromUserRightToRemove = (
       </>
     );
 
-  return userRightToRemove.roles.includes("agency-admin") ? (
+  return hasAllowedRole({
+    allowedRoles: ["agency-admin"],
+    candidateRoles: userRightToRemove.roles,
+  }) ? (
     <>
       <p>
         Vous êtes sur le point de vous détacher de cet organisme. En tant

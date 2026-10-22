@@ -11,6 +11,7 @@ import {
   type AgencyUserForListing,
   type ConnectedUser,
   domElementIds,
+  hasAllowedRole,
 } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
@@ -183,18 +184,21 @@ const TableLine = ({
       inlineLayoutWhen={"always"}
       buttons={[
         {
-          children: agencyUser.agencyRightsByAgencyId[agency.id].roles.includes(
-            "to-review",
-          )
+          children: hasAllowedRole({
+            allowedRoles: ["to-review"],
+            candidateRoles: agencyUser.agencyRightsByAgencyId[agency.id].roles,
+          })
             ? "Valider"
             : "Modifier",
           priority: "secondary",
           className: fr.cx("fr-my-1v"),
           disabled:
             agency.refersToAgencyId !== null &&
-            agencyUser.agencyRightsByAgencyId[agency.id].roles.includes(
-              "validator",
-            ),
+            hasAllowedRole({
+              allowedRoles: ["validator"],
+              candidateRoles:
+                agencyUser.agencyRightsByAgencyId[agency.id].roles,
+            }),
           id: `${
             isLocationAdmin
               ? domElementIds.admin.agencyTab.editAgencyUserRoleButton

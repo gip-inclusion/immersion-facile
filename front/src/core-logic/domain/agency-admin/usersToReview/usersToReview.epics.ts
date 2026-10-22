@@ -1,5 +1,6 @@
 import { values } from "ramda";
 import { filter, map, switchMap } from "rxjs";
+import { hasAllowedRole } from "shared";
 import { getConnectedUserJwt } from "src/core-logic/domain/admin/admin.helpers";
 import { usersToReviewSlice } from "src/core-logic/domain/agency-admin/usersToReview/usersToReview.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -29,7 +30,10 @@ const getUsersInReviewEpic: UsersInReviewEpic = (
             usersToReview: agencyUsers.flatMap((agencyUser) =>
               values(agencyUser.agencyRightsByAgencyId)
                 .filter((agencyRight) =>
-                  agencyRight.roles.includes("to-review"),
+                  hasAllowedRole({
+                    allowedRoles: ["to-review"],
+                    candidateRoles: agencyRight.roles,
+                  }),
                 )
                 .map((agencyRight) => ({
                   id: agencyUser.id,
