@@ -32,6 +32,7 @@ import { assesmentEntityToConventionAssessmentFields } from "../../../utils/conv
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryBroadcastFeedbacksRepository } from "../../core/saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
+import { erroredBroadcastFeedbackMinSubmissionDate } from "../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { InMemoryBannedEstablishmentRepository } from "../../establishment/adapters/InMemoryBannedEstablishmentRepository";
 import type { BannedEstablishment } from "../../establishment/ports/BannedEstablishmentRepository";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
@@ -450,7 +451,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
       };
 
     const userConventions = this.conventionRepository.conventions.filter(
-      (convention) => userAgencyIds.includes(convention.agencyId),
+      (convention) =>
+        userAgencyIds.includes(convention.agencyId) &&
+        new Date(convention.dateSubmission) >=
+          erroredBroadcastFeedbackMinSubmissionDate,
     );
 
     const results: ConventionWithBroadcastFeedback[] = await Promise.all(
@@ -489,7 +493,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
           lastBroadcastFeedback: NonNullable<
             ConventionWithBroadcastFeedback["lastBroadcastFeedback"]
           >;
-        } => result.lastBroadcastFeedback !== null,
+        } =>
+          result.lastBroadcastFeedback !== null &&
+          result.lastBroadcastFeedback.subscriberErrorFeedback != null &&
+          !result.lastBroadcastFeedback.handledByAgency,
       )
       .filter((result) => {
         if (filters.broadcastErrorKind) {
@@ -511,7 +518,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           !hasPriorSuccessfulBroadcast(
             this.broadcastFeedbacksRepository.broadcastFeedbacks.filter(
               (bf) =>
-                bf.requestParams.conventionId === result.id &&
+                bf.conventionId === result.id &&
                 isBroadcastFeedbackRelevant(bf, relevantConsumerNames),
             ),
           )
@@ -536,6 +543,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
         return true;
       });
 
+    const totalRecords = filteredResults.length;
+
     return {
       data: filteredResults
         .sort(
@@ -547,12 +556,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           (pagination.page - 1) * pagination.perPage,
           pagination.page * pagination.perPage,
         ),
-      pagination: {
-        totalRecords: filteredResults.length,
-        currentPage: pagination.page,
-        totalPages: Math.ceil(filteredResults.length / pagination.perPage),
-        numberPerPage: pagination.perPage,
-      },
+      pagination: calculatePaginationResult({ ...pagination, totalRecords }),
     };
   }
 }
